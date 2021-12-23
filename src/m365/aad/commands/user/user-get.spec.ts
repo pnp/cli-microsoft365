@@ -61,8 +61,8 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using id', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/68be84bf-a585-4776-80b3-30aa5207aa21`) {
-        return Promise.resolve({ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" });
+      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter=id eq ') > -1) {
+        return Promise.resolve({ value: [{ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" }] });
       }
 
       return Promise.reject('Invalid request');
@@ -81,8 +81,8 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using id (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/68be84bf-a585-4776-80b3-30aa5207aa21`) {
-        return Promise.resolve({ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" });
+      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter=id eq ') > -1) {
+        return Promise.resolve({ value: [{ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" }] });
       }
 
       return Promise.reject('Invalid request');
@@ -101,8 +101,8 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using user name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/AarifS%40contoso.onmicrosoft.com`) {
-        return Promise.resolve({ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" });
+      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq ') > -1) {
+        return Promise.resolve({ value: [{ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" }] });
       }
 
       return Promise.reject('Invalid request');
@@ -141,8 +141,8 @@ describe(commands.USER_GET, () => {
 
   it('retrieves only the specified properties', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/AarifS%40contoso.onmicrosoft.com?$select=id,mail`) {
-        return Promise.resolve({ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "mail": null });
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'AarifS%40contoso.onmicrosoft.com'&$select=id,mail`) {
+        return Promise.resolve({ value: [{ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "mail": null }] });
       }
 
       return Promise.reject('Invalid request');
@@ -186,16 +186,86 @@ describe(commands.USER_GET, () => {
 
   it('fails to get user when user with provided email does not exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter=id eq ') > -1) {
+        return Promise.resolve({ value: [] });
+      }
+
+      return Promise.reject('The specified user with id 68be84bf-a585-4776-80b3-30aa5207aa22 does not exist');
+    });
+
+    command.action(logger, { options: { debug: false, id: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified user with id 68be84bf-a585-4776-80b3-30aa5207aa22 does not exist`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails to get user when user with provided user name does not exists', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq ') > -1) {
+        return Promise.resolve({ value: [] });
+      }
+
+      return Promise.reject('The specified user with user name AarifS@contoso.onmicrosoft.com does not exist');
+    });
+
+    command.action(logger, { options: { debug: false, userName: 'AarifS@contoso.onmicrosoft.com' } }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified user with user name AarifS@contoso.onmicrosoft.com does not exist`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails to get user when user with provided email does not exists', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter=mail eq ') > -1) {
         return Promise.resolve({ value: [] });
       }
 
-      return Promise.reject('User with email AarifS@contoso.onmicrosoft.com does not exist');
+      return Promise.reject('The specified user with email AarifS@contoso.onmicrosoft.com does not exist');
     });
 
     command.action(logger, { options: { debug: false, email: 'AarifS@contoso.onmicrosoft.com' } }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`User with email AarifS@contoso.onmicrosoft.com does not exist`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified user with email AarifS@contoso.onmicrosoft.com does not exist`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('handles error when multiple users with the specified email found', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter') > -1) {
+        return Promise.resolve({
+          value: [
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', userPrincipalName: 'AarifS@contoso.onmicrosoft.com' },
+            { id: '68be84bf-a585-4776-80b3-30aa5207aa21', userPrincipalName: 'DebraB@contoso.onmicrosoft.com' }
+          ]
+        });
+      }
+
+      return Promise.reject(`Multiple users with email AarifS@contoso.onmicrosoft.com found. Please disambiguate (user names): AarifS@contoso.onmicrosoft.com, DebraB@contoso.onmicrosoft.com or (ids): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 68be84bf-a585-4776-80b3-30aa5207aa21`);
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        email: 'AarifS@contoso.onmicrosoft.com'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(err.message, `Multiple users with email AarifS@contoso.onmicrosoft.com found. Please disambiguate (user names): AarifS@contoso.onmicrosoft.com, DebraB@contoso.onmicrosoft.com or (ids): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 68be84bf-a585-4776-80b3-30aa5207aa21`);
         done();
       }
       catch (e) {

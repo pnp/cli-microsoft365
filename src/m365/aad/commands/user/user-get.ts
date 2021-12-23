@@ -38,19 +38,17 @@ class AadUserGetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const queryParam: string = (args.options.id || args.options.userName) ? "?" : "&";
-
     const properties: string = args.options.properties ?
-      `${queryParam}$select=${args.options.properties.split(',').map(p => encodeURIComponent(p.trim())).join(',')}` :
+      `&$select=${args.options.properties.split(',').map(p => encodeURIComponent(p.trim())).join(',')}` :
       '';
 
     let requestUrl: string = `${this.resource}/v1.0/users`;
 
     if (args.options.id) {
-      requestUrl += `/${encodeURIComponent(args.options.id as string)}${properties}`;
+      requestUrl += `?$filter=id eq '${encodeURIComponent(args.options.id as string)}'${properties}`;
     }
     else if (args.options.userName) {
-      requestUrl += `/${encodeURIComponent(args.options.userName as string)}${properties}`;
+      requestUrl += `?$filter=userPrincipalName eq '${encodeURIComponent(args.options.userName as string)}'${properties}`;
     }
     else if (args.options.email) {
       requestUrl += `?$filter=mail eq '${encodeURIComponent(args.options.email as string)}'${properties}`;
@@ -65,19 +63,21 @@ class AadUserGetCommand extends GraphCommand {
     };
 
     request
-      .get(requestOptions)
-      .then((res: any): Promise<User> => {
-        if (args.options.email) {
-          if (res.value.length > 0) {
-            return Promise.resolve(res.value[0]);
-          }
-          else {
-            return Promise.reject(`User with email ${args.options.email} does not exist`);
-          }
+      .get<{ value: User[] }>(requestOptions)
+      .then((res: { value: User[] }): Promise<User> => {
+        if (res.value.length === 1) {
+          return Promise.resolve(res.value[0]);
         }
-        else {
-          return Promise.resolve(res);
+
+        const identifier = args.options.id ? `id ${args.options.id}`
+          : args.options.userName ? `user name ${args.options.userName}`
+            : `email ${args.options.email}`;
+
+        if (res.value.length === 0) {
+          return Promise.reject(`The specified user with ${identifier} does not exist`);
         }
+
+        return Promise.reject(`Multiple users with ${identifier} found. Please disambiguate (user names): ${res.value.map(a => a.userPrincipalName).join(', ')} or (ids): ${res.value.map(a => a.id).join(', ')}`);
       })
       .then((res: any): any => {
         logger.log(res);
