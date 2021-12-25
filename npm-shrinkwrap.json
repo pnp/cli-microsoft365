@@ -10,6 +10,7 @@
       "license": "MIT",
       "dependencies": {
         "@azure/msal-node": "^1.5.0",
+        "@xmldom/xmldom": "^0.7.5",
         "adaptive-expressions": "^4.15.0",
         "adaptivecards": "^2.10.0",
         "adaptivecards-templating": "^2.2.0",
@@ -31,8 +32,7 @@
         "strip-json-comments": "^3.1.1",
         "typescript": "^4.5.4",
         "update-notifier": "^5.1.0",
-        "uuid": "^8.3.2",
-        "xmldom": "^0.6.0"
+        "uuid": "^8.3.2"
       },
       "bin": {
         "m365": "dist/index.js",
@@ -53,7 +53,6 @@
         "@types/sinon": "^10.0.6",
         "@types/update-notifier": "^5.1.0",
         "@types/uuid": "^8.3.4",
-        "@types/xmldom": "^0.1.31",
         "@typescript-eslint/eslint-plugin": "^5.9.0",
         "@typescript-eslint/parser": "^5.9.0",
         "c8": "^7.11.0",
@@ -6065,14 +6064,6 @@
       "resolved": "https://registry.npmjs.org/xmlchars/-/xmlchars-2.2.0.tgz",
       "integrity": "sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw=="
     },
-    "node_modules/xmldom": {
-      "version": "0.6.0",
-      "resolved": "https://registry.npmjs.org/xmldom/-/xmldom-0.6.0.tgz",
-      "integrity": "sha512-iAcin401y58LckRZ0TkI4k0VSM1Qg0KGSc3i8rU+xrxe19A/BN1zHyVSJY7uoutVlaTSzYyk/v5AmkewAP7jtg==",
-      "engines": {
-        "node": ">=10.0.0"
-      }
-    },
     "node_modules/xpath": {
       "version": "0.0.32",
       "resolved": "https://registry.npmjs.org/xpath/-/xpath-0.0.32.tgz",
@@ -10752,11 +10743,6 @@
       "version": "2.2.0",
       "resolved": "https://registry.npmjs.org/xmlchars/-/xmlchars-2.2.0.tgz",
       "integrity": "sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw=="
-    },
-    "xmldom": {
-      "version": "0.6.0",
-      "resolved": "https://registry.npmjs.org/xmldom/-/xmldom-0.6.0.tgz",
-      "integrity": "sha512-iAcin401y58LckRZ0TkI4k0VSM1Qg0KGSc3i8rU+xrxe19A/BN1zHyVSJY7uoutVlaTSzYyk/v5AmkewAP7jtg=="
     },
     "xpath": {
       "version": "0.0.32",
