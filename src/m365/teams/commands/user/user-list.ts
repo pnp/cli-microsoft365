@@ -1,10 +1,10 @@
+import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
-import { GroupUser } from '../../../aad/commands/o365group/GroupUser';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
 
@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   teamId: string;
 }
 
-class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
+class TeamsUserListCommand extends GraphItemsListCommand<User> {
   public get name(): string {
     return commands.USER_LIST;
   }
