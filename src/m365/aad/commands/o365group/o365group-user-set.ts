@@ -64,7 +64,7 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<User> {
           logger.logToStderr('');
         }
 
-        if (this.items.filter(i => i.userPrincipalName?.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase()).length <= 0) {
+        if (this.items.filter(i => args.options.userName.toUpperCase() === i.userPrincipalName!.toUpperCase()).length <= 0) {
           const userNotInGroup = (typeof args.options.groupId !== 'undefined') ?
             'The specified user does not belong to the given Microsoft 365 Group. Please use the \'o365group user add\' command to add new users.' :
             'The specified user does not belong to the given Microsoft Teams team. Please use the \'graph teams user add\' command to add new users.';
@@ -73,7 +73,7 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<User> {
         }
 
         if (args.options.role === "Owner") {
-          const foundMember: User | undefined = this.items.find(e => e.userPrincipalName?.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase() && e.userType === 'Member');
+          const foundMember: User | undefined = this.items.find(e => args.options.userName.toUpperCase() === e.userPrincipalName!.toUpperCase() && e.userType === 'Member');
 
           if (foundMember !== undefined) {
             const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/$ref`;
@@ -98,7 +98,7 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<User> {
           }
         }
         else {
-          const foundOwner: User | undefined = this.items.find(e => e.userPrincipalName?.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase() && e.userType === 'Owner');
+          const foundOwner: User | undefined = this.items.find(e => args.options.userName.toUpperCase() === e.userPrincipalName!.toUpperCase() && e.userType === 'Owner');
 
           if (foundOwner !== undefined) {
             const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/${foundOwner.id}/$ref`;
