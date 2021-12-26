@@ -6,7 +6,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
-import { Group } from './Group';
+import { GroupExtended } from './GroupExtended';
 
 interface CommandArgs {
   options: Options;
@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
   orphaned?: boolean;
 }
 
-class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
+class AadO365GroupListCommand extends GraphItemsListCommand<GroupExtended> {
   public get name(): string {
     return commands.O365GROUP_LIST;
   }
@@ -60,7 +60,7 @@ class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
       .getAllItems(endpoint, logger, true)
       .then((): Promise<any> => {
         if (args.options.orphaned) {
-          const orphanedGroups: Group[] = [];
+          const orphanedGroups: GroupExtended[] = [];
 
           this.items.forEach((group) => {
             if (!group.owners || group.owners.length === 0) {
@@ -72,7 +72,7 @@ class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
         }
 
         if (args.options.includeSiteUrl) {
-          return Promise.all(this.items.map(g => this.getGroupSiteUrl(g.id)));
+          return Promise.all(this.items.map(g => this.getGroupSiteUrl(g.id as string)));
         }
         else {
           return Promise.resolve();

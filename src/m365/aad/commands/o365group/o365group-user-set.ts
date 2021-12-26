@@ -1,3 +1,4 @@
+import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -8,7 +9,6 @@ import Utils from '../../../../Utils';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import teamsCommands from '../../../teams/commands';
 import commands from '../../commands';
-import { GroupUser } from './GroupUser';
 
 interface CommandArgs {
   options: Options;
@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   userName: string;
 }
 
-class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
+class AadO365GroupUserSetCommand extends GraphItemsListCommand<User> {
   public get name(): string {
     return commands.O365GROUP_USER_SET;
   }
@@ -64,7 +64,7 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
           logger.logToStderr('');
         }
 
-        if (this.items.filter(i => i.userPrincipalName.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase()).length <= 0) {
+        if (this.items.filter(i => args.options.userName.toUpperCase() === i.userPrincipalName!.toUpperCase()).length <= 0) {
           const userNotInGroup = (typeof args.options.groupId !== 'undefined') ?
             'The specified user does not belong to the given Microsoft 365 Group. Please use the \'o365group user add\' command to add new users.' :
             'The specified user does not belong to the given Microsoft Teams team. Please use the \'graph teams user add\' command to add new users.';
@@ -73,7 +73,7 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
         }
 
         if (args.options.role === "Owner") {
-          const foundMember: GroupUser | undefined = this.items.find(e => e.userPrincipalName.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase() && e.userType === 'Member');
+          const foundMember: User | undefined = this.items.find(e => args.options.userName.toUpperCase() === e.userPrincipalName!.toUpperCase() && e.userType === 'Member');
 
           if (foundMember !== undefined) {
             const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/$ref`;
@@ -98,7 +98,7 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
           }
         }
         else {
-          const foundOwner: GroupUser | undefined = this.items.find(e => e.userPrincipalName.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase() && e.userType === 'Owner');
+          const foundOwner: User | undefined = this.items.find(e => args.options.userName.toUpperCase() === e.userPrincipalName!.toUpperCase() && e.userType === 'Owner');
 
           if (foundOwner !== undefined) {
             const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/${foundOwner.id}/$ref`;

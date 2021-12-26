@@ -1,3 +1,4 @@
+import { DirectoryObject } from '@microsoft/microsoft-graph-types';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -6,7 +7,6 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
-import { Group } from './Group';
 
 interface CommandArgs {
   options: Options;
@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class AadO365GroupRecycleBinItemClearCommand extends GraphItemsListCommand<Group> {
+class AadO365GroupRecycleBinItemClearCommand extends GraphItemsListCommand<DirectoryObject> {
   public get name(): string {
     return commands.O365GROUP_RECYCLEBINITEM_CLEAR;
   }

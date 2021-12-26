@@ -7,7 +7,7 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { Group } from './Group';
+import { GroupExtended } from './GroupExtended';
 
 interface CommandArgs {
   options: Options;
@@ -28,7 +28,7 @@ class AadO365GroupGetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let group: Group;
+    let group: GroupExtended;
 
     const requestOptions: any = {
       url: `${this.resource}/v1.0/groups/${args.options.id}`,
@@ -39,8 +39,8 @@ class AadO365GroupGetCommand extends GraphCommand {
     };
 
     request
-      .get<Group>(requestOptions)
-      .then((res: Group): Promise<{ webUrl: string }> => {
+      .get<GroupExtended>(requestOptions)
+      .then((res: GroupExtended): Promise<{ webUrl: string }> => {
         group = res;
 
         if (args.options.includeSiteUrl) {
