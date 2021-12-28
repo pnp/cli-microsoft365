@@ -17,6 +17,10 @@
 
 - [search externalconnection add](../cmd/search/externalconnection/externalconnection-add.md) - adds a new external connection to be defined for Microsoft Search [#2662](https://github.com/pnp/cli-microsoft365/issues/2662)
 
+**Planner:**
+
+- [planner task add](../cmd/planner/task/task-add.md) - adds a new Microsoft Planner task [#2255](https://github.com/pnp/cli-microsoft365/issues/2255)
+
 **SharePoint:**
 
 - [spo web installedlanguage list](../cmd/spo/web/web-installedlanguage-list.md) - lists all installed languages on site [#2833](https://github.com/pnp/cli-microsoft365/issues/2833)
@@ -33,6 +37,9 @@
 - extended 'pa app list' with environment [#2872](https://github.com/pnp/cli-microsoft365/issues/2872)
 - updated social links in the docs [#2885](https://github.com/pnp/cli-microsoft365/issues/2885)
 - added csv output mode [#2836](https://github.com/pnp/cli-microsoft365/issues/2836)
+- changed handling non-existent sites in 'spo site ensure' [#2861](https://github.com/pnp/cli-microsoft365/issues/2861)
+- updated 'cli doctor' tests to not depend on empty config [#2870](https://github.com/pnp/cli-microsoft365/issues/2870)
+- extended 'aad user get' with email [#2856](https://github.com/pnp/cli-microsoft365/issues/2856)
 
 ## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
 
