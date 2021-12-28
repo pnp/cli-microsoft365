@@ -4,7 +4,6 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { RecycleBinItemPropertiesCollection } from './SiteProperties';
 
 interface CommandArgs {
   options: Options;
@@ -51,8 +50,8 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
     };
 
     request
-      .get<RecycleBinItemPropertiesCollection>(requestOptions)
-      .then((recycleBinItemProperties: RecycleBinItemPropertiesCollection): void => {
+      .get<any>(requestOptions)
+      .then((recycleBinItemProperties: any): void => {
         logger.log(recycleBinItemProperties.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
