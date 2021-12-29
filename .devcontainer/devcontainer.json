@@ -2,7 +2,15 @@
   "name": "CLI for Microsoft 365",
   "dockerFile": "Dockerfile",
   "settings": {
-    "terminal.integrated.shell.linux": "/bin/zsh"
+    "terminal.integrated.profiles.linux": {
+        "zsh": {
+          "path": "/bin/zsh",
+          "args": [
+            "-l"
+          ]
+        }
+      },
+      "terminal.integrated.defaultProfile.linux": "zsh"
   },
   "postCreateCommand": "npm i && npm run clean && npm run build && npm link",
   "extensions": [
