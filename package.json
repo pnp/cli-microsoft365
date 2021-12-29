@@ -171,6 +171,7 @@
   ],
   "dependencies": {
     "@azure/msal-node": "^1.4.0",
+    "@xmldom/xmldom": "^0.7.5",
     "adaptive-expressions": "^4.15.0",
     "adaptivecards": "^2.10.0",
     "adaptivecards-templating": "^2.2.0",
@@ -192,8 +193,7 @@
     "strip-json-comments": "^3.1.1",
     "typescript": "^4.5.3",
     "update-notifier": "^5.1.0",
-    "uuid": "^8.3.2",
-    "@xmldom/xmldom": "^0.8.0"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@microsoft/microsoft-graph-types": "^2.10.0",
