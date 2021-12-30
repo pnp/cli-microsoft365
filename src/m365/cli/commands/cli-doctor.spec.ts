@@ -20,6 +20,7 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    sinon.stub(Cli.getInstance().config, 'all').value({});
   });
 
   beforeEach(() => {
@@ -50,7 +51,8 @@ describe(commands.DOCTOR, () => {
   after(() => {
     Utils.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      Cli.getInstance().config.all
     ]);
     auth.service.connected = false;
   });
@@ -592,6 +594,7 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service, 'tenant').value('common');
     sinon.stub(auth.service, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    Utils.restore(Cli.getInstance().config.all);
     sinon.stub(Cli.getInstance().config, 'all').value({ "showHelpOnFailure": false });
 
     command.action(logger, { options: {} }, () => {

@@ -631,7 +631,7 @@ describe('Cli', () => {
       .then((output: CommandOutput) => {
         try {
           assert.strictEqual(output.stdout, 'Raw output');
-          assert.strictEqual(output.stderr, 'Debug output');
+          assert.strictEqual(output.stderr, ['Executing command cli mock output with options {"options":{"_":[],"debug":true,"output":"text"}}', 'Debug output'].join(os.EOL));
           done();
         }
         catch (e) {
@@ -649,20 +649,6 @@ describe('Cli', () => {
       .then(_ => {
         try {
           assert(promptStub.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
-  });
-
-  it('logs command name when executing command with output in debug mode', (done) => {
-    Cli
-      .executeCommandWithOutput(mockCommand, { options: { debug: true, _: [] } })
-      .then(_ => {
-        try {
-          assert(cliLogStub.calledWith('Executing command cli mock with options {"options":{"debug":true,"_":[]}}'));
           done();
         }
         catch (e) {
@@ -839,6 +825,45 @@ describe('Cli', () => {
       '}'
     ].join('\n');
     const actual = (Cli as any).formatOutput(input, { output: 'json' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('formats object with array as csv', (done) => {
+    const input = 
+    [{
+      "header1": "value1item1",
+      "header2": "value2item1"
+    },
+    {
+      "header1": "value1item2",
+      "header2": "value2item2"
+    }
+    ];
+    const expected = "header1,header2\nvalue1item1,value2item1\nvalue1item2,value2item2\n";
+    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('formats a simple object as csv', (done) => {
+    const input = 
+    {
+      "header1": "value1item1",
+      "header2": "value2item1"
+    };
+    const expected = "header1,header2\nvalue1item1,value2item1\n";
+    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
     try {
       assert.strictEqual(actual, expected);
       done();
