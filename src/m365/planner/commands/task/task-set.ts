@@ -5,7 +5,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { PlannerAssignment, PlannerTask, User } from '@microsoft/microsoft-graph-types';
+import { Group, PlannerAssignment, PlannerBucket, PlannerPlan, PlannerTask, User } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
@@ -14,6 +14,10 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id: string;
   title?: string;
+  planId?: string;
+  planName?: string;
+  ownerGroupId?: string;
+  ownerGroupName?: string;
   bucketId?: string;
   bucketName?: string;
   startDateTime?: string;
@@ -41,6 +45,10 @@ class PlannerTaskSetCommand extends GraphCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.title = typeof args.options.title !== 'undefined';
+    telemetryProps.planId = typeof args.options.planId !== 'undefined';
+    telemetryProps.planName = typeof args.options.planName !== 'undefined';
+    telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
+    telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
     telemetryProps.bucketId = typeof args.options.bucketId !== 'undefined';
     telemetryProps.bucketName = typeof args.options.bucketName !== 'undefined';
     telemetryProps.startDateTime = typeof args.options.startDateTime !== 'undefined';
@@ -57,16 +65,22 @@ class PlannerTaskSetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let assignments: { [userId: string]: PlannerAssignment; } = {};
+    let assignments: { [userId: string]: { [property: string]: string }; } = {};
 
-    this.generateUserAssignments(args)
-      .then(genAssignments => {
-        assignments = genAssignments;
+
+    this.getBucketId(args.options)
+      .then(bucketId => {
+        args.options.bucketId = bucketId;
+
+        return this.generateUserAssignments(args.options);
+      })
+      .then(resultAssignments => {
+        assignments = resultAssignments;
 
         return this.getTaskEtag(args.options.id);
       })
       .then(etag => {
-        const genAppliedcategories = this.generateAppliedCategories(args);
+        const genAppliedcategories = this.generateAppliedCategories(args.options);
         const data = this.mapRequestBody(args.options, assignments, genAppliedcategories);
 
         const requestOptions: any = {
@@ -79,8 +93,6 @@ class PlannerTaskSetCommand extends GraphCommand {
           responseType: 'json',
           data: data
         };
-
-        logger.log(requestOptions);
 
         return request.patch(requestOptions) as PlannerTask;
       })
@@ -112,11 +124,11 @@ class PlannerTaskSetCommand extends GraphCommand {
       });
   }
 
-  private generateAppliedCategories(args: CommandArgs): { [category: string]: boolean } {
+  private generateAppliedCategories(options: Options): { [category: string]: boolean } {
     const categories: { [category: string]: boolean } = {};
 
-    if (args.options.assignedToUserIds) {
-      args.options.assignedToUserIds.split(',').map(x => categories[x] = true);
+    if (options.assignedToUserIds) {
+      options.assignedToUserIds.split(',').map(x => categories[x] = true);
 
       return categories;
     } 
@@ -125,33 +137,33 @@ class PlannerTaskSetCommand extends GraphCommand {
     }
   }
 
-  private generateUserAssignments(args: CommandArgs): Promise<{ [userId: string]: PlannerAssignment; }> {
-    const assignments: { [userId: string]: PlannerAssignment; } = {};
+  private generateUserAssignments(options: Options): Promise<{ [userId: string]: { [property: string]: string }; }> {
+    const assignments: { [userId: string]: { [property: string]: string } } = {};
 
-    if (args.options.assignedToUserNames) {
-      return this.getUserIds(args.options.assignedToUserNames)
+    if (options.assignedToUserNames || options.assignedToUserIds) {
+      return this.getUserIds(options)
         .then((userIds) => {
           userIds.map(x => assignments[x] = {
+            "@odata.type": "#microsoft.graph.plannerAssignment",
             orderHint: " !"
           });
 
           return Promise.resolve(assignments);
         });
     }
-    else if (args.options.assignedToUserIds) {
-      args.options.assignedToUserIds.split(',').map(x => assignments[x] = {
-        orderHint: " !"
-      });
-
-      return Promise.resolve(assignments);
-    } 
     else {
       return Promise.resolve(assignments);
     }
   }
 
-  private getUserIds(users: string): Promise<string[]> {
-    const userArr: string[] = users.split(',').map(o => o.trim());
+  private getUserIds(options: Options): Promise<string[]> {
+    if (options.assignedToUserIds) {
+      return Promise.resolve(options.assignedToUserIds.split(','));
+    }
+
+    // Hitting this section means assignedToUserNames won't be undefined
+    const userNames = options.assignedToUserNames as string;
+    const userArr: string[] = userNames.split(',').map(o => o.trim());
     let userIds: string[] = [];
 
     const promises: Promise<{ value: User[] }>[] = userArr.map(user => {
@@ -176,10 +188,95 @@ class PlannerTaskSetCommand extends GraphCommand {
       const invalidUsers = userArr.filter(user => !userUpns.some((upn) => upn?.toLowerCase() === user.toLowerCase()));
 
       if (invalidUsers && invalidUsers.length > 0) {
-        return Promise.reject(`Cannot proceed with planner task update. The following users provided are invalid : ${invalidUsers.join(',')}`);
+        return Promise.reject(`Cannot proceed with planner task creation. The following users provided are invalid : ${invalidUsers.join(',')}`);
       }
       return Promise.resolve(userIds);
     });
+  }
+
+  private getBucketId(options: Options): Promise<string | undefined> {
+    if (options.bucketId) {
+      return Promise.resolve(options.bucketId);
+    }
+
+    if (!options.bucketName) {
+      return Promise.resolve(undefined);
+    }
+
+    return this.getPlanId(options)
+      .then(planId => {
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/planner/plans/${planId}/buckets`,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          responseType: 'json'
+        };
+
+        return request.get<{ value: PlannerBucket[] }>(requestOptions);
+      })
+      .then((response) => {
+        const bucket: PlannerBucket | undefined = response.value.find(val => val.name === options.bucketName);
+
+        if (!bucket) {
+          return Promise.reject(`The specified bucket does not exist`);
+        }
+
+        return Promise.resolve(bucket.id as string);
+      });
+  }
+
+  private getPlanId(options: Options): Promise<string> {
+    if (options.planId) {
+      return Promise.resolve(options.planId);
+    }
+
+    return this.getGroupId(options)
+      .then((groupId: string) => {
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/planner/plans?$filter=(owner eq '${groupId}')`,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          responseType: 'json'
+        };
+
+        return request.get<{ value: PlannerPlan[] }>(requestOptions);
+      }).then((response) => {
+        const plan: PlannerPlan | undefined = response.value.find(val => val.title === options.planName);
+
+        if (!plan) {
+          return Promise.reject(`The specified plan does not exist`);
+        }
+
+        return Promise.resolve(plan.id as string);
+      });
+  }
+
+  private getGroupId(options: Options): Promise<string> {
+    if (options.ownerGroupId) {
+      return Promise.resolve(options.ownerGroupId);
+    }
+
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(options.ownerGroupName as string)}'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    return request
+      .get<{ value: Group[] }>(requestOptions)
+      .then(response => {
+        const group: Group | undefined = response.value[0];
+
+        if (!group) {
+          return Promise.reject(`The specified owner group does not exist`);
+        }
+
+        return Promise.resolve(group.id as string);
+      });
   }
 
   private mapRequestBody(options: Options, assignments: { [userId: string]: PlannerAssignment }, appliedcategories: { [category: string]: boolean }): any {
@@ -227,6 +324,18 @@ class PlannerTaskSetCommand extends GraphCommand {
         option: "-t, --title [title]"
       },
       {
+        option: "--planId [planId]"
+      },
+      {
+        option: "--planName [planName]"
+      },
+      {
+        option: "--ownerGroupId [ownerGroupId]"
+      },
+      {
+        option: "--ownerGroupName [ownerGroupName]"
+      },
+      {
         option: "--bucketId [bucketId]"
       },
       {
@@ -271,6 +380,26 @@ class PlannerTaskSetCommand extends GraphCommand {
   public validate(args: CommandArgs): boolean | string {    
     if (args.options.bucketId && args.options.bucketName) {
       return 'Specify either bucketId or bucketName but not both';
+    }
+
+    if (args.options.bucketName && !args.options.planId && !args.options.planName) {
+      return 'Specify either planId or planName when using bucketName';
+    }
+
+    if (args.options.bucketName && args.options.planId && args.options.planName) {
+      return 'Specify either planId or planName when using bucketName but not both';
+    }
+
+    if (args.options.planName && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planName';
+    }
+
+    if (args.options.planName && args.options.ownerGroupId && args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
+    }
+
+    if (args.options.ownerGroupId && !Utils.isValidGuid(args.options.ownerGroupId as string)) {
+      return `${args.options.ownerGroupId} is not a valid GUID`;
     }
 
     if (args.options.startDateTime && !Utils.isValidISODateTime(args.options.startDateTime)) {
