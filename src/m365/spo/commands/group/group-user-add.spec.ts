@@ -105,6 +105,7 @@ describe(commands.GROUP_USER_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
+      request.get,
       request.post,
       Cli.executeCommandWithOutput
     ]);
@@ -126,11 +127,74 @@ describe(commands.GROUP_USER_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation if both groupId and groupName options are passed', (done) => {
+    const actual = command.validate({
+      options: {
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        groupId: 32,
+        groupName: "Contoso Site Owners",
+        userName: "Alex.Wilber@contoso.com"
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if both groupId and groupName options are not passed', (done) => {
+    const actual = command.validate({
+      options: {
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        userName: "Alex.Wilber@contoso.com"
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if both userName and email options are passed', (done) => {
+    const actual = command.validate({
+      options: {
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        groupId: 32,
+        email: "Alex.Wilber@contoso.com",
+        userName: "Alex.Wilber@contoso.com"
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if both userName and email options are not passed', (done) => {
+    const actual = command.validate({
+      options: {
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        groupId: 32
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if webURL is Invalid', () => {
+    const actual = command.validate({ options: { webUrl: "InvalidWEBURL", groupId: 32, userName: "Alex.Wilber@contoso.com" } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if groupID is Invalid', () => {
+    const actual = command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "NOGROUP", userName: "Alex.Wilber@contoso.com" } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if all the required options are specified', () => {
+    const actual = command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, userName: "Alex.Wilber@contoso.com" } });
+    assert.strictEqual(actual, true);
+  });
+
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['DisplayName', 'Email']);
   });
 
-  it('Adding user to a SharePoint Group', (done) => {
+  it('Adding user to a SharePoint Group by groupId and userName', (done) => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify(userInformation),
       stderr: ''
@@ -162,11 +226,20 @@ describe(commands.GROUP_USER_ADD, () => {
     });
   });
 
-  it('Adding user to a SharePoint Group (DEBUG)', (done) => {
+  it('Adding user to a SharePoint Group by groupName and email (DEBUG)', (done) => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify(userInformation),
       stderr: ''
     }));
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetByName(`) > -1) {
+        return Promise.resolve({
+          Id: 7
+        });
+      }
+      return Promise.reject('Invalid Request');
+    });
 
     sinon.stub(request, 'post').callsFake(opts => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/SiteA/_api/SP.Web.ShareObject' &&
@@ -180,12 +253,38 @@ describe(commands.GROUP_USER_ADD, () => {
       options: {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
-        groupId: 32,
-        userName: "Alex.Wilber@contoso.com"
+        groupName: "Contoso Site Owners",
+        email: "Alex.Wilber@contoso.com"
       }
     }, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails to get group when does not exists', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetByName('`) > -1) {
+        return Promise.resolve({});
+      }
+      return Promise.reject('The specified group not exist in the SharePoint site');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: "https://contoso.sharepoint.com/sites/SiteA",
+        groupName: "Contoso Site Owners",
+        email: "Alex.Wilber@contoso.com"
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified group not exist in the SharePoint site`)));
         done();
       }
       catch (e) {
@@ -257,21 +356,6 @@ describe(commands.GROUP_USER_ADD, () => {
         done(e);
       }
     });
-  });
-
-  it('fails validation if webURL is Invalid', () => {
-    const actual = command.validate({ options: { webUrl: "InvalidWEBURL", groupId: 32, userName: "Alex.Wilber@contoso.com" } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if groupID is Invalid', () => {
-    const actual = command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "NOGROUP", userName: "Alex.Wilber@contoso.com" } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if all the required options are specified', () => {
-    const actual = command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, userName: "Alex.Wilber@contoso.com" } });
-    assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
