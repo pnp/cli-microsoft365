@@ -40,6 +40,8 @@
 - changed handling non-existent sites in 'spo site ensure' [#2861](https://github.com/pnp/cli-microsoft365/issues/2861)
 - updated 'cli doctor' tests to not depend on empty config [#2870](https://github.com/pnp/cli-microsoft365/issues/2870)
 - extended 'aad user get' with email [#2856](https://github.com/pnp/cli-microsoft365/issues/2856)
+- updated 'teams message get' command to Graph v1.0 API [#2678](https://github.com/pnp/cli-microsoft365/issues/2678)
+- replaced custom group and user types with MS Graph types [#2436](https://github.com/pnp/cli-microsoft365/issues/2436)
 
 ## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
 
