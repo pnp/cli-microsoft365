@@ -18,29 +18,36 @@ class AadGroupListCommand extends GraphItemsListCommand<Group>   {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['id', 'displayName', 'groupTypes'];
+    return ['id', 'displayName', 'groupType'];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getAllItems(`${this.resource}/v1.0/groups`, logger, true)
       .then((): void => {
-        this.items.forEach(group => {
-          if (group.groupTypes && group.groupTypes.length > 0 && group.groupTypes[0] === "Unified") {
-            group.groupTypes = ["Microsoft 365"];
-          }
-          else if (group.mailEnabled && group.securityEnabled) {
-            group.groupTypes = ["Mail enabled security"];
-          }
-          else if (group.securityEnabled) {
-            group.groupTypes = ["Security"];
-          }
-          else if (group.mailEnabled) {
-            group.groupTypes = ["Distribution"];
-          }
-        });
+        if (args.options.output === 'text') {
+          const allGroups: any = [];
 
-        logger.log(this.items);
+          this.items.forEach(group => {
+            if (group.groupTypes && group.groupTypes.length > 0 && group.groupTypes[0] === "Unified") {
+              allGroups.push({id: group.id, displayName: group.displayName, groupType: "Microsoft 365"});
+            }
+            else if (group.mailEnabled && group.securityEnabled) {
+              allGroups.push({id: group.id, displayName: group.displayName, groupType: "Mail enabled security"});
+            }
+            else if (group.securityEnabled) {
+              allGroups.push({id: group.id, displayName: group.displayName, groupType: "Security"});
+            }
+            else if (group.mailEnabled) {
+              allGroups.push({id: group.id, displayName: group.displayName, groupType: "Distribution"});
+            }
+          });
+
+          logger.log(allGroups);
+        }
+        else {
+          logger.log(this.items);
+        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
