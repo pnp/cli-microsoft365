@@ -26,28 +26,23 @@ class AadGroupListCommand extends GraphItemsListCommand<Group>   {
       .getAllItems(`${this.resource}/v1.0/groups`, logger, true)
       .then((): void => {
         if (args.options.output === 'text') {
-          const allGroups: any = [];
-
-          this.items.forEach(group => {
+          this.items.forEach((group: any) => {
             if (group.groupTypes && group.groupTypes.length > 0 && group.groupTypes[0] === "Unified") {
-              allGroups.push({id: group.id, displayName: group.displayName, groupType: "Microsoft 365"});
+              group.groupType = "Microsoft 365";
             }
             else if (group.mailEnabled && group.securityEnabled) {
-              allGroups.push({id: group.id, displayName: group.displayName, groupType: "Mail enabled security"});
+              group.groupType = "Mail enabled security";
             }
             else if (group.securityEnabled) {
-              allGroups.push({id: group.id, displayName: group.displayName, groupType: "Security"});
+              group.groupType = "Security";
             }
             else if (group.mailEnabled) {
-              allGroups.push({id: group.id, displayName: group.displayName, groupType: "Distribution"});
+              group.groupType = "Distribution";
             }
           });
+        }
 
-          logger.log(allGroups);
-        }
-        else {
-          logger.log(this.items);
-        }
+        logger.log(this.items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
