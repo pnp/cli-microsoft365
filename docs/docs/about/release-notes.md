@@ -42,6 +42,7 @@
 - extended 'aad user get' with email [#2856](https://github.com/pnp/cli-microsoft365/issues/2856)
 - updated 'teams message get' command to Graph v1.0 API [#2678](https://github.com/pnp/cli-microsoft365/issues/2678)
 - replaced custom group and user types with MS Graph types [#2436](https://github.com/pnp/cli-microsoft365/issues/2436)
+- updated default terminal profile in devcontainer [#2664](https://github.com/pnp/cli-microsoft365/issues/2664)
 
 ## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
 
