@@ -25,7 +25,7 @@ class TeamsChatMemberListCommand extends GraphItemsListCommand<any> {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['userId', 'displayName', 'tenantId'];
+    return ['userId', 'displayName', 'email'];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -34,7 +34,6 @@ class TeamsChatMemberListCommand extends GraphItemsListCommand<any> {
     this
       .getAllItems(endpoint, logger, true)
       .then((): void => {
-        
         logger.log(this.items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));

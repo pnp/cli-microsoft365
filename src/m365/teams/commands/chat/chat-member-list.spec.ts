@@ -59,7 +59,7 @@ describe(commands.CHAT_MEMBER_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['userId', 'displayName', 'tenantId']);
+    assert.deepStrictEqual(command.defaultProperties(), ['userId', 'displayName', 'email']);
   });
 
   it('fails validation if chatId is not specified', () => {
