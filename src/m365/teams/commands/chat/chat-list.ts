@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  chatId: string;
+  type: string;
 }
 
 class TeamsChatListCommand extends GraphItemsListCommand<any> {
@@ -28,20 +28,35 @@ class TeamsChatListCommand extends GraphItemsListCommand<any> {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const endpoint: string = `${this.resource}/v1.0/chats`;
+    const filter = args.options.type !== undefined ? `?$filter=chatType eq '${args.options.type}'` : '';
+    const endpoint: string = `${this.resource}/v1.0/chats${filter}`;
 
     this
       .getAllItems(endpoint, logger, true)
       .then((): void => {
         logger.log(this.items);
-        
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {    
+    const options: CommandOption[] = [
+      {
+        option: '-t, --type [chatType]'
+      }
+    ];
+
     const parentOptions: CommandOption[] = super.options();
-    return parentOptions;
+    return options.concat(parentOptions);
+  }
+
+  
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.type !== undefined && args.options.type !== "oneOnOne" && args.options.type !== "group" && args.options.type !== "meeting") {
+      return `${args.options.type} is not a valid chatType. Accepted values are 'oneOnOne', 'group' or 'meeting'`;
+    }
+
+    return true;
   }
 }
 
