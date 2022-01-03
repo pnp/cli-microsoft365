@@ -105,27 +105,6 @@ describe(commands.USER_HIBP, () => {
     });
   });
 
-  it('checks user is pwned using userName (verbose)', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent('account-exists@hibp-integration-tests.com')}`) {
-        // this is the actual truncated response as the API would return
-        return Promise.resolve([{ "Name": "Adobe" }]);
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { verbose: true, userName: 'account-exists@hibp-integration-tests.com', apiKey: '2975xc539c304xf797f665x43f8x557x' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{ "Name": "Adobe" }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('checks user is pwned using userName and multiple breaches', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent('account-exists@hibp-integration-tests.com')}`) {
@@ -214,7 +193,7 @@ describe(commands.USER_HIBP, () => {
     });
   });
 
-  it('correctly handles no pwnage found', (done) => {
+  it('correctly handles no pwnage found (debug)', (done) => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "response": {
@@ -224,6 +203,26 @@ describe(commands.USER_HIBP, () => {
     });
 
     command.action(logger, { options: { debug: true, userName: 'account-notexists@hibp-integration-tests.com', apiKey: "2975xc539c304xf797f665x43f8x557x" } }, () => {
+      try {
+        assert(loggerLogSpy.calledWith("No pwnage found"));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles no pwnage found (verbose)', (done) => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.reject({
+        "response": {
+          "status": 404
+        }
+      });
+    });
+
+    command.action(logger, { options: { verbose: true, userName: 'account-notexists@hibp-integration-tests.com', apiKey: "2975xc539c304xf797f665x43f8x557x" } }, () => {
       try {
         assert(loggerLogSpy.calledWith("No pwnage found"));
         done();
