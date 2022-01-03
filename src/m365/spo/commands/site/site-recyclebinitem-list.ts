@@ -11,7 +11,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   siteUrl: string;
-  type?: number;
+  type?: string;
   secondary?: boolean;
 }
 
@@ -38,7 +38,10 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
     let requestUrl: string = `${args.options.siteUrl}/_api/site/RecycleBin?$filter=(ItemState eq ${state})`;
 
     if (typeof args.options.type !== 'undefined') {
-      requestUrl += ` and (ItemType eq ${args.options.type})`;
+      const type = SpoSiteRecycleBinItemListCommand.recycleBinItemType.find(item => item.value === args.options.type);
+      if (typeof type !== 'undefined') {
+        requestUrl += ` and (ItemType eq ${type.id})`;
+      }
     }
 
     const requestOptions: any = {
@@ -51,8 +54,8 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
 
     request
       .get<any>(requestOptions)
-      .then((recycleBinItemProperties: any): void => {
-        logger.log(recycleBinItemProperties.value);
+      .then((value: any[] ): void => {
+        logger.log(value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -63,7 +66,8 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
         option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '-t, --type [type]'
+        option: '-t, --type [type]',
+        autocomplete: SpoSiteRecycleBinItemListCommand.recycleBinItemType.map(item => item.value)
       },
       {
         option: '-s, --secondary'
@@ -80,12 +84,18 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
       return isValidSharePointUrl;
     }
 
-    if (typeof args.options.type !== 'undefined' && [1, 3, 5].indexOf(args.options.type) < 0) {
-      return `${args.options.type} is not a valid value. Allowed values are 1|3|5`;
+    if (typeof args.options.type !== 'undefined' && !SpoSiteRecycleBinItemListCommand.recycleBinItemType.some(item => item.value === args.options.type)) {
+      return `${args.options.type} is not a valid value. Allowed values are ${SpoSiteRecycleBinItemListCommand.recycleBinItemType.map(item => item.value).join(', ')}`;
     }
 
     return true;
   }
+
+  private static recycleBinItemType: { id: number, value: string }[] = [
+    { id: 1, value: 'listItems' },
+    { id: 3, value: 'folders' },
+    { id: 5, value: 'files' }
+  ];
 }
 
 module.exports = new SpoSiteRecycleBinItemListCommand();

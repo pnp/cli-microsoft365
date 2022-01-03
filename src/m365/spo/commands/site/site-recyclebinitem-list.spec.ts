@@ -85,12 +85,12 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
   });
 
   it('fails validation if type is not an allowed value', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', type: 2 } });
+    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', type: 'something' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if type is an allowed value', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', type: 3 } });
+    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', type: 'listItems' } });
     assert(actual);
   });
 
@@ -160,27 +160,31 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith([{
-          "AuthorEmail": "test.onmicrosoft.com",
-          "AuthorName": "test test",
-          "DeletedByEmail": "test.onmicrosoft.com",
-          "DeletedByName": "test test",
-          "DeletedDate": "2021-11-20T20:48:16Z",
-          "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
-          "DirName": "sites/test/Shared Documents",
-          "DirNamePath": {
-            "DecodedUrl": "sites/test/Shared Documents"
-          },
-          "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
-          "ItemState": 1,
-          "ItemType": 1,
-          "LeafName": "Document.docx",
-          "LeafNamePath": {
-            "DecodedUrl": "Document.docx"
-          },
-          "Size": "41939",
-          "Title": "Document.docx"
-        }]));
+        assert(loggerLogSpy.calledWith(
+          {
+            "value": [{
+              "AuthorEmail": "test.onmicrosoft.com",
+              "AuthorName": "test test",
+              "DeletedByEmail": "test.onmicrosoft.com",
+              "DeletedByName": "test test",
+              "DeletedDate": "2021-11-20T20:48:16Z",
+              "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
+              "DirName": "sites/test/Shared Documents",
+              "DirNamePath": {
+                "DecodedUrl": "sites/test/Shared Documents"
+              },
+              "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
+              "ItemState": 1,
+              "ItemType": 1,
+              "LeafName": "Document.docx",
+              "LeafNamePath": {
+                "DecodedUrl": "Document.docx"
+              },
+              "Size": "41939",
+              "Title": "Document.docx"
+            }]
+          }
+        ));
         done();
       }
       catch (e) {
@@ -224,33 +228,37 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
     command.action(logger, {
       options: {
         output: 'json',
-        secondary: 2,
+        secondary: true,
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith([{
-          "AuthorEmail": "test.onmicrosoft.com",
-          "AuthorName": "test test",
-          "DeletedByEmail": "test.onmicrosoft.com",
-          "DeletedByName": "test test",
-          "DeletedDate": "2021-11-20T20:48:16Z",
-          "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
-          "DirName": "sites/test/Shared Documents",
-          "DirNamePath": {
-            "DecodedUrl": "sites/test/Shared Documents"
-          },
-          "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
-          "ItemState": 2,
-          "ItemType": 1,
-          "LeafName": "Document.docx",
-          "LeafNamePath": {
-            "DecodedUrl": "Document.docx"
-          },
-          "Size": "41939",
-          "Title": "Document.docx"
-        }]));
+        assert(loggerLogSpy.calledWith(
+          {
+            "value": [{
+              "AuthorEmail": "test.onmicrosoft.com",
+              "AuthorName": "test test",
+              "DeletedByEmail": "test.onmicrosoft.com",
+              "DeletedByName": "test test",
+              "DeletedDate": "2021-11-20T20:48:16Z",
+              "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
+              "DirName": "sites/test/Shared Documents",
+              "DirNamePath": {
+                "DecodedUrl": "sites/test/Shared Documents"
+              },
+              "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
+              "ItemState": 2,
+              "ItemType": 1,
+              "LeafName": "Document.docx",
+              "LeafNamePath": {
+                "DecodedUrl": "Document.docx"
+              },
+              "Size": "41939",
+              "Title": "Document.docx"
+            }]
+          }
+        ));
         done();
       }
       catch (e) {
@@ -261,7 +269,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
 
   it('retrieves all items from recycle bin filtered by type', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/site/RecycleBin?$filter=(ItemState eq 1) and (ItemType eq 1)') > -1) {
+      if ((opts.url as string).indexOf('/_api/site/RecycleBin?$filter=(ItemState eq 1) and (ItemType eq 5)') > -1) {
         return Promise.resolve(
           {
             "value": [{
@@ -277,7 +285,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
               },
               "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
               "ItemState": 1,
-              "ItemType": 1,
+              "ItemType": 5,
               "LeafName": "Document.docx",
               "LeafNamePath": {
                 "DecodedUrl": "Document.docx"
@@ -294,33 +302,71 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
     command.action(logger, {
       options: {
         output: 'json',
-        type: 1,
+        type: 'files',
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith([{
-          "AuthorEmail": "test.onmicrosoft.com",
-          "AuthorName": "test test",
-          "DeletedByEmail": "test.onmicrosoft.com",
-          "DeletedByName": "test test",
-          "DeletedDate": "2021-11-20T20:48:16Z",
-          "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
-          "DirName": "sites/test/Shared Documents",
-          "DirNamePath": {
-            "DecodedUrl": "sites/test/Shared Documents"
-          },
-          "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
-          "ItemState": 1,
-          "ItemType": 1,
-          "LeafName": "Document.docx",
-          "LeafNamePath": {
-            "DecodedUrl": "Document.docx"
-          },
-          "Size": "41939",
-          "Title": "Document.docx"
-        }]));
+        assert(loggerLogSpy.calledWith(
+          {
+            "value": [{
+              "AuthorEmail": "test.onmicrosoft.com",
+              "AuthorName": "test test",
+              "DeletedByEmail": "test.onmicrosoft.com",
+              "DeletedByName": "test test",
+              "DeletedDate": "2021-11-20T20:48:16Z",
+              "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
+              "DirName": "sites/test/Shared Documents",
+              "DirNamePath": {
+                "DecodedUrl": "sites/test/Shared Documents"
+              },
+              "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
+              "ItemState": 1,
+              "ItemType": 5,
+              "LeafName": "Document.docx",
+              "LeafNamePath": {
+                "DecodedUrl": "Document.docx"
+              },
+              "Size": "41939",
+              "Title": "Document.docx"
+            }]
+          }
+        ));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('does not retrieve items from recycle bin filtered by type', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/site/RecycleBin?$filter=(ItemState eq 1)') > -1) {
+        return Promise.resolve(
+          {
+            "value": []
+          }
+        );
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        output: 'json',
+        type: 'something',
+        debug: true,
+        siteUrl: 'https://contoso.sharepoint.com'
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(
+          {
+            "value": []
+          }
+        ));
         done();
       }
       catch (e) {
