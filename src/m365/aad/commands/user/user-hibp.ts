@@ -41,7 +41,6 @@ class AadUserHibpCommand extends AnonymousCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        console.log(res); // eslint-disable-line no-console
 
         logger.log(res);
 
@@ -49,12 +48,10 @@ class AadUserHibpCommand extends AnonymousCommand {
       })
       .catch((err: any): void => {
         if ((err && err.response !== undefined && err.response.status === 404) && (this.debug || this.verbose)) {
-          console.log('error'); // eslint-disable-line no-console
           logger.log('No pwnage found');
           cb();
           return;
         }
-        console.log('other error'); // eslint-disable-line no-console
         return this.handleRejectedODataJsonPromise(err, logger, cb);
       });
   }
