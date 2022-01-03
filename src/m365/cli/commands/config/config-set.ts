@@ -37,6 +37,9 @@ class CliConfigSetCommand extends AnonymousCommand {
     switch (args.options.key) {
       case settingsNames.showHelpOnFailure:
       case settingsNames.printErrorsAsPlainText:
+      case settingsNames.csvHeader:
+      case settingsNames.csvQuoted:
+      case settingsNames.csvQuotedEmpty:
         value = args.options.value === 'true';
         break;
       default:
@@ -68,7 +71,7 @@ class CliConfigSetCommand extends AnonymousCommand {
       return `${args.options.key} is not a valid setting. Allowed values: ${CliConfigSetCommand.optionNames.join(', ')}`;
     }
 
-    const allowedOutputs = ['text', 'json'];
+    const allowedOutputs = ['text', 'json', 'csv'];
     if (args.options.key === settingsNames.output &&
       allowedOutputs.indexOf(args.options.value) === -1) {
       return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${allowedOutputs.join(', ')}`;
