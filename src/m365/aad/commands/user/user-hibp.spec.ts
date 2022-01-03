@@ -83,14 +83,12 @@ describe(commands.USER_HIBP, () => {
       try {
 
         if (loggerLogSpy.getCall(0)) {
+          console.log("Response"); // eslint-disable-line no-console
           console.log(loggerLogSpy.getCall(0).args); // eslint-disable-line no-console
         }
 
-        if(loggerLogSpy.lastCall){
-          assert.strictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([{ "Name": "Adobe" }]));
-        }
 
-        assert(true);
+        assert(loggerLogSpy.calledWith([{ "Name": "Adobe" }]));
 
         done();
       }

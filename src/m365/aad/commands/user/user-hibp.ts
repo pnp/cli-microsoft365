@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli';
 import {
   CommandOption
 } from '../../../../Command';
-import AnonymousCommand from '../../../../Command';
+import AnonymousCommand from '../../../base/AnonymousCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import commands from '../../commands';
@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   domain?: string
 }
 
-class AadUserHIBPCommand extends AnonymousCommand {
+class AadUserHibpCommand extends AnonymousCommand {
   public get name(): string {
     return commands.USER_HIBP;
   }
@@ -84,4 +84,4 @@ class AadUserHIBPCommand extends AnonymousCommand {
   }
 }
 
-module.exports = new AadUserHIBPCommand();
+module.exports = new AadUserHibpCommand();
