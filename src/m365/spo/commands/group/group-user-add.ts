@@ -21,6 +21,8 @@ interface Options extends GlobalOptions {
 }
 
 class SpoGroupUserAddCommand extends SpoCommand {
+  private groupId: number = 0;
+
   public get name(): string {
     return commands.GROUP_USER_ADD;
   }
@@ -36,31 +38,32 @@ class SpoGroupUserAddCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     this
       .getGroupId(args)
-      .then((groupId: number): Promise<SharingResult> => {
-        return this.getOnlyActiveUsers(args, logger)
-          .then((resolvedUsernameList: string[]): Promise<SharingResult> => {
-            if (this.verbose) {
-              logger.logToStderr(`Start adding Active user/s to SharePoint Group ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
-            }
+      .then((groupId: number): Promise<string[]> => {
+        this.groupId = groupId;
+        return this.getOnlyActiveUsers(args, logger);
+      })
+      .then((resolvedUsernameList: string[]): Promise<SharingResult> => {
+        if (this.verbose) {
+          logger.logToStderr(`Start adding Active user/s to SharePoint Group ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
+        }
 
-            const data: any = {
-              url: args.options.webUrl,
-              peoplePickerInput: this.getFormattedUserList(resolvedUsernameList),
-              roleValue: `group:${groupId}`
-            };
+        const data: any = {
+          url: args.options.webUrl,
+          peoplePickerInput: this.getFormattedUserList(resolvedUsernameList),
+          roleValue: `group:${this.groupId}`
+        };
 
-            const requestOptions: any = {
-              url: `${args.options.webUrl}/_api/SP.Web.ShareObject`,
-              headers: {
-                'Accept': 'application/json;odata=nometadata',
-                'Content-type': 'application/json;odata=verbose'
-              },
-              data: data,
-              responseType: 'json'
-            };
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/SP.Web.ShareObject`,
+          headers: {
+            'Accept': 'application/json;odata=nometadata',
+            'Content-type': 'application/json;odata=verbose'
+          },
+          data: data,
+          responseType: 'json'
+        };
 
-            return request.post<SharingResult>(requestOptions);
-          });
+        return request.post<SharingResult>(requestOptions);
       })
       .then((sharingResult: SharingResult): void => {
         if (sharingResult.ErrorMessage !== null) {
@@ -117,10 +120,10 @@ class SpoGroupUserAddCommand extends SpoCommand {
       };
 
       if (args.options.userName) {
-        options['userName'] = singleUsername.trim();
+        options.userName = singleUsername.trim();
       }
       else {
-        options['email'] = singleUsername.trim();
+        options.email = singleUsername.trim();
       }
 
       return Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } })
