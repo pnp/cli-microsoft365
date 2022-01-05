@@ -6,7 +6,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
-import { Message } from '../../Message';
+import { ItemBody } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   chatId: string;
 }
 
-class TeamsChatMessageListCommand extends GraphItemsListCommand<Message> {
+class TeamsChatMessageListCommand extends GraphItemsListCommand<any> {
   public get name(): string {
     return commands.CHAT_MESSAGE_LIST;
   }
@@ -26,7 +26,7 @@ class TeamsChatMessageListCommand extends GraphItemsListCommand<Message> {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['id', 'summary', 'body'];
+    return ['id', 'shortBody'];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -37,7 +37,27 @@ class TeamsChatMessageListCommand extends GraphItemsListCommand<Message> {
       .then((): void => {
         if (args.options.output !== 'json') {
           this.items.forEach(i => {
-            i.body = i.body.content as any;
+            i.body = (i.body as ItemBody).content;
+          });
+        }
+
+        if (args.options.output === 'text') {
+          this.items.forEach(i => {
+            let shortBody;
+            const bodyToProcess = i.body;
+
+            if (bodyToProcess) {
+              let maxLength = 50;
+              let addedDots = "...";
+              if (bodyToProcess.length < maxLength) {
+                maxLength = bodyToProcess.length;
+                addedDots = "";
+              }
+
+              shortBody = bodyToProcess.replace(/\n/g, ' ').substring(0, maxLength) + addedDots;
+            }
+
+            i.shortBody = shortBody;
           });
         }
 
