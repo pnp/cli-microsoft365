@@ -9,6 +9,7 @@ import * as graphCommands from './m365/graph/commands';
 import * as oneDriveCommands from './m365/onedrive/commands';
 import * as outlookCommands from './m365/outlook/commands';
 import * as paCommands from './m365/pa/commands';
+import * as ppCommands from './m365/pp/commands';
 import * as plannerCommands from './m365/planner/commands';
 import * as searchCommands from './m365/search/commands';
 import * as spfxCommands from './m365/spfx/commands';
@@ -30,6 +31,7 @@ describe('Lazy loading commands', () => {
       oneDriveCommands.default,
       outlookCommands.default,
       paCommands.default,
+      ppCommands.default,
       plannerCommands.default,
       searchCommands.default,
       spfxCommands.default,
@@ -52,7 +54,7 @@ describe('Lazy loading commands', () => {
       'spo sp permissionrequest approve',
       'spo sp permissionrequest deny',
       'spo sp permissionrequest list',
-      'spo sp set',      
+      'spo sp set',
       'teams user add',
       'teams user list',
       'teams user remove',
