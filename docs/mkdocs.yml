@@ -198,8 +198,7 @@ nav:
         - task get: 'cmd/planner/task/task-get.md'
         - task list: 'cmd/planner/task/task-list.md'
         - task set: 'cmd/planner/task/task-set.md'
-        - details:
-          - details get: 'cmd/planner/task/task-details-get.md'
+        - task details get: 'cmd/planner/task/task-details-get.md'
     - Power Apps (pa):
       - app:
         - app get: 'cmd/pa/app/app-get.md'
@@ -234,6 +233,9 @@ nav:
         - run get: 'cmd/flow/run/run-get.md'
         - run list: 'cmd/flow/run/run-list.md'
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
+    - Power Platform (pp):
+      - managementapp:
+        - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
     - Search (search):
       - externalconnection:
         - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
