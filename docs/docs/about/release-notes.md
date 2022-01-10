@@ -1,5 +1,13 @@
 # Release notes
 
+## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad group list](../cmd/aad/group/group-list.md) - Lists Azure AD groups [#2622](https://github.com/pnp/cli-microsoft365/issues/2622)
+
 ## [v4.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.3.0)
 
 ### New commands
