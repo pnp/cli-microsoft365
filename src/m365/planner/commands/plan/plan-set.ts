@@ -1,3 +1,4 @@
+import * as os from 'os';
 import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command, {
   CommandOption,
@@ -10,7 +11,7 @@ import commands from '../../commands';
 import request from '../../../../request';
 import { Options as PlanGetCommandOptions } from '../plan/plan-get';
 import * as planGetCommand from '../plan/plan-get';
-//import { Plan } from './Plan';
+import { Plan } from './Plan';
 
 interface CommandArgs {
   options: Options;
@@ -49,25 +50,25 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
           cb(new CommandError(`No plan found`));
           return;
         }
-        let plans: any = JSON.parse(output.stdout);
-        if(!Array.isArray(plans)) {
-          plans = [plans];
-        }
-        const promises = [];
-        for (let index = 0; index < plans.length; index++) {
-          promises.push(this.updatePlan(logger, args, plans[index]));
+        const plans: Plan[] = JSON.parse(output.stdout);
+        if (plans.length > 1) {
+          let sameNamePlans: string = `Multiple plans with the name ${args.options.title} found. Please disambiguate using the ID:`;
+          plans.map((plan: Plan) => sameNamePlans += `${os.EOL}${plan.id}`);
+          cb(new CommandError(`${sameNamePlans}`));
+          return;
         }
 
-        Promise.all(promises).then(() => {
-          cb();
-        })
+        this.updatePlan(logger, args, plans[0])
+          .then((): void => {
+            cb();
+          })
           .catch((err) => {
             this.handleRejectedODataJsonPromise(err, logger, cb);
           });
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getPlan(logger: Logger,args: CommandArgs): Promise<CommandOutput> {
+  private getPlan(logger: Logger, args: CommandArgs): Promise<CommandOutput> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving plan ${args.options.id || args.options.title} ...`);
     }
@@ -82,16 +83,16 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
     return Cli.executeCommandWithOutput(planGetCommand as Command, { options: { ...options, _: [] } });
   }
 
-  private updatePlan(logger: Logger,args: CommandArgs, plan: any): Promise<void> {
+  private updatePlan(logger: Logger, args: CommandArgs, plan: Plan): Promise<void> {
     if (this.verbose) {
-      logger.logToStderr(`Updating plan with id ${plan['id']} ...`);
+      logger.logToStderr(`Updating plan with id ${plan.id} ...`);
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/plans/${plan['id']}`,
+      url: `${this.resource}/v1.0/planner/plans/${plan.id}`,
       headers: {
         'accept': 'application/json;odata.metadata=none',
-        'If-Match': `${plan["@odata.etag"]}`
+        'If-Match': `${plan['@odata.etag']}`
       },
       responseType: 'json',
       data: {
