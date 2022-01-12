@@ -8,6 +8,14 @@
 
 - [aad group list](../cmd/aad/group/group-list.md) - Lists Azure AD groups [#2622](https://github.com/pnp/cli-microsoft365/issues/2622)
 
+**Teams:**
+
+- [teams chat member list](../cmd/teams/chat/chat-member-list.md) - lists all members from a Microsoft Teams chat conversation [#2896](https://github.com/pnp/cli-microsoft365/issues/2896)
+
+### Changes
+
+- extended 'cli config set' with support for csv output [#2901](https://github.com/pnp/cli-microsoft365/issues/2901)
+
 ## [v4.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.3.0)
 
 ### New commands
