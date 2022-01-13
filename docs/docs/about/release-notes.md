@@ -6,10 +6,12 @@
 
 **Azure Active Directory:**
 
-- [aad group list](../cmd/aad/group/group-list.md) - Lists Azure AD groups [#2622](https://github.com/pnp/cli-microsoft365/issues/2622)
+- [aad group list](../cmd/aad/group/group-list.md) - lists Azure AD groups [#2622](https://github.com/pnp/cli-microsoft365/issues/2622)
+- [aad user hibp](../cmd/aad/user/user-hibp.md) - allows you to retrieve all accounts that have been pwned with the specified username [#2476](https://github.com/pnp/cli-microsoft365/issues/2476)
 
 **Teams:**
 
+- [teams chat list](../cmd/teams/chat/chat-list.md) - lists all Microsoft Teams chat conversations for the current user [#2893](https://github.com/pnp/cli-microsoft365/issues/2893)
 - [teams chat member list](../cmd/teams/chat/chat-member-list.md) - lists all members from a Microsoft Teams chat conversation [#2896](https://github.com/pnp/cli-microsoft365/issues/2896)
 
 ### Changes
