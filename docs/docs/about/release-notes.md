@@ -17,6 +17,8 @@
 ### Changes
 
 - extended 'cli config set' with support for csv output [#2901](https://github.com/pnp/cli-microsoft365/issues/2901)
+- fixed 'teams tab get' and 'teams app list' commands [#2930](https://github.com/pnp/cli-microsoft365/issues/2930)
+- extended 'spo group user add' with groupName and email [#2831](https://github.com/pnp/cli-microsoft365/issues/2831)
 
 ## [v4.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.3.0)
 
