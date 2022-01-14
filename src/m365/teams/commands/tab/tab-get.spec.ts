@@ -333,7 +333,7 @@ describe(commands.TAB_GET, () => {
 
   it('fails when multiple teams with same name exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/me/joinedTeams?$filter=displayName eq '`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
           "@odata.count": 2,
@@ -354,7 +354,8 @@ describe(commands.TAB_GET, () => {
               "guestSettings": null,
               "messagingSettings": null,
               "funSettings": null,
-              "discoverySettings": null
+              "discoverySettings": null,
+              "resourceProvisioningOptions": ["Team"]
             },
             {
               "id": "00000000-0000-0000-0000-000000000000",
@@ -372,7 +373,8 @@ describe(commands.TAB_GET, () => {
               "guestSettings": null,
               "messagingSettings": null,
               "funSettings": null,
-              "discoverySettings": null
+              "discoverySettings": null,
+              "resourceProvisioningOptions": ["Team"]
             }
           ]
         }
@@ -401,7 +403,7 @@ describe(commands.TAB_GET, () => {
 
   it('should get a Microsoft Teams Tab by Team name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/me/joinedTeams?$filter=displayName eq '`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
           "value": [
             {
@@ -420,7 +422,8 @@ describe(commands.TAB_GET, () => {
               "guestSettings": null,
               "messagingSettings": null,
               "funSettings": null,
-              "discoverySettings": null
+              "discoverySettings": null,
+              "resourceProvisioningOptions": ["Team"]
             }
           ]
         });

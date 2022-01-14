@@ -5,7 +5,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
-import { Team } from '../../Team';
 import { TeamsApp } from '../../TeamsApp';
 
 interface CommandArgs {
@@ -44,8 +43,8 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
       return Promise.resolve(args.options.teamId);
     }
 
-    const teamRequestOptions: any = {
-      url: `${this.resource}/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -53,11 +52,15 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
     };
 
     return request
-      .get<{ value: Team[] }>(teamRequestOptions)
+      .get<{ value: [{ id: string, resourceProvisioningOptions: string[] }] }>(requestOptions)
       .then(response => {
-        const teamItem: Team | undefined = response.value[0];
+        const groupItem: { id: string, resourceProvisioningOptions: string[] } | undefined = response.value[0];
 
-        if (!teamItem) {
+        if (!groupItem) {
+          return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
+        }
+
+        if (groupItem.resourceProvisioningOptions.indexOf('Team') === -1) {
           return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
         }
 
@@ -65,7 +68,7 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
           return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${response.value.map(x => x.id)}`);
         }
 
-        return Promise.resolve(teamItem.id);
+        return Promise.resolve(groupItem.id);
       });
   }
 
