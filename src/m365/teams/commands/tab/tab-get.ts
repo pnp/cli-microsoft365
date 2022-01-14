@@ -1,3 +1,4 @@
+import { Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -9,7 +10,6 @@ import GraphCommand from '../../../base/GraphCommand';
 import { Channel } from '../../Channel';
 import commands from '../../commands';
 import { Tab } from '../../Tab';
-import { Team } from '../../Team';
 
 interface CommandArgs {
   options: Options;
@@ -22,6 +22,10 @@ interface Options extends GlobalOptions {
   channelName?: string;
   tabId?: string;
   tabName?: string;
+}
+
+interface ExtendedGroup extends Group {
+  resourceProvisioningOptions: string[];
 }
 
 class TeamsTabGetCommand extends GraphCommand {
@@ -52,8 +56,8 @@ class TeamsTabGetCommand extends GraphCommand {
       return Promise.resolve(args.options.teamId);
     }
 
-    const teamRequestOptions: any = {
-      url: `${this.resource}/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -61,11 +65,15 @@ class TeamsTabGetCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: Team[] }>(teamRequestOptions)
+      .get<{ value: ExtendedGroup[] }>(requestOptions)
       .then(response => {
-        const teamItem: Team | undefined = response.value[0];
+        const groupItem: ExtendedGroup | undefined = response.value[0];
 
-        if (!teamItem) {
+        if (!groupItem) {
+          return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
+        }
+
+        if (groupItem.resourceProvisioningOptions.indexOf('Team') === -1) {
           return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
         }
 
@@ -73,7 +81,7 @@ class TeamsTabGetCommand extends GraphCommand {
           return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${response.value.map(x => x.id)}`);
         }
 
-        return Promise.resolve(teamItem.id);
+        return Promise.resolve(groupItem.id as string);
       });
   }
 
