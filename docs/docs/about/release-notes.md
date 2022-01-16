@@ -1,5 +1,26 @@
 # Release notes
 
+## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad group list](../cmd/aad/group/group-list.md) - lists Azure AD groups [#2622](https://github.com/pnp/cli-microsoft365/issues/2622)
+- [aad user hibp](../cmd/aad/user/user-hibp.md) - allows you to retrieve all accounts that have been pwned with the specified username [#2476](https://github.com/pnp/cli-microsoft365/issues/2476)
+
+**Teams:**
+
+- [teams chat list](../cmd/teams/chat/chat-list.md) - lists all Microsoft Teams chat conversations for the current user [#2893](https://github.com/pnp/cli-microsoft365/issues/2893)
+- [teams chat member list](../cmd/teams/chat/chat-member-list.md) - lists all members from a Microsoft Teams chat conversation [#2896](https://github.com/pnp/cli-microsoft365/issues/2896)
+- [teams chat message list](../cmd/teams/chat/chat-message-list.md) - lists all messages from a Microsoft Teams chat conversation [#2860](https://github.com/pnp/cli-microsoft365/issues/2860)
+
+### Changes
+
+- extended 'cli config set' with support for csv output [#2901](https://github.com/pnp/cli-microsoft365/issues/2901)
+- fixed 'teams tab get' and 'teams app list' commands [#2930](https://github.com/pnp/cli-microsoft365/issues/2930)
+- extended 'spo group user add' with groupName and email [#2831](https://github.com/pnp/cli-microsoft365/issues/2831)
+
 ## [v4.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.3.0)
 
 ### New commands

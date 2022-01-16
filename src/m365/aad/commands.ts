@@ -10,6 +10,7 @@ export default {
   APPROLEASSIGNMENT_ADD: `${prefix} approleassignment add`,
   APPROLEASSIGNMENT_LIST: `${prefix} approleassignment list`,
   APPROLEASSIGNMENT_REMOVE: `${prefix} approleassignment remove`,
+  GROUP_LIST:`${prefix} group list`,
   GROUPSETTING_ADD: `${prefix} groupsetting add`,
   GROUPSETTING_GET: `${prefix} groupsetting get`,
   GROUPSETTING_LIST: `${prefix} groupsetting list`,
@@ -49,6 +50,7 @@ export default {
   SP_ADD: `${prefix} sp add`,
   SP_GET: `${prefix} sp get`,
   USER_GET: `${prefix} user get`,
+  USER_HIBP: `${prefix} user hibp`,
   USER_LIST: `${prefix} user list`,
   USER_PASSWORD_VALIDATE: `${prefix} user password validate`,
   USER_SET: `${prefix} user set`

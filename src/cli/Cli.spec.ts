@@ -10,6 +10,7 @@ import { Cli, CommandOutput } from '.';
 import appInsights from '../appInsights';
 import Command, { CommandArgs, CommandError, CommandOption, CommandTypes } from '../Command';
 import AnonymousCommand from '../m365/base/AnonymousCommand';
+import { settingsNames } from '../settingsNames';
 import Utils from '../Utils';
 import { Logger } from './Logger';
 import Table = require('easy-table');
@@ -207,7 +208,8 @@ describe('Cli', () => {
       (Cli as any).formatOutput,
       process.exit,
       markshell.toRawContent,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -835,16 +837,16 @@ describe('Cli', () => {
   });
 
   it('formats object with array as csv', (done) => {
-    const input = 
-    [{
-      "header1": "value1item1",
-      "header2": "value2item1"
-    },
-    {
-      "header1": "value1item2",
-      "header2": "value2item2"
-    }
-    ];
+    const input =
+      [{
+        "header1": "value1item1",
+        "header2": "value2item1"
+      },
+      {
+        "header1": "value1item2",
+        "header2": "value2item2"
+      }
+      ];
     const expected = "header1,header2\nvalue1item1,value2item1\nvalue1item2,value2item2\n";
     const actual = (Cli as any).formatOutput(input, { output: 'csv' });
     try {
@@ -857,12 +859,114 @@ describe('Cli', () => {
   });
 
   it('formats a simple object as csv', (done) => {
-    const input = 
+    const input =
     {
       "header1": "value1item1",
       "header2": "value2item1"
     };
     const expected = "header1,header2\nvalue1item1,value2item1\n";
+    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('does not produce headers when csvHeader config is set to false ', (done) => {
+    const input =
+    {
+      "header1": "value1item1",
+      "header2": "value2item1"
+    };
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.csvHeader) {
+        return false;
+      }
+      return defaultValue;
+    });
+
+    const expected = "value1item1,value2item1\n";
+    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('quotes all non-empty fields even if not required when csvQuoted config is set to true', (done) => {
+    const input =
+    {
+      "header1": "value1item1",
+      "header2": "value2item1"
+    };
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.csvQuoted) {
+        return true;
+      }
+      return defaultValue;
+    });
+
+    const expected = "\"header1\",\"header2\"\n\"value1item1\",\"value2item1\"\n";
+    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('quotes all empty fields if csvQuotedEmpty config is set to true', (done) => {
+    const input =
+    {
+      "header1": "value1item1",
+      "header2": ""
+    };
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.csvQuotedEmpty) {
+        return true;
+      }
+      return defaultValue;
+    });
+
+    const expected = "header1,header2\nvalue1item1,\"\"\n";
+    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('quotes all fields with character set in csvQuote config', (done) => {
+    const input =
+    {
+      "header1": "value1item1",
+      "header2": "value2item1"
+    };
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.csvQuoted) {
+        return true;
+      }
+      return defaultValue;
+    });
+    sinon.stub(Cli.getInstance().config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.csvQuote) {
+        return "_";
+      }
+      return null;
+    });
+
+    const expected = "_header1_,_header2_\n_value1item1_,_value2item1_\n";
     const actual = (Cli as any).formatOutput(input, { output: 'csv' });
     try {
       assert.strictEqual(actual, expected);
