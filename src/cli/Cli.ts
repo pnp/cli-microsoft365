@@ -152,45 +152,8 @@ export class Cli {
       }
     }
 
-    // validate options
-    // validate required options
-    for (let i = 0; i < this.commandToExecute.options.length; i++) {
-      if (this.commandToExecute.options[i].required &&
-        typeof this.optionsFromArgs.options[this.commandToExecute.options[i].name] === 'undefined') {
-        return this.closeWithError(`Required option ${this.commandToExecute.options[i].name} not specified`, this.optionsFromArgs, true);
-      }
-    }
-
-    const optionsWithoutShorts = Cli.removeShortOptions(this.optionsFromArgs);
-    try {
-      // replace values staring with @ with file contents
-      Cli.loadOptionValuesFromFiles(optionsWithoutShorts);
-    }
-    catch (e) {
-      return this.closeWithError(e, optionsWithoutShorts);
-    }
-
-    try {
-      // process options before passing them on to validation stage
-      await this.commandToExecute.command.processOptions(optionsWithoutShorts.options);
-    }
-    catch (e: any) {
-      return this.closeWithError(e.message, optionsWithoutShorts, false);
-    }
-
-    // if output not specified, set the configured output value (if any)
-    if (optionsWithoutShorts.options.output === undefined) {
-      optionsWithoutShorts.options.output = this.getSettingWithDefaultValue<string | undefined>(settingsNames.output, undefined);
-    }
-
-    const validationResult: boolean | string = this.commandToExecute.command.validate(optionsWithoutShorts);
-    if (typeof validationResult === 'string') {
-      return this.closeWithError(validationResult, optionsWithoutShorts, true);
-    }
-
-    return Cli
-      .executeCommand(this.commandToExecute.command, optionsWithoutShorts)
-      .then(_ => process.exit(0), err => this.closeWithError(err, optionsWithoutShorts));
+    const shouldPrompt = this.getSettingWithDefaultValue<string | undefined>(settingsNames.prompt, undefined)?.toLowerCase() === 'true';
+    this.validateOrPromptForOptions(0, this.commandToExecute.options.length, shouldPrompt, this.commandToExecute, this.optionsFromArgs);
   }
 
   public static executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
@@ -361,6 +324,76 @@ export class Cli {
     catch {
       this.loadAllCommands();
     }
+  }
+
+  private validateOrPromptForOptions(index: number, optionsLength: number, shouldPrompt: boolean, commandToExecute: CommandInfo, optionsFromArgs: any): void {
+    if (typeof commandToExecute.options[index] !== 'undefined' &&
+      commandToExecute.options[index].required &&
+      typeof optionsFromArgs.options[commandToExecute.options[index].name] === 'undefined') {
+
+      if (!shouldPrompt) {
+        return this.closeWithError(`Required option ${commandToExecute.options[index].name} not specified`, optionsFromArgs, true);
+      }
+
+      Cli.prompt({
+        name: 'missingRequireOptionValue',
+        message: `Please specify value for required option ${commandToExecute.options[index].name}: `
+      }, (result: { missingRequireOptionValue: string }): void => {
+        optionsFromArgs.options[commandToExecute.options[index].name] = result.missingRequireOptionValue;
+        if (typeof commandToExecute.options[index].short !== 'undefined') {
+          optionsFromArgs.options[commandToExecute.options[index].short?.toString() ?? ""] = result.missingRequireOptionValue;
+        }
+
+        this.checkAndExecuteOrContinueValidate(index, optionsLength, shouldPrompt, commandToExecute, optionsFromArgs);
+      });
+
+    }
+    else {
+      this.checkAndExecuteOrContinueValidate(index, optionsLength, shouldPrompt, commandToExecute, optionsFromArgs);
+    }
+  }
+
+  private checkAndExecuteOrContinueValidate(index: number, optionsLength: number, shouldPrompt: boolean, commandToExecute: CommandInfo, optionsFromArgs: any): void {
+    index += 1;
+    if (index >= optionsLength - 1) {
+      this.continueExecute(commandToExecute, optionsFromArgs);
+    }
+    else {
+      this.validateOrPromptForOptions(index, optionsLength, shouldPrompt, commandToExecute, optionsFromArgs);
+    }
+  }
+
+  private async continueExecute(commandToExecute: CommandInfo, optionsFromArgs: any): Promise<void> {
+    const optionsWithoutShorts = Cli.removeShortOptions(optionsFromArgs);
+    try {
+      // replace values staring with @ with file contents
+      Cli.loadOptionValuesFromFiles(optionsWithoutShorts);
+    }
+    catch (e) {
+      return this.closeWithError(e, optionsWithoutShorts);
+    }
+
+    try {
+      // process options before passing them on to validation stage
+      await commandToExecute.command.processOptions(optionsWithoutShorts.options);
+    }
+    catch (e: any) {
+      return this.closeWithError(e.message, optionsWithoutShorts, false);
+    }
+
+    // if output not specified, set the configured output value (if any)
+    if (optionsWithoutShorts.options.output === undefined) {
+      optionsWithoutShorts.options.output = this.getSettingWithDefaultValue<string | undefined>(settingsNames.output, undefined);
+    }
+
+    const validationResult: boolean | string = commandToExecute.command.validate(optionsWithoutShorts);
+    if (typeof validationResult === 'string') {
+      return this.closeWithError(validationResult, optionsWithoutShorts, true);
+    }
+
+    return Cli
+      .executeCommand(commandToExecute.command, optionsWithoutShorts)
+      .then(_ => process.exit(0), err => this.closeWithError(err, optionsWithoutShorts));
   }
 
   private loadCommand(command: Command): void {
