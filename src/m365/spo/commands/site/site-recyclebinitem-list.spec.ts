@@ -161,29 +161,27 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
     }, () => {
       try {
         assert(loggerLogSpy.calledWith(
-          {
-            "value": [{
-              "AuthorEmail": "test.onmicrosoft.com",
-              "AuthorName": "test test",
-              "DeletedByEmail": "test.onmicrosoft.com",
-              "DeletedByName": "test test",
-              "DeletedDate": "2021-11-20T20:48:16Z",
-              "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
-              "DirName": "sites/test/Shared Documents",
-              "DirNamePath": {
-                "DecodedUrl": "sites/test/Shared Documents"
-              },
-              "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
-              "ItemState": 1,
-              "ItemType": 1,
-              "LeafName": "Document.docx",
-              "LeafNamePath": {
-                "DecodedUrl": "Document.docx"
-              },
-              "Size": "41939",
-              "Title": "Document.docx"
-            }]
-          }
+          [{
+            "AuthorEmail": "test.onmicrosoft.com",
+            "AuthorName": "test test",
+            "DeletedByEmail": "test.onmicrosoft.com",
+            "DeletedByName": "test test",
+            "DeletedDate": "2021-11-20T20:48:16Z",
+            "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
+            "DirName": "sites/test/Shared Documents",
+            "DirNamePath": {
+              "DecodedUrl": "sites/test/Shared Documents"
+            },
+            "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
+            "ItemState": 1,
+            "ItemType": 1,
+            "LeafName": "Document.docx",
+            "LeafNamePath": {
+              "DecodedUrl": "Document.docx"
+            },
+            "Size": "41939",
+            "Title": "Document.docx"
+          }]
         ));
         done();
       }
@@ -235,29 +233,27 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
     }, () => {
       try {
         assert(loggerLogSpy.calledWith(
-          {
-            "value": [{
-              "AuthorEmail": "test.onmicrosoft.com",
-              "AuthorName": "test test",
-              "DeletedByEmail": "test.onmicrosoft.com",
-              "DeletedByName": "test test",
-              "DeletedDate": "2021-11-20T20:48:16Z",
-              "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
-              "DirName": "sites/test/Shared Documents",
-              "DirNamePath": {
-                "DecodedUrl": "sites/test/Shared Documents"
-              },
-              "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
-              "ItemState": 2,
-              "ItemType": 1,
-              "LeafName": "Document.docx",
-              "LeafNamePath": {
-                "DecodedUrl": "Document.docx"
-              },
-              "Size": "41939",
-              "Title": "Document.docx"
-            }]
-          }
+          [{
+            "AuthorEmail": "test.onmicrosoft.com",
+            "AuthorName": "test test",
+            "DeletedByEmail": "test.onmicrosoft.com",
+            "DeletedByName": "test test",
+            "DeletedDate": "2021-11-20T20:48:16Z",
+            "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
+            "DirName": "sites/test/Shared Documents",
+            "DirNamePath": {
+              "DecodedUrl": "sites/test/Shared Documents"
+            },
+            "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
+            "ItemState": 2,
+            "ItemType": 1,
+            "LeafName": "Document.docx",
+            "LeafNamePath": {
+              "DecodedUrl": "Document.docx"
+            },
+            "Size": "41939",
+            "Title": "Document.docx"
+          }]
         ));
         done();
       }
@@ -269,7 +265,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
 
   it('retrieves all items from recycle bin filtered by type', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/site/RecycleBin?$filter=(ItemState eq 1) and (ItemType eq 5)') > -1) {
+      if ((opts.url as string).indexOf('/_api/site/RecycleBin?$filter=(ItemState eq 1) and (ItemType eq 1)') > -1) {
         return Promise.resolve(
           {
             "value": [{
@@ -309,29 +305,27 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
     }, () => {
       try {
         assert(loggerLogSpy.calledWith(
-          {
-            "value": [{
-              "AuthorEmail": "test.onmicrosoft.com",
-              "AuthorName": "test test",
-              "DeletedByEmail": "test.onmicrosoft.com",
-              "DeletedByName": "test test",
-              "DeletedDate": "2021-11-20T20:48:16Z",
-              "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
-              "DirName": "sites/test/Shared Documents",
-              "DirNamePath": {
-                "DecodedUrl": "sites/test/Shared Documents"
-              },
-              "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
-              "ItemState": 1,
-              "ItemType": 5,
-              "LeafName": "Document.docx",
-              "LeafNamePath": {
-                "DecodedUrl": "Document.docx"
-              },
-              "Size": "41939",
-              "Title": "Document.docx"
-            }]
-          }
+          [{
+            "AuthorEmail": "test.onmicrosoft.com",
+            "AuthorName": "test test",
+            "DeletedByEmail": "test.onmicrosoft.com",
+            "DeletedByName": "test test",
+            "DeletedDate": "2021-11-20T20:48:16Z",
+            "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
+            "DirName": "sites/test/Shared Documents",
+            "DirNamePath": {
+              "DecodedUrl": "sites/test/Shared Documents"
+            },
+            "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
+            "ItemState": 1,
+            "ItemType": 5,
+            "LeafName": "Document.docx",
+            "LeafNamePath": {
+              "DecodedUrl": "Document.docx"
+            },
+            "Size": "41939",
+            "Title": "Document.docx"
+          }]
         ));
         done();
       }
@@ -362,10 +356,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith(
-          {
-            "value": []
-          }
+        assert(loggerLogSpy.calledWith([]
         ));
         done();
       }

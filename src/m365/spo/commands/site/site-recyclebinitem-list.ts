@@ -54,8 +54,8 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
 
     request
       .get<any>(requestOptions)
-      .then((value: any[] ): void => {
-        logger.log(value);
+      .then((response: { value: any[] }): void => {
+        logger.log(response.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -92,9 +92,9 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
   }
 
   private static recycleBinItemType: { id: number, value: string }[] = [
-    { id: 1, value: 'listItems' },
-    { id: 3, value: 'folders' },
-    { id: 5, value: 'files' }
+    { id: 1, value: 'files' },
+    { id: 3, value: 'listItems' },
+    { id: 5, value: 'folders' }
   ];
 }
 
