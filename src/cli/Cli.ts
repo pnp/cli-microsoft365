@@ -152,12 +152,32 @@ export class Cli {
       }
     }
 
-    // validate options
-    // validate required options
+    const shouldPrompt = this.getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
+
+    let inquirer: Inquirer | undefined;
     for (let i = 0; i < this.commandToExecute.options.length; i++) {
       if (this.commandToExecute.options[i].required &&
         typeof this.optionsFromArgs.options[this.commandToExecute.options[i].name] === 'undefined') {
-        return this.closeWithError(`Required option ${this.commandToExecute.options[i].name} not specified`, this.optionsFromArgs, true);
+        if (!shouldPrompt) {
+          return this.closeWithError(`Required option ${this.commandToExecute.options[i].name} not specified`, this.optionsFromArgs, true);
+        }
+        
+        if (i === 0) {
+          Cli.log('Provide values for the following parameters:');
+        }
+
+        if (!inquirer) {
+          inquirer = require('inquirer');
+        }
+
+        const missingRequireOptionValue = await (inquirer as Inquirer)
+          .prompt({
+            name: 'missingRequireOptionValue',
+            message: `${this.commandToExecute.options[i].name}: `
+          })
+          .then(result => result.missingRequireOptionValue);
+
+        this.optionsFromArgs.options[this.commandToExecute.options[i].name] = missingRequireOptionValue;
       }
     }
 

@@ -197,7 +197,8 @@ describe('Cli', () => {
       // eslint-disable-next-line no-console
       console.error,
       mockCommand.commandAction,
-      mockCommand.processOptions
+      mockCommand.processOptions,
+      Cli.prompt
     ]);
   });
 
@@ -414,7 +415,14 @@ describe('Cli', () => {
       });
   });
 
-  it(`fails validation if a required option is missing`, (done) => {
+  it(`does not prompt and fails validation if a required option is missing`, (done) => {
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return undefined;
+      }
+      return defaultValue;
+    });
+
     cli
       .execute(rootFolder, ['cli', 'mock'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
@@ -426,6 +434,28 @@ describe('Cli', () => {
           done(e);
         }
       });
+  });
+
+  it(`prompts for required options`, (done) => {
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake(() => Promise.resolve({ missingRequireOptionValue: "test" }) as any);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return 'true';
+      }
+      return defaultValue;
+    });
+
+    cli
+      .execute(rootFolder, ['cli', 'mock'])
+      .then(_ => {
+        try {
+          assert(promptStub.called);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
   });
 
   it(`calls command's validation method when defined`, (done) => {
