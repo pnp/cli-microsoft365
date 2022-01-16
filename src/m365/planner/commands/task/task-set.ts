@@ -35,6 +35,8 @@ interface Options extends GlobalOptions {
 
 class PlannerTaskSetCommand extends GraphCommand {
   private assignments: { [userId: string]: { [property: string]: string; }; } | undefined;
+  private bucketId: string | undefined;
+  private allowedAppliedCategories: string[] = [ 'category1', 'category2', 'category3', 'category4', 'category5', 'category6' ];
 
   public get name(): string {
     return commands.TASK_SET;
@@ -70,7 +72,7 @@ class PlannerTaskSetCommand extends GraphCommand {
     this
       .getBucketId(args.options)
       .then(bucketId => {
-        args.options.bucketId = bucketId;
+        this.bucketId = bucketId;
 
         return this.generateUserAssignments(args.options);
       })
@@ -80,8 +82,8 @@ class PlannerTaskSetCommand extends GraphCommand {
         return this.getTaskEtag(args.options.id);
       })
       .then(etag => {
-        const genAppliedcategories = this.generateAppliedCategories(args.options);
-        const data = this.mapRequestBody(args.options, genAppliedcategories);
+        const appliedcategories = this.generateAppliedCategories(args.options);
+        const data = this.mapRequestBody(args.options, appliedcategories);
 
         const requestOptions: any = {
           url: `${this.resource}/v1.0/planner/tasks/${args.options.id}`,
@@ -181,7 +183,7 @@ class PlannerTaskSetCommand extends GraphCommand {
     const categories: { [category: string]: boolean } = {};
 
     if (options.appliedCategories) {
-      options.appliedCategories.toLocaleLowerCase().split(',').map(x => categories[x] = true);
+      options.appliedCategories.toLocaleLowerCase().split(',').forEach(x => categories[x] = true);
 
       return categories;
     } 
@@ -200,7 +202,7 @@ class PlannerTaskSetCommand extends GraphCommand {
     return this
       .getUserIds(options)
       .then((userIds) => {
-        userIds.map(x => assignments[x] = {
+        userIds.forEach(x => assignments[x] = {
           '@odata.type': '#microsoft.graph.plannerAssignment',
           orderHint: ' !'
         });
@@ -211,7 +213,7 @@ class PlannerTaskSetCommand extends GraphCommand {
 
   private getUserIds(options: Options): Promise<string[]> {
     if (options.assignedToUserIds) {
-      return Promise.resolve(options.assignedToUserIds.split(','));
+      return Promise.resolve(options.assignedToUserIds.split(',').map(o => o.trim()));
     }
 
     // Hitting this section means assignedToUserNames won't be undefined
@@ -223,7 +225,7 @@ class PlannerTaskSetCommand extends GraphCommand {
       const requestOptions: any = {
         url: `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${Utils.encodeQueryParameter(user)}'&$select=id,userPrincipalName`,
         headers: {
-          'content-type': 'application/json'
+          'accept ': 'application/json;odata.metadata=none'
         },
         responseType: 'json'
       };
@@ -262,7 +264,7 @@ class PlannerTaskSetCommand extends GraphCommand {
       .getPlanId(options)
       .then(planId => {
         const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/plans/${planId}/buckets`,
+          url: `${this.resource}/v1.0/planner/plans/${planId}/buckets?$select=id,name`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
@@ -291,7 +293,7 @@ class PlannerTaskSetCommand extends GraphCommand {
       .getGroupId(options)
       .then((groupId: string) => {
         const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/plans?$filter=(owner eq '${groupId}')`,
+          url: `${this.resource}/v1.0/planner/plans?$filter=(owner eq '${groupId}')&$select=id,title`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
@@ -316,7 +318,7 @@ class PlannerTaskSetCommand extends GraphCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(options.ownerGroupName as string)}'`,
+      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(options.ownerGroupName as string)}'&$select=id`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -336,15 +338,15 @@ class PlannerTaskSetCommand extends GraphCommand {
       });
   }
 
-  private mapRequestBody(options: Options, appliedcategories: { [category: string]: boolean }): any {
+  private mapRequestBody(options: Options, appliedCategories: { [category: string]: boolean }): any {
     const requestBody: any = {};
 
     if (options.title) {
       requestBody.title = options.title;
     }
 
-    if (options.bucketId) {
-      requestBody.bucketId = options.bucketId;
+    if (this.bucketId) {
+      requestBody.bucketId = this.bucketId;
     }
 
     if (options.startDateTime) {
@@ -371,8 +373,8 @@ class PlannerTaskSetCommand extends GraphCommand {
       requestBody.conversationThreadId = options.conversationThreadId;
     }
 
-    if (appliedcategories && Object.keys(appliedcategories).length > 0) {
-      requestBody.appliedCategories = appliedcategories;
+    if (appliedCategories && Object.keys(appliedCategories).length > 0) {
+      requestBody.appliedCategories = appliedCategories;
     }
 
     if (options.orderHint) {
@@ -385,58 +387,58 @@ class PlannerTaskSetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: "-i, --id <id>"
+        option: '-i, --id <id>'
       },
       {
-        option: "-t, --title [title]"
+        option: '-t, --title [title]'
       },
       {
-        option: "--planId [planId]"
+        option: '--planId [planId]'
       },
       {
-        option: "--planName [planName]"
+        option: '--planName [planName]'
       },
       {
-        option: "--ownerGroupId [ownerGroupId]"
+        option: '--ownerGroupId [ownerGroupId]'
       },
       {
-        option: "--ownerGroupName [ownerGroupName]"
+        option: '--ownerGroupName [ownerGroupName]'
       },
       {
-        option: "--bucketId [bucketId]"
+        option: '--bucketId [bucketId]'
       },
       {
-        option: "--bucketName [bucketName]"
+        option: '--bucketName [bucketName]'
       },
       {
-        option: "--startDateTime [startDateTime]"
+        option: '--startDateTime [startDateTime]'
       },
       {
-        option: "--dueDateTime [dueDateTime]"
+        option: '--dueDateTime [dueDateTime]'
       },
       {
-        option: "--percentComplete [percentComplete]"
+        option: '--percentComplete [percentComplete]'
       },
       {
-        option: "--assignedToUserIds [assignedToUserIds]"
+        option: '--assignedToUserIds [assignedToUserIds]'
       },
       {
-        option: "--assignedToUserNames [assignedToUserNames]"
+        option: '--assignedToUserNames [assignedToUserNames]'
       },
       {
-        option: "--assigneePriority [assigneePriority]"
+        option: '--assigneePriority [assigneePriority]'
       },
       {
-        option: "--description [description]"
+        option: '--description [description]'
       },
       {
-        option: "--conversationThreadId [conversationThreadId]"
+        option: '--conversationThreadId [conversationThreadId]'
       },
       {
-        option: "--appliedCategories [appliedCategories]"
+        option: '--appliedCategories [appliedCategories]'
       },
       {
-        option: "--orderHint [orderHint]"
+        option: '--orderHint [orderHint]'
       }
     ];
 
@@ -492,14 +494,7 @@ class PlannerTaskSetCommand extends GraphCommand {
     if (args.options.assignedToUserIds && args.options.assignedToUserNames) {
       return 'Specify either assignedToUserIds or assignedToUserNames but not both';
     }
-    if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => 
-      category.toLocaleLowerCase() !== "category1" &&
-      category.toLocaleLowerCase() !== "category2" &&
-      category.toLocaleLowerCase() !== "category3" &&
-      category.toLocaleLowerCase() !== "category4" &&
-      category.toLocaleLowerCase() !== "category5" &&
-      category.toLocaleLowerCase() !== "category6"
-    ).length !== 0) {
+    if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => this.allowedAppliedCategories.indexOf(category.toLocaleLowerCase()) < 0).length !== 0) {
       return 'The appliedCategories contains invalid value. Specify either category1, category2, category3, category4, category5 and/or category6 as properties';
     }
 

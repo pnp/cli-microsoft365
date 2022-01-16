@@ -14,7 +14,7 @@ m365 planner task set [options]
 : ID of the task.
 
 `-t, --title [title]`
-: Title of the task to add.
+: New title of the task.
 
 `--bucketId [bucketId]`
 : Bucket ID to which the task belongs. Specify either `bucketId` or `bucketName` but not both.
@@ -47,10 +47,10 @@ m365 planner task set [options]
   - When set to 100, the task is considered _Completed_.
 
 `--assignedToUserIds [assignedToUserIds]`
-: The comma-separated IDs of the assignees the task is assigned to. Specify either `assignedToUserIds` or `assignedToUserNames` but not both.
+: The comma-separated IDs of the assignees that should be added to the task assigment. Specify either `assignedToUserIds` or `assignedToUserNames` but not both.
 
 `--assignedToUserNames [assignedToUserNames]`
-: The comma-separated UPNs of the assignees the task is assigned to. Specify either `assignedToUserIds` or `assignedToUserNames` but not both.
+: The comma-separated UPNs of the assignees that should be added to the task assigment. Specify either `assignedToUserIds` or `assignedToUserNames` but not both.
 
 `--description [description]`
 : Description of the task
@@ -62,30 +62,30 @@ m365 planner task set [options]
 : Hint used to order items of this type in a list view. The format is defined as outlined [here](https://docs.microsoft.com/en-us/graph/api/resources/planner-order-hint-format?view=graph-rest-1.0).
 
 `--conversationThreadId [conversationThreadId]`
-: Thread id of the conversation on the task. This is the id of the conversation thread object created in the group.
+: Change the thread conversation of the task based on an existing thread. This can be done by assigning the existing conversation thread id.
 
 `--appliedCategories [appliedCategories]`
-: The comma-separated categories to which the task has been applied. Possible values see [here](https://docs.microsoft.com/en-us/graph/api/resources/plannerappliedcategories?view=graph-rest-1.0). Values are set to true. `category1,category3`
+: The comma-separated categories that should be added to the task. You can add up to 6 categories to the task. An example to add category1 and category3 would be 'category1,category3'. More info can be found [here](https://docs.microsoft.com/en-us/graph/api/resources/plannerappliedcategories?view=graph-rest-1.0)
 
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
 
-Updates a Microsoft Planner task with the name _My Planner Task_ for task with the ID _Z-RLQGfppU6H3663DBzfs5gAMD3o_
+Updates a Microsoft Planner task name to _My Planner Task_ for the task with the ID _Z-RLQGfppU6H3663DBzfs5gAMD3o_
 
 ```sh
-m365 planner task set -i "Z-RLQGfppU6H3663DBzfs5gAMD3o" --title "My Planner Task"
+m365 planner task set --id "Z-RLQGfppU6H3663DBzfs5gAMD3o" --title "My Planner Task"
 ```
 
-Updates a Microsoft Planner task with the ID _Z-RLQGfppU6H3663DBzfs5gAMD3o_ to the bucket named _My Planner Bucket_. Based on the plan with the name _My Planner Plan_ owned by the group _My Planner Group_
+Moves a Microsoft Planner task with the ID _Z-RLQGfppU6H3663DBzfs5gAMD3o_ to the bucket named _My Planner Bucket_. Based on the plan with the name _My Planner Plan_ owned by the group _My Planner Group_
 
 ```sh
-m365 planner task set  -i "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --bucketName "My Planner Bucket" --planName "My Planner Plan" --ownerGroupName "My Planner Group"
+m365 planner task set  --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --bucketName "My Planner Bucket" --planName "My Planner Plan" --ownerGroupName "My Planner Group"
 ```
 
-Updates a Microsoft Planner task with the ID _Z-RLQGfppU6H3663DBzfs5gAMD3o_ to complete and adds _Category1_ and _Category3_.
+Marks a Microsoft Planner task with the ID _Z-RLQGfppU6H3663DBzfs5gAMD3o_ as 50% complete and assigned to categories 1 and 3.
 
 ```sh
-m365 planner task set -i "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2"  --percentComplete 50 --appliedCategories "category1,category3"
+m365 planner task set --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2"  --percentComplete 50 --appliedCategories "category1,category3"
 ```
 

@@ -124,43 +124,7 @@ describe(commands.TASK_SET, () => {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
     "value": [
       {
-        "id": "0d0402ee-970f-4951-90b5-2f24519d2e40",
-        "deletedDateTime": null,
-        "classification": null,
-        "createdDateTime": "2021-06-08T11:04:45Z",
-        "creationOptions": [],
-        "description": "My Planner Group",
-        "displayName": "My Planner Group",
-        "expirationDateTime": null,
-        "groupTypes": [
-          "Unified"
-        ],
-        "isAssignableToRole": null,
-        "mail": "MyPlannerGroup@contoso.onmicrosoft.com",
-        "mailEnabled": true,
-        "mailNickname": "My Planner Group",
-        "membershipRule": null,
-        "membershipRuleProcessingState": null,
-        "onPremisesDomainName": null,
-        "onPremisesLastSyncDateTime": null,
-        "onPremisesNetBiosName": null,
-        "onPremisesSamAccountName": null,
-        "onPremisesSecurityIdentifier": null,
-        "onPremisesSyncEnabled": null,
-        "preferredDataLocation": null,
-        "preferredLanguage": null,
-        "proxyAddresses": [
-          "SPO:SPO_e13f6193-fb01-43e8-8e8d-557796b82ebf@SPO_cc6fafe9-dd93-497c-b521-1d971b1471c7",
-          "SMTP:MyPlannerGroup@contoso.onmicrosoft.com"
-        ],
-        "renewedDateTime": "2021-06-08T11:04:45Z",
-        "resourceBehaviorOptions": [],
-        "resourceProvisioningOptions": [],
-        "securityEnabled": false,
-        "securityIdentifier": "S-1-12-1-218366702-1230083855-573552016-1076796785",
-        "theme": null,
-        "visibility": "Private",
-        "onPremisesProvisioningErrors": []
+        "id": "0d0402ee-970f-4951-90b5-2f24519d2e40"
       }
     ]
   };
@@ -430,7 +394,7 @@ describe(commands.TASK_SET, () => {
     });
     
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${encodeURIComponent('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${encodeURIComponent('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
         return Promise.resolve({
           value: [
             {
@@ -450,11 +414,10 @@ describe(commands.TASK_SET, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')&$select=id,title`) {
         return Promise.resolve({
           value: [
             {
-              "owner": "0d0402ee-970f-4951-90b5-2f24519d2e40",
               "title": "My Planner Plan",
               "id": "8QZEH7b3wkS_bGQobscsM5gADCBb"
             }
@@ -462,7 +425,7 @@ describe(commands.TASK_SET, () => {
         });
       }
       
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'&$select=id`) {
         return Promise.resolve(groupByDisplayNameResponse);
       }
 
@@ -497,7 +460,7 @@ describe(commands.TASK_SET, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${encodeURIComponent('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${encodeURIComponent('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
         return Promise.resolve({
           value: [
             {
@@ -517,20 +480,10 @@ describe(commands.TASK_SET, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')&$select=id,title`) {
         return Promise.resolve({
           value: [
             {
-              "createdBy": {
-                "application": {
-                  "id": "95e27074-6c4a-447a-aa24-9d718a0b86fa"
-                },
-                "user": {
-                  "id": "ebf3b108-5234-4e22-b93d-656d7dae5874"
-                }
-              },
-              "createdDateTime": "2015-03-30T18:36:49.2407981Z",
-              "owner": "0d0402ee-970f-4951-90b5-2f24519d2e40",
               "title": "My Planner Plan",
               "id": "8QZEH7b3wkS_bGQobscsM5gADCBb"
             }
@@ -569,7 +522,7 @@ describe(commands.TASK_SET, () => {
     });
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${encodeURIComponent('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${encodeURIComponent('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
         return Promise.resolve({
           value: [
             {
@@ -802,7 +755,7 @@ describe(commands.TASK_SET, () => {
   
   it('fails when no bucket is found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${encodeURIComponent('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${encodeURIComponent('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
         return Promise.resolve({
           value: []
         });
@@ -895,10 +848,10 @@ describe(commands.TASK_SET, () => {
 
   it('fails validation when planName not found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'&$select=id`) {
         return Promise.resolve(groupByDisplayNameResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')&$select=id,title`) {
         return Promise.resolve({ value: [] });
       }
       return Promise.reject('Invalid Request');
