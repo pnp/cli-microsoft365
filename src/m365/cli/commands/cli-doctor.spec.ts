@@ -3,7 +3,7 @@ import * as os from 'os';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
-import { Logger } from '../../../cli';
+import { Cli, Logger } from '../../../cli';
 import Command from '../../../Command';
 import Utils from '../../../Utils';
 import commands from '../commands';
@@ -20,6 +20,7 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    sinon.stub(Cli.getInstance().config, 'all').value({});
   });
 
   beforeEach(() => {
@@ -50,7 +51,8 @@ describe(commands.DOCTOR, () => {
   after(() => {
     Utils.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      Cli.getInstance().config.all
     ]);
     auth.service.connected = false;
   });
@@ -91,6 +93,7 @@ describe(commands.DOCTOR, () => {
           cliAadAppTenant: 'common',
           cliEnvironment: '',
           cliVersion: '3.11.0',
+          cliConfig: {},
           nodeVersion: 'v14.17.0',
           os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
           roles: [],
@@ -139,6 +142,7 @@ describe(commands.DOCTOR, () => {
           cliAadAppTenant: 'common',
           cliEnvironment: '',
           cliVersion: '3.11.0',
+          cliConfig: {},
           nodeVersion: 'v14.17.0',
           os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
           roles: [],
@@ -180,6 +184,7 @@ describe(commands.DOCTOR, () => {
           cliAadAppTenant: 'common',
           cliEnvironment: '',
           cliVersion: '3.11.0',
+          cliConfig: {},
           nodeVersion: 'v14.17.0',
           os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
           roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
@@ -228,6 +233,7 @@ describe(commands.DOCTOR, () => {
           cliAadAppTenant: 'common',
           cliEnvironment: '',
           cliVersion: '3.11.0',
+          cliConfig: {},
           nodeVersion: 'v14.17.0',
           os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
           roles: ['Sites.Read.All', 'Files.ReadWrite.All', 'TermStore.Read.All'],
@@ -270,6 +276,7 @@ describe(commands.DOCTOR, () => {
           cliAadAppTenant: 'common',
           cliEnvironment: '',
           cliVersion: '3.11.0',
+          cliConfig: {},
           nodeVersion: 'v14.17.0',
           os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
           roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
@@ -313,6 +320,7 @@ describe(commands.DOCTOR, () => {
           cliAadAppTenant: 'common',
           cliEnvironment: '',
           cliVersion: '3.11.0',
+          cliConfig: {},
           nodeVersion: 'v14.17.0',
           os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
           roles: [],
@@ -354,6 +362,7 @@ describe(commands.DOCTOR, () => {
           cliAadAppTenant: 'common',
           cliEnvironment: '',
           cliVersion: '3.11.0',
+          cliConfig: {},
           nodeVersion: 'v14.17.0',
           os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
           roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
@@ -395,6 +404,7 @@ describe(commands.DOCTOR, () => {
           cliAadAppTenant: 'single',
           cliEnvironment: '',
           cliVersion: '3.11.0',
+          cliConfig: {},
           nodeVersion: 'v14.17.0',
           os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
           roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
@@ -436,6 +446,7 @@ describe(commands.DOCTOR, () => {
           cliAadAppTenant: 'common',
           cliEnvironment: '',
           cliVersion: '3.11.0',
+          cliConfig: {},
           nodeVersion: 'v14.17.0',
           os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
           roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
@@ -477,6 +488,7 @@ describe(commands.DOCTOR, () => {
           cliAadAppTenant: 'common',
           cliEnvironment: 'docker',
           cliVersion: '3.11.0',
+          cliConfig: {},
           nodeVersion: 'v14.17.0',
           os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
           roles: ['Sites.Read.All', 'Files.ReadWrite.All'],
@@ -512,6 +524,7 @@ describe(commands.DOCTOR, () => {
           cliAadAppTenant: 'common',
           cliEnvironment: '',
           cliVersion: '3.11.0',
+          cliConfig: {},
           nodeVersion: 'v14.17.0',
           os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
           roles: [],
@@ -548,6 +561,7 @@ describe(commands.DOCTOR, () => {
           cliAadAppTenant: 'common',
           cliEnvironment: '',
           cliVersion: '3.11.0',
+          cliConfig: {},
           nodeVersion: 'v14.17.0',
           os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
           roles: [],
@@ -561,7 +575,51 @@ describe(commands.DOCTOR, () => {
     });
   });
 
+  it('retrieves CLI Configuration in the diagnostic information about the current environment', (done) => {
+    const jwt = JSON.stringify({
+      scp: 'AllSites.FullControl AppCatalog.ReadWrite.All'
+    });
+    const jwt64 = Buffer.from(jwt).toString('base64');
+    const accessToken = `abc.${jwt64}.def`;
 
+    sinon.stub(auth.service, 'accessTokens').value({
+      'https://graph.microsoft.com': { 'expiresOn': '2021-07-04T09:52:18.000Z', 'accessToken': `${accessToken}` }
+    });
+    sinon.stub(os, 'platform').returns('win32');
+    sinon.stub(os, 'version').returns('Windows 10 Pro');
+    sinon.stub(os, 'release').returns('10.0.19043');
+    sinon.stub(packageJSON, 'version').value('3.11.0');
+    sinon.stub(process, 'version').value('v14.17.0');
+    sinon.stub(auth.service, 'appId').value('31359c7f-bd7e-475c-86db-fdb8c937548e');
+    sinon.stub(auth.service, 'tenant').value('common');
+    sinon.stub(auth.service, 'authType').value(0);
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    Utils.restore(Cli.getInstance().config.all);
+    sinon.stub(Cli.getInstance().config, 'all').value({ "showHelpOnFailure": false });
+
+    command.action(logger, { options: {} }, () => {
+      try {
+        assert(loggerLogSpy.calledWith({
+          authMode: 'DeviceCode',
+          cliAadAppId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+          cliAadAppTenant: 'common',
+          cliEnvironment: '',
+          cliVersion: '3.11.0',
+          cliConfig: {
+            "showHelpOnFailure": false
+          },
+          nodeVersion: 'v14.17.0',
+          os: { 'platform': 'win32', 'version': 'Windows 10 Pro', 'release': '10.0.19043' },
+          roles: [],
+          scopes: ['AllSites.FullControl', 'AppCatalog.ReadWrite.All']
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
 
   it('supports debug mode', () => {
     const options = command.options();

@@ -1,3 +1,4 @@
+import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -6,7 +7,6 @@ import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
-import { GroupUser } from './GroupUser';
 
 interface CommandArgs {
   options: Options;
@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   groupId: string;
 }
 
-class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
+class AadO365GroupUserListCommand extends GraphItemsListCommand<User> {
   public get name(): string {
     return commands.O365GROUP_USER_LIST;
   }

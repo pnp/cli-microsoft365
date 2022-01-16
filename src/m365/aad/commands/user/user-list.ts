@@ -1,3 +1,4 @@
+import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -14,7 +15,7 @@ interface Options extends GlobalOptions {
   properties?: string;
 }
 
-class AadUserListCommand extends GraphItemsListCommand<any> {
+class AadUserListCommand extends GraphItemsListCommand<User> {
   public get name(): string {
     return commands.USER_LIST;
   }

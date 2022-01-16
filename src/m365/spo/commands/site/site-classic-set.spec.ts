@@ -857,7 +857,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -907,7 +907,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -957,7 +957,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -1004,7 +1004,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -1050,7 +1050,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -1108,7 +1108,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });

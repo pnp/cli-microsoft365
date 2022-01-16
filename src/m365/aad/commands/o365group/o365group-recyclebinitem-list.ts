@@ -1,3 +1,4 @@
+import { DirectoryObject } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -5,7 +6,6 @@ import {
 import GlobalOptions from '../../../../GlobalOptions';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
-import { Group } from './Group';
 
 interface CommandArgs {
   options: Options;
@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   mailNickname?: string;
 }
 
-class AadO365GroupRecycleBinItemListCommand extends GraphItemsListCommand<Group> {
+class AadO365GroupRecycleBinItemListCommand extends GraphItemsListCommand<DirectoryObject> {
   public get name(): string {
     return commands.O365GROUP_RECYCLEBINITEM_LIST;
   }

@@ -32,6 +32,8 @@ nav:
         - approleassignment add: 'cmd/aad/approleassignment/approleassignment-add.md'
         - approleassignment list: 'cmd/aad/approleassignment/approleassignment-list.md'
         - approleassignment remove: 'cmd/aad/approleassignment/approleassignment-remove.md'
+      - group:
+        - group list: 'cmd/aad/group/group-list.md'
       - groupsetting:
         - groupsetting add: 'cmd/aad/groupsetting/groupsetting-add.md'
         - groupsetting get: 'cmd/aad/groupsetting/groupsetting-get.md'
@@ -79,7 +81,9 @@ nav:
         - sp get: 'cmd/aad/sp/sp-get.md'
       - user:
         - user get: 'cmd/aad/user/user-get.md'
+        - user hibp: 'cmd/aad/user/user-hibp.md'
         - user list: 'cmd/aad/user/user-list.md'
+        - user password validate: 'cmd/aad/user/user-password-validate.md'
         - user set: 'cmd/aad/user/user-set.md'
     - Adaptive Card (adaptivecard):
       - send: 'cmd/adaptivecard/adaptivecard-send.md'
@@ -103,6 +107,27 @@ nav:
       - convert:
         - convert pdf: 'cmd/file/convert/convert-pdf.md'
       - list: 'cmd/file/file-list.md'
+    - Microsoft 365 apps (app):
+      - permission:
+        - permission add: 'cmd/app/permission/permission-list.md'
+    - Microsoft 365 tenant (tenant):
+      - auditlog:
+        - auditlog report: 'cmd/tenant/auditlog/auditlog-report.md'
+      - id:
+        - id get: 'cmd/tenant/id/id-get.md'
+      - report:
+        - report activeusercounts: 'cmd/tenant/report/report-activeusercounts.md'
+        - report activeuserdetail: 'cmd/tenant/report/report-activeuserdetail.md'
+        - report office365activationcounts: 'cmd/tenant/report/report-office365activationcounts.md'
+        - report office365activationsuserdetail: 'cmd/tenant/report/report-office365activationsuserdetail.md'
+        - report office365activationsusercounts: 'cmd/tenant/report/report-office365activationsusercounts.md'
+        - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
+      - service:
+        - service list: 'cmd/tenant/service/service-list.md'
+        - service message list: 'cmd/tenant/service/service-message-list.md'
+        - service report historicalservicestatus: 'cmd/tenant/service/service-report-historicalservicestatus.md'
+      - status:
+        - status list: 'cmd/tenant/status/status-list.md'
     - Microsoft Graph (graph):
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
@@ -140,7 +165,7 @@ nav:
         - report mailboxusagemailboxcount: 'cmd/outlook/report/report-mailboxusagemailboxcount.md'
         - report mailboxusagequotastatusmailboxcounts: 'cmd/outlook/report/report-mailboxusagequotastatusmailboxcounts.md'
         - report mailboxusagestorage: 'cmd/outlook/report/report-mailboxusagestorage.md'
-    - Microsoft Planner (planner):
+    - Planner (planner):
       - bucket:
         - bucket add: 'cmd/planner/bucket/bucket-add.md'
         - bucket list: 'cmd/planner/bucket/bucket-list.md'
@@ -149,6 +174,7 @@ nav:
         - plan get: 'cmd/planner/plan/plan-get.md'
         - plan list: 'cmd/planner/plan/plan-list.md'
       - task:
+        - task add: 'cmd/planner/task/task-add.md'
         - task list: 'cmd/planner/task/task-list.md'
     - Power Apps (pa):
       - app:
@@ -184,7 +210,7 @@ nav:
         - run get: 'cmd/flow/run/run-get.md'
         - run list: 'cmd/flow/run/run-list.md'
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
-    - Search:
+    - Search (search):
       - externalconnection:
         - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
     - Skype (skype):
@@ -480,7 +506,7 @@ nav:
         - web reindex: 'cmd/spo/web/web-reindex.md'
         - web remove: 'cmd/spo/web/web-remove.md'
         - web set: 'cmd/spo/web/web-set.md'
-    - Microsoft Teams (teams):
+    - Teams (teams):
       - app:
         - app install: 'cmd/teams/app/app-install.md'
         - app list: 'cmd/teams/app/app-list.md'
@@ -494,6 +520,10 @@ nav:
         - channel list: 'cmd/teams/channel/channel-list.md'
         - channel remove: 'cmd/teams/channel/channel-remove.md'
         - channel set: 'cmd/teams/channel/channel-set.md'
+      - chat:
+        - chat list: 'cmd/teams/chat/chat-list.md'
+        - chat member list: 'cmd/teams/chat/chat-member-list.md'
+        - chat message list: 'cmd/teams/chat/chat-message-list.md'
       - conversationmember:
         - conversationmember add: 'cmd/teams/conversationmember/conversationmember-add.md'
         - conversationmember list: 'cmd/teams/conversationmember/conversationmember-list.md'
@@ -544,24 +574,6 @@ nav:
         - user app add: 'cmd/teams/user/user-app-add.md'
         - user app list: 'cmd/teams/user/user-app-list.md'
         - user app remove: 'cmd/teams/user/user-app-remove.md'
-    - Microsoft 365 (tenant):
-      - auditlog:
-        - auditlog report: 'cmd/tenant/auditlog/auditlog-report.md'
-      - id:
-        - id get: 'cmd/tenant/id/id-get.md'
-      - report:
-        - report activeusercounts: 'cmd/tenant/report/report-activeusercounts.md'
-        - report activeuserdetail: 'cmd/tenant/report/report-activeuserdetail.md'
-        - report office365activationcounts: 'cmd/tenant/report/report-office365activationcounts.md'
-        - report office365activationsuserdetail: 'cmd/tenant/report/report-office365activationsuserdetail.md'
-        - report office365activationsusercounts: 'cmd/tenant/report/report-office365activationsusercounts.md'
-        - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
-      - service:
-        - service list: 'cmd/tenant/service/service-list.md'
-        - service message list: 'cmd/tenant/service/service-message-list.md'
-        - service report historicalservicestatus: 'cmd/tenant/service/service-report-historicalservicestatus.md'
-      - status:
-        - status list: 'cmd/tenant/status/status-list.md'
     - To Do (todo):
       - list:
         - list add: 'cmd/todo/list/list-add.md'
@@ -640,6 +652,7 @@ nav:
       - 'Add multiple lists in multiple sites': 'sample-scripts/spo/add-multiple-lists-in-multiple-sites.md'
       - 'Add users to the Associated SharePoint Groups from a CSV File': 'sample-scripts/spo/add-users-associatedspgroup-site-csv-file.md'
       - 'Copy files to another SharePoint Library in another site': 'sample-scripts/spo/copy-files-to-another-library.md'
+      - 'Copy list items between SharePoint lists': 'sample-scripts/spo/copy-listitems-sharepointlist.md'
       - 'Delete all (non-group connected) modern SharePoint sites': 'sample-scripts/spo/delete-non-group-connected-modern-sites.md'
       - 'Delete custom color themes from SharePoint': 'sample-scripts/spo/remove-custom-themes.md'
       - 'Delete custom SharePoint site designs': 'sample-scripts/spo/remove-site-designs.md'
@@ -721,7 +734,9 @@ markdown_extensions:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: 'https://twitter.com/m365pnp'
+      link: 'https://github.com/pnp/cli-microsoft365'
+    - icon: fontawesome/brands/twitter
+      link: 'https://twitter.com/climicrosoft365'
     - icon: fontawesome/brands/youtube
       link: 'http://aka.ms/sppnp-videos'
     - icon: fontawesome/solid/link

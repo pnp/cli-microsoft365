@@ -1,5 +1,26 @@
 # Release notes
 
+## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad group list](../cmd/aad/group/group-list.md) - lists Azure AD groups [#2622](https://github.com/pnp/cli-microsoft365/issues/2622)
+- [aad user hibp](../cmd/aad/user/user-hibp.md) - allows you to retrieve all accounts that have been pwned with the specified username [#2476](https://github.com/pnp/cli-microsoft365/issues/2476)
+
+**Teams:**
+
+- [teams chat list](../cmd/teams/chat/chat-list.md) - lists all Microsoft Teams chat conversations for the current user [#2893](https://github.com/pnp/cli-microsoft365/issues/2893)
+- [teams chat member list](../cmd/teams/chat/chat-member-list.md) - lists all members from a Microsoft Teams chat conversation [#2896](https://github.com/pnp/cli-microsoft365/issues/2896)
+- [teams chat message list](../cmd/teams/chat/chat-message-list.md) - lists all messages from a Microsoft Teams chat conversation [#2860](https://github.com/pnp/cli-microsoft365/issues/2860)
+
+### Changes
+
+- extended 'cli config set' with support for csv output [#2901](https://github.com/pnp/cli-microsoft365/issues/2901)
+- fixed 'teams tab get' and 'teams app list' commands [#2930](https://github.com/pnp/cli-microsoft365/issues/2930)
+- extended 'spo group user add' with groupName and email [#2831](https://github.com/pnp/cli-microsoft365/issues/2831)
+
 ## [v4.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.3.0)
 
 ### New commands
@@ -7,14 +28,42 @@
 **Azure Active Directory:**
 
 - [aad app get](../cmd/aad/app/app-get.md) - gets an Azure AD app registration [#2835](https://github.com/pnp/cli-microsoft365/issues/2835)
+- [aad user password validate](../cmd/aad/user/user-password-validate.md) - checks a user's password against the organization's password validation policy [#2846](https://github.com/pnp/cli-microsoft365/issues/2846)
+
+**Microsoft 365 apps:**
+
+- [app permission list](../cmd/app/permission/permission-list.md) - lists API permissions for the current AAD app [#2841](https://github.com/pnp/cli-microsoft365/issues/2841)
 
 **Microsoft Search:**
 
 - [search externalconnection add](../cmd/search/externalconnection/externalconnection-add.md) - adds a new external connection to be defined for Microsoft Search [#2662](https://github.com/pnp/cli-microsoft365/issues/2662)
 
+**Planner:**
+
+- [planner task add](../cmd/planner/task/task-add.md) - adds a new Microsoft Planner task [#2255](https://github.com/pnp/cli-microsoft365/issues/2255)
+
 **SharePoint:**
 
 - [spo web installedlanguage list](../cmd/spo/web/web-installedlanguage-list.md) - lists all installed languages on site [#2833](https://github.com/pnp/cli-microsoft365/issues/2833)
+
+### Changes
+
+- added support for upgrading SPFx projects to v1.14.0-beta.4 [#2865](https://github.com/pnp/cli-microsoft365/issues/2865)
+- extended 'cli doctor' with cli configuration [#2601](https://github.com/pnp/cli-microsoft365/issues/2601)
+- removed value wrapper from JMESPath [#2858](https://github.com/pnp/cli-microsoft365/issues/2858)
+- updated completion PS filename in docs [#2862](https://github.com/pnp/cli-microsoft365/issues/2862)
+- added the 'Copy list items between SharePoint lists' script [#2652](https://github.com/pnp/cli-microsoft365/issues/2652)
+- updated Node version Readme.md Build instructions [#2873](https://github.com/pnp/cli-microsoft365/issues/2873)
+- fixed the maxBodyLength issue [#2863](https://github.com/pnp/cli-microsoft365/issues/2863)
+- extended 'pa app list' with environment [#2872](https://github.com/pnp/cli-microsoft365/issues/2872)
+- updated social links in the docs [#2885](https://github.com/pnp/cli-microsoft365/issues/2885)
+- added csv output mode [#2836](https://github.com/pnp/cli-microsoft365/issues/2836)
+- changed handling non-existent sites in 'spo site ensure' [#2861](https://github.com/pnp/cli-microsoft365/issues/2861)
+- updated 'cli doctor' tests to not depend on empty config [#2870](https://github.com/pnp/cli-microsoft365/issues/2870)
+- extended 'aad user get' with email [#2856](https://github.com/pnp/cli-microsoft365/issues/2856)
+- updated 'teams message get' command to Graph v1.0 API [#2678](https://github.com/pnp/cli-microsoft365/issues/2678)
+- replaced custom group and user types with MS Graph types [#2436](https://github.com/pnp/cli-microsoft365/issues/2436)
+- updated default terminal profile in devcontainer [#2664](https://github.com/pnp/cli-microsoft365/issues/2664)
 
 ## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
 

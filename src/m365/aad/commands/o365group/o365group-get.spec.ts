@@ -1,3 +1,4 @@
+import { Group } from '@microsoft/microsoft-graph-types';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
@@ -16,7 +17,7 @@ describe(commands.O365GROUP_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -61,7 +62,7 @@ describe(commands.O365GROUP_GET, () => {
   it('retrieves information about the specified Microsoft 365 Group', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
-        return Promise.resolve({
+        return Promise.resolve(<Group>{
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "deletedDateTime": null,
           "classification": null,
@@ -129,7 +130,7 @@ describe(commands.O365GROUP_GET, () => {
   it('retrieves information about the specified Microsoft 365 Group (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
-        return Promise.resolve({
+        return Promise.resolve(<Group>{
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "deletedDateTime": null,
           "classification": null,
@@ -197,7 +198,7 @@ describe(commands.O365GROUP_GET, () => {
   it('retrieves information about the specified Microsoft 365 Group including its site URL', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
-        return Promise.resolve({
+        return Promise.resolve(<Group>{
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "deletedDateTime": null,
           "classification": null,
@@ -225,7 +226,7 @@ describe(commands.O365GROUP_GET, () => {
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844/drive?$select=webUrl`) {
-        return Promise.resolve({
+        return Promise.resolve(<Group>{
           webUrl: "https://contoso.sharepoint.com/sites/finance/Shared%20Documents"
         });
       }
@@ -272,7 +273,7 @@ describe(commands.O365GROUP_GET, () => {
   it('retrieves information about the specified Microsoft 365 Group including its site URL (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
-        return Promise.resolve({
+        return Promise.resolve(<Group>{
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "deletedDateTime": null,
           "classification": null,
@@ -300,7 +301,7 @@ describe(commands.O365GROUP_GET, () => {
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844/drive?$select=webUrl`) {
-        return Promise.resolve({
+        return Promise.resolve(<Group>{
           webUrl: "https://contoso.sharepoint.com/sites/finance/Shared%20Documents"
         });
       }
@@ -347,7 +348,7 @@ describe(commands.O365GROUP_GET, () => {
   it('retrieves information about the specified Microsoft 365 Group including its site URL (group has no site)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
-        return Promise.resolve({
+        return Promise.resolve(<Group>{
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "deletedDateTime": null,
           "classification": null,
@@ -375,7 +376,7 @@ describe(commands.O365GROUP_GET, () => {
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844/drive?$select=webUrl`) {
-        return Promise.resolve({
+        return Promise.resolve(<Group>{
           webUrl: ""
         });
       }
@@ -422,7 +423,7 @@ describe(commands.O365GROUP_GET, () => {
   it('correctly handles no group found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c843`) {
-        return Promise.reject({
+        return Promise.reject(<Group>{
           error: {
             "error": {
               "code": "Request_ResourceNotFound",
