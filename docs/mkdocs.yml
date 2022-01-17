@@ -109,7 +109,7 @@ nav:
       - list: 'cmd/file/file-list.md'
     - Microsoft 365 apps (app):
       - permission:
-        - permission add: 'cmd/app/permission/permission-list.md'
+        - permission list: 'cmd/app/permission/permission-list.md'
     - Microsoft 365 tenant (tenant):
       - auditlog:
         - auditlog report: 'cmd/tenant/auditlog/auditlog-report.md'
