@@ -5,6 +5,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
+import { AppliedCategories } from '../../AppliedCategories';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -179,8 +180,8 @@ class PlannerTaskSetCommand extends GraphCommand {
       });
   }
 
-  private generateAppliedCategories(options: Options): { [category: string]: boolean } {
-    const categories: { [category: string]: boolean } = {};
+  private generateAppliedCategories(options: Options): AppliedCategories {
+    const categories: AppliedCategories = {};
 
     if (options.appliedCategories) {
       options.appliedCategories.toLocaleLowerCase().split(',').forEach(x => categories[x] = true);
@@ -338,7 +339,7 @@ class PlannerTaskSetCommand extends GraphCommand {
       });
   }
 
-  private mapRequestBody(options: Options, appliedCategories: { [category: string]: boolean }): any {
+  private mapRequestBody(options: Options, appliedCategories: AppliedCategories): any {
     const requestBody: any = {};
 
     if (options.title) {
