@@ -9,6 +9,10 @@
 - [aad group list](../cmd/aad/group/group-list.md) - lists Azure AD groups [#2622](https://github.com/pnp/cli-microsoft365/issues/2622)
 - [aad user hibp](../cmd/aad/user/user-hibp.md) - allows you to retrieve all accounts that have been pwned with the specified username [#2476](https://github.com/pnp/cli-microsoft365/issues/2476)
 
+**SharePoint:**
+
+- [spo site recyclebinitem list](../cmd/spo/site/site-recyclebinitem-list.md) - lists items from recycle bin [#2875](https://github.com/pnp/cli-microsoft365/issues/2875)
+
 **Teams:**
 
 - [teams chat list](../cmd/teams/chat/chat-list.md) - lists all Microsoft Teams chat conversations for the current user [#2893](https://github.com/pnp/cli-microsoft365/issues/2893)
@@ -20,6 +24,7 @@
 - extended 'cli config set' with support for csv output [#2901](https://github.com/pnp/cli-microsoft365/issues/2901)
 - fixed 'teams tab get' and 'teams app list' commands [#2930](https://github.com/pnp/cli-microsoft365/issues/2930)
 - extended 'spo group user add' with groupName and email [#2831](https://github.com/pnp/cli-microsoft365/issues/2831)
+- added docs explaining app commands [#2888](https://github.com/pnp/cli-microsoft365/issues/2888)
 
 ## [v4.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.3.0)
 
