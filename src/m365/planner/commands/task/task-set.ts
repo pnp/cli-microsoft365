@@ -29,7 +29,6 @@ interface Options extends GlobalOptions {
   assigneePriority?: string;
   assignments?: string;
   description?: string;
-  conversationThreadId?: string;
   appliedCategories?: string;
   orderHint?: string;
 }
@@ -63,7 +62,6 @@ class PlannerTaskSetCommand extends GraphCommand {
     telemetryProps.assignedToUserNames = typeof args.options.assignedToUserNames !== 'undefined';
     telemetryProps.assigneePriority = typeof args.options.assigneePriority !== 'undefined';
     telemetryProps.description = typeof args.options.description !== 'undefined';
-    telemetryProps.conversationThreadId = typeof args.options.conversationThreadId !== 'undefined';
     telemetryProps.appliedCategories = typeof args.options.appliedCategories !== 'undefined';
     telemetryProps.orderHint = typeof args.options.orderHint !== 'undefined';
     return telemetryProps;
@@ -370,10 +368,6 @@ class PlannerTaskSetCommand extends GraphCommand {
       requestBody.assigneePriority = options.assigneePriority;
     }
 
-    if (options.conversationThreadId) {
-      requestBody.conversationThreadId = options.conversationThreadId;
-    }
-
     if (appliedCategories && Object.keys(appliedCategories).length > 0) {
       requestBody.appliedCategories = appliedCategories;
     }
@@ -431,9 +425,6 @@ class PlannerTaskSetCommand extends GraphCommand {
       },
       {
         option: '--description [description]'
-      },
-      {
-        option: '--conversationThreadId [conversationThreadId]'
       },
       {
         option: '--appliedCategories [appliedCategories]'

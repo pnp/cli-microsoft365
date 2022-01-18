@@ -708,7 +708,7 @@ describe(commands.TASK_SET, () => {
     });
   });
 
-  it('correctly updates planner task with appliedCategories, bucketId, startDateTime, dueDateTime, percentComplete, assigneePriority, conversationThreadId, and orderHint', (done) => {
+  it('correctly updates planner task with appliedCategories, bucketId, startDateTime, dueDateTime, percentComplete, assigneePriority, and orderHint', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
@@ -738,7 +738,6 @@ describe(commands.TASK_SET, () => {
       dueDateTime: '2023-01-01T00:00:00Z',
       percentComplete: '50',
       assigneePriority: ' !',
-      conversationThreadId: 'id',
       orderHint: ' !'
     };
 
