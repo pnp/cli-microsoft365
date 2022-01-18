@@ -1,3 +1,4 @@
+import { Application } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -18,7 +19,7 @@ export interface Options extends GlobalOptions {
   name?: string;
 }
 
-class PpManagementappAddCommand extends GraphCommand {
+class PpManagementAppAddCommand extends GraphCommand {
   public get name(): string {
     return commands.MANAGEMENTAPP_ADD;
   }
@@ -38,7 +39,7 @@ class PpManagementappAddCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getAppObjectId(args)
-      .then((appId: string): Promise<void> => {
+      .then((appId: string): Promise<any> => {
         const requestOptions: any = {
           // This should be refactored once we implement a PowerPlatform base class as api.bap will differ between envs.
           url: `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/adminApplications/${appId}?api-version=2020-06-01`,
@@ -76,18 +77,19 @@ class PpManagementappAddCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: { appId: string }[] }>(requestOptions)
-      .then((res: { value: { appId: string }[] }): Promise<string> => {
-        if (res.value.length === 1) {
-          return Promise.resolve(res.value[0].appId);
-        }
+      .get<{ value: Application[] }>((requestOptions))
+      .then((aadApps: { value: Application[] }): Promise<string> => {
 
-        if (res.value.length === 0) {
+        if (aadApps.value.length === 0) {
           const applicationIdentifier = objectId ? `ID ${objectId}` : `name ${name}`;
           return Promise.reject(`No Azure AD application registration with ${applicationIdentifier} found`);
         }
 
-        return Promise.reject(`Multiple Azure AD application registration with name ${name} found. Please disambiguate (app IDs): ${res.value.map(a => a.appId).join(', ')}`);
+        if (aadApps.value.length === 1 && aadApps.value[0].appId) {
+          return Promise.resolve(aadApps.value[0].appId);
+        }
+
+        return Promise.reject(`Multiple Azure AD application registration with name ${name} found. Please disambiguate (app IDs): ${aadApps.value.map(a => a.appId).join(', ')}`);
       });
   }
 
@@ -127,4 +129,4 @@ class PpManagementappAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new PpManagementappAddCommand();
+module.exports = new PpManagementAppAddCommand();
