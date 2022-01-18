@@ -15,6 +15,7 @@ nav:
     - 'Configuring CLI': 'user-guide/configuring-cli.md'
     - 'Using your own Azure AD identity': 'user-guide/using-own-identity.md'
     - 'Caveats when working with the CLI and certificate login': 'user-guide/cli-certificate-caveats.md'
+    - 'Manage Microsoft 365 apps with the CLI': 'user-guide/manage-microsoft-365-apps.md'
   - Commands:
     - login: 'cmd/login.md'
     - logout: 'cmd/logout.md'
@@ -109,7 +110,7 @@ nav:
       - list: 'cmd/file/file-list.md'
     - Microsoft 365 apps (app):
       - permission:
-        - permission add: 'cmd/app/permission/permission-list.md'
+        - permission list: 'cmd/app/permission/permission-list.md'
     - Microsoft 365 tenant (tenant):
       - auditlog:
         - auditlog report: 'cmd/tenant/auditlog/auditlog-report.md'
@@ -423,6 +424,7 @@ nav:
         - site get: 'cmd/spo/site/site-get.md'
         - site groupify: 'cmd/spo/site/site-groupify.md'
         - site list: 'cmd/spo/site/site-list.md'
+        - site recyclebinitem list: 'cmd/spo/site/site-recyclebinitem-list.md'
         - site remove: 'cmd/spo/site/site-remove.md'
         - site rename: 'cmd/spo/site/site-rename.md'
         - site set: 'cmd/spo/site/site-set.md'
@@ -522,6 +524,7 @@ nav:
       - chat:
         - chat list: 'cmd/teams/chat/chat-list.md'
         - chat member list: 'cmd/teams/chat/chat-member-list.md'
+        - chat message list: 'cmd/teams/chat/chat-message-list.md'
       - conversationmember:
         - conversationmember add: 'cmd/teams/conversationmember/conversationmember-add.md'
         - conversationmember list: 'cmd/teams/conversationmember/conversationmember-list.md'

@@ -182,6 +182,7 @@ export default {
   SITE_GROUPIFY: `${prefix} site groupify`,
   SITE_LIST: `${prefix} site list`,
   SITE_INPLACERECORDSMANAGEMENT_SET: `${prefix} site inplacerecordsmanagement set`,
+  SITE_RECYCLEBINITEM_LIST: `${prefix} site recyclebinitem list`,
   SITE_REMOVE: `${prefix} site remove`,
   SITE_RENAME: `${prefix} site rename`,
   SITE_SET: `${prefix} site set`,
