@@ -37,7 +37,7 @@ class SpoGroupUserAddCommand extends SpoCommand {
     let groupId: number = 0;
 
     this
-      .getGroupId(args)
+      .validateGroupIdOrName(args)
       .then((_groupId: number): Promise<string[]> => {
         groupId = _groupId;
         return this.getOnlyActiveUsers(args, logger);
@@ -76,11 +76,25 @@ class SpoGroupUserAddCommand extends SpoCommand {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getGroupId(args: CommandArgs): Promise<number> {
-    if (args.options.groupId) {
-      return Promise.resolve(args.options.groupId);
+  private validateGroupIdOrName(args: CommandArgs): Promise<number> {
+    if (args.options.groupName) {
+      return this.getGroupId(args);
     }
 
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/web/sitegroups/GetById('${args.options.groupId}')`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    return request
+      .get<{ Id: number }>(requestOptions)
+      .then((response) => Promise.resolve(response.Id));
+  }
+
+  private getGroupId(args: CommandArgs): Promise<number> {
     const requestOptions: any = {
       url: `${args.options.webUrl}/_api/web/sitegroups/GetByName('${encodeURIComponent(args.options.groupName as string)}')`,
       headers: {
