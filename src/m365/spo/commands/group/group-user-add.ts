@@ -77,12 +77,12 @@ class SpoGroupUserAddCommand extends SpoCommand {
   }
 
   private getGroupId(args: CommandArgs): Promise<number> {
-    if (args.options.groupId) {
-      return Promise.resolve(args.options.groupId);
-    }
+    const getGroupMethod: string = args.options.groupName ? 
+      `GetByName('${encodeURIComponent(args.options.groupName as string)}')` :
+      `GetById('${args.options.groupId}')`;
 
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/sitegroups/GetByName('${encodeURIComponent(args.options.groupName as string)}')`,
+      url: `${args.options.webUrl}/_api/web/sitegroups/${getGroupMethod}`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -95,10 +95,10 @@ class SpoGroupUserAddCommand extends SpoCommand {
         const groupId: number | undefined = response.Id;
 
         if (!groupId) {
-          return Promise.reject(`The specified group not exist in the SharePoint site`);
+          return Promise.reject(`The specified group does not exist in the SharePoint site`);
         }
 
-        return Promise.resolve(groupId);
+        return groupId;
       });
   }
 
