@@ -1,3 +1,4 @@
+import { Application } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -18,7 +19,7 @@ export interface Options extends GlobalOptions {
   name?: string;
 }
 
-class PpManagementappAddCommand extends GraphCommand {
+class PpManagementAppAddCommand extends GraphCommand {
   public get name(): string {
     return commands.MANAGEMENTAPP_ADD;
   }
@@ -38,7 +39,7 @@ class PpManagementappAddCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getAppObjectId(args)
-      .then((appId: string): Promise<void> => {
+      .then((appId: string): Promise<any> => {
         const requestOptions: any = {
           // This should be refactored once we implement a PowerPlatform base class as api.bap will differ between envs.
           url: `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/adminApplications/${appId}?api-version=2020-06-01`,
@@ -127,4 +128,4 @@ class PpManagementappAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new PpManagementappAddCommand();
+module.exports = new PpManagementAppAddCommand();
