@@ -7,9 +7,9 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
-const command: Command = require('./service-health-list');
+const command: Command = require('./serviceannouncement-health-list');
 
-describe(commands.SERVICE_HEALTH_LIST, () => {
+describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
   const serviceHealthResponse = [
     {
       "service": "Exchange Online",
@@ -108,7 +108,7 @@ describe(commands.SERVICE_HEALTH_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.SERVICE_HEALTH_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.SERVICEANNOUNCEMENT_HEALTH_LIST), true);
   });
 
   it('has a description', () => {

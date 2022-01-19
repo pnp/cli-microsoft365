@@ -124,10 +124,11 @@ nav:
         - report office365activationsusercounts: 'cmd/tenant/report/report-office365activationsusercounts.md'
         - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
       - service:
-        - service health list: 'cmd/tenant/service/service-health-list.md'
         - service list: 'cmd/tenant/service/service-list.md'
         - service message list: 'cmd/tenant/service/service-message-list.md'
         - service report historicalservicestatus: 'cmd/tenant/service/service-report-historicalservicestatus.md'
+      - service announcement:
+        - serviceannouncement health list: 'cmd/tenant/serviceannouncement/serviceannouncement-health-list.md'
       - status:
         - status list: 'cmd/tenant/status/status-list.md'
     - Microsoft Graph (graph):

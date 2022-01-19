@@ -1,11 +1,11 @@
-# tenant service health list
+# tenant service announcement health list
 
 Gets the health report of all subscribed services for a tenant
 
 ## Usage
 
 ```sh
-m365 tenant service health list [options]
+m365 tenant serviceannouncement health list [options]
 ```
 
 ## Options
@@ -20,11 +20,11 @@ m365 tenant service health list [options]
 Get the health report of all subscribed services for a tenant
 
 ```sh
-m365 tenant service health list
+m365 tenant serviceannouncement health list
 ```
 
 Get the health report of all subscribed services for a tenant including the issues that happend on each service
 
 ```sh
-m365 tenant service health list --issues
+m365 tenant serviceannouncement health list --issues
 ```
