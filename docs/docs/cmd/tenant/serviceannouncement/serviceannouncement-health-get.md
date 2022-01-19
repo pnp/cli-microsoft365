@@ -1,11 +1,11 @@
-# tenant service health get
+# tenant service announcement health get
 
 Get the health report of a specified service for a tenant
 
 ## Usage
 
 ```sh
-m365 tenant service health get [options]
+m365 tenant serviceannouncement health get [options]
 ```
 
 ## Options
@@ -23,11 +23,11 @@ m365 tenant service health get [options]
 Get the health report for the service _Exchange Online_
 
 ```sh
-m365 tenant service health get --serviceName "Exchange Online"
+m365 tenant serviceannouncement health get --serviceName "Exchange Online"
 ```
 
 Get the health report for the service _Exchange Online_ including the issues of the service
 
 ```sh
-m365 tenant service health get --serviceName "Exchange Online" --issues
+m365 tenant serviceannouncement health get --serviceName "Exchange Online" --issues
 ```

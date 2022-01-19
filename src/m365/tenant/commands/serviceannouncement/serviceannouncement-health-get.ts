@@ -15,9 +15,9 @@ interface Options extends GlobalOptions {
   issues?: boolean;
 }
 
-class TenantServiceHealthGetCommand extends GraphCommand {
+class TenantServiceAnnouncementHealthGetCommand extends GraphCommand {
   public get name(): string {
-    return commands.SERVICE_HEALTH_GET;
+    return commands.SERVICEANNOUNCEMENT_HEALTH_GET;
   }
 
   public get description(): string {
@@ -76,4 +76,4 @@ class TenantServiceHealthGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new TenantServiceHealthGetCommand();
+module.exports = new TenantServiceAnnouncementHealthGetCommand();
