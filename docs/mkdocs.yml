@@ -128,6 +128,7 @@ nav:
         - service message list: 'cmd/tenant/service/service-message-list.md'
         - service report historicalservicestatus: 'cmd/tenant/service/service-report-historicalservicestatus.md'
       - service announcement:
+        - serviceannouncement health get: 'cmd/tenant/serviceannouncement/serviceannouncement-health-get.md'
         - serviceannouncement health list: 'cmd/tenant/serviceannouncement/serviceannouncement-health-list.md'
       - status:
         - status list: 'cmd/tenant/status/status-list.md'
