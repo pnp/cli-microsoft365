@@ -82,7 +82,7 @@ npm install -g @pnp/cli-microsoft365@latest
 This will download and install the latest public version of the CLI for Microsoft 365. If you want to update to the latest beta version of the CLI, replace `@latest` with `@next`.
 
 !!! important
-    New version of the CLI for Microsoft 365 often contains new commands. Don't forget to update command completion for your terminal to get suggestions for the latest commands added in the CLI. For more information see the article on [command completion](../concepts/completion.md).
+    New version of the CLI for Microsoft 365 often contains new commands. Don't forget to update command completion for your terminal to get suggestions for the latest commands added in the CLI. For more information see the article on [command completion](completion.md).
 
 ## Uninstall the CLI
 

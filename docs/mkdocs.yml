@@ -13,8 +13,10 @@ nav:
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
     - 'Filter CLI data': 'user-guide/filter-cli-data.md'
     - 'Configure CLI': 'user-guide/configuring-cli.md'
+    - 'Command completion': 'user-guide/completion.md'
     - 'Use your own Azure AD identity': 'user-guide/using-own-identity.md'
     - 'Caveats when working with the CLI and certificate login': 'user-guide/cli-certificate-caveats.md'
+    - 'GitHub Actions': 'user-guide/github-actions.md'
     - 'Manage Microsoft 365 apps with the CLI': 'user-guide/manage-microsoft-365-apps.md'
     - 'Use CLI programmatically': 'user-guide/use-cli-api.md'
   - Commands:
@@ -642,9 +644,7 @@ nav:
   - Concepts:
     - 'Persisting connection': 'concepts/persisting-connection.md'
     - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
-    - 'Command completion': 'concepts/completion.md'
     - 'Communication with Microsoft 365': 'concepts/communicating-m365.md'
-    - 'GitHub Actions': 'concepts/github-actions.md'
   - Sample Scripts:
     - 'Introduction': 'sample-scripts/index.md'
     - Azure Active Directory:
