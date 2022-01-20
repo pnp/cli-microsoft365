@@ -15,6 +15,7 @@ export default {
   CHAT_LIST: `${prefix} chat list`,
   CHAT_MEMBER_LIST: `${prefix} chat member list`,
   CHAT_MESSAGE_LIST: `${prefix} chat message list`,
+  CHAT_MESSAGE_SEND: `${prefix} chat message send`,
   CONVERSATIONMEMBER_ADD: `${prefix} conversationmember add`,
   CONVERSATIONMEMBER_LIST: `${prefix} conversationmember list`,
   FUNSETTINGS_LIST: `${prefix} funsettings list`,
