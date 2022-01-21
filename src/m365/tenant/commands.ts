@@ -14,5 +14,6 @@ export default {
   SERVICE_REPORT_HISTORICALSERVICESTATUS: `${prefix} service report historicalservicestatus`,
   SERVICEANNOUNCEMENT_HEALTH_GET: `${prefix} serviceannouncement health get`,
   SERVICEANNOUNCEMENT_HEALTH_LIST: `${prefix} serviceannouncement health list`,
+  SERVICEANNOUNCEMENT_MESSAGE_GET: `${prefix} serviceannouncement message get`,
   STATUS_LIST: `${prefix} status list`
 }; 
