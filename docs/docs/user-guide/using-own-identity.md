@@ -49,7 +49,7 @@ This will refresh the `Authentication` blade and will display the Redirect URI w
 !!! info
     This Redirect URI is specific to the use of authentication methods that do not use a web interface for authenticating users and are therefore called `Native Clients`. This is the category that the CLI for Microsoft 365 falls into.
 
-Moving on, we can skip over the `Supported account type` section, as this is defaulted to `Accounts in this organizational directory only (<tenant> only - Single tenant)` meaning, that only users within the current tenant directory can use this application. In the `Advanced settings` section, we need to enable the `Default client type` toggle, as we are using the `Device code flow` method to authenticate to our tenant using the CLI for Microsoft 365.
+Moving on, we can skip over the `Supported account type` section, as this is defaulted to `Accounts in this organizational directory only (<tenant> only - Single tenant)` meaning, that only users within the current tenant directory can use this application. In the `Advanced settings` section, we need to enable the `Allow public client flows` toggle, as we are using the `Device code flow` method to authenticate to our tenant using the CLI for Microsoft 365.
 
 [![Advanced settings](../images/using-own-identity/advanced-settings.png)](../images/using-own-identity/advanced-settings.png)
 
