@@ -640,6 +640,7 @@ nav:
   - Sample Scripts:
     - 'Introduction': 'sample-scripts/index.md'
     - Azure Active Directory:
+      - 'Analyze users for known data breaches with have i been pwned' : 'sample-scripts/aad/analyze-users-haveibeenpwnd.md'
       - 'Analyze User Profile Photos using Azure Computer Vision API' : 'sample-scripts/aad/analyze-user-profile-photos.md'
       - 'Bulk add/remove users to Microsoft Teams and Microsoft 365 Groups' : 'sample-scripts/aad/manage-group-users.md'
       - 'Delete all Microsoft 365 groups' : 'sample-scripts/aad/delete-m365-groups.md'
