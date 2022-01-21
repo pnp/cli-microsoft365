@@ -666,6 +666,7 @@ nav:
       - 'Grant API permissions to SharePoint Azure AD Application': 'sample-scripts/spo/grant-api-permissions-aad.md'
       - 'Hide SharePoint list from Site Contents': 'sample-scripts/spo/hide-list-from-site-contents.md'
       - 'Insert pictures in a SharePoint Document Library into a Word document': 'sample-scripts/spo/insert-sp-library-pictures-into-word.md'
+      - 'List attachment names from SharePoint lists for a site': 'sample-scripts/spo/list-attachment-names-from-spo-lists.md'
       - 'List site collections and their lists': 'sample-scripts/spo/list-site-collection-lists.md'
       - 'Lists active SharePoint site collection application catalogs': 'sample-scripts/spo/list-site-app-catalogs.md'
       - 'Lists all application customizers in the tenant': 'sample-scripts/spo/list-all-application-customizers.md'
