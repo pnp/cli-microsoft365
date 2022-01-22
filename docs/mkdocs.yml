@@ -131,6 +131,7 @@ nav:
         - serviceannouncement health get: 'cmd/tenant/serviceannouncement/serviceannouncement-health-get.md'
         - serviceannouncement health list: 'cmd/tenant/serviceannouncement/serviceannouncement-health-list.md'
         - serviceannouncement message get: 'cmd/tenant/serviceannouncement/serviceannouncement-message-get.md'
+        - serviceannouncement message list: 'cmd/tenant/serviceannouncement/serviceannouncement-message-list.md'
       - status:
         - status list: 'cmd/tenant/status/status-list.md'
     - Microsoft Graph (graph):

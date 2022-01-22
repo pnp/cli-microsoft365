@@ -15,5 +15,6 @@ export default {
   SERVICEANNOUNCEMENT_HEALTH_GET: `${prefix} serviceannouncement health get`,
   SERVICEANNOUNCEMENT_HEALTH_LIST: `${prefix} serviceannouncement health list`,
   SERVICEANNOUNCEMENT_MESSAGE_GET: `${prefix} serviceannouncement message get`,
+  SERVICEANNOUNCEMENT_MESSAGE_LIST: `${prefix} serviceannouncement message list`,
   STATUS_LIST: `${prefix} status list`
 }; 
