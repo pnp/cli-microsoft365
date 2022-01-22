@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   service: string;
 }
 
-class ServiceAnnouncementMessageListCommand extends GraphItemsListCommand<ServiceUpdateMessage> {
+class TenantServiceAnnouncementMessageListCommand extends GraphItemsListCommand<ServiceUpdateMessage> {
   public get name(): string {
     return commands.SERVICEANNOUNCEMENT_MESSAGE_LIST;
   }
@@ -62,4 +62,4 @@ class ServiceAnnouncementMessageListCommand extends GraphItemsListCommand<Servic
   }
 }
 
-module.exports = new ServiceAnnouncementMessageListCommand();
+module.exports = new TenantServiceAnnouncementMessageListCommand();
