@@ -685,6 +685,7 @@ nav:
       - 'List all documents with a specific name within a SharePoint site': 'sample-scripts/spo/list-all-files-specific-name.md'
       - 'Lists all external users in all site collections': 'sample-scripts/spo/list-site-externalusers.md'
       - 'Lists all failed site designs': 'sample-scripts/spo/list-failed-sitedesigns.md'
+      - 'List all items with unique permissions': 'sample-scripts/spo/list-all-items-with-unique-permissions.md'
       - 'List all large files within a SharePoint Site': 'sample-scripts/spo/list-large-files-within-a-site.md'
       - 'Lists all tenant-wide extensions': 'sample-scripts/spo/list-tenant-wide-extensions.md'
       - 'Lists number of files in all lists and folders for the given site': 'sample-scripts/spo/list-all-list-folders-itemcount.md'
