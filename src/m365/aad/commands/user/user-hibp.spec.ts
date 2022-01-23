@@ -66,14 +66,13 @@ describe(commands.USER_HIBP, () => {
   it('checks user is pwned using userName', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent('account-exists@hibp-integration-tests.com')}`) {
-        // this is the actual truncated response as the API would return
         return Promise.resolve([{ "Name": "Adobe" }]);
       }
 
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { userName: 'account-exists@hibp-integration-tests.com', apiKey: '2975xc539c304xf797f665x43f8x557x' } }, () => {
+    command.action(logger, { options: { debug: false, userName: 'account-exists@hibp-integration-tests.com', apiKey: "2975xc539c304xf797f665x43f8x557x" } }, () => {
       try {
         assert(loggerLogSpy.calledWith([{ "Name": "Adobe" }]));
         done();
@@ -165,26 +164,6 @@ describe(commands.USER_HIBP, () => {
       try {
         assert(loggerLogSpy.calledWith("No pwnage found"));
 
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('checks user is pwned using userName (debug)', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent('account-exists@hibp-integration-tests.com')}`) {
-        return Promise.resolve([{ "Name": "Adobe" }]);
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: false, userName: 'account-exists@hibp-integration-tests.com', apiKey: "2975xc539c304xf797f665x43f8x557x" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{ "Name": "Adobe" }]));
         done();
       }
       catch (e) {

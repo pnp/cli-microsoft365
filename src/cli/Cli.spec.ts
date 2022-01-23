@@ -1049,7 +1049,7 @@ describe('Cli', () => {
     assert.strictEqual(actual, d.toString());
   });
 
-  it('formats object output as transposed table', (done) => {
+  it('formats object output as transposed table when passing seqential props', (done) => {
     const o = { prop1: 'value1', prop2: 'value2' };
     const actual = (Cli as any).formatOutput(o, { output: 'text' });
     const t = new Table();

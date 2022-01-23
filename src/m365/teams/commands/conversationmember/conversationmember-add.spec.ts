@@ -506,17 +506,6 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct teamId, channelName, and userId input', () => {
-    const actual = command.validate({
-      options: {
-        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
-        channelName: "Private Channel",
-        userId: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
-      }
-    });
-    assert.strictEqual(actual, true);
-  });
-
   it('validates for a correct teamId, channelId, and userDisplayName input', () => {
     const actual = command.validate({
       options: {
@@ -543,17 +532,6 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
     const actual = command.validate({
       options: {
         teamName: "Human Resources",
-        channelName: "Private Channel",
-        userDisplayName: "admin.contoso.com"
-      }
-    });
-    assert.strictEqual(actual, true);
-  });
-
-  it('validates for a correct teamId, channelName, and userDisplayName input', () => {
-    const actual = command.validate({
-      options: {
-        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelName: "Private Channel",
         userDisplayName: "admin.contoso.com"
       }
