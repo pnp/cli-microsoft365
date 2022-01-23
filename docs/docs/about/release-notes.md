@@ -9,6 +9,10 @@
 - [aad group list](../cmd/aad/group/group-list.md) - lists Azure AD groups [#2622](https://github.com/pnp/cli-microsoft365/issues/2622)
 - [aad user hibp](../cmd/aad/user/user-hibp.md) - allows you to retrieve all accounts that have been pwned with the specified username [#2476](https://github.com/pnp/cli-microsoft365/issues/2476)
 
+**Planner:**
+
+- [planner task set](../cmd/planner/task/task-set.md) - updates a Microsoft Planner task [#2824](https://github.com/pnp/cli-microsoft365/issues/2824)
+
 **SharePoint:**
 
 - [spo site recyclebinitem list](../cmd/spo/site/site-recyclebinitem-list.md) - lists items from recycle bin [#2875](https://github.com/pnp/cli-microsoft365/issues/2875)
