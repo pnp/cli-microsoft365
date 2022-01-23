@@ -23,6 +23,7 @@ const dictionary = [
   'group',
   'groupify',
   'guest',
+  'health',
   'hide',
   'historical',
   'home',

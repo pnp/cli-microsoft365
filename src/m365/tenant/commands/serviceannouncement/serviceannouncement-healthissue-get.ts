@@ -2,8 +2,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
-import { ServiceHealthIssue } from '@microsoft/microsoft-graph-types';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -11,31 +10,21 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  service: string;
+  id: string;
 }
 
-class TenantServiceAnnouncementHealthIssueListCommand extends GraphItemsListCommand<ServiceHealthIssue> {
+class TenantServiceAnnouncementHealthIssueGetCommand extends GraphCommand {
   public get name(): string {
-    return commands.SERVICEANNOUNCEMENT_HEALTHISSUE_LIST;
+    return commands.SERVICEANNOUNCEMENT_HEALTHISSUE_GET;
   }
 
   public get description(): string {
-    return 'Gets all service health issues for the tenant';
-  }
-
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'title'];
+    return 'Gets a specified service health issue for tenant';
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let endpoint: string = `${this.resource}/v1.0/admin/serviceAnnouncement/issues`;
-
-    if (args.options.service) {
-      endpoint += `?$filter=service eq '${encodeURIComponent(args.options.service)}'`;
-    }
-
     const requestOptions: any = {
-      url: endpoint,
+      url: `${this.resource}/v1.0/admin/serviceAnnouncement/issues/${encodeURIComponent(args.options.id)}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -45,7 +34,7 @@ class TenantServiceAnnouncementHealthIssueListCommand extends GraphItemsListComm
     request
       .get(requestOptions)
       .then((res: any): void => {
-        logger.log(res.value);
+        logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -53,7 +42,7 @@ class TenantServiceAnnouncementHealthIssueListCommand extends GraphItemsListComm
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-s, --service [service]'
+        option: '-i, --id <id>'
       }
     ];
 
@@ -62,4 +51,4 @@ class TenantServiceAnnouncementHealthIssueListCommand extends GraphItemsListComm
   }
 }
 
-module.exports = new TenantServiceAnnouncementHealthIssueListCommand();
+module.exports = new TenantServiceAnnouncementHealthIssueGetCommand(); 
