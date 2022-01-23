@@ -24,7 +24,7 @@ class TenantServiceAnnouncementMessageListCommand extends GraphItemsListCommand<
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['services', 'id', 'title'];
+    return ['id', 'title'];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

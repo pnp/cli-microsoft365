@@ -219,7 +219,7 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['services', 'id', 'title']);
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'title']);
   });
 
   it('handles promise error while getting service update messages available in Microsoft 365', (done) => {
