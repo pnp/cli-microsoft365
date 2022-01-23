@@ -151,9 +151,8 @@ export class Cli {
         }
       }
     }
-
     const shouldPrompt = this.getSettingWithDefaultValue<string | undefined>(settingsNames.prompt, undefined)?.toLowerCase() === 'true';
-    this.validateOrPromptForOptions(0, this.commandToExecute.options.length, shouldPrompt, this.commandToExecute, this.optionsFromArgs);
+    await this.validateOrPromptForOptions(0, this.commandToExecute.options.length, shouldPrompt, this.commandToExecute, this.optionsFromArgs);
   }
 
   public static executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
@@ -326,7 +325,7 @@ export class Cli {
     }
   }
 
-  private validateOrPromptForOptions(index: number, optionsLength: number, shouldPrompt: boolean, commandToExecute: CommandInfo, optionsFromArgs: any): void {
+  private async validateOrPromptForOptions(index: number, optionsLength: number, shouldPrompt: boolean, commandToExecute: CommandInfo, optionsFromArgs: any): Promise<void> {
     if (typeof commandToExecute.options[index] !== 'undefined' &&
       commandToExecute.options[index].required &&
       typeof optionsFromArgs.options[commandToExecute.options[index].name] === 'undefined') {
@@ -334,32 +333,34 @@ export class Cli {
       if (!shouldPrompt) {
         return this.closeWithError(`Required option ${commandToExecute.options[index].name} not specified`, optionsFromArgs, true);
       }
+      if (index === 0) {
+        Cli.log("Supply values for the following parameters:");
+      }
 
       Cli.prompt({
         name: 'missingRequireOptionValue',
-        message: `Please specify value for required option ${commandToExecute.options[index].name}: `
-      }, (result: { missingRequireOptionValue: string }): void => {
+        message: `${commandToExecute.options[index].name}: `
+      }, async (result: { missingRequireOptionValue: string }): Promise<void> => {
         optionsFromArgs.options[commandToExecute.options[index].name] = result.missingRequireOptionValue;
         if (typeof commandToExecute.options[index].short !== 'undefined') {
           optionsFromArgs.options[commandToExecute.options[index].short?.toString() ?? ""] = result.missingRequireOptionValue;
         }
-
-        this.checkAndExecuteOrContinueValidate(index, optionsLength, shouldPrompt, commandToExecute, optionsFromArgs);
+        await this.checkExecuteOrContinueValidate(index, optionsLength, shouldPrompt, commandToExecute, optionsFromArgs);
       });
 
     }
     else {
-      this.checkAndExecuteOrContinueValidate(index, optionsLength, shouldPrompt, commandToExecute, optionsFromArgs);
+      await this.checkExecuteOrContinueValidate(index, optionsLength, shouldPrompt, commandToExecute, optionsFromArgs);
     }
   }
 
-  private checkAndExecuteOrContinueValidate(index: number, optionsLength: number, shouldPrompt: boolean, commandToExecute: CommandInfo, optionsFromArgs: any): void {
+  private async checkExecuteOrContinueValidate(index: number, optionsLength: number, shouldPrompt: boolean, commandToExecute: CommandInfo, optionsFromArgs: any): Promise<void> {
     index += 1;
     if (index >= optionsLength - 1) {
-      this.continueExecute(commandToExecute, optionsFromArgs);
+      await this.continueExecute(commandToExecute, optionsFromArgs);
     }
     else {
-      this.validateOrPromptForOptions(index, optionsLength, shouldPrompt, commandToExecute, optionsFromArgs);
+      await this.validateOrPromptForOptions(index, optionsLength, shouldPrompt, commandToExecute, optionsFromArgs);
     }
   }
 
@@ -378,7 +379,7 @@ export class Cli {
       await commandToExecute.command.processOptions(optionsWithoutShorts.options);
     }
     catch (e: any) {
-      return this.closeWithError(e.message, optionsWithoutShorts, false);
+      this.closeWithError(e.message, optionsWithoutShorts, false);
     }
 
     // if output not specified, set the configured output value (if any)
@@ -815,7 +816,6 @@ export class Cli {
     if (error instanceof CommandError && error.code) {
       exitCode = error.code;
     }
-
     Cli.error(errorMessage);
 
     if (showHelpIfEnabled &&
@@ -825,7 +825,6 @@ export class Cli {
     else {
       process.exit(exitCode);
     }
-
     // will never be run. Required for testing where we're stubbing process.exit
     /* c8 ignore next */
     throw new Error();

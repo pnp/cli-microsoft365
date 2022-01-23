@@ -197,7 +197,8 @@ describe('Cli', () => {
       // eslint-disable-next-line no-console
       console.error,
       mockCommand.commandAction,
-      mockCommand.processOptions
+      mockCommand.processOptions,
+      Cli.prompt
     ]);
   });
 
@@ -426,6 +427,44 @@ describe('Cli', () => {
           done(e);
         }
       });
+  });
+
+  it(`does not prompt and fails validation if a required option is missing`, (done) => {
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return undefined;
+      }
+      return defaultValue;
+    });
+
+    cli
+      .execute(rootFolder, ['cli', 'mock'])
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
+        try {
+          assert(cliErrorStub.calledWith(chalk.red(`Error: Required option parameterX not specified`)));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it(`prompts for required options`, () => {
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return 'true';
+      }
+      return defaultValue;
+    });
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    });
+    
+    cli
+      .execute(rootFolder, ['cli', 'mock'])
+      .then(_ => assert(mockCommandActionSpy.called));
   });
 
   it(`calls command's validation method when defined`, (done) => {
