@@ -52,11 +52,6 @@ describe('Utils', () => {
     assert.strictEqual(result, false);
   });
 
-  it('isValidISODate returns false if value is not in ISO Date format', () => {
-    const result = Utils.isValidISODate("22-03-2019");
-    assert.strictEqual(result, false);
-  });
-
   it('isValidISODateDashOnly returns false if alpha characters are passed', () => {
     const result = Utils.isValidISODateDashOnly("sharing is caring");
     assert.strictEqual(result, false);
@@ -231,7 +226,7 @@ describe('Utils', () => {
     assert.strictEqual(actual, '/sites/team1/Shared Documents');
   });
 
-  it('should get server relative path when https://contoso.sharepoint.com/ and /Shared Documents', () => {
+  it('should get server relative path when https://contoso.sharepoint.com/sites/team1/ and /Shared Documents', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/team1/', '/Shared Documents');
     assert.strictEqual(actual, '/sites/team1/Shared Documents');
   });
@@ -263,11 +258,6 @@ describe('Utils', () => {
 
   it('should get server relative path when sites/team1/ and Shared Documents', () => {
     const actual = Utils.getServerRelativePath('sites/team1/', 'Shared Documents');
-    assert.strictEqual(actual, '/sites/team1/Shared Documents');
-  });
-
-  it('should get server relative path when sites/team1/ and Shared Documents', () => {
-    const actual = Utils.getServerRelativePath('sites/team1', 'Shared Documents');
     assert.strictEqual(actual, '/sites/team1/Shared Documents');
   });
 
@@ -311,11 +301,6 @@ describe('Utils', () => {
     assert.strictEqual(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get server relative path when https://contoso.sharepoint.com/sites/site1 and sites/site1/Shared Documents', () => {
-    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/site1', 'sites/site1/Shared Documents');
-    assert.strictEqual(actual, '/sites/site1/Shared Documents');
-  });
-
   it('should get server relative path when https://contoso.sharepoint.com/sites/site1/ and /sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/site1/', '/sites/site1/Shared Documents');
     assert.strictEqual(actual, '/sites/site1/Shared Documents');
@@ -341,33 +326,18 @@ describe('Utils', () => {
     assert.strictEqual(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get server relative path when https://contoso.sharepoint.com/sites/site1 and /sites/site1/Shared Documents', () => {
-    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/site1', '/sites/site1/Shared Documents');
-    assert.strictEqual(actual, '/sites/site1/Shared Documents');
-  });
-
-  it('should get server relative path when https://contoso.sharepoint.com/sites/site1 and sites/site1/Shared Documents', () => {
-    const actual = Utils.getServerRelativePath('https://contoso.sharepoint.com/sites/site1', 'sites/site1/Shared Documents');
-    assert.strictEqual(actual, '/sites/site1/Shared Documents');
-  });
-
   it('should get server relative path when /sites/site1/ and /sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('/sites/site1/', '/sites/site1/Shared Documents');
     assert.strictEqual(actual, '/sites/site1/Shared Documents');
   });
 
-  it('should get server relative path when sites/site1/ and /sites/site1/Shared Documents', () => {
+  it('should get server relative path when sites/site1 and /sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('sites/site1', '/sites/site1/Shared Documents');
     assert.strictEqual(actual, '/sites/site1/Shared Documents');
   });
 
   it('should get server relative path when /sites/site1 and /sites/site1/Shared Documents', () => {
     const actual = Utils.getServerRelativePath('/sites/site1', '/sites/site1/Shared Documents');
-    assert.strictEqual(actual, '/sites/site1/Shared Documents');
-  });
-
-  it('should get server relative path when sites/site1 and /sites/site1/Shared Documents', () => {
-    const actual = Utils.getServerRelativePath('sites/site1', '/sites/site1/Shared Documents');
     assert.strictEqual(actual, '/sites/site1/Shared Documents');
   });
 
@@ -461,7 +431,7 @@ describe('Utils', () => {
     assert.strictEqual(actual, '/Shared Documents');
   });
 
-  it('should get web relative path when https://contoso.sharepoint.com/ and /Shared Documents', () => {
+  it('should get web relative path when https://contoso.sharepoint.com/sites/team1/ and /Shared Documents', () => {
     const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/team1/', '/Shared Documents');
     assert.strictEqual(actual, '/Shared Documents');
   });
@@ -496,7 +466,7 @@ describe('Utils', () => {
     assert.strictEqual(actual, '/Shared Documents');
   });
 
-  it('should get web relative path when sites/team1/ and Shared Documents', () => {
+  it('should get web relative path when sites/team1 and Shared Documents', () => {
     const actual = Utils.getWebRelativePath('sites/team1', 'Shared Documents');
     assert.strictEqual(actual, '/Shared Documents');
   });
@@ -541,11 +511,6 @@ describe('Utils', () => {
     assert.strictEqual(actual, '/Shared Documents');
   });
 
-  it('should get web relative path when https://contoso.sharepoint.com/sites/site1 and sites/site1/Shared Documents', () => {
-    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/site1', 'sites/site1/Shared Documents');
-    assert.strictEqual(actual, '/Shared Documents');
-  });
-
   it('should get web relative path when https://contoso.sharepoint.com/sites/site1/ and /sites/site1/Shared Documents', () => {
     const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/site1/', '/sites/site1/Shared Documents');
     assert.strictEqual(actual, '/Shared Documents');
@@ -568,16 +533,6 @@ describe('Utils', () => {
 
   it('should get web relative path when https://contoso.sharepoint.com/sites/site1/ and sites/site1/Shared Documents/', () => {
     const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/site1/', 'sites/site1/Shared Documents/');
-    assert.strictEqual(actual, '/Shared Documents');
-  });
-
-  it('should get web relative path when https://contoso.sharepoint.com/sites/site1 and /sites/site1/Shared Documents', () => {
-    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/site1', '/sites/site1/Shared Documents');
-    assert.strictEqual(actual, '/Shared Documents');
-  });
-
-  it('should get web relative path when https://contoso.sharepoint.com/sites/site1 and sites/site1/Shared Documents', () => {
-    const actual = Utils.getWebRelativePath('https://contoso.sharepoint.com/sites/site1', 'sites/site1/Shared Documents');
     assert.strictEqual(actual, '/Shared Documents');
   });
 
@@ -748,11 +703,6 @@ describe('Utils', () => {
 
   it('returns empty tenant id when invalid access token passed', () => {
     const actual = Utils.getTenantIdFromAccessToken('abc.def.ghi');
-    assert.strictEqual(actual, '');
-  });
-
-  it('returns empty tenant id when invalid access token passed', () => {
-    const actual = Utils.getTenantIdFromAccessToken('abc.ghi');
     assert.strictEqual(actual, '');
   });
 

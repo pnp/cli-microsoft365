@@ -467,7 +467,7 @@ describe(commands.SITE_ADD, () => {
     });
   });
 
-  it('sets specified title for communication site', (done) => {
+  it('sets specified title for communication site when owners is passed', (done) => {
     const expected = 'Marketing';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -2849,17 +2849,6 @@ describe(commands.SITE_ADD, () => {
         done(e);
       }
     });
-  });
-
-  it('supports debug mode', () => {
-    const options = command.options();
-    let containsdebugOption = false;
-    options.forEach(o => {
-      if (o.option === '--debug') {
-        containsdebugOption = true;
-      }
-    });
-    assert(containsdebugOption);
   });
 
   it('fails validation if the url is not specified', () => {

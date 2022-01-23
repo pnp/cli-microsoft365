@@ -240,7 +240,7 @@ describe('Auth', () => {
     });
   });
 
-  it('handles empty response when retrieving new access token', (done) => {
+  it('handles failure response when retrieving new access token', (done) => {
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(publicApplication, 'acquireTokenSilent').callsFake(_ => Promise.resolve(null));
 
@@ -2046,7 +2046,7 @@ describe('Auth', () => {
     const actualClientApp = (auth as any).getClientApplication(logger, false);
     assert(actualClientApp instanceof msal.ConfidentialClientApplication);
   });
-  
+
   it('retrieves token using client secret flow when authType "secret" specified', (done) => {
     auth.service.authType = AuthType.Secret;
     auth.service.secret = "SomeSecretValue";

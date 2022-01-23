@@ -298,12 +298,12 @@ describe(commands.SEARCH, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('query must be a string', () => {
+  it('passes validation if queryText is a string', () => {
     const actual = command.validate({ options: { queryText: 'abc' } });
     assert.strictEqual(actual, true);
   });
 
-  it('query must be a string', () => {
+  it('does not pass validation if queryText is a number', () => {
     const actual = command.validate({ options: { queryText: 123 } });
     assert.notStrictEqual(actual, true);
   });

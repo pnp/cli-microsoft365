@@ -824,7 +824,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['pnpm un package']));
   });
 
-  it(`returns command to uninstall dev dependency for 1 dev dep for npm package manager`, () => {
+  it(`returns command to uninstall dev dependency for 1 dev dep for pnpm package manager`, () => {
     (command as any).packageManager = 'pnpm';
     const commands: string[] = (command as any).reducePackageManagerCommand([], [], [], ['package']);
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['pnpm un package']));

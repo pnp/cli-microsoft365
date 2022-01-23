@@ -145,7 +145,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
     });
   });
 
-  it('removes the Org Assets Library when prompt confirmed', (done) => {
+  it('removes the Org Assets Library when prompt confirmed and output set to JSON', (done) => {
     let orgAssetLibRemoveCallIssued = false;
 
     sinon.stub(request, 'post').callsFake((opts) => {

@@ -95,17 +95,17 @@ describe(commands.MESSAGE_LIKE_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('enable must be true or false', () => {
+  it('passes validation if enabled set to "true"', () => {
     const actual = command.validate({ options: { id: 10123123, enable: 'true' } });
     assert.strictEqual(actual, true);
   });
 
-  it('enable must be true or false', () => {
+  it('passes validation if enabled set to "true"', () => {
     const actual = command.validate({ options: { id: 10123123, enable: 'false' } });
     assert.strictEqual(actual, true);
   });
 
-  it('enable must be true or false', () => {
+  it('does not pass validation if enable not set to either "true" or "false"', () => {
     const actual = command.validate({ options: { id: 10123123, enable: 'fals' } });
     assert.notStrictEqual(actual, true);
   });

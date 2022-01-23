@@ -1,0 +1,9 @@
+{
+  "extension": [
+    "ts"
+  ],
+  "spec": "dist/**/*.spec.js",
+  "require": "source-map-support/register",
+  "watch": "dist/**/*.js",
+  "logpanel": true
+}
