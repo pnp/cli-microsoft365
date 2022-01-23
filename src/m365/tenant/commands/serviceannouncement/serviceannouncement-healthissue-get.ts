@@ -13,7 +13,7 @@ interface Options extends GlobalOptions {
   issueId: string;
 }
 
-class TenantServiceAnnouncementHealthIssueGetCommand extends GraphCommand {
+class TenantServiceAnnouncementHealthissueGetCommand extends GraphCommand {
   public get name(): string {
     return commands.SERVICEANNOUNCEMENT_HEALTHISSUE_GET;
   }
@@ -57,4 +57,4 @@ class TenantServiceAnnouncementHealthIssueGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new TenantServiceAnnouncementHealthIssueGetCommand(); 
+module.exports = new TenantServiceAnnouncementHealthissueGetCommand(); 
