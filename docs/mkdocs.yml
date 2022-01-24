@@ -673,6 +673,7 @@ nav:
       - 'List site collections and their lists': 'sample-scripts/spo/list-site-collection-lists.md'
       - 'Lists active SharePoint site collection application catalogs': 'sample-scripts/spo/list-site-app-catalogs.md'
       - 'Lists all application customizers in the tenant': 'sample-scripts/spo/list-all-application-customizers.md'
+      - 'List all documents with a specific name within a SharePoint site': 'sample-scripts/spo/list-all-files-specific-name.md'
       - 'Lists all external users in all site collections': 'sample-scripts/spo/list-site-externalusers.md'
       - 'Lists all failed site designs': 'sample-scripts/spo/list-failed-sitedesigns.md'
       - 'List all large files within a SharePoint Site': 'sample-scripts/spo/list-large-files-within-a-site.md'
