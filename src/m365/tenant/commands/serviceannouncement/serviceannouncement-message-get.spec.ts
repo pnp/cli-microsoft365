@@ -111,6 +111,10 @@ describe (commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['startDateTime', 'endDateTime', 'lastModifiedDateTime', 'title', 'id', 'category', 'severity', 'tags', 'isMajorChange', 'actionRequiredByDateTime', 'services', 'expiryDateTime', 'hasAttachments', 'viewPoint' ]);
+  });
+
   it('fails validation if incorrect message ID is provided', (done) => {
     const actual = command.validate({
       options: {
@@ -207,6 +211,32 @@ describe (commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
       }
     }
     );
+  });
+
+  it('lists all properties for output json', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/messages/${testId}`) {
+        return Promise.resolve(resMessage);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+
+    command.action(logger, { 
+      options: 
+      {
+        id: testId,
+        output: 'json'
+      } }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(resMessage));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('supports debug mode', () => {

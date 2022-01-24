@@ -24,10 +24,8 @@ class TenantServiceAnnouncementMessageGetCommand extends GraphCommand {
     return 'Retrieves a specified service update message for the tenant';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = (!(!args.options.appId)).toString();
-    return telemetryProps;
+  public defaultProperties(): string[] | undefined {
+    return ['startDateTime', 'endDateTime', 'lastModifiedDateTime', 'title', 'id', 'category', 'severity', 'tags', 'isMajorChange', 'actionRequiredByDateTime', 'services', 'expiryDateTime', 'hasAttachments', 'viewPoint' ];
   }
 
   public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
