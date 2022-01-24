@@ -40,7 +40,7 @@ class SpoGroupUserAddCommand extends SpoCommand {
       .getGroupId(args)
       .then((_groupId: number): Promise<string[]> => {
         groupId = _groupId;
-        return this.getOnlyActiveUsers(args, logger);
+        return this.checkUserValidity(args, logger);
       })
       .then((resolvedUsernameList: string[]): Promise<SharingResult> => {
         if (this.verbose) {
@@ -102,12 +102,13 @@ class SpoGroupUserAddCommand extends SpoCommand {
       });
   }
 
-  private getOnlyActiveUsers(args: CommandArgs, logger: Logger): Promise<string[]> {
+  private checkUserValidity(args: CommandArgs, logger: Logger): Promise<string[]> {
     if (this.verbose) {
-      logger.logToStderr(`Removing Users which are not active from the original list`);
+      logger.logToStderr(`Checking the validity of users and showing error if invalid users exists`);
     }
 
-    const activeUserNameList: string[] = [];
+    const validUsernamelist: string[] = [];
+    const InvalidUsernamelist: string[] = [];
     const userInfo: string = args.options.userName ? args.options.userName : args.options.email!;
 
     return Promise.all(userInfo.split(',').map(singleUserName => {
@@ -130,15 +131,19 @@ class SpoGroupUserAddCommand extends SpoCommand {
             logger.logToStderr(getUserGetOutput.stderr);
           }
 
-          activeUserNameList.push(JSON.parse(getUserGetOutput.stdout).userPrincipalName);
+          validUsernamelist.push(JSON.parse(getUserGetOutput.stdout).userPrincipalName);
         }, (err: CommandErrorWithOutput) => {
           if (this.debug) {
             logger.logToStderr(err.stderr);
           }
+          InvalidUsernamelist.push(singleUserName);
         });
     }))
       .then((): Promise<string[]> => {
-        return Promise.resolve(activeUserNameList);
+        if (InvalidUsernamelist.length > 0) {
+          return Promise.reject(`Users not added to the group because of the Invalid users : ${InvalidUsernamelist.join(', ')}`);
+        }
+        return Promise.resolve(validUsernamelist);
       });
   }
 
