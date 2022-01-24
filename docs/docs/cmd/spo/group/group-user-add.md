@@ -27,6 +27,10 @@ m365 spo group user add [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+For the `--userName` or `--email` options you can specify multiple values by separating them with a comma. If one of the specified entries is not valid, the command will fail with an error message showing the list invalid values.
+
 ## Examples
 
 Add a user with name _Alex.Wilber@contoso.com_ to the SharePoint group with id _5_ available on the web _https://contoso.sharepoint.com/sites/SiteA_
