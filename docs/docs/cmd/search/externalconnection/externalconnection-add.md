@@ -30,7 +30,7 @@ The `id` must be at least 3 and no more than 32 characters long. It can contain 
 
 ## Examples
 
-Adds a new external connection with name and description of test
+Adds a new external connection with name and description of test app
 
 ```sh
 m365 search externalconnection add --id MyApp --name "Test" --description "Test"
