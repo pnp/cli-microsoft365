@@ -12,6 +12,6 @@ export default {
   SERVICEANNOUNCEMENT_MESSAGE_LIST: `${prefix} serviceannouncement message list`,
   SERVICE_LIST: `${prefix} service list`,
   SERVICE_MESSAGE_LIST: `${prefix} service message list`,
-  SERVICE_REPORT_HISTORICALSERVICESTATUS: `${prefix} service report historicalservicestatus`,  
-  STATUS_LIST: `${prefix} status list`  
-}; 
+  SERVICE_REPORT_HISTORICALSERVICESTATUS: `${prefix} service report historicalservicestatus`,
+  STATUS_LIST: `${prefix} status list`
+};
