@@ -28,6 +28,37 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
     }
   ];
 
+  const serviceHealthResponseCSV = `service,status,id
+    Exchange Online,serviceDegradation,Exchange
+    Identity Service,serviceOperational,OrgLiveID
+    Microsoft 365 suite,serviceOperational,OSDPPlatform
+    Skype for Business,serviceOperational,Lync
+    SharePoint Online,serviceOperational,SharePoint
+    Dynamics 365 Apps,serviceOperational,DynamicsCRM
+    Azure Information Protection,serviceOperational,RMS
+    Yammer Enterprise,serviceOperational,yammer
+    Mobile Device Management for Office 365,serviceOperational,MobileDeviceManagement
+    Planner,serviceOperational,Planner
+    Sway,serviceOperational,SwayEnterprise
+    Power BI,serviceOperational,PowerBIcom
+    Microsoft Intune,extendedRecovery,Intune
+    OneDrive for Business,serviceOperational,OneDriveForBusiness
+    Microsoft Teams,serviceOperational,microsoftteams
+    Microsoft StaffHub,serviceOperational,StaffHub
+    Microsoft Bookings,serviceOperational,Bookings
+    Office for the web,serviceOperational,officeonline
+    Microsoft 365 Apps,serviceOperational,O365Client
+    Power Apps,serviceOperational,PowerApps
+    Power Apps in Microsoft 365,serviceOperational,PowerAppsM365
+    Microsoft Power Automate,serviceOperational,MicrosoftFlow
+    Microsoft Power Automate in Microsoft 365,serviceOperational,MicrosoftFlowM365
+    Microsoft Forms,serviceOperational,Forms
+    Microsoft 365 Defender,extendedRecovery,Microsoft365Defender
+    Microsoft Stream,serviceOperational,Stream
+    Privileged Access,serviceOperational,PAM
+    Microsoft Viva,serviceOperational,Viva
+    Microsoft Defender for Cloud Apps,serviceOperational,cloudappsecurity`;
+
   const serviceHealthIssuesResponse = [
     {
       "service": "Exchange Online",
@@ -151,6 +182,35 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
     command.action(logger, {options} as any, () => {
       try {
         assert(loggerLogSpy.calledWith(serviceHealthResponse));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly returns list as csv with issues flag', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/healthOverviews`) {
+        return Promise.resolve(
+          {
+            value: serviceHealthResponseCSV
+          }
+        );
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const options: any = {
+      issues: true,
+      output: "csv"
+    };
+
+    command.action(logger, {options} as any, () => {
+      try {
+        assert(loggerLogSpy.calledWith(serviceHealthResponseCSV));
         done();
       }
       catch (e) {
