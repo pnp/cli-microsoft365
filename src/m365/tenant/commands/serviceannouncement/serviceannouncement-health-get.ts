@@ -45,7 +45,7 @@ class TenantServiceAnnouncementHealthGetCommand extends GraphCommand {
 
   private getServiceHealth(options: Options): Promise<ServiceHealth> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/admin/serviceAnnouncement/healthOverviews/${options.serviceName}${options.issues ? '?$expand=issues' : ''}`,
+      url: `${this.resource}/v1.0/admin/serviceAnnouncement/healthOverviews/${options.serviceName}${options.issues && (!options.output || options.output.toLocaleLowerCase() === 'json') ? '?$expand=issues' : ''}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

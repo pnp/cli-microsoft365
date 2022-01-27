@@ -16,6 +16,9 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
     "id": "Exchange"
   };
 
+  const serviceHealthResponseCSV = `service,status,id
+    Exchange Online,serviceDegradation,Exchange`;
+
   const serviceHealthIssueResponse = [
     {
       "service": "Exchange Online",
@@ -144,6 +147,33 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
     command.action(logger, {options} as any, () => {
       try {
         assert(loggerLogSpy.calledWith(serviceHealthResponse));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  
+  it('correctly returns service health as csv with issues flag', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/healthOverviews/Exchange Online`) {
+        return Promise.resolve(serviceHealthResponseCSV);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const options: any = {
+      serviceName: "Exchange Online",
+      issues: true,
+      output: "csv"
+    };
+
+    command.action(logger, {options} as any, () => {
+      try {
+        assert(loggerLogSpy.calledWith(serviceHealthResponseCSV));
         done();
       }
       catch (e) {
