@@ -6,7 +6,32 @@
 
 **Azure Active Directory:**
 
-- [aad group list](../cmd/aad/group/group-list.md) - Lists Azure AD groups [#2622](https://github.com/pnp/cli-microsoft365/issues/2622)
+- [aad group list](../cmd/aad/group/group-list.md) - lists Azure AD groups [#2622](https://github.com/pnp/cli-microsoft365/issues/2622)
+- [aad user hibp](../cmd/aad/user/user-hibp.md) - allows you to retrieve all accounts that have been pwned with the specified username [#2476](https://github.com/pnp/cli-microsoft365/issues/2476)
+
+**Planner:**
+
+- [planner task set](../cmd/planner/task/task-set.md) - updates a Microsoft Planner task [#2824](https://github.com/pnp/cli-microsoft365/issues/2824)
+
+**SharePoint:**
+
+- [spo site recyclebinitem list](../cmd/spo/site/site-recyclebinitem-list.md) - lists items from recycle bin [#2875](https://github.com/pnp/cli-microsoft365/issues/2875)
+
+**Teams:**
+
+- [teams chat list](../cmd/teams/chat/chat-list.md) - lists all Microsoft Teams chat conversations for the current user [#2893](https://github.com/pnp/cli-microsoft365/issues/2893)
+- [teams chat member list](../cmd/teams/chat/chat-member-list.md) - lists all members from a Microsoft Teams chat conversation [#2896](https://github.com/pnp/cli-microsoft365/issues/2896)
+- [teams chat message list](../cmd/teams/chat/chat-message-list.md) - lists all messages from a Microsoft Teams chat conversation [#2860](https://github.com/pnp/cli-microsoft365/issues/2860)
+
+### Changes
+
+- extended 'cli config set' with support for csv output [#2901](https://github.com/pnp/cli-microsoft365/issues/2901)
+- fixed 'teams tab get' and 'teams app list' commands [#2930](https://github.com/pnp/cli-microsoft365/issues/2930)
+- extended 'spo group user add' with groupName and email [#2831](https://github.com/pnp/cli-microsoft365/issues/2831)
+- added docs explaining app commands [#2888](https://github.com/pnp/cli-microsoft365/issues/2888)
+- added support for upgrading SPFx projects to v1.14.0-beta.5 [#2983](https://github.com/pnp/cli-microsoft365/issues/2983)
+- fixed unhandled exception for spo group user add [#2935](https://github.com/pnp/cli-microsoft365/issues/2935)
+- added the 'List all large files within a SharePoint Site' sample [#2772](https://github.com/pnp/cli-microsoft365/issues/2772)
 
 ## [v4.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.3.0)
 

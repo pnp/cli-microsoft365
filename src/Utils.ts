@@ -62,6 +62,12 @@ export default class Utils {
     return guidRegEx.test(guid);
   }
 
+  public static isValidTeamsChatId(guid: string): boolean {
+    const guidRegEx: RegExp = new RegExp(/^19:[0-9a-zA-Z-_]+(@thread\.v2|@unq\.gbl\.spaces)$/i);
+
+    return guidRegEx.test(guid);
+  }
+
   public static isValidUserPrincipalName(upn: string): boolean {
     const upnRegEx = new RegExp(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/i);
 

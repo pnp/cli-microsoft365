@@ -527,18 +527,15 @@ export class Cli {
 
     if (options.output === 'csv') {
       const { stringify } = require('csv-stringify/sync');
+      const cli = Cli.getInstance();
 
-      /* 
-        https://csv.js.org/stringify/options/
-        header: Display the column names on the first line if the columns option is provided or discovered.
-        escape: Single character used for escaping; only apply to characters matching the quote and the escape options default to ".
-        quote: The quote characters surrounding a field, defaults to the " (double quotation marks), an empty quote value will preserve the original field, whether it contains quotation marks or not.
-        quoted: Boolean, default to false, quote all the non-empty fields even if not required.
-        quotedEmpty: Quote empty strings and overrides quoted_string on empty strings when defined; default is false.
-      */
-
+      // https://csv.js.org/stringify/options/
       return stringify(logStatement, {
-        header: true
+        header: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvHeader, true),
+        escape: cli.getSettingWithDefaultValue(settingsNames.csvEscape, '"'),
+        quote: cli.config.get(settingsNames.csvQuote),
+        quoted: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuoted, false),
+        quotedEmpty: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuotedEmpty, false)
       });
     }
 

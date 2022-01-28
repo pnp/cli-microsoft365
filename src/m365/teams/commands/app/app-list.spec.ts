@@ -112,7 +112,7 @@ describe(commands.APP_LIST, () => {
 
   it('fails to get team when team does not exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/me/joinedTeams?$filter=displayName eq '`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve({ value: [] });
       }
       return Promise.reject('The specified team does not exist in the Microsoft Teams');
@@ -134,9 +134,58 @@ describe(commands.APP_LIST, () => {
     });
   });
 
+  it('fails when team name does not exist', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
+          "@odata.count": 1,
+          "value": [
+            {
+              "id": "00000000-0000-0000-0000-000000000000",
+              "createdDateTime": null,
+              "displayName": "Team Name",
+              "description": "Team Description",
+              "internalId": null,
+              "classification": null,
+              "specialization": null,
+              "visibility": null,
+              "webUrl": null,
+              "isArchived": false,
+              "isMembershipLimitedToOwners": null,
+              "memberSettings": null,
+              "guestSettings": null,
+              "messagingSettings": null,
+              "funSettings": null,
+              "discoverySettings": null,
+              "resourceProvisioningOptions": []
+            }
+          ]
+        }
+        );
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        teamName: 'Team Name'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('fails when multiple teams with same name exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/me/joinedTeams?$filter=displayName eq '`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
           "@odata.count": 2,
@@ -157,7 +206,8 @@ describe(commands.APP_LIST, () => {
               "guestSettings": null,
               "messagingSettings": null,
               "funSettings": null,
-              "discoverySettings": null
+              "discoverySettings": null,
+              "resourceProvisioningOptions": ["Team"]
             },
             {
               "id": "00000000-0000-0000-0000-000000000000",
@@ -175,7 +225,8 @@ describe(commands.APP_LIST, () => {
               "guestSettings": null,
               "messagingSettings": null,
               "funSettings": null,
-              "discoverySettings": null
+              "discoverySettings": null,
+              "resourceProvisioningOptions": ["Team"]
             }
           ]
         });
@@ -296,7 +347,7 @@ describe(commands.APP_LIST, () => {
 
   it('lists organization\'s apps installed in a team by team name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/me/joinedTeams?$filter=displayName eq '`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
           "value": [
             {
@@ -315,7 +366,8 @@ describe(commands.APP_LIST, () => {
               "guestSettings": null,
               "messagingSettings": null,
               "funSettings": null,
-              "discoverySettings": null
+              "discoverySettings": null,
+              "resourceProvisioningOptions": ["Team"]
             }
           ]
         });
