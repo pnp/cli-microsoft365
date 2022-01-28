@@ -11,7 +11,7 @@ m365 tenant serviceannouncement health list [options]
 ## Options
 
 `-i, --issues`
-: Return the collection of issues that happened on the service, with detailed information for each issue.
+: Return the collection of issues that happened on the service, with detailed information for each issue. Is only returned in JSON output mode.
 
 --8<-- "docs/cmd/_global.md"
 
