@@ -17,6 +17,16 @@ interface Options extends GlobalOptions {
   asAdmin: boolean;
 }
 
+interface Triggers {
+  type: string;
+  kind?: string;
+}
+
+interface Actions {
+  type: string;
+  swaggerOperationId?: string;
+}
+
 class FlowGetCommand extends AzmgmtCommand {
   public get name(): string {
     return commands.GET;
@@ -49,8 +59,8 @@ class FlowGetCommand extends AzmgmtCommand {
 
         res.displayName = res.properties.displayName;
         res.description = res.properties.definitionSummary.description || '';
-        res.triggers = res.properties.definitionSummary.triggers.map((t: any) => (t.type + (t.kind ? "-" + t.kind : '')) as string).join(', ');
-        res.actions = res.properties.definitionSummary.actions.map((a: any) => (a.type + (a.swaggerOperationId ? "-" + a.swaggerOperationId : '')) as string).join(', ');
+        res.triggers = res.properties.definitionSummary.triggers.map((t: Triggers) => (t.type + (t.kind ? "-" + t.kind : '')) as string).join(', ');
+        res.actions = res.properties.definitionSummary.actions.map((a: Actions) => (a.type + (a.swaggerOperationId ? "-" + a.swaggerOperationId : '')) as string).join(', ');
 
         logger.log(res);
 
