@@ -29,6 +29,9 @@
 - fixed 'teams tab get' and 'teams app list' commands [#2930](https://github.com/pnp/cli-microsoft365/issues/2930)
 - extended 'spo group user add' with groupName and email [#2831](https://github.com/pnp/cli-microsoft365/issues/2831)
 - added docs explaining app commands [#2888](https://github.com/pnp/cli-microsoft365/issues/2888)
+- added support for upgrading SPFx projects to v1.14.0-beta.5 [#2983](https://github.com/pnp/cli-microsoft365/issues/2983)
+- fixed unhandled exception for spo group user add [#2935](https://github.com/pnp/cli-microsoft365/issues/2935)
+- added the 'List all large files within a SharePoint Site' sample [#2772](https://github.com/pnp/cli-microsoft365/issues/2772)
 
 ## [v4.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.3.0)
 
