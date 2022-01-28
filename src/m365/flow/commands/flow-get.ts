@@ -46,12 +46,14 @@ class FlowGetCommand extends AzmgmtCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
+
         res.displayName = res.properties.displayName;
         res.description = res.properties.definitionSummary.description || '';
-        res.triggers = Object.keys(res.properties.definition.triggers).join(', ');
-        res.actions = Object.keys(res.properties.definition.actions).join(', ');
+        res.triggers = res.properties.definitionSummary.triggers.map((t: any) => (t.type + (t.kind ? "-" + t.kind : '')) as string).join(', ');
+        res.actions = res.properties.definitionSummary.actions.map((a: any) => (a.type + (a.swaggerOperationId ? "-" + a.swaggerOperationId : '')) as string).join(', ');
 
         logger.log(res);
+
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }

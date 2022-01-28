@@ -1443,8 +1443,8 @@ describe(commands.GET, () => {
           },
           displayName: 'Get a daily digest of the top CNN news',
           description: 'Each day, get an email with a list of all of the top CNN posts from the last day.',
-          triggers: 'Every_day',
-          actions: 'Check_if_there_were_any_posts_this_week, Filter_array, List_all_RSS_feed_items'
+          triggers: 'Recurrence',
+          actions: 'If, Query, ApiConnection-ListFeedItems, Foreach, ApiConnection-SendEmailNotification, Compose'
         }));
         done();
       }
@@ -2835,8 +2835,8 @@ describe(commands.GET, () => {
           },
           displayName: 'Get a daily digest of the top CNN news',
           description: 'Each day, get an email with a list of all of the top CNN posts from the last day.',
-          triggers: 'Every_day',
-          actions: 'Check_if_there_were_any_posts_this_week, Filter_array, List_all_RSS_feed_items'
+          triggers: 'Recurrence',
+          actions: 'If, Query, ApiConnection-ListFeedItems, Foreach, ApiConnection-SendEmailNotification, Compose'
         }));
         done();
       }
@@ -4227,8 +4227,8 @@ describe(commands.GET, () => {
           },
           displayName: 'Get a daily digest of the top CNN news',
           description: 'Each day, get an email with a list of all of the top CNN posts from the last day.',
-          triggers: 'Every_day',
-          actions: 'Check_if_there_were_any_posts_this_week, Filter_array, List_all_RSS_feed_items'
+          triggers: 'Recurrence',
+          actions: 'If, Query, ApiConnection-ListFeedItems, Foreach, ApiConnection-SendEmailNotification, Compose'
         }));
         done();
       }
@@ -6321,8 +6321,8 @@ describe(commands.GET, () => {
           },
           displayName: 'Get a daily digest of the top CNN news',
           description: '',
-          triggers: 'Every_day',
-          actions: 'Check_if_there_were_any_posts_this_week, Filter_array, List_all_RSS_feed_items'
+          triggers: 'Recurrence',
+          actions: 'If, Query, ApiConnection-ListFeedItems, Foreach, ApiConnection-SendEmailNotification, Compose'
         }));
         done();
       }
