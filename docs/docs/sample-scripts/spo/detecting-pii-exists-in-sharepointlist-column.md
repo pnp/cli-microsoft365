@@ -6,9 +6,9 @@ Personally Identifiable Information (PII) is information that, when used alone o
 
 [Amazon Comprehend](https://aws.amazon.com/comprehend/) is a natural-language processing (NLP) service that uses machine learning to uncover valuable insights and connections in text and documents. We can now use Amazon Comprehend to protect and control who has access to sensitive data by identifying and redacting Personally Identifiable Information (PII) from text and documents.
 
-Also, we can redact documents(stored in an Amazon S3 bucket) by using Amazon Comprehend asynchronous analysis job. We can choose redaction mode Replace to mask PII entity with character and replace the characters in PII entities with a symbol(!, #, $, %, &, *, or @). Asynchronous PII redaction batch processing will be a great use case for SharePoint Document Libraries. 
+Also, we can redact documents(stored in an Amazon S3 bucket) by using Amazon Comprehend asynchronous analysis job. We can choose redaction mode Replace to mask PII entity with character and replace the characters in PII entities with a symbol(!, #, $, %, &, \*, or @). Asynchronous PII redaction batch processing will be a great use case for SharePoint Document Libraries.
 
-In this post, I showcased using Amazon Comprehend to detect PII entities from a specific SharePoint List column and record the results in another list and CSV report via the AWS CLI and CLI for Microsoft 365. Take a look at this script, give it a try, and please send me your feedback via the contact page. 
+In this post, I showcased using Amazon Comprehend to detect PII entities from a specific SharePoint List column and record the results in another list and CSV report via the AWS CLI and CLI for Microsoft 365. Take a look at this script, give it a try, and please send me your feedback via the contact page.
 
 Thank you, [Sriharsha M S](https://aws.amazon.com/blogs/machine-learning/detecting-and-redacting-pii-using-amazon-comprehend/), for your valuable article on this topic.
 
@@ -23,9 +23,9 @@ Prerequisites:
 
 Source & Target Lists:
 
-[![pii-source-list](../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-source-list.png)](../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-source-list.png)
+[![pii-source-list](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-source-list.png)](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-source-list.png)
 
-[![pii-audit-report-list-schema](../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list-schema.png)](../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list-schema.png)
+[![pii-audit-report-list-schema](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list-schema.png)](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list-schema.png)
 
 === "PowerShell"
 
@@ -53,7 +53,7 @@ Source & Target Lists:
             $spolListItemContent = $spolListItem.Content
             Write-Host "Auditing Item Id: ${spolListItemId} in ${spolListToAuditTitle}" -ForegroundColor Green
             $response = aws comprehend detect-pii-entities --language-code en --text $spolListItemContent
-            $auditResponse = $response | ConvertFrom-Json -AsHashtable 
+            $auditResponse = $response | ConvertFrom-Json -AsHashtable
             if ($auditResponse.Entities) {
                 $auditEntitiesCount = $auditResponse.Entities.Count
                 if ($auditEntitiesCount -gt 0) {
@@ -89,9 +89,9 @@ Source & Target Lists:
 
 Output:
 
-[![pii-audit-report-list](../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list.png)](../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list.png)
+[![pii-audit-report-list](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list.png)](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-list.png)
 
-[![pii-audit-report-data](../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-data.png)](../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-data.png)
+[![pii-audit-report-data](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-data.png)](../../images/sample-scripts/detecting-pii-exists-in-splist-column/pii-audit-report-data.png)
 
 Keywords:
 
