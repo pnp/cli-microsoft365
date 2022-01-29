@@ -8,6 +8,8 @@
 - updated the 'aad sp get' command to use MS Graph [#2754](https://github.com/pnp/cli-microsoft365/issues/2754)
 - extended 'aad oauth2grant remove' with confirm [#2785](https://github.com/pnp/cli-microsoft365/issues/2785)
 - renamed clientId to spObjectId in aad oauth2grant list [#2786](https://github.com/pnp/cli-microsoft365/issues/2786)
+- fixed flow get as admin [#2984](https://github.com/pnp/cli-microsoft365/issues/2984)
+- added the 'Get attachment names from SPO lists' sample [#2661](https://github.com/pnp/cli-microsoft365/issues/2661)
 
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
