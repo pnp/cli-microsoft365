@@ -59,6 +59,7 @@ const dictionary = [
   'site',
   'status',
   'storage',
+  'teams',
   'token',
   'type',
   'user',
