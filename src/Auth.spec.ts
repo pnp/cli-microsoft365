@@ -369,7 +369,7 @@ describe('Auth', () => {
 
   it('retrieves new access token using existing refresh token when refresh forced', (done) => {
     const config = cli.config as Configstore;
-    sinon.stub(config, 'get').callsFake((() => 'value'));
+    sinon.stub(config, 'get').callsFake((() => { }) as any);
     const now = new Date();
     now.setSeconds(now.getSeconds() + 1);
     auth.service.accessTokens[resource] = {
