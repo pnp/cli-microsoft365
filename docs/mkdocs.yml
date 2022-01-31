@@ -175,6 +175,8 @@ nav:
         - report mailboxusagemailboxcount: 'cmd/outlook/report/report-mailboxusagemailboxcount.md'
         - report mailboxusagequotastatusmailboxcounts: 'cmd/outlook/report/report-mailboxusagequotastatusmailboxcounts.md'
         - report mailboxusagestorage: 'cmd/outlook/report/report-mailboxusagestorage.md'
+      - room:
+        - room list: 'cmd/outlook/room/room-list.md'
     - Planner (planner):
       - bucket:
         - bucket add: 'cmd/planner/bucket/bucket-add.md'
