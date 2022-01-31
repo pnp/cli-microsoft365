@@ -53,7 +53,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
         option: '--chatId [chatId]'
       },
       {
-        option: '--e, --userEmails [userEmails]'
+        option: '-e, --userEmails [userEmails]'
       },
       {
         option: '--chatName [chatName]'
@@ -90,7 +90,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     }
 
     if (args.options.userEmails) {
-      const userEmails = args.options.userEmails.toLowerCase().replace(/\s/g,"").split(",").filter(e => e && e !== "");
+      const userEmails = args.options.userEmails.toLowerCase().replace(/\s/g,'').split(',').filter(e => e && e !== '');
       if (!userEmails || userEmails.length === 0 || userEmails.some(e => !Utils.isValidUserPrincipalName(e))) {
         return `${args.options.userEmails} contains one or more invalid email addresses.`;
       }
@@ -99,45 +99,45 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     return true;
   }
   
-  private async ensureChatIdByUserEmails(userEmailsOption: string): Promise<string | undefined> {    
-    const userEmails = userEmailsOption.toLowerCase().replace(/\s/g,"").split(",").filter(e => e && e !== "");
+  private async ensureChatIdByUserEmails(userEmailsOption: string): Promise<string> {    
+    const userEmails = userEmailsOption.toLowerCase().replace(/\s/g,'').split(',').filter(e => e && e !== '');
     const currentUserEmail = Utils.getUserNameFromAccessToken(Auth.service.accessTokens[this.resource].accessToken).toLowerCase();    
     const existingChats = await this.findExistingGroupChatsByMembers([currentUserEmail, ...userEmails]);
 
     if (existingChats && existingChats.length > 0) {
       if (existingChats.length > 1) {
         const disambiguationText = existingChats.map(c => {
-          return `- ${c.id}${c.topic && " - "}${c.topic} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()}`;
+          return `- ${c.id}${c.topic && ' - '}${c.topic} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()}`;
         }).join(os.EOL);
 
         throw new Error(`Multiple chat conversations with this topic found. Please disambiguate:${os.EOL}${disambiguationText}`);
       } 
       else {
-        return existingChats[0].id;
+        return existingChats[0].id as string;
       }
     }
 
     const chat = await this.createConversation([currentUserEmail, ...userEmails]);
-    return chat.id;
+    return chat.id as string;
   }
 
   private async getChatIdByName(chatName: string): Promise<string> {    
     const existingChats = await this.findExistingGroupChatsByTopic(chatName);
         
     if (!existingChats || existingChats.length === 0) {          
-      throw new Error("No chat conversation was found with this name.");
+      throw new Error('No chat conversation was found with this name.');
     }
-    else if (existingChats.length === 1) {
+
+    if (existingChats.length === 1) {
       return existingChats[0].id as string;
     }
-    else {
-      const disambiguationText = existingChats.map(c => { 
-        const memberstring = (c.members as ConversationMember[]).map(m => (m as AadUserConversationMember).email).join(", ");
-        return `- ${c.id} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()} - ${memberstring}`;
-      }).join(os.EOL);
+    
+    const disambiguationText = existingChats.map(c => { 
+      const memberstring = (c.members as ConversationMember[]).map(m => (m as AadUserConversationMember).email).join(', ');
+      return `- ${c.id} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()} - ${memberstring}`;
+    }).join(os.EOL);
 
-      throw new Error(`Multiple chat conversations with this topic found. Please disambiguate:${os.EOL}${disambiguationText}`);
-    }
+    throw new Error(`Multiple chat conversations with this topic found. Please disambiguate:${os.EOL}${disambiguationText}`);  
   }
 
   // This Microsoft Graph API request throws an intermittent 404 exception, saying that it cannot find the principal.
@@ -148,21 +148,30 @@ class TeamsChatMessageSendCommand extends GraphCommand {
   private async createConversation(memberEmails: string[], retried: number = 0): Promise<Chat> {
     try {
       const jsonBody = {
-        chatType: memberEmails.length > 2 ? "group" : "oneOnOne",
+        chatType: memberEmails.length > 2 ? 'group' : 'oneOnOne',
         members: memberEmails.map(email => {
           return {
-            "@odata.type": "#microsoft.graph.aadUserConversationMember",
-            roles: ["owner"],
-            "user@odata.bind": `https://graph.microsoft.com/v1.0/users/${email}`
+            '@odata.type': '#microsoft.graph.aadUserConversationMember',
+            roles: ['owner'],
+            'user@odata.bind': `https://graph.microsoft.com/v1.0/users/${email}`
           };
         })
       };
-      
-      const requestOptions = this.getRequestOptions(`${this.resource}/v1.0/chats`, jsonBody);
+
+      const requestOptions = <AxiosRequestConfig>{
+        url: `${this.resource}/v1.0/chats`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',        
+          'content-type': 'application/json;odata=nometadata'
+        },      
+        responseType: 'json',
+        data: jsonBody
+      };
+            
       return await request.post<Chat>(requestOptions);    
     } 
-    catch(err: any) {
-      if (err.message?.indexOf("404") > -1 && retried < 4) {        
+    catch(err) {
+      if ((err as Error).message?.indexOf('404') > -1 && retried < 4) {        
         return await this.createConversation(memberEmails, retried+1);
       }
 
@@ -170,13 +179,20 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     }
   }
 
-  private async sendChatMessage(chatId: string, options: Options): Promise<void> {
-    const jsonBody = {
-      body: {
-        content: options.message
+  private async sendChatMessage(chatId: string, options: Options): Promise<void> {    
+    const requestOptions = <AxiosRequestConfig>{
+      url: `${this.resource}/v1.0/chats/${chatId}/messages`,
+      headers: {
+        accept: 'application/json;odata.metadata=none',        
+        'content-type': 'application/json;odata=nometadata'
+      },      
+      responseType: 'json',
+      data: {
+        body: {
+          content: options.message
+        }
       }
     };
-    const requestOptions = this.getRequestOptions(`${this.resource}/v1.0/chats/${chatId}/messages`, jsonBody);
     
     await request.post(requestOptions);
   }
@@ -190,9 +206,9 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     for (const chat of chats) {      
       const chatMembers = chat.members as ConversationMember[];
       if (chatMembers.length === expectedMemberEmails.length) {
-        const chatMemberEmails = chatMembers.map(m => (m as AadUserConversationMember).email?.toLowerCase());
+        const chatMemberEmails = chatMembers.map(member => (member as AadUserConversationMember).email?.toLowerCase());
 
-        if (expectedMemberEmails.every(e => chatMemberEmails.some(m => m === e))) {
+        if (expectedMemberEmails.every(email => chatMemberEmails.some(memberEmail => memberEmail === email))) {
           foundChats.push(chat);
         }          
       }
@@ -208,7 +224,14 @@ class TeamsChatMessageSendCommand extends GraphCommand {
   }
 
   private async getAllChats(url: string, items: Chat[]): Promise<Chat[]> {            
-    const requestOptions = this.getRequestOptions(url);
+    const requestOptions = <AxiosRequestConfig>{
+      url: url,
+      headers: {
+        accept: 'application/json;odata.metadata=none'        
+      },      
+      responseType: 'json'
+    };
+    
     const res = await request.get<GraphResponse<Chat>>(requestOptions);
     
     items = items.concat(res.value);
@@ -219,26 +242,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     else {
       return items;
     }            
-  }
-  
-  private getRequestOptions(url: string, data?: any): AxiosRequestConfig {
-    const requestConfig = <AxiosRequestConfig>{
-      url: url,
-      headers: {
-        accept: 'application/json;odata.metadata=none'        
-      },      
-      responseType: 'json'
-    };
-
-    if (data) {
-      if (requestConfig.headers) {
-        requestConfig.headers['content-type'] = 'application/json;odata=nometadata';
-      }
-      requestConfig.data = data;
-    }
-
-    return requestConfig;
-  } 
+  }  
 }
 
 module.exports = new TeamsChatMessageSendCommand();

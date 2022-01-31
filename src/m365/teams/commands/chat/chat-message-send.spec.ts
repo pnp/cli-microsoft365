@@ -435,8 +435,8 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
         assert.strictEqual(
           JSON.stringify(err),
           JSON.stringify(new CommandError(`Multiple chat conversations with this topic found. Please disambiguate:${os.EOL}${[
-            "- 19:309128478c1743b19bebd08efc390efb@thread.v2 - 9/14/2021, 7:44:11 AM - AlexW@M365x214355.onmicrosoft.com, MeganB@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com",
-            "- 19:650081f4700a4414ac15cd7993129f80@thread.v2 - 6/26/2020, 8:27:55 AM - MeganB@M365x214355.onmicrosoft.com, AlexW@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com"
+            `- 19:309128478c1743b19bebd08efc390efb@thread.v2 - ${new Date(2021, 8, 14, 7, 44, 11).toLocaleString()} - AlexW@M365x214355.onmicrosoft.com, MeganB@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`,
+            `- 19:650081f4700a4414ac15cd7993129f80@thread.v2 - ${new Date(2020, 5, 26, 8, 27, 55).toLocaleString()} - MeganB@M365x214355.onmicrosoft.com, AlexW@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`
           ].join(os.EOL)}`)));
         done();
       }
@@ -457,8 +457,8 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
         assert.strictEqual(
           JSON.stringify(err),
           JSON.stringify(new CommandError(`Multiple chat conversations with this topic found. Please disambiguate:${os.EOL}${[
-            "- 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2 - Megan Bowen_Alex Wilber_Sundar Ganesan_ArchivedChat - 12/22/2021, 1:13:11 PM",
-            "- 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2 - CC Call v3 - 10/18/2021, 4:56:30 PM"
+            `- 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2 - Megan Bowen_Alex Wilber_Sundar Ganesan_ArchivedChat - ${new Date(2021, 11, 22, 13, 13, 11).toLocaleString()}`,
+            `- 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2 - CC Call v3 - ${new Date(2021, 9, 18, 16, 56, 30).toLocaleString()}`
           ].join(os.EOL)}`)));                              
         done();
       }
@@ -513,7 +513,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats`) {
         return Promise.reject("Request failed with status code 404");
       }
-      
+
       return Promise.reject('Invalid Request');
     });
 
