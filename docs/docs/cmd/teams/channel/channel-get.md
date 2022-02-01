@@ -22,6 +22,9 @@ m365 teams channel get [options]
 `--channelName [channelName]`
 : The display name of the channel for which to retrieve more information. Specify either channelId or channelName but not both
 
+`--primary`
+: Gets the default channel, General, of a team. If specified, channelId or channelName are not needed
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
@@ -36,4 +39,10 @@ Get information about Microsoft Teams team channel with name _Channel Name_
 
 ```sh
 m365 teams channel get --teamName "Team Name" --channelName "Channel Name"
+```
+
+Get information about Microsoft Teams team primary channel , i.e. General
+
+```sh
+m365 teams channel get --teamName "Team Name" --primary
 ```
