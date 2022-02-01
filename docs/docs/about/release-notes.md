@@ -17,6 +17,9 @@
 - renamed clientId to spObjectId in aad oauth2grant list [#2786](https://github.com/pnp/cli-microsoft365/issues/2786)
 - fixed flow get as admin [#2984](https://github.com/pnp/cli-microsoft365/issues/2984)
 - added the 'Get attachment names from SPO lists' sample [#2661](https://github.com/pnp/cli-microsoft365/issues/2661)
+- updated the 'using own identity' guide with updated interface [#2968](https://github.com/pnp/cli-microsoft365/issues/2968)
+- added the 'List all documents with a specific name within a SharePoint site' sample [#2768](https://github.com/pnp/cli-microsoft365/issues/2768)
+- extended 'aad user list' with --deleted flag [#2955](https://github.com/pnp/cli-microsoft365/issues/2955)
 
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
