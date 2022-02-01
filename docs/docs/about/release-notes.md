@@ -2,6 +2,13 @@
 
 ## [v5.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.0.0)
 
+### New commands
+
+**Tenant:**
+
+- [tenant serviceannouncement health list](../cmd/tenant/serviceannouncement/serviceannouncement-health-list.md) - lists the tenant health information [#2947](https://github.com/pnp/cli-microsoft365/issues/2947)
+- [tenant serviceannouncement health get](../cmd/tenant/serviceannouncement/serviceannouncement-health-get.md) - retrieves a tenant health information [#2950](https://github.com/pnp/cli-microsoft365/issues/2950)
+
 ### Changes
 
 - updated 'aad oauth2grant list' to use MS Graph [#2710](https://github.com/pnp/cli-microsoft365/issues/2710)
@@ -249,7 +256,7 @@
 - fixed 'spo site set' code coverage [#2586](https://github.com/pnp/cli-microsoft365/issues/2586)
 - updated 'teams channel get' to Graph v1.0 [#2505](https://github.com/pnp/cli-microsoft365/issues/2505)
 - added missing 'chalk' dependency [#2592](https://github.com/pnp/cli-microsoft365/issues/2592)
-- extended Teams channel ID validation with - and _ [#2594](https://github.com/pnp/cli-microsoft365/issues/2594)
+- extended Teams channel ID validation with - and \_ [#2594](https://github.com/pnp/cli-microsoft365/issues/2594)
 - added file count sample [#2576](https://github.com/pnp/cli-microsoft365/issues/2576)
 - added support for upgrading SPFx projects to v1.13.0-beta.13 [#2604](https://github.com/pnp/cli-microsoft365/issues/2604)
 - updated upgrade rule for SPFx v1.13.0-beta.13 [#2611](https://github.com/pnp/cli-microsoft365/issues/2611)
@@ -934,7 +941,7 @@
 - fixed guidance for upgrading teams piece in `spfx project upgrade` [#1471](https://github.com/pnp/cli-microsoft365/pull/1471)
 - extended `spo theme set` command with support for theme validation [#1466](https://github.com/pnp/cli-microsoft365/pull/1466)
 - fixed resolution of `FN003005_CFG_localizedResource_pathLib` in `spfx project upgrade` [#1470](https://github.com/pnp/cli-microsoft365/pull/1470)
-- updated Theme Generator URL on `spo theme set` & `spo theme  apply` commands [#1465](https://github.com/pnp/cli-microsoft365/pull/1465)
+- updated Theme Generator URL on `spo theme set` & `spo theme apply` commands [#1465](https://github.com/pnp/cli-microsoft365/pull/1465)
 
 ## [v2.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v2.8.0)
 
