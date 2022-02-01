@@ -216,8 +216,8 @@ nav:
         - run list: 'cmd/flow/run/run-list.md'
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Power Platform (pp):
-        - managementapp:
-            - managementapp add: 'cmd/pp/managementapp/app-add.md'
+      - managementapp:
+        - managementapp add: 'cmd/pp/managementapp/app-add.md'
     - Search (search):
       - externalconnection:
         - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
