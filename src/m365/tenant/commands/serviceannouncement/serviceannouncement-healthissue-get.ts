@@ -22,6 +22,10 @@ class TenantServiceAnnouncementHealthissueGetCommand extends GraphCommand {
     return 'Gets a specified service health issue for tenant';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'title'];
+  }
+
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.issueId = typeof args.options.issueId !== 'undefined';
