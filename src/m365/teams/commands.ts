@@ -9,7 +9,6 @@ export default {
   APP_UPDATE: `${prefix} app update`,
   CHANNEL_ADD: `${prefix} channel add`,
   CHANNEL_GET: `${prefix} channel get`,
-  CHANNEL_PRIMARY_GET: `${prefix} channel primary get`,
   CHANNEL_LIST: `${prefix} channel list`,
   CHANNEL_REMOVE: `${prefix} channel remove`,
   CHANNEL_SET: `${prefix} channel set`,
