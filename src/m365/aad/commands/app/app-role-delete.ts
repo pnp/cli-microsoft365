@@ -81,7 +81,7 @@ class AadAppRoleDeleteCommand extends GraphCommand {
           logger.logToStderr(`Deleting role with ${appRoleDeleteIdentifierNameValue} from Azure AD app ${aadApp.id}...`);
         }
 
-        // Find the role search criteria provided by the user.     
+        // Find the role search criteria provided by the user.
         const appRoleDeleteIdentifierProperty = args.options.name ? `displayName` : (args.options.claim ? `value` : `id`);
         const appRoleDeleteIdentifierValue = args.options.name ? args.options.name : (args.options.claim ? args.options.claim : args.options.id);
 

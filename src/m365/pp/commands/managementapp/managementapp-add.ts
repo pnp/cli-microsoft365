@@ -77,18 +77,19 @@ class PpManagementAppAddCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: { appId: string }[] }>(requestOptions)
-      .then((res: { value: { appId: string }[] }): Promise<string> => {
-        if (res.value.length === 1) {
-          return Promise.resolve(res.value[0].appId);
-        }
+      .get<{ value: Application[] }>((requestOptions))
+      .then((aadApps: { value: Application[] }): Promise<string> => {
 
-        if (res.value.length === 0) {
+        if (aadApps.value.length === 0) {
           const applicationIdentifier = objectId ? `ID ${objectId}` : `name ${name}`;
           return Promise.reject(`No Azure AD application registration with ${applicationIdentifier} found`);
         }
 
-        return Promise.reject(`Multiple Azure AD application registration with name ${name} found. Please disambiguate (app IDs): ${res.value.map(a => a.appId).join(', ')}`);
+        if (aadApps.value.length === 1 && aadApps.value[0].appId) {
+          return Promise.resolve(aadApps.value[0].appId);
+        }
+
+        return Promise.reject(`Multiple Azure AD application registration with name ${name} found. Please disambiguate (app IDs): ${aadApps.value.map(a => a.appId).join(', ')}`);
       });
   }
 

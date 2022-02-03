@@ -34,6 +34,7 @@ const dictionary = [
   'is',
   'issue',
   'list',
+  'management',
   'member',
   'messaging',
   'news',
