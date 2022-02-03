@@ -13,6 +13,9 @@ m365 aad user list [options]
 `-p, --properties [properties]`
 : Comma-separated list of properties to retrieve
 
+`-d, --deleted`
+: Use to retrieve deleted users
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -29,6 +32,12 @@ List all users in the tenant
 
 ```sh
 m365 aad user list
+```
+
+List all recently deleted users in the tenant
+
+```sh
+m365 aad user list --deleted
 ```
 
 List all users in the tenant. For each one return the display name and e-mail address

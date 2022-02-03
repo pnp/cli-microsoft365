@@ -1,5 +1,26 @@
 # Release notes
 
+## [v5.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.0.0)
+
+### New commands
+
+**Tenant:**
+
+- [tenant serviceannouncement health list](../cmd/tenant/serviceannouncement/serviceannouncement-health-list.md) - lists the tenant health information [#2947](https://github.com/pnp/cli-microsoft365/issues/2947)
+- [tenant serviceannouncement health get](../cmd/tenant/serviceannouncement/serviceannouncement-health-get.md) - retrieves a tenant health information [#2950](https://github.com/pnp/cli-microsoft365/issues/2950)
+
+### Changes
+
+- updated 'aad oauth2grant list' to use MS Graph [#2710](https://github.com/pnp/cli-microsoft365/issues/2710)
+- updated the 'aad sp get' command to use MS Graph [#2754](https://github.com/pnp/cli-microsoft365/issues/2754)
+- extended 'aad oauth2grant remove' with confirm [#2785](https://github.com/pnp/cli-microsoft365/issues/2785)
+- renamed clientId to spObjectId in aad oauth2grant list [#2786](https://github.com/pnp/cli-microsoft365/issues/2786)
+- fixed flow get as admin [#2984](https://github.com/pnp/cli-microsoft365/issues/2984)
+- added the 'Get attachment names from SPO lists' sample [#2661](https://github.com/pnp/cli-microsoft365/issues/2661)
+- updated the 'using own identity' guide with updated interface [#2968](https://github.com/pnp/cli-microsoft365/issues/2968)
+- added the 'List all documents with a specific name within a SharePoint site' sample [#2768](https://github.com/pnp/cli-microsoft365/issues/2768)
+- extended 'aad user list' with --deleted flag [#2955](https://github.com/pnp/cli-microsoft365/issues/2955)
+
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
 ### New commands
@@ -8,6 +29,10 @@
 
 - [aad group list](../cmd/aad/group/group-list.md) - lists Azure AD groups [#2622](https://github.com/pnp/cli-microsoft365/issues/2622)
 - [aad user hibp](../cmd/aad/user/user-hibp.md) - allows you to retrieve all accounts that have been pwned with the specified username [#2476](https://github.com/pnp/cli-microsoft365/issues/2476)
+
+**Planner:**
+
+- [planner task set](../cmd/planner/task/task-set.md) - updates a Microsoft Planner task [#2824](https://github.com/pnp/cli-microsoft365/issues/2824)
 
 **SharePoint:**
 
@@ -25,6 +50,9 @@
 - fixed 'teams tab get' and 'teams app list' commands [#2930](https://github.com/pnp/cli-microsoft365/issues/2930)
 - extended 'spo group user add' with groupName and email [#2831](https://github.com/pnp/cli-microsoft365/issues/2831)
 - added docs explaining app commands [#2888](https://github.com/pnp/cli-microsoft365/issues/2888)
+- added support for upgrading SPFx projects to v1.14.0-beta.5 [#2983](https://github.com/pnp/cli-microsoft365/issues/2983)
+- fixed unhandled exception for spo group user add [#2935](https://github.com/pnp/cli-microsoft365/issues/2935)
+- added the 'List all large files within a SharePoint Site' sample [#2772](https://github.com/pnp/cli-microsoft365/issues/2772)
 
 ## [v4.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.3.0)
 
@@ -231,7 +259,7 @@
 - fixed 'spo site set' code coverage [#2586](https://github.com/pnp/cli-microsoft365/issues/2586)
 - updated 'teams channel get' to Graph v1.0 [#2505](https://github.com/pnp/cli-microsoft365/issues/2505)
 - added missing 'chalk' dependency [#2592](https://github.com/pnp/cli-microsoft365/issues/2592)
-- extended Teams channel ID validation with - and _ [#2594](https://github.com/pnp/cli-microsoft365/issues/2594)
+- extended Teams channel ID validation with - and \_ [#2594](https://github.com/pnp/cli-microsoft365/issues/2594)
 - added file count sample [#2576](https://github.com/pnp/cli-microsoft365/issues/2576)
 - added support for upgrading SPFx projects to v1.13.0-beta.13 [#2604](https://github.com/pnp/cli-microsoft365/issues/2604)
 - updated upgrade rule for SPFx v1.13.0-beta.13 [#2611](https://github.com/pnp/cli-microsoft365/issues/2611)
@@ -916,7 +944,7 @@
 - fixed guidance for upgrading teams piece in `spfx project upgrade` [#1471](https://github.com/pnp/cli-microsoft365/pull/1471)
 - extended `spo theme set` command with support for theme validation [#1466](https://github.com/pnp/cli-microsoft365/pull/1466)
 - fixed resolution of `FN003005_CFG_localizedResource_pathLib` in `spfx project upgrade` [#1470](https://github.com/pnp/cli-microsoft365/pull/1470)
-- updated Theme Generator URL on `spo theme set` & `spo theme  apply` commands [#1465](https://github.com/pnp/cli-microsoft365/pull/1465)
+- updated Theme Generator URL on `spo theme set` & `spo theme apply` commands [#1465](https://github.com/pnp/cli-microsoft365/pull/1465)
 
 ## [v2.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v2.8.0)
 
