@@ -16,6 +16,7 @@ nav:
     - 'Using your own Azure AD identity': 'user-guide/using-own-identity.md'
     - 'Caveats when working with the CLI and certificate login': 'user-guide/cli-certificate-caveats.md'
     - 'Manage Microsoft 365 apps with the CLI': 'user-guide/manage-microsoft-365-apps.md'
+    - 'Use CLI programmatically': 'user-guide/use-cli-api.md'
   - Commands:
     - login: 'cmd/login.md'
     - logout: 'cmd/logout.md'

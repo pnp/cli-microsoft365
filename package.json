@@ -3,7 +3,8 @@
   "version": "5.0.0",
   "description": "Manage Microsoft 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
-  "main": "./dist/index.js",
+  "main": "./dist/api.js",
+  "typings": "./dist/api.d.ts",
   "bin": {
     "m365": "./dist/index.js",
     "m365_comp": "./dist/autocomplete.js",
