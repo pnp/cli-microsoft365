@@ -16,7 +16,7 @@ m365 teams channel get [options]
 `--teamName [teamName]`
 : The display name of the team to which the channel belongs to. Specify either teamId or teamName but not both
 
-`-c, --channelId <channelId>`
+`-c, --channelId [channelId]`
 : The ID of the channel for which to retrieve more information. Specify either channelId or channelName but not both
 
 `--channelName [channelName]`
