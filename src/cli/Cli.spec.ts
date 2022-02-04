@@ -642,6 +642,60 @@ describe('Cli', () => {
       }, e => done(e));
   });
 
+  it('captures command stdout output in a listener when specified', (done) => {
+    let output: string = '';
+    const commandWithOutput: MockCommandWithOutput = new MockCommandWithOutput();
+    Cli
+      .executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text' } }, {
+        stdout: (message) => output = message
+      })
+      .then(_ => {
+        try {
+          assert.strictEqual(output, 'Command output');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it('captures command raw stdout output in a listener when specified', (done) => {
+    let output: string = '';
+    const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
+    Cli
+      .executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text' } }, {
+        stdout: (message) => output = message
+      })
+      .then(_ => {
+        try {
+          assert.strictEqual(output, 'Raw output');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it('captures command stderr output in a listener when specified', (done) => {
+    const output: string[] = [];
+    const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
+    Cli
+      .executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text', debug: true } }, {
+        stderr: (message) => output.push(message)
+      })
+      .then(_ => {
+        try {
+          assert.deepStrictEqual(output, ['Executing command cli mock output with options {"options":{"_":[],"output":"text","debug":true}}', 'Debug output']);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
   it('calls inquirer when command shows prompt and executed with output', (done) => {
     const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake(() => Promise.resolve() as any);
     const mockCommandWithPrompt = new MockCommandWithPrompt();

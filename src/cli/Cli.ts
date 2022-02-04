@@ -35,7 +35,7 @@ export class Cli {
    */
   public currentCommandName: string | undefined;
   private optionsFromArgs: { options: minimist.ParsedArgs } | undefined;
-  private commandsFolder: string = '';
+  public commandsFolder: string = '';
   private static instance: Cli;
 
   private _config: Configstore | undefined;
@@ -232,24 +232,42 @@ export class Cli {
     });
   }
 
-  public static executeCommandWithOutput(command: Command, args: { options: minimist.ParsedArgs }): Promise<CommandOutput> {
+  public static executeCommandWithOutput(command: Command, args: { options: minimist.ParsedArgs }, listener?: {
+    stdout?: (message: any) => void,
+    stderr?: (message: any) => void
+  }): Promise<CommandOutput> {
     return new Promise((resolve: (result: CommandOutput) => void, reject: (error: any) => void): void => {
       const log: string[] = [];
       const logErr: string[] = [];
       const logger: Logger = {
         log: (message: any): void => {
-          log.push(Cli.formatOutput(message, args.options));
+          const formattedMessage = Cli.formatOutput(message, args.options);
+          if (listener && listener.stdout) {
+            listener.stdout(formattedMessage);
+          }
+          log.push(formattedMessage);
         },
         logRaw: (message: any): void => {
-          log.push(Cli.formatOutput(message, args.options));
+          const formattedMessage = Cli.formatOutput(message, args.options);
+          if (listener && listener.stdout) {
+            listener.stdout(formattedMessage);
+          }
+          log.push(formattedMessage);
         },
         logToStderr: (message: any): void => {
+          if (listener && listener.stderr) {
+            listener.stderr(message);
+          }
           logErr.push(message);
         }
       };
 
       if (args.options.debug) {
-        logErr.push(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
+        const message = `Executing command ${command.name} with options ${JSON.stringify(args)}`;
+        if (listener && listener.stderr) {
+          listener.stderr(message);
+        }
+        logErr.push(message);
       }
 
       // store the current command name, if any and set the name to the name of
