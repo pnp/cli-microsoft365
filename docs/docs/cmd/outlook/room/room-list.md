@@ -13,7 +13,7 @@ m365 outlook room list [options]
 `--roomlistEmail, [roomlistEmail]`
 : Use to filter returned rooms by their roomlist email (eg. bldg2@contoso.com)
 
---8<-- "docs/cmd/\_global.md"
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 
