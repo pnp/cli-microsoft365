@@ -103,10 +103,6 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id', 'title']);
-  });
-
   it('handles promise error while getting a specified service health issue for tenant', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/admin/serviceAnnouncement/issues/') > -1) {
