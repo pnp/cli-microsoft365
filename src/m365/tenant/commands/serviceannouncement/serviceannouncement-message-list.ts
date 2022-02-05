@@ -1,9 +1,8 @@
+import { ServiceUpdateMessage } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
-import { ServiceUpdateMessage } from '@microsoft/microsoft-graph-types';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -34,18 +33,10 @@ class TenantServiceAnnouncementMessageListCommand extends GraphItemsListCommand<
       endpoint += `?$filter=services/any(c:c+eq+'${encodeURIComponent(args.options.service)}')`;
     }
 
-    const requestOptions: any = {
-      url: endpoint,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    request
-      .get(requestOptions)
-      .then((res: any): void => {
-        logger.log(res.value);
+    this
+      .getAllItems(endpoint, logger, true)
+      .then((): void => {
+        logger.log(this.items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -53,7 +44,7 @@ class TenantServiceAnnouncementMessageListCommand extends GraphItemsListCommand<
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-s, --service [service]	'
+        option: '-s, --service [service]'
       }
     ];
 
