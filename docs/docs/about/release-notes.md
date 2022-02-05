@@ -8,6 +8,8 @@
 
 - [tenant serviceannouncement health list](../cmd/tenant/serviceannouncement/serviceannouncement-health-list.md) - lists the tenant health information [#2947](https://github.com/pnp/cli-microsoft365/issues/2947)
 - [tenant serviceannouncement health get](../cmd/tenant/serviceannouncement/serviceannouncement-health-get.md) - retrieves a tenant health information [#2950](https://github.com/pnp/cli-microsoft365/issues/2950)
+- [tenant serviceannouncement message list](../cmd/tenant/serviceannouncement/serviceannouncement-health-list.md) - retrieves all service update messages that exist for the tenant [#2949](https://github.com/pnp/cli-microsoft365/issues/2949)
+- [tenant serviceannouncement message get](../cmd/tenant/serviceannouncement/serviceannouncement-message-get.md) - retrieves a specified service update message for the tenant [#2952](https://github.com/pnp/cli-microsoft365/issues/2952)
 
 ### Changes
 
