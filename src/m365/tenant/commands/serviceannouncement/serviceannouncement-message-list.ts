@@ -20,7 +20,7 @@ class TenantServiceAnnouncementMessageListCommand extends GraphItemsListCommand<
   }
 
   public get description(): string {
-    return 'Gets all service update messages that exist for the tenant';
+    return 'Gets all service update messages for the tenant';
   }
 
   public defaultProperties(): string[] | undefined {

@@ -1,6 +1,6 @@
 # tenant serviceannouncement message list
 
-Gets all service update messages that exist for the tenant.
+Gets all service update messages for the tenant.
 
 ## Usage
 
@@ -13,7 +13,7 @@ m365 tenant serviceannouncement message list [options]
 `-s, --service [service]`
 : Retrieve service update messages for the particular service. If not provided, retrieves messages for all services
 
---8<-- "docs/cmd/_global.md"
+--8<-- "docs/cmd/\_global.md"
 
 ## Examples
 
