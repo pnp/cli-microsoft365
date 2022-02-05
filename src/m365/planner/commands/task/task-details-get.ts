@@ -14,9 +14,9 @@ interface Options extends GlobalOptions {
   id: string;
 }
 
-class PlannerTaskGetCommand extends GraphItemsListCommand<Task> {
+class PlannerTaskDetailsGetCommand extends GraphItemsListCommand<Task> {
   public get name(): string {
-    return commands.TASK_GET;
+    return commands.TASK_DETAILS_GET;
   }
 
   public get description(): string {
@@ -24,9 +24,8 @@ class PlannerTaskGetCommand extends GraphItemsListCommand<Task> {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(args.options.id as string)}/details`,
+      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(args.options.id)}/details`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -54,4 +53,4 @@ class PlannerTaskGetCommand extends GraphItemsListCommand<Task> {
   }
 }
 
-module.exports = new PlannerTaskGetCommand();
+module.exports = new PlannerTaskDetailsGetCommand();

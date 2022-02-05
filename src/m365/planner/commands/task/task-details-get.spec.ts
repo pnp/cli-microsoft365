@@ -7,9 +7,9 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
-const command: Command = require('./task-get');
+const command: Command = require('./task-details-get');
 
-describe(commands.TASK_GET, () => {
+describe(commands.TASK_DETAILS_GET, () => {
   let log: string[];
   let logger: Logger;
 
@@ -50,7 +50,7 @@ describe(commands.TASK_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TASK_GET), true);
+    assert.strictEqual(command.name.startsWith(commands.TASK_DETAILS_GET), true);
   });
 
   it('has a description', () => {
