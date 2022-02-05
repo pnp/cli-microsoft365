@@ -4,7 +4,7 @@
 
 ### New commands
 
-**Tenant:**
+**Microsoft 365:**
 
 - [tenant serviceannouncement health get](../cmd/tenant/serviceannouncement/serviceannouncement-health-get.md) - retrieves a tenant health information [#2950](https://github.com/pnp/cli-microsoft365/issues/2950)
 - [tenant serviceannouncement health list](../cmd/tenant/serviceannouncement/serviceannouncement-health-list.md) - lists the tenant health information [#2947](https://github.com/pnp/cli-microsoft365/issues/2947)
@@ -12,6 +12,11 @@
 - [tenant serviceannouncement healthissue list](../cmd/tenant/serviceannouncement/serviceannouncement-healthissue-list.md) - retrieves all service health issues for the tenant [#2948](https://github.com/pnp/cli-microsoft365/issues/2948)
 - [tenant serviceannouncement message get](../cmd/tenant/serviceannouncement/serviceannouncement-message-get.md) - retrieves a specified service update message for the tenant [#2952](https://github.com/pnp/cli-microsoft365/issues/2952)
 - [tenant serviceannouncement message list](../cmd/tenant/serviceannouncement/serviceannouncement-message-list.md) - retrieves all service update messages for the tenant [#2949](https://github.com/pnp/cli-microsoft365/issues/2949)
+
+**Planner:**
+
+- [planner task get](../cmd/planner/task/task-get.md) - retrieves the the specified planner task [#3019](https://github.com/pnp/cli-microsoft365/issues/3019)
+- [planner task details get](../cmd/planner/task/task-details-get.md) - retrieves the details of the specified planner task [#3015](https://github.com/pnp/cli-microsoft365/issues/3015)
 
 ### Changes
 
