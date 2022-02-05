@@ -8,15 +8,15 @@ nav:
   - User Guide:
     - 'Installing the CLI': 'user-guide/installing-cli.md'
     - 'Using the CLI': 'user-guide/using-cli.md'
-    - 'Command completion': 'user-guide/completion.md'
-    - 'GitHub Actions': 'user-guide/github-actions.md'
     - 'Run CLI in a Docker Container': 'user-guide/run-cli-in-docker-container.md'
     - 'Logging in to Microsoft 365': 'user-guide/connecting-office-365.md'
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
     - 'Filter CLI data': 'user-guide/filter-cli-data.md'
     - 'Configuring CLI': 'user-guide/configuring-cli.md'
+    - 'Command completion': 'user-guide/completion.md'
     - 'Using your own Azure AD identity': 'user-guide/using-own-identity.md'
     - 'Caveats when working with the CLI and certificate login': 'user-guide/cli-certificate-caveats.md'
+    - 'GitHub Actions': 'user-guide/github-actions.md'
     - 'Manage Microsoft 365 apps with the CLI': 'user-guide/manage-microsoft-365-apps.md'
   - Commands:
     - login: 'cmd/login.md'
