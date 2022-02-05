@@ -1,10 +1,10 @@
 import { Logger } from '../../../../cli';
-import GraphCommand from '../../../base/GraphCommand';
 import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -24,13 +24,9 @@ class TenantServiceAnnouncementMessageGetCommand extends GraphCommand {
     return 'Retrieves a specified service update message for the tenant';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['startDateTime', 'endDateTime', 'lastModifiedDateTime', 'title', 'id', 'category', 'severity', 'tags', 'isMajorChange', 'actionRequiredByDateTime', 'services', 'expiryDateTime', 'hasAttachments', 'viewPoint' ];
-  }
-
-  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving service update message ${args.id}`);
+      logger.logToStderr(`Retrieving service update message ${args.options.id}`);
     }
 
     const requestOptions: any = {
@@ -42,7 +38,7 @@ class TenantServiceAnnouncementMessageGetCommand extends GraphCommand {
     };
 
     request
-      .get<{ value: [{ id: string }] }>(requestOptions)
+      .get(requestOptions)
       .then((res: any): void => {
         logger.log(res);
         cb();
@@ -52,7 +48,7 @@ class TenantServiceAnnouncementMessageGetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id [id]'
+        option: '-i, --id <id>'
       }
     ];
 

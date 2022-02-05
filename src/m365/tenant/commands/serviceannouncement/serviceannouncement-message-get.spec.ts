@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from "../../commands";
 const command: Command = require('./serviceannouncement-message-get');
 
-describe (commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
+describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -111,10 +111,6 @@ describe (commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['startDateTime', 'endDateTime', 'lastModifiedDateTime', 'title', 'id', 'category', 'severity', 'tags', 'isMajorChange', 'actionRequiredByDateTime', 'services', 'expiryDateTime', 'hasAttachments', 'viewPoint' ]);
-  });
-
   it('fails validation if incorrect message ID is provided', (done) => {
     const actual = command.validate({
       options: {
@@ -206,7 +202,7 @@ describe (commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
         assert((JSON.parse(JSON.parse(err.message).message).error as string).indexOf(`Resource doesn't exist for the tenant.`) > -1);
         done();
       }
-      catch (e){
+      catch (e) {
         done(e);
       }
     }
@@ -223,12 +219,13 @@ describe (commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
     });
 
 
-    command.action(logger, { 
-      options: 
+    command.action(logger, {
+      options:
       {
         id: testId,
         output: 'json'
-      } }, () => {
+      }
+    }, () => {
       try {
         assert(loggerLogSpy.calledWith(resMessage));
         done();
@@ -247,7 +244,7 @@ describe (commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
         containsOption = true;
       }
     });
-    
+
     assert(containsOption);
   });
 });
