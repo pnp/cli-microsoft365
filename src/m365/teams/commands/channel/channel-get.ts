@@ -74,13 +74,13 @@ class TeamsChannelGetCommand extends GraphCommand {
       });
   }
 
-  private getChannelId(args: CommandArgs): Promise<any> {
+  private getChannelId(args: CommandArgs): Promise<string> {
     if (args.options.channelId) {
       return Promise.resolve(args.options.channelId);
     }
 
     if (args.options.primary) {
-      return Promise.resolve(args.options.primary);
+      return Promise.resolve("");
     }
 
     const channelRequestOptions: any = {
@@ -111,7 +111,7 @@ class TeamsChannelGetCommand extends GraphCommand {
         this.teamId = teamId;
         return this.getChannelId(args);
       })
-      .then((channelId: any): Promise<Channel> => {
+      .then((channelId: string): Promise<Channel> => {
         let url: string = '';
         if(args.options.primary) {
           url = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/primaryChannel`; 
@@ -174,7 +174,7 @@ class TeamsChannelGetCommand extends GraphCommand {
     }
 
     if (args.options.channelId && args.options.channelName && args.options.primary) {
-      return 'Specify channelId or channelName or primary, but not all three.';
+      return 'Specify channelId or channelName or primary';
     }
     
     if (!args.options.channelId && args.options.channelName && args.options.primary) {
