@@ -342,9 +342,6 @@ export class Cli {
         message: `${commandToExecute.options[index].name}: `
       }, async (result: { missingRequireOptionValue: string }): Promise<void> => {
         optionsFromArgs.options[commandToExecute.options[index].name] = result.missingRequireOptionValue;
-        if (typeof commandToExecute.options[index].short !== 'undefined') {
-          optionsFromArgs.options[commandToExecute.options[index].short?.toString() ?? ""] = result.missingRequireOptionValue;
-        }
         await this.checkExecuteOrContinueValidate(index, optionsLength, shouldPrompt, commandToExecute, optionsFromArgs);
       });
 

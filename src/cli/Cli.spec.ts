@@ -415,20 +415,6 @@ describe('Cli', () => {
       });
   });
 
-  it(`fails validation if a required option is missing`, (done) => {
-    cli
-      .execute(rootFolder, ['cli', 'mock'])
-      .then(_ => done('Promise fulfilled while error expected'), _ => {
-        try {
-          assert(cliErrorStub.calledWith(chalk.red(`Error: Required option parameterX not specified`)));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
-  });
-
   it(`does not prompt and fails validation if a required option is missing`, (done) => {
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
