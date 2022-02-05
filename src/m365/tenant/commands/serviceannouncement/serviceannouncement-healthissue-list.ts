@@ -1,9 +1,8 @@
+import { ServiceHealthIssue } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
-import { ServiceHealthIssue } from '@microsoft/microsoft-graph-types';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -11,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  service: string;
+  service?: string;
 }
 
 class TenantServiceAnnouncementHealthIssueListCommand extends GraphItemsListCommand<ServiceHealthIssue> {
@@ -34,18 +33,10 @@ class TenantServiceAnnouncementHealthIssueListCommand extends GraphItemsListComm
       endpoint += `?$filter=service eq '${encodeURIComponent(args.options.service)}'`;
     }
 
-    const requestOptions: any = {
-      url: endpoint,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    request
-      .get(requestOptions)
-      .then((res: any): void => {
-        logger.log(res.value);
+    this
+      .getAllItems(endpoint, logger, true)
+      .then((): void => {
+        logger.log(this.items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
