@@ -8,7 +8,9 @@
 
 - [tenant serviceannouncement health list](../cmd/tenant/serviceannouncement/serviceannouncement-health-list.md) - lists the tenant health information [#2947](https://github.com/pnp/cli-microsoft365/issues/2947)
 - [tenant serviceannouncement health get](../cmd/tenant/serviceannouncement/serviceannouncement-health-get.md) - retrieves a tenant health information [#2950](https://github.com/pnp/cli-microsoft365/issues/2950)
-- [tenant serviceannouncement message list](../cmd/tenant/serviceannouncement/serviceannouncement-health-list.md) - retrieves all service update messages that exist for the tenant [#2949](https://github.com/pnp/cli-microsoft365/issues/2949)
+- [tenant serviceannouncement healthissue list](../cmd/tenant/serviceannouncement/serviceannouncement-healthissue-list.md) - retrieves all service health issues for the tenant [#2948](https://github.com/pnp/cli-microsoft365/issues/2948)
+- [tenant serviceannouncement healthissue get](../cmd/tenant/serviceannouncement/serviceannouncement-healthissue-get.md) - retrieves a specified service health issue for the tenant [#2951](https://github.com/pnp/cli-microsoft365/issues/2951)
+- [tenant serviceannouncement message list](../cmd/tenant/serviceannouncement/serviceannouncement-message-list.md) - retrieves all service update messages for the tenant [#2949](https://github.com/pnp/cli-microsoft365/issues/2949)
 - [tenant serviceannouncement message get](../cmd/tenant/serviceannouncement/serviceannouncement-message-get.md) - retrieves a specified service update message for the tenant [#2952](https://github.com/pnp/cli-microsoft365/issues/2952)
 
 ### Changes
