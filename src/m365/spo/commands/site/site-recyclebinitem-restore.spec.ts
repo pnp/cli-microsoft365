@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command, { CommandError } from '../../../../Command';
+import Command from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
@@ -69,17 +69,22 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('fails validation if the siteUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { siteUrl: 'foo', id: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } });
+    const actual = command.validate({ options: { siteUrl: 'foo', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } });
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the siteUrl option is a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', id: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } });
+  it('fails validation if ids option is not a valid GUID', () => {
+    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '9526' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if the siteUrl and ids options are valid', () => {
+    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } });
     assert(actual);
   });
 
   it('passes validation if siteUrl and id are defined', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', id: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } });
+    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } });
     assert(actual);
   });
 
@@ -97,38 +102,11 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
         output: 'json',
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com',
-        id: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526,1adcf0d6-3733-4c13-b883-c84a27905cfd'
+        ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526,1adcf0d6-3733-4c13-b883-c84a27905cfd'
       }
     }, () => {
       try {
         assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('command handles restoring items from recycle bin reject request', (done) => {
-    const err = 'Invalid request';
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/site/RecycleBin/RestoreByIds') > -1) {
-        return Promise.reject(err);
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        siteUrl: 'https://contoso.sharepoint.com',
-        id: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526,1adcf0d6-3733-4c13-b883-c84a27905cfd'
-      }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }
       catch (e) {

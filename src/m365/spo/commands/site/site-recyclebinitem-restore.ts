@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import Utils from '../../../../Utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -11,7 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   siteUrl: string;
-  id: string;
+  ids: string;
 }
 
 class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
@@ -30,14 +31,14 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
 
     const requestUrl: string = `${args.options.siteUrl}/_api/site/RecycleBin/RestoreByIds`;
 
-    const ids: string[] = args.options.id.split(',');
-    const idsChunks = [];
+    const ids: string[] = this.splitIdsList(args.options.ids);
+    const idsChunks: string[][] = [];
 
     while (ids.length) {
       idsChunks.push(ids.splice(0, 20));
     }
 
-    idsChunks.forEach((idsChunk) => {
+    idsChunks.forEach(async (idsChunk: string[], index: number) => {
       const requestOptions: any = {
         url: requestUrl,
         headers: {
@@ -49,11 +50,11 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
         }
       };
 
-      request
-        .post(requestOptions)
-        .then((): void => {
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      await request.post(requestOptions);
+
+      if(index === idsChunks.length - 1) {
+        cb();
+      }
     });
   }
 
@@ -63,7 +64,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
         option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '-i, --id <id>'
+        option: '-i, --ids <ids>'
       }
     ];
 
@@ -72,7 +73,20 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
+
+    if (this.splitIdsList(args.options.ids).map(id => Utils.isValidGuid(id as string)).some(check => check !== true)) {
+      return `some items in list ${args.options.ids} is not a valid GUID`;
+    }
+
+    return true;
+  }
+
+  private splitIdsList(ids: string): string[] {
+    return ids.split(',').map(id => id.trim());
   }
 }
 
