@@ -14,6 +14,109 @@ describe(commands.ROOM_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
+  const jsonOutput = {
+    "value": [
+      {
+        "id": "3162F1E1-C4C0-604B-51D8-91DA78989EB1",
+        "emailAddress": "cf100@contoso.com",
+        "displayName": "Conf Room 100",
+        "address": {
+          "street": "4567 Main Street",
+          "city": "Buffalo",
+          "state": "NY",
+          "postalCode": "98052",
+          "countryOrRegion": "USA"
+        },
+        "geoCoordinates": {
+          "latitude": 47.6405,
+          "longitude": -122.1293
+        },
+        "phone": "000-000-0000",
+        "nickname": "Conf Room",
+        "label": "100",
+        "capacity": 50,
+        "building": "1",
+        "floorNumber": 1,
+        "isManaged": true,
+        "isWheelChairAccessible": false,
+        "bookingType": "standard",
+        "tags": [
+          "bean bags"
+        ],
+        "audioDeviceName": null,
+        "videoDeviceName": null,
+        "displayDevice": "surface hub"
+      },
+      {
+        "id": "3162F1E1-C4C0-604B-51D8-91DA78970B97",
+        "emailAddress": "cf200@contoso.com",
+        "displayName": "Conf Room 200",
+        "address": {
+          "street": "4567 Main Street",
+          "city": "Buffalo",
+          "state": "NY",
+          "postalCode": "98052",
+          "countryOrRegion": "USA"
+        },
+        "geoCoordinates": {
+          "latitude": 47.6405,
+          "longitude": -122.1293
+        },
+        "phone": "000-000-0000",
+        "nickname": "Conf Room",
+        "label": "200",
+        "capacity": 40,
+        "building": "2",
+        "floorNumber": 2,
+        "isManaged": true,
+        "isWheelChairAccessible": false,
+        "bookingType": "standard",
+        "tags": [
+          "benches",
+          "nice view"
+        ],
+        "audioDeviceName": null,
+        "videoDeviceName": null,
+        "displayDevice": "surface hub"
+      }
+    ]
+  };
+  const jsonOutputFilter = {
+    "value": [
+      {
+        "id": "3162F1E1-C4C0-604B-51D8-91DA78970B97",
+        "emailAddress": "cf200@contoso.com",
+        "displayName": "Conf Room 200",
+        "address": {
+          "street": "4567 Main Street",
+          "city": "Buffalo",
+          "state": "NY",
+          "postalCode": "98052",
+          "countryOrRegion": "USA"
+        },
+        "geoCoordinates": {
+          "latitude": 47.6405,
+          "longitude": -122.1293
+        },
+        "phone": "000-000-0000",
+        "nickname": "Conf Room",
+        "label": "200",
+        "capacity": 40,
+        "building": "2",
+        "floorNumber": 2,
+        "isManaged": true,
+        "isWheelChairAccessible": false,
+        "bookingType": "standard",
+        "tags": [
+          "benches",
+          "nice view"
+        ],
+        "audioDeviceName": null,
+        "videoDeviceName": null,
+        "displayDevice": "surface hub"
+      }
+    ]
+  };
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -67,74 +170,7 @@ describe(commands.ROOM_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/places/microsoft.graph.room`) {
         return Promise.resolve(
-          {
-            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#places/microsoft.graph.room",
-            "value": [
-              {
-                "id": "3162F1E1-C4C0-604B-51D8-91DA78989EB1",
-                "emailAddress": "cf100@contoso.com",
-                "displayName": "Conf Room 100",
-                "address": {
-                  "street": "4567 Main Street",
-                  "city": "Buffalo",
-                  "state": "NY",
-                  "postalCode": "98052",
-                  "countryOrRegion": "USA"
-                },
-                "geoCoordinates": {
-                  "latitude": 47.6405,
-                  "longitude": -122.1293
-                },
-                "phone": "000-000-0000",
-                "nickname": "Conf Room",
-                "label": "100",
-                "capacity": 50,
-                "building": "1",
-                "floorNumber": 1,
-                "isManaged": true,
-                "isWheelChairAccessible": false,
-                "bookingType": "standard",
-                "tags": [
-                  "bean bags"
-                ],
-                "audioDeviceName": null,
-                "videoDeviceName": null,
-                "displayDevice": "surface hub"
-              },
-              {
-                "id": "3162F1E1-C4C0-604B-51D8-91DA78970B97",
-                "emailAddress": "cf200@contoso.com",
-                "displayName": "Conf Room 200",
-                "address": {
-                  "street": "4567 Main Street",
-                  "city": "Buffalo",
-                  "state": "NY",
-                  "postalCode": "98052",
-                  "countryOrRegion": "USA"
-                },
-                "geoCoordinates": {
-                  "latitude": 47.6405,
-                  "longitude": -122.1293
-                },
-                "phone": "000-000-0000",
-                "nickname": "Conf Room",
-                "label": "200",
-                "capacity": 40,
-                "building": "2",
-                "floorNumber": 2,
-                "isManaged": true,
-                "isWheelChairAccessible": false,
-                "bookingType": "standard",
-                "tags": [
-                  "benches",
-                  "nice view"
-                ],
-                "audioDeviceName": null,
-                "videoDeviceName": null,
-                "displayDevice": "surface hub"
-              }
-            ]
-          }
+          jsonOutput
         );
       }
       return Promise.reject('Invalid request');
@@ -142,74 +178,9 @@ describe(commands.ROOM_LIST, () => {
 
     command.action(logger, { options: { verbose: true } }, () => {
       try {
-        assert(loggerLogSpy.calledWith({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#places/microsoft.graph.room",
-          "value": [
-            {
-              "id": "3162F1E1-C4C0-604B-51D8-91DA78989EB1",
-              "emailAddress": "cf100@contoso.com",
-              "displayName": "Conf Room 100",
-              "address": {
-                "street": "4567 Main Street",
-                "city": "Buffalo",
-                "state": "NY",
-                "postalCode": "98052",
-                "countryOrRegion": "USA"
-              },
-              "geoCoordinates": {
-                "latitude": 47.6405,
-                "longitude": -122.1293
-              },
-              "phone": "000-000-0000",
-              "nickname": "Conf Room",
-              "label": "100",
-              "capacity": 50,
-              "building": "1",
-              "floorNumber": 1,
-              "isManaged": true,
-              "isWheelChairAccessible": false,
-              "bookingType": "standard",
-              "tags": [
-                "bean bags"
-              ],
-              "audioDeviceName": null,
-              "videoDeviceName": null,
-              "displayDevice": "surface hub"
-            },
-            {
-              "id": "3162F1E1-C4C0-604B-51D8-91DA78970B97",
-              "emailAddress": "cf200@contoso.com",
-              "displayName": "Conf Room 200",
-              "address": {
-                "street": "4567 Main Street",
-                "city": "Buffalo",
-                "state": "NY",
-                "postalCode": "98052",
-                "countryOrRegion": "USA"
-              },
-              "geoCoordinates": {
-                "latitude": 47.6405,
-                "longitude": -122.1293
-              },
-              "phone": "000-000-0000",
-              "nickname": "Conf Room",
-              "label": "200",
-              "capacity": 40,
-              "building": "2",
-              "floorNumber": 2,
-              "isManaged": true,
-              "isWheelChairAccessible": false,
-              "bookingType": "standard",
-              "tags": [
-                "benches",
-                "nice view"
-              ],
-              "audioDeviceName": null,
-              "videoDeviceName": null,
-              "displayDevice": "surface hub"
-            }
-          ]
-        }));
+        assert(loggerLogSpy.calledWith(
+          jsonOutput.value
+        ));
         done();
       }
       catch (e) {
@@ -222,43 +193,7 @@ describe(commands.ROOM_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/places/bldg2@contoso.com/microsoft.graph.roomlist/rooms`) {
         return Promise.resolve(
-          {
-            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#places('bldg2%40contoso.com')/microsoft.graph.roomList/rooms",
-            "value": [
-              {
-                "id": "3162F1E1-C4C0-604B-51D8-91DA78970B97",
-                "emailAddress": "cf200@contoso.com",
-                "displayName": "Conf Room 200",
-                "address": {
-                  "street": "4567 Main Street",
-                  "city": "Buffalo",
-                  "state": "NY",
-                  "postalCode": "98052",
-                  "countryOrRegion": "USA"
-                },
-                "geoCoordinates": {
-                  "latitude": 47.6405,
-                  "longitude": -122.1293
-                },
-                "phone": "000-000-0000",
-                "nickname": "Conf Room",
-                "label": "200",
-                "capacity": 40,
-                "building": "2",
-                "floorNumber": 2,
-                "isManaged": true,
-                "isWheelChairAccessible": false,
-                "bookingType": "standard",
-                "tags": [
-                  "benches",
-                  "nice view"
-                ],
-                "audioDeviceName": null,
-                "videoDeviceName": null,
-                "displayDevice": "surface hub"
-              }
-            ]
-          }
+          jsonOutputFilter
         );
       }
       return Promise.reject('Invalid request');
@@ -266,43 +201,9 @@ describe(commands.ROOM_LIST, () => {
 
     command.action(logger, { options: { verbose: true, roomlistEmail: "bldg2@contoso.com" } }, () => {
       try {
-        assert(loggerLogSpy.calledWith({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#places('bldg2%40contoso.com')/microsoft.graph.roomList/rooms",
-          "value": [
-            {
-              "id": "3162F1E1-C4C0-604B-51D8-91DA78970B97",
-              "emailAddress": "cf200@contoso.com",
-              "displayName": "Conf Room 200",
-              "address": {
-                "street": "4567 Main Street",
-                "city": "Buffalo",
-                "state": "NY",
-                "postalCode": "98052",
-                "countryOrRegion": "USA"
-              },
-              "geoCoordinates": {
-                "latitude": 47.6405,
-                "longitude": -122.1293
-              },
-              "phone": "000-000-0000",
-              "nickname": "Conf Room",
-              "label": "200",
-              "capacity": 40,
-              "building": "2",
-              "floorNumber": 2,
-              "isManaged": true,
-              "isWheelChairAccessible": false,
-              "bookingType": "standard",
-              "tags": [
-                "benches",
-                "nice view"
-              ],
-              "audioDeviceName": null,
-              "videoDeviceName": null,
-              "displayDevice": "surface hub"
-            }
-          ]
-        }));
+        assert(loggerLogSpy.calledWith(
+          jsonOutputFilter.value
+        ));
         done();
       }
       catch (e) {

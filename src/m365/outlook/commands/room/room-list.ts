@@ -3,9 +3,9 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { Room } from '@microsoft/microsoft-graph-types';
+import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 
 interface CommandArgs {
   options: Options;
@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   roomlistEmail?: string;
 }
 
-class OutlookRoomListCommand extends GraphCommand {
+class OutlookRoomListCommand extends GraphItemsListCommand<Room> {
   public get name(): string {
     return commands.ROOM_LIST;
   }
@@ -37,20 +37,11 @@ class OutlookRoomListCommand extends GraphCommand {
     if (args.options.roomlistEmail) {
       endpoint = `${this.resource}/v1.0/places/${args.options.roomlistEmail}/microsoft.graph.roomlist/rooms`;
     }
-    const requestOptions: any = {
-      url: endpoint,
-      headers: {
-        accept: 'application/json;odata.metadata=none',
-        'content-type': 'application/json'
-      },
-      responseType: 'json'
-    };
-
-    request.get(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
+    this.getAllItems(endpoint, logger, true)
+      .then((): void => {
+        logger.log(this.items);
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
   public options(): CommandOption[] {
     const options: CommandOption[] = [
