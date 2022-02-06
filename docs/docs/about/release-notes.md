@@ -18,6 +18,10 @@
 - [planner task get](../cmd/planner/task/task-get.md) - retrieves the the specified planner task [#3019](https://github.com/pnp/cli-microsoft365/issues/3019)
 - [planner task details get](../cmd/planner/task/task-details-get.md) - retrieves the details of the specified planner task [#3015](https://github.com/pnp/cli-microsoft365/issues/3015)
 
+**SharePoint:**
+
+- [spo group user remove](../cmd/spo/group/group-user-remove.md) - removes the specified user from a SharePoint group [#2642](https://github.com/pnp/cli-microsoft365/issues/2642)
+
 ### Changes
 
 - updated 'aad oauth2grant list' to use MS Graph [#2710](https://github.com/pnp/cli-microsoft365/issues/2710)
@@ -29,6 +33,8 @@
 - updated the 'using own identity' guide with updated interface [#2968](https://github.com/pnp/cli-microsoft365/issues/2968)
 - added the 'List all documents with a specific name within a SharePoint site' sample [#2768](https://github.com/pnp/cli-microsoft365/issues/2768)
 - extended 'aad user list' with --deleted flag [#2955](https://github.com/pnp/cli-microsoft365/issues/2955)
+- remvoes obsolete AADCommand base class [#2922](https://github.com/pnp/cli-microsoft365/issues/2922)
+- updates the 'teams channel get' documentation [#3009](https://github.com/pnp/cli-microsoft365/issues/3009)
 
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
