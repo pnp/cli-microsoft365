@@ -14,6 +14,39 @@ describe(commands.ROOMLIST_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
+  const jsonOutput = {
+    "value": [
+      {
+        "id": "DC404124-302A-92AA-F98D-7B4DEB0C1705",
+        "displayName": "Building 1",
+        "address": {
+          "street": "4567 Main Street",
+          "city": "Buffalo",
+          "state": "NY",
+          "postalCode": "98052",
+          "countryOrRegion": "USA"
+        },
+        "geocoordinates": null,
+        "phone": null,
+        "emailAddress": "bldg1@contoso.com"
+      },
+      {
+        "id": "DC404124-302A-92AA-F98D-7B4DEB0C1706",
+        "displayName": "Building 2",
+        "address": {
+          "street": "4567 Main Street",
+          "city": "Buffalo",
+          "state": "NY",
+          "postalCode": "98052",
+          "countryOrRegion": "USA"
+        },
+        "geocoordinates": null,
+        "phone": null,
+        "emailAddress": "bldg2@contoso.com"
+      }
+    ]
+  };
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -67,39 +100,7 @@ describe(commands.ROOMLIST_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/places/microsoft.graph.roomlist`) {
         return Promise.resolve(
-          {
-            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#places/microsoft.graph.roomList",
-            "value": [
-              {
-                "id": "DC404124-302A-92AA-F98D-7B4DEB0C1705",
-                "displayName": "Building 1",
-                "address": {
-                  "street": "4567 Main Street",
-                  "city": "Buffalo",
-                  "state": "NY",
-                  "postalCode": "98052",
-                  "countryOrRegion": "USA"
-                },
-                "geocoordinates": null,
-                "phone": null,
-                "emailAddress": "bldg1@contoso.com"
-              },
-              {
-                "id": "DC404124-302A-92AA-F98D-7B4DEB0C1706",
-                "displayName": "Building 2",
-                "address": {
-                  "street": "4567 Main Street",
-                  "city": "Buffalo",
-                  "state": "NY",
-                  "postalCode": "98052",
-                  "countryOrRegion": "USA"
-                },
-                "geocoordinates": null,
-                "phone": null,
-                "emailAddress": "bldg2@contoso.com"
-              }
-            ]
-          }
+          jsonOutput
         );
       }
       return Promise.reject('Invalid request');
@@ -108,39 +109,7 @@ describe(commands.ROOMLIST_LIST, () => {
     command.action(logger, { options: { verbose: true } }, () => {
       try {
         assert(loggerLogSpy.calledWith(
-          {
-            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#places/microsoft.graph.roomList",
-            "value": [
-              {
-                "id": "DC404124-302A-92AA-F98D-7B4DEB0C1705",
-                "displayName": "Building 1",
-                "address": {
-                  "street": "4567 Main Street",
-                  "city": "Buffalo",
-                  "state": "NY",
-                  "postalCode": "98052",
-                  "countryOrRegion": "USA"
-                },
-                "geocoordinates": null,
-                "phone": null,
-                "emailAddress": "bldg1@contoso.com"
-              },
-              {
-                "id": "DC404124-302A-92AA-F98D-7B4DEB0C1706",
-                "displayName": "Building 2",
-                "address": {
-                  "street": "4567 Main Street",
-                  "city": "Buffalo",
-                  "state": "NY",
-                  "postalCode": "98052",
-                  "countryOrRegion": "USA"
-                },
-                "geocoordinates": null,
-                "phone": null,
-                "emailAddress": "bldg2@contoso.com"
-              }
-            ]
-          }
+          jsonOutput.value
         ));
         done();
       }
