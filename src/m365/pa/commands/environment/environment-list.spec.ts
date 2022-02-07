@@ -69,7 +69,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       if ((opts.url as string).indexOf(`/providers/Microsoft.PowerApps/environments?api-version=2017-08-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve(env);
         }
       }
@@ -96,7 +96,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       if ((opts.url as string).indexOf(`/providers/Microsoft.PowerApps/environments?api-version=2017-08-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve(env);
         }
       }
@@ -120,7 +120,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
       if ((opts.url as string).indexOf(`/providers/Microsoft.PowerApps/environments?api-version=2017-08-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             value: []
           });

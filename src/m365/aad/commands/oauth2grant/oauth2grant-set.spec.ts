@@ -65,7 +65,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
       if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants/YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek`) > -1) {
         if (opts.headers &&
           opts.headers['content-type'] &&
-          opts.headers['content-type'].indexOf('application/json') === 0 &&
+          (opts.headers['content-type'] as string).indexOf('application/json') === 0 &&
           opts.data.scope === 'user_impersonation') {
           return Promise.resolve();
         }
@@ -90,7 +90,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
       if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants/YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek`) > -1) {
         if (opts.headers &&
           opts.headers['content-type'] &&
-          opts.headers['content-type'].indexOf('application/json') === 0 &&
+          (opts.headers['content-type'] as string).indexOf('application/json') === 0 &&
           opts.data.scope === 'user_impersonation') {
           return Promise.resolve();
         }
