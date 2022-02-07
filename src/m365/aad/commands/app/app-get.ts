@@ -9,14 +9,10 @@ import GraphCommand from '../../../base/GraphCommand';
 import { M365RcJson } from '../../../base/M365RcJson';
 import commands from '../../commands';
 import * as fs from 'fs';
+import { Application } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
-}
-
-interface AppInfo {
-  appId: string;
-  displayName: string;  
 }
 
 export interface Options extends GlobalOptions {
@@ -89,7 +85,7 @@ class AadAppGetCommand extends GraphCommand {
       });
   }
 
-  private getAppInfo(appObjectId: string): Promise<AppInfo> {
+  private getAppInfo(appObjectId: string): Promise<Application> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/myorganization/applications/${appObjectId}`,
       headers: {
@@ -98,10 +94,10 @@ class AadAppGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request.get<AppInfo>(requestOptions);
+    return request.get<Application>(requestOptions);
   }
 
-  private saveAppInfo(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
+  private saveAppInfo(args: CommandArgs, appInfo: Application, logger: Logger): Promise<Application> {
     if (!args.options.save) {
       return Promise.resolve(appInfo);
     }
@@ -134,10 +130,10 @@ class AadAppGetCommand extends GraphCommand {
       m365rc.apps = [];
     }
 
-    if (m365rc.apps.every(a => a.appId !== appInfo.appId)) {
+    if (!m365rc.apps.some(a => a.appId === appInfo.appId)) {
       m365rc.apps.push({
-        appId: appInfo.appId,
-        name: appInfo.displayName
+        appId: appInfo.appId as string,
+        name: appInfo.displayName as string
       });
 
       try {
