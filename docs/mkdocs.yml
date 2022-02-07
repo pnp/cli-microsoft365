@@ -231,6 +231,7 @@ nav:
         - environment list: 'cmd/pp/managementapp/environment/environment-list.md' 
       - managementapp:
         - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
+        - managementapp list: 'cmd/pp/managementapp/managementapp-list.md'
     - Search (search):
       - externalconnection:
         - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
