@@ -1,11 +1,16 @@
 import { Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
-  options: GlobalOptions;
+  options: Options;
+}
+
+interface Options extends GlobalOptions {
+  deleted?: boolean;
 }
 
 interface ExtendedGroup extends Group {
@@ -26,8 +31,10 @@ class AadGroupListCommand extends GraphItemsListCommand<Group>   {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    const endpoint: string = args.options.deleted ? 'directory/deletedItems/microsoft.graph.group' : 'groups';
+
     this
-      .getAllItems(`${this.resource}/v1.0/groups`, logger, true)
+      .getAllItems(`${this.resource}/v1.0/${endpoint}`, logger, true)
       .then((): void => {
         if (args.options.output === 'text') {
           this.items.forEach((group: ExtendedGroup) => {
@@ -49,6 +56,16 @@ class AadGroupListCommand extends GraphItemsListCommand<Group>   {
         logger.log(this.items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  }
+
+  
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      { option: '-d, --deleted' }
+    ];
+
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
   }
 }
 
