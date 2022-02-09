@@ -36,6 +36,8 @@
 - removes obsolete AADCommand base class [#2922](https://github.com/pnp/cli-microsoft365/issues/2922)
 - updates the 'teams channel get' documentation [#3009](https://github.com/pnp/cli-microsoft365/issues/3009)
 - added the 'Check all users for known breaches with HBIP' sample [#2957](https://github.com/pnp/cli-microsoft365/issues/2957)
+- added the 'List items with unique permissions' sample script [#2283](https://github.com/pnp/cli-microsoft365/issues/2283)
+- added link for 'Using your own Azure AD identity' [#2946](https://github.com/pnp/cli-microsoft365/issues/2946)
 
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
