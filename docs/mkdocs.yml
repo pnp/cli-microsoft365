@@ -48,6 +48,7 @@ nav:
         - groupsettingtemplate list: 'cmd/aad/groupsettingtemplate/groupsettingtemplate-list.md'
       - o365group:
         - o365group add: 'cmd/aad/o365group/o365group-add.md'
+        - o365group conversation list: 'cmd/aad/o365group/o365group-conversation-list.md'
         - o365group get: 'cmd/aad/o365group/o365group-get.md'
         - o365group list: 'cmd/aad/o365group/o365group-list.md'
         - o365group recyclebinitem list: 'cmd/aad/o365group/o365group-recyclebinitem-list.md'
