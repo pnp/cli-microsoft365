@@ -72,7 +72,7 @@ describe(commands.TASK_LIST, () => {
   ];
 
   const taskListResponse: any = {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.plannerTask)",
+    "@odata.context": "https://graph.microsoft.com/beta/$metadata#Collection(microsoft.graph.plannerTask)",
     "@odata.count": 2,
     "value": taskListResponseValue
   };
@@ -207,13 +207,13 @@ describe(commands.TASK_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets`) {
         return Promise.resolve(bucketListResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
         return Promise.resolve(taskListResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
         return Promise.resolve(taskListResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/planner/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/beta/me/planner/tasks`) {
         return Promise.resolve(taskListResponse);
       }
       return Promise.reject('Invalid Request');
@@ -464,13 +464,13 @@ describe(commands.TASK_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
         return Promise.resolve(plansInOwnerGroup);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
         return Promise.resolve(taskListResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
         return Promise.resolve(taskListResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/planner/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/beta/me/planner/tasks`) {
         return Promise.resolve(taskListResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets`) {
@@ -506,13 +506,13 @@ describe(commands.TASK_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets`) {
         return Promise.resolve(bucketListResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
         return Promise.resolve(taskListResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
         return Promise.resolve(taskListResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/planner/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/beta/me/planner/tasks`) {
         return Promise.resolve(taskListResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {

@@ -53,7 +53,7 @@ class PlannerTaskListCommand extends GraphItemsListCommand<Task> {
     if (bucketId || bucketName) {
       this
         .getBucketId(args)
-        .then((bucketId: string): Promise<void> => this.getAllItems(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`, logger, true))
+        .then((bucketId: string): Promise<void> => this.getAllItems(`${this.resource}/beta/planner/buckets/${bucketId}/tasks`, logger, true))
         .then((): void => {
           logger.log(this.items);
           cb();
@@ -62,7 +62,7 @@ class PlannerTaskListCommand extends GraphItemsListCommand<Task> {
     else if (planId || planName) {
       this
         .getPlanId(args)
-        .then((planId: string): Promise<void> => this.getAllItems(`${this.resource}/v1.0/planner/plans/${planId}/tasks`, logger, true))
+        .then((planId: string): Promise<void> => this.getAllItems(`${this.resource}/beta/planner/plans/${planId}/tasks`, logger, true))
         .then((): void => {
           logger.log(this.items);
           cb();
@@ -70,7 +70,7 @@ class PlannerTaskListCommand extends GraphItemsListCommand<Task> {
     }
     else {
       this
-        .getAllItems(`${this.resource}/v1.0/me/planner/tasks`, logger, true)
+        .getAllItems(`${this.resource}/beta/me/planner/tasks`, logger, true)
         .then((): void => {
           logger.log(this.items);
           cb();
