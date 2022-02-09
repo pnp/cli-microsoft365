@@ -4,6 +4,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { Task } from '../../Task';
 
 interface CommandArgs {
   options: Options;
@@ -24,7 +25,7 @@ class PlannerTaskGetCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(args.options.id)}`,
+      url: `${this.resource}/beta/planner/tasks/${encodeURIComponent(args.options.id)}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -32,13 +33,12 @@ class PlannerTaskGetCommand extends GraphCommand {
     };
 
     request
-      .get(requestOptions)
-      .then((res: any): void => {
+      .get<Task>(requestOptions)
+      .then((res: Task): void => {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
-
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
