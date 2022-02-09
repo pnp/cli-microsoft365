@@ -15,6 +15,11 @@ m365 planner task get [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+!!! attention
+    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+
 ## Examples
 
 Retrieve the the specified planner task

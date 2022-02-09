@@ -59,7 +59,7 @@ describe(commands.TASK_GET, () => {
 
   it('successfully handles item found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/01gzSlKkIUSUl6DF_EilrmQAKDhh`) {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/01gzSlKkIUSUl6DF_EilrmQAKDhh`) {
         return Promise.resolve({
           "createdBy": {
             "user": {

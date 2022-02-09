@@ -24,7 +24,7 @@ class PlannerTaskGetCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(args.options.id)}`,
+      url: `${this.resource}/beta/planner/tasks/${encodeURIComponent(args.options.id)}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
