@@ -1,3 +1,4 @@
+import { PlannerTask } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -5,7 +6,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
-import { Task } from '../../Task';
 
 interface CommandArgs {
   options: Options;
@@ -20,7 +20,11 @@ interface Options extends GlobalOptions {
   ownerGroupName?: string;
 }
 
-class PlannerTaskListCommand extends GraphItemsListCommand<Task> {
+interface BetaPlannerTask extends PlannerTask {
+  priority?: number;
+}
+
+class PlannerTaskListCommand extends GraphItemsListCommand<PlannerTask> {
   public get name(): string {
     return commands.TASK_LIST;
   }
@@ -45,34 +49,53 @@ class PlannerTaskListCommand extends GraphItemsListCommand<Task> {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const bucketId: string | undefined = args.options.bucketId;
     const bucketName: string | undefined = args.options.bucketName;
-    const planId: string | undefined = args.options.planId;
+    let bucketId: string | undefined = args.options.bucketId;
     const planName: string | undefined = args.options.planName;
+    let planId: string | undefined = args.options.planId;
+    let taskItems: PlannerTask[] = [];
 
     if (bucketId || bucketName) {
       this
         .getBucketId(args)
-        .then((bucketId: string): Promise<void> => this.getAllItems(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`, logger, true))
+        .then((retrievedBucketId: string): Promise<void> => {
+          bucketId = retrievedBucketId;
+          return this.getAllItems(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`, logger, true);
+        })
+        .then((): Promise<void> => {
+          taskItems = this.items;
+          return this.getAllItems(`${this.resource}/beta/planner/buckets/${bucketId}/tasks`, logger, true);
+        })
         .then((): void => {
-          logger.log(this.items);
+          logger.log(this.mergeTaskPriority(taskItems, this.items));
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
     else if (planId || planName) {
       this
         .getPlanId(args)
-        .then((planId: string): Promise<void> => this.getAllItems(`${this.resource}/v1.0/planner/plans/${planId}/tasks`, logger, true))
+        .then((retrievedPlanId: string): Promise<void> => {
+          planId = retrievedPlanId;
+          return this.getAllItems(`${this.resource}/v1.0/planner/plans/${planId}/tasks`, logger, true);
+        })
+        .then((): Promise<void> => {
+          taskItems = this.items;
+          return this.getAllItems(`${this.resource}/beta/planner/plans/${planId}/tasks`, logger, true);
+        })
         .then((): void => {
-          logger.log(this.items);
+          logger.log(this.mergeTaskPriority(taskItems, this.items));
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
     else {
       this
         .getAllItems(`${this.resource}/v1.0/me/planner/tasks`, logger, true)
+        .then((): Promise<void> => {
+          taskItems = this.items;
+          return this.getAllItems(`${this.resource}/beta/me/planner/tasks`, logger, true);
+        })
         .then((): void => {
-          logger.log(this.items);
+          logger.log(this.mergeTaskPriority(taskItems, this.items));
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
@@ -159,6 +182,20 @@ class PlannerTaskListCommand extends GraphItemsListCommand<Task> {
 
         return Promise.resolve(group.id);
       });
+  }
+
+  private mergeTaskPriority(taskItems: PlannerTask[], betaTaskItems: BetaPlannerTask[]): BetaPlannerTask[] {
+    const findBetaTask = (id: string) => betaTaskItems.find(task => task.id === id);
+
+    taskItems.forEach(task => {
+      const betaTaskItem = findBetaTask(task.id as string);
+      if (betaTaskItem) {
+        const { priority } = betaTaskItem;
+        Object.assign(task, { priority });
+      }
+    });
+
+    return taskItems;
   }
 
   public options(): CommandOption[] {
