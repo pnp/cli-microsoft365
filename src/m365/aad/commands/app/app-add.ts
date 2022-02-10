@@ -172,14 +172,14 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
       return Promise.resolve(appInfo);
     }
 
-    const manifest: any = JSON.parse(args.options.manifest);
+    const v2Manifest: any = JSON.parse(args.options.manifest);
     // remove properties that might be coming from the original app that was
     // used to create the manifest and which can't be updated
-    delete manifest.id;
-    delete manifest.appId;
-    delete manifest.publisherDomain;
+    delete v2Manifest.id;
+    delete v2Manifest.appId;
+    delete v2Manifest.publisherDomain;
     // Azure Portal returns v2 manifest whereas the Graph API expects a v1.6
-    const transformedManifest = this.transformManifest(manifest);
+    const graphManifest = this.transformManifest(v2Manifest);
 
     const updateAppRequestOptions: any = {
       url: `${this.resource}/v1.0/myorganization/applications/${appInfo.id}`,
@@ -187,7 +187,40 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
         'content-type': 'application/json'
       },
       responseType: 'json',
-      data: transformedManifest
+      data: graphManifest
+    };
+
+    return request
+      .patch(updateAppRequestOptions)
+      .then(_ => this.updatePreAuthorizedAppsFromManifest(v2Manifest, appInfo))
+      .then(_ => Promise.resolve(appInfo));
+  }
+
+  private updatePreAuthorizedAppsFromManifest(manifest: any, appInfo: AppInfo): Promise<AppInfo> {
+    if (!manifest ||
+      !manifest.preAuthorizedApplications ||
+      manifest.preAuthorizedApplications.length === 0) {
+      return Promise.resolve(appInfo);
+    }
+
+    const graphManifest: any = {
+      api: {
+        preAuthorizedApplications: manifest.preAuthorizedApplications
+      }
+    };
+
+    graphManifest.api.preAuthorizedApplications.forEach((p: any) => {
+      p.delegatedPermissionIds = p.permissionIds;
+      delete p.permissionIds;
+    });
+
+    const updateAppRequestOptions: any = {
+      url: `${this.resource}/v1.0/myorganization/applications/${appInfo.id}`,
+      headers: {
+        'content-type': 'application/json'
+      },
+      responseType: 'json',
+      data: graphManifest
     };
 
     return request
@@ -260,10 +293,18 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
 
     graphManifest.api.oauth2PermissionScopes = v2Manifest.oauth2Permissions;
     delete graphManifest.oauth2Permissions;
+    if (graphManifest.api.oauth2PermissionScopes) {
+      graphManifest.api.oauth2PermissionScopes.forEach((scope: any) => {
+        delete scope.lang;
+        delete scope.origin;
+      });
+    }
 
     delete graphManifest.oauth2RequiredPostResponse;
 
-    graphManifest.api.preAuthorizedApplications = v2Manifest.preAuthorizedApplications;
+    // MS Graph doesn't support creating OAuth2 permissions and pre-authorized
+    // apps in one request. This is why we need to remove it here and do it in
+    // the next request
     delete graphManifest.preAuthorizedApplications;
 
     if (v2Manifest.replyUrlsWithType) {
