@@ -22,6 +22,15 @@ m365 aad app set [options]
 `-u, --uri [uri]`
 : Application ID URI to update
 
+`-r, --redirectUris [redirectUris]`
+: Comma-separated list of redirect URIs to add to the app registration. Requires `platform` to be specified
+
+`-p, --platform [platform]`
+: Platform for which the `redirectUri` should be configured. Allowed values `spa,web,publicClient`
+
+`--redirectUrisToRemove [redirectUrisToRemove]`
+: Comma-separated list of existing redirect URIs to remove. Specify, when you want to replace existing redirect URIs with another
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -48,4 +57,16 @@ Update the app URI of the Azure AD application registration specified by its nam
 
 ```sh
 m365 aad app set --name "My app" --uri https://contoso.com/e75be2e1-0204-4f95-857d-51a37cf40be8
+```
+
+Add a new redirect URI for SPA authentication
+
+```sh
+m365 aad app set --objectId 95cfe30d-ed44-4f9d-b73d-c66560f72e83 --redirectUris https://contoso.com/auth --platform spa
+```
+
+Replace one redirect URI with another for SPA authentication
+
+```sh
+m365 aad app set --objectId 95cfe30d-ed44-4f9d-b73d-c66560f72e83 --redirectUris https://contoso.com/auth --platform spa --redirectUrisToRemove https://contoso.com/old-auth
 ```
