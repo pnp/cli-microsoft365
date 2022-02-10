@@ -38,6 +38,8 @@
 - added the 'Check all users for known breaches with HBIP' sample [#2957](https://github.com/pnp/cli-microsoft365/issues/2957)
 - added the 'List items with unique permissions' sample script [#2283](https://github.com/pnp/cli-microsoft365/issues/2283)
 - added link for 'Using your own Azure AD identity' [#2946](https://github.com/pnp/cli-microsoft365/issues/2946)
+- fixed creating AAD apps with preauthorized apps from manifest [#3041](https://github.com/pnp/cli-microsoft365/issues/3041)
+- added CLI API to execute commands [#2996](https://github.com/pnp/cli-microsoft365/issues/2996)
 
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
