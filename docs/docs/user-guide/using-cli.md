@@ -1,4 +1,4 @@
-# Using the CLI for Microsoft 365
+# Use the CLI for Microsoft 365
 
 Information in this section will help you understand how the CLI for Microsoft 365 works and how you can use it most effectively.
 
