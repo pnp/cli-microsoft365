@@ -158,7 +158,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
         })
       };
 
-      const requestOptions = <AxiosRequestConfig>{
+      const requestOptions: AxiosRequestConfig = {
         url: `${this.resource}/v1.0/chats`,
         headers: {
           accept: 'application/json;odata.metadata=none',        
@@ -180,7 +180,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
   }
 
   private async sendChatMessage(chatId: string, options: Options): Promise<void> {    
-    const requestOptions = <AxiosRequestConfig>{
+    const requestOptions: AxiosRequestConfig = {
       url: `${this.resource}/v1.0/chats/${chatId}/messages`,
       headers: {
         accept: 'application/json;odata.metadata=none',        
@@ -224,7 +224,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
   }
 
   private async getAllChats(url: string, items: Chat[]): Promise<Chat[]> {            
-    const requestOptions = <AxiosRequestConfig>{
+    const requestOptions: AxiosRequestConfig = {
       url: url,
       headers: {
         accept: 'application/json;odata.metadata=none'        
