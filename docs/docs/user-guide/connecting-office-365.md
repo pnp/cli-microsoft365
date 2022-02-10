@@ -1,4 +1,4 @@
-# Logging in to Microsoft 365
+# Log in to Microsoft 365
 
 Before you can use CLI for Microsoft 365 commands to manage your tenant, you have to log in to Microsoft 365. Following section explains how you can log in and check the Microsoft 365 login status.
 
