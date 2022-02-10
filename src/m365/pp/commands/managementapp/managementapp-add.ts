@@ -38,7 +38,7 @@ class PpManagementAppAddCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
-      .getAppObjectId(args)
+      .getAppId(args)
       .then((appId: string): Promise<any> => {
         const requestOptions: any = {
           // This should be refactored once we implement a PowerPlatform base class as api.bap will differ between envs.
@@ -57,7 +57,7 @@ class PpManagementAppAddCommand extends GraphCommand {
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getAppObjectId(args: CommandArgs): Promise<string> {
+  private getAppId(args: CommandArgs): Promise<string> {
     if (args.options.appId) {
       return Promise.resolve(args.options.appId);
     }
@@ -79,7 +79,6 @@ class PpManagementAppAddCommand extends GraphCommand {
     return request
       .get<{ value: Application[] }>((requestOptions))
       .then((aadApps: { value: Application[] }): Promise<string> => {
-
         if (aadApps.value.length === 0) {
           const applicationIdentifier = objectId ? `ID ${objectId}` : `name ${name}`;
           return Promise.reject(`No Azure AD application registration with ${applicationIdentifier} found`);
