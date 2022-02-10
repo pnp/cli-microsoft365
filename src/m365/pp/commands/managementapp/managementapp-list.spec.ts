@@ -64,7 +64,6 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
           "value": [{"applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548e"}]
         });
       }
-
       return Promise.reject('Invalid request');
     });
 
@@ -93,7 +92,6 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
           "value": [{"applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548e"},{"applicationId":"31359c7f-bd7e-475c-86db-fdb8c937548f"}]
         });
       }
-
       return Promise.reject('Invalid request');
     });
 
@@ -122,7 +120,6 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
           "value": [ {} ]
         });
       }
-
       return Promise.reject('Invalid request');
     });
 

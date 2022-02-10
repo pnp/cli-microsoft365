@@ -28,11 +28,9 @@ class PpManagementAppListCommand extends GraphCommand {
         if (res.value && res.value.length > 0) {
           logger.log(res.value);
         }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
-
 }
 
 module.exports = new PpManagementAppListCommand();
