@@ -7,3 +7,7 @@ export interface Task {
   planId?: string;
   bucketId?: string;
 }
+
+export interface BetaTask extends Task {
+  priority?: number;
+}

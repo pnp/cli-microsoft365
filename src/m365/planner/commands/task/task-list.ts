@@ -5,7 +5,7 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
-import { Task } from '../../Task';
+import { Task, BetaTask } from '../../Task';
 
 interface CommandArgs {
   options: Options;
@@ -49,7 +49,7 @@ class PlannerTaskListCommand extends GraphItemsListCommand<Task> {
     let bucketId: string | undefined = args.options.bucketId;
     const planName: string | undefined = args.options.planName;
     let planId: string | undefined = args.options.planId;
-    let taskItems: any[] = [];
+    let taskItems: Task[] = [];
 
     if (bucketId || bucketName) {
       this
@@ -180,12 +180,15 @@ class PlannerTaskListCommand extends GraphItemsListCommand<Task> {
       });
   }
 
-  private mergeTaskPriority(taskItems: any[], betaTaskItems: any[]): any[] {
+  private mergeTaskPriority(taskItems: Task[], betaTaskItems: BetaTask[]): BetaTask[] {
     const findBetaTask = (id: string) => betaTaskItems.find(task => task.id === id);
 
     taskItems.forEach(task => {
-      const { priority } = findBetaTask(task.id);
-      Object.assign(task, { priority });
+      const betaTaskItem = findBetaTask(task.id);
+      if (betaTaskItem) {
+        const { priority } = betaTaskItem;
+        Object.assign(task, { priority });
+      }
     });
 
     return taskItems;

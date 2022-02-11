@@ -33,7 +33,7 @@ m365 planner task list [options]
 ## Remarks
 
 !!! attention
-    This command is uses on an API that is currently in preview to enrich the results with the `priority` field. Keep in mind that this preview is subject to change once the API reached general availability.
+    This command uses on API that is currently in preview to enrich the results with the `priority` field. Keep in mind that this preview API is subject to change once the API reached general availability.
 
 ## Examples
 
