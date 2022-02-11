@@ -41,6 +41,7 @@
 - fixed creating AAD apps with preauthorized apps from manifest [#3041](https://github.com/pnp/cli-microsoft365/issues/3041)
 - added CLI API to execute commands [#2996](https://github.com/pnp/cli-microsoft365/issues/2996)
 - added support for upgrading SPFx projects to v1.14.0-rc.2 [#3045](https://github.com/pnp/cli-microsoft365/issues/3045)
+- extended 'planner task list' with 'priority' [#3037](https://github.com/pnp/cli-microsoft365/issues/3037)
 
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
