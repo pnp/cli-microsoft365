@@ -4,6 +4,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { Task, BetaTask } from '../../Task';
 
 interface CommandArgs {
   options: Options;
@@ -24,21 +25,35 @@ class PlannerTaskGetCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
-      url: `${this.resource}/beta/planner/tasks/${encodeURIComponent(args.options.id)}`,
+      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(args.options.id)}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
+    let taskItem: Task;
 
     request
       .get(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
+      .then((res: any): Promise<BetaTask> => {
+        taskItem = res;
+        requestOptions.url = `${this.resource}/beta/planner/tasks/${encodeURIComponent(args.options.id)}`;
+        return request.get(requestOptions);
+      })
+      .then((betaTaskItem: BetaTask): void => {
+        logger.log(this.mergeTaskPriority(taskItem, betaTaskItem));
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
+  private mergeTaskPriority(taskItem: Task, betaTaskItem: BetaTask): BetaTask {
+    if (betaTaskItem) {
+      const { priority } = betaTaskItem;
+      Object.assign(taskItem, { priority });
+    }
+
+    return taskItem;
+  }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [

@@ -18,7 +18,7 @@ m365 planner task get [options]
 ## Remarks
 
 !!! attention
-    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
+    This command uses an API that is currently in preview to enrich the results with the `priority` field. Keep in mind that this preview API is subject to change once the API reached general availability.
 
 ## Examples
 
