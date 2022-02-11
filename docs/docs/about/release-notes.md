@@ -40,6 +40,7 @@
 - added link for 'Using your own Azure AD identity' [#2946](https://github.com/pnp/cli-microsoft365/issues/2946)
 - fixed creating AAD apps with preauthorized apps from manifest [#3041](https://github.com/pnp/cli-microsoft365/issues/3041)
 - added CLI API to execute commands [#2996](https://github.com/pnp/cli-microsoft365/issues/2996)
+- added support for upgrading SPFx projects to v1.14.0-rc.2 [#3045](https://github.com/pnp/cli-microsoft365/issues/3045)
 
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
