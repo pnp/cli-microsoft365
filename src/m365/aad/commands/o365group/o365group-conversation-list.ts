@@ -13,7 +13,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  groupId?: string;
+  groupId: string;
 }
 
 class AadO365GroupConversationListCommand extends GraphItemsListCommand<Conversation> {
@@ -25,11 +25,6 @@ class AadO365GroupConversationListCommand extends GraphItemsListCommand<Conversa
     return 'Retrieve conversations for the specified group';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.groupId = typeof args.options.groupId !== 'undefined';
-    return telemetryProps;
-  }
   public defaultProperties(): string[] | undefined {
     return ['topic', 'lastDeliveredDateTime', 'id'];
   }
