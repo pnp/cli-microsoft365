@@ -6,6 +6,7 @@
 
 **Microsoft 365:**
 
+- [aad app delete](../cmd/aad/app/app-delete.md) - removes an Azure AD app registration [#3008](https://github.com/pnp/cli-microsoft365/issues/3008)
 - [tenant serviceannouncement health get](../cmd/tenant/serviceannouncement/serviceannouncement-health-get.md) - retrieves a tenant health information [#2950](https://github.com/pnp/cli-microsoft365/issues/2950)
 - [tenant serviceannouncement health list](../cmd/tenant/serviceannouncement/serviceannouncement-health-list.md) - lists the tenant health information [#2947](https://github.com/pnp/cli-microsoft365/issues/2947)
 - [tenant serviceannouncement healthissue get](../cmd/tenant/serviceannouncement/serviceannouncement-healthissue-get.md) - retrieves a specified service health issue for the tenant [#2951](https://github.com/pnp/cli-microsoft365/issues/2951)
@@ -42,6 +43,9 @@
 - added CLI API to execute commands [#2996](https://github.com/pnp/cli-microsoft365/issues/2996)
 - added support for upgrading SPFx projects to v1.14.0-rc.2 [#3045](https://github.com/pnp/cli-microsoft365/issues/3045)
 - extended 'planner task list' with 'priority' [#3037](https://github.com/pnp/cli-microsoft365/issues/3037)
+- extends 'planner task get' with task priority [#3036](https://github.com/pnp/cli-microsoft365/issues/3036)
+- extends 'aad group list' with --deleted flag [#2956](https://github.com/pnp/cli-microsoft365/issues/2956)
+- added csv to autocomplete option [#2997](https://github.com/pnp/cli-microsoft365/issues/2997)
 
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
