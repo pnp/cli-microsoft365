@@ -4,9 +4,12 @@
 
 ### New commands
 
-**Microsoft 365:**
+**Azure Active Directory:**
 
 - [aad app delete](../cmd/aad/app/app-delete.md) - removes an Azure AD app registration [#3008](https://github.com/pnp/cli-microsoft365/issues/3008)
+
+**Microsoft 365:**
+
 - [tenant serviceannouncement health get](../cmd/tenant/serviceannouncement/serviceannouncement-health-get.md) - retrieves a tenant health information [#2950](https://github.com/pnp/cli-microsoft365/issues/2950)
 - [tenant serviceannouncement health list](../cmd/tenant/serviceannouncement/serviceannouncement-health-list.md) - lists the tenant health information [#2947](https://github.com/pnp/cli-microsoft365/issues/2947)
 - [tenant serviceannouncement healthissue get](../cmd/tenant/serviceannouncement/serviceannouncement-healthissue-get.md) - retrieves a specified service health issue for the tenant [#2951](https://github.com/pnp/cli-microsoft365/issues/2951)
@@ -46,6 +49,8 @@
 - extends 'planner task get' with task priority [#3036](https://github.com/pnp/cli-microsoft365/issues/3036)
 - extends 'aad group list' with --deleted flag [#2956](https://github.com/pnp/cli-microsoft365/issues/2956)
 - added csv to autocomplete option [#2997](https://github.com/pnp/cli-microsoft365/issues/2997)
+- added the 'Detecting PII exist in SharePoint List using AWS Comprehend' sample [#2925](https://github.com/pnp/cli-microsoft365/issues/2925)
+- extended 'teams channel get' with 'primary' [#3004](https://github.com/pnp/cli-microsoft365/issues/3004)
 
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
