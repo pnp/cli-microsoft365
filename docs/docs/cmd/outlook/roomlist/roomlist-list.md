@@ -10,7 +10,7 @@ m365 outlook roomlist list [options]
 
 ## Options
 
---8<-- "docs/cmd/\_global.md"
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 
