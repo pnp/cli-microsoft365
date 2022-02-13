@@ -82,7 +82,7 @@ class TeamsAppUpdateCommand extends GraphCommand {
         }
 
         if (response.value.length > 1) {
-          return Promise.reject(`Multiple Teams apps with name ${args.options.name} found. Please disambiguate using the ids: ${response.value.map(x => x.id)}`);
+          return Promise.reject(`Multiple Teams apps with name ${args.options.name} found. Please disambiguate using the ids: ${response.value.map(x => x.id).join(', ')}`);
         }
 
         return Promise.resolve(app.id);
