@@ -32,6 +32,10 @@
 
 - [spo group user remove](../cmd/spo/group/group-user-remove.md) - removes the specified user from a SharePoint group [#2642](https://github.com/pnp/cli-microsoft365/issues/2642)
 
+**Teams:**
+
+- [teams chat message send](../cmd/teams/chat/chat-message-send.md) - Sends a chat message to a Microsoft Teams chat conversation [#2916](https://github.com/pnp/cli-microsoft365/issues/2916)
+
 ### Changes
 
 - updated 'aad oauth2grant list' to use MS Graph [#2710](https://github.com/pnp/cli-microsoft365/issues/2710)
@@ -57,6 +61,8 @@
 - added csv to autocomplete option [#2997](https://github.com/pnp/cli-microsoft365/issues/2997)
 - added the 'Detecting PII exist in SharePoint List using AWS Comprehend' sample [#2925](https://github.com/pnp/cli-microsoft365/issues/2925)
 - extended 'teams channel get' with 'primary' [#3004](https://github.com/pnp/cli-microsoft365/issues/3004)
+- extended 'aad app set' with updating redirect URIs [#3043](https://github.com/pnp/cli-microsoft365/issues/3043)
+- extended 'spo group user add' with validating users [#2653](https://github.com/pnp/cli-microsoft365/issues/2653)
 
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
