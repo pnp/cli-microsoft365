@@ -11,10 +11,10 @@ m365 teams app update [options]
 ## Options
 
 `-i, --id [id]`
-: ID of the app to update. Specify either id or name but not both
+: ID of the app to update. Specify either id or name, but not both
 
 `-n, --name [name]`
-: The display name of the app to update. Specify either id or name but not both
+: The display name of the app to update. Specify either id or name, but not both
 
 `-p, --filePath <filePath>`
 : Absolute or relative path to the Teams manifest zip file to update in the app catalog

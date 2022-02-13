@@ -26,6 +26,13 @@ class TeamsAppUpdateCommand extends GraphCommand {
   public get description(): string {
     return 'Updates Teams app in the organization\'s app catalog';
   }
+  
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.id = typeof args.options.id !== 'undefined';
+    telemetryProps.name = typeof args.options.name !== 'undefined';
+    return telemetryProps;
+  }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const { filePath } = args.options;
@@ -74,6 +81,10 @@ class TeamsAppUpdateCommand extends GraphCommand {
           return Promise.reject(`The specified Teams app does not exist`);
         }
 
+        if (response.value.length > 1) {
+          return Promise.reject(`Multiple Teams apps with name ${args.options.name} found. Please disambiguate using the ids: ${response.value.map(x => x.id)}`);
+        }
+
         return Promise.resolve(app.id);
       });
   }
@@ -101,7 +112,7 @@ class TeamsAppUpdateCommand extends GraphCommand {
     }
 
     if (args.options.id && args.options.name) {
-      return 'Specify either id or name but not both';
+      return 'Specify either id or name, but not both';
     }
 
     if (args.options.id && !Utils.isValidGuid(args.options.id)) {

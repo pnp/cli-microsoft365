@@ -163,6 +163,42 @@ describe(commands.APP_UPDATE, () => {
     });
   });
 
+  it('handles error when multiple Teams apps with the specified name found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/v1.0/appCatalogs/teamsApps?$filter=displayName eq '`) > -1) {
+        return Promise.resolve({
+          "value": [
+            {
+              "id": "e3e29acb-8c79-412b-b746-e6c39ff4cd22",
+              "displayName": "Test app"
+            },
+            {
+              "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+              "displayName": "Test app"
+            }
+          ]
+        });
+      }
+      return Promise.reject('Multiple Teams apps with name Test app found. Please disambiguate using the ids: e3e29acb-8c79-412b-b746-e6c39ff4cd22, 5b31c38c-2584-42f0-aa47-657fb3a84230');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Test app',
+        filePath: 'teamsapp.zip'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple Teams apps with name Test app found. Please disambiguate using the ids: e3e29acb-8c79-412b-b746-e6c39ff4cd22, 5b31c38c-2584-42f0-aa47-657fb3a84230`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('update Teams app in the tenant app catalog by id', (done) => {
     let updateTeamsAppCalled = false;
     sinon.stub(request, 'put').callsFake((opts) => {
