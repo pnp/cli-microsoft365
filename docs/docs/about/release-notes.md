@@ -7,6 +7,7 @@
 **Azure Active Directory:**
 
 - [aad app delete](../cmd/aad/app/app-delete.md) - removes an Azure AD app registration [#3008](https://github.com/pnp/cli-microsoft365/issues/3008)
+- [aad o365group conversation list](../cmd/aad/o365group/o365group-conversation-list.md) - lists conversations for the specified Microsoft 365 group [#3030](https://github.com/pnp/cli-microsoft365/issues/3030)
 
 **Microsoft 365:**
 
@@ -16,6 +17,11 @@
 - [tenant serviceannouncement healthissue list](../cmd/tenant/serviceannouncement/serviceannouncement-healthissue-list.md) - retrieves all service health issues for the tenant [#2948](https://github.com/pnp/cli-microsoft365/issues/2948)
 - [tenant serviceannouncement message get](../cmd/tenant/serviceannouncement/serviceannouncement-message-get.md) - retrieves a specified service update message for the tenant [#2952](https://github.com/pnp/cli-microsoft365/issues/2952)
 - [tenant serviceannouncement message list](../cmd/tenant/serviceannouncement/serviceannouncement-message-list.md) - retrieves all service update messages for the tenant [#2949](https://github.com/pnp/cli-microsoft365/issues/2949)
+
+**Outlook:**
+
+- [outlook room list](../cmd/outlook/room/room-list.md) - get a collection of all available rooms [#2963](https://github.com/pnp/cli-microsoft365/issues/2963)
+- [outlook roomlist list](../cmd/outlook/roomlist/roomlist-list.md) - get a collection of available roomlists [#3002](https://github.com/pnp/cli-microsoft365/issues/3002)
 
 **Planner:**
 
