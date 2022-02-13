@@ -1,12 +1,12 @@
+import { Conversation } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import commands from '../../commands';
-import { Conversation } from '@microsoft/microsoft-graph-types';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import Utils from '../../../../Utils';
+import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -30,7 +30,8 @@ class AadO365GroupConversationListCommand extends GraphItemsListCommand<Conversa
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this.getAllItems(`${this.resource}/v1.0/groups/${args.options.groupId}/conversations`, logger, true)
+    this
+      .getAllItems(`${this.resource}/v1.0/groups/${args.options.groupId}/conversations`, logger, true)
       .then((): void => {
         logger.log(this.items);
         cb();
@@ -51,6 +52,7 @@ class AadO365GroupConversationListCommand extends GraphItemsListCommand<Conversa
     if (!Utils.isValidGuid(args.options.groupId as string)) {
       return `${args.options.groupId} is not a valid GUID`;
     }
+
     return true;
   }
 }

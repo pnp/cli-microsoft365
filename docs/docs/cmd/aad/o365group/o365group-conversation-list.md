@@ -13,7 +13,7 @@ m365 aad o365group conversation list [options]
 `-i, --groupId <groupId>`
 : The ID of the Microsoft 365 group
 
---8<-- "docs/cmd/\_global.md"
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 
