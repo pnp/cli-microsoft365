@@ -1,11 +1,11 @@
+import { Room } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import commands from '../../commands';
-import { Room } from '@microsoft/microsoft-graph-types';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -36,16 +36,19 @@ class OutlookRoomListCommand extends GraphItemsListCommand<Room> {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let endpoint: string = `${this.resource}/v1.0/places/microsoft.graph.room`;
+
     if (args.options.roomlistEmail) {
       endpoint = `${this.resource}/v1.0/places/${args.options.roomlistEmail}/microsoft.graph.roomlist/rooms`;
     }
-    this.getAllItems(endpoint, logger, true)
+
+    this
+      .getAllItems(endpoint, logger, true)
       .then((): void => {
         logger.log(this.items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
-  
+
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
