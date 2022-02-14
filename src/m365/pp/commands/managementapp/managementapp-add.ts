@@ -6,8 +6,8 @@ import {
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import PowerPlatformCommand from '../../base/PowerPlatformCommand';
 
 interface CommandArgs {
   options: Options;
@@ -19,7 +19,7 @@ export interface Options extends GlobalOptions {
   name?: string;
 }
 
-class PpManagementAppAddCommand extends GraphCommand {
+class PpManagementAppAddCommand extends PowerPlatformCommand {
   public get name(): string {
     return commands.MANAGEMENTAPP_ADD;
   }
@@ -42,7 +42,7 @@ class PpManagementAppAddCommand extends GraphCommand {
       .then((appId: string): Promise<any> => {
         const requestOptions: any = {
           // This should be refactored once we implement a PowerPlatform base class as api.bap will differ between envs.
-          url: `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/adminApplications/${appId}?api-version=2020-06-01`,
+          url: `${this.bapResource}/providers/Microsoft.BusinessAppPlatform/adminApplications/${appId}?api-version=2020-06-01`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
@@ -69,7 +69,7 @@ class PpManagementAppAddCommand extends GraphCommand {
       `displayName eq '${encodeURIComponent(name as string)}'`;
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/myorganization/applications?$filter=${filter}&$select=appId`,
+      url: `${this.graphResource}/v1.0/myorganization/applications?$filter=${filter}&$select=appId`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
