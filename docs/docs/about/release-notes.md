@@ -63,6 +63,10 @@
 - extended 'teams channel get' with 'primary' [#3004](https://github.com/pnp/cli-microsoft365/issues/3004)
 - extended 'aad app set' with updating redirect URIs [#3043](https://github.com/pnp/cli-microsoft365/issues/3043)
 - extended 'spo group user add' with validating users [#2653](https://github.com/pnp/cli-microsoft365/issues/2653)
+- extended 'teams app install' with support for installing personal apps [#3025](https://github.com/pnp/cli-microsoft365/issues/3025)
+- moved 'Command completion' and 'GitHub Actions' to 'User Guide' [#2944](https://github.com/pnp/cli-microsoft365/issues/2944)
+- added --save option to the 'aad app get' command [#2939](https://github.com/pnp/cli-microsoft365/issues/2939)
+- added Mocha Test Explorer [#2817](https://github.com/pnp/cli-microsoft365/issues/2817)
 
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
