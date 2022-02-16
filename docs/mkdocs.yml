@@ -190,6 +190,7 @@ nav:
       - plan:
         - plan add: 'cmd/planner/plan/plan-add.md'
         - plan get: 'cmd/planner/plan/plan-get.md'
+        - plan details get: 'cmd/planner/plan/plan-details-get.md'
         - plan list: 'cmd/planner/plan/plan-list.md'
       - task:
         - task add: 'cmd/planner/task/task-add.md'
