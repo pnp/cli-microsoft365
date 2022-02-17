@@ -436,21 +436,26 @@ describe('Cli', () => {
       });
   });
 
-  it(`prompts for required options`, () => {
+  it(`prompts for required options`, (done) => {
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake(() => Promise.resolve({ missingRequireOptionValue: "test" }) as any);
     sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
       if (settingName === settingsNames.prompt) {
         return 'true';
       }
       return defaultValue;
     });
-    Utils.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    
+
     cli
       .execute(rootFolder, ['cli', 'mock'])
-      .then(_ => assert(mockCommandActionSpy.called));
+      .then(_ => {
+        try {
+          assert(promptStub.called);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
   });
 
   it(`calls command's validation method when defined`, (done) => {

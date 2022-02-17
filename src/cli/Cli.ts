@@ -71,6 +71,8 @@ export class Cli {
   }
 
   public async execute(commandsFolder: string, rawArgs: string[]): Promise<void> {
+    const inquirer: Inquirer = require('inquirer');
+
     this.commandsFolder = commandsFolder;
 
     // check if help for a specific command has been requested using the
@@ -151,8 +153,59 @@ export class Cli {
         }
       }
     }
-    const shouldPrompt = this.getSettingWithDefaultValue<string | undefined>(settingsNames.prompt, undefined)?.toLowerCase() === 'true';
-    await this.validateOrPromptForOptions(0, this.commandToExecute.options.length, shouldPrompt, this.commandToExecute, this.optionsFromArgs);
+    const shouldPrompt = this.getSettingWithDefaultValue<string | boolean>(settingsNames.prompt, false);
+
+    for (let i = 0; i < this.commandToExecute.options.length; i++) {
+      if (typeof this.commandToExecute.options[i] !== 'undefined' && this.commandToExecute.options[i].required && typeof this.optionsFromArgs.options[this.commandToExecute.options[i].name] === 'undefined') {
+
+        if (!shouldPrompt) {
+          return this.closeWithError(`Required option ${this.commandToExecute.options[i].name} not specified`, this.optionsFromArgs, true);
+        }
+        if (i === 0) {
+          Cli.log("Provide values for the following parameters:");
+        }
+
+        const missingRequireOptionValue = await inquirer
+          .prompt({
+            name: 'missingRequireOptionValue',
+            message: `${this.commandToExecute.options[i].name}: `
+          })
+          .then(result => result.missingRequireOptionValue);
+
+        this.optionsFromArgs.options[this.commandToExecute.options[i].name] = missingRequireOptionValue;
+      }
+    }
+
+    const optionsWithoutShorts = Cli.removeShortOptions(this.optionsFromArgs);
+    try {
+      // replace values staring with @ with file contents
+      Cli.loadOptionValuesFromFiles(optionsWithoutShorts);
+    }
+    catch (e) {
+      return this.closeWithError(e, optionsWithoutShorts);
+    }
+
+    try {
+      // process options before passing them on to validation stage
+      await this.commandToExecute.command.processOptions(optionsWithoutShorts.options);
+    }
+    catch (e: any) {
+      this.closeWithError(e.message, optionsWithoutShorts, false);
+    }
+
+    // if output not specified, set the configured output value (if any)
+    if (optionsWithoutShorts.options.output === undefined) {
+      optionsWithoutShorts.options.output = this.getSettingWithDefaultValue<string | undefined>(settingsNames.output, undefined);
+    }
+
+    const validationResult: boolean | string = this.commandToExecute.command.validate(optionsWithoutShorts);
+    if (typeof validationResult === 'string') {
+      return this.closeWithError(validationResult, optionsWithoutShorts, true);
+    }
+
+    return Cli
+      .executeCommand(this.commandToExecute.command, optionsWithoutShorts)
+      .then(_ => process.exit(0), err => this.closeWithError(err, optionsWithoutShorts));
   }
 
   public static executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
@@ -323,75 +376,6 @@ export class Cli {
     catch {
       this.loadAllCommands();
     }
-  }
-
-  private async validateOrPromptForOptions(index: number, optionsLength: number, shouldPrompt: boolean, commandToExecute: CommandInfo, optionsFromArgs: any): Promise<void> {
-    if (typeof commandToExecute.options[index] !== 'undefined' &&
-      commandToExecute.options[index].required &&
-      typeof optionsFromArgs.options[commandToExecute.options[index].name] === 'undefined') {
-
-      if (!shouldPrompt) {
-        return this.closeWithError(`Required option ${commandToExecute.options[index].name} not specified`, optionsFromArgs, true);
-      }
-      if (index === 0) {
-        Cli.log("Supply values for the following parameters:");
-      }
-
-      Cli.prompt({
-        name: 'missingRequireOptionValue',
-        message: `${commandToExecute.options[index].name}: `
-      }, async (result: { missingRequireOptionValue: string }): Promise<void> => {
-        optionsFromArgs.options[commandToExecute.options[index].name] = result.missingRequireOptionValue;
-        await this.checkExecuteOrContinueValidate(index, optionsLength, shouldPrompt, commandToExecute, optionsFromArgs);
-      });
-
-    }
-    else {
-      await this.checkExecuteOrContinueValidate(index, optionsLength, shouldPrompt, commandToExecute, optionsFromArgs);
-    }
-  }
-
-  private async checkExecuteOrContinueValidate(index: number, optionsLength: number, shouldPrompt: boolean, commandToExecute: CommandInfo, optionsFromArgs: any): Promise<void> {
-    index += 1;
-    if (index >= optionsLength - 1) {
-      await this.continueExecute(commandToExecute, optionsFromArgs);
-    }
-    else {
-      await this.validateOrPromptForOptions(index, optionsLength, shouldPrompt, commandToExecute, optionsFromArgs);
-    }
-  }
-
-  private async continueExecute(commandToExecute: CommandInfo, optionsFromArgs: any): Promise<void> {
-    const optionsWithoutShorts = Cli.removeShortOptions(optionsFromArgs);
-    try {
-      // replace values staring with @ with file contents
-      Cli.loadOptionValuesFromFiles(optionsWithoutShorts);
-    }
-    catch (e) {
-      return this.closeWithError(e, optionsWithoutShorts);
-    }
-
-    try {
-      // process options before passing them on to validation stage
-      await commandToExecute.command.processOptions(optionsWithoutShorts.options);
-    }
-    catch (e: any) {
-      this.closeWithError(e.message, optionsWithoutShorts, false);
-    }
-
-    // if output not specified, set the configured output value (if any)
-    if (optionsWithoutShorts.options.output === undefined) {
-      optionsWithoutShorts.options.output = this.getSettingWithDefaultValue<string | undefined>(settingsNames.output, undefined);
-    }
-
-    const validationResult: boolean | string = commandToExecute.command.validate(optionsWithoutShorts);
-    if (typeof validationResult === 'string') {
-      return this.closeWithError(validationResult, optionsWithoutShorts, true);
-    }
-
-    return Cli
-      .executeCommand(commandToExecute.command, optionsWithoutShorts)
-      .then(_ => process.exit(0), err => this.closeWithError(err, optionsWithoutShorts));
   }
 
   private loadCommand(command: Command): void {

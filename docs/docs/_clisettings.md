@@ -8,6 +8,7 @@ Setting name|Definition|Default value
 `output`|Defines the default output when issuing a command|`json`
 `printErrorsAsPlainText`|When output mode is set to `json`, print error messages as plain-text rather than JSON|`true`
 `showHelpOnFailure`|Automatically display help when executing a command failed|`true`
+`prompt`|Prompts for missing values in required options|`false`
 `csvHeader`|Display the column names on the first line|`true`
 `csvEscape`|Single character used for escaping; only apply to characters matching the quote and the escape options|`"`
 `csvQuote`|The quote characters surrounding a field. An empty quote value will preserve the original field, whether it contains quotation marks or not.|` `
