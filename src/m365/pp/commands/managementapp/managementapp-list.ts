@@ -2,7 +2,6 @@ import { Logger } from '../../../../cli';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-
 class PpManagementAppListCommand extends GraphCommand {
   public get name(): string {
     return commands.MANAGEMENTAPP_LIST;
@@ -10,6 +9,10 @@ class PpManagementAppListCommand extends GraphCommand {
 
   public get description(): string {
     return 'Lists management applications for Power Platform';
+  }
+
+  public defaultProperties(): string[] | undefined {
+    return ['applicationId'];
   }
 
   public commandAction(logger: Logger, args: any, cb: () => void): void {
@@ -23,8 +26,8 @@ class PpManagementAppListCommand extends GraphCommand {
     };
 
     request
-      .get(requestOptions)
-      .then((res: any): void => {
+      .get<{ value: any }>(requestOptions)
+      .then((res: { value: any[] }): void => {
         if (res.value && res.value.length > 0) {
           logger.log(res.value);
         }
