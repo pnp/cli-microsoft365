@@ -3,8 +3,10 @@ import { CommandOption} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { Plan } from '../../Plan';
+import { PlanDetails } from '../../PlanDetails';
 
 interface CommandArgs {
   options: Options;
@@ -17,7 +19,7 @@ interface Options extends GlobalOptions {
   ownerGroupName?: string;
 }
 
-class PlannerPlanDetailsGetCommand extends GraphItemsListCommand<any> {
+class PlannerPlanDetailsGetCommand extends GraphCommand {
   private groupId: string = "";
 
   public get name(): string {
@@ -40,11 +42,7 @@ class PlannerPlanDetailsGetCommand extends GraphItemsListCommand<any> {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (args.options.planId) {
       this
-        .getPlanDetails(args)
-        .then((res: any): void => {
-          logger.log(res);
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        .getPlanDetails(logger,args,cb);
     }
     else {
       this
@@ -53,14 +51,10 @@ class PlannerPlanDetailsGetCommand extends GraphItemsListCommand<any> {
           this.groupId = groupId;
           return this.getPlanId(args);
         })
-        .then((planId: string): Promise<any> => {
+        .then((planId: string): any => {
           args.options.planId = planId;
-          return this.getPlanDetails(args);
-        })
-        .then((res: any): void => {
-          logger.log(res);
-          cb();
-        }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+          this.getPlanDetails(logger,args,cb);
+        },(err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
   }
 
@@ -94,7 +88,7 @@ class PlannerPlanDetailsGetCommand extends GraphItemsListCommand<any> {
       });
   }
 
-  private async getPlanId(args: CommandArgs): Promise<string> {
+  private getPlanId(args: CommandArgs): Promise<string> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/groups/${this.groupId}/planner/plans`,
       headers: {
@@ -104,9 +98,9 @@ class PlannerPlanDetailsGetCommand extends GraphItemsListCommand<any> {
     };
     
     return request
-      .get<{ value: any [] }>(requestOptions)
+      .get<{ value: Plan [] }>(requestOptions)
       .then(response => {
-        const filteredPlan = response.value.filter((plan: any) => plan.title === args.options.planTitle);
+        const filteredPlan = response.value.filter((plan: Plan) => plan.title === args.options.planTitle);
         if (filteredPlan && filteredPlan.length > 0) {
           if (filteredPlan.length > 1) {
             return Promise.reject(`Multiple plans with name ${args.options.planTitle} found: ${filteredPlan.map(x => x.id)}`);
@@ -117,25 +111,30 @@ class PlannerPlanDetailsGetCommand extends GraphItemsListCommand<any> {
       });    
   }
 
-  private getPlanDetails(args: CommandArgs): Promise<any> {
+  private getPlanDetails(logger: Logger,args: CommandArgs,cb: () => void): void {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/planner/plans/${args.options.planId}/details`,
       headers: {
-        'accept': 'application/json'
+        'accept': 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
 
-    return request.get(requestOptions);
+    request
+      .get<{ value: PlanDetails }>(requestOptions)
+      .then((res: any): void => {
+        logger.log(res);
+        cb();
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --planId [id]'
+        option: '-i, --planId [planId]'
       },
       {
-        option: '-t, --planTitle [title]'
+        option: '-t, --planTitle [planTitle]'
       },
       {
         option: '--ownerGroupId [ownerGroupId]'
