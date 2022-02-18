@@ -43,7 +43,8 @@ describe('Auth', () => {
   let auth: Auth;
   let cli: Cli;
   let response: DeviceCodeResponse;
-  // let openStub: sinon.SinonStub;
+  let openStub: sinon.SinonStub;
+  let getSettingWithDefaultValueStub: sinon.SinonStub;
   const resource: string = 'https://contoso.sharepoint.com';
   let loggerSpy: sinon.SinonSpy;
   const logger: Logger = {
@@ -98,7 +99,8 @@ describe('Auth', () => {
       resolve(httpServerResponse);
     });
     loggerSpy = sinon.spy(logger, 'log');
-    // openStub = sinon.stub(auth as any, 'open').callsFake(() => { });
+    openStub = sinon.stub(auth as any, 'open').callsFake(() => { });
+    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => 'key'));
   });
 
   afterEach(() => {
@@ -109,12 +111,15 @@ describe('Auth', () => {
       cli.config.get,
       request.get,
       (auth as any).getClientApplication,
+      (auth as any).getDeviceCodeResponse,
       publicApplication.acquireTokenSilent,
       publicApplication.acquireTokenByDeviceCode,
       publicApplication.acquireTokenByUsernamePassword,
       publicApplication.acquireTokenByCode,
       tokenCache.getAllAccounts
     ]);
+    openStub.restore();
+    getSettingWithDefaultValueStub.restore();
   });
 
   it('returns existing access token if still valid', (done) => {
@@ -421,16 +426,23 @@ describe('Auth', () => {
   });
 
   it('got response from device code request', (done) => {
-    const getSettingWithDefaultValue = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => 'key'));
+    auth.getDeviceCodeResponse(response, logger, false);
+    assert(loggerSpy.calledWith(response.message));
+    assert(getSettingWithDefaultValueStub.called);
+    assert(openStub.called);
+    done();
+  });
+
+  it('got response from device code request (debug)', (done) => {
     auth.getDeviceCodeResponse(response, logger, true);
 
-    assert(loggerLogToStderrSpy.calledWith('Response'));
+    assert(loggerLogToStderrSpy.calledWith('Response:'));
     assert(loggerLogToStderrSpy.calledWith(response));
     assert(loggerLogToStderrSpy.calledWith(''));
 
     assert(loggerSpy.calledWith(response.message));
-    assert(getSettingWithDefaultValue.called);
-
+    assert(getSettingWithDefaultValueStub.called);
+    assert(openStub.called);
     done();
   });
 
@@ -2116,5 +2128,4 @@ describe('Auth', () => {
       done(err);
     });
   });
-
 });
