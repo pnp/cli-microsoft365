@@ -67,6 +67,8 @@
 - moved 'Command completion' and 'GitHub Actions' to 'User Guide' [#2944](https://github.com/pnp/cli-microsoft365/issues/2944)
 - added --save option to the 'aad app get' command [#2939](https://github.com/pnp/cli-microsoft365/issues/2939)
 - added Mocha Test Explorer [#2817](https://github.com/pnp/cli-microsoft365/issues/2817)
+- added support for upgrading SPFx projects to v1.14.0 [#3067](https://github.com/pnp/cli-microsoft365/issues/3067)
+- extended 'spfx doctor' with support for SPFx v1.14.0 [#3069](https://github.com/pnp/cli-microsoft365/issues/3069)
 
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
