@@ -13,6 +13,7 @@ import { Cli, Logger } from './cli';
 import { CommandError } from './Command';
 import request from './request';
 import Utils from './Utils';
+import * as open from 'open';
 
 class MockTokenStorage implements TokenStorage {
   public get(): Promise<string> {
@@ -99,7 +100,8 @@ describe('Auth', () => {
       resolve(httpServerResponse);
     });
     loggerSpy = sinon.spy(logger, 'log');
-    openStub = sinon.stub(auth as any, 'open').callsFake(() => { });
+    (auth as any)._open = open;
+    openStub = sinon.stub(auth as any, '_open').callsFake(() => { });
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => 'key'));
   });
 

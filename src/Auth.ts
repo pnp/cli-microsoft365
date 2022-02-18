@@ -10,7 +10,6 @@ import { CommandError } from './Command';
 import config from './config';
 import request from './request';
 import { settingsNames } from './settingsNames';
-import * as open from 'open';
 
 export interface Hash<TValue> {
   [key: string]: TValue;
@@ -86,7 +85,7 @@ export enum CertificateType {
 }
 
 export class Auth {
-  private open = open;
+  private _open: any;
   private _authServer: AuthServer | undefined;
   private deviceCodeRequest?: Msal.DeviceCodeRequest;
   private _service: Service;
@@ -360,8 +359,15 @@ export class Auth {
     logger.log(response.message);
 
     if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenBrowserOnLogin, false)) {
-      // const open = require('open') as typeof import('open');
-      this.open(response.verificationUri);
+      // _open is never set before hitting this line, but this check
+      // is implemented so that we can support lazy loading
+      // but also stub it for testing
+      /* c8 ignore next 3 */
+      if (!this._open) {
+        this._open = require('open'); 
+      }
+
+      this._open(response.verificationUri);
     }
   }
 
