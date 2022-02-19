@@ -22,7 +22,7 @@ This script will retrieve all the checked out files in a particular site.
 
     foreach($library in $allLibs){
         $allDocs = m365 spo file list --webUrl $siteURL --folder $library.Url --recursive -o json | ConvertFrom-Json
-        
+
         foreach($document in $allDocs){
             if($document.CheckOutType -eq [int64]0){
                 $resultsForSite += [pscustomobject][ordered]@{
@@ -54,7 +54,7 @@ This script will retrieve all the checked out files in a specific document libra
     $libraryName = "<LIBRARY NAME>"  ## Example: "Shared Documents"
     $allDocuments = m365 spo file list --webUrl $siteURL --folder $("$libraryName") --recursive -o json | ConvertFrom-Json
     $resultsForLib = @()
-    
+
     #Loop through each document
     foreach($doc in $allDocuments){
         if($doc.CheckOutType -eq [int64]0){
@@ -72,17 +72,14 @@ This script will retrieve all the checked out files in a specific document libra
 
 This script will loop through each site from your CSV file, and retrieve all the checked out files from each document library. Your CSV file should contain a single header called "siteURL" with each URL per row:
 
-| siteURL | 
-| --------| 
-| https://contoso.sharepoint.com/sites/site1 | 
-| https://contoso.sharepoint.com/sites/site2 | 
-| https://contoso.sharepoint.com/sites/site3 |  
-&nbsp;
+| siteURL                                    |
+| ------------------------------------------ |
+| https://contoso.sharepoint.com/sites/site1 |
+| https://contoso.sharepoint.com/sites/site2 |
+| https://contoso.sharepoint.com/sites/site3 |
 
-{{< admonition type=warning title="Performance" open=true >}}
-Depending on the number of sites in your .csv file, the number of libraries as well as the number of files, the below script can take a very long time to provide results.
-{{< /admonition >}}
-
+!!! important
+    Depending on the number of sites in your .csv file, the number of libraries as well as the number of files, the below script can take a very long time to provide results.
 
 === "PowerShell"
 
@@ -100,12 +97,12 @@ Depending on the number of sites in your .csv file, the number of libraries as w
     foreach($row in $allsites){
         #Get the libraries
         $allLibraries = m365 spo list list --webUrl $row.siteURL --query "[?BaseTemplate == ``101``]" -o json | ConvertFrom-Json
-        
+
         foreach($lib in $allLibraries){
-        
+
             #Get all the documents
             $allDocs = m365 spo file list --webUrl $row.siteURL --folder $lib.Url --recursive -o json | ConvertFrom-Json
-            
+
             foreach($docu in $allDocs){
                 if($docu.CheckOutType -eq [int64]0){
                     $resultsForEachSC += [pscustomobject][ordered]@{
@@ -115,12 +112,12 @@ Depending on the number of sites in your .csv file, the number of libraries as w
                     }
                 }
             }
-        }  
+        }
     }
     $resultsForEachSC
     ```
 
 Keywords
 
--   SharePoint Online
--   Governance
+- SharePoint Online
+- Governance
