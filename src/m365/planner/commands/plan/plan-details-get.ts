@@ -5,8 +5,7 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { Plan } from '../../Plan';
-import { PlanDetails } from '../../PlanDetails';
+import { PlannerPlan, PlannerPlanDetails  } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
@@ -38,31 +37,32 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
     telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
     return telemetryProps;
   }
-
+  
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (args.options.planId) {
-      this
-        .getPlanDetails(logger,args,cb);
-    }
-    else {
-      this
-        .getGroupId(args)
-        .then((groupId: string): Promise<string> => {
-          this.groupId = groupId;
-          return this.getPlanId(args);
-        })
-        .then((planId: string): any => {
-          args.options.planId = planId;
-          this.getPlanDetails(logger,args,cb);
-        },(err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-    }
+    this
+      .getGroupId(args)
+      .then((groupId: string): Promise<string> => {
+        this.groupId = groupId;
+        return this.getPlanId(args);
+      })
+      .then((planItemId: string): Promise<PlannerPlanDetails> => {
+        args.options.planId = planItemId;
+        return this.getPlanDetails(args);
+      })
+      .then((res: PlannerPlanDetails): void => {
+        logger.log(res);
+        cb();
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {
+    if (args.options.planId) {
+      return Promise.resolve("");
+    }
+
     if (args.options.ownerGroupId) {
       return Promise.resolve(args.options.ownerGroupId);
     }
-
     const requestOptions: any = {
       url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.ownerGroupName as string)}'`,
       headers: {
@@ -89,6 +89,10 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
   }
 
   private getPlanId(args: CommandArgs): Promise<string> {
+    if (args.options.planId) {
+      return Promise.resolve(args.options.planId);
+    }
+
     const requestOptions: any = {
       url: `${this.resource}/v1.0/groups/${this.groupId}/planner/plans`,
       headers: {
@@ -98,20 +102,22 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
     };
     
     return request
-      .get<{ value: Plan [] }>(requestOptions)
-      .then(response => {
-        const filteredPlan = response.value.filter((plan: Plan) => plan.title === args.options.planTitle);
+      .get<{ value: PlannerPlan [] }>(requestOptions)
+      .then((response: { value: PlannerPlan[] }): Promise<string> => {
+        const filteredPlan = response.value.filter((plan: PlannerPlan) => plan.title === args.options.planTitle);
         if (filteredPlan && filteredPlan.length > 0) {
           if (filteredPlan.length > 1) {
             return Promise.reject(`Multiple plans with name ${args.options.planTitle} found: ${filteredPlan.map(x => x.id)}`);
           }
-          return Promise.resolve(filteredPlan[0].id);
+          if(filteredPlan[0].id) {
+            return Promise.resolve(filteredPlan[0].id);
+          }
         }
         return Promise.reject(`The specified plan title does not exist`);
       });    
   }
 
-  private getPlanDetails(logger: Logger,args: CommandArgs,cb: () => void): void {
+  private getPlanDetails(args: CommandArgs): Promise<PlannerPlanDetails> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/planner/plans/${args.options.planId}/details`,
       headers: {
@@ -120,12 +126,12 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ value: PlanDetails }>(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+    return request
+      .get<{ value: PlannerPlanDetails }>(requestOptions)
+      .then(response => {
+        const planDetailsItem: any | undefined = response;
+        return Promise.resolve(planDetailsItem);
+      });
   }
 
   public options(): CommandOption[] {

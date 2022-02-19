@@ -141,7 +141,7 @@ describe(commands.PLAN_DETAILS_GET, () => {
     done();
   });
   
-  it('correctly get planner plan details with given id', (done) => {
+  it('correctly get planner plan details with given planId', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/opb7bchfZUiFbVWEPL7jPGUABW7f/details`) {
         return Promise.resolve({
