@@ -45,8 +45,8 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
         this.groupId = groupId;
         return this.getPlanId(args);
       })
-      .then((planItemId: string): Promise<PlannerPlanDetails> => {
-        args.options.planId = planItemId;
+      .then((planId: string): Promise<PlannerPlanDetails> => {
+        args.options.planId = planId;
         return this.getPlanDetails(args);
       })
       .then((res: PlannerPlanDetails): void => {
