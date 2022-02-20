@@ -26,7 +26,7 @@ class TeamsAppUpdateCommand extends GraphCommand {
   public get description(): string {
     return 'Updates Teams app in the organization\'s app catalog';
   }
-  
+
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.id = typeof args.options.id !== 'undefined';
@@ -39,7 +39,7 @@ class TeamsAppUpdateCommand extends GraphCommand {
 
     this
       .getAppId(args)
-      .then((appId: string): Promise<any> => {
+      .then((appId: string): Promise<void> => {
         const fullPath: string = path.resolve(filePath);
         if (this.verbose) {
           logger.logToStderr(`Updating app with id '${appId}' and file '${fullPath}' in the app catalog...`);
@@ -53,8 +53,7 @@ class TeamsAppUpdateCommand extends GraphCommand {
           data: fs.readFileSync(fullPath)
         };
 
-        return request
-          .put(requestOptions);
+        return request.put(requestOptions);
       })
       .then(_ => cb(), (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
   }

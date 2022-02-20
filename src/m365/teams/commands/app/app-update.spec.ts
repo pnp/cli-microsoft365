@@ -278,7 +278,7 @@ describe(commands.APP_UPDATE, () => {
 
     command.action(logger, {
       options: {
-        debug: false,
+        debug: true,
         filePath: 'teamsapp.zip',
         name: 'Test app'
       }
