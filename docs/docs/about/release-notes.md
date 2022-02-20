@@ -71,6 +71,7 @@
 - extended 'spfx doctor' with support for SPFx v1.14.0 [#3069](https://github.com/pnp/cli-microsoft365/issues/3069)
 - extended 'teams app update' to search apps by name [#3026](https://github.com/pnp/cli-microsoft365/issues/3026)
 - added the 'List all checked out files' sample [#3046](https://github.com/pnp/cli-microsoft365/issues/3046)
+- extended login with automatically opening the browser [#2158](https://github.com/pnp/cli-microsoft365/issues/2158)
 
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
