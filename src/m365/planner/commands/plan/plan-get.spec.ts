@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import * as os from 'os';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -243,7 +244,7 @@ describe(commands.PLAN_GET, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith([{
+        assert(loggerLogSpy.calledWith({
           "@odata.etag": "W/\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\"",
           "createdDateTime": "2021-03-10T17:39:43.1045549Z",
           "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
@@ -259,7 +260,7 @@ describe(commands.PLAN_GET, () => {
               "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
             }
           }
-        }]));
+        }));
         done();
       }
       catch (e) {
@@ -363,7 +364,7 @@ describe(commands.PLAN_GET, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith([{
+        assert(loggerLogSpy.calledWith({
           "@odata.etag": "W/\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\"",
           "createdDateTime": "2021-03-10T17:39:43.1045549Z",
           "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
@@ -379,7 +380,7 @@ describe(commands.PLAN_GET, () => {
               "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
             }
           }
-        }]));
+        }));
         done();
       }
       catch (e) {
@@ -413,6 +414,72 @@ describe(commands.PLAN_GET, () => {
     });
   });
 
+  it('correctly handles multiple plans found with given ownerGroupId', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/planner/plans`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.plannerPlan)",
+          "@odata.count": 2,
+          "value": [
+            {
+              "@odata.etag": "W/\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\"",
+              "createdDateTime": "2021-03-10T17:39:43.1045549Z",
+              "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
+              "title": "My Planner Plan",
+              "id": "opb7bchfZUiFbVWEPL7jPGUABW7f",
+              "createdBy": {
+                "user": {
+                  "displayName": null,
+                  "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
+                },
+                "application": {
+                  "displayName": null,
+                  "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
+                }
+              }
+            },
+            {
+              "@odata.etag": "W/\"JzEtUZphbiCmQEBAQEBAzEBAQEBAVTBALVv=\"",
+              "createdDateTime": "2021-03-10T18:39:43.1045549Z",
+              "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
+              "title": "My Planner Plan",
+              "id": "bpd8bchfZUiFsVWEPL7jRGUABW9f",
+              "createdBy": {
+                "user": {
+                  "displayName": null,
+                  "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
+                },
+                "application": {
+                  "displayName": null,
+                  "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
+                }
+              }
+            }
+          ]
+        });
+      }
+
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    const options: any = {
+      debug: false,
+      title: 'My Planner Plan',
+      ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
+    };
+
+    command.action(logger, { options: options } as any, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple plans with the name My Planner Plan found. Please choose between the following IDs:${os.EOL}${['opb7bchfZUiFbVWEPL7jPGUABW7f', 'bpd8bchfZUiFsVWEPL7jRGUABW9f'].join(os.EOL)}`)));
+        assert(loggerLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles no plan found with given ownerGroupId', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/planner/plans`) {
@@ -432,8 +499,9 @@ describe(commands.PLAN_GET, () => {
       ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
     };
 
-    command.action(logger, { options: options } as any, () => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`No plan with the name My Planner Plan found`)));
         assert(loggerLogSpy.notCalled);
         done();
       }
