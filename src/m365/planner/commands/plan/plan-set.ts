@@ -1,8 +1,7 @@
-import * as os from 'os';
+import { PlannerPlan } from "@microsoft/microsoft-graph-types";
 import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command, {
-  CommandOption,
-  CommandError
+  CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
@@ -11,7 +10,6 @@ import commands from '../../commands';
 import request from '../../../../request';
 import { Options as PlanGetCommandOptions } from '../plan/plan-get';
 import * as planGetCommand from '../plan/plan-get';
-import { Plan } from './Plan';
 
 interface CommandArgs {
   options: Options;
@@ -23,6 +21,10 @@ interface Options extends GlobalOptions {
   newTitle: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
+}
+
+interface PlannerPlanWithOdata extends PlannerPlan {
+  '@odata.etag': string
 }
 
 class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
@@ -46,19 +48,8 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
   public commandAction(logger: Logger, args: CommandArgs, cb: (error?: any) => void): void {
     this.getPlan(logger, args)
       .then((output: CommandOutput): void => {
-        if (!output.stdout) {
-          cb(new CommandError(`No plan found`));
-          return;
-        }
-        const plans: Plan[] = JSON.parse(output.stdout);
-        if (plans.length > 1) {
-          let sameNamePlans: string = `Multiple plans with the name ${args.options.title} found. Please disambiguate using the ID:`;
-          plans.map((plan: Plan) => sameNamePlans += `${os.EOL}${plan.id}`);
-          cb(new CommandError(`${sameNamePlans}`));
-          return;
-        }
-
-        this.updatePlan(logger, args, plans[0])
+        const plan: PlannerPlanWithOdata = JSON.parse(output.stdout);
+        this.updatePlan(logger, args, plan)
           .then((): void => {
             cb();
           })
@@ -83,7 +74,7 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
     return Cli.executeCommandWithOutput(planGetCommand as Command, { options: { ...options, _: [] } });
   }
 
-  private updatePlan(logger: Logger, args: CommandArgs, plan: Plan): Promise<void> {
+  private updatePlan(logger: Logger, args: CommandArgs, plan: PlannerPlanWithOdata): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Updating plan with id ${plan.id} ...`);
     }
@@ -92,7 +83,7 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
       url: `${this.resource}/v1.0/planner/plans/${plan.id}`,
       headers: {
         'accept': 'application/json;odata.metadata=none',
-        'If-Match': `${plan['@odata.etag']}`
+        'If-Match': `${plan["@odata.etag"]}`
       },
       responseType: 'json',
       data: {

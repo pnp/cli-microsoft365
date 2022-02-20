@@ -166,9 +166,7 @@ describe(commands.PLAN_SET, () => {
   it('fails when plan is not found', (done) => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === planGetCommand) {
-        return Promise.resolve({
-          stdout: ''
-        });
+        return Promise.reject(`Error: The requested item is not found.`);
       }
 
       return Promise.reject(`Invalid request`);
@@ -182,7 +180,7 @@ describe(commands.PLAN_SET, () => {
       }
     }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`No plan found`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Error: The requested item is not found.`)));
         done();
       }
       catch (e) {
@@ -195,7 +193,7 @@ describe(commands.PLAN_SET, () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === planGetCommand) {
         return Promise.resolve({
-          stdout: '[{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\\"","createdDateTime":"2021-03-10T17:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"opb7bchfZUiFbVWEPL7jPGUABW7f","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}}]'
+          stdout: '{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\\"","createdDateTime":"2021-03-10T17:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"opb7bchfZUiFbVWEPL7jPGUABW7f","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}}'
         });
       }
 
@@ -294,7 +292,7 @@ describe(commands.PLAN_SET, () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === planGetCommand) {
         return Promise.resolve({
-          stdout: '[{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\\"","createdDateTime":"2021-03-10T17:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"opb7bchfZUiFbVWEPL7jPGUABW7f","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}}]'
+          stdout: '{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\\"","createdDateTime":"2021-03-10T17:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"opb7bchfZUiFbVWEPL7jPGUABW7f","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}}'
         });
       }
 
@@ -335,7 +333,7 @@ describe(commands.PLAN_SET, () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === planGetCommand) {
         return Promise.resolve({
-          stdout: '[{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\\"","createdDateTime":"2021-03-10T17:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"opb7bchfZUiFbVWEPL7jPGUABW7f","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}}]'
+          stdout: '{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\\"","createdDateTime":"2021-03-10T17:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"opb7bchfZUiFbVWEPL7jPGUABW7f","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}}'
         });
       }
 
@@ -377,7 +375,7 @@ describe(commands.PLAN_SET, () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === planGetCommand) {
         return Promise.resolve({
-          stdout: '[{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\\"","createdDateTime":"2021-03-10T17:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"My Planner Plan","id":"opb7bchfZUiFbVWEPL7jPGUABW7f","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}}]'
+          stdout: '{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\\"","createdDateTime":"2021-03-10T17:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"My Planner Plan","id":"opb7bchfZUiFbVWEPL7jPGUABW7f","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}}'
         });
       }
 
@@ -418,40 +416,16 @@ describe(commands.PLAN_SET, () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === planGetCommand) {
         return Promise.resolve({
-          stdout: '[{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\\"","createdDateTime":"2021-03-10T17:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"opb7bchfZUiFbVWEPL7jPGUABW7f","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}},{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUDd=\\"","createdDateTime":"2021-03-10T18:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"zck9bchfZTimlUBAQR4jPGTABW8v","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}}]'
+          stdout: '{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\\"","createdDateTime":"2021-03-10T17:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"opb7bchfZUiFbVWEPL7jPGUABW7f","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}},{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUDd=\\"","createdDateTime":"2021-03-10T18:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"zck9bchfZTimlUBAQR4jPGTABW8v","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}}'
         });
       }
 
       return Promise.reject(`Invalid request`);
     });
 
-    /*const patches = sinon.stub(request, 'patch').callsFake(opts => {
-      if ((opts.url as string).indexOf(`/v1.0/planner/plans/opb7bchfZUiFbVWEPL7jPGUABW7f`) > -1 &&
-        opts.data &&
-        opts.data.title !== undefined) {
-        if (opts.data.title === 'MyNewPlan') {
-          return Promise.resolve();
-        }
-      }
-
-      if ((opts.url as string).indexOf(`/v1.0/planner/plans/zck9bchfZTimlUBAQR4jPGTABW8v`) > -1 &&
-        opts.data &&
-        opts.data.title !== undefined) {
-        if (opts.data.title === 'MyNewPlan') {
-          return Promise.resolve();
-        }
-      }
-
-      return Promise.reject(`Invalid request`);
-    });*/
-
     command.action(logger, { options: { debug: false, title: 'MyPlan', ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4', newTitle: 'MyNewPlan' } }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple plans with the name MyPlan found. Please disambiguate using the ID:${os.EOL}opb7bchfZUiFbVWEPL7jPGUABW7f${os.EOL}zck9bchfZTimlUBAQR4jPGTABW8v`)));
-        /*assert.strictEqual(typeof err, 'undefined', err?.message);
-        assert.strictEqual(patches.firstCall.args[0].url, 'https://graph.microsoft.com/v1.0/planner/plans/opb7bchfZUiFbVWEPL7jPGUABW7f');
-        assert.strictEqual(patches.secondCall.args[0].url, 'https://graph.microsoft.com/v1.0/planner/plans/zck9bchfZTimlUBAQR4jPGTABW8v');
-        assert.strictEqual(patches.callCount, 2);*/
         done();
       }
       catch (e) {
@@ -460,57 +434,12 @@ describe(commands.PLAN_SET, () => {
     });
   });
 
-  /*it('fails when multiple plans with the same are found (debug)', (done) => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
-      if (command === planGetCommand) {
-        return Promise.resolve({
-          stdout: '[{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\\"","createdDateTime":"2021-03-10T17:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"opb7bchfZUiFbVWEPL7jPGUABW7f","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}},{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUDd=\\"","createdDateTime":"2021-03-10T18:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"zck9bchfZTimlUBAQR4jPGTABW8v","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}}]'
-        });
-      }
-
-      return Promise.reject(`Invalid request`);
-    });
-
-    const patches = sinon.stub(request, 'patch').callsFake(opts => {
-      if ((opts.url as string).indexOf(`/v1.0/planner/plans/opb7bchfZUiFbVWEPL7jPGUABW7f`) > -1 &&
-        opts.data &&
-        opts.data.title !== undefined) {
-        if (opts.data.title === 'MyNewPlan') {
-          return Promise.resolve();
-        }
-      }
-
-      if ((opts.url as string).indexOf(`/v1.0/planner/plans/zck9bchfZTimlUBAQR4jPGTABW8v`) > -1 &&
-        opts.data &&
-        opts.data.title !== undefined) {
-        if (opts.data.title === 'MyNewPlan') {
-          return Promise.resolve();
-        }
-      }
-
-      return Promise.reject(`Invalid request`);
-    });
-
-    command.action(logger, { options: { debug: true, title: 'MyPlan', ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4', newTitle: 'MyNewPlan' } }, (err?: any) => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        assert.strictEqual(patches.firstCall.args[0].url, 'https://graph.microsoft.com/v1.0/planner/plans/opb7bchfZUiFbVWEPL7jPGUABW7f');
-        assert.strictEqual(patches.secondCall.args[0].url, 'https://graph.microsoft.com/v1.0/planner/plans/zck9bchfZTimlUBAQR4jPGTABW8v');
-        assert.strictEqual(patches.callCount, 2);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });*/
 
   it('handles failure when plan update fails', (done) => {
     const getPlanStub = sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === planGetCommand) {
         return Promise.resolve({
-          stdout: '[{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\\"","createdDateTime":"2021-03-10T17:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"opb7bchfZUiFbVWEPL7jPGUABW7f","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}}]'
+          stdout: '{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\\"","createdDateTime":"2021-03-10T17:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"opb7bchfZUiFbVWEPL7jPGUABW7f","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}}'
         });
       }
 

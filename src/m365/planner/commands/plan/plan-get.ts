@@ -1,6 +1,9 @@
+import * as os from 'os';
+import { PlannerPlan } from "@microsoft/microsoft-graph-types";
 import { Logger } from '../../../../cli';
 import {
-  CommandOption
+  CommandOption,
+  CommandError
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -41,11 +44,11 @@ class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
     return ['id', 'title', 'createdDateTime', 'owner', '@odata.etag'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (error?: any) => void): void {
     if (args.options.id) {
       this
         .getPlan(args)
-        .then((res: any): void => {
+        .then((res: PlannerPlan): void => {
           logger.log(res);
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
@@ -55,10 +58,22 @@ class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
         .getGroupId(args)
         .then((groupId: string): Promise<void> => this.getAllItems(`${this.resource}/v1.0/groups/${groupId}/planner/plans`, logger, true, 'minimal'))
         .then((): void => {
-          const filteredPlan = this.items.filter((plan: any) => plan.title === args.options.title);
-          if (filteredPlan && filteredPlan.length > 0) {
-            logger.log(filteredPlan);
+          const filteredPlans = this.items.filter((plan: PlannerPlan) => plan.title === args.options.title);
+
+          if (!filteredPlans.length) {
+            cb(new CommandError(`No plan with the name ${args.options.title} found`));
+            return;
           }
+
+          if (filteredPlans && filteredPlans.length > 1) {
+            let sameNamePlans: string = `Multiple plans with the name ${args.options.title} found. Please choose between the following IDs:`;
+            filteredPlans.map((plan: PlannerPlan) => sameNamePlans += `${os.EOL}${plan.id}`);
+            cb(new CommandError(`${sameNamePlans}`));
+            return;
+          }
+          
+          logger.log(filteredPlans[0]);
+          
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
@@ -90,7 +105,7 @@ class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
       });
   }
 
-  private getPlan(args: CommandArgs): Promise<any> {
+  private getPlan(args: CommandArgs): Promise<PlannerPlan> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/planner/plans/${args.options.id}`,
       headers: {
@@ -99,7 +114,7 @@ class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
       responseType: 'json'
     };
 
-    return request.get(requestOptions);
+    return request.get<PlannerPlan>(requestOptions);
   }
 
   public options(): CommandOption[] {
