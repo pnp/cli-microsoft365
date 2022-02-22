@@ -3,17 +3,20 @@
   "dockerFile": "Dockerfile",
   "settings": {
     "terminal.integrated.profiles.linux": {
-        "zsh": {
-          "path": "/bin/zsh",
-          "args": [
-            "-l"
-          ]
-        }
-      },
-      "terminal.integrated.defaultProfile.linux": "zsh"
+      "zsh": {
+        "path": "/bin/zsh",
+        "args": [
+          "-l"
+        ]
+      }
+    },
+    "terminal.integrated.defaultProfile.linux": "zsh"
   },
   "postCreateCommand": "npm i && npm run clean && npm run build && npm link",
   "extensions": [
-    "dbaeumer.vscode-eslint"
+    "dbaeumer.vscode-eslint",
+    "hbenl.vscode-test-explorer",
+    "hbenl.vscode-mocha-test-adapter",
+    "eamodio.gitlens"
   ]
 }

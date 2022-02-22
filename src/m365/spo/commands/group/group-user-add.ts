@@ -40,7 +40,7 @@ class SpoGroupUserAddCommand extends SpoCommand {
       .getGroupId(args)
       .then((_groupId: number): Promise<string[]> => {
         groupId = _groupId;
-        return this.getOnlyActiveUsers(args, logger);
+        return this.getValidUsers(args, logger);
       })
       .then((resolvedUsernameList: string[]): Promise<SharingResult> => {
         if (this.verbose) {
@@ -77,7 +77,7 @@ class SpoGroupUserAddCommand extends SpoCommand {
   }
 
   private getGroupId(args: CommandArgs): Promise<number> {
-    const getGroupMethod: string = args.options.groupName ? 
+    const getGroupMethod: string = args.options.groupName ?
       `GetByName('${encodeURIComponent(args.options.groupName as string)}')` :
       `GetById('${args.options.groupId}')`;
 
@@ -102,43 +102,51 @@ class SpoGroupUserAddCommand extends SpoCommand {
       });
   }
 
-  private getOnlyActiveUsers(args: CommandArgs, logger: Logger): Promise<string[]> {
+  private getValidUsers(args: CommandArgs, logger: Logger): Promise<string[]> {
     if (this.verbose) {
-      logger.logToStderr(`Removing Users which are not active from the original list`);
+      logger.logToStderr(`Checking if the specified users exist`);
     }
 
-    const activeUserNameList: string[] = [];
+    const validUserNames: string[] = [];
+    const invalidUserNames: string[] = [];
     const userInfo: string = args.options.userName ? args.options.userName : args.options.email!;
 
-    return Promise.all(userInfo.split(',').map(singleUserName => {
-      const options: AadUserGetCommandOptions = {
-        output: 'json',
-        debug: args.options.debug,
-        verbose: args.options.verbose
-      };
+    return Promise
+      .all(userInfo.split(',').map(singleUserName => {
+        const options: AadUserGetCommandOptions = {
+          output: 'json',
+          debug: args.options.debug,
+          verbose: args.options.verbose
+        };
 
-      if (args.options.userName) {
-        options.userName = singleUserName.trim();
-      }
-      else {
-        options.email = singleUserName.trim();
-      }
+        if (args.options.userName) {
+          options.userName = singleUserName.trim();
+        }
+        else {
+          options.email = singleUserName.trim();
+        }
 
-      return Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } })
-        .then((getUserGetOutput: CommandOutput): void => {
-          if (this.debug) {
-            logger.logToStderr(getUserGetOutput.stderr);
-          }
+        return Cli
+          .executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } })
+          .then((getUserGetOutput: CommandOutput): void => {
+            if (this.debug) {
+              logger.logToStderr(getUserGetOutput.stderr);
+            }
 
-          activeUserNameList.push(JSON.parse(getUserGetOutput.stdout).userPrincipalName);
-        }, (err: CommandErrorWithOutput) => {
-          if (this.debug) {
-            logger.logToStderr(err.stderr);
-          }
-        });
-    }))
+            validUserNames.push(JSON.parse(getUserGetOutput.stdout).userPrincipalName);
+          }, (err: CommandErrorWithOutput) => {
+            if (this.debug) {
+              logger.logToStderr(err.stderr);
+            }
+            invalidUserNames.push(singleUserName);
+          });
+      }))
       .then((): Promise<string[]> => {
-        return Promise.resolve(activeUserNameList);
+        if (invalidUserNames.length > 0) {
+          return Promise.reject(`Users not added to the group because the following users don't exist: ${invalidUserNames.join(', ')}`);
+        }
+
+        return Promise.resolve(validUserNames);
       });
   }
 
@@ -146,6 +154,7 @@ class SpoGroupUserAddCommand extends SpoCommand {
     const generatedPeoplePicker: any = JSON.stringify(activeUserList.map(singleUsername => {
       return { Key: singleUsername.trim() };
     }));
+
     return generatedPeoplePicker;
   }
 

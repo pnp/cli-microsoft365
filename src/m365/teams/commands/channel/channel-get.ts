@@ -16,6 +16,7 @@ interface Options extends GlobalOptions {
   teamName?: string;
   channelId?: string;
   channelName?: string;
+  primary?: boolean;
 }
 
 class TeamsChannelGetCommand extends GraphCommand {
@@ -35,6 +36,7 @@ class TeamsChannelGetCommand extends GraphCommand {
     telemetryProps.teamName = typeof args.options.teamName !== 'undefined';
     telemetryProps.channelId = typeof args.options.channelId !== 'undefined';
     telemetryProps.channelName = typeof args.options.channelName !== 'undefined';
+    telemetryProps.primary = (!(!args.options.primary)).toString();
     return telemetryProps;
   }
 
@@ -77,6 +79,10 @@ class TeamsChannelGetCommand extends GraphCommand {
       return Promise.resolve(args.options.channelId);
     }
 
+    if (args.options.primary) {
+      return Promise.resolve('');
+    }
+
     const channelRequestOptions: any = {
       url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName as string)}'`,
       headers: {
@@ -106,16 +112,23 @@ class TeamsChannelGetCommand extends GraphCommand {
         return this.getChannelId(args);
       })
       .then((channelId: string): Promise<Channel> => {
+        let url: string = '';
+        if (args.options.primary) {
+          url = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/primaryChannel`;
+        }
+        else {
+          url = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(channelId)}`;
+        }
+
         const requestOptions: any = {
-          url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(channelId)}`,
+          url: url,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json'
         };
 
-        return request
-          .get<Channel>(requestOptions);
+        return request.get<Channel>(requestOptions);
       })
       .then((res: Channel): void => {
         logger.log(res);
@@ -136,6 +149,9 @@ class TeamsChannelGetCommand extends GraphCommand {
       },
       {
         option: '--channelName [channelName]'
+      },
+      {
+        option: '--primary'
       }
     ];
 
@@ -156,12 +172,24 @@ class TeamsChannelGetCommand extends GraphCommand {
       return `${args.options.teamId} is not a valid GUID`;
     }
 
-    if (args.options.channelId && args.options.channelName) {
-      return 'Specify either channelId or channelName, but not both.';
+    if (args.options.channelId && args.options.channelName && args.options.primary) {
+      return 'Specify channelId, channelName or primary';
     }
 
-    if (!args.options.channelId && !args.options.channelName) {
-      return 'Specify channelId or channelName, one is required';
+    if (!args.options.channelId && args.options.channelName && args.options.primary) {
+      return 'Specify channelId, channelName or primary.';
+    }
+
+    if (args.options.channelId && !args.options.channelName && args.options.primary) {
+      return 'Specify channelId, channelName or primary.';
+    }
+
+    if (args.options.channelId && args.options.channelName && !args.options.primary) {
+      return 'Specify channelId, channelName or primary.';
+    }
+
+    if (!args.options.channelId && !args.options.channelName && !args.options.primary) {
+      return 'Specify channelId, channelName or primary, one is required';
     }
 
     if (args.options.channelId && !Utils.isValidTeamsChannelId(args.options.channelId as string)) {

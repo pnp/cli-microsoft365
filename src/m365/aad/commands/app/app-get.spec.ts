@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -38,7 +39,10 @@ describe(commands.APP_GET, () => {
 
   afterEach(() => {
     Utils.restore([
-      request.get
+      request.get,
+      fs.existsSync,
+      fs.readFileSync,
+      fs.writeFileSync
     ]);
   });
 
@@ -221,7 +225,7 @@ describe(commands.APP_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('should get an Azure AD app registration by its app (client) ID', (done) => {
+  it(`should get an Azure AD app registration by its app (client) ID. Doesn't save the app info if not requested`, (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
         return Promise.resolve({
@@ -249,6 +253,7 @@ describe(commands.APP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
     command.action(logger, {
       options: {
@@ -260,6 +265,7 @@ describe(commands.APP_GET, () => {
         assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
         assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
         assert.strictEqual(call.args[0].displayName, 'My App');
+        assert(fsWriteFileSyncSpy.notCalled);
         done();
       }
       catch (e) {
@@ -268,7 +274,7 @@ describe(commands.APP_GET, () => {
     });
   });
 
-  it('should get an Azure AD app registration by its name', (done) => {
+  it(`should get an Azure AD app registration by its name. Doesn't save the app info if not requested`, (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20App'&$select=id`) {
         return Promise.resolve({
@@ -296,6 +302,7 @@ describe(commands.APP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
     command.action(logger, {
       options: {
@@ -307,6 +314,7 @@ describe(commands.APP_GET, () => {
         assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
         assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
         assert.strictEqual(call.args[0].displayName, 'My App');
+        assert(fsWriteFileSyncSpy.notCalled);
         done();
       }
       catch (e) {
@@ -315,7 +323,7 @@ describe(commands.APP_GET, () => {
     });
   });
 
-  it('should get an Azure AD app registration by its object ID', (done) => {
+  it(`should get an Azure AD app registration by its object ID. Doesn't save the app info if not requested`, (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/340a4aa3-1af6-43ac-87d8-189819003952`) {
         return Promise.resolve({
@@ -328,6 +336,7 @@ describe(commands.APP_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
     command.action(logger, {
       options: {
@@ -339,6 +348,429 @@ describe(commands.APP_GET, () => {
         assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
         assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
         assert.strictEqual(call.args[0].displayName, 'My App');
+        assert(fsWriteFileSyncSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`should get an Azure AD app registration by its app (client) ID. Creates the file it doesn't exist`, (done) => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
+        return Promise.resolve({
+          value: [
+            {
+              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+              "createdDateTime": "2019-10-29T17:46:55Z",
+              "displayName": "My App",
+              "description": null
+            }
+          ]
+        });
+      }
+
+      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
+        return Promise.resolve({
+          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+          "createdDateTime": "2019-10-29T17:46:55Z",
+          "displayName": "My App",
+          "description": null
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    command.action(logger, {
+      options: {
+        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+        save: true
+      }
+    }, () => {
+      try {
+        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+        assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
+        assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
+        assert.strictEqual(call.args[0].displayName, 'My App');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [{
+            appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+            name: 'My App'
+          }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`should get an Azure AD app registration by its app (client) ID. Writes to the existing empty file`, (done) => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
+        return Promise.resolve({
+          value: [
+            {
+              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+              "createdDateTime": "2019-10-29T17:46:55Z",
+              "displayName": "My App",
+              "description": null
+            }
+          ]
+        });
+      }
+
+      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
+        return Promise.resolve({
+          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+          "createdDateTime": "2019-10-29T17:46:55Z",
+          "displayName": "My App",
+          "description": null
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => '');
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    command.action(logger, {
+      options: {
+        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+        save: true
+      }
+    }, () => {
+      try {
+        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+        assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
+        assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
+        assert.strictEqual(call.args[0].displayName, 'My App');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [{
+            appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+            name: 'My App'
+          }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`should get an Azure AD app registration by its app (client) ID. Adds to the existing file contents`, (done) => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
+        return Promise.resolve({
+          value: [
+            {
+              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+              "createdDateTime": "2019-10-29T17:46:55Z",
+              "displayName": "My App",
+              "description": null
+            }
+          ]
+        });
+      }
+
+      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
+        return Promise.resolve({
+          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+          "createdDateTime": "2019-10-29T17:46:55Z",
+          "displayName": "My App",
+          "description": null
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
+      "apps": [
+        {
+          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+          "name": "M365 app"
+        }
+      ]
+    }));
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    command.action(logger, {
+      options: {
+        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+        save: true
+      }
+    }, () => {
+      try {
+        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+        assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
+        assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
+        assert.strictEqual(call.args[0].displayName, 'My App');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [
+            {
+              "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+              "name": "M365 app"
+            },
+            {
+              appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+              name: 'My App'
+            }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`should get an Azure AD app registration by its app (client) ID. Adds to the existing file contents (Debug)`, (done) => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
+        return Promise.resolve({
+          value: [
+            {
+              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+              "createdDateTime": "2019-10-29T17:46:55Z",
+              "displayName": "My App",
+              "description": null
+            }
+          ]
+        });
+      }
+
+      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
+        return Promise.resolve({
+          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+          "createdDateTime": "2019-10-29T17:46:55Z",
+          "displayName": "My App",
+          "description": null
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
+      "apps": [
+        {
+          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+          "name": "M365 app"
+        }
+      ]
+    }));
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+        save: true
+      }
+    }, () => {
+      try {
+        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+        assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
+        assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
+        assert.strictEqual(call.args[0].displayName, 'My App');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [
+            {
+              "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+              "name": "M365 app"
+            },
+            {
+              appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+              name: 'My App'
+            }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`doesn't save app info in the .m365rc.json file when there was error reading file contents`, (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
+        return Promise.resolve({
+          value: [
+            {
+              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+              "createdDateTime": "2019-10-29T17:46:55Z",
+              "displayName": "My App",
+              "description": null
+            }
+          ]
+        });
+      }
+
+      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
+        return Promise.resolve({
+          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+          "createdDateTime": "2019-10-29T17:46:55Z",
+          "displayName": "My App",
+          "description": null
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
+
+    command.action(logger, {
+      options: {
+        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(fsWriteFileSyncSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`doesn't save app info in the .m365rc.json file when file has invalid JSON`, (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
+        return Promise.resolve({
+          value: [
+            {
+              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+              "createdDateTime": "2019-10-29T17:46:55Z",
+              "displayName": "My App",
+              "description": null
+            }
+          ]
+        });
+      }
+
+      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
+        return Promise.resolve({
+          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+          "createdDateTime": "2019-10-29T17:46:55Z",
+          "displayName": "My App",
+          "description": null
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => '{');
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
+
+    command.action(logger, {
+      options: {
+        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(fsWriteFileSyncSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`doesn't fail execution when error occurred while saving app info`, (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
+        return Promise.resolve({
+          value: [
+            {
+              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+              "createdDateTime": "2019-10-29T17:46:55Z",
+              "displayName": "My App",
+              "description": null
+            }
+          ]
+        });
+      }
+
+      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
+        return Promise.resolve({
+          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+          "createdDateTime": "2019-10-29T17:46:55Z",
+          "displayName": "My App",
+          "description": null
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('Error occurred while saving app info'); });
+
+
+    command.action(logger, {
+      options: {
+        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {

@@ -1,13 +1,16 @@
+import { DeviceCodeResponse } from "@azure/msal-common";
 import type * as Msal from '@azure/msal-node';
 import type * as NodeForge from 'node-forge';
+import type * as open from 'open';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { msalCachePlugin } from './auth/msalCachePlugin';
 import { TokenStorage } from './auth/TokenStorage';
 import type { AuthServer } from './AuthServer';
-import { Logger } from './cli';
+import { Cli, Logger } from './cli';
 import { CommandError } from './Command';
 import config from './config';
 import request from './request';
+import { settingsNames } from './settingsNames';
 
 export interface Hash<TValue> {
   [key: string]: TValue;
@@ -83,6 +86,7 @@ export enum CertificateType {
 }
 
 export class Auth {
+  private _open: typeof open | undefined;
   private _authServer: AuthServer | undefined;
   private deviceCodeRequest?: Msal.DeviceCodeRequest;
   private _service: Service;
@@ -236,14 +240,14 @@ export class Auth {
       privateKey: certificatePrivateKey as string
     };
 
-    const config = { 
-      clientId: this.service.appId, 
-      authority: `https://login.microsoftonline.com/${this.service.tenant}` 
+    const config = {
+      clientId: this.service.appId,
+      authority: `https://login.microsoftonline.com/${this.service.tenant}`
     };
 
-    const authConfig = cert 
-      ? { ...config, clientCertificate: cert } 
-      : { ...config, clientSecret};
+    const authConfig = cert
+      ? { ...config, clientCertificate: cert }
+      : { ...config, clientSecret };
 
     return {
       auth: authConfig,
@@ -339,19 +343,33 @@ export class Auth {
 
     this.deviceCodeRequest = {
       // deviceCodeCallback is called by MSAL which we're not testing
-      /* c8 ignore next 9 */
-      deviceCodeCallback: response => {
-        if (debug) {
-          logger.logToStderr('Response:');
-          logger.logToStderr(response);
-          logger.logToStderr('');
-        }
-
-        logger.log(response.message);
-      },
+      /* c8 ignore next 1 */
+      deviceCodeCallback: response => this.processDeviceCodeCallback(response, logger, debug),
       scopes: [`${resource}/.default`]
     };
     return (this.clientApplication as Msal.PublicClientApplication).acquireTokenByDeviceCode(this.deviceCodeRequest) as Promise<AccessToken | null>;
+  }
+
+  private processDeviceCodeCallback(response: DeviceCodeResponse, logger: Logger, debug: boolean): void {
+    if (debug) {
+      logger.logToStderr('Response:');
+      logger.logToStderr(response);
+      logger.logToStderr('');
+    }
+
+    logger.log(response.message);
+
+    if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenBrowserOnLogin, false)) {
+      // _open is never set before hitting this line, but this check
+      // is implemented so that we can support lazy loading
+      // but also stub it for testing
+      /* c8 ignore next 3 */
+      if (!this._open) {
+        this._open = require('open');
+      }
+
+      (this._open as typeof open)(response.verificationUri);
+    }
   }
 
   private async ensureAccessTokenWithPassword(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {

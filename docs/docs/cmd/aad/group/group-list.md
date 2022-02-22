@@ -10,6 +10,9 @@ m365 aad group list [options]
 
 ## Options
 
+`-d, --deleted`
+: Use to retrieve deleted groups
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
@@ -18,4 +21,10 @@ Lists all groups defined in Azure Active Directory.
 
 ```sh
 m365 aad group list
+```
+
+List all recently deleted groups in the tenant
+
+```sh
+m365 aad group list --deleted
 ```

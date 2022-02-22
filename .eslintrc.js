@@ -49,6 +49,7 @@ const dictionary = [
   'records',
   'recycle',
   'role',
+  'room',
   'schema',
   'service',
   'setting',

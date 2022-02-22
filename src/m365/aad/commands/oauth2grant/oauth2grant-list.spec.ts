@@ -236,9 +236,9 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants?$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
         if (opts.headers &&
           opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          (opts.headers.authorization as string).indexOf('Bearer ') === 0 &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             value: []
           });

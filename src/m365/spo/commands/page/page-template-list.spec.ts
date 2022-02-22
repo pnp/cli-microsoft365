@@ -83,7 +83,7 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
     });
   });
 
-  it('list all page templates', (done) => {
+  it('list all page templates (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/templates`) > -1) {
         return Promise.resolve(templatesMock);

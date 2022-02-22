@@ -402,16 +402,6 @@ describe(commands.CONVERSATIONMEMBER_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct teamId and channelName input', () => {
-    const actual = command.validate({
-      options: {
-        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
-        channelName: "Private Channel"
-      }
-    });
-    assert.strictEqual(actual, true);
-  });
-
   it('supports debug mode', () => {
     const options = command.options();
     let containsOption = false;

@@ -198,7 +198,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     });
   });
 
-  it('rejects if not app roles found for the specified resource option value', (done) => {
+  it('rejects if app roles are not found for the specified resource option value', (done) => {
     postRequestStub();
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
@@ -223,7 +223,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     });
   });
 
-  it('rejects if not app roles found for the specified resource option value', (done) => {
+  it('rejects if app role scope not found for the specified resource option value', (done) => {
     postRequestStub();
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {

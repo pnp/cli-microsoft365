@@ -78,22 +78,17 @@ describe(commands.MESSAGE_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('has all fields', () => {
-    const actual = command.validate({ options: { body: "test", groupId: 1234123 } });
-    assert.strictEqual(actual, true);
-  });
-
-  it('has all fields', () => {
+  it('passes validation if body and repliedToId set', () => {
     const actual = command.validate({ options: { body: "test", repliedToId: 1234122 } });
     assert.strictEqual(actual, true);
   });
 
-  it('has all fields', () => {
+  it('passes validation if body and directToUserIds set', () => {
     const actual = command.validate({ options: { body: "test", directToUserIds: 1234125 } });
     assert.strictEqual(actual, true);
   });
 
-  it('has all fields', () => {
+  it('passes validation if body and groupId set', () => {
     const actual = command.validate({ options: { body: "test", groupId: 1234123 } });
     assert.strictEqual(actual, true);
   });

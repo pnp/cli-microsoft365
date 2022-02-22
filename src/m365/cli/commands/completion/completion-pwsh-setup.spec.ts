@@ -114,7 +114,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     });
   });
 
-  it('creates profile file when it does not exist and appends the completion script to it', (done) => {
+  it('creates profile file when it does not exist and appends the completion script to it (debug)', (done) => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().indexOf('.ps1') < 0);
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });

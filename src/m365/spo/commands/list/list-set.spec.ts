@@ -12,10 +12,10 @@ const command: Command = require('./list-set');
 describe(commands.LIST_SET, () => {
   let log: any[];
   let logger: Logger;
-  
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -2027,18 +2027,13 @@ describe(commands.LIST_SET, () => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorVersionLimit: majorVersionLimitValue, enableVersioning: 'true' } });
     assert(actual === true);
   });
-  
+
   it('fails if majorWithMinorVersionsLimit specified, but enableModeration is not true', () => {
     const majorWithMinorVersionLimitValue = 20;
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorWithMinorVersionsLimit: majorWithMinorVersionLimitValue } });
     assert.strictEqual(actual, `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`);
   });
 
-  it('has correct majorVersionLimit and enableVersioning values specified', () => {
-    const majorVersionLimitValue = 20;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorVersionLimit: majorVersionLimitValue, enableVersioning: 'true' } });
-    assert(actual === true);
-  });
 
   it('fails if non existing readSecurity specified', () => {
     const readSecurityValue = 5;
@@ -2064,13 +2059,13 @@ describe(commands.LIST_SET, () => {
     assert(actual === true);
   });
 
-  it('fails if non existing readSecurity specified', () => {
+  it('fails if non existing writeSecurity specified', () => {
     const writeSecurityValue = 5;
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', writeSecurity: writeSecurityValue } });
     assert.notStrictEqual(actual, true);
   });
 
-  it('has correct direction specified', () => {
+  it('has correct writeSecurity specified', () => {
     const writeSecurityValue = 4;
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', writeSecurity: writeSecurityValue } });
     assert(actual === true);
