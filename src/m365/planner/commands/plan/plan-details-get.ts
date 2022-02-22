@@ -3,7 +3,7 @@ import { CommandOption} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import GraphCommand from '../../../base/GraphCommand';
+import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
 import { PlannerPlan, PlannerPlanDetails  } from '@microsoft/microsoft-graph-types';
 
@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   ownerGroupName?: string;
 }
 
-class PlannerPlanDetailsGetCommand extends GraphCommand {
+class PlannerPlanDetailsGetCommand extends GraphItemsListCommand<any> {
   private groupId: string = "";
 
   public get name(): string {
@@ -43,7 +43,7 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
       .getGroupId(args)
       .then((groupId: string): Promise<string> => {
         this.groupId = groupId;
-        return this.getPlanId(args);
+        return this.getPlanId(args,logger);
       })
       .then((planId: string): Promise<PlannerPlanDetails> => {
         args.options.planId = planId;
@@ -72,9 +72,9 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: [{ id: string, resourceProvisioningOptions: string[] }] }>(requestOptions)
+      .get<{ value: [{ id: string }] }>(requestOptions)
       .then(response => {
-        const groupItem: { id: string, resourceProvisioningOptions: string[] } | undefined = response.value[0];
+        const groupItem: { id: string} | undefined = response.value[0];
 
         if (!groupItem) {
           return Promise.reject(`The specified ownerGroup does not exist`);
@@ -88,30 +88,19 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
       });
   }
 
-  private getPlanId(args: CommandArgs): Promise<string> {
+  private getPlanId(args: CommandArgs,logger: Logger): Promise<string> {
     if (args.options.planId) {
       return Promise.resolve(args.options.planId);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups/${this.groupId}/planner/plans`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-    
-    return request
-      .get<{ value: PlannerPlan [] }>(requestOptions)
-      .then((response: { value: PlannerPlan[] }): Promise<string> => {
-        const filteredPlan = response.value.filter((plan: PlannerPlan) => plan.title === args.options.planTitle);
+    return this.getAllItems(`${this.resource}/v1.0/groups/${this.groupId}/planner/plans`, logger, true, 'minimal')
+      .then((): Promise<string> => {
+        const filteredPlan = this.items.filter((plan: PlannerPlan) => plan.title === args.options.planTitle);
         if (filteredPlan && filteredPlan.length > 0) {
           if (filteredPlan.length > 1) {
             return Promise.reject(`Multiple plans with name ${args.options.planTitle} found: ${filteredPlan.map(x => x.id)}`);
           }
-          if(filteredPlan[0].id) {
-            return Promise.resolve(filteredPlan[0].id);
-          }
+          return Promise.resolve(filteredPlan[0].id as string);
         }
         return Promise.reject(`The specified plan title does not exist`);
       });    
@@ -125,13 +114,7 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
       },
       responseType: 'json'
     };
-
-    return request
-      .get<{ value: PlannerPlanDetails }>(requestOptions)
-      .then(response => {
-        const planDetailsItem: any | undefined = response;
-        return Promise.resolve(planDetailsItem);
-      });
+    return request.get<PlannerPlanDetails>(requestOptions);
   }
 
   public options(): CommandOption[] {

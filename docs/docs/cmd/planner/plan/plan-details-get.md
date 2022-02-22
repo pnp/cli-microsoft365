@@ -10,10 +10,10 @@ m365 planner plan details get [options]
 
 ## Options
 
-`-i,--planId [planId]`
+`-i, --planId [planId]`
 : ID of the plan. Specify either `planId` or `planTitle` but not both.
 
-`-t,--planTitle [planTitle]`
+`-t, --planTitle [planTitle]`
 : Title of the plan. Specify either `planId` or `planTitle` but not both.
 
 `--ownerGroupId [ownerGroupId]`
