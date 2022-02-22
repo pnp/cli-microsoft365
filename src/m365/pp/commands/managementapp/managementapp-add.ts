@@ -42,7 +42,7 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
       .then((appId: string): Promise<any> => {
         const requestOptions: any = {
           // This should be refactored once we implement a PowerPlatform base class as api.bap will differ between envs.
-          url: `${this.bapResource}/providers/Microsoft.BusinessAppPlatform/adminApplications/${appId}?api-version=2020-06-01`,
+          url: `${this.resource}/providers/Microsoft.BusinessAppPlatform/adminApplications/${appId}?api-version=2020-06-01`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
@@ -69,7 +69,7 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
       `displayName eq '${encodeURIComponent(name as string)}'`;
 
     const requestOptions: any = {
-      url: `${this.graphResource}/v1.0/myorganization/applications?$filter=${filter}&$select=appId`,
+      url: `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=${filter}&$select=appId`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

@@ -3,7 +3,6 @@ import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
 import { Logger } from '../../../cli';
-import { CommandError } from '../../../Command';
 import Utils from '../../../Utils';
 import PowerPlatformCommand from './PowerPlatformCommand';
 
@@ -24,7 +23,7 @@ class MockCommand extends PowerPlatformCommand {
   }
 }
 
-describe('GraphCommand', () => {
+describe('PowerPlatformCommand', () => {
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
   });
@@ -35,45 +34,6 @@ describe('GraphCommand', () => {
 
   after(() => {
     Utils.restore(appInsights.trackEvent);
-  });
-
-  it('correctly reports an error while restoring auth info', (done) => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
-    const command = new MockCommand();
-    const logger: Logger = {
-      log: () => { },
-      logRaw: () => { },
-      logToStderr: () => { }
-    };
-    command.action(logger, { options: {} } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('doesn\'t execute command when error occurred while restoring auth info', (done) => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
-    const command = new MockCommand();
-    const logger: Logger = {
-      log: () => { },
-      logRaw: () => { },
-      logToStderr: () => { }
-    };
-    const commandCommandActionSpy = sinon.spy(command, 'commandAction');
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(commandCommandActionSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('doesn\'t execute command when not logged in', (done) => {
@@ -118,13 +78,8 @@ describe('GraphCommand', () => {
     });
   });
 
-  it('returns correct graph resource', () => {
-    const command = new MockCommand();
-    assert.strictEqual((command as any).graphResource, 'https://graph.microsoft.com');
-  });
-
   it('returns correct bapi resource', () => {
     const command = new MockCommand();
-    assert.strictEqual((command as any).bapResource, 'https://api.bap.microsoft.com');
+    assert.strictEqual((command as any).resource, 'https://api.bap.microsoft.com');
   });
 });
