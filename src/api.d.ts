@@ -7,5 +7,7 @@ export interface CommandOutput {
   stderr: string;
 }
 
-export declare function executeCommand(commandName: string, options: any): Promise<CommandOutput>;
-export declare function on(eventName: string, listener: (...args: any[]) => void): void;
+export declare function executeCommand(commandName: string, options: any, listener?: {
+  stdout: (message: any) => void,
+  stderr: (message: any) => void,
+}): Promise<CommandOutput>;
