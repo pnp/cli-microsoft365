@@ -31,31 +31,31 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
 
     const requestUrl: string = `${args.options.siteUrl}/_api/site/RecycleBin/RestoreByIds`;
 
-    const ids: string[] = this.splitIdsList(args.options.ids);
+    const ids: string[] = Utils.splitAndTrim(args.options.ids);
     const idsChunks: string[][] = [];
 
     while (ids.length) {
       idsChunks.push(ids.splice(0, 20));
     }
 
-    idsChunks.forEach(async (idsChunk: string[], index: number) => {
-      const requestOptions: any = {
-        url: requestUrl,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json',
-        data: {
-          ids: idsChunk
-        }
-      };
+    Promise.all(
+      idsChunks.map(async (idsChunk: string[]) => {
+        const requestOptions: any = {
+          url: requestUrl,
+          headers: {
+            'accept': 'application/json;odata=nometadata',
+            'content-type': 'application/json'
+          },
+          responseType: 'json',
+          data: {
+            ids: idsChunk
+          }
+        };
 
-      await request.post(requestOptions);
+        await request.post(requestOptions);
+      })
+    ).then(_ => cb());
 
-      if(index === idsChunks.length - 1) {
-        cb();
-      }
-    });
   }
 
   public options(): CommandOption[] {
@@ -78,15 +78,13 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
       return isValidSharePointUrl;
     }
 
-    if (this.splitIdsList(args.options.ids).map(id => Utils.isValidGuid(id as string)).some(check => check !== true)) {
-      return `some items in list ${args.options.ids} is not a valid GUID`;
+    const notValidGuidsList = Utils.splitAndTrim(args.options.ids).filter(id => !Utils.isValidGuid(id as string));
+
+    if (notValidGuidsList.length > 0) {
+      return `some GUIDs are not valid. Please double check: ${notValidGuidsList.map(guid => guid)}`;
     }
 
     return true;
-  }
-
-  private splitIdsList(ids: string): string[] {
-    return ids.split(',').map(id => id.trim());
   }
 }
 

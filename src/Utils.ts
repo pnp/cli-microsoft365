@@ -665,4 +665,8 @@ export default class Utils {
 
     return encodeURIComponent(value).replace(/'/g, "''");
   }
+
+  public static splitAndTrim(ids: string): string[] {
+    return ids.split(',').map(id => id.trim());
+  }
 }

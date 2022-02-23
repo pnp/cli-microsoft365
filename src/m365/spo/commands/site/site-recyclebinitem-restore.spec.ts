@@ -10,7 +10,6 @@ import commands from '../../commands';
 const command: Command = require('./site-recyclebinitem-restore');
 
 describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
-
   let log: any[];
   let logger: Logger;
 
