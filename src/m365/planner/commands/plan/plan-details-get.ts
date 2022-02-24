@@ -5,7 +5,7 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
-import { PlannerPlan, PlannerPlanDetails,Group  } from '@microsoft/microsoft-graph-types';
+import { PlannerPlan, PlannerPlanDetails, Group  } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
