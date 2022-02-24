@@ -28,6 +28,18 @@ m365 aad o365group add [options]
 `--isPrivate [isPrivate]`
 : Set to `true` if the Microsoft 365 Group should be private and to `false` if it should be public (default)
 
+`--allowMembersToPost [allowMembersToPost]`
+: Set if only group members should be able to post conversations to the group
+
+`--hideGroupInOutlook [hideGroupInOutlook]`
+: Set to hide the group in Outlook experiences
+
+`--subscribeNewGroupMembers [subscribeNewGroupMembers]`
+: Set to subscribe all new group members to receive group conversation emails when new messages are posted in the group
+
+`--welcomeEmailDisabled [welcomeEmailDisabled]`
+: Set to not send welcome emails to new group members
+
 `-l, --logoPath [logoPath]`
 : Local path to the image file to use as group logo
 
@@ -43,29 +55,40 @@ If an invalid user is provided in the comma-separated list or Owners or Members,
 Create a public Microsoft 365 Group
 
 ```sh
-m365 aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance
 ```
 
 Create a private Microsoft 365 Group
 
 ```sh
-m365 aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --isPrivate true
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --isPrivate true
 ```
 
 Create a public Microsoft 365 Group and set specified users as its owners
 
 ```sh
-m365 aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --owners "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --owners "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
 Create a public Microsoft 365 Group and set specified users as its members
 
 ```sh
-m365 aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
+```
+
+Create a public Microsoft 365 Group and set its resourceBehaviorOptions
+
+```sh
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --allowMembersToPost --hideGroupInOutlook --subscribeNewGroupMembers --welcomeEmailDisabled
 ```
 
 Create a public Microsoft 365 Group and set its logo
 
 ```sh
-m365 aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --logoPath images/logo.png
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --logoPath images/logo.png
 ```
+
+## More information
+
+- Create group: [https://docs.microsoft.com/en-us/graph/api/group-post-groups](https://docs.microsoft.com/en-us/graph/api/group-post-groups)
+- Set Microsoft 365 group behaviors and provisioning options: [https://docs.microsoft.com/en-us/graph/group-set-options](https://docs.microsoft.com/en-us/graph/group-set-options)
