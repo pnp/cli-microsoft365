@@ -5,7 +5,7 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
-import { PlannerPlan, PlannerPlanDetails  } from '@microsoft/microsoft-graph-types';
+import { PlannerPlan, PlannerPlanDetails,Group  } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   ownerGroupName?: string;
 }
 
-class PlannerPlanDetailsGetCommand extends GraphItemsListCommand<any> {
+class PlannerPlanDetailsGetCommand extends GraphItemsListCommand<PlannerPlanDetails> {
   private groupId: string = "";
 
   public get name(): string {
@@ -72,9 +72,9 @@ class PlannerPlanDetailsGetCommand extends GraphItemsListCommand<any> {
     };
 
     return request
-      .get<{ value: [{ id: string }] }>(requestOptions)
+      .get<{ value: Group[] }>(requestOptions)
       .then(response => {
-        const groupItem: { id: string} | undefined = response.value[0];
+        const groupItem: Group | undefined = response.value[0];
 
         if (!groupItem) {
           return Promise.reject(`The specified ownerGroup does not exist`);
@@ -84,7 +84,7 @@ class PlannerPlanDetailsGetCommand extends GraphItemsListCommand<any> {
           return Promise.reject(`Multiple ownerGroups with name ${args.options.ownerGroupName} found: Please choose between the following IDs ${response.value.map(x => x.id)}`);
         }
 
-        return Promise.resolve(groupItem.id);
+        return Promise.resolve(groupItem.id as string);
       });
   }
 
@@ -93,7 +93,7 @@ class PlannerPlanDetailsGetCommand extends GraphItemsListCommand<any> {
       return Promise.resolve(args.options.planId);
     }
 
-    return this.getAllItems(`${this.resource}/v1.0/groups/${this.groupId}/planner/plans`, logger, true, 'minimal')
+    return this.getAllItems(`${this.resource}/v1.0/groups/${this.groupId}/planner/plans`, logger, true)
       .then((): Promise<string> => {
         const filteredPlan = this.items.filter((plan: PlannerPlan) => plan.title === args.options.planTitle);
         if (filteredPlan && filteredPlan.length > 0) {
