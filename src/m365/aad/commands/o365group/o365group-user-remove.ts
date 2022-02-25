@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import teamsCommands from '../../../teams/commands';
 import commands from '../../commands';
@@ -155,11 +155,11 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
       return 'You cannot provide both a groupId and teamId parameter, please provide only one';
     }
 
-    if (args.options.teamId && !Utils.isValidGuid(args.options.teamId as string)) {
+    if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 
-    if (args.options.groupId && !Utils.isValidGuid(args.options.groupId as string)) {
+    if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
       return `${args.options.groupId} is not a valid GUID`;
     }
 

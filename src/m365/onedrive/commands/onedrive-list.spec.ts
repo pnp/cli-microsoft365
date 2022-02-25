@@ -2,7 +2,7 @@ import sinon = require("sinon");
 import commands from "../commands";
 import auth from "../../../Auth";
 import Command, { CommandError } from "../../../Command";
-import Utils from "../../../Utils";
+import { sinonUtil, spo } from "../../../utils";
 import request from "../../../request";
 import appInsights from "../../../appInsights";
 import assert = require("assert");
@@ -17,7 +17,7 @@ describe(commands.LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(command as any, 'ensureFormDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'abc' }));
+    sinon.stub(spo, 'ensureFormDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -39,15 +39,15 @@ describe(commands.LIST, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      (command as any).getRequestDigest,
+      spo.ensureFormDigest,
       appInsights.trackEvent
     ]);
     auth.service.connected = false;

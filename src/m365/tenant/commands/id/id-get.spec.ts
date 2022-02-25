@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { accessToken, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./id-get');
 
@@ -43,16 +43,16 @@ describe(commands.ID_GET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent,
       auth.restoreAuth,
-      Utils.getUserNameFromAccessToken
+      accessToken.getUserNameFromAccessToken
     ]);
     auth.service.connected = false;
   });
@@ -66,7 +66,7 @@ describe(commands.ID_GET, () => {
   });
 
   it('gets logged in Microsoft 365 tenant ID if no domain name is passed', (done) => {
-    sinon.stub(Utils, 'getUserNameFromAccessToken').callsFake(() => {
+    sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => {
       return 'admin@contoso.onmicrosoft.com';
     });
 
@@ -144,7 +144,7 @@ describe(commands.ID_GET, () => {
     command.action(logger, { options: {} }, () => {
       try {
         assert(loggerLogSpy.calledWith('31537af4-6d77-4bb9-a681-d2394888ea26'));
-        Utils.restore(Utils.getUserNameFromAccessToken);
+        sinonUtil.restore(accessToken.getUserNameFromAccessToken);
         done();
       }
       catch (e) {

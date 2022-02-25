@@ -3,8 +3,8 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   chatId: string;
 }
 
-class TeamsChatMemberListCommand extends GraphItemsListCommand<any> {
+class TeamsChatMemberListCommand extends GraphCommand {
   public get name(): string {
     return commands.CHAT_MEMBER_LIST;
   }
@@ -31,10 +31,10 @@ class TeamsChatMemberListCommand extends GraphItemsListCommand<any> {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const endpoint: string = `${this.resource}/v1.0/chats/${args.options.chatId}/members`;
 
-    this
-      .getAllItems(endpoint, logger, true)
-      .then((): void => {
-        logger.log(this.items);
+    odata
+      .getAllItems(endpoint, logger)
+      .then((items): void => {
+        logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -51,7 +51,7 @@ class TeamsChatMemberListCommand extends GraphItemsListCommand<any> {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidTeamsChatId(args.options.chatId)) {
+    if (!validation.isValidTeamsChatId(args.options.chatId)) {
       return `${args.options.chatId} is not a valid Teams ChatId`;
     }
 

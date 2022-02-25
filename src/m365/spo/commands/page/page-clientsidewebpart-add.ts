@@ -4,7 +4,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { StandardWebPart, StandardWebPartUtils } from '../../StandardWebPartTypes';
@@ -430,7 +430,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       return 'Specify either the standardWebPart or the webPartId option but not both';
     }
 
-    if (args.options.webPartId && !Utils.isValidGuid(args.options.webPartId)) {
+    if (args.options.webPartId && !validation.isValidGuid(args.options.webPartId)) {
       return `The webPartId '${args.options.webPartId}' is not a valid GUID`;
     }
 
@@ -470,7 +470,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       return 'The value of parameter column must be 1 or higher';
     }
 
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

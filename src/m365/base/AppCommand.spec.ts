@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import { Cli, Logger } from '../../cli';
-import Utils from '../../Utils';
+import { sinonUtil } from '../../utils';
 import AppCommand from './AppCommand';
 import sinon = require('sinon');
 
@@ -43,7 +43,7 @@ describe('AppCommand', () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
       Cli.prompt

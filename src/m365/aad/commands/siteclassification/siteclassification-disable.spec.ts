@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./siteclassification-disable');
 
@@ -41,7 +41,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.delete,
       Cli.prompt
@@ -49,7 +49,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -564,7 +564,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   it('aborts removing the group when prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'delete');
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -665,7 +665,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });

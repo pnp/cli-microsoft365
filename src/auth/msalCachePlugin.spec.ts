@@ -1,7 +1,7 @@
 import { ISerializableTokenCache, TokenCacheContext } from '@azure/msal-node';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import Utils from '../Utils';
+import { sinonUtil } from '../utils';
 import { msalCachePlugin } from './msalCachePlugin';
 
 const mockCache: ISerializableTokenCache = {
@@ -23,7 +23,7 @@ describe('msalCachePlugin', () => {
     mockCacheDeserializeSpy.resetHistory();
     mockCacheSerializeSpy.resetHistory();
     mockCacheContext.hasChanged = false;
-    Utils.restore([
+    sinonUtil.restore([
       (msalCachePlugin as any).fileTokenStorage.get,
       (msalCachePlugin as any).fileTokenStorage.set
     ]);

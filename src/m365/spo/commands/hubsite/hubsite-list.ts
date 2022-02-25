@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { AssociatedSite } from './AssociatedSite';
@@ -46,7 +47,7 @@ class SpoHubSiteListCommand extends SpoCommand {
     let hubSites: HubSite[];
     let spoAdminUrl: string = '';
 
-    this
+    spo
       .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<{ value: HubSite[]; }> => {
         spoAdminUrl = _spoAdminUrl;

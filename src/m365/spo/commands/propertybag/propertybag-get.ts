@@ -3,10 +3,8 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import SpoCommand from '../../../base/SpoCommand';
-import { ClientSvc, IdentityResponse } from '../../ClientSvc';
+import { ContextInfo, IdentityResponse, spo, validation } from '../../../../utils';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 import { Property, SpoPropertyBagBaseCommand } from './propertybag-base';
 
 export interface CommandArgs {
@@ -35,14 +33,12 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const clientSvcCommons: ClientSvc = new ClientSvc(logger, this.debug);
-
-    this
+    spo
       .getRequestDigest(args.options.webUrl)
       .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
         this.formDigestValue = contextResponse.FormDigestValue;
 
-        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
+        return spo.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
       })
       .then((identityResp: IdentityResponse): Promise<any> => {
         const opts: Options = args.options;
@@ -83,7 +79,7 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 
   private filterByKey(propertyBag: any, key: string): Property | null {

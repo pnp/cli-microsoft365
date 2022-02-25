@@ -5,10 +5,10 @@ import {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import { BasePermissions, PermissionKind } from '../../base-permissions';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -54,7 +54,7 @@ class SpoWebAddCommand extends SpoCommand {
     let siteInfo: any = null;
     let subsiteFullUrl: string = '';
 
-    this
+    spo
       .getRequestDigest(args.options.parentWebUrl)
       .then((res: ContextInfo): Promise<any> => {
         const requestOptions: any = {
@@ -124,7 +124,7 @@ class SpoWebAddCommand extends SpoCommand {
           return Promise.reject(SpoWebAddCommand.DONE);
         }
 
-        return this.getRequestDigest(subsiteFullUrl);
+        return spo.getRequestDigest(subsiteFullUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         const requestOptions: any = {
@@ -202,7 +202,7 @@ class SpoWebAddCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.parentWebUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.parentWebUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }

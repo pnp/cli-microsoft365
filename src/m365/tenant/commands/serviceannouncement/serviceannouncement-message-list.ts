@@ -2,7 +2,8 @@ import { ServiceUpdateMessage } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -13,7 +14,7 @@ interface Options extends GlobalOptions {
   service: string;
 }
 
-class TenantServiceAnnouncementMessageListCommand extends GraphItemsListCommand<ServiceUpdateMessage> {
+class TenantServiceAnnouncementMessageListCommand extends GraphCommand {
   public get name(): string {
     return commands.SERVICEANNOUNCEMENT_MESSAGE_LIST;
   }
@@ -33,10 +34,10 @@ class TenantServiceAnnouncementMessageListCommand extends GraphItemsListCommand<
       endpoint += `?$filter=services/any(c:c+eq+'${encodeURIComponent(args.options.service)}')`;
     }
 
-    this
-      .getAllItems(endpoint, logger, true)
-      .then((): void => {
-        logger.log(this.items);
+    odata
+      .getAllItems<ServiceUpdateMessage>(endpoint, logger)
+      .then((items): void => {
+        logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

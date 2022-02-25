@@ -4,7 +4,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -114,7 +114,7 @@ class TeamsAppUpdateCommand extends GraphCommand {
       return 'Specify either id or name, but not both';
     }
 
-    if (args.options.id && !Utils.isValidGuid(args.options.id)) {
+    if (args.options.id && !validation.isValidGuid(args.options.id)) {
       return `${args.options.id} is not a valid GUID`;
     }
 

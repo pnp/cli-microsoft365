@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./customaction-remove');
 
@@ -60,14 +60,14 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       Cli.prompt
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -122,7 +122,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   it('should abort custom action remove when prompt not confirmed', (done) => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -141,7 +141,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -159,7 +159,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         done(e);
       }
       finally {
-        Utils.restore((command as any)['removeScopedCustomAction']);
+        sinonUtil.restore((command as any)['removeScopedCustomAction']);
       }
     });
   });
@@ -193,7 +193,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         done(e);
       }
       finally {
-        Utils.restore((command as any)['removeScopedCustomAction']);
+        sinonUtil.restore((command as any)['removeScopedCustomAction']);
       }
     });
   });
@@ -226,7 +226,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         done(e);
       }
       finally {
-        Utils.restore((command as any)['removeScopedCustomAction']);
+        sinonUtil.restore((command as any)['removeScopedCustomAction']);
       }
     });
   });
@@ -253,7 +253,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         done(e);
       }
       finally {
-        Utils.restore((command as any)['removeScopedCustomAction']);
+        sinonUtil.restore((command as any)['removeScopedCustomAction']);
       }
     });
   });
@@ -291,7 +291,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         done(e);
       }
       finally {
-        Utils.restore((command as any)['removeScopedCustomAction']);
+        sinonUtil.restore((command as any)['removeScopedCustomAction']);
       }
     });
   });
@@ -321,7 +321,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         done(e);
       }
       finally {
-        Utils.restore((command as any)['searchAllScopes']);
+        sinonUtil.restore((command as any)['searchAllScopes']);
       }
     });
   });
@@ -491,7 +491,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = command.options();
-    Utils.restore(Command.prototype.options);
+    sinonUtil.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 

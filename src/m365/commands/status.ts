@@ -1,7 +1,7 @@
 import auth, { AuthType } from '../../Auth';
 import { Logger } from '../../cli';
 import Command, { CommandArgs, CommandError } from '../../Command';
-import Utils from '../../Utils';
+import { accessToken } from '../../utils';
 import commands from './commands';
 
 class StatusCommand extends Command {
@@ -17,14 +17,14 @@ class StatusCommand extends Command {
     if (auth.service.connected) {
       if (this.debug) {
         logger.logToStderr({
-          connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
+          connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
           authType: AuthType[auth.service.authType],
           accessTokens: JSON.stringify(auth.service.accessTokens, null, 2)
         });
       }
       else {
         logger.log({
-          connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken)
+          connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken)
         });
       }
     }

@@ -5,6 +5,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -123,7 +124,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
       return 'Missing required option url';
     }
 
-    const isValidUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+    const isValidUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
     if (typeof isValidUrl === 'string') {
       return isValidUrl;
     }

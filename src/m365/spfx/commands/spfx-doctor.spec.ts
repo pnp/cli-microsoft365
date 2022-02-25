@@ -5,7 +5,7 @@ import { SinonSandbox } from 'sinon';
 import appInsights from '../../../appInsights';
 import { Logger } from '../../../cli';
 import Command, { CommandError, CommandTypes } from '../../../Command';
-import Utils from '../../../Utils';
+import { sinonUtil } from '../../../utils';
 import commands from '../commands';
 const command: Command = require('./spfx-doctor');
 
@@ -49,7 +49,7 @@ describe(commands.DOCTOR, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       sandbox,
       child_process.exec,
       process.platform
@@ -57,7 +57,7 @@ describe(commands.DOCTOR, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent
     ]);
   });

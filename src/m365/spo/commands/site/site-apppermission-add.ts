@@ -2,9 +2,8 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
-import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
 interface AppInfo {
@@ -165,7 +164,7 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
       return `Specify appId or appDisplayName, one is required`;
     }
 
-    if (args.options.appId && !Utils.isValidGuid(args.options.appId)) {
+    if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
       return `${args.options.appId} is not a valid GUID`;
     }
 
@@ -176,7 +175,7 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
       }
     }
 
-    return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+    return validation.isValidSharePointUrl(args.options.siteUrl);
   }
 }
 

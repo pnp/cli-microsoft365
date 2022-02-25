@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./app-uninstall');
 
@@ -44,11 +44,11 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   afterEach(() => {
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       request.post,
       appInsights.trackEvent
@@ -101,7 +101,7 @@ describe(commands.APP_UNINSTALL, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -142,7 +142,7 @@ describe(commands.APP_UNINSTALL, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -183,7 +183,7 @@ describe(commands.APP_UNINSTALL, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -207,7 +207,7 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   it('aborts removing property when prompt not confirmed', (done) => {
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -241,7 +241,7 @@ describe(commands.APP_UNINSTALL, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -262,7 +262,7 @@ describe(commands.APP_UNINSTALL, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -305,7 +305,7 @@ describe(commands.APP_UNINSTALL, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -347,7 +347,7 @@ describe(commands.APP_UNINSTALL, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -378,7 +378,7 @@ describe(commands.APP_UNINSTALL, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -409,7 +409,7 @@ describe(commands.APP_UNINSTALL, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -449,7 +449,7 @@ describe(commands.APP_UNINSTALL, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });

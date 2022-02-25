@@ -1,3 +1,4 @@
+import { Group, User } from '@microsoft/microsoft-graph-types';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
@@ -6,10 +7,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { Group, User } from '@microsoft/microsoft-graph-types';
-import Utils from '../../../../Utils';
 
 interface CommandArgs {
   options: Options;
@@ -158,7 +158,7 @@ class AadO365GroupAddCommand extends GraphCommand {
 
     promises = userArr.map(user => {
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${Utils.encodeQueryParameter(user)}'&$select=id,userPrincipalName`,
+        url: `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(user)}'&$select=id,userPrincipalName`,
         headers: {
           'content-type': 'application/json'
         },

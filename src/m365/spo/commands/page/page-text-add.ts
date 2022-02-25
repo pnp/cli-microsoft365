@@ -3,10 +3,9 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ContextInfo, spo, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 import {
   ClientSidePage,
   ClientSideText
@@ -55,7 +54,7 @@ class SpoPageTextAddCommand extends SpoCommand {
       logger.logToStderr(`Retrieving request digest...`);
     }
 
-    this
+    spo
       .getRequestDigest(args.options.webUrl)
       .then((res: ContextInfo): Promise<ClientSidePage> => {
         // Keep the reference of request digest for subsequent requests
@@ -114,7 +113,7 @@ class SpoPageTextAddCommand extends SpoCommand {
 
     const requestOptions: any = {
       url: `${args.options
-        .webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}')/ListItemAllFields`,
+        .webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}')/ListItemAllFields`,
       headers: {
         'X-RequestDigest': requestDigest,
         'content-type': 'application/json;odata=nometadata',
@@ -166,7 +165,7 @@ class SpoPageTextAddCommand extends SpoCommand {
       return 'The value of parameter column must be 1 or higher';
     }
 
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

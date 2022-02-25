@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { CustomAction } from './customaction';
@@ -147,11 +147,11 @@ class SpoCustomActionGetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (Utils.isValidGuid(args.options.id) === false) {
+    if (validation.isValidGuid(args.options.id) === false) {
       return `${args.options.id} is not valid. Custom action id (Guid) expected.`;
     }
 
-    if (SpoCommand.isValidSharePointUrl(args.options.url) !== true) {
+    if (validation.isValidSharePointUrl(args.options.url) !== true) {
       return 'Missing required option url';
     }
 

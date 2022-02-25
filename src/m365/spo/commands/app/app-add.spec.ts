@@ -6,7 +6,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./app-add');
 
@@ -42,7 +42,7 @@ describe(commands.APP_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       request.get,
       fs.readFileSync
@@ -50,7 +50,7 @@ describe(commands.APP_ADD, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -132,7 +132,7 @@ describe(commands.APP_ADD, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           fs.readFileSync
         ]);
@@ -178,7 +178,7 @@ describe(commands.APP_ADD, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           fs.readFileSync
         ]);
@@ -213,7 +213,7 @@ describe(commands.APP_ADD, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           fs.readFileSync
         ]);
@@ -250,7 +250,7 @@ describe(commands.APP_ADD, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           fs.readFileSync
         ]);
@@ -287,7 +287,7 @@ describe(commands.APP_ADD, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           fs.readFileSync
         ]);
@@ -322,7 +322,7 @@ describe(commands.APP_ADD, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           fs.readFileSync
         ]);
@@ -357,7 +357,7 @@ describe(commands.APP_ADD, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           fs.readFileSync
         ]);
@@ -392,7 +392,7 @@ describe(commands.APP_ADD, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           fs.readFileSync
         ]);
@@ -427,7 +427,7 @@ describe(commands.APP_ADD, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           fs.readFileSync
         ]);
@@ -436,7 +436,7 @@ describe(commands.APP_ADD, () => {
   });
 
   it('handles promise error while getting tenant appcatalog', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
@@ -457,7 +457,7 @@ describe(commands.APP_ADD, () => {
   });
 
   it('handles error while getting tenant appcatalog', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
@@ -517,7 +517,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
     const actual = command.validate({ options: { scope: 'tenant', filePath: 'abc' } });
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);
@@ -531,7 +531,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
     const actual = command.validate({ options: { scope: 'Tenant', filePath: 'abc' } });
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);
@@ -545,7 +545,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
     const actual = command.validate({ options: { scope: 'SiteCollection', appCatalogUrl: 'https://contoso.sharepoint.com', filePath: 'abc' } });
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);
@@ -587,7 +587,7 @@ describe(commands.APP_ADD, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           fs.readFileSync
         ]);
@@ -630,7 +630,7 @@ describe(commands.APP_ADD, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           fs.readFileSync
         ]);
@@ -673,7 +673,7 @@ describe(commands.APP_ADD, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           fs.readFileSync
         ]);
@@ -684,7 +684,7 @@ describe(commands.APP_ADD, () => {
   it('fails validation if file path doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = command.validate({ options: { filePath: 'abc' } });
-    Utils.restore(fs.existsSync);
+    sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
   });
 
@@ -694,7 +694,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
     const actual = command.validate({ options: { filePath: 'abc' } });
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);
@@ -709,7 +709,7 @@ describe(commands.APP_ADD, () => {
 
     const actual = command.validate({ options: { filePath: 'abc', scope: 'foo' } });
 
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);
@@ -724,7 +724,7 @@ describe(commands.APP_ADD, () => {
 
     const actual = command.validate({ options: { filePath: 'abc' } });
 
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);
@@ -739,7 +739,7 @@ describe(commands.APP_ADD, () => {
 
     const actual = command.validate({ options: { filePath: 'abc' } });
 
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);
@@ -754,7 +754,7 @@ describe(commands.APP_ADD, () => {
 
     const actual = command.validate({ options: { filePath: 'abc', scope: 'tenant' } });
 
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);
@@ -770,7 +770,7 @@ describe(commands.APP_ADD, () => {
 
     const actual = command.validate({ options: { filePath: 'abc', scope: 'sitecollection' } });
 
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);
@@ -785,7 +785,7 @@ describe(commands.APP_ADD, () => {
 
     const actual = command.validate({ options: { filePath: 'abc', scope: 'tenant', appCatalogUrl: 'https://contoso.sharepoint.com' } });
 
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);
@@ -800,7 +800,7 @@ describe(commands.APP_ADD, () => {
 
     const actual = command.validate({ options: { filePath: 'abc', scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } });
 
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);

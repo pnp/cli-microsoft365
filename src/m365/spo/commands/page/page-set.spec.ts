@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./page-set');
 
@@ -17,7 +17,12 @@ describe(commands.PAGE_SET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    }));
     auth.service.connected = true;
   });
 
@@ -79,16 +84,16 @@ describe(commands.PAGE_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      (command as any).getRequestDigest,
+      spo.getRequestDigest,
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
@@ -151,7 +156,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('updates page layout to Home', (done) => {
-    Utils.restore([request.post]);
+    sinonUtil.restore([request.post]);
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
@@ -176,7 +181,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('promotes the page as NewsPage', (done) => {
-    Utils.restore([request.post]);
+    sinonUtil.restore([request.post]);
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
@@ -204,7 +209,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('promotes the page as Template', (done) => {
-    Utils.restore([request.post]);
+    sinonUtil.restore([request.post]);
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
@@ -239,7 +244,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('updates page layout to Home and promotes it as HomePage (debug)', (done) => {
-    Utils.restore([request.post]);
+    sinonUtil.restore([request.post]);
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
@@ -293,7 +298,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('enables comments on the page', (done) => {
-    Utils.restore([request.post]);
+    sinonUtil.restore([request.post]);
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(false)`) > -1) {
@@ -339,7 +344,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('disables comments on the page (debug)', (done) => {
-    Utils.restore([request.post]);
+    sinonUtil.restore([request.post]);
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(true)`) > -1) {
@@ -361,7 +366,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('updates page title', (done) => {
-    Utils.restore([request.post]);
+    sinonUtil.restore([request.post]);
 
     const newPageTitle = "updated title";
     let responseData: any = {};
@@ -411,7 +416,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('publishes page', (done) => {
-    Utils.restore([request.post]);
+    sinonUtil.restore([request.post]);
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1) {
@@ -457,7 +462,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('publishes page with a message (debug)', (done) => {
-    Utils.restore([request.post]);
+    sinonUtil.restore([request.post]);
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
@@ -499,7 +504,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('escapes special characters in user input', (done) => {
-    Utils.restore([request.post]);
+    sinonUtil.restore([request.post]);
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/Publish('Don%39t%20tell')`) > -1) {
@@ -521,7 +526,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('correctly handles OData error when creating modern page', (done) => {
-    Utils.restore([request.post]);
+    sinonUtil.restore([request.post]);
 
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });

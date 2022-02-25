@@ -5,7 +5,7 @@ import auth from "../../../../Auth";
 import { Logger } from "../../../../cli";
 import Command, { CommandError, CommandOption } from "../../../../Command";
 import request from "../../../../request";
-import Utils from "../../../../Utils";
+import { sinonUtil } from "../../../../utils";
 import commands from "../../commands";
 const command: Command = require("./apppage-set");
 
@@ -35,11 +35,11 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([request.post]);
+    sinonUtil.restore([request.post]);
   });
 
   after(() => {
-    Utils.restore([appInsights.trackEvent, auth.restoreAuth]);
+    sinonUtil.restore([appInsights.trackEvent, auth.restoreAuth]);
     auth.service.connected = false;
   });
 

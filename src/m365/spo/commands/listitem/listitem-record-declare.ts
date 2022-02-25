@@ -5,14 +5,9 @@ import {
 import config from "../../../../config";
 import GlobalOptions from "../../../../GlobalOptions";
 import request from '../../../../request';
-import Utils from "../../../../Utils";
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, IdentityResponse, spo, validation } from "../../../../utils";
 import SpoCommand from "../../../base/SpoCommand";
-import { ClientSvc, IdentityResponse } from "../../ClientSvc";
 import commands from "../../commands";
-import {
-  ClientSvcResponse,
-  ClientSvcResponseContents, ContextInfo
-} from "../../spo";
 
 interface CommandArgs {
   options: Options;
@@ -44,7 +39,6 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    const clientSvc: ClientSvc = new ClientSvc(logger, this.debug);
     let formDigestValue: string = '';
     let webIdentity: string = '';
     let listId: string = '';
@@ -53,12 +47,12 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
       ? `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
 
-    this
+    spo
       .getRequestDigest(args.options.webUrl)
       .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
         formDigestValue = contextResponse.FormDigestValue;
 
-        return clientSvc.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
+        return spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
       })
       .then((webIdentityResp: IdentityResponse): Promise<{ Id: string }> => {
         webIdentity = webIdentityResp.objectIdentity;
@@ -143,7 +137,7 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
@@ -156,7 +150,7 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
       return `Specify listId or listTitle but not both`;
     }
 
-    if (args.options.listId && !Utils.isValidGuid(args.options.listId)) {
+    if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
       return `${args.options.listId} in option listId is not a valid GUID`;
     }
 
@@ -169,7 +163,7 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
       return `Item ID must be a positive number`;
     }
 
-    if (args.options.date && !Utils.isValidISODate(args.options.date)) {
+    if (args.options.date && !validation.isValidISODate(args.options.date)) {
       return `${args.options.date} in option date is not in ISO format (yyyy-mm-dd)`;
     }
 

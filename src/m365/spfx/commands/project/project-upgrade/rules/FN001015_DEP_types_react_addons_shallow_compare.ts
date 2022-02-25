@@ -1,4 +1,4 @@
-import { Utils } from "../";
+import { spfx } from "../../../../../../utils";
 import { Project } from "../../model";
 import { DependencyRule } from "./DependencyRule";
 
@@ -12,6 +12,6 @@ export class FN001015_DEP_types_react_addons_shallow_compare extends DependencyR
   }
 
   customCondition(project: Project): boolean {
-    return Utils.isReactProject(project);
+    return spfx.isReactProject(project);
   }
 }

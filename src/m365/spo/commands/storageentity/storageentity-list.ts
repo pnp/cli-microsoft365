@@ -4,6 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { TenantProperty } from './TenantProperty';
@@ -87,7 +88,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const result: boolean | string = SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+    const result: boolean | string = validation.isValidSharePointUrl(args.options.appCatalogUrl);
     if (result === false) {
       return 'Missing required option appCatalogUrl';
     }

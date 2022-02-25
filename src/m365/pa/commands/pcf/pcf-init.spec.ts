@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import { Logger } from '../../../../cli';
 import Command, { CommandOption } from '../../../../Command';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 import TemplateInstantiator from '../../template-instantiator';
 const command: Command = require('./pcf-init');
@@ -39,7 +39,7 @@ describe(commands.PCF_INIT, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.readdirSync,
       TemplateInstantiator.instantiate,
       process.cwd,
@@ -48,7 +48,7 @@ describe(commands.PCF_INIT, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent
     ]);
   });

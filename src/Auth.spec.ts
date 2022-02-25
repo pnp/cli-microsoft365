@@ -12,7 +12,7 @@ import authServer from './AuthServer';
 import { Cli, Logger } from './cli';
 import { CommandError } from './Command';
 import request from './request';
-import Utils from './Utils';
+import { sinonUtil } from './utils';
 import * as open from 'open';
 
 class MockTokenStorage implements TokenStorage {
@@ -109,7 +109,7 @@ describe('Auth', () => {
     loggerSpy.restore();
     readFileSyncStub.restore();
     initializeServerStub.restore();
-    Utils.restore([
+    sinonUtil.restore([
       cli.config.get,
       request.get,
       (auth as any).getClientApplication,

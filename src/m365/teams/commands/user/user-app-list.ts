@@ -2,8 +2,8 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { TeamsAppDefinition, TeamsAppInstallation } from '@microsoft/microsoft-graph-types';
 
@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   userName: string;
 }
 
-class TeamsUserAppListCommand extends GraphItemsListCommand<TeamsAppInstallation> {
+class TeamsUserAppListCommand extends GraphCommand {
   public get name(): string {
     return commands.USER_APP_LIST;
   }
@@ -37,24 +37,24 @@ class TeamsUserAppListCommand extends GraphItemsListCommand<TeamsAppInstallation
 
     this
       .getUserId(args)
-      .then((_userId): Promise<void> => {
+      .then((_userId): Promise<TeamsAppInstallation[]> => {
         userId = _userId.value;
         const endpoint: string = `${this.resource}/v1.0/users/${encodeURIComponent(userId)}/teamwork/installedApps?$expand=teamsAppDefinition`;
 
-        return this.getAllItems(endpoint, logger, true);
+        return odata.getAllItems<TeamsAppInstallation>(endpoint, logger);
       })
-      .then((): void => {
-        this.items.map(i => {
+      .then((items): void => {
+        items.forEach(i => {
           const userAppId: string = Buffer.from(i.id as string, 'base64').toString('ascii');
           const appId: string = userAppId.substr(userAppId.indexOf("##") + 2, userAppId.length - userId.length - 2);
           (i as any).appId = appId;
         });
-        
+
         if (args.options.output === 'json') {
-          logger.log(this.items);
+          logger.log(items);
         }
         else {
-          logger.log(this.items.map(i => {
+          logger.log(items.map(i => {
             return {
               id: i.id,
               appId: (i as any).appId,
@@ -107,11 +107,11 @@ class TeamsUserAppListCommand extends GraphItemsListCommand<TeamsAppInstallation
       return `Please specify either userId or userName, not both`;
     }
 
-    if (args.options.userId && !Utils.isValidGuid(args.options.userId)) {
+    if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
       return `${args.options.userId} is not a valid GUID`;
     }
 
-    if (args.options.userName && !Utils.isValidUserPrincipalName(args.options.userName)) {
+    if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
       return `${args.options.userName} is not a valid userName`;
     }
 

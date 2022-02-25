@@ -5,10 +5,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ContextInfo, spo, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 import { ClientSidePageProperties } from './ClientSidePageProperties';
 import { Page, supportedPageLayouts, supportedPromoteAs } from './Page';
 
@@ -53,7 +52,7 @@ class SpoPageAddCommand extends SpoCommand {
     let requestDigest: string = '';
     let itemId: string = '';
     let pageName: string = args.options.name;
-    const serverRelativeSiteUrl: string = Utils.getServerRelativeSiteUrl(args.options.webUrl);
+    const serverRelativeSiteUrl: string = urlUtil.getServerRelativeSiteUrl(args.options.webUrl);
     const fileNameWithoutExtension: string = pageName.replace('.aspx', '');
     let bannerImageUrl: string = '';
     let canvasContent1: string = '';
@@ -62,7 +61,7 @@ class SpoPageAddCommand extends SpoCommand {
     let pageId: number | null = null;
     const pageDescription: string = args.options.description || "";
 
-    this
+    spo
       .getRequestDigest(args.options.webUrl)
       .then((res: ContextInfo): Promise<{ UniqueId: string }> => {
         requestDigest = res.FormDigestValue;
@@ -359,7 +358,7 @@ class SpoPageAddCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }

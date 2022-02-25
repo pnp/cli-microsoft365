@@ -14,7 +14,7 @@ import config from '../config';
 import GlobalOptions from '../GlobalOptions';
 import request from '../request';
 import { settingsNames } from '../settingsNames';
-import Utils from '../Utils';
+import { formatting, fsUtil } from '../utils';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
 const packageJSON = require('../../package.json');
@@ -300,7 +300,7 @@ export class Cli {
   }
 
   public loadAllCommands(): void {
-    const files: string[] = Utils.readdirR(this.commandsFolder) as string[];
+    const files: string[] = fsUtil.readdirR(this.commandsFolder) as string[];
 
     files.forEach(file => {
       if (file.indexOf(`${path.sep}commands${path.sep}`) > -1 &&
@@ -538,7 +538,7 @@ export class Cli {
           }
 
           logStatement = logStatement.map((s: any) =>
-            Utils.filterObject(s, currentCommand.defaultProperties as string[]));
+            formatting.filterObject(s, currentCommand.defaultProperties as string[]));
         }
       }
     }

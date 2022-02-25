@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./app-list');
 
@@ -38,14 +38,14 @@ describe(commands.APP_LIST, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -118,7 +118,7 @@ describe(commands.APP_LIST, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
@@ -173,7 +173,7 @@ describe(commands.APP_LIST, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
@@ -248,7 +248,7 @@ describe(commands.APP_LIST, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
@@ -278,7 +278,7 @@ describe(commands.APP_LIST, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
@@ -322,7 +322,7 @@ describe(commands.APP_LIST, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
@@ -362,7 +362,7 @@ describe(commands.APP_LIST, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });

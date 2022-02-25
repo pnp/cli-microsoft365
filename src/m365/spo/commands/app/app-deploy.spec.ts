@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./app-deploy');
 
@@ -40,7 +40,7 @@ describe(commands.APP_DEPLOY, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post,
       Cli.prompt
@@ -48,7 +48,7 @@ describe(commands.APP_DEPLOY, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -101,7 +101,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -142,7 +142,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -183,7 +183,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -378,7 +378,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -420,7 +420,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -462,7 +462,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -503,7 +503,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -544,7 +544,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -588,7 +588,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -631,7 +631,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -671,7 +671,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -765,7 +765,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -795,7 +795,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -824,7 +824,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -852,7 +852,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -889,7 +889,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -926,7 +926,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });

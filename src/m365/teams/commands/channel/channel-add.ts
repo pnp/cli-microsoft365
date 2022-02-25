@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from "../../../base/GraphCommand";
 import commands from '../../commands';
 import { Team } from '../../Team';
@@ -120,7 +120,7 @@ class TeamsChannelAddCommand extends GraphCommand {
       return 'Specify teamId or teamName, one is required';
     }
 
-    if (args.options.teamId && !Utils.isValidGuid(args.options.teamId)) {
+    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 

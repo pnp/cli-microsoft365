@@ -6,9 +6,8 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
-import { FolderExtensions } from '../../FolderExtensions';
 const command: Command = require('./file-add');
 
 describe(commands.FILE_ADD, () => {
@@ -175,9 +174,10 @@ describe(commands.FILE_ADD, () => {
 
   before(() => {
     sinon.stub(fs, 'readFileSync').returns(Buffer.from('abc'));
-    ensureFolderStub = sinon.stub(FolderExtensions.prototype, 'ensureFolder').resolves();
+    ensureFolderStub = sinon.stub(spo, 'ensureFolder').resolves();
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    sinon.stub(Buffer, 'alloc').returns(Buffer.from('abc'));
     auth.service.connected = true;
   });
 
@@ -203,7 +203,7 @@ describe(commands.FILE_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       request.get,
       fs.existsSync,
@@ -215,12 +215,13 @@ describe(commands.FILE_ADD, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       fs.readFileSync,
       fs.existsSync,
-      FolderExtensions.prototype.ensureFolder,
-      appInsights.trackEvent
+      spo.ensureFolder,
+      appInsights.trackEvent,
+      Buffer.alloc
     ]);
     auth.service.connected = false;
   });
@@ -679,7 +680,7 @@ describe(commands.FILE_ADD, () => {
     const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();
 
-    Utils.restore([fs.statSync]);
+    sinonUtil.restore([fs.statSync]);
     sinon.stub(fs, 'statSync').returns({ size: 250 * 1024 * 1024 } as any); // 250 MB
 
     command.action(logger, {
@@ -701,11 +702,11 @@ describe(commands.FILE_ADD, () => {
     });
   });
 
-  it('should perform chunck upload on files over 250 MB (debug)', (done) => {
+  it('should perform chunk upload on files over 250 MB (debug)', (done) => {
     const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();
 
-    Utils.restore([fs.statSync]);
+    sinonUtil.restore([fs.statSync]);
     sinon.stub(fs, 'statSync').returns({ size: 251 * 1024 * 1024 } as any); // 250 MB
 
     command.action(logger, {
@@ -729,7 +730,7 @@ describe(commands.FILE_ADD, () => {
     });
   });
 
-  it('should cancel chunck upload on files over 250 MB on error', (done) => {
+  it('should cancel chunk upload on files over 250 MB on error', (done) => {
     stubGetResponses();
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
@@ -752,7 +753,7 @@ describe(commands.FILE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore([fs.statSync]);
+    sinonUtil.restore([fs.statSync]);
     sinon.stub(fs, 'statSync').returns({ size: 251 * 1024 * 1024 } as any); // 250 MB
 
     command.action(logger, {
@@ -778,7 +779,7 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
     stubPostResponses();
 
-    Utils.restore([fs.statSync, fs.openSync]);
+    sinonUtil.restore([fs.statSync, fs.openSync]);
     sinon.stub(fs, 'statSync').returns({ size: 251 * 1024 * 1024 } as any); // 250 MB
     sinon.stub(fs, 'openSync').throws(new Error('openSync error'));
 
@@ -805,7 +806,7 @@ describe(commands.FILE_ADD, () => {
     stubGetResponses();
     stubPostResponses();
 
-    Utils.restore([fs.statSync, fs.openSync, , fs.readSync, , fs.closeSync]);
+    sinonUtil.restore([fs.statSync, fs.openSync, , fs.readSync, , fs.closeSync]);
     sinon.stub(fs, 'statSync').returns({ size: 251 * 1024 * 1024 } as any); // 250 MB
     sinon.stub(fs, 'openSync').returns(3);
     sinon.stub(fs, 'readSync').throws(new Error('readSync error'));

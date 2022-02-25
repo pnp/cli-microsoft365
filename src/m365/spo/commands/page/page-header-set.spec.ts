@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 import { mockCanvasContent, mockPage } from './page-control-set.mock';
 const command: Command = require('./page-header-set');
@@ -61,7 +61,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post
     ]);
@@ -69,7 +69,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -89,7 +89,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('checks out page if not checked out by the current user', (done) => {
-    Utils.restore([request.get, request.post]);
+    sinonUtil.restore([request.get, request.post]);
     let checkedOut = false;
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
@@ -133,7 +133,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('doesn\'t check out page if not checked out by the current user', (done) => {
-    Utils.restore([request.get, request.post]);
+    sinonUtil.restore([request.get, request.post]);
     let checkingOut = false;
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
@@ -233,7 +233,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       AuthorByline: []
     };
 
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
@@ -285,7 +285,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
@@ -337,7 +337,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
@@ -406,7 +406,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
@@ -535,7 +535,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('correctly handles OData error when retrieving modern page', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
@@ -552,7 +552,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('correctly handles error when the specified image doesn\'t exist', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({

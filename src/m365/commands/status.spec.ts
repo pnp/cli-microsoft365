@@ -4,7 +4,7 @@ import appInsights from '../../appInsights';
 import auth from '../../Auth';
 import { Logger } from '../../cli';
 import Command, { CommandError } from '../../Command';
-import Utils from '../../Utils';
+import { sinonUtil } from '../../utils';
 import commands from './commands';
 const command: Command = require('./status');
 
@@ -37,7 +37,7 @@ describe(commands.STATUS, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -120,7 +120,7 @@ describe(commands.STATUS, () => {
   });
 
   it('correctly handles error when restoring auth', (done) => {
-    Utils.restore(auth.restoreAuth);
+    sinonUtil.restore(auth.restoreAuth);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     command.action(logger, { options: {} } as any, (err?: any) => {
       try {
