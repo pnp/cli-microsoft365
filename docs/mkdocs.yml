@@ -3,6 +3,7 @@ site_url: https://pnp.github.io/cli-microsoft365/
 nav:
   - Home:
     - 'index.md'
+    - v5 Upgrade Guidance: 'v5-upgrade-guidance.md'
     - v4 Upgrade Guidance: 'v4-upgrade-guidance.md'
     - v3 Upgrade Guidance: 'v3-upgrade-guidance.md'
   - User Guide:
