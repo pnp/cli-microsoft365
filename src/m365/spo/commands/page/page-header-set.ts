@@ -4,6 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { ClientSidePageProperties } from './ClientSidePageProperties';
@@ -454,7 +455,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       return `${args.options.textAlignment} is not a valid textAlignment value. Allowed values Left|Center`;
     }
 
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

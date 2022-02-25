@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
-import Utils from '../../../../../../Utils';
+import { sinonUtil } from '../../../../../../utils';
 import { Project } from '../../model';
 import { Finding } from '../Finding';
 import { FN014008_CODE_launch_hostedWorkbench_type } from './FN014008_CODE_launch_hostedWorkbench_type';
@@ -9,7 +9,7 @@ describe('FN014008_CODE_launch_hostedWorkbench_type', () => {
   let findings: Finding[];
   let rule: FN014008_CODE_launch_hostedWorkbench_type;
   afterEach(() => {
-    Utils.restore(fs.existsSync);
+    sinonUtil.restore(fs.existsSync);
   });
 
   beforeEach(() => {

@@ -6,7 +6,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./approleassignment-remove');
 
@@ -62,7 +62,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.delete,
       Cli.prompt
@@ -70,7 +70,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -122,7 +122,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('aborts removing the app role assignment when prompt not confirmed', (done) => {
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -138,7 +138,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('deletes app role assignment when prompt confirmed (debug)', (done) => {
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -226,7 +226,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('rejects if no resource is found', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
         // fake first call for getting service principal
@@ -251,7 +251,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('rejects if no app roles found for the specified resource', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
         // fake first call for getting service principal
@@ -276,7 +276,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('rejects if no app roles found for the specified resource option value', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
         // fake first call for getting service principal
@@ -301,7 +301,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('rejects if no service principal found', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
         // fake first call for getting service principal
@@ -338,7 +338,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {

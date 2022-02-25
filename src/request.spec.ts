@@ -6,7 +6,7 @@ import * as sinon from 'sinon';
 import auth from './Auth';
 import { Logger } from './cli';
 import _request from './request';
-import Utils from './Utils';
+import { sinonUtil } from './utils';
 
 describe('Request', () => {
   const logger: Logger = {
@@ -25,7 +25,7 @@ describe('Request', () => {
 
   afterEach(() => {
     _request.debug = false;
-    Utils.restore([
+    sinonUtil.restore([
       global.setTimeout,
       https.request,
       (_request as any).req,

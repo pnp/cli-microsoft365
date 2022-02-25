@@ -4,8 +4,8 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -20,7 +20,7 @@ interface ExtendedMessage extends Message {
   shortBody?: string;
 }
 
-class TeamsChatMessageListCommand extends GraphItemsListCommand<ExtendedMessage> {
+class TeamsChatMessageListCommand extends GraphCommand {
   public get name(): string {
     return commands.CHAT_MESSAGE_LIST;
   }
@@ -36,11 +36,11 @@ class TeamsChatMessageListCommand extends GraphItemsListCommand<ExtendedMessage>
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const endpoint: string = `${this.resource}/v1.0/chats/${args.options.chatId}/messages`;
 
-    this
-      .getAllItems(endpoint, logger, true)
-      .then((): void => {
+    odata
+      .getAllItems<ExtendedMessage>(endpoint, logger)
+      .then((items): void => {
         if (args.options.output !== 'json') {
-          this.items.forEach(i => {
+          items.forEach(i => {
             // hoist the content to body for readability
             i.body = (i.body as ItemBody).content as any;
 
@@ -62,7 +62,7 @@ class TeamsChatMessageListCommand extends GraphItemsListCommand<ExtendedMessage>
           });
         }
 
-        logger.log(this.items);
+        logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -79,7 +79,7 @@ class TeamsChatMessageListCommand extends GraphItemsListCommand<ExtendedMessage>
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidTeamsChatId(args.options.chatId)) {
+    if (!validation.isValidTeamsChatId(args.options.chatId)) {
       return `${args.options.chatId} is not a valid Teams chat ID`;
     }
 

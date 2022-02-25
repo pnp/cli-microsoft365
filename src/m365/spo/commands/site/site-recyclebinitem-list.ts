@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -79,7 +80,7 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.siteUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }

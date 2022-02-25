@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -59,11 +59,11 @@ class TeamsUserAppAddCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.appId)) {
+    if (!validation.isValidGuid(args.options.appId)) {
       return `${args.options.appId} is not a valid GUID`;
     }
 
-    if (!Utils.isValidGuid(args.options.userId)) {
+    if (!validation.isValidGuid(args.options.userId)) {
       return `${args.options.userId} is not a valid GUID`;
     }
 

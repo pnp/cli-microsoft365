@@ -4,10 +4,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ContextInfo, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -28,7 +27,7 @@ class SpoHubSiteConnectCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
+    spo
       .getRequestDigest(args.options.url)
       .then((res: ContextInfo): Promise<void> => {
         const requestOptions: any = {
@@ -60,12 +59,12 @@ class SpoHubSiteConnectCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
 
-    if (!Utils.isValidGuid(args.options.hubSiteId)) {
+    if (!validation.isValidGuid(args.options.hubSiteId)) {
       return `${args.options.hubSiteId} is not a valid GUID`;
     }
 

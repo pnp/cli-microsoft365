@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -49,7 +49,7 @@ class SpoSiteDesignSetCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
+    spo
       .getSpoUrl(logger, this.debug)
       .then((spoUrl: string): Promise<any> => {
         const updateInfo: any = {
@@ -143,7 +143,7 @@ class SpoSiteDesignSetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.id)) {
+    if (!validation.isValidGuid(args.options.id)) {
       return `${args.options.id} is not a valid GUID`;
     }
 
@@ -157,7 +157,7 @@ class SpoSiteDesignSetCommand extends SpoCommand {
       const siteScripts = args.options.siteScripts.split(',');
       for (let i: number = 0; i < siteScripts.length; i++) {
         const trimmedId: string = siteScripts[i].trim();
-        if (!Utils.isValidGuid(trimmedId)) {
+        if (!validation.isValidGuid(trimmedId)) {
           return `${trimmedId} is not a valid GUID`;
         }
       }

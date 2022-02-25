@@ -6,7 +6,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./o365group-remove');
 
@@ -45,7 +45,7 @@ describe(commands.O365GROUP_REMOVE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.delete,
       global.setTimeout,
       Cli.prompt
@@ -53,7 +53,7 @@ describe(commands.O365GROUP_REMOVE, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       fs.readFileSync,
       appInsights.trackEvent
@@ -147,7 +147,7 @@ describe(commands.O365GROUP_REMOVE, () => {
 
   it('aborts removing the group when prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'delete');
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -164,7 +164,7 @@ describe(commands.O365GROUP_REMOVE, () => {
 
   it('aborts removing the group when prompt not confirmed (debug)', (done) => {
     const postSpy = sinon.spy(request, 'delete');
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -181,7 +181,7 @@ describe(commands.O365GROUP_REMOVE, () => {
 
   it('removes the group when prompt confirmed', (done) => {
     const postStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -198,7 +198,7 @@ describe(commands.O365GROUP_REMOVE, () => {
 
   it('removes the group when prompt confirmed (debug)', (done) => {
     const postStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -227,7 +227,7 @@ describe(commands.O365GROUP_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });

@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 import * as paAppListCommand from '../app/app-list';
 const command: Command = require('./app-get');
@@ -40,7 +40,7 @@ describe(commands.APP_GET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       Cli.executeCommand,
       Cli.executeCommandWithOutput
@@ -48,7 +48,7 @@ describe(commands.APP_GET, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);

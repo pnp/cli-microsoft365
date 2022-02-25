@@ -1,11 +1,9 @@
 import { Logger } from '../../../../cli';
 import config from '../../../../config';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ClientSvcResponse, ClientSvcResponseContents, formatting, IdentityResponse, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import { BasePermissions, PermissionKind } from '../../base-permissions';
-import { ClientSvc, IdentityResponse } from '../../ClientSvc';
-import { ClientSvcResponse, ClientSvcResponseContents } from "../../spo";
 
 export interface Property {
   key: string;
@@ -153,7 +151,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
       headers: {
         'X-RequestDigest': formDigest
       },
-      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${Utils.escapeXml(name)}</Parameter><Parameter Type="String">${Utils.escapeXml(value)}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="${objectType}" /><Identity Id="198" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${formatting.escapeXml(name)}</Parameter><Parameter Type="String">${formatting.escapeXml(value)}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="${objectType}" /><Identity Id="198" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
     };
 
     return new Promise<any>((resolve: any, reject: any): void => {
@@ -178,9 +176,9 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
    * @param options command options
    * @param cmd command instance
    */
-  public static isNoScriptSite(webUrl: string, formDigest: string, webIdentityResp: IdentityResponse, clientSvcCommons: ClientSvc): Promise<boolean> {
+  public static isNoScriptSite(webUrl: string, formDigest: string, webIdentityResp: IdentityResponse, logger: Logger, debug: boolean): Promise<boolean> {
     return new Promise<boolean>((resolve: (isNoScriptSite: boolean) => void, reject: (error: any) => void): void => {
-      clientSvcCommons.getEffectiveBasePermissions(webIdentityResp.objectIdentity, webUrl, formDigest)
+      spo.getEffectiveBasePermissions(webIdentityResp.objectIdentity, webUrl, formDigest, logger, debug)
         .then((basePermissionsResp: BasePermissions): void => {
           resolve(basePermissionsResp.has(PermissionKind.AddAndCustomizePages) === false);
         })

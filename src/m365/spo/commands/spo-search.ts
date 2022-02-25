@@ -5,7 +5,7 @@ import {
 } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
-import Utils from '../../../Utils';
+import { spo, validation } from '../../../utils';
 import SpoCommand from '../../base/SpoCommand';
 import commands from '../commands';
 import { ResultTableRow } from './search/datatypes/ResultTableRow';
@@ -87,7 +87,7 @@ class SpoSearchCommand extends SpoCommand {
         return Promise.resolve(args.options.webUrl);
       }
       else {
-        return this.getSpoUrl(logger, this.debug);
+        return spo.getSpoUrl(logger, this.debug);
       }
     })()
       .then((_webUrl: string): Promise<SearchResult[]> => {
@@ -293,11 +293,11 @@ class SpoSearchCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (args.options.sourceId && !Utils.isValidGuid(args.options.sourceId)) {
+    if (args.options.sourceId && !validation.isValidGuid(args.options.sourceId)) {
       return `${args.options.sourceId} is not a valid GUID`;
     }
 
-    if (args.options.rankingModelId && !Utils.isValidGuid(args.options.rankingModelId)) {
+    if (args.options.rankingModelId && !validation.isValidGuid(args.options.rankingModelId)) {
       return `${args.options.rankingModelId} is not a valid GUID`;
     }
 

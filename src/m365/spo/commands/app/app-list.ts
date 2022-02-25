@@ -4,6 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { spo, validation } from '../../../../utils';
 import commands from '../../commands';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
 
@@ -41,7 +42,7 @@ class SpoAppListCommand extends SpoAppBaseCommand {
     let appCatalogSiteUrl: string = '';
     let spoUrl: string = '';
 
-    this
+    spo
       .getSpoUrl(logger, this.debug)
       .then((_spoUrl: string): Promise<string> => {
         spoUrl = _spoUrl;
@@ -106,7 +107,7 @@ class SpoAppListCommand extends SpoAppBaseCommand {
       }
 
       if (args.options.appCatalogUrl) {
-        return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+        return validation.isValidSharePointUrl(args.options.appCatalogUrl);
       }
     }
 

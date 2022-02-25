@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -68,11 +68,11 @@ class AadOAuth2GrantAddCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.clientId)) {
+    if (!validation.isValidGuid(args.options.clientId)) {
       return `${args.options.clientId} is not a valid GUID`;
     }
 
-    if (!Utils.isValidGuid(args.options.resourceId)) {
+    if (!validation.isValidGuid(args.options.resourceId)) {
       return `${args.options.resourceId} is not a valid GUID`;
     }
 

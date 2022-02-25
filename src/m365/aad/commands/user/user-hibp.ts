@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import commands from '../../commands';
 
@@ -77,7 +77,7 @@ class AadUserHibpCommand extends AnonymousCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidUserPrincipalName(args.options.userName)) {
+    if (!validation.isValidUserPrincipalName(args.options.userName)) {
       return 'Specify valid userName';
     }
 

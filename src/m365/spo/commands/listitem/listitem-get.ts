@@ -5,7 +5,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { ListItemInstance } from './ListItemInstance';
@@ -110,7 +110,7 @@ class SpoListItemGetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
@@ -124,7 +124,7 @@ class SpoListItemGetCommand extends SpoCommand {
     }
 
     if (args.options.listId &&
-      !Utils.isValidGuid(args.options.listId)) {
+      !validation.isValidGuid(args.options.listId)) {
       return `${args.options.listId} in option listId is not a valid GUID`;
     }
 

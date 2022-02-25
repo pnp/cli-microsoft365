@@ -6,7 +6,7 @@ import { Logger } from '../../../../cli';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./knowledgehub-get');
 
@@ -18,8 +18,11 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({
-      FormDigestValue: 'abc'
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
@@ -42,17 +45,17 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       request.post,
       appInsights.trackEvent,
-      (command as any).getRequestDigest
+      spo.getRequestDigest
     ]);
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
@@ -179,7 +182,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
   });
 
   it('correctly handles an error when getting Knowledgehub Site', (done) => {
-    Utils.restore(request.post);
+    sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
@@ -217,7 +220,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });

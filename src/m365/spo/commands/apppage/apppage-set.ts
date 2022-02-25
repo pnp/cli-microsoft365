@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { urlUtil } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -36,7 +36,7 @@ class SpoAppPageSetCommand extends SpoCommand {
       },
       responseType: 'json',
       data: {
-        serverRelativeUrl: `${Utils.getServerRelativePath(args.options.webUrl, '')}/SitePages/${args.options.pageName}`,
+        serverRelativeUrl: `${urlUtil.getServerRelativePath(args.options.webUrl, '')}/SitePages/${args.options.pageName}`,
         webPartDataAsJson: args.options.webPartData
       }
     };

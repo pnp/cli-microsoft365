@@ -6,7 +6,7 @@ import { Logger } from '../../../../cli';
 import Command, { CommandError, CommandTypes } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./contenttype-field-set');
 
@@ -19,7 +19,12 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -46,16 +51,16 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      (command as any).getRequestDigest,
+      spo.getRequestDigest,
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
@@ -1135,8 +1140,8 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
   });
 
   it('handles error while retrieving request digest', (done) => {
-    Utils.restore((command as any).getRequestDigest);
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } }));
+    sinonUtil.restore(spo.getRequestDigest);
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } }));
     let fieldLinksRequestNum: number = 0;
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {

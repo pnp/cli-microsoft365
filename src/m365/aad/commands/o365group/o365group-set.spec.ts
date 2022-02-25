@@ -7,7 +7,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./o365group-set');
 
@@ -42,7 +42,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       request.put,
       request.patch,
@@ -52,7 +52,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       fs.readFileSync,
       appInsights.trackEvent
@@ -530,7 +530,7 @@ describe(commands.O365GROUP_SET, () => {
   it('fails validation if logoPath points to a non-existent file', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'invalid' } });
-    Utils.restore(fs.existsSync);
+    sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
   });
 
@@ -540,7 +540,7 @@ describe(commands.O365GROUP_SET, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
     const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } });
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);
@@ -553,7 +553,7 @@ describe(commands.O365GROUP_SET, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
     const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } });
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);

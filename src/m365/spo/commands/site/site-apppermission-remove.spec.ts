@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./site-apppermission-remove');
 
@@ -88,7 +88,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.delete,
       global.setTimeout,
@@ -97,7 +97,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -221,7 +221,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   });
 
   it('aborts removing the site apppermission when prompt not confirmed', (done) => {
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
 
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
@@ -244,7 +244,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   });
 
   it('removes site apppermission when prompt confirmed (debug)', (done) => {
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
 
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
@@ -285,7 +285,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   });
 
   it('removes site apppermission with specified appId', (done) => {
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
 
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
@@ -326,7 +326,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
   });
 
   it('removes site apppermission with specified appDisplayName', (done) => {
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
 
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });

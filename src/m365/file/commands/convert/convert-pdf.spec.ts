@@ -7,7 +7,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./convert-pdf');
 
@@ -54,7 +54,7 @@ describe(commands.CONVERT_PDF, () => {
 
   afterEach(() => {
     unlinkSyncStub.resetHistory();
-    Utils.restore([
+    sinonUtil.restore([
       request.delete,
       request.get,
       request.post,
@@ -67,7 +67,7 @@ describe(commands.CONVERT_PDF, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent,
       fs.unlinkSync
@@ -1341,7 +1341,7 @@ describe(commands.CONVERT_PDF, () => {
       sinon.stub(request, 'put').callsFake(_ => Promise.reject('Issued PUT request'));
       sinon.stub(request, 'delete').callsFake(_ => Promise.reject('Issue DELETE request'));
 
-      Utils.restore(fs.createWriteStream);
+      sinonUtil.restore(fs.createWriteStream);
       const invalidStream = new PassThrough();
       sinon.stub(fs, 'createWriteStream').returns(invalidStream as any);
       setTimeout(() => {
@@ -1821,7 +1821,7 @@ describe(commands.CONVERT_PDF, () => {
       });
 
       sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
-      Utils.restore(fs.unlinkSync);
+      sinonUtil.restore(fs.unlinkSync);
       unlinkSyncStub = sinon.stub(fs, 'unlinkSync').callsFake(_ => { throw 'An error has occurred'; });
 
       command.action(logger, {

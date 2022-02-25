@@ -4,7 +4,7 @@ import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError, CommandErrorWithOutput } from '../../../../Command';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 import * as spoSiteClassicAddCommand from '../site/site-classic-add';
 import * as spoSiteGetCommand from '../site/site-get';
@@ -38,14 +38,14 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       Cli.executeCommand,
       Cli.executeCommandWithOutput
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);

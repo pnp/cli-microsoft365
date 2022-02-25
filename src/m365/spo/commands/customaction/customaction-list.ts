@@ -4,6 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { CustomAction } from './customaction';
@@ -142,7 +143,7 @@ class SpoCustomActionListCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (SpoCommand.isValidSharePointUrl(args.options.url) !== true) {
+    if (validation.isValidSharePointUrl(args.options.url) !== true) {
       return 'Missing required option url';
     }
 

@@ -4,10 +4,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { ContextInfo, IdentityResponse, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
-import { ClientSvc, IdentityResponse } from '../../ClientSvc';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 import { SpoPropertyBagBaseCommand } from '../propertybag/propertybag-base';
 
 interface CommandArgs {
@@ -35,11 +34,10 @@ class SpoWebReindexCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const clientSvcCommons: ClientSvc = new ClientSvc(logger, this.debug);
     let requestDigest: string = '';
     let webIdentityResp: IdentityResponse;
 
-    this
+    spo
       .getRequestDigest(args.options.webUrl)
       .then((res: ContextInfo): Promise<IdentityResponse> => {
         requestDigest = res.FormDigestValue;
@@ -48,7 +46,7 @@ class SpoWebReindexCommand extends SpoCommand {
           logger.logToStderr(`Retrieved request digest. Retrieving web identity...`);
         }
 
-        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, requestDigest);
+        return spo.getCurrentWebIdentity(args.options.webUrl, requestDigest);
       })
       .then((identityResp: IdentityResponse): Promise<boolean> => {
         webIdentityResp = identityResp;
@@ -60,7 +58,7 @@ class SpoWebReindexCommand extends SpoCommand {
           logger.logToStderr(`Checking if the site is a no-script site...`);
         }
 
-        return SpoPropertyBagBaseCommand.isNoScriptSite(args.options.webUrl, requestDigest, webIdentityResp, clientSvcCommons);
+        return SpoPropertyBagBaseCommand.isNoScriptSite(args.options.webUrl, requestDigest, webIdentityResp, logger, this.debug);
       })
       .then((isNoScriptSite: boolean): Promise<{ vti_x005f_searchversion?: number }> => {
         if (isNoScriptSite) {
@@ -68,7 +66,7 @@ class SpoWebReindexCommand extends SpoCommand {
             logger.logToStderr(`Site is a no-script site. Reindexing lists instead...`);
           }
 
-          return this.reindexLists(args.options.webUrl, requestDigest, logger, webIdentityResp, clientSvcCommons) as any;
+          return this.reindexLists(args.options.webUrl, requestDigest, logger, webIdentityResp) as any;
         }
 
         if (this.verbose) {
@@ -102,7 +100,7 @@ class SpoWebReindexCommand extends SpoCommand {
       });
   }
 
-  private reindexLists(webUrl: string, requestDigest: string, logger: Logger, webIdentityResp: IdentityResponse, clientSvcCommons: ClientSvc): Promise<void> {
+  private reindexLists(webUrl: string, requestDigest: string, logger: Logger, webIdentityResp: IdentityResponse): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       ((): Promise<{ value: { NoCrawl: boolean; Title: string; RootFolder: { Properties: any; ServerRelativeUrl: string; } }[] }> => {
         if (this.debug) {
@@ -120,7 +118,7 @@ class SpoWebReindexCommand extends SpoCommand {
         return request.get(requestOptions);
       })()
         .then((lists: { value: { NoCrawl: boolean; Title: string; RootFolder: { Properties: any; ServerRelativeUrl: string; } }[] }): Promise<void[]> => {
-          const promises: Promise<void>[] = lists.value.map(l => this.reindexList(l, webUrl, requestDigest, webIdentityResp, clientSvcCommons, logger));
+          const promises: Promise<void>[] = lists.value.map(l => this.reindexList(l, webUrl, requestDigest, webIdentityResp, logger));
           return Promise.all(promises);
         })
         .then((): void => {
@@ -130,7 +128,7 @@ class SpoWebReindexCommand extends SpoCommand {
     });
   }
 
-  private reindexList(list: { NoCrawl: boolean; Title: string; RootFolder: { Properties: any; ServerRelativeUrl: string; } }, webUrl: string, requestDigest: string, webIdentityResp: IdentityResponse, clientSvcCommons: ClientSvc, logger: Logger): Promise<void> {
+  private reindexList(list: { NoCrawl: boolean; Title: string; RootFolder: { Properties: any; ServerRelativeUrl: string; } }, webUrl: string, requestDigest: string, webIdentityResp: IdentityResponse, logger: Logger): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       if (list.NoCrawl) {
         if (this.debug) {
@@ -140,7 +138,7 @@ class SpoWebReindexCommand extends SpoCommand {
         return;
       }
 
-      clientSvcCommons
+      spo
         .getFolderIdentity(webIdentityResp.objectIdentity, webUrl, list.RootFolder.ServerRelativeUrl, requestDigest)
         .then((folderIdentityResp: IdentityResponse): Promise<any> => {
           let searchversion: number = list.RootFolder.Properties.vti_x005f_searchversion || 0;
@@ -166,7 +164,7 @@ class SpoWebReindexCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

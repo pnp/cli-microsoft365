@@ -5,7 +5,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -250,7 +250,7 @@ class AadAppRoleDeleteCommand extends GraphCommand {
     }
 
     if (args.options.id) {
-      if (!Utils.isValidGuid(args.options.id)) {
+      if (!validation.isValidGuid(args.options.id)) {
         return `${args.options.id} is not a valid GUID`;
       }
     }

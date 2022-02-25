@@ -2,9 +2,8 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { Task } from '../../Task';
 
 interface CommandArgs {
   options: Options;
@@ -14,7 +13,7 @@ interface Options extends GlobalOptions {
   taskId: string;
 }
 
-class PlannerTaskDetailsGetCommand extends GraphItemsListCommand<Task> {
+class PlannerTaskDetailsGetCommand extends GraphCommand {
   public get name(): string {
     return commands.TASK_DETAILS_GET;
   }

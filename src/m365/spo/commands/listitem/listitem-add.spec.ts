@@ -5,9 +5,8 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandTypes } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
-import { FolderExtensions } from '../../FolderExtensions';
 const command: Command = require('./listitem-add');
 
 describe(commands.LISTITEM_ADD, () => {
@@ -64,7 +63,7 @@ describe(commands.LISTITEM_ADD, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    ensureFolderStub = sinon.stub(FolderExtensions.prototype, 'ensureFolder').resolves();
+    ensureFolderStub = sinon.stub(spo, 'ensureFolder').resolves();
     auth.service.connected = true;
   });
 
@@ -84,16 +83,16 @@ describe(commands.LISTITEM_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      FolderExtensions.prototype.ensureFolder,
+      spo.ensureFolder,
       appInsights.trackEvent
     ]);
     auth.service.connected = false;

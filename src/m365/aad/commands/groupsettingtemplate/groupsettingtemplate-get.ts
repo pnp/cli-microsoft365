@@ -1,8 +1,8 @@
 import { Logger } from '../../../../cli';
 import { CommandError, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { GroupSettingTemplate } from './GroupSettingTemplate';
 
@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   displayName?: string;
 }
 
-class AadGroupSettingTemplateGetCommand extends GraphItemsListCommand<GroupSettingTemplate> {
+class AadGroupSettingTemplateGetCommand extends GraphCommand {
   public get name(): string {
     return commands.GROUPSETTINGTEMPLATE_GET;
   }
@@ -32,10 +32,10 @@ class AadGroupSettingTemplateGetCommand extends GraphItemsListCommand<GroupSetti
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    this
-      .getAllItems(`${this.resource}/v1.0/groupSettingTemplates`, logger, true)
-      .then((): void => {
-        const groupSettingTemplate: GroupSettingTemplate[] = this.items.filter(t => args.options.id ? t.id === args.options.id : t.displayName === args.options.displayName);
+    odata
+      .getAllItems<GroupSettingTemplate>(`${this.resource}/v1.0/groupSettingTemplates`, logger)
+      .then((templates): void => {
+        const groupSettingTemplate: GroupSettingTemplate[] = templates.filter(t => args.options.id ? t.id === args.options.id : t.displayName === args.options.displayName);
 
         if (groupSettingTemplate && groupSettingTemplate.length > 0) {
           logger.log(groupSettingTemplate.pop());
@@ -73,7 +73,7 @@ class AadGroupSettingTemplateGetCommand extends GraphItemsListCommand<GroupSetti
     }
 
     if (args.options.id &&
-      !Utils.isValidGuid(args.options.id)) {
+      !validation.isValidGuid(args.options.id)) {
       return `${args.options.id} is not a valid GUID`;
     }
 

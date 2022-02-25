@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./navigation-node-remove');
 
@@ -19,7 +19,12 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    }));
     auth.service.connected = true;
   });
 
@@ -46,15 +51,15 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.delete,
       Cli.prompt
     ]);
   });
 
   after(() => {
-    Utils.restore([
-      (command as any).getRequestDigest,
+    sinonUtil.restore([
+      spo.getRequestDigest,
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -131,7 +136,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject('Invalid request');
     });
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -154,7 +159,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
     
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -167,7 +172,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });

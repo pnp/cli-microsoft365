@@ -6,8 +6,7 @@ import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { ClientSvc, IdentityResponse } from '../../ClientSvc';
+import { IdentityResponse, sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./propertybag-get');
 
@@ -88,8 +87,11 @@ describe(commands.PROPERTYBAG_GET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({
-      FormDigestValue: 'abc'
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'abc',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
     }));
     auth.service.connected = true;
   });
@@ -112,19 +114,20 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       (command as any).getWebPropertyBag,
       (command as any).filterByKey,
       (command as any).getFolderPropertyBag,
-      ClientSvc.prototype.getCurrentWebIdentity
+      spo.getCurrentWebIdentity
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      spo.getRequestDigest
     ]);
     auth.service.connected = false;
   });
@@ -349,7 +352,7 @@ describe(commands.PROPERTYBAG_GET, () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity error" } }]);
 
     stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }), null, null);
-    const requestObjectIdentitySpy = sinon.spy(ClientSvc.prototype, 'getCurrentWebIdentity');
+    const requestObjectIdentitySpy = sinon.spy(spo, 'getCurrentWebIdentity');
     const options = {
       webUrl: 'https://contoso.sharepoint.com'
     };
@@ -370,7 +373,7 @@ describe(commands.PROPERTYBAG_GET, () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": undefined } }]);
 
     stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }), null, null);
-    const requestObjectIdentitySpy = sinon.spy(ClientSvc.prototype, 'getCurrentWebIdentity');
+    const requestObjectIdentitySpy = sinon.spy(spo, 'getCurrentWebIdentity');
     const options = {
       webUrl: 'https://contoso.sharepoint.com'
     };
@@ -830,7 +833,7 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = command.options();
-    Utils.restore(Command.prototype.options);
+    sinonUtil.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 

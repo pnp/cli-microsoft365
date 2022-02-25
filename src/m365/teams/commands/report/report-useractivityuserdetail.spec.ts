@@ -4,7 +4,7 @@ import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import DateAndPeriodBasedReport from '../../../base/DateAndPeriodBasedReport';
 import commands from '../../commands';
 const command: DateAndPeriodBasedReport = require('./report-useractivityuserdetail');
@@ -36,13 +36,13 @@ describe(commands.REPORT_USERACTIVITYUSERDETAIL, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent,
       auth.restoreAuth
     ]);

@@ -4,9 +4,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { spo, ContextInfo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -37,7 +37,7 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeNode: () => void = (): void => {
-      this
+      spo
         .getRequestDigest(args.options.webUrl)
         .then((res: ContextInfo): Promise<void> => {
           if (this.verbose) {
@@ -100,7 +100,7 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }

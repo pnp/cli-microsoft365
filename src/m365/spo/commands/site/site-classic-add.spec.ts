@@ -6,7 +6,7 @@ import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./site-classic-add');
 
@@ -26,7 +26,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   beforeEach(() => {
     const futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
-    sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
+    sinon.stub(spo, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate, WebFullUrl: 'https://contoso.sharepoint.com' }); });
 
     log = [];
     logger = {
@@ -46,15 +46,15 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
   afterEach(() => {
     (command as any).currentContext = undefined;
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       global.setTimeout,
-      (command as any).ensureFormDigest
+      spo.ensureFormDigest
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -746,11 +746,11 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   });
 
   it('creates classic site with minimal options. doesn\'t wait for completion. remove deleted site, site doesn\'t exist. refreshes expired token', (done) => {
-    Utils.restore((command as any).ensureFormDigest);
+    sinonUtil.restore(spo.ensureFormDigest);
 
     const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
-    sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
+    sinon.stub(spo, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate, WebFullUrl: 'https://contoso.sharepoint.com' }); });
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
@@ -815,11 +815,11 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   });
 
   it('creates classic site with minimal options. doesn\'t wait for completion. remove deleted site, site doesn\'t exist. refreshes expired token (debug)', (done) => {
-    Utils.restore((command as any).ensureFormDigest);
-    //sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: -1 }); });
+    sinonUtil.restore(spo.ensureFormDigest);
+    //sinon.stub(spo, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: -1 }); });
     const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
-    sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
+    sinon.stub(spo, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate, WebFullUrl: 'https://contoso.sharepoint.com' }); });
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {

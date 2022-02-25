@@ -3,7 +3,7 @@ import { Logger } from '../../../../cli';
 import Command, { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { accessToken } from '../../../../utils';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -40,7 +40,7 @@ class TenantStatusListCommand extends Command {
 
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
     const statusEndpoint: string = typeof args.options.workload !== 'undefined' ? `ServiceComms/CurrentStatus?$filter=Workload eq '${encodeURIComponent(args.options.workload)}'` : 'ServiceComms/CurrentStatus';
-    const tenantId: string = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
+    const tenantId: string = accessToken.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
 
     const requestOptions: any = {
       url: `${serviceUrl}/${tenantId}/${statusEndpoint}`,

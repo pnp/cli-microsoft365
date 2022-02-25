@@ -6,8 +6,8 @@ import {
 } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
-import { GraphItemsListCommand } from '../../base/GraphItemsListCommand';
-import SpoCommand from '../../base/SpoCommand';
+import { odata, validation } from '../../../utils';
+import GraphCommand from '../../base/GraphCommand';
 import commands from '../commands';
 
 interface CommandArgs {
@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
   recursive?: boolean;
 }
 
-class FileListCommand extends GraphItemsListCommand<DriveItem> {
+class FileListCommand extends GraphCommand {
   foldersToGetFilesFrom: string[] = [];
 
   public get name(): string {
@@ -67,8 +67,8 @@ class FileListCommand extends GraphItemsListCommand<DriveItem> {
 
         return this.loadFilesFromFolders(driveId, this.foldersToGetFilesFrom, logger);
       })
-      .then(_ => {
-        logger.log(this.items);
+      .then(files => {
+        logger.log(files);
         cb();
       }, err => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -182,23 +182,26 @@ class FileListCommand extends GraphItemsListCommand<DriveItem> {
       });
   }
 
-  private loadFilesFromFolders(driveId: string, folderIds: string[], logger: Logger): Promise<void> {
+  private loadFilesFromFolders(driveId: string, folderIds: string[], logger: Logger): Promise<DriveItem[]> {
     if (this.verbose) {
       logger.logToStderr(`Loading files from folders...`);
     }
 
-    this.items = [];
+    let files: DriveItem[] = [];
 
     return Promise
-      .all(folderIds.map((folderId: string): Promise<void> =>
+      .all(folderIds.map((folderId: string): Promise<DriveItem[]> =>
         // get items from folder. Because we can't filter out folders here
         // we need to get all items from the folder and filter them out later
-        this.getAllItems(`${this.resource}/v1.0/drives/${driveId}/items/${folderId}/children`, logger, false)))
-      .then(_ => {
+        odata.getAllItems<DriveItem>(`${this.resource}/v1.0/drives/${driveId}/items/${folderId}/children`, logger)))
+      .then(res => {
+        // flatten data from all promises
+        files = files.concat(...res);
+
         // remove folders from the list of files
-        this.items = this.items.filter((item: DriveItem) => item.file);
-        this.items.forEach(file => (file as any).lastModifiedByUser = file.lastModifiedBy?.user?.displayName);
-        return Promise.resolve();
+        files = files.filter((item: DriveItem) => item.file);
+        files.forEach(file => (file as any).lastModifiedByUser = file.lastModifiedBy?.user?.displayName);
+        return files;
       });
   }
 
@@ -214,7 +217,7 @@ class FileListCommand extends GraphItemsListCommand<DriveItem> {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

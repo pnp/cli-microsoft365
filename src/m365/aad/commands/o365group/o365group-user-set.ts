@@ -5,8 +5,8 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import teamsCommands from '../../../teams/commands';
 import commands from '../../commands';
 
@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   userName: string;
 }
 
-class AadO365GroupUserSetCommand extends GraphItemsListCommand<User> {
+class AadO365GroupUserSetCommand extends GraphCommand {
   public get name(): string {
     return commands.O365GROUP_USER_SET;
   }
@@ -45,14 +45,20 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<User> {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
 
+    let users: User[] = [];
+
     this
       .getOwners(logger, groupId)
-      .then((): Promise<void> => {
+      .then((owners): Promise<User[]> => {
+        users = owners;
+
         return this.getMembersAndGuests(logger, groupId);
       })
-      .then((): Promise<void> | void => {
+      .then((membersAndGuests): Promise<void> | void => {
+        users = users.concat(membersAndGuests);
+
         // Filter out duplicate added values for owners (as they are returned as members as well)
-        this.items = this.items.filter((groupUser, index, self) =>
+        users = users.filter((groupUser, index, self) =>
           index === self.findIndex((t) => (
             t.id === groupUser.id && t.displayName === groupUser.displayName
           ))
@@ -60,11 +66,11 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<User> {
 
         if (this.debug) {
           logger.logToStderr((typeof args.options.groupId !== 'undefined') ? 'Group owners and members:' : 'Team owners and members:');
-          logger.logToStderr(this.items);
+          logger.logToStderr(users);
           logger.logToStderr('');
         }
 
-        if (this.items.filter(i => args.options.userName.toUpperCase() === i.userPrincipalName!.toUpperCase()).length <= 0) {
+        if (users.filter(i => args.options.userName.toUpperCase() === i.userPrincipalName!.toUpperCase()).length <= 0) {
           const userNotInGroup = (typeof args.options.groupId !== 'undefined') ?
             'The specified user does not belong to the given Microsoft 365 Group. Please use the \'o365group user add\' command to add new users.' :
             'The specified user does not belong to the given Microsoft Teams team. Please use the \'graph teams user add\' command to add new users.';
@@ -73,7 +79,7 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<User> {
         }
 
         if (args.options.role === "Owner") {
-          const foundMember: User | undefined = this.items.find(e => args.options.userName.toUpperCase() === e.userPrincipalName!.toUpperCase() && e.userType === 'Member');
+          const foundMember: User | undefined = users.find(e => args.options.userName.toUpperCase() === e.userPrincipalName!.toUpperCase() && e.userType === 'Member');
 
           if (foundMember !== undefined) {
             const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/$ref`;
@@ -98,7 +104,7 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<User> {
           }
         }
         else {
-          const foundOwner: User | undefined = this.items.find(e => args.options.userName.toUpperCase() === e.userPrincipalName!.toUpperCase() && e.userType === 'Owner');
+          const foundOwner: User | undefined = users.find(e => args.options.userName.toUpperCase() === e.userPrincipalName!.toUpperCase() && e.userType === 'Owner');
 
           if (foundOwner !== undefined) {
             const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners/${foundOwner.id}/$ref`;
@@ -124,21 +130,25 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<User> {
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getOwners(logger: Logger, groupId: string): Promise<void> {
+  private getOwners(logger: Logger, groupId: string): Promise<User[]> {
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
 
-    return this.getAllItems(endpoint, logger, true).then((): void => {
-      // Currently there is a bug in the Microsoft Graph that returns Owners as
-      // userType 'member'. We therefore update all returned user as owner
-      for (const i in this.items) {
-        this.items[i].userType = 'Owner';
-      }
-    });
+    return odata
+      .getAllItems<User>(endpoint, logger)
+      .then(users => {
+        // Currently there is a bug in the Microsoft Graph that returns Owners as
+        // userType 'member'. We therefore update all returned user as owner
+        users.forEach(user => {
+          user.userType = 'Owner';
+        });
+
+        return users;
+      });
   }
 
-  private getMembersAndGuests(logger: Logger, groupId: string): Promise<void> {
+  private getMembersAndGuests(logger: Logger, groupId: string): Promise<User[]> {
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
-    return this.getAllItems(endpoint, logger, false);
+    return odata.getAllItems<User>(endpoint, logger);
   }
 
   public options(): CommandOption[] {
@@ -171,11 +181,11 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<User> {
       return 'You cannot provide both a groupId and teamId parameter, please provide only one';
     }
 
-    if (args.options.teamId && !Utils.isValidGuid(args.options.teamId as string)) {
+    if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 
-    if (args.options.groupId && !Utils.isValidGuid(args.options.groupId as string)) {
+    if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
       return `${args.options.groupId} is not a valid GUID`;
     }
 

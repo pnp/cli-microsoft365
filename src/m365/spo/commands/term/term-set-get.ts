@@ -6,10 +6,9 @@ import {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { TermSet } from './TermSet';
 
 interface CommandArgs {
@@ -44,19 +43,19 @@ class SpoTermSetGetCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
-    this
+    spo
       .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
-        return this.getRequestDigest(spoAdminUrl);
+        return spo.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
           logger.logToStderr(`Retrieving taxonomy term set...`);
         }
 
-        const termGroupQuery: string = args.options.termGroupId ? `<Method Id="62" ParentId="60" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termGroupId}}</Parameter></Parameters></Method>` : `<Method Id="62" ParentId="60" Name="GetByName"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.termGroupName)}</Parameter></Parameters></Method>`;
-        const termSetQuery: string = args.options.id ? `<Method Id="67" ParentId="65" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.id}}</Parameter></Parameters></Method>` : `<Method Id="67" ParentId="65" Name="GetByName"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.name)}</Parameter></Parameters></Method>`;
+        const termGroupQuery: string = args.options.termGroupId ? `<Method Id="62" ParentId="60" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termGroupId}}</Parameter></Parameters></Method>` : `<Method Id="62" ParentId="60" Name="GetByName"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.termGroupName)}</Parameter></Parameters></Method>`;
+        const termSetQuery: string = args.options.id ? `<Method Id="67" ParentId="65" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.id}}</Parameter></Parameters></Method>` : `<Method Id="67" ParentId="65" Name="GetByName"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.name)}</Parameter></Parameters></Method>`;
 
         const requestOptions: any = {
           url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
@@ -117,7 +116,7 @@ class SpoTermSetGetCommand extends SpoCommand {
     }
 
     if (args.options.id) {
-      if (!Utils.isValidGuid(args.options.id)) {
+      if (!validation.isValidGuid(args.options.id)) {
         return `${args.options.id} is not a valid GUID`;
       }
     }
@@ -131,7 +130,7 @@ class SpoTermSetGetCommand extends SpoCommand {
     }
 
     if (args.options.termGroupId) {
-      if (!Utils.isValidGuid(args.options.termGroupId)) {
+      if (!validation.isValidGuid(args.options.termGroupId)) {
         return `${args.options.termGroupId} is not a valid GUID`;
       }
     }

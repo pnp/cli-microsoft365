@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { AppRoleAssignment } from './AppRoleAssignment';
@@ -150,11 +150,11 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
       return 'Specify either appId, objectId or displayName';
     }
 
-    if (args.options.appId && !Utils.isValidGuid(args.options.appId)) {
+    if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
       return `${args.options.appId} is not a valid GUID`;
     }
 
-    if (args.options.objectId && !Utils.isValidGuid(args.options.objectId)) {
+    if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
       return `${args.options.objectId} is not a valid GUID`;
     }
 

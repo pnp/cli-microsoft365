@@ -3,10 +3,9 @@ import { CommandOption } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ClientSvcResponse, ClientSvcResponseContents, formatting, FormDigestInfo, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
 import { SiteProperties } from './SiteProperties';
 import { SPOSitePropertiesEnumerable } from './SPOSitePropertiesEnumerable';
 
@@ -49,7 +48,7 @@ class SpoSiteClassicListCommand extends SpoCommand {
     const personalSite: string = includeOneDriveSites === false ? '0' : '1';
     let spoAdminUrl: string = '';
 
-    this
+    spo
       .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<void> => {
         spoAdminUrl = _spoAdminUrl;
@@ -60,7 +59,7 @@ class SpoSiteClassicListCommand extends SpoCommand {
 
         this.allSites = [];
 
-        return this.getAllSites(spoAdminUrl, Utils.escapeXml(args.options.filter || ''), '0', personalSite, webTemplate, undefined, logger);
+        return this.getAllSites(spoAdminUrl, formatting.escapeXml(args.options.filter || ''), '0', personalSite, webTemplate, undefined, logger);
       })
       .then(_ => {
         logger.log(this.allSites);
@@ -70,7 +69,7 @@ class SpoSiteClassicListCommand extends SpoCommand {
 
   private getAllSites(spoAdminUrl: string, filter: string | undefined, startIndex: string | undefined, personalSite: string, webTemplate: string, formDigest: FormDigestInfo | undefined, logger: Logger): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      this
+      spo
         .ensureFormDigest(spoAdminUrl, logger, formDigest, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           const requestOptions: any = {

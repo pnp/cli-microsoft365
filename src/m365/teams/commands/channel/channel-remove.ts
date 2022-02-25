@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import { Channel } from '../../Channel';
 import commands from '../../commands';
@@ -138,11 +138,11 @@ class TeamsChannelRemoveCommand extends GraphCommand {
       return 'Specify channelId or channelName';
     }
 
-    if (args.options.channelId && !Utils.isValidTeamsChannelId(args.options.channelId)) {
+    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
       return `${args.options.channelId} is not a valid Teams Channel Id`;
     }
 
-    if (args.options.teamId && !Utils.isValidGuid(args.options.teamId)) {
+    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 

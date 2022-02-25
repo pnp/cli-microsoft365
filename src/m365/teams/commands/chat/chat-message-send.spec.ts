@@ -6,7 +6,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { accessToken, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./chat-message-send');
 
@@ -46,7 +46,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(Utils, 'getUserNameFromAccessToken').callsFake(() => {
+    sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => {
       return 'MeganB@M365x214355.onmicrosoft.com';
     });
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -93,18 +93,18 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post,
-      Utils.getUserNameFromAccessToken
+      accessToken.getUserNameFromAccessToken
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent,
-      Utils.getUserNameFromAccessToken
+      accessToken.getUserNameFromAccessToken
     ]);
     auth.service.connected = false;
   });
@@ -328,7 +328,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
   
   it('sends chat message using userEmails (single)', (done) => {
-    Utils.restore(request.post);
+    sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats`) {
         return Promise.resolve(chatCreatedResponse);
@@ -376,7 +376,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   });
   
   it('sends chat message to new conversation using userEmails (multiple)', (done) => {
-    Utils.restore(request.post);
+    sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats`) {
         return Promise.resolve(groupChatCreatedResponse);
@@ -470,7 +470,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   
   // The following test is used to test the retry mechanism in use because of an intermittent Graph issue.
   it('sends chat message using userEmails with single retry because of 404 intermittent failure', (done) => {
-    Utils.restore(request.post);
+    sinonUtil.restore(request.post);
     let retries: number = 0;
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats`) {
@@ -508,7 +508,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
   
   // The following test is used to test the retry mechanism in use because of an intermittent Graph issue.
   it('fails sending chat message when maximum of 3 retries with 404 intermittent failure have occurred', (done) => {
-    Utils.restore(request.post);
+    sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats`) {
         return Promise.reject("Request failed with status code 404");

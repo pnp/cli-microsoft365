@@ -5,11 +5,8 @@ import {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import SpoCommand from '../../../base/SpoCommand';
-import { ClientSvc, IdentityResponse } from '../../ClientSvc';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, IdentityResponse, spo, validation } from '../../../../utils';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { SpoPropertyBagBaseCommand } from './propertybag-base';
 
 export interface CommandArgs {
@@ -41,20 +38,18 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeProperty = (): void => {
-      const clientSvcCommons: ClientSvc = new ClientSvc(logger, this.debug);
-
-      this
+      spo
         .getRequestDigest(args.options.webUrl)
         .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
           this.formDigestValue = contextResponse.FormDigestValue;
 
-          return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
+          return spo.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
         })
         .then((identityResp: IdentityResponse): Promise<IdentityResponse> => {
           const opts: Options = args.options;
           if (opts.folder) {
             // get the folder guid instead of the web guid
-            return clientSvcCommons.getFolderIdentity(identityResp.objectIdentity, opts.webUrl, opts.folder, this.formDigestValue);
+            return spo.getFolderIdentity(identityResp.objectIdentity, opts.webUrl, opts.folder, this.formDigestValue);
           }
           return new Promise<IdentityResponse>(resolve => { return resolve(identityResp); });
         })
@@ -95,7 +90,7 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
       headers: {
         'X-RequestDigest': this.formDigestValue
       },
-      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${Utils.escapeXml(options.key)}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="${objectType}" /><Identity Id="198" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${formatting.escapeXml(options.key)}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="${objectType}" /><Identity Id="198" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
     };
 
     return new Promise<any>((resolve: any, reject: any): void => {
@@ -133,7 +128,7 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (SpoCommand.isValidSharePointUrl(args.options.webUrl) !== true) {
+    if (validation.isValidSharePointUrl(args.options.webUrl) !== true) {
       return 'Missing required option url';
     }
 

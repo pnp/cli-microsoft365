@@ -6,7 +6,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./conversationmember-add');
 
@@ -329,14 +329,14 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -651,7 +651,7 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
   });
 
   it('adds conversation members using teamName, channelName, and userDisplayName', (done) => {
-    Utils.restore(request.post);
+    sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${encodeURIComponent('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}/members`) {
         return Promise.resolve(conversationMembersResponse);
@@ -679,7 +679,7 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
   });
 
   it('fails adding conversation members with invalid teamName', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Other Human Resources')}'`) {
         return Promise.resolve({
@@ -711,7 +711,7 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
   });
 
   it('fails adding conversation members with invalid channelName', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
         return Promise.resolve(singleTeamResponse);
@@ -747,7 +747,7 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
   });
 
   it('fails adding conversation members with multiple teamName', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
         return Promise.resolve(multipleTeamsResponse);
@@ -777,7 +777,7 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
   });
 
   it('fails adding conversation members with multiple userDisplayNames', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=displayName eq '${encodeURIComponent('Admin')}'`) {
         return Promise.resolve(multipleUserResponse);
@@ -812,7 +812,7 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
   });
 
   it('fails adding conversation members when no users are found', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=displayName eq '${encodeURIComponent('Admin')}'`) {
         return Promise.resolve(noUserResponse);
@@ -845,7 +845,7 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
   });
 
   it('correctly handles error when adding conversation members', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });

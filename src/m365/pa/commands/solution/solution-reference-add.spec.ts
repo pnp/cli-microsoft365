@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import { Logger } from '../../../../cli';
 import Command, { CommandOption } from '../../../../Command';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import CdsProjectMutator from '../../cds-project-mutator';
 import commands from '../../commands';
 const command: Command = require('./solution-reference-add');
@@ -39,7 +39,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
       fs.writeFileSync,
@@ -50,7 +50,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent
     ]);
   });

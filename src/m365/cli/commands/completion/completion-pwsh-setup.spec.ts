@@ -7,7 +7,7 @@ import appInsights from '../../../../appInsights';
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./completion-pwsh-setup');
 
@@ -39,7 +39,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.mkdirSync,
       fs.writeFileSync,
@@ -48,7 +48,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent,
       autocomplete.generateShCompletion
     ]);

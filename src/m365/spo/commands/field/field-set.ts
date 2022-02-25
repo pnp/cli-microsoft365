@@ -5,10 +5,9 @@ import {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -49,7 +48,7 @@ class SpoFieldSetCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let requestDigest: string = '';
 
-    this
+    spo
       .getRequestDigest(args.options.webUrl)
       .then((res: ContextInfo): Promise<string> => {
         requestDigest = res.FormDigestValue;
@@ -59,8 +58,8 @@ class SpoFieldSetCommand extends SpoCommand {
         }
 
         const listQuery: string = args.options.listId ?
-          `<Method Id="663" ParentId="7" Name="GetById"><Parameters><Parameter Type="Guid">${Utils.escapeXml(args.options.listId)}</Parameter></Parameters></Method>` :
-          `<Method Id="663" ParentId="7" Name="GetByTitle"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.listTitle)}</Parameter></Parameters></Method>`;
+          `<Method Id="663" ParentId="7" Name="GetById"><Parameters><Parameter Type="Guid">${formatting.escapeXml(args.options.listId)}</Parameter></Parameters></Method>` :
+          `<Method Id="663" ParentId="7" Name="GetByTitle"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.listTitle)}</Parameter></Parameters></Method>`;
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
@@ -89,8 +88,8 @@ class SpoFieldSetCommand extends SpoCommand {
 
         // retrieve column CSOM object id
         const fieldQuery: string = args.options.id ?
-          `<Method Id="663" ParentId="7" Name="GetById"><Parameters><Parameter Type="Guid">${Utils.escapeXml(args.options.id)}</Parameter></Parameters></Method>` :
-          `<Method Id="663" ParentId="7" Name="GetByInternalNameOrTitle"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.name)}</Parameter></Parameters></Method>`;
+          `<Method Id="663" ParentId="7" Name="GetById"><Parameters><Parameter Type="Guid">${formatting.escapeXml(args.options.id)}</Parameter></Parameters></Method>` :
+          `<Method Id="663" ParentId="7" Name="GetByInternalNameOrTitle"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.name)}</Parameter></Parameters></Method>`;
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
@@ -149,7 +148,7 @@ class SpoFieldSetCommand extends SpoCommand {
 
     let i: number = 667;
     const payload: string = Object.keys(options).map(key => {
-      return excludeOptions.indexOf(key) === -1 ? `<SetProperty Id="${i++}" ObjectPathId="663" Name="${key}"><Parameter Type="String">${Utils.escapeXml(options[key])}</Parameter></SetProperty>` : '';
+      return excludeOptions.indexOf(key) === -1 ? `<SetProperty Id="${i++}" ObjectPathId="663" Name="${key}"><Parameter Type="String">${formatting.escapeXml(options[key])}</Parameter></SetProperty>` : '';
     }).join('');
 
     return payload;
@@ -182,7 +181,7 @@ class SpoFieldSetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
@@ -192,7 +191,7 @@ class SpoFieldSetCommand extends SpoCommand {
     }
 
     if (args.options.listId &&
-      !Utils.isValidGuid(args.options.listId)) {
+      !validation.isValidGuid(args.options.listId)) {
       return `${args.options.listId} in option listId is not a valid GUID`;
     }
 
@@ -205,7 +204,7 @@ class SpoFieldSetCommand extends SpoCommand {
     }
 
     if (args.options.id &&
-      !Utils.isValidGuid(args.options.id)) {
+      !validation.isValidGuid(args.options.id)) {
       return `${args.options.id} in option id is not a valid GUID`;
     }
 

@@ -2,7 +2,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { accessToken } from '../../../../utils';
 import commands from '../../commands';
 
 class TenantServiceListCommand extends Command {
@@ -26,7 +26,7 @@ class TenantServiceListCommand extends Command {
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
     const statusEndpoint: string = 'ServiceComms/Services';
 
-    const tenantId = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
+    const tenantId = accessToken.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
 
     const requestOptions: any = {
       url: `${serviceUrl}/${tenantId}/${statusEndpoint}`,

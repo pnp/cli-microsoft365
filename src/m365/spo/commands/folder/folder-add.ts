@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { FolderProperties } from './FolderProperties';
@@ -33,7 +33,7 @@ class SpoFolderAddCommand extends SpoCommand {
       logger.logToStderr(`Adding folder to site ${args.options.webUrl}...`);
     }
 
-    const parentFolderServerRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
+    const parentFolderServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
     const serverRelativeUrl: string = `${parentFolderServerRelativeUrl}/${args.options.name}`;
     const requestUrl: string = `${args.options.webUrl}/_api/web/folders`;
     const requestOptions: any = {
@@ -73,7 +73,7 @@ class SpoFolderAddCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

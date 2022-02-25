@@ -5,9 +5,9 @@ import {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { spo, ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: GlobalOptions;
@@ -25,11 +25,11 @@ class SpoContentTypeHubGetCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoUrl: string = '';
 
-    this
+    spo
       .getSpoUrl(logger,this.debug)
       .then((_spoUrl: string): Promise<ContextInfo> => {
         spoUrl = _spoUrl;
-        return this.getRequestDigest(spoUrl);
+        return spo.getRequestDigest(spoUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {

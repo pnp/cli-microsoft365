@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { Cli, Logger } from '../../cli';
 import Command, { CommandError, CommandOption } from '../../Command';
 import GlobalOptions from '../../GlobalOptions';
-import Utils from '../../Utils';
+import { validation } from '../../utils';
 import { M365RcJson, M365RcJsonApp } from './M365RcJson';
 
 export interface AppCommandArgs {
@@ -90,7 +90,7 @@ export default abstract class AppCommand extends Command {
   }
 
   public validate(args: AppCommandArgs): boolean | string {
-    if (args.options.appId && !Utils.isValidGuid(args.options.appId)) {
+    if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
       return `${args.options.appId} is not a valid GUID`;
     }
 

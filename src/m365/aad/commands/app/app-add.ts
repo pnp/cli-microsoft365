@@ -7,8 +7,8 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { accessToken, odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import { M365RcJson } from '../../../base/M365RcJson';
 import commands from '../../commands';
 
@@ -59,7 +59,7 @@ interface Options extends GlobalOptions {
   withSecret: boolean;
 }
 
-class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
+class AadAppAddCommand extends GraphCommand {
   private static aadApplicationPlatform: string[] = ['spa', 'web', 'publicClient'];
   private static aadAppScopeConsentBy: string[] = ['admins', 'adminsAndUsers'];
   private manifest: any;
@@ -98,7 +98,7 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
         // directory. If we in the future extend the command with allowing
         // users to create AAD app in a different directory, we'll need to
         // adjust this
-        appInfo.tenantId = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
+        appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
         return Promise.resolve(appInfo);
       })
       .then(appInfo => this.updateAppFromManifest(args, appInfo))
@@ -378,15 +378,15 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
       logger.logToStderr('Resolving requested APIs...');
     }
 
-    return this
-      .getAllItems(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles`, logger, true)
-      .then(_ => {
+    return odata
+      .getAllItems<ServicePrincipalInfo>(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles`, logger)
+      .then(servicePrincipals => {
         try {
-          const resolvedApis = this.getRequiredResourceAccessForApis(args.options.apisDelegated, 'Scope', logger);
+          const resolvedApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisDelegated, 'Scope', logger);
           if (this.debug) {
             logger.logToStderr(`Resolved delegated permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
           }
-          const resolvedApplicationApis = this.getRequiredResourceAccessForApis(args.options.apisApplication, 'Role', logger);
+          const resolvedApplicationApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisApplication, 'Role', logger);
           if (this.debug) {
             logger.logToStderr(`Resolved application permissions: ${JSON.stringify(resolvedApplicationApis, null, 2)}`);
           }
@@ -413,7 +413,7 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
       });
   }
 
-  private getRequiredResourceAccessForApis(apis: string | undefined, scopeType: string, logger: Logger): RequiredResourceAccess[] {
+  private getRequiredResourceAccessForApis(servicePrincipals: ServicePrincipalInfo[], apis: string | undefined, scopeType: string, logger: Logger): RequiredResourceAccess[] {
     if (!apis) {
       return [];
     }
@@ -429,7 +429,7 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
         logger.logToStderr(`Permission name: ${permissionName}`);
         logger.logToStderr(`Service principal name: ${servicePrincipalName}`);
       }
-      const servicePrincipal = this.items.find(sp => (
+      const servicePrincipal = servicePrincipals.find(sp => (
         sp.servicePrincipalNames.indexOf(servicePrincipalName) > -1 ||
         sp.servicePrincipalNames.indexOf(`${servicePrincipalName}/`) > -1));
       if (!servicePrincipal) {

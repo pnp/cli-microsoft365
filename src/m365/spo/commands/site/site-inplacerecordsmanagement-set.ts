@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -71,11 +71,11 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidBoolean(args.options.enabled)) {
+    if (!validation.isValidBoolean(args.options.enabled)) {
       return 'Invalid "enabled" option value. Specify "true" or "false"';
     }
 
-    return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+    return validation.isValidSharePointUrl(args.options.siteUrl);
   }
 }
 
