@@ -17,6 +17,7 @@ import { settingsNames } from '../settingsNames';
 import Utils from '../Utils';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
+import auth from '../Auth';
 const packageJSON = require('../../package.json');
 
 export interface CommandOutput {
@@ -162,6 +163,13 @@ export class Cli {
     }
 
     const optionsWithoutShorts = Cli.removeShortOptions(this.optionsFromArgs);
+    try {
+      Cli.loadValuesFromAccessToken(optionsWithoutShorts);
+    }
+    catch (e) {
+      return this.closeWithError(e, optionsWithoutShorts);
+    }
+
     try {
       // replace values staring with @ with file contents
       Cli.loadOptionValuesFromFiles(optionsWithoutShorts);
@@ -850,6 +858,32 @@ export class Cli {
     optionsToRemove.forEach(option => delete filteredArgs.options[option]);
 
     return filteredArgs;
+  }
+
+  private static loadValuesFromAccessToken(args: { options: minimist.ParsedArgs }) {
+    if (!auth.service.connected) {
+      return;
+    }
+
+    const accessToken = auth.service.accessTokens[auth.defaultResource].accessToken;
+    if (Utils.isAppOnlyAccessToken(accessToken)) {
+      return;
+    }
+
+    const optionNames: string[] = Object.getOwnPropertyNames(args.options);
+    optionNames.forEach(option => {
+      const value = args.options[option];
+      if (!value || typeof value !== 'string') {
+        return;  
+      }
+
+      if (value.toLowerCase() === '@me.id') {
+        args.options[option] = Utils.getUserNameFromAccessToken(accessToken);
+      }
+      if (value.toLowerCase() === '@me.username') {
+        args.options[option] = Utils.getUserNameFromAccessToken(accessToken);
+      }
+    });
   }
 
   private static loadOptionValuesFromFiles(args: { options: minimist.ParsedArgs }) {

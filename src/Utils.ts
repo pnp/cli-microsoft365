@@ -158,6 +158,53 @@ export default class Utils {
     return tenantId;
   }
 
+  // see idtyp under https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens
+  public static isAppOnlyAccessToken(accessToken: string): boolean {
+    let isAppOnlyAccessToken: boolean = false;
+
+    if (!accessToken || accessToken.length === 0) {
+      return isAppOnlyAccessToken;
+    }
+
+    const chunks = accessToken.split('.');
+    if (chunks.length !== 3) {
+      return isAppOnlyAccessToken;
+    }
+
+    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
+    try {
+      const token: any = JSON.parse(tokenString);
+      isAppOnlyAccessToken = token.idtyp === 'app';
+    }
+    catch {
+    }
+
+    return isAppOnlyAccessToken;
+  }
+
+  public static getUserIdFromAccessToken(accessToken: string): string {
+    let userId: string = '';
+
+    if (!accessToken || accessToken.length === 0) {
+      return userId;
+    }
+
+    const chunks = accessToken.split('.');
+    if (chunks.length !== 3) {
+      return userId;
+    }
+
+    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
+    try {
+      const token: any = JSON.parse(tokenString);
+      userId = token.oid;
+    }
+    catch {
+    }
+
+    return userId;
+  }
+
   public static getUserNameFromAccessToken(accessToken: string): string {
     let userName: string = '';
 
