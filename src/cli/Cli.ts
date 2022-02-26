@@ -878,9 +878,9 @@ export class Cli {
       }
 
       if (value.toLowerCase() === '@me.id') {
-        args.options[option] = Utils.getUserNameFromAccessToken(accessToken);
+        args.options[option] = Utils.getUserIdFromAccessToken(accessToken);
       }
-      if (value.toLowerCase() === '@me.username') {
+      else if (value.toLowerCase() === '@me.username') {
         args.options[option] = Utils.getUserNameFromAccessToken(accessToken);
       }
     });
