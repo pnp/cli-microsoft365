@@ -83,7 +83,7 @@ describe(commands.CHANNEL_GET, () => {
     done();
   });
 
-  it('fails validation if both channelId and channelName options are not passed', (done) => {
+  it('fails validation if channelId, channelName and primary options are not passed', (done) => {
     const actual = command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
@@ -94,7 +94,47 @@ describe(commands.CHANNEL_GET, () => {
     done();
   });
 
-  it('fails validation if both channelId and channelName options are passed', (done) => {
+  it('fails validation if channelId with primary options are passed', (done) => {
+    const actual = command.validate({
+      options: {
+        teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
+        primary: true,
+        tabId: '00000000-0000-0000-0000-000000000000'
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if channelName and primary options are passed', (done) => {
+    const actual = command.validate({
+      options: {
+        teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
+        channelName: 'Channel Name',
+        primary: true,
+        tabId: '00000000-0000-0000-0000-000000000000'
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if channelId, channelName and primary options are passed', (done) => {
+    const actual = command.validate({
+      options: {
+        teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
+        channelName: 'Channel Name',
+        primary: true,
+        tabId: '00000000-0000-0000-0000-000000000000'
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if channelId and channelName are passed', (done) => {
     const actual = command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
@@ -205,7 +245,7 @@ describe(commands.CHANNEL_GET, () => {
     });
   });
 
-  it('fails to get team when team does not exists', (done) => {
+  it('fails to get team when team does not exist', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve({ value: [] });
@@ -352,7 +392,7 @@ describe(commands.CHANNEL_GET, () => {
     });
   });
 
-  it('fails to get channel when channel does not exists', (done) => {
+  it('fails to get channel when channel does not exist', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/channels?$filter=displayName eq '`) > -1) {
         return Promise.resolve({ value: [] });
@@ -405,6 +445,41 @@ describe(commands.CHANNEL_GET, () => {
         assert.strictEqual(call.args[0].description, null);
         assert.strictEqual(call.args[0].email, '');
         assert.strictEqual(call.args[0].webUrl, 'https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/channel1?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('should get primary channel information for the Microsoft Teams team by id', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/39958f28-eefb-4006-8f83-13b6ac2a4a7f/primaryChannel`) {
+        return Promise.resolve({
+          "id": "19:493665404ebd4a18adb8a980a31b4986@thread.skype",
+          "displayName": "General",
+          "description": null,
+          "email": "",
+          "webUrl": "https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/general?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4"
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        teamId: '39958f28-eefb-4006-8f83-13b6ac2a4a7f',
+        primary: true
+      }
+    }, () => {
+      try {
+        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+        assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
+        assert.strictEqual(call.args[0].displayName, 'General');
+        assert.strictEqual(call.args[0].description, null);
+        assert.strictEqual(call.args[0].email, '');
+        assert.strictEqual(call.args[0].webUrl, 'https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/general?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4');
         done();
       }
       catch (e) {
@@ -481,6 +556,82 @@ describe(commands.CHANNEL_GET, () => {
         assert.strictEqual(call.args[0].description, null);
         assert.strictEqual(call.args[0].email, '');
         assert.strictEqual(call.args[0].webUrl, 'https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/channel1?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('should get primary channel information for the Microsoft Teams team by name', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
+        return Promise.resolve({
+          "value": [
+            {
+              "id": "39958f28-eefb-4006-8f83-13b6ac2a4a7f",
+              "createdDateTime": null,
+              "displayName": "Team Name",
+              "description": "Team Description",
+              "internalId": null,
+              "classification": null,
+              "specialization": null,
+              "visibility": null,
+              "webUrl": null,
+              "isArchived": false,
+              "isMembershipLimitedToOwners": null,
+              "memberSettings": null,
+              "guestSettings": null,
+              "messagingSettings": null,
+              "funSettings": null,
+              "discoverySettings": null,
+              "resourceProvisioningOptions": ["Team"]
+            }
+          ]
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/channels?$filter=displayName eq '`) > -1) {
+        return Promise.resolve({
+          "value": [
+            {
+              "id": "19:493665404ebd4a18adb8a980a31b4986@thread.skype",
+              "displayName": "General",
+              "description": null,
+              "email": "",
+              "webUrl": "https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/general?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4",
+              "membershipType": "standard"
+            }
+          ]
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/39958f28-eefb-4006-8f83-13b6ac2a4a7f/primaryChannel`) {
+        return Promise.resolve({
+          "id": "19:493665404ebd4a18adb8a980a31b4986@thread.skype",
+          "displayName": "General",
+          "description": null,
+          "email": "",
+          "webUrl": "https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/general?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4"
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        teamName: 'Team Name',
+        primary: true
+      }
+    }, () => {
+      try {
+        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+        assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
+        assert.strictEqual(call.args[0].displayName, 'General');
+        assert.strictEqual(call.args[0].description, null);
+        assert.strictEqual(call.args[0].email, '');
+        assert.strictEqual(call.args[0].webUrl, 'https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/general?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4');
         done();
       }
       catch (e) {

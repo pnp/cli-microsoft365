@@ -34,10 +34,8 @@ m365 help
 
 See the [User Guide](user-guide/installing-cli.md) to learn more about the CLI for Microsoft 365 and its capabilities.
 
-## Microsoft 365 Patterns and Practices
+## Microsoft 365 Platform Community
 
-CLI for Microsoft 365 is an open-source project driven by the [Microsoft 365 Patterns and Practices](https://aka.ms/m365pnp) initiative. The project is built and managed publicly on GitHub at [https://github.com/pnp/cli-microsoft365](https://github.com/pnp/cli-microsoft365) and accepts community contributions. We would encourage you to try it and [tell us what you think](https://github.com/pnp/cli-microsoft365/issues). We would also love your help! We have a number of feature requests that are a [good starting point](https://github.com/pnp/cli-microsoft365/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to contribute to the project.
+CLI for Microsoft 365 is a [Microsoft 365 Platform Community](https://pnp.github.io) (PnP) project. Microsoft 365 Platform Community is a virtual team consisting of Microsoft employees and community members focused on helping the community make the best use of Microsoft products. CLI for Microsoft 365 is an open-source project not affiliated with Microsoft and not covered by Microsoft support. If you experience any issues using the CLI, please submit an issue in the [issues list](https://github.com/pnp/cli-microsoft365/issues).
 
-_“Sharing is caring”_
-
-Microsoft 365 Patterns and Practices team
+The project is built and managed publicly on GitHub at [https://github.com/pnp/cli-microsoft365](https://github.com/pnp/cli-microsoft365) and accepts community contributions. We would encourage you to try it and [tell us what you think](https://github.com/pnp/cli-microsoft365/issues). We would also love your help! We have a number of feature requests that are a [good starting point](https://github.com/pnp/cli-microsoft365/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to contribute to the project.

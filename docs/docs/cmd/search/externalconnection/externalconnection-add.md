@@ -30,14 +30,14 @@ The `id` must be at least 3 and no more than 32 characters long. It can contain 
 
 ## Examples
 
-Adds a new external connection with name and description of test
+Adds a new external connection with name and description of test app
 
 ```sh
-m365 search externalconnection add --id MyApp --name "My application" --description "Description of your application"
+m365 search externalconnection add --id MyApp --name "Test" --description "Test"
 ```
 
 Adds a new external connection with a limited number of authorized apps
 
 ```sh
-m365 search externalconnection add --id MyApp --name "My application" --description "Description of your application" --authorizedAppIds  "00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002"
+m365 search externalconnection add --id MyApp --name "Test" --description "Test" --authorizedAppIds  "00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002"
 ```

@@ -346,14 +346,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('validation fails if wrong enum value', () => {
-    const options: any = {
-      SharingCapability: 'abc'
-    };
-    const actual = command.validate({ options: options });
-    assert.strictEqual(actual, 'SharingCapability option has invalid value of abc. Allowed values are ["Disabled","ExternalUserSharingOnly","ExternalUserAndGuestSharing","ExistingExternalUserSharingOnly"]');
-  });
-
   it('validation fails if wrong enum key', () => {
 
     const actual = (command as any).mapEnumToInt('abc', 'abc');

@@ -150,7 +150,7 @@ export default abstract class Command {
       },
       {
         option: '-o, --output [output]',
-        autocomplete: ['json', 'text']
+        autocomplete: ['csv', 'json', 'text']
       },
       {
         option: '--verbose'

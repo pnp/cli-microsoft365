@@ -11,6 +11,8 @@ import { Logger } from '.';
 import appInsights from '../appInsights';
 import Command, { CommandArgs, CommandError } from '../Command';
 import config from '../config';
+import GlobalOptions from '../GlobalOptions';
+import request from '../request';
 import { settingsNames } from '../settingsNames';
 import Utils from '../Utils';
 import { CommandInfo } from './CommandInfo';
@@ -33,7 +35,7 @@ export class Cli {
    */
   public currentCommandName: string | undefined;
   private optionsFromArgs: { options: minimist.ParsedArgs } | undefined;
-  private commandsFolder: string = '';
+  public commandsFolder: string = '';
   private static instance: Cli;
 
   private _config: Configstore | undefined;
@@ -230,24 +232,42 @@ export class Cli {
     });
   }
 
-  public static executeCommandWithOutput(command: Command, args: { options: minimist.ParsedArgs }): Promise<CommandOutput> {
+  public static executeCommandWithOutput(command: Command, args: { options: minimist.ParsedArgs }, listener?: {
+    stdout?: (message: any) => void,
+    stderr?: (message: any) => void
+  }): Promise<CommandOutput> {
     return new Promise((resolve: (result: CommandOutput) => void, reject: (error: any) => void): void => {
       const log: string[] = [];
       const logErr: string[] = [];
       const logger: Logger = {
         log: (message: any): void => {
-          log.push(Cli.formatOutput(message, args.options));
+          const formattedMessage = Cli.formatOutput(message, args.options);
+          if (listener && listener.stdout) {
+            listener.stdout(formattedMessage);
+          }
+          log.push(formattedMessage);
         },
         logRaw: (message: any): void => {
-          log.push(Cli.formatOutput(message, args.options));
+          const formattedMessage = Cli.formatOutput(message, args.options);
+          if (listener && listener.stdout) {
+            listener.stdout(formattedMessage);
+          }
+          log.push(formattedMessage);
         },
         logToStderr: (message: any): void => {
+          if (listener && listener.stderr) {
+            listener.stderr(message);
+          }
           logErr.push(message);
         }
       };
 
       if (args.options.debug) {
-        Cli.log(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
+        const message = `Executing command ${command.name} with options ${JSON.stringify(args)}`;
+        if (listener && listener.stderr) {
+          listener.stderr(message);
+        }
+        logErr.push(message);
       }
 
       // store the current command name, if any and set the name to the name of
@@ -255,10 +275,14 @@ export class Cli {
       const cli = Cli.getInstance();
       const parentCommandName: string | undefined = cli.currentCommandName;
       cli.currentCommandName = command.getCommandName();
+      // store the current logger if any
+      const currentLogger: Logger | undefined = request.logger;
 
       command.action(logger, args as any, (err: any): void => {
         // restore the original command name
         cli.currentCommandName = parentCommandName;
+        // restore the original logger
+        request.logger = currentLogger;
 
         if (err) {
           return reject({
@@ -421,7 +445,7 @@ export class Cli {
     return minimist(args, minimistOptions);
   }
 
-  private static formatOutput(logStatement: any, options: any): any {
+  private static formatOutput(logStatement: any, options: GlobalOptions): any {
     if (logStatement instanceof Date) {
       return logStatement.toString();
     }
@@ -491,11 +515,11 @@ export class Cli {
       return logStatement.join(os.EOL);
     }
 
-    // if output type has been set to 'text', process the retrieved
+    // if output type has been set to 'text' or 'csv', process the retrieved
     // data so that returned objects contain only default properties specified
     // on the current command. If there is no current command or the
     // command doesn't specify default properties, return original data
-    if (options.output === 'text') {
+    if (options.output === 'text' || options.output === 'csv') {
       const cli: Cli = Cli.getInstance();
       const currentCommand: CommandInfo | undefined = cli.commandToExecute;
 
@@ -517,6 +541,20 @@ export class Cli {
             Utils.filterObject(s, currentCommand.defaultProperties as string[]));
         }
       }
+    }
+
+    if (options.output === 'csv') {
+      const { stringify } = require('csv-stringify/sync');
+      const cli = Cli.getInstance();
+
+      // https://csv.js.org/stringify/options/
+      return stringify(logStatement, {
+        header: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvHeader, true),
+        escape: cli.getSettingWithDefaultValue(settingsNames.csvEscape, '"'),
+        quote: cli.config.get(settingsNames.csvQuote),
+        quoted: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuoted, false),
+        quotedEmpty: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuotedEmpty, false)
+      });
     }
 
     // display object as a list of key-value pairs

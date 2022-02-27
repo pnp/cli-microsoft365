@@ -63,7 +63,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
       if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             storageentitiesindex: JSON.stringify({
               'Property1': {
@@ -110,7 +110,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
       if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ storageentitiesindex: '' });
         }
       }
@@ -133,7 +133,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
       if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({});
         }
       }
@@ -166,7 +166,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
       if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ storageentitiesindex: JSON.stringify({}) });
         }
       }
@@ -189,7 +189,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
       if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ storageentitiesindex: JSON.stringify({}) });
         }
       }
@@ -222,7 +222,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
       if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ storageentitiesindex: 'a' });
         }
       }

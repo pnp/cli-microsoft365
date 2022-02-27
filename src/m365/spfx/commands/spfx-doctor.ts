@@ -432,8 +432,8 @@ class SpfxDoctorCommand extends AnonymousCommand {
         fix: 'Install Node.js v12 or v14'
       },
       react: {
-        range: '16.9.0',
-        fix: 'npm i react@16.9.0'
+        range: '16.9.36',
+        fix: 'npm i react@16.9.36'
       },
       sp: SharePointVersion.SPO,
       yo: {
@@ -451,8 +451,8 @@ class SpfxDoctorCommand extends AnonymousCommand {
         fix: 'Install Node.js v12 or v14'
       },
       react: {
-        range: '16.9.0',
-        fix: 'npm i react@16.9.0'
+        range: '16.9.51',
+        fix: 'npm i react@16.9.51'
       },
       sp: SharePointVersion.SPO,
       yo: {
@@ -470,8 +470,27 @@ class SpfxDoctorCommand extends AnonymousCommand {
         fix: 'Install Node.js v12 or v14'
       },
       react: {
-        range: '16.9.0',
-        fix: 'npm i react@16.9.0'
+        range: '16.9.51',
+        fix: 'npm i react@16.9.51'
+      },
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^4',
+        fix: 'npm i -g yo@4'
+      }
+    },
+    '1.14.0': {
+      gulp: {
+        range: '^4',
+        fix: 'npm i -g gulp@4'
+      },
+      node: {
+        range: '^12 || ^14',
+        fix: 'Install Node.js v12 or v14'
+      },
+      react: {
+        range: '16.9.51',
+        fix: 'npm i react@16.9.51'
       },
       sp: SharePointVersion.SPO,
       yo: {

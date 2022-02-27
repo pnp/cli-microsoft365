@@ -24,7 +24,7 @@ describe(commands.STORAGEENTITY_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('existingproperty')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ Comment: 'Lorem', Description: 'ipsum', Value: 'dolor' });
         }
       }
@@ -32,7 +32,7 @@ describe(commands.STORAGEENTITY_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('propertywithoutdescription')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ Comment: 'Lorem', Value: 'dolor' });
         }
       }
@@ -40,7 +40,7 @@ describe(commands.STORAGEENTITY_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('propertywithoutcomments')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ Description: 'ipsum', Value: 'dolor' });
         }
       }
@@ -48,7 +48,7 @@ describe(commands.STORAGEENTITY_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('nonexistingproperty')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ "odata.null": true });
         }
       }
@@ -56,7 +56,7 @@ describe(commands.STORAGEENTITY_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('%23myprop')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ Description: 'ipsum', Value: 'dolor' });
         }
       }

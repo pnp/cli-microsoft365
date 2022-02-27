@@ -1,3 +1,4 @@
+import { Group } from '@microsoft/microsoft-graph-types';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
@@ -18,7 +19,7 @@ describe(commands.O365GROUP_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     auth.service.connected = true;
   });
@@ -70,7 +71,7 @@ describe(commands.O365GROUP_SET, () => {
   it('updates Microsoft 365 Group display name', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
-        if (JSON.stringify(opts.data) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify(<Group>{
           displayName: 'My group'
         })) {
           return Promise.resolve();
@@ -94,7 +95,7 @@ describe(commands.O365GROUP_SET, () => {
   it('updates Microsoft 365 Group description (debug)', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
-        if (JSON.stringify(opts.data) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify(<Group>{
           description: 'My group'
         })) {
           return Promise.resolve();
@@ -118,7 +119,7 @@ describe(commands.O365GROUP_SET, () => {
   it('updates Microsoft 365 Group to public', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
-        if (JSON.stringify(opts.data) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify(<Group>{
           visibility: 'Public'
         })) {
           return Promise.resolve();
@@ -142,7 +143,7 @@ describe(commands.O365GROUP_SET, () => {
   it('updates Microsoft 365 Group to private', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
-        if (JSON.stringify(opts.data) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify(<Group>{
           visibility: 'Private'
         })) {
           return Promise.resolve();

@@ -13,10 +13,10 @@ describe(commands.LIST_ADD, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -2041,7 +2041,7 @@ describe(commands.LIST_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('has correct direction specified', () => {
+  it('has correct direction value specified', () => {
     const directionValue = 'LTR';
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', direction: directionValue } });
     assert(actual === true);
@@ -2058,22 +2058,22 @@ describe(commands.LIST_ADD, () => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: majorVersionLimitValue, enableVersioning: 'true' } });
     assert(actual === true);
   });
-  
+
   it('fails if majorWithMinorVersionsLimit specified, but enableModeration is not true', () => {
     const majorWithMinorVersionLimitValue = 20;
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorWithMinorVersionsLimit: majorWithMinorVersionLimitValue } });
     assert.strictEqual(actual, `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`);
   });
 
-  it('has correct majorVersionLimit and enableVersioning values specified', () => {
-    const majorVersionLimitValue = 20;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: majorVersionLimitValue, enableVersioning: 'true' } });
-    assert(actual === true);
-  });
-
   it('fails if non existing readSecurity specified', () => {
     const readSecurityValue = 5;
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readSecurity: readSecurityValue } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails if non existing writeSecurity specified', () => {
+    const writeSecurityValue = 5;
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', writeSecurity: writeSecurityValue } });
     assert.notStrictEqual(actual, true);
   });
 
@@ -2092,18 +2092,6 @@ describe(commands.LIST_ADD, () => {
   it('has correct listExperienceOptions specified', () => {
     const listExperienceValue = 'NewExperience';
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: listExperienceValue } });
-    assert(actual === true);
-  });
-
-  it('fails if non existing readSecurity specified', () => {
-    const writeSecurityValue = 5;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', writeSecurity: writeSecurityValue } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('has correct direction specified', () => {
-    const writeSecurityValue = 4;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', writeSecurity: writeSecurityValue } });
     assert(actual === true);
   });
 
@@ -2171,7 +2159,7 @@ describe(commands.LIST_ADD, () => {
 
     command.action(logger, { options: { debug: true, title: 'List 1', baseTemplate: 'GenericList', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert(loggerLogSpy.calledWith({ 
+        assert(loggerLogSpy.calledWith({
           AllowContentTypes: true,
           BaseTemplate: 100,
           BaseType: 1,
@@ -2229,6 +2217,6 @@ describe(commands.LIST_ADD, () => {
         done(e);
       }
     });
-    
+
   });
 });

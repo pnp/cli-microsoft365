@@ -1,5 +1,111 @@
 # Release notes
 
+## [v5.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.0.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad app delete](../cmd/aad/app/app-delete.md) - removes an Azure AD app registration [#3008](https://github.com/pnp/cli-microsoft365/issues/3008)
+- [aad o365group conversation list](../cmd/aad/o365group/o365group-conversation-list.md) - lists conversations for the specified Microsoft 365 group [#3030](https://github.com/pnp/cli-microsoft365/issues/3030)
+
+**Microsoft 365:**
+
+- [tenant serviceannouncement health get](../cmd/tenant/serviceannouncement/serviceannouncement-health-get.md) - retrieves a tenant health information [#2950](https://github.com/pnp/cli-microsoft365/issues/2950)
+- [tenant serviceannouncement health list](../cmd/tenant/serviceannouncement/serviceannouncement-health-list.md) - lists the tenant health information [#2947](https://github.com/pnp/cli-microsoft365/issues/2947)
+- [tenant serviceannouncement healthissue get](../cmd/tenant/serviceannouncement/serviceannouncement-healthissue-get.md) - retrieves a specified service health issue for the tenant [#2951](https://github.com/pnp/cli-microsoft365/issues/2951)
+- [tenant serviceannouncement healthissue list](../cmd/tenant/serviceannouncement/serviceannouncement-healthissue-list.md) - retrieves all service health issues for the tenant [#2948](https://github.com/pnp/cli-microsoft365/issues/2948)
+- [tenant serviceannouncement message get](../cmd/tenant/serviceannouncement/serviceannouncement-message-get.md) - retrieves a specified service update message for the tenant [#2952](https://github.com/pnp/cli-microsoft365/issues/2952)
+- [tenant serviceannouncement message list](../cmd/tenant/serviceannouncement/serviceannouncement-message-list.md) - retrieves all service update messages for the tenant [#2949](https://github.com/pnp/cli-microsoft365/issues/2949)
+
+**Outlook:**
+
+- [outlook room list](../cmd/outlook/room/room-list.md) - get a collection of all available rooms [#2963](https://github.com/pnp/cli-microsoft365/issues/2963)
+- [outlook roomlist list](../cmd/outlook/roomlist/roomlist-list.md) - get a collection of available roomlists [#3002](https://github.com/pnp/cli-microsoft365/issues/3002)
+
+**Planner:**
+
+- [planner task get](../cmd/planner/task/task-get.md) - retrieves the the specified planner task [#3019](https://github.com/pnp/cli-microsoft365/issues/3019)
+- [planner task details get](../cmd/planner/task/task-details-get.md) - retrieves the details of the specified planner task [#3015](https://github.com/pnp/cli-microsoft365/issues/3015)
+
+**SharePoint:**
+
+- [spo group user remove](../cmd/spo/group/group-user-remove.md) - removes the specified user from a SharePoint group [#2642](https://github.com/pnp/cli-microsoft365/issues/2642)
+
+**Teams:**
+
+- [teams chat message send](../cmd/teams/chat/chat-message-send.md) - Sends a chat message to a Microsoft Teams chat conversation [#2916](https://github.com/pnp/cli-microsoft365/issues/2916)
+
+### Changes
+
+- updated 'aad oauth2grant list' to use MS Graph [#2710](https://github.com/pnp/cli-microsoft365/issues/2710)
+- updated the 'aad sp get' command to use MS Graph [#2754](https://github.com/pnp/cli-microsoft365/issues/2754)
+- extended 'aad oauth2grant remove' with confirm [#2785](https://github.com/pnp/cli-microsoft365/issues/2785)
+- renamed clientId to spObjectId in aad oauth2grant list [#2786](https://github.com/pnp/cli-microsoft365/issues/2786)
+- fixed flow get as admin [#2984](https://github.com/pnp/cli-microsoft365/issues/2984)
+- added the 'Get attachment names from SPO lists' sample [#2661](https://github.com/pnp/cli-microsoft365/issues/2661)
+- updated the 'using own identity' guide with updated interface [#2968](https://github.com/pnp/cli-microsoft365/issues/2968)
+- added the 'List all documents with a specific name within a SharePoint site' sample [#2768](https://github.com/pnp/cli-microsoft365/issues/2768)
+- extended 'aad user list' with --deleted flag [#2955](https://github.com/pnp/cli-microsoft365/issues/2955)
+- removes obsolete AADCommand base class [#2922](https://github.com/pnp/cli-microsoft365/issues/2922)
+- updates the 'teams channel get' documentation [#3009](https://github.com/pnp/cli-microsoft365/issues/3009)
+- added the 'Check all users for known breaches with HBIP' sample [#2957](https://github.com/pnp/cli-microsoft365/issues/2957)
+- added the 'List items with unique permissions' sample script [#2283](https://github.com/pnp/cli-microsoft365/issues/2283)
+- added link for 'Using your own Azure AD identity' [#2946](https://github.com/pnp/cli-microsoft365/issues/2946)
+- fixed creating AAD apps with preauthorized apps from manifest [#3041](https://github.com/pnp/cli-microsoft365/issues/3041)
+- added CLI API to execute commands [#2996](https://github.com/pnp/cli-microsoft365/issues/2996)
+- added support for upgrading SPFx projects to v1.14.0-rc.2 [#3045](https://github.com/pnp/cli-microsoft365/issues/3045)
+- extended 'planner task list' with 'priority' [#3037](https://github.com/pnp/cli-microsoft365/issues/3037)
+- extends 'planner task get' with task priority [#3036](https://github.com/pnp/cli-microsoft365/issues/3036)
+- extends 'aad group list' with --deleted flag [#2956](https://github.com/pnp/cli-microsoft365/issues/2956)
+- added csv to autocomplete option [#2997](https://github.com/pnp/cli-microsoft365/issues/2997)
+- added the 'Detecting PII exist in SharePoint List using AWS Comprehend' sample [#2925](https://github.com/pnp/cli-microsoft365/issues/2925)
+- extended 'teams channel get' with 'primary' [#3004](https://github.com/pnp/cli-microsoft365/issues/3004)
+- extended 'aad app set' with updating redirect URIs [#3043](https://github.com/pnp/cli-microsoft365/issues/3043)
+- extended 'spo group user add' with validating users [#2653](https://github.com/pnp/cli-microsoft365/issues/2653)
+- extended 'teams app install' with support for installing personal apps [#3025](https://github.com/pnp/cli-microsoft365/issues/3025)
+- moved 'Command completion' and 'GitHub Actions' to 'User Guide' [#2944](https://github.com/pnp/cli-microsoft365/issues/2944)
+- added --save option to the 'aad app get' command [#2939](https://github.com/pnp/cli-microsoft365/issues/2939)
+- added Mocha Test Explorer [#2817](https://github.com/pnp/cli-microsoft365/issues/2817)
+- added support for upgrading SPFx projects to v1.14.0 [#3067](https://github.com/pnp/cli-microsoft365/issues/3067)
+- extended 'spfx doctor' with support for SPFx v1.14.0 [#3069](https://github.com/pnp/cli-microsoft365/issues/3069)
+- extended 'teams app update' to search apps by name [#3026](https://github.com/pnp/cli-microsoft365/issues/3026)
+- added the 'List all checked out files' sample [#3046](https://github.com/pnp/cli-microsoft365/issues/3046)
+- extended login with automatically opening the browser [#2158](https://github.com/pnp/cli-microsoft365/issues/2158)
+
+## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad group list](../cmd/aad/group/group-list.md) - lists Azure AD groups [#2622](https://github.com/pnp/cli-microsoft365/issues/2622)
+- [aad user hibp](../cmd/aad/user/user-hibp.md) - allows you to retrieve all accounts that have been pwned with the specified username [#2476](https://github.com/pnp/cli-microsoft365/issues/2476)
+
+**Planner:**
+
+- [planner task set](../cmd/planner/task/task-set.md) - updates a Microsoft Planner task [#2824](https://github.com/pnp/cli-microsoft365/issues/2824)
+
+**SharePoint:**
+
+- [spo site recyclebinitem list](../cmd/spo/site/site-recyclebinitem-list.md) - lists items from recycle bin [#2875](https://github.com/pnp/cli-microsoft365/issues/2875)
+
+**Teams:**
+
+- [teams chat list](../cmd/teams/chat/chat-list.md) - lists all Microsoft Teams chat conversations for the current user [#2893](https://github.com/pnp/cli-microsoft365/issues/2893)
+- [teams chat member list](../cmd/teams/chat/chat-member-list.md) - lists all members from a Microsoft Teams chat conversation [#2896](https://github.com/pnp/cli-microsoft365/issues/2896)
+- [teams chat message list](../cmd/teams/chat/chat-message-list.md) - lists all messages from a Microsoft Teams chat conversation [#2860](https://github.com/pnp/cli-microsoft365/issues/2860)
+
+### Changes
+
+- extended 'cli config set' with support for csv output [#2901](https://github.com/pnp/cli-microsoft365/issues/2901)
+- fixed 'teams tab get' and 'teams app list' commands [#2930](https://github.com/pnp/cli-microsoft365/issues/2930)
+- extended 'spo group user add' with groupName and email [#2831](https://github.com/pnp/cli-microsoft365/issues/2831)
+- added docs explaining app commands [#2888](https://github.com/pnp/cli-microsoft365/issues/2888)
+- added support for upgrading SPFx projects to v1.14.0-beta.5 [#2983](https://github.com/pnp/cli-microsoft365/issues/2983)
+- fixed unhandled exception for spo group user add [#2935](https://github.com/pnp/cli-microsoft365/issues/2935)
+- added the 'List all large files within a SharePoint Site' sample [#2772](https://github.com/pnp/cli-microsoft365/issues/2772)
+
 ## [v4.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.3.0)
 
 ### New commands
@@ -9,9 +115,17 @@
 - [aad app get](../cmd/aad/app/app-get.md) - gets an Azure AD app registration [#2835](https://github.com/pnp/cli-microsoft365/issues/2835)
 - [aad user password validate](../cmd/aad/user/user-password-validate.md) - checks a user's password against the organization's password validation policy [#2846](https://github.com/pnp/cli-microsoft365/issues/2846)
 
+**Microsoft 365 apps:**
+
+- [app permission list](../cmd/app/permission/permission-list.md) - lists API permissions for the current AAD app [#2841](https://github.com/pnp/cli-microsoft365/issues/2841)
+
 **Microsoft Search:**
 
 - [search externalconnection add](../cmd/search/externalconnection/externalconnection-add.md) - adds a new external connection to be defined for Microsoft Search [#2662](https://github.com/pnp/cli-microsoft365/issues/2662)
+
+**Planner:**
+
+- [planner task add](../cmd/planner/task/task-add.md) - adds a new Microsoft Planner task [#2255](https://github.com/pnp/cli-microsoft365/issues/2255)
 
 **SharePoint:**
 
@@ -26,6 +140,15 @@
 - added the 'Copy list items between SharePoint lists' script [#2652](https://github.com/pnp/cli-microsoft365/issues/2652)
 - updated Node version Readme.md Build instructions [#2873](https://github.com/pnp/cli-microsoft365/issues/2873)
 - fixed the maxBodyLength issue [#2863](https://github.com/pnp/cli-microsoft365/issues/2863)
+- extended 'pa app list' with environment [#2872](https://github.com/pnp/cli-microsoft365/issues/2872)
+- updated social links in the docs [#2885](https://github.com/pnp/cli-microsoft365/issues/2885)
+- added csv output mode [#2836](https://github.com/pnp/cli-microsoft365/issues/2836)
+- changed handling non-existent sites in 'spo site ensure' [#2861](https://github.com/pnp/cli-microsoft365/issues/2861)
+- updated 'cli doctor' tests to not depend on empty config [#2870](https://github.com/pnp/cli-microsoft365/issues/2870)
+- extended 'aad user get' with email [#2856](https://github.com/pnp/cli-microsoft365/issues/2856)
+- updated 'teams message get' command to Graph v1.0 API [#2678](https://github.com/pnp/cli-microsoft365/issues/2678)
+- replaced custom group and user types with MS Graph types [#2436](https://github.com/pnp/cli-microsoft365/issues/2436)
+- updated default terminal profile in devcontainer [#2664](https://github.com/pnp/cli-microsoft365/issues/2664)
 
 ## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
 
@@ -188,7 +311,7 @@
 - fixed 'spo site set' code coverage [#2586](https://github.com/pnp/cli-microsoft365/issues/2586)
 - updated 'teams channel get' to Graph v1.0 [#2505](https://github.com/pnp/cli-microsoft365/issues/2505)
 - added missing 'chalk' dependency [#2592](https://github.com/pnp/cli-microsoft365/issues/2592)
-- extended Teams channel ID validation with - and _ [#2594](https://github.com/pnp/cli-microsoft365/issues/2594)
+- extended Teams channel ID validation with - and \_ [#2594](https://github.com/pnp/cli-microsoft365/issues/2594)
 - added file count sample [#2576](https://github.com/pnp/cli-microsoft365/issues/2576)
 - added support for upgrading SPFx projects to v1.13.0-beta.13 [#2604](https://github.com/pnp/cli-microsoft365/issues/2604)
 - updated upgrade rule for SPFx v1.13.0-beta.13 [#2611](https://github.com/pnp/cli-microsoft365/issues/2611)
@@ -873,7 +996,7 @@
 - fixed guidance for upgrading teams piece in `spfx project upgrade` [#1471](https://github.com/pnp/cli-microsoft365/pull/1471)
 - extended `spo theme set` command with support for theme validation [#1466](https://github.com/pnp/cli-microsoft365/pull/1466)
 - fixed resolution of `FN003005_CFG_localizedResource_pathLib` in `spfx project upgrade` [#1470](https://github.com/pnp/cli-microsoft365/pull/1470)
-- updated Theme Generator URL on `spo theme set` & `spo theme  apply` commands [#1465](https://github.com/pnp/cli-microsoft365/pull/1465)
+- updated Theme Generator URL on `spo theme set` & `spo theme apply` commands [#1465](https://github.com/pnp/cli-microsoft365/pull/1465)
 
 ## [v2.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v2.8.0)
 

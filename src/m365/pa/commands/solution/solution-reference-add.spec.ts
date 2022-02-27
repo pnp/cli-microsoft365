@@ -128,19 +128,6 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the specified path contains no *.pcfproj or *.csproj file', () => {
-    sinon.stub(fs, 'readdirSync').callsFake((path) => {
-      if (path === process.cwd()) {
-        return ['file1.cdsproj'] as any;
-      }
-      return [];
-    });
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-
-    const actual = command.validate({ options: { path: 'path/to/project' } });
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation when the specified path contains two *.pcfproj files', () => {
     sinon.stub(fs, 'readdirSync').callsFake((path) => {
       if (path === process.cwd()) {

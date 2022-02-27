@@ -1,10 +1,10 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
-import Command, { CommandErrorWithOutput, CommandError, CommandOption } from '../../../../Command';
+import Command, { CommandError, CommandErrorWithOutput, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import SpoCommand from '../../../base/SpoCommand';
 import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
 import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
+import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { SharingResult } from './SharingResult';
 
@@ -14,12 +14,13 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  groupId: number;
-  userName: string;
+  groupId?: number;
+  groupName?: string;
+  userName?: string;
+  email?: string;
 }
 
 class SpoGroupUserAddCommand extends SpoCommand {
-
   public get name(): string {
     return commands.GROUP_USER_ADD;
   }
@@ -33,17 +34,25 @@ class SpoGroupUserAddCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    this.getOnlyActiveUsers(args, logger)
+    let groupId: number = 0;
+
+    this
+      .getGroupId(args)
+      .then((_groupId: number): Promise<string[]> => {
+        groupId = _groupId;
+        return this.getValidUsers(args, logger);
+      })
       .then((resolvedUsernameList: string[]): Promise<SharingResult> => {
         if (this.verbose) {
-          logger.logToStderr(`Start adding Active user/s to SharePoint Group ${args.options.groupId}...`);
+          logger.logToStderr(`Start adding Active user/s to SharePoint Group ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
         }
 
         const data: any = {
           url: args.options.webUrl,
           peoplePickerInput: this.getFormattedUserList(resolvedUsernameList),
-          roleValue: `group:${args.options.groupId}`
+          roleValue: `group:${groupId}`
         };
+
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/SP.Web.ShareObject`,
           headers: {
@@ -60,40 +69,84 @@ class SpoGroupUserAddCommand extends SpoCommand {
         if (sharingResult.ErrorMessage !== null) {
           return cb(new CommandError(sharingResult.ErrorMessage));
         }
+
         logger.log(sharingResult.UsersAddedToGroup);
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getOnlyActiveUsers(args: CommandArgs, logger: Logger): Promise<string[]> {
+  private getGroupId(args: CommandArgs): Promise<number> {
+    const getGroupMethod: string = args.options.groupName ?
+      `GetByName('${encodeURIComponent(args.options.groupName as string)}')` :
+      `GetById('${args.options.groupId}')`;
+
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/web/sitegroups/${getGroupMethod}`,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    return request
+      .get<{ Id: number }>(requestOptions)
+      .then(response => {
+        const groupId: number | undefined = response.Id;
+
+        if (!groupId) {
+          return Promise.reject(`The specified group does not exist in the SharePoint site`);
+        }
+
+        return groupId;
+      });
+  }
+
+  private getValidUsers(args: CommandArgs, logger: Logger): Promise<string[]> {
     if (this.verbose) {
-      logger.logToStderr(`Removing Users which are not active from the original list`);
+      logger.logToStderr(`Checking if the specified users exist`);
     }
 
-    const activeUsernamelist: string[] = [];
-    return Promise.all(args.options.userName.split(",").map(singleUsername => {
-      const options: AadUserGetCommandOptions = {
-        userName: singleUsername.trim(),
-        output: 'json',
-        debug: args.options.debug,
-        verbose: args.options.verbose
-      };
-      return Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } })
-        .then((getUserGetOutput: CommandOutput): void => {
-          if (this.debug) {
-            logger.logToStderr(getUserGetOutput.stderr);
-          }
+    const validUserNames: string[] = [];
+    const invalidUserNames: string[] = [];
+    const userInfo: string = args.options.userName ? args.options.userName : args.options.email!;
 
-          activeUsernamelist.push(JSON.parse(getUserGetOutput.stdout).userPrincipalName);
-        }, (err: CommandErrorWithOutput) => {
-          if (this.debug) {
-            logger.logToStderr(err.stderr);
-          }
-        });
-    }))
+    return Promise
+      .all(userInfo.split(',').map(singleUserName => {
+        const options: AadUserGetCommandOptions = {
+          output: 'json',
+          debug: args.options.debug,
+          verbose: args.options.verbose
+        };
+
+        if (args.options.userName) {
+          options.userName = singleUserName.trim();
+        }
+        else {
+          options.email = singleUserName.trim();
+        }
+
+        return Cli
+          .executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...options, _: [] } })
+          .then((getUserGetOutput: CommandOutput): void => {
+            if (this.debug) {
+              logger.logToStderr(getUserGetOutput.stderr);
+            }
+
+            validUserNames.push(JSON.parse(getUserGetOutput.stdout).userPrincipalName);
+          }, (err: CommandErrorWithOutput) => {
+            if (this.debug) {
+              logger.logToStderr(err.stderr);
+            }
+            invalidUserNames.push(singleUserName);
+          });
+      }))
       .then((): Promise<string[]> => {
-        return Promise.resolve(activeUsernamelist);
+        if (invalidUserNames.length > 0) {
+          return Promise.reject(`Users not added to the group because the following users don't exist: ${invalidUserNames.join(', ')}`);
+        }
+
+        return Promise.resolve(validUserNames);
       });
   }
 
@@ -101,6 +154,7 @@ class SpoGroupUserAddCommand extends SpoCommand {
     const generatedPeoplePicker: any = JSON.stringify(activeUserList.map(singleUsername => {
       return { Key: singleUsername.trim() };
     }));
+
     return generatedPeoplePicker;
   }
 
@@ -110,10 +164,16 @@ class SpoGroupUserAddCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--groupId <groupId>'
+        option: '--groupId [groupId]'
       },
       {
-        option: '--userName <userName>'
+        option: '--groupName [groupName]'
+      },
+      {
+        option: '--userName [userName]'
+      },
+      {
+        option: '--email [email]'
       }
     ];
 
@@ -127,8 +187,24 @@ class SpoGroupUserAddCommand extends SpoCommand {
       return isValidSharePointUrl;
     }
 
-    if (typeof args.options.groupId !== 'number') {
-      return `Group Id : ${args.options.groupId} is not a number`;
+    if (!args.options.groupId && !args.options.groupName) {
+      return 'Specify either groupId or groupName';
+    }
+
+    if (args.options.groupId && args.options.groupName) {
+      return 'Specify either groupId or groupName but not both';
+    }
+
+    if (!args.options.userName && !args.options.email) {
+      return 'Specify either userName or email';
+    }
+
+    if (args.options.userName && args.options.email) {
+      return 'Specify either userName or email but not both';
+    }
+
+    if (args.options.groupId && isNaN(args.options.groupId)) {
+      return `Specified groupId ${args.options.groupId} is not a number`;
     }
 
     return true;

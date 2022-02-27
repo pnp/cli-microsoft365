@@ -1,3 +1,4 @@
+import { Group } from '@microsoft/microsoft-graph-types';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
@@ -47,7 +48,7 @@ class AadO365GroupSetCommand extends GraphCommand {
         logger.logToStderr(`Updating Microsoft 365 Group ${args.options.id}...`);
       }
 
-      const update: any = {};
+      const update: Group = {};
       if (args.options.displayName) {
         update.displayName = args.options.displayName;
       }

@@ -46,6 +46,10 @@ export default class Utils {
     });
   }
 
+  public static isValidGuidArray(guids: string[]): boolean {
+    return guids.every(guid => this.isValidGuid(guid));
+  }
+
   public static isValidGuid(guid: string): boolean {
     const guidRegEx: RegExp = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
@@ -54,6 +58,12 @@ export default class Utils {
 
   public static isValidTeamsChannelId(guid: string): boolean {
     const guidRegEx: RegExp = new RegExp(/^19:[0-9a-zA-Z-_]+@thread\.(skype|tacv2)$/i);
+
+    return guidRegEx.test(guid);
+  }
+
+  public static isValidTeamsChatId(guid: string): boolean {
+    const guidRegEx: RegExp = new RegExp(/^19:[0-9a-zA-Z-_]+(@thread\.v2|@unq\.gbl\.spaces)$/i);
 
     return guidRegEx.test(guid);
   }
