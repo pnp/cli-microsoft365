@@ -12,6 +12,7 @@ const command: Command = require('./site-recyclebinitem-restore');
 describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
   let log: any[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -32,6 +33,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -96,6 +98,30 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
+    const result = command.action(logger, {
+      options: {
+        output: 'json',
+        debug: true,
+        siteUrl: 'https://contoso.sharepoint.com',
+        ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526,1adcf0d6-3733-4c13-b883-c84a27905cfd'
+      }
+    }, () => {
+      try {
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+
+    assert.equal(result, undefined);
+  });
+
+  it('catch error when restores all items from recycle', (done) => {
+    sinon.stub(request, 'post').callsFake(() => {
+      return Promise.reject('Invalid request');
+    });
+
     command.action(logger, {
       options: {
         output: 'json',
@@ -105,7 +131,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
       }
     }, () => {
       try {
-        assert(true);
+        assert(loggerLogSpy.calledWith('Could not restore items from recyclebin'));
         done();
       }
       catch (e) {

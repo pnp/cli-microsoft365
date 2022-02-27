@@ -39,7 +39,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
     }
 
     Promise.all(
-      idsChunks.map(async (idsChunk: string[]) => {
+      idsChunks.map((idsChunk: string[]) => {
         const requestOptions: any = {
           url: requestUrl,
           headers: {
@@ -52,9 +52,17 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
           }
         };
 
-        await request.post(requestOptions);
+        return request.post(requestOptions);
       })
-    ).then(_ => cb());
+    )
+      .then(_ => cb())
+      .catch(_ => {
+        if (this.debug) {
+          logger.log(`Could not restore items from recyclebin`);
+        }
+
+        cb();
+      });
 
   }
 
