@@ -1,6 +1,5 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import * as os from 'os';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
@@ -251,7 +250,6 @@ describe(commands.PLAN_SET, () => {
               }
             }
           })
-          //stdout: '[{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\\"","createdDateTime":"2021-03-10T17:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"opb7bchfZUiFbVWEPL7jPGUABW7f","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}}]'
         });
       }
 
@@ -412,29 +410,6 @@ describe(commands.PLAN_SET, () => {
     });
   });
 
-  it('fails when multiple plans with the same are found', (done) => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
-      if (command === planGetCommand) {
-        return Promise.resolve({
-          stdout: '{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\\"","createdDateTime":"2021-03-10T17:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"opb7bchfZUiFbVWEPL7jPGUABW7f","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}},{"@odata.context":"https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity)","@odata.etag":"W/\\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUDd=\\"","createdDateTime":"2021-03-10T18:39:43.1045549Z","owner":"233e43d0-dc6a-482e-9b4e-0de7a7bce9b4","title":"MyPlan","id":"zck9bchfZTimlUBAQR4jPGTABW8v","createdBy":{"user":{"displayName":null,"id":"eded3a2a-8f01-40aa-998a-e4f02ec693ba"},"application":{"displayName":null,"id":"31359c7f-bd7e-475c-86db-fdb8c937548e"}}}'
-        });
-      }
-
-      return Promise.reject(`Invalid request`);
-    });
-
-    command.action(logger, { options: { debug: false, title: 'MyPlan', ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4', newTitle: 'MyNewPlan' } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple plans with the name MyPlan found. Please disambiguate using the ID:${os.EOL}opb7bchfZUiFbVWEPL7jPGUABW7f${os.EOL}zck9bchfZTimlUBAQR4jPGTABW8v`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-
   it('handles failure when plan update fails', (done) => {
     const getPlanStub = sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === planGetCommand) {
@@ -450,7 +425,14 @@ describe(commands.PLAN_SET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false, title: 'MyPlan', ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4', newTitle: 'MyNewPlan' } }, (err?: any) => {
+    command.action(logger, {
+      options: {
+        debug: false,
+        title: 'MyPlan',
+        ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4',
+        newTitle: 'MyNewPlan'
+      }
+    }, (err?: any) => {
       try {
         assert(getPlanStub.called);
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
