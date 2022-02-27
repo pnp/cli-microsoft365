@@ -7,14 +7,9 @@ const settingsNames = {
   csvHeader: 'csvHeader',
   autoOpenBrowserOnLogin: 'autoOpenBrowserOnLogin',
   csvEscape: 'csvEscape',
-  csvHeader: 'csvHeader',
   csvQuote: 'csvQuote',
   csvQuoted: 'csvQuoted',
-  csvQuotedEmpty: 'csvQuotedEmpty',
-  errorOutput: 'errorOutput',
-  output: 'output',
-  printErrorsAsPlainText: 'printErrorsAsPlainText',
-  showHelpOnFailure: 'showHelpOnFailure'
+  csvQuotedEmpty: 'csvQuotedEmpty'
 };
 
 export { settingsNames };
