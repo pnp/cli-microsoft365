@@ -123,7 +123,7 @@ describe(commands.LISTITEM_REMOVE, () => {
       if ((opts.url as string).indexOf(`/_api/web/lists(guid'`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -161,7 +161,7 @@ describe(commands.LISTITEM_REMOVE, () => {
       if ((opts.url as string).indexOf(`/recycle()`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }

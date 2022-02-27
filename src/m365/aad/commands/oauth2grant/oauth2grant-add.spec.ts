@@ -65,7 +65,7 @@ describe(commands.OAUTH2GRANT_ADD, () => {
       if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants`) > -1) {
         if (opts.headers &&
           opts.headers['content-type'] &&
-          opts.headers['content-type'].indexOf('application/json') === 0 &&
+          (opts.headers['content-type'] as string).indexOf('application/json') === 0 &&
           opts.data.clientId === '6a7b1395-d313-4682-8ed4-65a6265a6320' &&
           opts.data.resourceId === '6a7b1395-d313-4682-8ed4-65a6265a6321' &&
           opts.data.scope === 'user_impersonation') {
@@ -92,9 +92,9 @@ describe(commands.OAUTH2GRANT_ADD, () => {
       if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants`) > -1) {
         if (opts.headers &&
           opts.headers.authorization &&
-          opts.headers.authorization.indexOf('Bearer ') === 0 &&
+          (opts.headers.authorization as string).indexOf('Bearer ') === 0 &&
           opts.headers['content-type'] &&
-          opts.headers['content-type'].indexOf('application/json') === 0 &&
+          (opts.headers['content-type'] as string).indexOf('application/json') === 0 &&
           opts.data.clientId === '6a7b1395-d313-4682-8ed4-65a6265a6320' &&
           opts.data.resourceId === '6a7b1395-d313-4682-8ed4-65a6265a6321' &&
           opts.data.scope === 'user_impersonation') {

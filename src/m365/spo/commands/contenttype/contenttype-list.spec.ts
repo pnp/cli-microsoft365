@@ -119,7 +119,7 @@ describe(commands.CONTENTTYPE_LIST, () => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/test/_api/web/ContentTypes`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
               {
@@ -256,7 +256,7 @@ describe(commands.CONTENTTYPE_LIST, () => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/test/_api/web/ContentTypes`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
               {
@@ -393,7 +393,7 @@ describe(commands.CONTENTTYPE_LIST, () => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/test/_api/web/ContentTypes?$filter=Group eq 'List%20Content%20Types'`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
               {
@@ -531,7 +531,7 @@ describe(commands.CONTENTTYPE_LIST, () => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/test/_api/web/ContentTypes?$filter=Group eq 'List%20Content%20Types'`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
               {

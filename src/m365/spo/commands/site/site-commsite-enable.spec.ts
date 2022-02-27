@@ -216,13 +216,6 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when valid site URL specified', () => {
-    const actual = command.validate({
-      options: { url: 'https://contoso.sharepoint.com' }
-    });
-    assert.strictEqual(actual, true);
-  });
-
   it('fails validation when invalid design package ID specified', () => {
     const actual = command.validate({
       options: { url: 'https://contoso.sharepoint.com', designPackageId: 'invalid' }

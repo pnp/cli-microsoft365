@@ -64,7 +64,7 @@ describe(commands.LIST_VIEW_SET, () => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('List%201')/views/getByTitle('All%20items')`) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0 &&
+          (opts.headers.accept as string).indexOf('application/json') === 0 &&
           opts.headers['X-RequestDigest'] &&
           JSON.stringify(opts.data) === JSON.stringify({ Title: 'All events' })) {
           return Promise.resolve();
@@ -90,7 +90,7 @@ describe(commands.LIST_VIEW_SET, () => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('List%201')/views/getByTitle('All%20items')`) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0 &&
+          (opts.headers.accept as string).indexOf('application/json') === 0 &&
           opts.headers['X-RequestDigest'] &&
           JSON.stringify(opts.data) === JSON.stringify({ Title: 'All events' })) {
           return Promise.resolve();
@@ -116,7 +116,7 @@ describe(commands.LIST_VIEW_SET, () => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'330f29c5-5c4c-465f-9f4b-7903020ae1cf')/views/getById('330f29c5-5c4c-465f-9f4b-7903020ae1ce')`) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0 &&
+          (opts.headers.accept as string).indexOf('application/json') === 0 &&
           opts.headers['X-RequestDigest'] &&
           JSON.stringify(opts.data) === JSON.stringify({ Title: 'All events', CustomFormatter: 'abc' })) {
           return Promise.resolve();

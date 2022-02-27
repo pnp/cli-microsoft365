@@ -7,5 +7,8 @@ export default {
   PLAN_GET: `${prefix} plan get`,
   PLAN_LIST: `${prefix} plan list`,
   TASK_ADD: `${prefix} task add`,
-  TASK_LIST: `${prefix} task list`
+  TASK_DETAILS_GET: `${prefix} task details get`,
+  TASK_GET: `${prefix} task get`,
+  TASK_LIST: `${prefix} task list`,
+  TASK_SET: `${prefix} task set`
 };

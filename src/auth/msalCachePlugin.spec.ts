@@ -59,21 +59,6 @@ describe('msalCachePlugin', () => {
       }, ex => done(ex));
   });
 
-  it(`doesn't fail restoring cache if cache file not found`, (done) => {
-    sinon.stub((msalCachePlugin as any).fileTokenStorage, 'get').callsFake(() => Promise.reject('File not found'));
-    msalCachePlugin
-      .beforeCacheAccess(mockCacheContext)
-      .then(() => {
-        try {
-          assert(mockCacheDeserializeSpy.notCalled);
-          done();
-        }
-        catch (ex) {
-          done(ex);
-        }
-      }, ex => done(ex));
-  });
-
   it(`doesn't fail restoring cache if an error has occurred`, (done) => {
     sinon.stub((msalCachePlugin as any).fileTokenStorage, 'get').callsFake(() => Promise.reject('An error has occurred'));
     msalCachePlugin

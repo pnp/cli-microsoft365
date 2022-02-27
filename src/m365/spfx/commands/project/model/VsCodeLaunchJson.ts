@@ -7,6 +7,8 @@ export interface VsCodeLaunchJson extends JsonFile {
 }
 
 export interface VsCodeLaunchJsonConfiguration {
+  name?: string;
   sourceMapPathOverrides?: Hash;
+  type?: string;
   url?: string;
 }

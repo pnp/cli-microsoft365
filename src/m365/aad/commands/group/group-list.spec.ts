@@ -176,6 +176,76 @@ describe(commands.GROUP_LIST, () => {
     });
   });
 
+  it('lists deleted groups in the tenant with the default properties', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/microsoft.graph.group`) {
+        return Promise.resolve({
+          "value": [
+            {
+              "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+              "description": "Code Challenge",
+              "displayName": "Code Challenge",
+              "groupTypes": [
+                "Unified"
+              ],
+              "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "CodeChallenge",
+              "securityEnabled": false
+            },
+            {
+              "id": "2f64f70d-386b-489f-805a-670cad739fde",
+              "description": "The Jumping Jacks",
+              "displayName": "The Jumping Jacks",
+              "groupTypes": [
+              ],
+              "mail": "TheJumpingJacks@dev1802.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "TheJumpingJacks",
+              "securityEnabled": true
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, deleted: true } }, () => {
+      try {
+        assert(loggerLogSpy.calledWith([
+          {
+            "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+            "description": "Code Challenge",
+            "displayName": "Code Challenge",
+            "groupTypes": [
+              "Unified"
+            ],
+            "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+            "mailEnabled": true,
+            "mailNickname": "CodeChallenge",
+            "securityEnabled": false
+          },
+          {
+            "id": "2f64f70d-386b-489f-805a-670cad739fde",
+            "description": "The Jumping Jacks",
+            "displayName": "The Jumping Jacks",
+            "groupTypes": [
+            ],
+            "mail": "TheJumpingJacks@dev1802.onmicrosoft.com",
+            "mailEnabled": true,
+            "mailNickname": "TheJumpingJacks",
+            "securityEnabled": true
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('lists aad Groups in the tenant (text)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups`) {

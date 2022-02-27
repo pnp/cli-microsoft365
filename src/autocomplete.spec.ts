@@ -132,9 +132,9 @@ describe('autocomplete', () => {
     assert(writeFileSyncStub.calledWith(path.join(__dirname, `..${path.sep}commands.json`), JSON.stringify({
       cli: {
         mock: {
-          "-o": ["json", "text"],
+          "-o": ["csv", "json", "text"],
           "--query": {},
-          "--output": ["json", "text"],
+          "--output": ["csv", "json", "text"],
           "--verbose": {},
           "--debug": {},
           "--help": {},
@@ -170,7 +170,7 @@ describe('autocomplete', () => {
 
     assert.strictEqual(clink, [
       'local parser = clink.arg.new_parser',
-      'local m365_parser = parser({"cli"..parser({"mock"..parser({},"--debug", "--help", "--output"..parser({"json","text"}), "--query", "--verbose", "-h", "-o"..parser({"json","text"}))})})',
+      'local m365_parser = parser({"cli"..parser({"mock"..parser({},"--debug", "--help", "--output"..parser({"csv","json","text"}), "--query", "--verbose", "-h", "-o"..parser({"csv","json","text"}))})})',
       '',
       'clink.arg.register_parser("m365", m365_parser)',
       'clink.arg.register_parser("microsoft365", m365_parser)'
@@ -183,7 +183,7 @@ describe('autocomplete', () => {
 
     assert.strictEqual(clink, [
       'local parser = clink.arg.new_parser',
-      'local m365_parser = parser({"cli"..parser({"mock2"..parser({},"--debug", "--help", "--longOption", "--output"..parser({"json","text"}), "--query", "--verbose", "-h", "-l", "-o"..parser({"json","text"}))})})',
+      'local m365_parser = parser({"cli"..parser({"mock2"..parser({},"--debug", "--help", "--longOption", "--output"..parser({"csv","json","text"}), "--query", "--verbose", "-h", "-l", "-o"..parser({"csv","json","text"}))})})',
       '',
       'clink.arg.register_parser("m365", m365_parser)',
       'clink.arg.register_parser("microsoft365", m365_parser)'
@@ -196,7 +196,7 @@ describe('autocomplete', () => {
 
     assert.strictEqual(clink, [
       'local parser = clink.arg.new_parser',
-      'local m365_parser = parser({"cli"..parser({"mock2"..parser({},"--debug", "--help", "--longOption", "--output"..parser({"json","text"}), "--query", "--verbose", "-h", "-l", "-o"..parser({"json","text"}))})})',
+      'local m365_parser = parser({"cli"..parser({"mock2"..parser({},"--debug", "--help", "--longOption", "--output"..parser({"csv","json","text"}), "--query", "--verbose", "-h", "-l", "-o"..parser({"csv","json","text"}))})})',
       '',
       'clink.arg.register_parser("m365", m365_parser)',
       'clink.arg.register_parser("microsoft365", m365_parser)'
@@ -209,7 +209,7 @@ describe('autocomplete', () => {
 
     assert.strictEqual(clink, [
       'local parser = clink.arg.new_parser',
-      'local m365_parser = parser({"cli"..parser({"mock2"..parser({},"--debug", "--help", "--longOption", "--output"..parser({"json","text"}), "--query", "--verbose", "-h", "-l", "-o"..parser({"json","text"}))})})',
+      'local m365_parser = parser({"cli"..parser({"mock2"..parser({},"--debug", "--help", "--longOption", "--output"..parser({"csv","json","text"}), "--query", "--verbose", "-h", "-l", "-o"..parser({"csv","json","text"}))})})',
       '',
       'clink.arg.register_parser("m365", m365_parser)',
       'clink.arg.register_parser("microsoft365", m365_parser)'
@@ -222,7 +222,7 @@ describe('autocomplete', () => {
 
     assert.strictEqual(clink, [
       'local parser = clink.arg.new_parser',
-      'local m365_parser = parser({"cli"..parser({"alias"..parser({},"--debug", "--help", "--output"..parser({"json","text"}), "--query", "--verbose", "-h", "-o"..parser({"json","text"})),"mock"..parser({},"--debug", "--help", "--output"..parser({"json","text"}), "--query", "--verbose", "-h", "-o"..parser({"json","text"}))})})',
+      'local m365_parser = parser({"cli"..parser({"alias"..parser({},"--debug", "--help", "--output"..parser({"csv","json","text"}), "--query", "--verbose", "-h", "-o"..parser({"csv","json","text"})),"mock"..parser({},"--debug", "--help", "--output"..parser({"csv","json","text"}), "--query", "--verbose", "-h", "-o"..parser({"csv","json","text"}))})})',
       '',
       'clink.arg.register_parser("m365", m365_parser)',
       'clink.arg.register_parser("microsoft365", m365_parser)'

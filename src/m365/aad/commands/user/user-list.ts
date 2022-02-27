@@ -13,6 +13,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   properties?: string;
+  deleted?: boolean;
 }
 
 class AadUserListCommand extends GraphItemsListCommand<User> {
@@ -31,6 +32,7 @@ class AadUserListCommand extends GraphItemsListCommand<User> {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.properties = args.options.properties;
+    telemetryProps.deleted = typeof args.options.deleted !== 'undefined';
     return telemetryProps;
   }
 
@@ -39,7 +41,8 @@ class AadUserListCommand extends GraphItemsListCommand<User> {
       args.options.properties.split(',').map(p => p.trim()) :
       ['userPrincipalName', 'displayName'];
     const filter: string = this.getFilter(args.options);
-    const url: string = `${this.resource}/v1.0/users?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
+    const endpoint: string = args.options.deleted ? 'directory/deletedItems/microsoft.graph.user' : 'users';
+    const url: string = `${this.resource}/v1.0/${endpoint}?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
 
     this
       .getAllItems(url, logger, true)
@@ -54,6 +57,8 @@ class AadUserListCommand extends GraphItemsListCommand<User> {
     const excludeOptions: string[] = [
       'properties',
       'p',
+      'deleted',
+      'd',
       'debug',
       'verbose',
       'output',
@@ -77,9 +82,8 @@ class AadUserListCommand extends GraphItemsListCommand<User> {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
-      {
-        option: '-p, --properties [properties]'
-      }
+      { option: '-p, --properties [properties]' },
+      { option: '-d, --deleted' }
     ];
 
     const parentOptions: CommandOption[] = super.options();

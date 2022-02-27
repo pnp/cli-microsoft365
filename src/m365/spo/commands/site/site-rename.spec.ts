@@ -298,7 +298,7 @@ describe(commands.SITE_RENAME, () => {
       if ((opts.url as string).indexOf('/_api/SiteRenameJobs/GetJobsBySiteUrl') > -1 &&
         opts.headers &&
         opts.headers['X-AttemptNumber'] &&
-        parseInt(opts.headers['X-AttemptNumber']) <= 1) {
+        parseInt(opts.headers['X-AttemptNumber'] as string) <= 1) {
         return Promise.resolve(
           {
             "odata.metadata": "https://contoso-admin.sharepoint.com/_api/$metadata#SP.ApiData.SiteRenameJobEntityDatas",
@@ -328,7 +328,7 @@ describe(commands.SITE_RENAME, () => {
       else if ((opts.url as string).indexOf('/_api/SiteRenameJobs/GetJobsBySiteUrl') > -1 &&
         opts.headers &&
         opts.headers['X-AttemptNumber'] &&
-        parseInt(opts.headers['X-AttemptNumber']) > 1) {
+        parseInt(opts.headers['X-AttemptNumber'] as string) > 1) {
         return Promise.resolve(
           {
             "odata.metadata": "https://contoso-admin.sharepoint.com/_api/$metadata#SP.ApiData.SiteRenameJobEntityDatas",

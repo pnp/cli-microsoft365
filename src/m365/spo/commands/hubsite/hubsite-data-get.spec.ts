@@ -17,7 +17,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -168,7 +168,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
     });
   });
 
-  it('gets information about the specified hub site', (done) => {
+  it('correctly handles empty response', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/HubSiteData`) > -1) {
         return Promise.resolve({ "odata.null": true });
@@ -188,7 +188,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
     });
   });
 
-  it('gets information about the specified hub site (debug)', (done) => {
+  it('correctly handles error when specified site is not connect to or is a hub site (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/HubSiteData`) > -1) {
         return Promise.resolve({ "odata.null": true });

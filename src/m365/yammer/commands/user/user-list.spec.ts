@@ -269,27 +269,6 @@ describe(commands.USER_LIST, () => {
     });
   });
 
-  it('sorts network users by messages', function (done) {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1&sort_by=messages') {
-        return Promise.resolve([
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }
-        ]);
-      }
-      return Promise.reject('Invalid request');
-    });
-    command.action(logger, { options: { sortBy: "messages" } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('sorts users in reverse order', function (done) {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1&reverse=true') {
@@ -432,12 +411,12 @@ describe(commands.USER_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('letter allows just once char', () => {
+  it('passes validation if letter is set to a single character', () => {
     const actual = command.validate({ options: { letter: "a" } });
     assert.strictEqual(actual, true);
   });
 
-  it('letter allows just once char', () => {
+  it('does not pass validation if letter is set to a multiple characters', () => {
     const actual = command.validate({ options: { letter: "ab" } });
     assert.notStrictEqual(actual, true);
   });

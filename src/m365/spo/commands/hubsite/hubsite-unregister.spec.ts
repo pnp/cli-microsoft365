@@ -76,7 +76,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/site/UnregisterHubSite' &&
         opts.headers &&
         opts.headers.accept &&
-        opts.headers.accept.indexOf('application/json') === 0) {
+        (opts.headers.accept as string).indexOf('application/json') === 0) {
         return Promise.resolve();
       }
 
@@ -135,7 +135,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/site/UnregisterHubSite' &&
         opts.headers &&
         opts.headers.accept &&
-        opts.headers.accept.indexOf('application/json') === 0) {
+        (opts.headers.accept as string).indexOf('application/json') === 0) {
         return Promise.resolve();
       }
 

@@ -46,6 +46,8 @@ CLI for Microsoft 365 requires the following permissions to Microsoft 365 servic
 !!! attention
     After changing the ID of the Azure AD application used by the CLI for Microsoft 365 refresh the existing connection to Microsoft 365 using the `login` command. If you try to use the existing connection, CLI for Microsoft 365 will fail when trying to refresh the existing access token.
 
+For instructions on how to create your own Azure AD app see [Using your own Azure AD identity](../user-guide/using-own-identity.md).
+
 ### Access and refresh tokens in the CLI for Microsoft 365
 
 After completing the OAuth flow, the CLI receives from Azure Active Directory a refresh- and an access token. Each web request to Microsoft 365 APIs contains the access token which authorizes the CLI for Microsoft 365 to execute the particular operation. When the access token expires, the CLI uses the refresh token to obtain a new access token. When the refresh token expires, the user has to reauthenticate to Microsoft 365 to obtain a new refresh token.

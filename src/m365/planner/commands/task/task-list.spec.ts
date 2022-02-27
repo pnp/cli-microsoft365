@@ -71,10 +71,79 @@ describe(commands.TASK_LIST, () => {
     }
   ];
 
+  const taskListResponseBetaValue = [
+    {
+      "@odata.etag": "W/\"JzEtVGFzayAgQEBAQEBAQEBAQEBAQEBARCc=\"",
+      "planId": "iVPMIgdku0uFlou-KLNg6MkAE1O2",
+      "bucketId": "FtzysDykv0-9s9toWiZhdskAD67z",
+      "title": "Bucket Task 1",
+      "orderHint": "8585760017701920008P'",
+      "assigneePriority": "",
+      "percentComplete": 0,
+      "startDateTime": null,
+      "createdDateTime": "2021-07-06T20:59:35.4105517Z",
+      "dueDateTime": null,
+      "hasDescription": false,
+      "previewType": "automatic",
+      "completedDateTime": null,
+      "completedBy": null,
+      "referenceCount": 0,
+      "checklistItemCount": 0,
+      "activeChecklistItemCount": 0,
+      "conversationThreadId": null,
+      "id": "KvamtRjaPkmPVy1rEA1r2skAOxcA",
+      "createdBy": {
+        "user": {
+          "displayName": null,
+          "id": "73829096-6f0a-4745-8f72-12a17bacadea"
+        }
+      },
+      "appliedCategories": {},
+      "assignments": {},
+      "priority": 5
+    },
+    {
+      "@odata.etag": "W/\"JzEtVGFzayAgQEBAQEBAQEBAQEBAQEBARCc=\"",
+      "planId": "iVPMIgdku0uFlou-KLNg6MkAE1O2",
+      "bucketId": "FtzysDykv0-9s9toWiZhdskAD67z",
+      "title": "Bucket Task 2",
+      "orderHint": "8585763504689506592PK",
+      "assigneePriority": "8585763504089037251",
+      "percentComplete": 0,
+      "startDateTime": null,
+      "createdDateTime": "2021-07-02T20:07:56.5738556Z",
+      "dueDateTime": null,
+      "hasDescription": false,
+      "previewType": "automatic",
+      "completedDateTime": null,
+      "completedBy": null,
+      "referenceCount": 0,
+      "checklistItemCount": 0,
+      "activeChecklistItemCount": 0,
+      "conversationThreadId": null,
+      "id": "BNWGt05mFUq1VV-cdK00aMkAH5nT",
+      "createdBy": {
+        "user": {
+          "displayName": null,
+          "id": "73829096-6f0a-4745-8f72-12a17bacadea"
+        }
+      },
+      "appliedCategories": {},
+      "assignments": {},
+      "priority": 1
+    }
+  ];
+
   const taskListResponse: any = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.plannerTask)",
     "@odata.count": 2,
     "value": taskListResponseValue
+  };
+
+  const taskListBetaResponse: any = {
+    "@odata.context": "https://graph.microsoft.com/beta/$metadata#Collection(microsoft.graph.plannerTask)",
+    "@odata.count": 2,
+    "value": taskListResponseBetaValue
   };
 
   const bucketListResponseValue = [
@@ -215,6 +284,15 @@ describe(commands.TASK_LIST, () => {
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/me/planner/tasks`) {
         return Promise.resolve(taskListResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/beta/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
+        return Promise.resolve(taskListBetaResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/beta/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
+        return Promise.resolve(taskListBetaResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/beta/me/planner/tasks`) {
+        return Promise.resolve(taskListBetaResponse);
       }
       return Promise.reject('Invalid Request');
     });
@@ -473,6 +551,15 @@ describe(commands.TASK_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/planner/tasks`) {
         return Promise.resolve(taskListResponse);
       }
+      if (opts.url === `https://graph.microsoft.com/beta/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
+        return Promise.resolve(taskListBetaResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/beta/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
+        return Promise.resolve(taskListBetaResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/beta/me/planner/tasks`) {
+        return Promise.resolve(taskListBetaResponse);
+      }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets`) {
         return Promise.resolve({ value: [] });
       }
@@ -514,6 +601,15 @@ describe(commands.TASK_LIST, () => {
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/me/planner/tasks`) {
         return Promise.resolve(taskListResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/beta/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
+        return Promise.resolve(taskListBetaResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/beta/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
+        return Promise.resolve(taskListBetaResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/beta/me/planner/tasks`) {
+        return Promise.resolve(taskListBetaResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
         return Promise.resolve({ value: [] });
@@ -558,8 +654,9 @@ describe(commands.TASK_LIST, () => {
     };
 
     command.action(logger, { options: options } as any, () => {
+
       try {
-        assert(loggerLogSpy.calledWith(taskListResponseValue));
+        assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
         done();
       }
       catch (e) {
@@ -577,7 +674,7 @@ describe(commands.TASK_LIST, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith(taskListResponseValue));
+        assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
         done();
       }
       catch (e) {
@@ -594,7 +691,7 @@ describe(commands.TASK_LIST, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith(taskListResponseValue));
+        assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
         done();
       }
       catch (e) {
@@ -604,6 +701,7 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('correctly lists planner tasks with bucketName and planId', (done) => {
+
     const options: any = {
       debug: false,
       bucketName: 'Planner Bucket A',
@@ -612,7 +710,7 @@ describe(commands.TASK_LIST, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith(taskListResponseValue));
+        assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
         done();
       }
       catch (e) {
@@ -631,7 +729,7 @@ describe(commands.TASK_LIST, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith(taskListResponseValue));
+        assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
         done();
       }
       catch (e) {
@@ -650,7 +748,7 @@ describe(commands.TASK_LIST, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith(taskListResponseValue));
+        assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
         done();
       }
       catch (e) {
