@@ -1,5 +1,17 @@
 # Release notes
 
+## [v5.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.1.0)
+
+### New commands
+
+**Planner:**
+
+- [planner plan details get](../cmd/planner/plan/plan-details-get.md) - retrieve the planner details about the specified plan [#3051](https://github.com/pnp/cli-microsoft365/issues/3051)
+
+### Changes
+
+- refactored helper methods [#2989](https://github.com/pnp/cli-microsoft365/issues/2989)
+
 ## [v5.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.0.0)
 
 ### New commands
