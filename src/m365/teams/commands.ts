@@ -12,6 +12,7 @@ export default {
   CHANNEL_LIST: `${prefix} channel list`,
   CHANNEL_REMOVE: `${prefix} channel remove`,
   CHANNEL_SET: `${prefix} channel set`,
+  CHAT_GET: `${prefix} chat get`,
   CHAT_LIST: `${prefix} chat list`,
   CHAT_MEMBER_LIST: `${prefix} chat member list`,
   CHAT_MESSAGE_LIST: `${prefix} chat message list`,

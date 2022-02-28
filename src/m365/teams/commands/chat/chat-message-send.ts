@@ -8,9 +8,10 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { accessToken, odata, validation } from '../../../../utils';
+import { accessToken, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { chatUtil } from './chatUtil';
 
 interface CommandArgs {
   options: Options;
@@ -92,7 +93,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     }
 
     if (args.options.userEmails) {
-      const userEmails = this.convertCommaSeparatedListToArray(args.options.userEmails);
+      const userEmails = chatUtil.convertParticipantStringToArray(args.options.userEmails);
       if (!userEmails || userEmails.length === 0 || userEmails.some(e => !validation.isValidUserPrincipalName(e))) {
         return `${args.options.userEmails} contains one or more invalid email addresses.`;
       }
@@ -112,9 +113,9 @@ class TeamsChatMessageSendCommand extends GraphCommand {
   }
 
   private async ensureChatIdByUserEmails(userEmailsOption: string, logger: Logger): Promise<string> {
-    const userEmails = this.convertCommaSeparatedListToArray(userEmailsOption);
+    const userEmails = chatUtil.convertParticipantStringToArray(userEmailsOption);
     const currentUserEmail = accessToken.getUserNameFromAccessToken(Auth.service.accessTokens[this.resource].accessToken).toLowerCase();
-    const existingChats = await this.findExistingGroupChatsByMembers([currentUserEmail, ...userEmails], logger);
+    const existingChats = await chatUtil.findExistingChatsByParticipants([currentUserEmail, ...userEmails], logger);
     
     if (!existingChats || existingChats.length === 0) {
       const chat = await this.createConversation([currentUserEmail, ...userEmails]);
@@ -133,7 +134,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
   }
 
   private async getChatIdByName(chatName: string, logger: Logger): Promise<string> {
-    const existingChats = await this.findExistingGroupChatsByName(chatName, logger);
+    const existingChats = await chatUtil.findExistingGroupChatsByName(chatName, logger);
 
     if (!existingChats || existingChats.length === 0) {
       throw new Error('No chat conversation was found with this name.');
@@ -206,35 +207,6 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     };
 
     await request.post(requestOptions);
-  }
-
-  private async findExistingGroupChatsByMembers(expectedMemberEmails: string[], logger: Logger): Promise<Chat[]> {
-    const endpoint = `${this.resource}/v1.0/chats?$filter=chatType eq 'group'&$expand=members&$select=id,topic,createdDateTime,members`;
-    const foundChats: Chat[] = [];
-
-    const chats = await odata.getAllItems<Chat>(endpoint, logger);
-
-    for (const chat of chats) {
-      const chatMembers = chat.members as ConversationMember[];
-      if (chatMembers.length === expectedMemberEmails.length) {
-        const chatMemberEmails = chatMembers.map(member => (member as AadUserConversationMember).email?.toLowerCase());
-
-        if (expectedMemberEmails.every(email => chatMemberEmails.some(memberEmail => memberEmail === email))) {
-          foundChats.push(chat);
-        }
-      }
-    }
-
-    return foundChats;
-  }
-
-  private async findExistingGroupChatsByName(name: string, logger: Logger): Promise<Chat[]> {
-    const endpoint = `${this.resource}/v1.0/chats?$filter=topic eq '${encodeURIComponent(name)}'&$expand=members&$select=id,topic,createdDateTime,chatType`;
-    return odata.getAllItems<Chat>(endpoint, logger);
-  }
-
-  private convertCommaSeparatedListToArray(userEmailsString: string): string[] {
-    return userEmailsString.toLowerCase().replace(/\s/g, '').split(',').filter(e => e && e !== '');
   }
 }
 
