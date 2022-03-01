@@ -6,7 +6,8 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { accessToken } from '../../../../utils/accessToken';
+import { sinonUtil } from '../../../../utils/sinonUtil';
 import commands from '../../commands';
 const command: Command = require('./chat-get');
 
@@ -34,7 +35,7 @@ describe(commands.CHAT_GET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub(Utils, 'getUserNameFromAccessToken').callsFake(() => { return 'MeganB@M365x214355.onmicrosoft.com'; });    
+    sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => { return 'MeganB@M365x214355.onmicrosoft.com'; });    
     auth.service.connected = true;
     if (!auth.service.accessTokens[auth.defaultResource]) {
       auth.service.accessTokens[auth.defaultResource] = {
@@ -89,16 +90,16 @@ describe(commands.CHAT_GET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent,
-      Utils.getUserNameFromAccessToken
+      accessToken.getUserNameFromAccessToken
     ]);
     auth.service.connected = false;
     auth.service.accessTokens = {};

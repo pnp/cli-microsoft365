@@ -8,10 +8,11 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { GraphResponse } from '../../../base/GraphResponse';
+import { validation } from '../../../../utils/validation';
+import { accessToken } from '../../../../utils/accessToken';
+import { ODataResponse } from '../../../../utils/odata';
 
 interface CommandArgs {
   options: Options;
@@ -80,13 +81,13 @@ class TeamsChatGetCommand extends GraphCommand {
       return 'Specify either id or participants or name, but not multiple.';
     }
 
-    if (args.options.id && !Utils.isValidTeamsChatId(args.options.id)) {
+    if (args.options.id && !validation.isValidTeamsChatId(args.options.id)) {
       return `${args.options.id} is not a valid Teams ChatId.`;
     }
 
     if (args.options.participants) {
       const participants = args.options.participants.toLowerCase().replace(/\s/g, '').split(',').filter(e => e && e !== '');
-      if (!participants || participants.length === 0 || participants.some(e => !Utils.isValidUserPrincipalName(e))) {
+      if (!participants || participants.length === 0 || participants.some(e => !validation.isValidUserPrincipalName(e))) {
         return `${args.options.participants} contains one or more invalid email addresses.`;
       }
     }
@@ -109,7 +110,7 @@ class TeamsChatGetCommand extends GraphCommand {
 
   private async getChatIdByParticipants(participantsString: string): Promise<string> {
     const participants = participantsString.toLowerCase().replace(/\s/g, '').split(',').filter(e => e && e !== '');
-    const currentUserEmail = Utils.getUserNameFromAccessToken(Auth.service.accessTokens[this.resource].accessToken).toLowerCase();
+    const currentUserEmail = accessToken.getUserNameFromAccessToken(Auth.service.accessTokens[this.resource].accessToken).toLowerCase();
     const existingChats = await this.findExistingChatsByParticipants([currentUserEmail, ...participants]);
     
     if (!existingChats || existingChats.length === 0) {
@@ -183,7 +184,7 @@ class TeamsChatGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    const res = await request.get<GraphResponse<Chat>>(requestOptions);
+    const res = await request.get<ODataResponse<Chat>>(requestOptions);
 
     items = items.concat(res.value);
 
