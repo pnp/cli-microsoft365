@@ -4,8 +4,8 @@ import Command, {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import request from '../../../../request';
 import { Options as PlanGetCommandOptions } from '../plan/plan-get';
@@ -23,11 +23,11 @@ interface Options extends GlobalOptions {
   ownerGroupName?: string;
 }
 
-interface PlannerPlanWithOdata extends PlannerPlan {
+interface ExtendedPlannerPlan extends PlannerPlan {
   '@odata.etag': string
 }
 
-class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
+class PlannerPlanSetCommand extends GraphCommand {
   public get name(): string {
     return commands.PLAN_SET;
   }
@@ -48,7 +48,7 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
   public commandAction(logger: Logger, args: CommandArgs, cb: (error?: any) => void): void {
     this.getPlan(logger, args)
       .then((output: CommandOutput): void => {
-        const plan: PlannerPlanWithOdata = JSON.parse(output.stdout);
+        const plan: ExtendedPlannerPlan = JSON.parse(output.stdout);
         this.updatePlan(logger, args, plan)
           .then((): void => {
             cb();
@@ -74,7 +74,7 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
     return Cli.executeCommandWithOutput(planGetCommand as Command, { options: { ...options, _: [] } });
   }
 
-  private updatePlan(logger: Logger, args: CommandArgs, plan: PlannerPlanWithOdata): Promise<void> {
+  private updatePlan(logger: Logger, args: CommandArgs, plan: ExtendedPlannerPlan): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Updating plan with id ${plan.id} ...`);
     }
@@ -134,7 +134,7 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
       return 'Specify either ownerGroupId or ownerGroupName but not both';
     }
 
-    if (args.options.ownerGroupId && !Utils.isValidGuid(args.options.ownerGroupId as string)) {
+    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
       return `${args.options.ownerGroupId} is not a valid GUID`;
     }
 
