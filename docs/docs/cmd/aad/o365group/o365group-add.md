@@ -1,6 +1,6 @@
 # aad o365group add
 
-Creates Microsoft 365 Group
+Creates a Microsoft 365 Group
 
 ## Usage
 
@@ -76,10 +76,28 @@ Create a public Microsoft 365 Group and set specified users as its members
 m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
-Create a public Microsoft 365 Group and set its resourceBehaviorOptions
+Create a public Microsoft 365 Group and allows only group members to be able to post conversations to the group.
 
 ```sh
-m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --allowMembersToPost --hideGroupInOutlook --subscribeNewGroupMembers --welcomeEmailDisabled
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --allowMembersToPost
+```
+
+Create a public Microsoft 365 Group and hides it from the Outlook experiences (web and client).
+
+```sh
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --hideGroupInOutlook
+```
+
+Create a public Microsoft 365 Group and subscribe all new group members to receive group conversation emails when new messages are posted in the group.
+
+```sh
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --subscribeNewGroupMembers
+```
+
+Create a public Microsoft 365 Group and set to not send welcome emails to new group members.
+
+```sh
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --welcomeEmailDisabled
 ```
 
 Create a public Microsoft 365 Group and set its logo
@@ -87,8 +105,3 @@ Create a public Microsoft 365 Group and set its logo
 ```sh
 m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --logoPath images/logo.png
 ```
-
-## More information
-
-- Create group: [https://docs.microsoft.com/en-us/graph/api/group-post-groups](https://docs.microsoft.com/en-us/graph/api/group-post-groups)
-- Set Microsoft 365 group behaviors and provisioning options: [https://docs.microsoft.com/en-us/graph/group-set-options](https://docs.microsoft.com/en-us/graph/group-set-options)

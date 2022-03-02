@@ -23,10 +23,10 @@ interface Options extends GlobalOptions {
   members?: string;
   isPrivate?: string;
   logoPath?: string;
-  allowMembersToPost: boolean;
-  hideGroupInOutlook: boolean;
-  subscribeNewGroupMembers: boolean;
-  welcomeEmailDisabled: boolean;
+  allowMembersToPost?: boolean;
+  hideGroupInOutlook?: boolean;
+  subscribeNewGroupMembers?: boolean;
+  welcomeEmailDisabled?: boolean;
 }
 
 class AadO365GroupAddCommand extends GraphCommand {
@@ -37,7 +37,19 @@ class AadO365GroupAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Creates Microsoft 365 Group';
+    return 'Creates a Microsoft 365 Group';
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.displayName = typeof args.options.displayName !== 'undefined';
+    telemetryProps.mailNickname = typeof args.options.mailNickname !== 'undefined';
+    telemetryProps.isPrivate = (!(!args.options.isPrivate)).toString();
+    telemetryProps.allowMembersToPost = (!(!args.options.allowMembersToPost)).toString();
+    telemetryProps.hideGroupInOutlook = (!(!args.options.hideGroupInOutlook)).toString();
+    telemetryProps.subscribeNewGroupMembers = (!(!args.options.subscribeNewGroupMembers)).toString();
+    telemetryProps.welcomeEmailDisabled = (!(!args.options.welcomeEmailDisabled)).toString();
+    return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
