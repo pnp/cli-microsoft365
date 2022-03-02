@@ -1,10 +1,12 @@
+import { Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { Team } from '../../Team';
 
@@ -16,7 +18,7 @@ interface Options extends GlobalOptions {
   joined?: boolean;
 }
 
-class TeamsTeamListCommand extends GraphItemsListCommand<Team> {
+class TeamsTeamListCommand extends GraphCommand {
   public get name(): string {
     return commands.TEAM_LIST;
   }
@@ -36,15 +38,15 @@ class TeamsTeamListCommand extends GraphItemsListCommand<Team> {
     if (args.options.joined) {
       endpoint = `${this.resource}/v1.0/me/joinedTeams`;
     }
-    this
-      .getAllItems(endpoint, logger, true)
-      .then((): Promise<any> => {
+    odata
+      .getAllItems<Group>(endpoint, logger)
+      .then((items): Promise<Group[] | Team[]> => {
         if (args.options.joined) {
-          return Promise.resolve();
+          return Promise.resolve(items);
         }
         else {
           return Promise.all(
-            this.items.filter((e: any) => {
+            items.filter((e: any) => {
               return e.resourceProvisioningOptions.indexOf('Team') > -1;
             }).map(
               g => this.getTeamFromGroup(g)
@@ -52,17 +54,13 @@ class TeamsTeamListCommand extends GraphItemsListCommand<Team> {
           );
         }
       })
-      .then((res?: Team[]): void => {
-        if (res) {
-          this.items = res;
-        }
-
-        logger.log(this.items);
+      .then((items: Group[] | Team[]): void => {
+        logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getTeamFromGroup(group: { id: string, displayName: string, description: string }): Promise<Team> {
+  private getTeamFromGroup(group: Group): Promise<Team> {
     return new Promise<Team>((resolve: (team: Team) => void, reject: (error: any) => void): void => {
       const requestOptions: any = {
         url: `${this.resource}/v1.0/teams/${group.id}`,
@@ -76,18 +74,18 @@ class TeamsTeamListCommand extends GraphItemsListCommand<Team> {
         .get(requestOptions)
         .then((res: any): void => {
           resolve({
-            id: group.id,
-            displayName: group.displayName,
+            id: group.id as string,
+            displayName: group.displayName as string,
             isArchived: res.isArchived,
-            description: group.description
+            description: group.description as string
           });
         }, (err: any): void => {
           // If the user is not member of the team he/she cannot access it
           if (err.statusCode === 403) {
             resolve({
-              id: group.id,
-              displayName: group.displayName,
-              description: group.description,
+              id: group.id as string,
+              displayName: group.displayName as string,
+              description: group.description as string,
               isArchived: undefined
             });
           }

@@ -13,6 +13,9 @@ m365 aad oauth2grant remove [options]
 `-i, --grantId <grantId>`
 : `objectId` of OAuth2 permission grant to remove
 
+`--confirm`
+: Do not prompt for confirmation before removing OAuth2 permission grant
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -31,6 +34,12 @@ Remove the OAuth2 permission grant with ID _YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXk
 
 ```sh
 m365 aad oauth2grant remove --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek
+```
+
+Remove the OAuth2 permission grant with ID _YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek_ without being asked for confirmation
+
+```sh
+m365 aad oauth2grant remove --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek --confirm
 ```
 
 ## More information

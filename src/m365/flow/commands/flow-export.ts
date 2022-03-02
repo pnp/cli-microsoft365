@@ -6,7 +6,7 @@ import {
 } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
-import Utils from '../../../Utils';
+import { validation } from '../../../utils';
 import AzmgmtCommand from '../../base/AzmgmtCommand';
 import commands from '../commands';
 
@@ -206,7 +206,7 @@ class FlowExportCommand extends AzmgmtCommand {
   public validate(args: CommandArgs): boolean | string {
     const lowerCaseFormat = args.options.format ? args.options.format.toLowerCase() : '';
 
-    if (!Utils.isValidGuid(args.options.id)) {
+    if (!validation.isValidGuid(args.options.id)) {
       return `${args.options.id} is not a valid GUID`;
     }
 

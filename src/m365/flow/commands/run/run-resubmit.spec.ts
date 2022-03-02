@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./run-resubmit');
 
@@ -43,7 +43,7 @@ describe(commands.RUN_RESUBMIT, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       request.get,
       Cli.prompt
@@ -51,7 +51,7 @@ describe(commands.RUN_RESUBMIT, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -116,7 +116,7 @@ describe(commands.RUN_RESUBMIT, () => {
   it('aborts resubmitting the specified Microsoft Flow when confirm option not passed and prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'post');
     const getSpy = sinon.spy(request, 'get');
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -149,7 +149,7 @@ describe(commands.RUN_RESUBMIT, () => {
       });
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -183,7 +183,7 @@ describe(commands.RUN_RESUBMIT, () => {
       });
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -212,7 +212,7 @@ describe(commands.RUN_RESUBMIT, () => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72/triggers?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
               {
@@ -242,7 +242,7 @@ describe(commands.RUN_RESUBMIT, () => {
       });
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -271,7 +271,7 @@ describe(commands.RUN_RESUBMIT, () => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
               {
@@ -299,7 +299,7 @@ describe(commands.RUN_RESUBMIT, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -330,7 +330,7 @@ describe(commands.RUN_RESUBMIT, () => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             "value": [
               {

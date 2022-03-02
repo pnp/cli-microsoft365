@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -34,7 +34,7 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeSiteDesignTask: () => void = (): void => {
-      this
+      spo
         .getSpoUrl(logger, this.debug)
         .then((spoUrl: string): Promise<any> => {
           const requestOptions: any = {
@@ -87,7 +87,7 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.taskId)) {
+    if (!validation.isValidGuid(args.options.taskId)) {
       return `${args.options.taskId} is not a valid GUID`;
     }
 

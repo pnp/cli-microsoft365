@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./storageentity-get');
 
@@ -24,7 +24,7 @@ describe(commands.STORAGEENTITY_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('existingproperty')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ Comment: 'Lorem', Description: 'ipsum', Value: 'dolor' });
         }
       }
@@ -32,7 +32,7 @@ describe(commands.STORAGEENTITY_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('propertywithoutdescription')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ Comment: 'Lorem', Value: 'dolor' });
         }
       }
@@ -40,7 +40,7 @@ describe(commands.STORAGEENTITY_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('propertywithoutcomments')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ Description: 'ipsum', Value: 'dolor' });
         }
       }
@@ -48,7 +48,7 @@ describe(commands.STORAGEENTITY_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('nonexistingproperty')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ "odata.null": true });
         }
       }
@@ -56,7 +56,7 @@ describe(commands.STORAGEENTITY_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/GetStorageEntity('%23myprop')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ Description: 'ipsum', Value: 'dolor' });
         }
       }
@@ -82,7 +82,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       request.get,
       appInsights.trackEvent
@@ -224,12 +224,12 @@ describe(commands.STORAGEENTITY_GET, () => {
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = command.options();
-    Utils.restore(Command.prototype.options);
+    sinonUtil.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
   it('handles promise rejection', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('error'));
 
     command.action(logger, {

@@ -6,7 +6,7 @@ import appInsights from '../../appInsights';
 import auth, { AuthType } from '../../Auth';
 import { Logger } from '../../cli';
 import Command, { CommandError } from '../../Command';
-import Utils from '../../Utils';
+import { sinonUtil } from '../../utils';
 import commands from './commands';
 const command: Command = require('./login');
 
@@ -38,7 +38,7 @@ describe(commands.LOGIN, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
       auth.service.logout,
@@ -47,7 +47,7 @@ describe(commands.LOGIN, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       auth.clearConnectionInfo,
       auth.storeConnectionInfo,
@@ -331,7 +331,7 @@ describe(commands.LOGIN, () => {
 
   it('correctly handles error when clearing persisted auth information', (done) => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
-    Utils.restore(auth.clearConnectionInfo);
+    sinonUtil.restore(auth.clearConnectionInfo);
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     command.action(logger, { options: {} }, () => {
       try {
@@ -341,7 +341,7 @@ describe(commands.LOGIN, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           auth.clearConnectionInfo
         ]);
       }
@@ -350,7 +350,7 @@ describe(commands.LOGIN, () => {
 
   it('correctly handles error when clearing persisted auth information (debug)', (done) => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
-    Utils.restore(auth.clearConnectionInfo);
+    sinonUtil.restore(auth.clearConnectionInfo);
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     command.action(logger, { options: { debug: true } }, () => {
       try {
@@ -360,7 +360,7 @@ describe(commands.LOGIN, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           auth.clearConnectionInfo
         ]);
       }
@@ -368,7 +368,7 @@ describe(commands.LOGIN, () => {
   });
 
   it('correctly handles error when restoring auth information', (done) => {
-    Utils.restore(auth.restoreAuth);
+    sinonUtil.restore(auth.restoreAuth);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     command.action(logger, { options: { debug: true } } as any, (err?: any) => {
       try {
@@ -379,7 +379,7 @@ describe(commands.LOGIN, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           auth.clearConnectionInfo
         ]);
       }

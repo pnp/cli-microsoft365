@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -109,7 +109,7 @@ class AadUserSetCommand extends GraphCommand {
     }
 
     if (args.options.objectId &&
-      !Utils.isValidGuid(args.options.objectId)) {
+      !validation.isValidGuid(args.options.objectId)) {
       return `${args.options.objectId} is not a valid GUID`;
     }
 

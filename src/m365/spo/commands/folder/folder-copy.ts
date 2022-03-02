@@ -5,6 +5,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { spo, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -45,9 +46,9 @@ class SpoFolderCopyCommand extends SpoCommand {
     const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
     const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
 
-    const sourceAbsoluteUrl: string = this.urlCombine(webUrl, args.options.sourceUrl);
+    const sourceAbsoluteUrl: string = urlUtil.urlCombine(webUrl, args.options.sourceUrl);
     const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
-    const requestUrl: string = this.urlCombine(webUrl, '/_api/site/CreateCopyJobs');
+    const requestUrl: string = urlUtil.urlCombine(webUrl, '/_api/site/CreateCopyJobs');
     const requestOptions: any = {
       url: requestUrl,
       headers: {
@@ -55,7 +56,7 @@ class SpoFolderCopyCommand extends SpoCommand {
       },
       data: {
         exportObjectUris: [sourceAbsoluteUrl],
-        destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
+        destinationUri: urlUtil.urlCombine(tenantUrl, args.options.targetUrl),
         options: {
           "AllowSchemaMismatch": allowSchemaMismatch,
           "IgnoreVersionHistory": true
@@ -74,7 +75,17 @@ class SpoFolderCopyCommand extends SpoCommand {
           const progressPollInterval: number = 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
 
           setTimeout(() => {
-            this.waitUntilCopyJobFinished(copyJobInfo, webUrl, progressPollInterval, resolve, reject, logger, this.dots);
+            spo.waitUntilCopyJobFinished({
+              copyJobInfo,
+              siteUrl: webUrl,
+              pollingInterval: progressPollInterval,
+              resolve,
+              reject,
+              logger,
+              dots: this.dots,
+              debug: this.debug,
+              verbose: this.verbose
+            });
           }, progressPollInterval);
         });
       })
@@ -102,7 +113,7 @@ class SpoFolderCopyCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

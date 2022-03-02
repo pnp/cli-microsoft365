@@ -6,7 +6,7 @@ import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./cdn-get');
 
@@ -38,13 +38,13 @@ describe(commands.CDN_GET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent,
       auth.restoreAuth
     ]);
@@ -66,7 +66,7 @@ describe(commands.CDN_GET, () => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ FormDigestValue: 'abc' });
         }
       }
@@ -109,7 +109,7 @@ describe(commands.CDN_GET, () => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ FormDigestValue: 'abc' });
         }
       }
@@ -148,7 +148,7 @@ describe(commands.CDN_GET, () => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ FormDigestValue: 'abc' });
         }
       }
@@ -191,7 +191,7 @@ describe(commands.CDN_GET, () => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ FormDigestValue: 'abc' });
         }
       }
@@ -230,12 +230,12 @@ describe(commands.CDN_GET, () => {
   });
 
   it('correctly handles an error when getting tenant CDN settings', (done) => {
-    Utils.restore(request.post);
+    sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ FormDigestValue: 'abc' });
         }
       }
@@ -271,7 +271,7 @@ describe(commands.CDN_GET, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    Utils.restore(request.post);
+    sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
@@ -312,7 +312,7 @@ describe(commands.CDN_GET, () => {
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = command.options();
-    Utils.restore(Command.prototype.options);
+    sinonUtil.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 

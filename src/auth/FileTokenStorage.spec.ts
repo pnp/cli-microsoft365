@@ -4,14 +4,14 @@ import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import { AuthType, CertificateType, Service } from '../Auth';
-import Utils from '../Utils';
+import { sinonUtil } from '../utils';
 import { FileTokenStorage } from './FileTokenStorage';
 
 describe('FileTokenStorage', () => {
   const fileStorage = new FileTokenStorage(FileTokenStorage.connectionInfoFilePath());
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
       fs.writeFile

@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./user-get');
 
@@ -38,13 +38,13 @@ describe(commands.USER_GET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -184,7 +184,7 @@ describe(commands.USER_GET, () => {
     });
   });
 
-  it('fails to get user when user with provided email does not exists', (done) => {
+  it('fails to get user when user with provided id does not exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter=id eq ') > -1) {
         return Promise.resolve({ value: [] });

@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import teamsCommands from '../../../teams/commands';
 import commands from '../../commands';
 const command: Command = require('./o365group-user-remove');
@@ -42,7 +42,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.delete,
       global.setTimeout,
@@ -51,7 +51,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -166,7 +166,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
   it('aborts removing the specified user from the specified Microsoft 365 Group when confirm option not passed and prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'delete');
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -183,7 +183,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
   it('aborts removing the specified user from the specified Microsoft 365 Group when confirm option not passed and prompt not confirmed (debug)', (done) => {
     const postSpy = sinon.spy(request, 'delete');
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -514,7 +514,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -565,7 +565,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -626,7 +626,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -659,7 +659,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       return Promise.resolve();
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });

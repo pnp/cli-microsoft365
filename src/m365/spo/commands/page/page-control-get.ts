@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { Control } from './canvasContent';
@@ -94,11 +94,11 @@ class SpoPageControlGetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.id)) {
+    if (!validation.isValidGuid(args.options.id)) {
       return `${args.options.id} is not a valid GUID`;
     }
 
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

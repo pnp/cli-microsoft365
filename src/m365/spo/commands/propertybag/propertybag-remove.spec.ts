@@ -6,8 +6,7 @@ import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { IdentityResponse } from '../../ClientSvc';
+import { IdentityResponse, sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./propertybag-remove');
 
@@ -87,8 +86,11 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({
-      FormDigestValue: 'abc'
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'abc',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
     }));
     auth.service.connected = true;
   });
@@ -115,7 +117,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       (command as any).removeProperty,
       Cli.prompt
@@ -123,9 +125,10 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      spo.getRequestDigest
     ]);
     auth.service.connected = false;
   });
@@ -186,7 +189,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('should abort property remove when prompt not confirmed', (done) => {
     const postCallsSpy: sinon.SinonStub = stubAllPostRequests();
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -210,7 +213,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     const postCallsSpy: sinon.SinonStub = stubAllPostRequests();
     const removePropertySpy = sinon.spy((command as any), 'removeProperty');
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -583,7 +586,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = command.options();
-    Utils.restore(Command.prototype.options);
+    sinonUtil.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 

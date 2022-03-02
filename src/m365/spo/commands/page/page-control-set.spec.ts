@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 import { ClientSidePage } from './clientsidepages';
 import { CanvasContent, mockPageData, mockPageDataFail } from './page-control-set.mock';
@@ -37,7 +37,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post,
       ClientSidePage.fromHtml
@@ -45,7 +45,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);

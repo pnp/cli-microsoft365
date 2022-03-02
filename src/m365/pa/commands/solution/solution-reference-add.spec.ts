@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import { Logger } from '../../../../cli';
 import Command, { CommandOption } from '../../../../Command';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import CdsProjectMutator from '../../cds-project-mutator';
 import commands from '../../commands';
 const command: Command = require('./solution-reference-add');
@@ -39,7 +39,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
       fs.writeFileSync,
@@ -50,7 +50,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent
     ]);
   });
@@ -110,19 +110,6 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
   it('fails validation when the specified path option doesn\'t exist', () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.cdsproj'] as any);
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-
-    const actual = command.validate({ options: { path: 'path/to/project' } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when the specified path contains no *.pcfproj or *.csproj file', () => {
-    sinon.stub(fs, 'readdirSync').callsFake((path) => {
-      if (path === process.cwd()) {
-        return ['file1.cdsproj'] as any;
-      }
-      return [];
-    });
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     const actual = command.validate({ options: { path: 'path/to/project' } });
     assert.notStrictEqual(actual, true);

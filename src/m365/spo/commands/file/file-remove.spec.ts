@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./file-remove');
 
@@ -42,14 +42,14 @@ describe(commands.FILE_REMOVE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       Cli.prompt
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -105,7 +105,7 @@ describe(commands.FILE_REMOVE, () => {
   });
 
   it('aborts removing file when prompt not confirmed', (done) => {
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -127,7 +127,7 @@ describe(commands.FILE_REMOVE, () => {
       if ((opts.url as string).indexOf(`/_api/web/GetFileById(guid'`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -135,7 +135,7 @@ describe(commands.FILE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -168,7 +168,7 @@ describe(commands.FILE_REMOVE, () => {
       if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/'+fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -176,7 +176,7 @@ describe(commands.FILE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -209,7 +209,7 @@ describe(commands.FILE_REMOVE, () => {
       if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/'+fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -217,7 +217,7 @@ describe(commands.FILE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -238,7 +238,7 @@ describe(commands.FILE_REMOVE, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -253,7 +253,7 @@ describe(commands.FILE_REMOVE, () => {
       if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -261,7 +261,7 @@ describe(commands.FILE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -294,7 +294,7 @@ describe(commands.FILE_REMOVE, () => {
       if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -302,7 +302,7 @@ describe(commands.FILE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -335,7 +335,7 @@ describe(commands.FILE_REMOVE, () => {
       if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/'+fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -343,7 +343,7 @@ describe(commands.FILE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -364,7 +364,7 @@ describe(commands.FILE_REMOVE, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -379,7 +379,7 @@ describe(commands.FILE_REMOVE, () => {
       if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/'+fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -387,7 +387,7 @@ describe(commands.FILE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -420,7 +420,7 @@ describe(commands.FILE_REMOVE, () => {
       if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -428,7 +428,7 @@ describe(commands.FILE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -461,7 +461,7 @@ describe(commands.FILE_REMOVE, () => {
       if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -469,7 +469,7 @@ describe(commands.FILE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -502,7 +502,7 @@ describe(commands.FILE_REMOVE, () => {
       if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/'+fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -510,7 +510,7 @@ describe(commands.FILE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -543,7 +543,7 @@ describe(commands.FILE_REMOVE, () => {
       if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/'+fileUrl)}')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -551,7 +551,7 @@ describe(commands.FILE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -581,7 +581,7 @@ describe(commands.FILE_REMOVE, () => {
       if ((opts.url as string).indexOf(`/recycle()`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -589,7 +589,7 @@ describe(commands.FILE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -619,7 +619,7 @@ describe(commands.FILE_REMOVE, () => {
       if ((opts.url as string).indexOf(`/_api/web/GetFileByServerRelativeUrl('`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -627,7 +627,7 @@ describe(commands.FILE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -657,7 +657,7 @@ describe(commands.FILE_REMOVE, () => {
       if ((opts.url as string).indexOf(`/recycle()`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -665,7 +665,7 @@ describe(commands.FILE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });

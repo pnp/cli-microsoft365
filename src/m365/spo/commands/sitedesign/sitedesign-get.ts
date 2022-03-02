@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { SiteDesign } from './SiteDesign';
@@ -59,7 +59,7 @@ class SpoSiteDesignGetCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
+    spo
       .getSpoUrl(logger, this.debug)
       .then((_spoUrl: string): Promise<string> => {
         this.spoUrl = _spoUrl;
@@ -107,7 +107,7 @@ class SpoSiteDesignGetCommand extends SpoCommand {
       return 'Specify id or title, one is required';
     }
 
-    if (args.options.id && !Utils.isValidGuid(args.options.id as string)) {
+    if (args.options.id && !validation.isValidGuid(args.options.id as string)) {
       return `${args.options.id} is not a valid GUID`;
     }
 

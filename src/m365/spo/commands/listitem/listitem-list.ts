@@ -5,10 +5,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ContextInfo, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 import { ListItemInstanceCollection } from './ListItemInstanceCollection';
 
 interface CommandArgs {
@@ -66,7 +65,7 @@ class SpoListItemListCommand extends SpoCommand {
           logger.logToStderr(`getting request digest for query request`);
         }
 
-        return this.getRequestDigest(args.options.webUrl);
+        return spo.getRequestDigest(args.options.webUrl);
       }
       else {
         return Promise.resolve();
@@ -178,7 +177,7 @@ class SpoListItemListCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
@@ -216,7 +215,7 @@ class SpoListItemListCommand extends SpoCommand {
     }
 
     if (args.options.id &&
-      !Utils.isValidGuid(args.options.id)) {
+      !validation.isValidGuid(args.options.id)) {
       return `${args.options.id} in option id is not a valid GUID`;
     }
 

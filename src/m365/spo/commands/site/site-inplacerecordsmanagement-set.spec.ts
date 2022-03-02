@@ -5,17 +5,17 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./site-inplacerecordsmanagement-set');
 
 describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   let log: string[];
   let logger: Logger;
-  
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -35,13 +35,13 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -231,12 +231,12 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the siteUrl is a valid SharePoint URL', () => {
+  it('passes validation when the siteUrl is a valid SharePoint URL and enabled set to "true"', () => {
     const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'true' } });
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the siteUrl is a valid SharePoint URL', () => {
+  it('passes validation when the siteUrl is a valid SharePoint URL and enabled set to "false"', () => {
     const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'false' } });
     assert.strictEqual(actual, true);
   });

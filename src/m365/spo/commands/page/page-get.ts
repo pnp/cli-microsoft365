@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -40,7 +40,7 @@ class SpoPageGetCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
+      url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
       headers: {
         'content-type': 'application/json;charset=utf-8',
         accept: 'application/json;odata=nometadata'
@@ -114,7 +114,7 @@ class SpoPageGetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

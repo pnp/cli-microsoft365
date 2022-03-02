@@ -5,7 +5,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { DraftVisibilityType } from './DraftVisibilityType';
@@ -500,30 +500,30 @@ class SpoListSetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
 
-    if (!Utils.isValidGuid(args.options.id)) {
+    if (!validation.isValidGuid(args.options.id)) {
       return `${args.options.id} is not a valid GUID`;
     }
 
     for (let i = 0; i < SpoListSetCommand.booleanOptions.length; i++) {
       const option: string = SpoListSetCommand.booleanOptions[i];
       const value: string | undefined = (args.options as any)[option];
-      if (value && !Utils.isValidBoolean(value)) {
+      if (value && !validation.isValidBoolean(value)) {
         return `${value} in option ${option} is not a valid boolean value`;
       }
     }
 
     if (args.options.templateFeatureId &&
-      !Utils.isValidGuid(args.options.templateFeatureId)) {
+      !validation.isValidGuid(args.options.templateFeatureId)) {
       return `${args.options.templateFeatureId} in option templateFeatureId is not a valid GUID`;
     }
 
     if (args.options.defaultContentApprovalWorkflowId &&
-      !Utils.isValidGuid(args.options.defaultContentApprovalWorkflowId)) {
+      !validation.isValidGuid(args.options.defaultContentApprovalWorkflowId)) {
       return `${args.options.defaultContentApprovalWorkflowId} in option defaultContentApprovalWorkflowId is not a valid GUID`;
     }
 

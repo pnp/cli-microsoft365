@@ -4,7 +4,8 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -13,9 +14,10 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   properties?: string;
+  deleted?: boolean;
 }
 
-class AadUserListCommand extends GraphItemsListCommand<User> {
+class AadUserListCommand extends GraphCommand {
   public get name(): string {
     return commands.USER_LIST;
   }
@@ -31,6 +33,7 @@ class AadUserListCommand extends GraphItemsListCommand<User> {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.properties = args.options.properties;
+    telemetryProps.deleted = typeof args.options.deleted !== 'undefined';
     return telemetryProps;
   }
 
@@ -39,12 +42,13 @@ class AadUserListCommand extends GraphItemsListCommand<User> {
       args.options.properties.split(',').map(p => p.trim()) :
       ['userPrincipalName', 'displayName'];
     const filter: string = this.getFilter(args.options);
-    const url: string = `${this.resource}/v1.0/users?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
+    const endpoint: string = args.options.deleted ? 'directory/deletedItems/microsoft.graph.user' : 'users';
+    const url: string = `${this.resource}/v1.0/${endpoint}?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
 
-    this
-      .getAllItems(url, logger, true)
-      .then((): void => {
-        logger.log(this.items);
+    odata
+      .getAllItems<User>(url, logger)
+      .then((users): void => {
+        logger.log(users);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -54,6 +58,8 @@ class AadUserListCommand extends GraphItemsListCommand<User> {
     const excludeOptions: string[] = [
       'properties',
       'p',
+      'deleted',
+      'd',
       'debug',
       'verbose',
       'output',
@@ -77,9 +83,8 @@ class AadUserListCommand extends GraphItemsListCommand<User> {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
-      {
-        option: '-p, --properties [properties]'
-      }
+      { option: '-p, --properties [properties]' },
+      { option: '-d, --deleted' }
     ];
 
     const parentOptions: CommandOption[] = super.options();

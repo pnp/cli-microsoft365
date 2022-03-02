@@ -2,7 +2,7 @@ import Axios, { AxiosError, AxiosInstance, AxiosPromise, AxiosRequestConfig, Axi
 import { Stream } from 'stream';
 import auth, { Auth } from './Auth';
 import { Logger } from './cli';
-import Utils from './Utils';
+import { formatting } from './utils';
 const packageJSON = require('../package.json');
 
 class Request {
@@ -28,7 +28,7 @@ class Request {
           if (config.responseType !== 'stream') {
             properties.push('data');
           }
-          this._logger.logToStderr(JSON.stringify(Utils.filterObject(config, properties), null, 2));
+          this._logger.logToStderr(JSON.stringify(formatting.filterObject(config, properties), null, 2));
         }
         return config;
       });
@@ -45,7 +45,7 @@ class Request {
           }
           this._logger.logToStderr(JSON.stringify({
             url: response.config.url,
-            ...Utils.filterObject(response, properties)
+            ...formatting.filterObject(response, properties)
           }, null, 2));
         }
         return response;
@@ -55,7 +55,7 @@ class Request {
           this._logger.logToStderr('Request error:');
           this._logger.logToStderr(JSON.stringify({
             url: error.config.url,
-            ...Utils.filterObject(error.response, properties),
+            ...formatting.filterObject(error.response, properties),
             error: (error as any).error
           }, null, 2));
         }

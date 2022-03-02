@@ -1,8 +1,8 @@
 import * as url from 'url';
 import { Logger } from "../../cli";
 import request from '../../request';
+import { ODataResponse } from '../../utils';
 import AzmgmtCommand from "./AzmgmtCommand";
-import { AzmgmtResponse } from './AzmgmtResponse';
 
 export abstract class AzmgmtItemsListCommand<T> extends AzmgmtCommand {
   protected items: T[];
@@ -23,8 +23,8 @@ export abstract class AzmgmtItemsListCommand<T> extends AzmgmtCommand {
       };
 
       request
-        .get<AzmgmtResponse<T>>(requestOptions)
-        .then((res: AzmgmtResponse<T>): void => {
+        .get<ODataResponse<T>>(requestOptions)
+        .then((res: ODataResponse<T>): void => {
           if (firstRun) {
             this.items = [];
           }

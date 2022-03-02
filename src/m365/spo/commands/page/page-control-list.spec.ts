@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 import { ClientSidePage } from './clientsidepages';
 import { mockControlListDataOutput, mockControlListData, mockControlListDataWithUnknownType, mockControlListDataWithUnknownTypeOutput, mockControlListDataWithText, mockControlListDataWithTextOutput } from './page-control-list.mock';
@@ -39,14 +39,14 @@ describe(commands.PAGE_CONTROL_LIST, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       ClientSidePage.fromHtml
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);

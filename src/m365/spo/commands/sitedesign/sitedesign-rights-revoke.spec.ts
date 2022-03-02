@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./sitedesign-rights-revoke');
 
@@ -18,7 +18,12 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -45,16 +50,16 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       Cli.prompt
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      (command as any).getRequestDigest,
+      spo.getRequestDigest,
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
@@ -206,7 +211,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
 
   it('revokes site design access when prompt confirmed', (done) => {
     const postStub = sinon.stub(request, 'post').callsFake(() => Promise.resolve());
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });

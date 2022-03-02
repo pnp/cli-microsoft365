@@ -5,7 +5,8 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { Message } from '../../Message';
 import { Outlook } from '../../Outlook';
@@ -19,7 +20,7 @@ interface Options extends GlobalOptions {
   folderName?: string;
 }
 
-class OutlookMessageListCommand extends GraphItemsListCommand<Message> {
+class OutlookMessageListCommand extends GraphCommand {
   public get name(): string {
     return commands.MESSAGE_LIST;
   }
@@ -42,13 +43,13 @@ class OutlookMessageListCommand extends GraphItemsListCommand<Message> {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getFolderId(args)
-      .then((folderId: string): Promise<void> => {
+      .then((folderId: string): Promise<Message[]> => {
         const url: string = folderId ? `me/mailFolders/${folderId}/messages` : 'me/messages';
 
-        return this.getAllItems(`${this.resource}/v1.0/${url}?$top=50`, logger, true);
+        return odata.getAllItems<Message>(`${this.resource}/v1.0/${url}?$top=50`, logger);
       })
-      .then((): void => {
-        logger.log(this.items);
+      .then((messages): void => {
+        logger.log(messages);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

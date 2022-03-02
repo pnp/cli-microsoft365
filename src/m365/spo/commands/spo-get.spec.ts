@@ -4,7 +4,7 @@ import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
 import { Logger } from '../../../cli';
 import Command, { CommandError } from '../../../Command';
-import Utils from '../../../Utils';
+import { sinonUtil } from '../../../utils';
 import commands from '../commands';
 const command: Command = require('./spo-get');
 
@@ -41,7 +41,7 @@ describe(commands.GET, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       auth.storeConnectionInfo,
       appInsights.trackEvent

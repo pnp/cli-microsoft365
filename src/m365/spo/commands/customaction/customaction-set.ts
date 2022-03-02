@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import { BasePermissions, PermissionKind } from '../../base-permissions';
 import commands from '../../commands';
@@ -170,11 +170,11 @@ class SpoCustomActionSetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (Utils.isValidGuid(args.options.id) === false) {
+    if (validation.isValidGuid(args.options.id) === false) {
       return `${args.options.id} is not valid. Custom action id (Guid) expected`;
     }
 
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
@@ -196,7 +196,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
       return 'Invalid option sequence. Expected value in range from 0 to 65536';
     }
 
-    if (args.options.clientSideComponentId && Utils.isValidGuid(args.options.clientSideComponentId) === false) {
+    if (args.options.clientSideComponentId && validation.isValidGuid(args.options.clientSideComponentId) === false) {
       return `ClientSideComponentId ${args.options.clientSideComponentId} is not a valid GUID`;
     }
 

@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./app-list');
 
@@ -39,13 +39,13 @@ describe(commands.APP_LIST, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -537,7 +537,7 @@ describe(commands.APP_LIST, () => {
       if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/apps?api-version=2017-08-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ "value": apps });
         }
       }
@@ -1498,7 +1498,7 @@ describe(commands.APP_LIST, () => {
       if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/apps?api-version=2017-08-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ "value": apps });
         }
       }
@@ -2460,7 +2460,7 @@ describe(commands.APP_LIST, () => {
       if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/scopes/admin/environments/4ce50206-9576-4237-8b17-38d8aadfaa35/apps?api-version=2017-08-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ "value": apps });
         }
       }
@@ -3444,7 +3444,7 @@ describe(commands.APP_LIST, () => {
       if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/apps?api-version=2017-08-01`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({ "value": apps });
         }
       }

@@ -6,4 +6,5 @@ export interface Task {
   completedDateTime?: Date;
   planId?: string;
   bucketId?: string;
+  priority?: number;
 }

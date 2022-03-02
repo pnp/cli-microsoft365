@@ -1,4 +1,4 @@
-# Configuring CLI for Microsoft 365
+# Configure CLI for Microsoft 365
 
 You can configure CLI for Microsoft 365 to your personal preferences using its settings. Settings are stored on the disk in the current user's folder: `C:\Users\user\.config\configstore\cli-m365-config.json` on Windows and `/Users/user/.config/configstore/cli-m365-config.json` on macOS. The configuration file is created when you set the settings for the first time.
 

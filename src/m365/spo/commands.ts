@@ -63,6 +63,7 @@ export default {
   GROUP_REMOVE: `${prefix} group remove`,
   GROUP_USER_ADD: `${prefix} group user add`,
   GROUP_USER_LIST: `${prefix} group user list`,
+  GROUP_USER_REMOVE: `${prefix} group user remove`,
   HIDEDEFAULTTHEMES_GET: `${prefix} hidedefaultthemes get`,
   HIDEDEFAULTTHEMES_SET: `${prefix} hidedefaultthemes set`,
   HOMESITE_GET: `${prefix} homesite get`,

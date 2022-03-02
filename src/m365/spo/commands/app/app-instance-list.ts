@@ -4,6 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { validation } from '../../../../utils';
 import commands from '../../commands';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
 
@@ -70,7 +71,7 @@ class SpoAppInStanceListCommand extends SpoAppBaseCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoAppBaseCommand.isValidSharePointUrl(args.options.siteUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.siteUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }

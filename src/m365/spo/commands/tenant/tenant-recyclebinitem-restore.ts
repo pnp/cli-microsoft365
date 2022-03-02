@@ -3,11 +3,9 @@ import { CommandOption } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ClientSvcResponse, ClientSvcResponseContents, formatting, FormDigestInfo, spo, SpoOperation, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
-import { SpoOperation } from '../site/SpoOperation';
 
 interface CommandArgs {
   options: Options;
@@ -40,12 +38,12 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     this.dots = '';
 
-    this
+    spo
       .getSpoAdminUrl(logger, this.debug)
       .then((adminUrl: string): Promise<FormDigestInfo> => {
         this.spoAdminUrl = adminUrl;
 
-        return this.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
+        return spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<string> => {
         this.context = res;
@@ -59,7 +57,7 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
           headers: {
             'X-RequestDigest': this.context.FormDigestValue
           },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="PollingInterval" ScalarProperty="true" /><Property Name="IsComplete" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="RestoreDeletedSite"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.url)}</Parameter></Parameters></Method></ObjectPaths></Request>`
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="PollingInterval" ScalarProperty="true" /><Property Name="IsComplete" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="RestoreDeletedSite"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.url)}</Parameter></Parameters></Method></ObjectPaths></Request>`
         };
 
         return request.post(requestOptions);
@@ -80,7 +78,17 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots);
+              spo.waitUntilFinished({
+                operationId: JSON.stringify(operation._ObjectIdentity_),
+                siteUrl: this.spoAdminUrl as string,
+                resolve,
+                reject,
+                logger,
+                currentContext: this.context as FormDigestInfo,
+                dots: this.dots,
+                debug: this.debug,
+                verbose: this.verbose
+              });
             }, operation.PollingInterval);
           }
         });
@@ -103,7 +111,7 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.url);
+    return validation.isValidSharePointUrl(args.options.url);
   }
 }
 

@@ -6,7 +6,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./app-publish');
 
@@ -39,7 +39,7 @@ describe(commands.APP_PUBLISH, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       fs.readFileSync,
       fs.existsSync
@@ -47,7 +47,7 @@ describe(commands.APP_PUBLISH, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -80,7 +80,7 @@ describe(commands.APP_PUBLISH, () => {
     const actual = command.validate({
       options: { filePath: './' }
     });
-    Utils.restore([
+    sinonUtil.restore([
       fs.lstatSync
     ]);
     assert.notStrictEqual(actual, true);
@@ -98,7 +98,7 @@ describe(commands.APP_PUBLISH, () => {
         filePath: 'teamsapp.zip'
       }
     });
-    Utils.restore([
+    sinonUtil.restore([
       fs.lstatSync
     ]);
     assert.strictEqual(actual, true);

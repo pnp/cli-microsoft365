@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { Cli, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import { settingsNames } from '../../../../settingsNames';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./config-set');
 
@@ -27,7 +27,7 @@ describe(commands.CONFIG_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore(Cli.getInstance().config.set);
+    sinonUtil.restore(Cli.getInstance().config.set);
   });
 
   it('has correct name', () => {
@@ -48,6 +48,25 @@ describe(commands.CONFIG_SET, () => {
     command.action(logger, { options: { key: settingsNames.showHelpOnFailure, value: false } }, () => {
       try {
         assert.strictEqual(actualKey, settingsNames.showHelpOnFailure, 'Invalid key');
+        assert.strictEqual(actualValue, false, 'Invalid value');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`sets ${settingsNames.autoOpenBrowserOnLogin} property`, (done) => {
+    const config = Cli.getInstance().config;
+    let actualKey: string, actualValue: any;
+    sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
+      actualKey = key;
+      actualValue = value;
+    }) as any);
+    command.action(logger, { options: { key: settingsNames.autoOpenBrowserOnLogin, value: false } }, () => {
+      try {
+        assert.strictEqual(actualKey, settingsNames.autoOpenBrowserOnLogin, 'Invalid key');
         assert.strictEqual(actualValue, false, 'Invalid value');
         done();
       }

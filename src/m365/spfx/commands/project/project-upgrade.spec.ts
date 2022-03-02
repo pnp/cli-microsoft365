@@ -5,10 +5,10 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
-import Utils from '../../../../Utils';
+import { fsUtil, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 import { Manifest, Project, VsCode } from './model';
-import { FindingToReport, Utils as Utils1 } from './project-upgrade/';
+import { FindingToReport } from './project-upgrade/';
 import { Finding } from './project-upgrade/Finding';
 const command: Command = require('./project-upgrade');
 
@@ -55,7 +55,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       (command as any).getProjectRoot,
       (command as any).getProjectVersion,
       fs.existsSync,
@@ -63,12 +63,12 @@ describe(commands.PROJECT_UPGRADE, () => {
       fs.statSync,
       fs.writeFileSync,
       fs.mkdirSync,
-      Utils1.getAllFiles
+      fsUtil.readdirR
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent
     ]);
   });
@@ -824,7 +824,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['pnpm un package']));
   });
 
-  it(`returns command to uninstall dev dependency for 1 dev dep for npm package manager`, () => {
+  it(`returns command to uninstall dev dependency for 1 dev dep for pnpm package manager`, () => {
     (command as any).packageManager = 'pnpm';
     const commands: string[] = (command as any).reducePackageManagerCommand([], [], [], ['package']);
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['pnpm un package']));
@@ -2507,57 +2507,57 @@ describe(commands.PROJECT_UPGRADE, () => {
   //#endregion
 
   //#region 1.13.1
-  it('e2e: shows correct number of findings for upgrading application customizer 1.13.1 project to 1.14.0-beta.4', () => {
+  it('e2e: shows correct number of findings for upgrading application customizer 1.13.1 project to 1.14.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-applicationcustomizer'));
 
-    command.action(logger, { options: { toVersion: '1.14.0-beta.4', output: 'json', preview: true } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.14.0', output: 'json', preview: true } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 10);
+      assert.strictEqual(findings.length, 11);
     });
   });
 
-  it('e2e: shows correct number of findings for upgrading field customizer react 1.13.1 project to 1.14.0-beta.4', () => {
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.13.1 project to 1.14.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-fieldcustomizer-react'));
 
-    command.action(logger, { options: { toVersion: '1.14.0-beta.4', output: 'json', preview: true } } as any, () => {
-      const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 9);
-    });
-  });
-
-  it('e2e: shows correct number of findings for upgrading list view command set 1.13.1 project to 1.14.0-beta.4', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-listviewcommandset'));
-
-    command.action(logger, { options: { toVersion: '1.14.0-beta.4', output: 'json', preview: true } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.14.0', output: 'json', preview: true } } as any, () => {
       const findings: FindingToReport[] = log[0];
       assert.strictEqual(findings.length, 10);
     });
   });
 
-  it('e2e: shows correct number of findings for upgrading no framework web part 1.13.1 project to 1.14.0-beta.4', () => {
+  it('e2e: shows correct number of findings for upgrading list view command set 1.13.1 project to 1.14.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-listviewcommandset'));
+
+    command.action(logger, { options: { toVersion: '1.14.0', output: 'json', preview: true } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 11);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.13.1 project to 1.14.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-nolib'));
 
-    command.action(logger, { options: { toVersion: '1.14.0-beta.4', output: 'json', preview: true } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.14.0', output: 'json', preview: true } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 12);
+      assert.strictEqual(findings.length, 13);
     });
   });
 
-  it('e2e: shows correct number of findings for upgrading react web part 1.13.1 project to 1.14.0-beta.4', () => {
+  it('e2e: shows correct number of findings for upgrading react web part 1.13.1 project to 1.14.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-react'));
 
-    command.action(logger, { options: { toVersion: '1.14.0-beta.4', output: 'json', preview: true } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.14.0', output: 'json', preview: true } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 12);
+      assert.strictEqual(findings.length, 13);
     });
   });
 
-  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.13.1 project to 1.14.0-beta.4', () => {
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.13.1 project to 1.14.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-optionaldeps'));
 
-    command.action(logger, { options: { toVersion: '1.14.0-beta.4', output: 'json', preview: true } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.14.0', output: 'json', preview: true } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 22);
+      assert.strictEqual(findings.length, 23);
     });
   });
   //#endregion

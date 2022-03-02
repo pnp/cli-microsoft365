@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -85,7 +85,7 @@ class GraphSchemaExtensionAddCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (args.options.owner && !Utils.isValidGuid(args.options.owner)) {
+    if (args.options.owner && !validation.isValidGuid(args.options.owner)) {
       return `The specified owner '${args.options.owner}' is not a valid App Id`;
     }
 

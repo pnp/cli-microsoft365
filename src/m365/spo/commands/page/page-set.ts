@@ -5,10 +5,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ContextInfo, spo, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 import { ClientSidePageProperties } from './ClientSidePageProperties';
 import { Page, supportedPageLayouts, supportedPromoteAs } from './Page';
 
@@ -67,10 +66,10 @@ class SpoPageSetCommand extends SpoCommand {
     if (!pageName.endsWith('.aspx')) {
       pageName += '.aspx';
     }
-    const serverRelativeFileUrl: string = `${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}`;
+    const serverRelativeFileUrl: string = `${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}`;
     const needsToSavePage = !!args.options.title || !!args.options.description;
 
-    this
+    spo
       .getRequestDigest(args.options.webUrl)
       .then((res: ContextInfo): Promise<ClientSidePageProperties> => {
         requestDigest = res.FormDigestValue;
@@ -362,7 +361,7 @@ class SpoPageSetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }

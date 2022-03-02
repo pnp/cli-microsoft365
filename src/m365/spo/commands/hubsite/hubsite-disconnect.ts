@@ -4,9 +4,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { spo, ContextInfo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -34,7 +34,7 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const disconnectHubSite: () => void = (): void => {
-      this
+      spo
         .getRequestDigest(args.options.url)
         .then((res: ContextInfo): Promise<void> => {
           if (this.verbose) {
@@ -90,7 +90,7 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.url);
+    return validation.isValidSharePointUrl(args.options.url);
   }
 }
 

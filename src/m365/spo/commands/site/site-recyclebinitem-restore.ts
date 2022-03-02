@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { formatting, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -31,7 +31,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
 
     const requestUrl: string = `${args.options.siteUrl}/_api/site/RecycleBin/RestoreByIds`;
 
-    const ids: string[] = Utils.splitAndTrim(args.options.ids);
+    const ids: string[] = formatting.splitAndTrim(args.options.ids);
     const idsChunks: string[][] = [];
 
     while (ids.length) {
@@ -73,12 +73,12 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.siteUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
 
-    const notValidGuidsList = Utils.splitAndTrim(args.options.ids).filter(id => !Utils.isValidGuid(id as string));
+    const notValidGuidsList = formatting.splitAndTrim(args.options.ids).filter(id => !validation.isValidGuid(id as string));
 
     if (notValidGuidsList.length > 0) {
       return `some GUIDs are not valid. Please double check: ${notValidGuidsList.map(guid => guid)}`;

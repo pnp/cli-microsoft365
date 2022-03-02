@@ -1,5 +1,6 @@
 import { Logger } from '../../../../cli';
 import request from '../../../../request';
+import { spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -13,7 +14,7 @@ class SpoTenantAppCatalogUrlGetCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
-    this
+    spo
       .getSpoUrl(logger, this.debug)
       .then((spoUrl: string): Promise<string> => {
         const requestOptions: any = {

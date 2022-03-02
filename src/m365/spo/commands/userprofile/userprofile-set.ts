@@ -4,9 +4,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { ContextInfo, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -30,12 +30,12 @@ class SpoUserProfileSetCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoUrl: string = '';
 
-    this
+    spo
       .getSpoUrl(logger, this.debug)
       .then((_spoUrl: string): Promise<ContextInfo> => {
         spoUrl = _spoUrl;
 
-        return this.getRequestDigest(spoUrl);
+        return spo.getRequestDigest(spoUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         const propertyValue: string[] = args.options.propertyValue.split(',').map(o => o.trim());

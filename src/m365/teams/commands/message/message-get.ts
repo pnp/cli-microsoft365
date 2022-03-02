@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from "../../../base/GraphCommand";
 import commands from '../../commands';
 
@@ -62,11 +62,11 @@ class TeamsMessageGetCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.teamId)) {
+    if (!validation.isValidGuid(args.options.teamId)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 
-    if (!Utils.isValidTeamsChannelId(args.options.channelId as string)) {
+    if (!validation.isValidTeamsChannelId(args.options.channelId as string)) {
       return `${args.options.channelId} is not a valid Teams ChannelId`;
     }
 

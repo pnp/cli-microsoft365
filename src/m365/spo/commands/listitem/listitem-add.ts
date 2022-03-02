@@ -5,10 +5,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { spo, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { FolderExtensions } from '../../FolderExtensions';
 import { ListItemInstance } from './ListItemInstance';
 
 interface CommandArgs {
@@ -61,7 +60,6 @@ class SpoListItemAddCommand extends SpoCommand {
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
     let contentTypeName: string = '';
     let targetFolderServerRelativeUrl: string = '';
-    const folderExtensions: FolderExtensions = new FolderExtensions(logger, this.debug);
 
     if (this.verbose) {
       logger.logToStderr(`Getting content types for list...`);
@@ -124,9 +122,9 @@ class SpoListItemAddCommand extends SpoCommand {
           return request
             .get<any>(requestOptions)
             .then(rootFolderResponse => {
-              targetFolderServerRelativeUrl = Utils.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], args.options.folder as string);
+              targetFolderServerRelativeUrl = urlUtil.getServerRelativePath(rootFolderResponse["ServerRelativeUrl"], args.options.folder as string);
 
-              return folderExtensions.ensureFolder(args.options.webUrl, targetFolderServerRelativeUrl);
+              return spo.ensureFolder(args.options.webUrl, targetFolderServerRelativeUrl, logger, this.debug);
             });
         }
         else {
@@ -241,7 +239,7 @@ class SpoListItemAddCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
@@ -255,7 +253,7 @@ class SpoListItemAddCommand extends SpoCommand {
     }
 
     if (args.options.listId &&
-      !Utils.isValidGuid(args.options.listId)) {
+      !validation.isValidGuid(args.options.listId)) {
       return `${args.options.listId} in option listId is not a valid GUID`;
     }
 

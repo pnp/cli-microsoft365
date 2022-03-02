@@ -1,10 +1,10 @@
 import { Logger } from "../../../cli";
 import config from "../../../config";
 import request from "../../../request";
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo, spo } from "../../../utils";
 import SpoCommand from "../../base/SpoCommand";
 import { SiteProperties } from "../../spo/commands/site/SiteProperties";
 import { SPOSitePropertiesEnumerable } from "../../spo/commands/site/SPOSitePropertiesEnumerable";
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from "../../spo/spo";
 import commands from "../commands";
 
 class OneDriveListCommand extends SpoCommand {
@@ -23,7 +23,7 @@ class OneDriveListCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
-    this
+    spo
       .getSpoAdminUrl(logger, this.debug)
       .then((spoAdminUrl: string): Promise<void> => {
         if (this.verbose) {
@@ -42,7 +42,7 @@ class OneDriveListCommand extends SpoCommand {
 
   private getAllSites(spoAdminUrl: string, startIndex: string | undefined, formDigest: FormDigestInfo | undefined, logger: Logger): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      this
+      spo
         .ensureFormDigest(spoAdminUrl, logger, formDigest, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           const requestOptions: any = {

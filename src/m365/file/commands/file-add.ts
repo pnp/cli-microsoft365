@@ -7,8 +7,8 @@ import {
 } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
+import { validation } from '../../../utils';
 import GraphCommand from '../../base/GraphCommand';
-import SpoCommand from '../../base/SpoCommand';
 import commands from '../commands';
 
 interface CommandArgs {
@@ -260,13 +260,13 @@ class FileAddCommand extends GraphCommand {
     }
 
     if (args.options.siteUrl) {
-      const isValidSiteUrl = SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+      const isValidSiteUrl = validation.isValidSharePointUrl(args.options.siteUrl);
       if (isValidSiteUrl !== true) {
         return isValidSiteUrl;
       }
     }
 
-    return SpoCommand.isValidSharePointUrl(args.options.folderUrl);
+    return validation.isValidSharePointUrl(args.options.folderUrl);
   }
 }
 

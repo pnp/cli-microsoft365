@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./file-checkin');
 
@@ -58,14 +58,14 @@ describe(commands.FILE_CHECKIN, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       request.post,
       appInsights.trackEvent
@@ -283,7 +283,7 @@ describe(commands.FILE_CHECKIN, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post
         ]);
       }
