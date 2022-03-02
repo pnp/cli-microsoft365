@@ -1,11 +1,11 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
-import Utils from '../../../../../Utils';
+import { sinonUtil } from '../../../../../utils';
 import { ScssFile } from './ScssFile';
 
 describe('ScssFile', () => {
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.readFileSync
     ]);
   });

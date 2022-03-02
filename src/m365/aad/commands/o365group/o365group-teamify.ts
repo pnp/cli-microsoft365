@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -112,7 +112,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
       return 'Specify groupId or mailNickname, one is required';
     }
 
-    if (args.options.groupId && !Utils.isValidGuid(args.options.groupId)) {
+    if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
       return `${args.options.groupId} is not a valid GUID`;
     }
 

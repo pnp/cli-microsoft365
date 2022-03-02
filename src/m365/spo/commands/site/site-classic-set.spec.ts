@@ -6,7 +6,7 @@ import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./site-classic-set');
 
@@ -27,7 +27,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   beforeEach(() => {
     const futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
-    sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
+    sinon.stub(spo, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate, WebFullUrl: 'https://contoso.sharepoint.com' }); });
 
     log = [];
     logger = {
@@ -47,15 +47,15 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
   afterEach(() => {
     (command as any).currentContext = undefined;
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       global.setTimeout,
-      (command as any).ensureFormDigest
+      spo.ensureFormDigest
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);

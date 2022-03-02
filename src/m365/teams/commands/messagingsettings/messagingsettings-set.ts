@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -97,7 +97,7 @@ class TeamsMessagingSettingsSetCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.teamId)) {
+    if (!validation.isValidGuid(args.options.teamId)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 
@@ -118,7 +118,7 @@ class TeamsMessagingSettingsSetCommand extends GraphCommand {
     TeamsMessagingSettingsSetCommand.props.every((p: string) => {
       property = p;
       value = (args.options as any)[p];
-      isValid = typeof value === 'undefined' || Utils.isValidBoolean(value);
+      isValid = typeof value === 'undefined' || validation.isValidBoolean(value);
       return isValid;
     });
     if (!isValid) {

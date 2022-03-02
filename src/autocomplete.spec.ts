@@ -7,7 +7,7 @@ import * as sinon from 'sinon';
 import { SinonSandbox } from 'sinon';
 import { Cli, Logger } from './cli';
 import Command, { CommandOption } from './Command';
-import Utils from './Utils';
+import { sinonUtil } from './utils';
 
 class SimpleCommand extends Command {
   public get name(): string {
@@ -118,7 +118,7 @@ describe('autocomplete', () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       sandbox,
       fs.existsSync,
       fs.writeFileSync
@@ -156,7 +156,7 @@ describe('autocomplete', () => {
       assert(setupSpy.called);
     }
     catch {
-      Utils.restore([
+      sinonUtil.restore([
         setupSpy,
         autocomplete.omelette,
         sandbox
@@ -230,7 +230,7 @@ describe('autocomplete', () => {
   });
 
   it('loads generated commands info from the file system', () => {
-    Utils.restore(fs.existsSync);
+    sinonUtil.restore(fs.existsSync);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const readFileSyncStub = sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({}));
     (autocomplete as any).init();
@@ -241,7 +241,7 @@ describe('autocomplete', () => {
       fail(e);
     }
     finally {
-      Utils.restore([
+      sinonUtil.restore([
         fs.existsSync,
         fs.readFileSync,
         readFileSyncStub
@@ -250,7 +250,7 @@ describe('autocomplete', () => {
   });
 
   it('doesnt fail when the commands file is empty', () => {
-    Utils.restore(fs.existsSync);
+    sinonUtil.restore(fs.existsSync);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const readFileSyncStub = sinon.stub(fs, 'readFileSync').callsFake(() => '');
     (autocomplete as any).init();
@@ -261,7 +261,7 @@ describe('autocomplete', () => {
       fail(e);
     }
     finally {
-      Utils.restore([
+      sinonUtil.restore([
         fs.existsSync,
         fs.readFileSync,
         readFileSyncStub

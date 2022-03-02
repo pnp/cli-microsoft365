@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import Utils from '../../../../../../Utils';
+import { sinonUtil } from '../../../../../../utils';
 import { Project } from '../../model';
 import { Finding } from '../Finding';
 import { FN018003_TEAMS_tab20x20_png } from './FN018003_TEAMS_tab20x20_png';
@@ -11,7 +11,7 @@ describe('FN018003_TEAMS_tab20x20_png', () => {
   let findings: Finding[];
   let rule: FN018003_TEAMS_tab20x20_png;
   afterEach(() => {
-    Utils.restore(fs.existsSync);
+    sinonUtil.restore(fs.existsSync);
   });
 
   beforeEach(() => {

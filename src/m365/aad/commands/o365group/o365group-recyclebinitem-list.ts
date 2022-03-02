@@ -4,7 +4,8 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -16,7 +17,7 @@ interface Options extends GlobalOptions {
   mailNickname?: string;
 }
 
-class AadO365GroupRecycleBinItemListCommand extends GraphItemsListCommand<DirectoryObject> {
+class AadO365GroupRecycleBinItemListCommand extends GraphCommand {
   public get name(): string {
     return commands.O365GROUP_RECYCLEBINITEM_LIST;
   }
@@ -44,10 +45,10 @@ class AadO365GroupRecycleBinItemListCommand extends GraphItemsListCommand<Direct
 
     const endpoint: string = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${filter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
 
-    this
-      .getAllItems(endpoint, logger, true)
-      .then((): void => {
-        logger.log(this.items);
+    odata
+      .getAllItems<DirectoryObject>(endpoint, logger)
+      .then((recycleBinItems): void => {
+        logger.log(recycleBinItems);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

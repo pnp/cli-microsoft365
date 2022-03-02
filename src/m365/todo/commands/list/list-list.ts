@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { ToDoList } from '../../ToDoList';
 
@@ -8,7 +9,7 @@ interface CommandArgs {
   options: GlobalOptions;
 }
 
-class TodoListListCommand extends GraphItemsListCommand<ToDoList> {
+class TodoListListCommand extends GraphCommand {
   public get name(): string {
     return commands.LIST_LIST;
   }
@@ -22,10 +23,10 @@ class TodoListListCommand extends GraphItemsListCommand<ToDoList> {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    this
-      .getAllItems(`${this.resource}/v1.0/me/todo/lists`, logger, true)
-      .then((): void => {
-        logger.log(this.items);
+    odata
+      .getAllItems<ToDoList>(`${this.resource}/v1.0/me/todo/lists`, logger)
+      .then((items): void => {
+        logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

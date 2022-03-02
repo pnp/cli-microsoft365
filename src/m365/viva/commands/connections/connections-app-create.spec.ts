@@ -6,7 +6,7 @@ import * as Sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import { Cli, Logger } from '../../../../cli';
 import Command from '../../../../Command';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./connections-app-create');
 
@@ -46,7 +46,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       Cli.executeCommandWithOutput,
       admZipMock.addFile,
@@ -57,7 +57,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
 
   after(() => {
     (command as any).archive = undefined;
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent
     ]);
   });

@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { ListInstance } from './ListInstance';
@@ -49,7 +49,7 @@ class SpoListLabelSetCommand extends SpoCommand {
       let listRestUrl: string = '';
 
       if (args.options.listUrl) {
-        const listServerRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
 
         return Promise.resolve(listServerRelativeUrl);
       }
@@ -75,7 +75,7 @@ class SpoListLabelSetCommand extends SpoCommand {
         });
     })()
       .then((listServerRelativeUrl: string): Promise<void> => {
-        const listAbsoluteUrl: string = Utils.getAbsoluteUrl(args.options.webUrl, listServerRelativeUrl);
+        const listAbsoluteUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, listServerRelativeUrl);
         const requestUrl: string = `${args.options.webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`;
         const requestOptions: any = {
           url: requestUrl,
@@ -134,11 +134,11 @@ class SpoListLabelSetCommand extends SpoCommand {
       return `Specify listId or listTitle or listUrl.`;
     }
 
-    if (args.options.listId && !Utils.isValidGuid(args.options.listId)) {
+    if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
       return `${args.options.listId} is not a valid GUID`;
     }
 
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

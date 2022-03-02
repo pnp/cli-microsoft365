@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./app-delete');
 
@@ -68,7 +68,7 @@ describe(commands.APP_DELETE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.delete,
       Cli.prompt
@@ -76,7 +76,7 @@ describe(commands.APP_DELETE, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -159,7 +159,7 @@ describe(commands.APP_DELETE, () => {
   });
 
   it('aborts removing the app when prompt not confirmed', (done) => {
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -180,7 +180,7 @@ describe(commands.APP_DELETE, () => {
   });
 
   it('deletes app when prompt confirmed (debug)', (done) => {
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -253,7 +253,7 @@ describe(commands.APP_DELETE, () => {
   });
 
   it('fails to get app by id when app does not exists', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/myorganization/applications?$filter=`) > -1) {
         return Promise.resolve({ value: [] });
@@ -273,7 +273,7 @@ describe(commands.APP_DELETE, () => {
   });
 
   it('fails to get app by name when app does not exists', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/myorganization/applications?$filter=`) > -1) {
         return Promise.resolve({ value: [] });
@@ -293,7 +293,7 @@ describe(commands.APP_DELETE, () => {
   });
 
   it('fails when multiple apps with same name exists', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/myorganization/applications?$filter=`) > -1) {
         return Promise.resolve({

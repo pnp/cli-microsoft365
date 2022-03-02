@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { urlUtil } from '../../../../utils';
 import { ClientSidePageProperties } from './ClientSidePageProperties';
 import { CanvasColumn, CanvasSection, ClientSidePage, ClientSidePart } from './clientsidepages';
 import { PageItem } from './PageItem';
@@ -19,7 +19,7 @@ export class Page {
       const pageName: string = this.getPageNameWithExtension(name);
 
       const requestOptions: any = {
-        url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
+        url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
         headers: {
           'content-type': 'application/json;charset=utf-8',
           accept: 'application/json;odata=nometadata'

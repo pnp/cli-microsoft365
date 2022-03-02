@@ -4,10 +4,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { Tab } from '../../Tab';
 
 interface CommandArgs {
   options: Options;
@@ -24,7 +23,7 @@ interface Options extends GlobalOptions {
   websiteUrl?: string;
 }
 
-class TeamsTabAddCommand extends GraphItemsListCommand<Tab> {
+class TeamsTabAddCommand extends GraphCommand {
   public get name(): string {
     return commands.TAB_ADD;
   }
@@ -95,10 +94,10 @@ class TeamsTabAddCommand extends GraphItemsListCommand<Tab> {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.teamId as string)) {
+    if (!validation.isValidGuid(args.options.teamId as string)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
-    if (!Utils.isValidTeamsChannelId(args.options.channelId as string)) {
+    if (!validation.isValidTeamsChannelId(args.options.channelId as string)) {
       return `${args.options.channelId} is not a valid Teams ChannelId`;
     }
 

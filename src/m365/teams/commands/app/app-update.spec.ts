@@ -6,7 +6,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./app-update');
 
@@ -37,7 +37,7 @@ describe(commands.APP_UPDATE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.put,
       fs.readFileSync,
@@ -46,7 +46,7 @@ describe(commands.APP_UPDATE, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -112,7 +112,7 @@ describe(commands.APP_UPDATE, () => {
     const actual = command.validate({
       options: { id: "e3e29acb-8c79-412b-b746-e6c39ff4cd22", filePath: './' }
     });
-    Utils.restore([
+    sinonUtil.restore([
       fs.lstatSync
     ]);
     assert.notStrictEqual(actual, true);
@@ -131,7 +131,7 @@ describe(commands.APP_UPDATE, () => {
         filePath: 'teamsapp.zip'
       }
     });
-    Utils.restore([
+    sinonUtil.restore([
       fs.lstatSync
     ]);
     assert.strictEqual(actual, true);

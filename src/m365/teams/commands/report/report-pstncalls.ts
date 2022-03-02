@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -69,12 +69,12 @@ class TeamsReportPstncallsCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidISODateDashOnly(args.options.fromDateTime)) {
+    if (!validation.isValidISODateDashOnly(args.options.fromDateTime)) {
       return 'The fromDateTime is not a valid ISO date string (YYYY-MM-DD)';
     }
 
     if (args.options.toDateTime &&
-      !Utils.isValidISODateDashOnly(args.options.toDateTime)) {
+      !validation.isValidISODateDashOnly(args.options.toDateTime)) {
       return 'The toDateTime is not a valid ISO date string (YYYY-MM-DD)';
     }
 

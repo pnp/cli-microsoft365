@@ -8,9 +8,8 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { accessToken, ODataResponse, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
-import { GraphResponse } from '../../../base/GraphResponse';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -85,13 +84,13 @@ class TeamsChatMessageSendCommand extends GraphCommand {
       return 'Specify a message to send.';
     }
 
-    if (args.options.chatId && !Utils.isValidTeamsChatId(args.options.chatId)) {
+    if (args.options.chatId && !validation.isValidTeamsChatId(args.options.chatId)) {
       return `${args.options.chatId} is not a valid Teams ChatId.`;
     }
 
     if (args.options.userEmails) {
       const userEmails = args.options.userEmails.toLowerCase().replace(/\s/g, '').split(',').filter(e => e && e !== '');
-      if (!userEmails || userEmails.length === 0 || userEmails.some(e => !Utils.isValidUserPrincipalName(e))) {
+      if (!userEmails || userEmails.length === 0 || userEmails.some(e => !validation.isValidUserPrincipalName(e))) {
         return `${args.options.userEmails} contains one or more invalid email addresses.`;
       }
     }
@@ -101,7 +100,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
 
   private async ensureChatIdByUserEmails(userEmailsOption: string): Promise<string> {
     const userEmails = userEmailsOption.toLowerCase().replace(/\s/g, '').split(',').filter(e => e && e !== '');
-    const currentUserEmail = Utils.getUserNameFromAccessToken(Auth.service.accessTokens[this.resource].accessToken).toLowerCase();
+    const currentUserEmail = accessToken.getUserNameFromAccessToken(Auth.service.accessTokens[this.resource].accessToken).toLowerCase();
     const existingChats = await this.findExistingGroupChatsByMembers([currentUserEmail, ...userEmails]);
 
     if (existingChats && existingChats.length > 0) {
@@ -232,7 +231,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    const res = await request.get<GraphResponse<Chat>>(requestOptions);
+    const res = await request.get<ODataResponse<Chat>>(requestOptions);
 
     items = items.concat(res.value);
 

@@ -1,10 +1,10 @@
+import { Channel } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
-import { Channel } from '../../Channel';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   teamName?: string;
 }
 
-class TeamsChannelListCommand extends GraphItemsListCommand<Channel>{
+class TeamsChannelListCommand extends GraphCommand{
   public get name(): string {
     return commands.CHANNEL_LIST;
   }
@@ -70,14 +70,12 @@ class TeamsChannelListCommand extends GraphItemsListCommand<Channel>{
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getTeamId(args)
-      .then((teamId: string): Promise<void> => {
+      .then((teamId: string): Promise<Channel[]> => {
         const endpoint: string = `${this.resource}/v1.0/teams/${teamId}/channels`;
-
-        return this
-          .getAllItems(endpoint, logger, true);
+        return odata.getAllItems<Channel>(endpoint, logger);
       })
-      .then((): void => {
-        logger.log(this.items);
+      .then((items): void => {
+        logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -105,7 +103,7 @@ class TeamsChannelListCommand extends GraphItemsListCommand<Channel>{
       return 'Specify teamId or teamName, one is required';
     }
 
-    if (args.options.teamId && !Utils.isValidGuid(args.options.teamId)) {
+    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 

@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./customaction-set');
 
@@ -58,7 +58,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       (command as any).updateCustomAction,
       (command as any).searchAllScopes
@@ -66,7 +66,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -650,7 +650,7 @@ describe(commands.CUSTOMACTION_SET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -941,7 +941,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = command.options();
-    Utils.restore(Command.prototype.options);
+    sinonUtil.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 

@@ -6,7 +6,7 @@ import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./cdn-origin-add');
 
@@ -18,8 +18,11 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({
-      FormDigestValue: 'abc'
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'abc',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
@@ -64,11 +67,11 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       request.post,
       appInsights.trackEvent,
-      (command as any).getRequestDigest
+      spo.getRequestDigest
     ]);
     auth.service.connected = false;
     auth.service.spoUrl = undefined;
@@ -147,7 +150,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   it('correctly handles trying to set CDN origin that has already been set', (done) => {
-    Utils.restore(request.post);
+    sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -189,7 +192,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    Utils.restore(request.post);
+    sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
@@ -205,7 +208,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   it('escapes XML in user input', (done) => {
-    Utils.restore(request.post);
+    sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -279,7 +282,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = command.options();
-    Utils.restore(Command.prototype.options);
+    sinonUtil.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 

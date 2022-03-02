@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import Utils from '../../../../../../Utils';
+import { sinonUtil } from '../../../../../../utils';
 import { Project } from '../../model';
 import { PnPJsRule } from './PnPJsRule';
 
@@ -60,7 +60,7 @@ describe('PnPJsRule', () => {
     assert.strictEqual(findings.suggestions.length, 0);
   });
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync
     ]);
   });

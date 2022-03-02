@@ -3,10 +3,9 @@ import { CommandOption } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ClientSvcResponse, ClientSvcResponseContents, formatting, FormDigestInfo, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
 import { SiteProperties } from './SiteProperties';
 import { SPOSitePropertiesEnumerable } from './SPOSitePropertiesEnumerable';
 
@@ -48,7 +47,7 @@ class SpoSiteListCommand extends SpoCommand {
     const webTemplate: string = siteType === 'TeamSite' ? 'GROUP#0' : 'SITEPAGEPUBLISHING#0';
     let spoAdminUrl: string;
 
-    this
+    spo
       .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<void> => {
         spoAdminUrl = _spoAdminUrl;
@@ -59,7 +58,7 @@ class SpoSiteListCommand extends SpoCommand {
 
         this.allSites = [];
 
-        return this.getAllSites(spoAdminUrl, Utils.escapeXml(args.options.filter || ''), '0', webTemplate, undefined, args.options.deleted, logger);
+        return this.getAllSites(spoAdminUrl, formatting.escapeXml(args.options.filter || ''), '0', webTemplate, undefined, args.options.deleted, logger);
       })
       .then(_ => {
         logger.log(this.allSites);
@@ -69,7 +68,7 @@ class SpoSiteListCommand extends SpoCommand {
 
   private getAllSites(spoAdminUrl: string, filter: string | undefined, startIndex: string | undefined, webTemplate: string, formDigest: FormDigestInfo | undefined, deleted: boolean | undefined, logger: Logger): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      this
+      spo
         .ensureFormDigest(spoAdminUrl, logger, formDigest, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           let requestBody: string = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">${filter}</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">${startIndex}</Property><Property Name="Template" Type="String">${webTemplate}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`;

@@ -5,10 +5,9 @@ import {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 export interface CommandArgs {
   options: Options;
@@ -216,15 +215,15 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     let spoAdminUrl: string = '';
     let tenantId: string = '';
 
-    this
+    spo
       .getTenantId(logger, this.debug)
       .then((_tenantId: string): Promise<string> => {
         tenantId = _tenantId;
-        return this.getSpoAdminUrl(logger, this.debug);
+        return spo.getSpoAdminUrl(logger, this.debug);
       })
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
-        return this.getRequestDigest(spoAdminUrl);
+        return spo.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         formDigestValue = res.FormDigestValue;
@@ -247,7 +246,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
             // the XML has to be represented as array of guids
             let valuesXml: string = '';
             optionValue.split(',').forEach((value: string) => {
-              valuesXml += `<Object Type="Guid">{${Utils.escapeXml(value)}}</Object>`;
+              valuesXml += `<Object Type="Guid">{${formatting.escapeXml(value)}}</Object>`;
             });
             propsXml += `<SetProperty Id="${id++}" ObjectPathId="7" Name="${optionKey}"><Parameter Type="Array">${valuesXml}</Parameter></SetProperty><Method Name="Update" Id="${id++}" ObjectPathId="7" />`;
           }

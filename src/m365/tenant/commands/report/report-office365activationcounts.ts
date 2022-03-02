@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { formatting } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -39,7 +39,7 @@ class TenantReportOffice365ActivationCountsCommand extends GraphCommand {
         const cleanResponse = this.removeEmptyLines(res);
 
         if (output && output.toLowerCase() === 'json') {
-          content = Utils.parseCsvToJson(cleanResponse);
+          content = formatting.parseCsvToJson(cleanResponse);
         }
         else {
           content = cleanResponse;

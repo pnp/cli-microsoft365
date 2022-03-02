@@ -5,11 +5,9 @@ import {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ContextInfo, IdentityResponse, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
-import { ClientSvc, IdentityResponse } from '../../ClientSvc';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -39,7 +37,6 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const clientSvcCommons: ClientSvc = new ClientSvc(logger, this.debug);
     const listIdArgument: string = args.options.listId || '';
     const listTitleArgument: string = args.options.listTitle || '';
     const listRestUrl: string = (args.options.listId ?
@@ -74,12 +71,12 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
           logger.logToStderr(`getting request digest for request`);
         }
 
-        return this.getRequestDigest(args.options.webUrl);
+        return spo.getRequestDigest(args.options.webUrl);
       })
       .then((res: ContextInfo): Promise<IdentityResponse> => {
         formDigestValue = res.FormDigestValue;
 
-        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
+        return spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
       })
       .then((objectIdentity: IdentityResponse): Promise<void> => {
         if (this.verbose) {
@@ -129,7 +126,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
       return `${args.options.id} is not a valid list item ID`;
     }
 
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
@@ -143,7 +140,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
     }
 
     if (args.options.listId &&
-      !Utils.isValidGuid(args.options.listId)) {
+      !validation.isValidGuid(args.options.listId)) {
       return `${args.options.listId} in option listId is not a valid GUID`;
     }
 

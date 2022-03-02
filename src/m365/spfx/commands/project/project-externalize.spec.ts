@@ -7,7 +7,7 @@ import appInsights from '../../../../appInsights';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 import { External, ExternalConfiguration, Project } from './model';
 import { ExternalizeEntry, FileEdit } from './project-externalize/';
@@ -25,6 +25,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
   });
 
   beforeEach(() => {
@@ -45,7 +46,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       (command as any).getProjectRoot,
       (command as any).getProjectVersion,
       fs.existsSync,
@@ -57,7 +58,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent
     ]);
   });
@@ -129,7 +130,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
   });
 
-  it('correctly handles the case when .yo-rc.json exists but doesn\'t contain spfx project info', (done) => {
+  it(`correctly handles the case when .yo-rc.json exists but doesn't contain spfx project info`, (done) => {
     const originalExistsSync = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake((path) => {
       if (path.toString().endsWith('.yo-rc.json') || path.toString().endsWith('package.json')) {

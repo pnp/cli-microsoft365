@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -26,7 +26,7 @@ class SpoUserProfileGetCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    this
+    spo
       .getSpoUrl(logger, this.debug)
       .then((spoUrl: string): Promise<{ UserProfileProperties: { Key: string; Value: string }[] }> => {
         const userName: string = `i:0#.f|membership|${args.options.userName}`;
@@ -62,7 +62,7 @@ class SpoUserProfileGetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidUserPrincipalName(args.options.userName)) {
+    if (!validation.isValidUserPrincipalName(args.options.userName)) {
       return `${args.options.userName} is not a valid user principal name`;
     }
 

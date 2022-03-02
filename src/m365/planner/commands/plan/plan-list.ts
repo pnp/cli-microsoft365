@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -108,7 +108,7 @@ class PlannerPlanListCommand extends GraphCommand {
       return 'Specify either ownerGroupId or ownerGroupName but not both';
     }
 
-    if (args.options.ownerGroupId && !Utils.isValidGuid(args.options.ownerGroupId as string)) {
+    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
       return `${args.options.ownerGroupId} is not a valid GUID`;
     }
 

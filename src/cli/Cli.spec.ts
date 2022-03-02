@@ -11,7 +11,7 @@ import appInsights from '../appInsights';
 import Command, { CommandArgs, CommandError, CommandOption, CommandTypes } from '../Command';
 import AnonymousCommand from '../m365/base/AnonymousCommand';
 import { settingsNames } from '../settingsNames';
-import Utils from '../Utils';
+import { sinonUtil } from '../utils';
 import { Logger } from './Logger';
 import Table = require('easy-table');
 const packageJSON = require('../../package.json');
@@ -185,7 +185,7 @@ describe('Cli', () => {
     processExitStub.reset();
     markshellStub.reset();
     mockCommandActionSpy.resetHistory();
-    Utils.restore([
+    sinonUtil.restore([
       Cli.executeCommand,
       fs.existsSync,
       fs.readFileSync,
@@ -202,7 +202,7 @@ describe('Cli', () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       (Cli as any).log,
       (Cli as any).error,
       (Cli as any).formatOutput,
@@ -1485,21 +1485,21 @@ describe('Cli', () => {
   });
 
   it(`logs output to console`, () => {
-    Utils.restore((Cli as any).log);
+    sinonUtil.restore((Cli as any).log);
     const consoleLogSpy: sinon.SinonSpy = sinon.stub(console, 'log').callsFake(() => { });
     (Cli as any).log('Message');
     assert(consoleLogSpy.calledWith('Message'));
   });
 
   it(`logs empty line to console when no message specified`, () => {
-    Utils.restore((Cli as any).log);
+    sinonUtil.restore((Cli as any).log);
     const consoleLogSpy: sinon.SinonSpy = sinon.stub(console, 'log').callsFake(() => { });
     (Cli as any).log();
     assert(consoleLogSpy.calledWith());
   });
 
   it(`logs error to console stderr`, () => {
-    Utils.restore((Cli as any).error);
+    sinonUtil.restore((Cli as any).error);
     const consoleErrorSpy: sinon.SinonSpy = sinon.stub(console, 'error').callsFake(() => { });
     (Cli as any).error('Message');
     assert(consoleErrorSpy.calledWith('Message'));
@@ -1508,7 +1508,7 @@ describe('Cli', () => {
   it(`logs error to console stdout when stdout configured as error output`, () => {
     const config = cli.config;
     sinon.stub(config, 'get').callsFake(() => 'stdout');
-    Utils.restore((Cli as any).error);
+    sinonUtil.restore((Cli as any).error);
     const consoleErrorSpy: sinon.SinonSpy = sinon.stub(console, 'error').callsFake(() => { });
     const consoleLogSpy: sinon.SinonSpy = sinon.stub(console, 'log').callsFake(() => { });
 

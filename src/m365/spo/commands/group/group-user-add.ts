@@ -2,6 +2,7 @@ import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command, { CommandError, CommandErrorWithOutput, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { validation } from '../../../../utils';
 import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
 import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
 import SpoCommand from '../../../base/SpoCommand';
@@ -182,7 +183,7 @@ class SpoGroupUserAddCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }

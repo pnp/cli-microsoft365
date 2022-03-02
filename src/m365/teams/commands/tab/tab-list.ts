@@ -3,8 +3,8 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { Tab } from '../../Tab';
 
@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   channelId: string;
 }
 
-class TeamsTabListCommand extends GraphItemsListCommand<Tab> {
+class TeamsTabListCommand extends GraphCommand {
   public get name(): string {
     return commands.TAB_LIST;
   }
@@ -33,14 +33,14 @@ class TeamsTabListCommand extends GraphItemsListCommand<Tab> {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const endpoint: string = `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${encodeURIComponent(args.options.channelId)}/tabs?$expand=teamsApp`;
 
-    this
-      .getAllItems(endpoint, logger, true)
-      .then((): void => {
-        this.items.forEach(i => {
+    odata
+      .getAllItems<Tab>(endpoint, logger)
+      .then((items): void => {
+        items.forEach(i => {
           (i as any).teamsAppTabId = i.teamsApp.id;
         });
 
-        logger.log(this.items);
+        logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -60,11 +60,11 @@ class TeamsTabListCommand extends GraphItemsListCommand<Tab> {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.teamId as string)) {
+    if (!validation.isValidGuid(args.options.teamId as string)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 
-    if (!Utils.isValidTeamsChannelId(args.options.channelId as string)) {
+    if (!validation.isValidTeamsChannelId(args.options.channelId as string)) {
       return `${args.options.channelId} is not a valid Teams ChannelId`;
     }
 

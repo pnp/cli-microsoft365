@@ -4,7 +4,7 @@ import appInsights from '../../appInsights';
 import auth from '../../Auth';
 import { Logger } from '../../cli';
 import { CommandError } from '../../Command';
-import Utils from '../../Utils';
+import { sinonUtil } from '../../utils';
 import YammerCommand from './YammerCommand';
 
 class MockCommand extends YammerCommand {
@@ -34,11 +34,11 @@ describe('YammerCommand', () => {
   });
 
   afterEach(() => {
-    Utils.restore(auth.restoreAuth);
+    sinonUtil.restore(auth.restoreAuth);
   });
 
   after(() => {
-    Utils.restore(appInsights.trackEvent);
+    sinonUtil.restore(appInsights.trackEvent);
   });
 
   it('correctly reports an error while restoring auth info', (done) => {

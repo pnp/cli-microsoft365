@@ -6,12 +6,11 @@ import Command, {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, FormDigestInfo, spo, urlUtil, validation } from '../../../../utils';
 import * as aadO365GroupSetCommand from '../../../aad/commands/o365group/o365group-set';
 import { Options as AadO365GroupSetCommandOptions } from '../../../aad/commands/o365group/o365group-set';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, FormDigestInfo } from '../../spo';
 import { SharingCapabilities } from '../site/SharingCapabilities';
 import * as spoSiteDesignApplyCommand from '../sitedesign/sitedesign-apply';
 import { Options as SpoSiteDesignApplyCommandOptions } from '../sitedesign/sitedesign-apply';
@@ -105,7 +104,7 @@ class SpoSiteSetCommand extends SpoCommand {
       logger.logToStderr(`Setting the site its logo...`);
     }
 
-    const logoUrl = args.options.siteLogoUrl ? Utils.getServerRelativePath(args.options.url, args.options.siteLogoUrl) : "";
+    const logoUrl = args.options.siteLogoUrl ? urlUtil.getServerRelativePath(args.options.url, args.options.siteLogoUrl) : "";
 
     const requestOptions: any = {
       url: `${args.options.url}/_api/siteiconmanager/setsitelogo`,
@@ -159,12 +158,12 @@ class SpoSiteSetCommand extends SpoCommand {
       const promises: Promise<void>[] = [];
 
       if (typeof args.options.title !== 'undefined') {
-        promises.push(this
+        promises.push(spo
           .getSpoAdminUrl(logger, this.debug)
           .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
             spoAdminUrl = _spoAdminUrl;
 
-            return this.getRequestDigest(spoAdminUrl);
+            return spo.getRequestDigest(spoAdminUrl);
           })
           .then((formDigest: FormDigestInfo) => {
             const requestOptions: any = {
@@ -238,7 +237,7 @@ class SpoSiteSetCommand extends SpoCommand {
 
     let spoAdminUrl: string;
 
-    return this
+    return spo
       .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<{ value: { id: string; }[] }> => {
         spoAdminUrl = _spoAdminUrl;
@@ -283,7 +282,7 @@ class SpoSiteSetCommand extends SpoCommand {
         logger.logToStderr(`Retrieving request digest...`);
       }
 
-      this
+      spo
         .getRequestDigest(args.options.url)
         .then((res: ContextInfo): Promise<string> => {
           if (this.verbose) {
@@ -293,7 +292,7 @@ class SpoSiteSetCommand extends SpoCommand {
           let propertyId: number = 27;
           const payload: string[] = [];
           if (typeof args.options.classification === 'string') {
-            payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="Classification"><Parameter Type="String">${Utils.escapeXml(args.options.classification)}</Parameter></SetProperty>`);
+            payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="Classification"><Parameter Type="String">${formatting.escapeXml(args.options.classification)}</Parameter></SetProperty>`);
           }
           if (typeof args.options.disableFlows === 'string') {
             payload.push(`<SetProperty Id="${propertyId++}" ObjectPathId="5" Name="DisableFlows"><Parameter Type="Boolean">${args.options.disableFlows === 'true'}</Parameter></SetProperty>`);
@@ -355,12 +354,12 @@ class SpoSiteSetCommand extends SpoCommand {
 
       const sharingCapability: SharingCapabilities = SharingCapabilities[(args.options.sharingCapability as keyof typeof SharingCapabilities)];
 
-      this
+      spo
         .getSpoAdminUrl(logger, this.debug)
         .then((_spoAdminUrl: string): Promise<ContextInfo> => {
           this.spoAdminUrl = _spoAdminUrl;
 
-          return this.getRequestDigest(this.spoAdminUrl);
+          return spo.getRequestDigest(this.spoAdminUrl);
         })
         .then((res: ContextInfo): Promise<string> => {
           if (this.verbose) {
@@ -372,7 +371,7 @@ class SpoSiteSetCommand extends SpoCommand {
             headers: {
               'X-RequestDigest': res.FormDigestValue
             },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1"/><ObjectPath Id="4" ObjectPathId="3"/><SetProperty Id="5" ObjectPathId="3" Name="SharingCapability"><Parameter Type="Enum">${sharingCapability}</Parameter></SetProperty><ObjectPath Id="7" ObjectPathId="6"/><ObjectIdentityQuery Id="8" ObjectPathId="3"/></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="6" ParentId="3" Name="Update"/></ObjectPaths></Request>`
+            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1"/><ObjectPath Id="4" ObjectPathId="3"/><SetProperty Id="5" ObjectPathId="3" Name="SharingCapability"><Parameter Type="Enum">${sharingCapability}</Parameter></SetProperty><ObjectPath Id="7" ObjectPathId="6"/><ObjectIdentityQuery Id="8" ObjectPathId="3"/></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="6" ParentId="3" Name="Update"/></ObjectPaths></Request>`
           };
 
           return request.post(requestOptions);
@@ -481,7 +480,7 @@ class SpoSiteSetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
@@ -522,7 +521,7 @@ class SpoSiteSetCommand extends SpoCommand {
     }
 
     if (args.options.siteDesignId) {
-      if (!Utils.isValidGuid(args.options.siteDesignId)) {
+      if (!validation.isValidGuid(args.options.siteDesignId)) {
         return `${args.options.siteDesignId} is not a valid GUID`;
       }
     }

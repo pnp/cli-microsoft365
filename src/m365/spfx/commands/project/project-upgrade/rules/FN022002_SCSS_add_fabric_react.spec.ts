@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import { Utils } from '../';
+import { spfx } from '../../../../../../utils';
 import { Project, ScssFile } from '../../model';
 import { Finding } from '../Finding';
 import { FN022002_SCSS_add_fabric_react } from './FN022002_SCSS_add_fabric_react';
@@ -14,7 +14,7 @@ describe('FN022002_SCSS_add_fabric_react', () => {
 
   beforeEach(() => {
     findings = [];
-    utilsStub = sinon.stub(Utils, 'isReactProject').returns(true);
+    utilsStub = sinon.stub(spfx, 'isReactProject').returns(true);
   });
 
   afterEach(() => {
@@ -79,7 +79,7 @@ describe('FN022002_SCSS_add_fabric_react', () => {
   it('doesn\'t return notifications if scss is not in react web part', () => {
     rule = new FN022002_SCSS_add_fabric_react('~fabric-ui/react');
     utilsStub.restore();
-    utilsStub = sinon.stub(Utils, 'isReactProject').returns(false);
+    utilsStub = sinon.stub(spfx, 'isReactProject').returns(false);
 
     fileStub = sinon.stub(fs, 'readFileSync').returns('');
 

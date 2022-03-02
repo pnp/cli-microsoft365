@@ -5,7 +5,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -110,10 +110,10 @@ class TeamsTeamGetCommand extends GraphCommand {
       return 'Specify teamId or teamName, one is required';
     }
 
-    if (args.options.id && !Utils.isValidGuid(args.options.id as string)) {
+    if (args.options.id && !validation.isValidGuid(args.options.id as string)) {
       return `${args.options.id} is not a valid GUID`;
     }
-    
+
     return true;
   }
 }

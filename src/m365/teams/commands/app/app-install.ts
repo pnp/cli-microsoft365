@@ -2,7 +2,7 @@ import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
 import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
 import GraphCommand from '../../../base/GraphCommand';
@@ -105,7 +105,7 @@ class TeamsAppInstallCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.appId)) {
+    if (!validation.isValidGuid(args.options.appId)) {
       return `${args.options.appId} is not a valid GUID`;
     }
 
@@ -122,12 +122,12 @@ class TeamsAppInstallCommand extends GraphCommand {
     }
 
     if (args.options.teamId &&
-      !Utils.isValidGuid(args.options.teamId)) {
+      !validation.isValidGuid(args.options.teamId)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 
     if (args.options.userId &&
-      !Utils.isValidGuid(args.options.userId)) {
+      !validation.isValidGuid(args.options.userId)) {
       return `${args.options.userId} is not a valid GUID`;
     }
 

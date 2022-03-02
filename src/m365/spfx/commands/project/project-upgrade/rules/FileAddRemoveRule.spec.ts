@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import Utils from '../../../../../../Utils';
+import { sinonUtil } from '../../../../../../utils';
 import { Project } from '../../model';
 import { Finding } from '../Finding';
 import { FileAddRemoveRule } from './FileAddRemoveRule';
@@ -21,7 +21,7 @@ describe('FileAddRemoveRule', () => {
   let rule: FileAddRemoveRule;
 
   afterEach(() => {
-    Utils.restore(fs.existsSync);
+    sinonUtil.restore(fs.existsSync);
   });
 
   beforeEach(() => {

@@ -3,7 +3,7 @@ import { Logger } from '../../../../cli';
 import Command, { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { accessToken } from '../../../../utils';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -76,7 +76,7 @@ class TenantAuditlogReportCommand extends Command {
       logger.logToStderr(`Start retrieving Audit Log Report`);
     }
 
-    this.tenantId = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
+    this.tenantId = accessToken.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
     this
       .getCompleteAuditReports(args, logger)
       .then((res: AuditlogReport[]): void => {
@@ -122,7 +122,7 @@ class TenantAuditlogReportCommand extends Command {
       .then((subscriptionLists: ActivityfeedSubscription[]): boolean => {
         return subscriptionLists.some(subscriptionList =>
           subscriptionList.contentType === (<any>AuditContentTypes)[args.options.contentType] &&
-            subscriptionList.status === 'enabled');
+          subscriptionList.status === 'enabled');
       })
       .then((hasActiveSubscription: boolean): Promise<void> => {
         if (hasActiveSubscription) {

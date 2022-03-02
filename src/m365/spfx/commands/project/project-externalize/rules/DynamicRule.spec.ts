@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import request from '../../../../../../request';
-import Utils from '../../../../../../Utils';
+import { sinonUtil } from '../../../../../../utils';
 import { Project } from '../../model';
 import { DynamicRule } from './DynamicRule';
 
@@ -14,7 +14,7 @@ describe('DynamicRule', () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.readFileSync,
       request.head,
       request.post

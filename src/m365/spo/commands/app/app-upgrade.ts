@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -78,11 +78,11 @@ class SpoAppUpgradeCommand extends SpoCommand {
       }
     }
 
-    if (!Utils.isValidGuid(args.options.id)) {
+    if (!validation.isValidGuid(args.options.id)) {
       return `${args.options.id} is not a valid GUID`;
     }
 
-    return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+    return validation.isValidSharePointUrl(args.options.siteUrl);
   }
 }
 

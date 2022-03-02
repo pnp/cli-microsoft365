@@ -5,7 +5,8 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -16,7 +17,7 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class AadO365GroupRecycleBinItemClearCommand extends GraphItemsListCommand<DirectoryObject> {
+class AadO365GroupRecycleBinItemClearCommand extends GraphCommand {
   public get name(): string {
     return commands.O365GROUP_RECYCLEBINITEM_CLEAR;
   }
@@ -61,16 +62,16 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphItemsListCommand<Direc
     const topCount: string = '&$top=100';
     const endpoint: string = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${filter}${topCount}`;
 
-    return this
-      .getAllItems(endpoint, logger, true)
-      .then((): Promise<any> => {
-        if (this.items.length === 0) {
+    return odata
+      .getAllItems<DirectoryObject>(endpoint, logger)
+      .then((recycleBinItems): Promise<any> => {
+        if (recycleBinItems.length === 0) {
           return Promise.resolve();
         }
 
         const deletePromises: Promise<any>[] = [];
         // Logic to delete a group from recycle bin items.
-        this.items.forEach(grp => {
+        recycleBinItems.forEach(grp => {
           deletePromises.push(
             request.delete({
               url: `${this.resource}/v1.0/directory/deletedItems/${grp.id}`,

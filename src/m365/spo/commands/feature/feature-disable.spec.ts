@@ -4,7 +4,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError, CommandTypes } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 import sinon = require('sinon');
 const command: Command = require('./feature-disable');
@@ -37,13 +37,13 @@ describe(commands.FEATURE_DISABLE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -136,7 +136,7 @@ describe(commands.FEATURE_DISABLE, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -172,7 +172,7 @@ describe(commands.FEATURE_DISABLE, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -208,7 +208,7 @@ describe(commands.FEATURE_DISABLE, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });

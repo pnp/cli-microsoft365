@@ -6,7 +6,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./o365group-add');
 
@@ -39,7 +39,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       request.put,
       request.get,
@@ -48,7 +48,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       fs.readFileSync,
       appInsights.trackEvent
@@ -1229,7 +1229,7 @@ describe(commands.O365GROUP_ADD, () => {
   it('fails validation if logoPath points to a non-existent file', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'invalid' } });
-    Utils.restore(fs.existsSync);
+    sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
   });
 
@@ -1239,7 +1239,7 @@ describe(commands.O365GROUP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
     const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'folder' } });
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);
@@ -1252,7 +1252,7 @@ describe(commands.O365GROUP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
     const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'folder' } });
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);

@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import { Logger } from '../../../cli';
 import Command from '../../../Command';
-import Utils from '../../../Utils';
+import { sinonUtil } from '../../../utils';
 import commands from '../commands';
 const command: Command = require('./cli-reconsent');
 
@@ -31,7 +31,7 @@ describe(commands.COMPLETION_SH_SETUP, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent
     ]);
   });

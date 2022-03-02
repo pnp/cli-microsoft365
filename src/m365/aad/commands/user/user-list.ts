@@ -4,7 +4,8 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -16,7 +17,7 @@ interface Options extends GlobalOptions {
   deleted?: boolean;
 }
 
-class AadUserListCommand extends GraphItemsListCommand<User> {
+class AadUserListCommand extends GraphCommand {
   public get name(): string {
     return commands.USER_LIST;
   }
@@ -44,10 +45,10 @@ class AadUserListCommand extends GraphItemsListCommand<User> {
     const endpoint: string = args.options.deleted ? 'directory/deletedItems/microsoft.graph.user' : 'users';
     const url: string = `${this.resource}/v1.0/${endpoint}?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
 
-    this
-      .getAllItems(url, logger, true)
-      .then((): void => {
-        logger.log(this.items);
+    odata
+      .getAllItems<User>(url, logger)
+      .then((users): void => {
+        logger.log(users);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

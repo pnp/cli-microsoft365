@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./hidedefaultthemes-get');
 
@@ -38,7 +38,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       request.get,
       request.post,
@@ -78,7 +78,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post
         ]);
       }
@@ -106,7 +106,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post
         ]);
       }
@@ -134,7 +134,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -156,7 +156,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });

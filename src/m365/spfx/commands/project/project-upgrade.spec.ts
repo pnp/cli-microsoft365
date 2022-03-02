@@ -5,10 +5,10 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
-import Utils from '../../../../Utils';
+import { fsUtil, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 import { Manifest, Project, VsCode } from './model';
-import { FindingToReport, Utils as Utils1 } from './project-upgrade/';
+import { FindingToReport } from './project-upgrade/';
 import { Finding } from './project-upgrade/Finding';
 const command: Command = require('./project-upgrade');
 
@@ -55,7 +55,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       (command as any).getProjectRoot,
       (command as any).getProjectVersion,
       fs.existsSync,
@@ -63,12 +63,12 @@ describe(commands.PROJECT_UPGRADE, () => {
       fs.statSync,
       fs.writeFileSync,
       fs.mkdirSync,
-      Utils1.getAllFiles
+      fsUtil.readdirR
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent
     ]);
   });

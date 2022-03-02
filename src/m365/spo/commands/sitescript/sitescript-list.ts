@@ -1,8 +1,8 @@
 import { Logger } from '../../../../cli';
 import request from '../../../../request';
+import { spo, ContextInfo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 
 class SpoSiteScriptListCommand extends SpoCommand {
   public get name(): string {
@@ -16,11 +16,11 @@ class SpoSiteScriptListCommand extends SpoCommand {
   public commandAction(logger: Logger, args: any, cb: () => void): void {
     let spoUrl: string = '';
 
-    this
+    spo
       .getSpoUrl(logger, this.debug)
       .then((_spoUrl: string): Promise<ContextInfo> => {
         spoUrl = _spoUrl;
-        return this.getRequestDigest(spoUrl);
+        return spo.getRequestDigest(spoUrl);
       })
       .then((res: ContextInfo): Promise<{ value: any[] }> => {
         const requestOptions: any = {

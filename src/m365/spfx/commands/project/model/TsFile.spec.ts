@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as sinon from 'sinon';
 import * as ts from 'typescript';
 import { TsFile } from ".";
-import Utils from '../../../../../Utils';
+import { sinonUtil } from '../../../../../utils';
 
 describe('TsFile', () => {
   let tsFile: TsFile;
@@ -13,7 +13,7 @@ describe('TsFile', () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       ts.createSourceFile
     ]);

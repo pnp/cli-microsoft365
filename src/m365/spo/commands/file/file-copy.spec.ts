@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./file-copy');
 
@@ -64,8 +64,11 @@ describe(commands.FILE_COPY, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub((command as any), 'getRequestDigest').callsFake(() => Promise.resolve({
-      FormDigestValue: 'abc'
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'abc',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
     }));
     sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
@@ -91,16 +94,16 @@ describe(commands.FILE_COPY, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      (command as any).getRequestDigest,
+      spo.getRequestDigest,
       appInsights.trackEvent,
       global.setTimeout
     ]);
@@ -311,8 +314,8 @@ describe(commands.FILE_COPY, () => {
   it('should show error when getRequestDigest rejects with error', (done) => {
     stubAllPostRequests();
     stubAllGetRequests();
-    Utils.restore((command as any).getRequestDigest);
-    sinon.stub((command as any), 'getRequestDigest').callsFake(() => Promise.reject('error'));
+    sinonUtil.restore(spo.getRequestDigest);
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('error'));
 
     command.action(logger, {
       options: {
@@ -331,9 +334,12 @@ describe(commands.FILE_COPY, () => {
         done(e);
       }
       finally {
-        Utils.restore((command as any).getRequestDigest);
-        sinon.stub((command as any), 'getRequestDigest').callsFake(() => Promise.resolve({
-          FormDigestValue: 'abc'
+        sinonUtil.restore(spo.getRequestDigest);
+        sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+          FormDigestValue: 'abc',
+          FormDigestTimeoutSeconds: 1800,
+          FormDigestExpiresAt: new Date(),
+          WebFullUrl: 'https://contoso.sharepoint.com'
         }));
       }
     });

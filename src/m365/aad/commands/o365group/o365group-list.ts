@@ -4,7 +4,8 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { GroupExtended } from './GroupExtended';
 
@@ -20,7 +21,7 @@ interface Options extends GlobalOptions {
   orphaned?: boolean;
 }
 
-class AadO365GroupListCommand extends GraphItemsListCommand<GroupExtended> {
+class AadO365GroupListCommand extends GraphCommand {
   public get name(): string {
     return commands.O365GROUP_LIST;
   }
@@ -56,23 +57,27 @@ class AadO365GroupListCommand extends GraphItemsListCommand<GroupExtended> {
       endpoint = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${groupFilter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
     }
 
-    this
-      .getAllItems(endpoint, logger, true)
-      .then((): Promise<any> => {
+    let groups: GroupExtended[] = [];
+
+    odata
+      .getAllItems<GroupExtended>(endpoint, logger)
+      .then((_groups): Promise<any> => {
+        groups = _groups;
+
         if (args.options.orphaned) {
           const orphanedGroups: GroupExtended[] = [];
 
-          this.items.forEach((group) => {
+          groups.forEach((group) => {
             if (!group.owners || group.owners.length === 0) {
               orphanedGroups.push(group);
             }
           });
 
-          this.items = orphanedGroups;
+          groups = orphanedGroups;
         }
 
         if (args.options.includeSiteUrl) {
-          return Promise.all(this.items.map(g => this.getGroupSiteUrl(g.id as string)));
+          return Promise.all(groups.map(g => this.getGroupSiteUrl(g.id as string)));
         }
         else {
           return Promise.resolve();
@@ -81,18 +86,18 @@ class AadO365GroupListCommand extends GraphItemsListCommand<GroupExtended> {
       .then((res?: { id: string, url: string }[]): void => {
         if (res) {
           res.forEach(r => {
-            for (let i: number = 0; i < this.items.length; i++) {
-              if (this.items[i].id !== r.id) {
+            for (let i: number = 0; i < groups.length; i++) {
+              if (groups[i].id !== r.id) {
                 continue;
               }
 
-              this.items[i].siteUrl = r.url;
+              groups[i].siteUrl = r.url;
               break;
             }
           });
         }
 
-        logger.log(this.items);
+        logger.log(groups);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

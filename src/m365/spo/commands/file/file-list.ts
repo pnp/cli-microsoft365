@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { formatting, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { FileFolderCollection } from '../folder/FileFolderCollection';
@@ -45,7 +45,7 @@ class SpoFileListCommand extends SpoCommand {
   private getFiles(folderUrl: string, args: CommandArgs, files: FilePropertiesCollection = { value: [] }): Promise<FilePropertiesCollection> {
     // If --recursive option is specified, retrieve both Files and Folder details, otherwise only Files.
     const expandParameters: string = args.options.recursive ? 'Files,Folders' : 'Files';
-    let requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${Utils.encodeQueryParameter(folderUrl)}')?$expand=${expandParameters}`;
+    let requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${formatting.encodeQueryParameter(folderUrl)}')?$expand=${expandParameters}`;
     if (args.options.output !== 'json') {
       requestUrl += '&$select=Files/UniqueId,Files/Name,Files/ServerRelativeUrl';
     }
@@ -92,7 +92,7 @@ class SpoFileListCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

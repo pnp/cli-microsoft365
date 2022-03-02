@@ -7,7 +7,7 @@ import {
   CommandError, CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import AnonymousCommand from "../../../base/AnonymousCommand";
 import commands from '../../commands';
 import TemplateInstantiator from "../../template-instantiator";
@@ -113,7 +113,7 @@ class PaSolutionInitCommand extends AnonymousCommand {
     }
 
     const workingDirectoryName: string = path.basename(process.cwd());
-    if (!Utils.isValidFileName(workingDirectoryName)) {
+    if (!validation.isValidFileName(workingDirectoryName)) {
       return `Empty or invalid project name '${workingDirectoryName}'`;
     }
 

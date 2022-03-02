@@ -7,8 +7,8 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -22,7 +22,7 @@ export interface Options extends GlobalOptions {
   ownerGroupName?: string;
 }
 
-class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
+class PlannerPlanGetCommand extends GraphCommand {
   public get name(): string {
     return commands.PLAN_GET;
   }
@@ -56,9 +56,9 @@ class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
     else {
       this
         .getGroupId(args)
-        .then((groupId: string): Promise<void> => this.getAllItems(`${this.resource}/v1.0/groups/${groupId}/planner/plans`, logger, true, 'minimal'))
-        .then((): void => {
-          const filteredPlans = this.items.filter((plan: PlannerPlan) => plan.title === args.options.title);
+        .then((groupId: string): Promise<PlannerPlan[]> => odata.getAllItems(`${this.resource}/v1.0/groups/${groupId}/planner/plans`, logger, 'minimal'))
+        .then((plans): void => {
+          const filteredPlans = plans.filter((plan: PlannerPlan) => plan.title === args.options.title);
 
           if (!filteredPlans.length) {
             cb(new CommandError(`No plan with the name ${args.options.title} found`));
@@ -154,7 +154,7 @@ class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
       return 'Specify either ownerGroupId or ownerGroupName but not both';
     }
 
-    if (args.options.ownerGroupId && !Utils.isValidGuid(args.options.ownerGroupId as string)) {
+    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
       return `${args.options.ownerGroupId} is not a valid GUID`;
     }
 

@@ -4,8 +4,8 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import { Channel } from '../../Channel';
 import commands from '../../commands';
 import { ConversationMember } from '../../ConversationMember';
@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   channelName?: string;
 }
 
-class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
+class TeamsConversationMemberListCommand extends GraphCommand {
   private teamId: string = "";
 
   public get name(): string {
@@ -49,13 +49,13 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
         return this.getChannelId(teamId, args);
       }).then((channelId: string) => {
         const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(channelId)}/members`;
-        return this.getAllItems(endpoint, logger, true);
-      }).then((): void => {
+        return odata.getAllItems<ConversationMember>(endpoint, logger);
+      }).then((items): void => {
         if (args.options.output === 'json') {
-          logger.log(this.items);
+          logger.log(items);
         }
         else {
-          logger.log(this.items.map((c: ConversationMember) => {
+          logger.log(items.map((c: ConversationMember) => {
             return {
               id: c.id,
               displayName: c.displayName,
@@ -98,7 +98,7 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
       return 'Specify teamId or teamName, one is required';
     }
 
-    if (args.options.teamId && !Utils.isValidGuid(args.options.teamId as string)) {
+    if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 
@@ -110,7 +110,7 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
       return 'Specify channelId or channelName, one is required';
     }
 
-    if (args.options.channelId && !Utils.isValidTeamsChannelId(args.options.channelId as string)) {
+    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
       return `${args.options.channelId} is not a valid Teams ChannelId`;
     }
 

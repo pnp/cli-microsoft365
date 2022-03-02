@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./task-get');
 
@@ -36,13 +36,13 @@ describe(commands.TASK_GET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent,
       auth.restoreAuth
     ]);
@@ -137,7 +137,7 @@ describe(commands.TASK_GET, () => {
   });
 
   it('correctly handles item not found', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('The requested item is not found.'));
 
     command.action(logger, { options: { debug: false } } as any, (err?: any) => {
@@ -152,7 +152,7 @@ describe(commands.TASK_GET, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     command.action(logger, { options: { debug: false } } as any, (err?: any) => {

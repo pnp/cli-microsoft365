@@ -1,20 +1,16 @@
+import { AppRole } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
-}
-
-interface AppRole {
-  description: string;
-  displayName: string;
-  id: string;
 }
 
 interface Options extends GlobalOptions {
@@ -23,7 +19,7 @@ interface Options extends GlobalOptions {
   appName?: string;
 }
 
-class AadAppRoleListCommand extends GraphItemsListCommand<AppRole> {
+class AadAppRoleListCommand extends GraphCommand {
   public get name(): string {
     return commands.APP_ROLE_LIST;
   }
@@ -47,9 +43,9 @@ class AadAppRoleListCommand extends GraphItemsListCommand<AppRole> {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getAppObjectId(args, logger)
-      .then(objectId => this.getAllItems(`${this.resource}/v1.0/myorganization/applications/${objectId}/appRoles`, logger, true))
-      .then(_ => {
-        logger.log(this.items);
+      .then(objectId => odata.getAllItems<AppRole>(`${this.resource}/v1.0/myorganization/applications/${objectId}/appRoles`, logger))
+      .then(appRoles => {
+        logger.log(appRoles);
         cb();
       }, rawRes => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
