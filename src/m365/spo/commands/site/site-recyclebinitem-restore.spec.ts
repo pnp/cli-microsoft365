@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
@@ -12,7 +12,6 @@ const command: Command = require('./site-recyclebinitem-restore');
 describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
   let log: any[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -33,7 +32,6 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -129,9 +127,9 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
         siteUrl: 'https://contoso.sharepoint.com',
         ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526,1adcf0d6-3733-4c13-b883-c84a27905cfd'
       }
-    }, () => {
+    } as any, (err?: any) => {
       try {
-        assert(loggerLogSpy.calledWith('Could not restore items from recyclebin'));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Invalid request')));
         done();
       }
       catch (e) {

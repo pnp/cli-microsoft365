@@ -54,15 +54,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-    )
-      .then(_ => cb())
-      .catch(_ => {
-        if (this.debug) {
-          logger.log(`Could not restore items from recyclebin`);
-        }
-
-        cb();
-      });
+    ).then(_ => cb(), (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
 
   }
 
