@@ -31,6 +31,7 @@ nav:
         - app get: 'cmd/aad/app/app-get.md'
         - app remove: 'cmd/aad/app/app-remove.md'
         - app set: 'cmd/aad/app/app-set.md'
+        - app open: 'cmd/aad/app/app-open.md'
         - app role add: 'cmd/aad/app/app-role-add.md'
         - app role list: 'cmd/aad/app/app-role-list.md'
         - app role remove: 'cmd/aad/app/app-role-remove.md'

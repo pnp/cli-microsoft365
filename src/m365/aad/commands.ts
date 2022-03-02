@@ -6,6 +6,7 @@ export default {
   APP_GET: `${prefix} app get`,
   APP_REMOVE: `${prefix} app remove`,
   APP_SET: `${prefix} app set`,
+  APP_OPEN: `${prefix} app open`,
   APP_ROLE_ADD: `${prefix} app role add`,
   APP_ROLE_DELETE: `${prefix} app role delete`,
   APP_ROLE_LIST: `${prefix} app role list`,
