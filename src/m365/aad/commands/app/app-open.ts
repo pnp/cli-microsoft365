@@ -84,8 +84,9 @@ class AadAppOpenCommand extends GraphCommand {
       
       logger.log(`Opening the following page in your browser: ${url}`);
       
+      // 'open' is required here so we can lazy load the dependency.
       // _open is never set before hitting this line, but this check
-      // is implemented so that we stub it when testing.
+      // is implemented so that we can stub it when testing.
       /* c8 ignore next 3 */
       if (!this._open) {
         this._open = require('open');
@@ -103,8 +104,8 @@ class AadAppOpenCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       { option: '--appId <appId>' },
-      { option: '--preview [preview]' },
-      { option: '--autoOpenBrowser [autoOpenBrowser]' }
+      { option: '--preview' },
+      { option: '--autoOpenBrowser' }
     ];
 
     const parentOptions: CommandOption[] = super.options();

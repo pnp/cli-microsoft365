@@ -1,6 +1,6 @@
 # aad app open
 
-Gets the url of the Azure AD app registration page to be able to quickly navigate to the Azure Portal. 
+Returns deep link to open the Azure portal on the Azure AD app registration management page.
 
 ## Usage
 
@@ -11,10 +11,10 @@ m365 aad app open [options]
 ## Options
 
 `--appId <appId>`
-: Application (client) ID of the Azure AD application registration to get.
+: Application (client) ID of the Azure AD application registration to open.
 
 `--preview`
-: Use to get the url of the Azure AD preview portal.
+: Use to open the url of the Azure AD preview portal.
 
 `--autoOpenBrowser`
 : Use to automatically open the url in the browser.
@@ -23,19 +23,19 @@ m365 aad app open [options]
 
 ## Examples
 
-Prints the url of the Azure AD application registration on the Azure Portal
+Prints the url of the Azure AD application registration management page on the Azure Portal.
 
 ```sh
 m365 aad app open --appId d75be2e1-0204-4f95-857d-51a37cf40be8
 ```
 
-Prints the url of the Azure AD application registration on the preview Azure Portal
+Prints the url of the Azure AD application registration management page on the preview Azure Portal.
 
 ```sh
 m365 aad app open --appId d75be2e1-0204-4f95-857d-51a37cf40be8 --preview
 ```
 
-Opens the url in the browser
+Opens the url of the Azure AD application registration management page using the browser.
 
 ```sh
 m365 aad app open --appId d75be2e1-0204-4f95-857d-51a37cf40be8 --autoOpenBrowser
