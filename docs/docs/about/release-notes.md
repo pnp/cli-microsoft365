@@ -11,6 +11,7 @@
 ### Changes
 
 - refactored helper methods [#2989](https://github.com/pnp/cli-microsoft365/issues/2989)
+- added prompting for missing required values [#2837](https://github.com/pnp/cli-microsoft365/issues/2837)
 
 ## [v5.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.0.0)
 
