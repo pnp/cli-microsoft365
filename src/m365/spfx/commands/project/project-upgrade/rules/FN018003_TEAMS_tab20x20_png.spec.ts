@@ -3,8 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import { sinonUtil } from '../../../../../../utils';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model';
 import { FN018003_TEAMS_tab20x20_png } from './FN018003_TEAMS_tab20x20_png';
 
 describe('FN018003_TEAMS_tab20x20_png', () => {

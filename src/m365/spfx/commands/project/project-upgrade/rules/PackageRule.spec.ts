@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { PackageJson, Project } from '../../model';
-import { Finding } from '../Finding';
+import { PackageJson, Project } from '../../project-model';
+import { Finding } from '../../report-model';
 import { PackageRule } from './PackageRule';
 
 class ResRule extends PackageRule {

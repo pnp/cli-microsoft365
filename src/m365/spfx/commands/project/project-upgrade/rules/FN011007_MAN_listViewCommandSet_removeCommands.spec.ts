@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { CommandSetManifest, Project } from '../../model';
-import { Finding } from '../Finding';
+import { CommandSetManifest, Project } from '../../project-model';
+import { Finding } from '../../report-model/Finding';
 import { FN011007_MAN_listViewCommandSet_removeCommands } from './FN011007_MAN_listViewCommandSet_removeCommands';
 
 describe('FN011007_MAN_listViewCommandSet_removeCommands', () => {

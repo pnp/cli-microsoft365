@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { formatting, fsUtil } from '../../../../utils';
 import AnonymousCommand from "../../../base/AnonymousCommand";
-import { Manifest, Project, ScssFile, TsFile } from "./model";
+import { Manifest, Project, ScssFile, TsFile } from "./project-model";
 
 export abstract class BaseProjectCommand extends AnonymousCommand {
   protected projectRootPath: string | null = null;

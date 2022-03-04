@@ -1,6 +1,7 @@
-import { Finding, Hash, Occurrence } from "../";
-import { ConfigJson, JsonFile, Project } from "../../model";
-import { JsonRule } from "./JsonRule";
+import { Hash } from '../../../../../../utils';
+import { JsonRule } from '../../JsonRule';
+import { ConfigJson, JsonFile, Project } from '../../project-model';
+import { Finding, Occurrence } from '../../report-model';
 
 export class FN003005_CFG_localizedResource_pathLib extends JsonRule {
   get id(): string {

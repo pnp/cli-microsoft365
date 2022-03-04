@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import { sinonUtil } from '../../../../../../utils';
-import { Project, TsFile } from '../../model';
-import { Finding } from '../Finding';
+import { Project, TsFile } from '../../project-model';
+import { Finding } from '../../report-model';
 import { FN016003_TS_aadhttpclient_instance } from './FN016003_TS_aadhttpclient_instance';
 import { TsRule } from './TsRule';
 

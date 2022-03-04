@@ -1,8 +1,7 @@
-import { Occurrence } from "../";
-import { spfx } from "../../../../../../utils";
-import { Project, ScssFile } from "../../model";
-import { Finding } from "../Finding";
-import { ScssRule } from "./ScssRule";
+import { spfx } from '../../../../../../utils';
+import { Project, ScssFile } from '../../project-model';
+import { Finding, Occurrence } from '../../report-model';
+import { ScssRule } from './ScssRule';
 
 export class FN022001_SCSS_remove_fabric_react extends ScssRule {
   constructor(private importValue: string) {

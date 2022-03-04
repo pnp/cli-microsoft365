@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model/Finding';
 import { FN004002_CFG_CA_deployCdnPath } from './FN004002_CFG_CA_deployCdnPath';
 
 describe('FN004002_CFG_CA_deployCdnPath', () => {

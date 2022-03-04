@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model/Finding';
 import { FN012004_TSC_typeRoots_types } from './FN012004_TSC_typeRoots_types';
 
 describe('FN012004_TSC_typeRoots_types', () => {

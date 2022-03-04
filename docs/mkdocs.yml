@@ -241,6 +241,7 @@ nav:
       - package:
         - package generate: 'cmd/spfx/package/package-generate.md'
       - project:
+        - project doctor: 'cmd/spfx/project/project-doctor.md'
         - project externalize: 'cmd/spfx/project/project-externalize.md'
         - project rename: 'cmd/spfx/project/project-rename.md'
         - project upgrade: 'cmd/spfx/project/project-upgrade.md'

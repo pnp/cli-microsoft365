@@ -9,7 +9,7 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
-import { External, ExternalConfiguration, Project } from './model';
+import { External, ExternalConfiguration, Project } from './project-model';
 import { ExternalizeEntry, FileEdit } from './project-externalize/';
 const command: Command = require('./project-externalize');
 

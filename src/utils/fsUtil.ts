@@ -1,6 +1,68 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+const copyCommands = {
+  bash: {
+    copyCommand: 'cp',
+    copyDestinationParam: ' '
+  },
+  powershell: {
+    copyCommand: 'Copy-Item',
+    copyDestinationParam: ' -Destination '
+  },
+  cmd: {
+    copyCommand: 'copy',
+    copyDestinationParam: ' '
+  }
+};
+
+const createDirectoryCommands = {
+  bash: {
+    createDirectoryCommand: 'mkdir',
+    createDirectoryPathParam: ' "',
+    createDirectoryNameParam: '/',
+    createDirectoryItemTypeParam: '"'
+  },
+  powershell: {
+    createDirectoryCommand: 'New-Item',
+    createDirectoryPathParam: ' -Path "',
+    createDirectoryNameParam: '" -Name "',
+    createDirectoryItemTypeParam: '" -ItemType "directory"'
+  },
+  cmd: {
+    createDirectoryCommand: 'mkdir',
+    createDirectoryPathParam: ' "',
+    createDirectoryNameParam: '\\',
+    createDirectoryItemTypeParam: '"'
+  }
+};
+
+const addFileCommands = {
+  bash: {
+    addFileCommand: 'cat > [FILEPATH] << EOF [FILECONTENT]EOF'
+  },
+  powershell: {
+    addFileCommand: `@"[FILECONTENT]"@ | Out-File -FilePath "[FILEPATH]"
+    `
+  },
+  cmd: {
+    addFileCommand: `echo [FILECONTENT] > "[FILEPATH]"
+    `
+  }
+};
+
+const removeFileCommands = {
+  bash: {
+    removeFileCommand: 'rm'
+  },
+  powershell: {
+    removeFileCommand: 'Remove-Item'
+  },
+  cmd: {
+    removeFileCommand: 'del'
+  }
+};
+
 export const fsUtil = {
   readdirR(dir: string): string | string[] {
     return fs.statSync(dir).isDirectory()
@@ -34,5 +96,21 @@ export const fsUtil = {
   
   getSafeFileName(input: string): string {
     return input.replace(/'/g, "''");
+  },
+
+  getCopyCommand(command: string, shell: string): string {
+    return (copyCommands as any)[shell][command];
+  },
+
+  getDirectoryCommand(command: string, shell: string): string {
+    return (createDirectoryCommands as any)[shell][command];
+  },
+
+  getAddCommand(command: string, shell: string): string {
+    return (addFileCommands as any)[shell][command];
+  },
+
+  getRemoveCommand(command: string, shell: string): string {
+    return (removeFileCommands as any)[shell][command];
   }
 };

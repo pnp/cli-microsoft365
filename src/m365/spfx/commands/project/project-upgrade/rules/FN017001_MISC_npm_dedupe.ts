@@ -1,6 +1,6 @@
-import { Finding } from "../";
-import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model';
+import { Rule } from '../../Rule';
 
 export class FN017001_MISC_npm_dedupe extends Rule {
   constructor() {

@@ -1,7 +1,7 @@
-import { Finding } from "../";
-import { Project } from "../../model";
-import { JsonRule } from "./JsonRule";
 import { v4 } from 'uuid';
+import { JsonRule } from '../../JsonRule';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model';
 
 export class FN006006_CFG_PS_features extends JsonRule {
   constructor() {
