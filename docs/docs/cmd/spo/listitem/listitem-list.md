@@ -16,7 +16,7 @@ m365 spo listitem list [options]
 `-i, --id <id>`
 : ID of the list to retrieve items from. Specify `id` or `title` but not both
 
-`-t, --title [listTitle]`
+`-t, --title [title]`
 : Title of the list from which to retrieve the item. Specify `id` or `title` but not both
 
 `-q, --camlQuery [camlQuery]`
