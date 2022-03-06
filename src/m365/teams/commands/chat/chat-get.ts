@@ -12,7 +12,7 @@ import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { validation } from '../../../../utils/validation';
 import { accessToken } from '../../../../utils/accessToken';
-import { ODataResponse } from '../../../../utils/odata';
+import { odata } from '../../../../utils/odata';
 
 interface CommandArgs {
   options: Options;
@@ -30,24 +30,25 @@ class TeamsChatGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Get a chat conversations by id, participants or chat name';
+    return 'Get a chat conversation by id, participants or chat name';
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs, cb: () => void): Promise<void> {
+  public getTelemetryProperties(args: any): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.id = typeof args.options.id !== 'undefined';
+    telemetryProps.participants = typeof args.options.participants !== 'undefined';
+    telemetryProps.name = typeof args.options.name !== 'undefined';
+    return telemetryProps;
+  }
 
-    try {
-      const chatId = args.options.id
-        || args.options.participants && await this.getChatIdByParticipants(args.options.participants)
-        || args.options.name && await this.getChatIdByName(args.options.name);
-
-      const chat = await this.getChatDetailsById(chatId as string);
-
-      logger.log(chat);
-      cb();
-    }
-    catch(error) {
-      this.handleRejectedODataJsonPromise(error, logger, cb);
-    }
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    this
+      .getChatId(logger, args)
+      .then(chatId => this.getChatDetailsById(chatId as string))
+      .then((chat: Chat) => {
+        logger.log(chat);
+        cb();
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));    
   }
 
   public options(): CommandOption[] {
@@ -86,13 +87,23 @@ class TeamsChatGetCommand extends GraphCommand {
     }
 
     if (args.options.participants) {
-      const participants = args.options.participants.toLowerCase().replace(/\s/g, '').split(',').filter(e => e && e !== '');
+      const participants = this.convertCommaSeparatedListToArray(args.options.participants);
       if (!participants || participants.length === 0 || participants.some(e => !validation.isValidUserPrincipalName(e))) {
         return `${args.options.participants} contains one or more invalid email addresses.`;
       }
     }
 
     return true;
+  }
+
+  private async getChatId(logger: Logger, args: CommandArgs): Promise<string> {
+    if (args.options.id) {
+      return args.options.id;
+    }    
+    
+    return args.options.participants 
+      ? this.getChatIdByParticipants(args.options.participants, logger)
+      : this.getChatIdByName(args.options.name as string, logger);
   }
   
   private async getChatDetailsById(id: string): Promise<Chat> {
@@ -104,14 +115,13 @@ class TeamsChatGetCommand extends GraphCommand {
       responseType: 'json'      
     };
 
-    const chat = await request.get<Chat>(requestOptions);
-    return chat;
+    return request.get<Chat>(requestOptions);    
   }
 
-  private async getChatIdByParticipants(participantsString: string): Promise<string> {
-    const participants = participantsString.toLowerCase().replace(/\s/g, '').split(',').filter(e => e && e !== '');
+  private async getChatIdByParticipants(participantsString: string, logger: Logger): Promise<string> {
+    const participants = this.convertCommaSeparatedListToArray(participantsString);
     const currentUserEmail = accessToken.getUserNameFromAccessToken(Auth.service.accessTokens[this.resource].accessToken).toLowerCase();
-    const existingChats = await this.findExistingChatsByParticipants([currentUserEmail, ...participants]);
+    const existingChats = await this.findExistingChatsByParticipants([currentUserEmail, ...participants], logger);
     
     if (!existingChats || existingChats.length === 0) {
       throw new Error('No chat conversation was found with these participants.');
@@ -125,12 +135,11 @@ class TeamsChatGetCommand extends GraphCommand {
       return `- ${c.id}${c.topic && ' - '}${c.topic} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()}`;
     }).join(os.EOL);
 
-    throw new Error(`Multiple chat conversations with this topic found. Please disambiguate:${os.EOL}${disambiguationText}`);
-    
+    throw new Error(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`);
   }
   
-  private async getChatIdByName(name: string): Promise<string> {
-    const existingChats = await this.findExistingGroupChatsByTopic(name);
+  private async getChatIdByName(name: string, logger: Logger): Promise<string> {
+    const existingChats = await this.findExistingGroupChatsByName(name, logger);
 
     if (!existingChats || existingChats.length === 0) {
       throw new Error('No chat conversation was found with this name.');
@@ -145,15 +154,15 @@ class TeamsChatGetCommand extends GraphCommand {
       return `- ${c.id} - ${c.createdDateTime && new Date(c.createdDateTime).toLocaleString()} - ${memberstring}`;
     }).join(os.EOL);
 
-    throw new Error(`Multiple chat conversations with this topic found. Please disambiguate:${os.EOL}${disambiguationText}`);
+    throw new Error(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`);
   }
   
-  private async findExistingChatsByParticipants(expectedMemberEmails: string[]): Promise<Chat[]> {
-    const chatType = expectedMemberEmails.length === 2 ? "oneOnOne" : "group";
+  private async findExistingChatsByParticipants(expectedMemberEmails: string[], logger: Logger): Promise<Chat[]> {
+    const chatType = expectedMemberEmails.length === 2 ? 'oneOnOne' : 'group';
     const endpoint = `${this.resource}/v1.0/chats?$filter=chatType eq '${chatType}'&$expand=members&$select=id,topic,createdDateTime,members`;
     const foundChats: Chat[] = [];
-
-    const chats = await this.getAllChats(endpoint, []);
+    
+    const chats = await odata.getAllItems<Chat>(endpoint, logger);
 
     for (const chat of chats) {
       const chatMembers = chat.members as ConversationMember[];
@@ -169,31 +178,13 @@ class TeamsChatGetCommand extends GraphCommand {
     return foundChats;
   }
 
-  private async findExistingGroupChatsByTopic(topic: string): Promise<Chat[]> {
-    const endpoint = `${this.resource}/v1.0/chats?$filter=topic eq '${encodeURIComponent(topic)}'&$expand=members&$select=id,topic,createdDateTime,chatType`;
-    const chats = await this.getAllChats(endpoint, []);
-    return chats;
+  private async findExistingGroupChatsByName(name: string, logger: Logger): Promise<Chat[]> {
+    const endpoint = `${this.resource}/v1.0/chats?$filter=topic eq '${encodeURIComponent(name)}'&$expand=members&$select=id,topic,createdDateTime,chatType`;
+    return odata.getAllItems<Chat>(endpoint, logger);    
   }
-
-  private async getAllChats(url: string, items: Chat[]): Promise<Chat[]> {
-    const requestOptions: AxiosRequestConfig = {
-      url: url,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    const res = await request.get<ODataResponse<Chat>>(requestOptions);
-
-    items = items.concat(res.value);
-
-    if (res['@odata.nextLink']) {
-      return await this.getAllChats(res['@odata.nextLink'] as string, items);
-    }
-    else {
-      return items;
-    }
+  
+  private convertCommaSeparatedListToArray(participantsString: string): string[] {
+    return participantsString.toLowerCase().replace(/\s/g, '').split(',').filter(e => e && e !== '');
   }
 }
 

@@ -24,6 +24,7 @@ m365 teams chat get [options]
 ## Remarks
 
 The output will not include the chat conversation members or messages. It will just retrieve the conversation details.
+When using the `participants` option, the signed-in user will automatically be included as a participant. There's no need to add it to the list manually.
 
 ## Examples
 
