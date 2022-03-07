@@ -2728,8 +2728,8 @@ describe(commands.PROJECT_UPGRADE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when logger shell specified', () => {
-    const actual = command.validate({ options: { shell: 'logger' } });
+  it('passes validation when cmd shell specified', () => {
+    const actual = command.validate({ options: { shell: 'cmd' } });
     assert.strictEqual(actual, true);
   });
 });

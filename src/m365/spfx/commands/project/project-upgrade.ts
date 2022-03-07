@@ -29,6 +29,9 @@ interface Options extends GlobalOptions {
 }
 
 class SpfxProjectUpgradeCommand extends BaseProjectCommand {
+  private static packageManagers: string[] = ['npm', 'pnpm', 'yarn'];
+  private static shells: string[] = ['bash', 'powershell', 'cmd'];  
+
   public constructor() {
     super();
   }
@@ -691,11 +694,11 @@ ${f.resolution}
       },
       {
         option: '--packageManager [packageManager]',
-        autocomplete: ['npm', 'pnpm', 'yarn']
+        autocomplete: SpfxProjectUpgradeCommand.packageManagers
       },
       {
         option: '--shell [shell]',
-        autocomplete: ['bash', 'powershell', 'cmd']
+        autocomplete: SpfxProjectUpgradeCommand.shells
       },
       {
         option: '--preview'
@@ -713,14 +716,14 @@ ${f.resolution}
 
   public validate(args: CommandArgs): boolean | string {
     if (args.options.packageManager) {
-      if (['npm', 'pnpm', 'yarn'].indexOf(args.options.packageManager) < 0) {
-        return `${args.options.packageManager} is not a supported package manager. Supported package managers are npm, pnpm and yarn`;
+      if (SpfxProjectUpgradeCommand.packageManagers.indexOf(args.options.packageManager) < 0) {
+        return `${args.options.packageManager} is not a supported package manager. Supported package managers are ${SpfxProjectUpgradeCommand.packageManagers.join(', ')}`;
       }
     }
 
     if (args.options.shell) {
-      if (['bash', 'powershell', 'logger'].indexOf(args.options.shell) < 0) {
-        return `${args.options.shell} is not a supported shell. Supported shells are bash, powershell and cmd`;
+      if (SpfxProjectUpgradeCommand.shells.indexOf(args.options.shell) < 0) {
+        return `${args.options.shell} is not a supported shell. Supported shells are ${SpfxProjectUpgradeCommand.shells.join(', ')}`;
       }
     }
 
