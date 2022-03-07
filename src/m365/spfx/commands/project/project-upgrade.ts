@@ -719,7 +719,7 @@ ${f.resolution}
     }
 
     if (args.options.shell) {
-      if (['bash', 'powershell', 'logger'].indexOf(args.options.shell) < 0) {
+      if (['bash', 'powershell', 'cmd'].indexOf(args.options.shell) < 0) {
         return `${args.options.shell} is not a supported shell. Supported shells are bash, powershell and cmd`;
       }
     }
