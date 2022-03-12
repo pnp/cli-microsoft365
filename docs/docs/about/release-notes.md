@@ -17,6 +17,8 @@
 - refactored helper methods [#2989](https://github.com/pnp/cli-microsoft365/issues/2989)
 - added prompting for missing required values [#2837](https://github.com/pnp/cli-microsoft365/issues/2837)
 - extends 'aad o365group add' command with resourceBehaviorOptions [#3080](https://github.com/pnp/cli-microsoft365/issues/3080)
+- refactors 'teams chat message send' [#3106](https://github.com/pnp/cli-microsoft365/issues/3106), [#3107](https://github.com/pnp/cli-microsoft365/issues/3107), [#3123](https://github.com/pnp/cli-microsoft365/issues/3123)
+- added planner migration sample [#3013](https://github.com/pnp/cli-microsoft365/issues/3013)
 
 ## [v5.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.0.0)
 
