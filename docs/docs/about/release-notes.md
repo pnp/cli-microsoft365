@@ -12,13 +12,19 @@
 
 - [planner plan details get](../cmd/planner/plan/plan-details-get.md) - retrieve the planner details about the specified plan [#3051](https://github.com/pnp/cli-microsoft365/issues/3051)
 
+**SharePoint:**
+
+- [spo site recyclebinitem restore](../cmd/spo/site/site-recyclebinitem-restore.md) - restores given items from the site recycle bin [#2882](https://github.com/pnp/cli-microsoft365/issues/2882)
+
 ### Changes
 
 - refactored helper methods [#2989](https://github.com/pnp/cli-microsoft365/issues/2989)
 - added prompting for missing required values [#2837](https://github.com/pnp/cli-microsoft365/issues/2837)
-- extends 'aad o365group add' command with resourceBehaviorOptions [#3080](https://github.com/pnp/cli-microsoft365/issues/3080)
-- refactors 'teams chat message send' [#3106](https://github.com/pnp/cli-microsoft365/issues/3106), [#3107](https://github.com/pnp/cli-microsoft365/issues/3107), [#3123](https://github.com/pnp/cli-microsoft365/issues/3123)
+- extended 'aad o365group add' command with `resourceBehaviorOptions` [#3080](https://github.com/pnp/cli-microsoft365/issues/3080)
+- refactored 'teams chat message send' [#3106](https://github.com/pnp/cli-microsoft365/issues/3106), [#3107](https://github.com/pnp/cli-microsoft365/issues/3107), [#3123](https://github.com/pnp/cli-microsoft365/issues/3123)
 - added planner migration sample [#3013](https://github.com/pnp/cli-microsoft365/issues/3013)
+- fixed 'spfx project upgrade' invalid allowed value [#3109](https://github.com/pnp/cli-microsoft365/issues/3109)
+- added support for upgrading SPFx projects to v1.15.0-beta.1 [#3117](https://github.com/pnp/cli-microsoft365/issues/3117)
 
 ## [v5.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.0.0)
 
