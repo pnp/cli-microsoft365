@@ -4,6 +4,10 @@
 
 ### New commands
 
+**Azure Active Directory:**
+
+- [m365 aad o365group conversation post list](../cmd/aad/o365group/o365group-conversation-post-list.md) - lists conversation posts of a Microsoft 365 Group [#3017](https://github.com/pnp/cli-microsoft365/issues/3017)
+
 **Planner:**
 
 - [planner plan details get](../cmd/planner/plan/plan-details-get.md) - retrieve the planner details about the specified plan [#3051](https://github.com/pnp/cli-microsoft365/issues/3051)
@@ -12,6 +16,7 @@
 
 - refactored helper methods [#2989](https://github.com/pnp/cli-microsoft365/issues/2989)
 - added prompting for missing required values [#2837](https://github.com/pnp/cli-microsoft365/issues/2837)
+- extends 'aad o365group add' command with resourceBehaviorOptions [#3080](https://github.com/pnp/cli-microsoft365/issues/3080)
 
 ## [v5.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.0.0)
 
