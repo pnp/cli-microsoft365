@@ -14,6 +14,7 @@ import { CommandError } from './Command';
 import request from './request';
 import { sinonUtil } from './utils';
 import * as open from 'open';
+import * as clipboard from 'clipboardy';
 
 class MockTokenStorage implements TokenStorage {
   public get(): Promise<string> {
@@ -45,6 +46,7 @@ describe('Auth', () => {
   let cli: Cli;
   let response: DeviceCodeResponse;
   let openStub: sinon.SinonStub;
+  let clipboardStub: sinon.SinonStub;
   let getSettingWithDefaultValueStub: sinon.SinonStub;
   const resource: string = 'https://contoso.sharepoint.com';
   let loggerSpy: sinon.SinonSpy;
@@ -101,7 +103,9 @@ describe('Auth', () => {
     });
     loggerSpy = sinon.spy(logger, 'log');
     (auth as any)._open = open;
+    (auth as any)._clipboardy = clipboard;
     openStub = sinon.stub(auth as any, '_open').callsFake(() => { });
+    clipboardStub = sinon.stub((auth as any)._clipboardy, 'writeSync').callsFake(() => 'clippy');
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => 'key'));
   });
 
@@ -121,6 +125,7 @@ describe('Auth', () => {
       tokenCache.getAllAccounts
     ]);
     openStub.restore();
+    clipboardStub.restore();
     getSettingWithDefaultValueStub.restore();
   });
 
@@ -427,9 +432,14 @@ describe('Auth', () => {
     });
   });
 
-  it('opens the browser with the login ', () => {
+  it('opens the browser with the login', () => {
     (auth as any).processDeviceCodeCallback(response, logger, false);
     assert(openStub.called);
+  });
+
+  it('copies the device code to the clipboard', () => {
+    (auth as any).processDeviceCodeCallback(response, logger, false);
+    assert(clipboardStub.called);
   });
 
   it('writes response from the device code request (debug)', () => {
