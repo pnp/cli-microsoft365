@@ -187,6 +187,7 @@
     "applicationinsights": "^2.2.2",
     "axios": "^0.26.0",
     "chalk": "^4.1.2",
+    "clipboardy": "^2.3.0",
     "csv-stringify": "^6.0.5",
     "easy-table": "^1.2.0",
     "inquirer": "^8.2.0",

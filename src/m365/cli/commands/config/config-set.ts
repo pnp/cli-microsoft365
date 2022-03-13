@@ -36,11 +36,12 @@ class CliConfigSetCommand extends AnonymousCommand {
 
     switch (args.options.key) {
       case settingsNames.autoOpenBrowserOnLogin:
-      case settingsNames.showHelpOnFailure:
-      case settingsNames.printErrorsAsPlainText:
+      case settingsNames.copyDeviceCodeToClipboard:
       case settingsNames.csvHeader:
       case settingsNames.csvQuoted:
       case settingsNames.csvQuotedEmpty:
+      case settingsNames.printErrorsAsPlainText:
+      case settingsNames.showHelpOnFailure:
         value = args.options.value === 'true';
         break;
       default:

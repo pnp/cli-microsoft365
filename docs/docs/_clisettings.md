@@ -5,6 +5,7 @@ Following is the list of configuration settings available in CLI for Microsoft 3
 Setting name|Definition|Default value
 ------------|----------|-------------
 `autoOpenBrowserOnLogin`|Automatically open the browser to the Azure AD login page after running `m365 login` command in device code mode|`false`
+`copyDeviceCodeToClipboard`|Automatically copy the device code to the clipboard when running `m365 login` command in device code mode|`false`
 `csvEscape`|Single character used for escaping; only apply to characters matching the quote and the escape options|`"`
 `csvHeader`|Display the column names on the first line|`true`
 `csvQuote`|The quote characters surrounding a field. An empty quote value will preserve the original field, whether it contains quotation marks or not.|` `
