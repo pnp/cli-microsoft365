@@ -35,6 +35,12 @@ interface AppInfo {
   id: string;
   tenantId: string;
   secret?: string;
+  // used when multiple secrets have been defined in the manifest
+  // in v6 we'll remove secret from AppInfo and just use secrets
+  secrets?: {
+    displayName: string;
+    value: string;
+  }[];
 }
 
 interface CommandArgs {
@@ -114,6 +120,9 @@ class AadAppAddCommand extends GraphCommand {
         if (_appInfo.secret) {
           appInfo.secret = _appInfo.secret;
         }
+        if (_appInfo.secrets) {
+          appInfo.secrets = _appInfo.secrets;
+        }
 
         logger.log(appInfo);
         cb();
@@ -178,6 +187,10 @@ class AadAppAddCommand extends GraphCommand {
     delete v2Manifest.id;
     delete v2Manifest.appId;
     delete v2Manifest.publisherDomain;
+    // extract secrets from the manifest. Store them in a separate variable
+    // and remove them from the manifest because we need to create them
+    // separately
+    const secrets: { name: string, expirationDate: Date }[] = this.getSecretsFromManifest(v2Manifest);
     // Azure Portal returns v2 manifest whereas the Graph API expects a v1.6
     const graphManifest = this.transformManifest(v2Manifest);
 
@@ -193,7 +206,31 @@ class AadAppAddCommand extends GraphCommand {
     return request
       .patch(updateAppRequestOptions)
       .then(_ => this.updatePreAuthorizedAppsFromManifest(v2Manifest, appInfo))
-      .then(_ => Promise.resolve(appInfo));
+      .then(_ => this.createSecrets(secrets, appInfo));
+  }
+
+  private getSecretsFromManifest(manifest: any): { name: string, expirationDate: Date }[] {
+    if (!manifest.passwordCredentials || manifest.passwordCredentials.length === 0) {
+      return [];
+    }
+
+    const secrets = manifest.passwordCredentials.map((c: any) => {
+      const startDate = new Date(c.startDate);
+      const endDate = new Date(c.endDate);
+      const expirationDate = new Date();
+      expirationDate.setMilliseconds(endDate.valueOf() - startDate.valueOf());
+
+      return {
+        name: c.displayName,
+        expirationDate
+      };
+    });
+
+    // delete the secrets from the manifest so that we won't try to set them
+    // from the manifest
+    delete manifest.passwordCredentials;
+
+    return secrets;
   }
 
   private updatePreAuthorizedAppsFromManifest(manifest: any, appInfo: AppInfo): Promise<AppInfo> {
@@ -226,6 +263,23 @@ class AadAppAddCommand extends GraphCommand {
     return request
       .patch(updateAppRequestOptions)
       .then(_ => Promise.resolve(appInfo));
+  }
+
+  private createSecrets(secrets: { name: string, expirationDate: Date }[], appInfo: AppInfo): Promise<AppInfo> {
+    if (secrets.length === 0) {
+      return Promise.resolve(appInfo);
+    }
+
+    return Promise
+      .all(secrets.map(secret => this.createSecret({
+        appObjectId: appInfo.id,
+        displayName: secret.name,
+        expirationDate: secret.expirationDate
+      })))
+      .then(secrets => {
+        appInfo.secrets = secrets;
+        return appInfo;
+      });
   }
 
   private transformManifest(v2Manifest: any): any {
@@ -475,18 +529,32 @@ class AadAppAddCommand extends GraphCommand {
       logger.logToStderr(`Configure Azure AD app secret...`);
     }
 
-    const secretExpirationDate = new Date();
-    secretExpirationDate.setFullYear(secretExpirationDate.getFullYear() + 1);
+    return this
+      .createSecret({ appObjectId: appInfo.id })
+      .then(secret => {
+        appInfo.secret = secret.value;
+        return Promise.resolve(appInfo);
+      });
+  }
+
+  private createSecret({ appObjectId, displayName = undefined, expirationDate = undefined }: { appObjectId: string, displayName?: string, expirationDate?: Date }): Promise<{ displayName: string, value: string }> {
+    let secretExpirationDate = expirationDate;
+    if (!secretExpirationDate) {
+      secretExpirationDate = new Date();
+      secretExpirationDate.setFullYear(secretExpirationDate.getFullYear() + 1);
+    }
+
+    const secretName = displayName ?? 'Default';
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/myorganization/applications/${appInfo.id}/addPassword`,
+      url: `${this.resource}/v1.0/myorganization/applications/${appObjectId}/addPassword`,
       headers: {
         'content-type': 'application/json'
       },
       responseType: 'json',
       data: {
         passwordCredential: {
-          displayName: 'Default',
+          displayName: secretName,
           endDateTime: secretExpirationDate.toISOString()
         }
       }
@@ -494,10 +562,10 @@ class AadAppAddCommand extends GraphCommand {
 
     return request
       .post<{ secretText: string }>(requestOptions)
-      .then((password: { secretText: string; }): Promise<AppInfo> => {
-        appInfo.secret = password.secretText;
-        return Promise.resolve(appInfo);
-      });
+      .then((password: { secretText: string; }) => Promise.resolve({
+        displayName: secretName,
+        value: password.secretText
+      }));
   }
 
   private saveAppInfo(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
