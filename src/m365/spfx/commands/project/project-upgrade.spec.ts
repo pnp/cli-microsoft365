@@ -2288,7 +2288,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 23);
+      assert.strictEqual(findings.length, 22);
     });
   });
 
@@ -2297,7 +2297,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 27);
+      assert.strictEqual(findings.length, 26);
     });
   });
 
@@ -2306,7 +2306,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 23);
+      assert.strictEqual(findings.length, 22);
     });
   });
 
@@ -2315,7 +2315,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 24);
+      assert.strictEqual(findings.length, 23);
     });
   });
 
@@ -2324,7 +2324,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 29);
+      assert.strictEqual(findings.length, 28);
     });
   });
 
@@ -2333,7 +2333,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 34);
+      assert.strictEqual(findings.length, 33);
     });
   });
   //#endregion
