@@ -324,6 +324,12 @@ class AadAppAddCommand extends GraphCommand {
     graphManifest.web.homePageUrl = v2Manifest.signInUrl;
     delete graphManifest.signInUrl;
 
+    if (graphManifest.appRoles) {
+      graphManifest.appRoles.forEach((role: any) => {
+        delete role.lang;
+      });
+    }
+
     return graphManifest;
   }
 
