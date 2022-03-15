@@ -264,7 +264,7 @@ class AadAppAddCommand extends GraphCommand {
     graphManifest.api.acceptMappedClaims = v2Manifest.acceptMappedClaims;
     delete graphManifest.acceptMappedClaims;
 
-    graphManifest.publicClient = v2Manifest.allowPublicClient;
+    graphManifest.isFallbackPublicClient = v2Manifest.allowPublicClient;
     delete graphManifest.allowPublicClient;
 
     graphManifest.info.termsOfServiceUrl = v2Manifest.informationalUrls?.termsOfService;
