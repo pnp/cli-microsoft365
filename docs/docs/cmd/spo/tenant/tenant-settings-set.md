@@ -258,6 +258,12 @@ m365 spo tenant settings set [options]
 `--DisableCustomAppAuthentication [DisableCustomAppAuthentication]`
 : Configure if ACS-based app-only auth should be disabled or not. Allowed values `true,false`
 
+`--EnableAzureADB2BIntegration [EnableAzureADB2BIntegration]`
+: Enables the preview for OneDrive and SharePoint integration with Azure AD B2B. Allowed values `true,false`. Azure AD one-time passcode needs to be enabled for this integration to work. For more information see [http://aka.ms/spo-b2b-integration](http://aka.ms/spo-b2b-integration).
+
+`--SyncAadB2BManagementPolicy [SyncAadB2BManagementPolicy]`
+: Syncs Azure B2B Management Policies. Allowed values `true,false`. For more information, see [SharePoint and OneDrive integration with Azure AD B2B](https://docs.microsoft.com/en-us/sharepoint/sharepoint-azureb2b-integration-preview).
+
 !!! important
     To use this command you have to have permissions to access the tenant admin site.
 
@@ -273,4 +279,17 @@ Sets multiple tenant global settings at once
 
 ```sh
 m365 spo tenant settings set --UserVoiceForFeedbackEnabled true --HideSyncButtonOnODB true --AllowedDomainListForSyncClient c9b1909e-901a-0000-2cdb-e91c3f46320a,c9b1909e-901a-0000-2cdb-e91c3f463201
+```
+
+Enable Azure AD B2B integration for SharePoint and OneDrive and sync the Azure AD B2B management policies
+
+```sh
+m365 spo tenant settings set --EnableAzureADB2BIntegration true
+m365 spo tenant settings set --SyncAadB2BManagementPolicy true
+```
+
+Disable Azure AD B2B integration for SharePoint and OneDrive
+
+```sh
+m365 spo tenant settings set --EnableAzureADB2BIntegration false
 ```

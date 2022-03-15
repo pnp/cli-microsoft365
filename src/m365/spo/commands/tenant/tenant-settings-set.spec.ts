@@ -14,6 +14,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let loggerStderrLogSpy: sinon.SinonSpy;
 
   const defaultRequestsSuccessStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
@@ -57,6 +58,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    loggerStderrLogSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -388,5 +390,23 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     };
     const actual = command.validate({ options: options });
     assert.strictEqual(actual, true);
+  });
+  
+  it('shows warning when option EnableAzureADB2BIntegration is used with value true', (done) => {
+    defaultRequestsSuccessStub();
+
+    command.action(logger, {
+      options: {
+        EnableAzureADB2BIntegration: 'true'
+      }
+    }, () => {
+      try {
+        assert.strictEqual(loggerStderrLogSpy.calledOnceWith("WARNING: Make sure to also enable the Azure AD one-time passcode authentication preview. If it is not enabled then SharePoint will not use Azure AD B2B even if EnableAzureADB2BIntegration is set to true. Learn more at http://aka.ms/spo-b2b-integration."), true);        
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 });

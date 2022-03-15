@@ -97,6 +97,8 @@ export interface Options extends GlobalOptions {
   AllowedDomainListForSyncClient: string[];
   DisabledWebPartIds: string[];
   DisableCustomAppAuthentication: boolean;
+  EnableAzureADB2BIntegration: boolean;
+  SyncAadB2BManagementPolicy: boolean;
 }
 
 class SpoTenantSettingsSetCommand extends SpoCommand {
@@ -192,6 +194,8 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     telemetryProps.DisabledWebPartIds = (!(!args.options.DisabledWebPartIds)).toString();
     telemetryProps.AllowedDomainListForSyncClient = (!(!args.options.AllowedDomainListForSyncClient)).toString();
     telemetryProps.DisableCustomAppAuthentication = (!(!args.options.DisableCustomAppAuthentication)).toString();
+    telemetryProps.EnableAzureADB2BIntegration = (!(!args.options.EnableAzureADB2BIntegration)).toString();
+    telemetryProps.SyncAadB2BManagementPolicy = (!(!args.options.SyncAadB2BManagementPolicy)).toString();
     return telemetryProps;
   }
 
@@ -279,6 +283,10 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         if (response.ErrorInfo) {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
+        }
+
+        if (args.options.EnableAzureADB2BIntegration === 'true') {
+          this.showWarning(logger, 'WARNING: Make sure to also enable the Azure AD one-time passcode authentication preview. If it is not enabled then SharePoint will not use Azure AD B2B even if EnableAzureADB2BIntegration is set to true. Learn more at http://aka.ms/spo-b2b-integration.');
         }
 
         cb();
@@ -595,6 +603,14 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
       },
       {
         option: '--DisableCustomAppAuthentication [DisableCustomAppAuthentication]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--EnableAzureADB2BIntegration [EnableAzureADB2BIntegration]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--SyncAadB2BManagementPolicy [SyncAadB2BManagementPolicy]',
         autocomplete: ['true', 'false']
       }
     ];
