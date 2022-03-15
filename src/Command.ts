@@ -71,6 +71,11 @@ export default abstract class Command {
     }
   }
 
+  protected warn(logger: Logger, warning: string): void {
+    const chalk: typeof Chalk = require('chalk');
+    logger.logToStderr(chalk.yellow(warning));
+  }
+
   protected getUsedCommandName(): string {
     const cli: Cli = Cli.getInstance();
     const commandName: string = this.getCommandName();
