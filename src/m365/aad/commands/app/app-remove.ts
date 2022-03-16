@@ -17,9 +17,13 @@ export interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class AadAppDeleteCommand extends GraphCommand {
+class AadAppRemoveCommand extends GraphCommand {
   public get name(): string {
-    return commands.APP_DELETE;
+    return commands.APP_REMOVE;
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.APP_DELETE];
   }
 
   public get description(): string {
@@ -65,7 +69,7 @@ class AadAppDeleteCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to delete the App?`
+        message: `Are you sure you want to remove the app?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -153,4 +157,4 @@ class AadAppDeleteCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadAppDeleteCommand();
+module.exports = new AadAppRemoveCommand();

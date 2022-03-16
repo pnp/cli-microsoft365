@@ -3,6 +3,7 @@ const prefix: string = 'aad';
 export default {
   APP_ADD: `${prefix} app add`,
   APP_DELETE: `${prefix} app delete`,
+  APP_REMOVE: `${prefix} app remove`,
   APP_GET: `${prefix} app get`,
   APP_SET: `${prefix} app set`,
   APP_ROLE_ADD: `${prefix} app role add`,
