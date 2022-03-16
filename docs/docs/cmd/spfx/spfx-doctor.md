@@ -20,7 +20,7 @@ m365 spfx doctor [options]
 : JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 
 `-o, --output [output]`
-: Output type. `json,text,csv,md`. Default `json`
+: Output type. `text`. Default `text`
 
 `--verbose`
 : Runs command with verbose logging
@@ -42,6 +42,9 @@ Based on the determined version of the SharePoint Framework, the command will lo
 If you miss any required tools or use a version that doesn't meet the SharePoint Framework requirements, the command will give you a list of recommendation how to address these issues.
 
 Next to verifying the readiness of your environment to use a particular version of the SharePoint Framework, you can also check if the version of the SharePoint Framework that you use is compatible with the specific version of SharePoint. Supported versions are `sp2016`, `sp2019` and `spo`.
+
+!!! important
+    This command supports only text output.
 
 ## Examples
 

@@ -509,6 +509,10 @@ class SpfxDoctorCommand extends AnonymousCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+    if (!args.options.output) {
+      args.options.output = 'text';
+    }
+
     logger.log(' ');
     logger.log('CLI for Microsoft 365 SharePoint Framework doctor');
     logger.log('Verifying configuration of your system for working with the SharePoint Framework');
@@ -824,6 +828,10 @@ class SpfxDoctorCommand extends AnonymousCommand {
       if (!sp) {
         return `${args.options.env} is not a valid SharePoint version. Valid versions are sp2016, sp2019 or spo`;
       }
+    }
+
+    if (args.options.output && args.options.output !== 'text') {
+      return `The output option only accepts the type 'text'`;
     }
 
     return true;

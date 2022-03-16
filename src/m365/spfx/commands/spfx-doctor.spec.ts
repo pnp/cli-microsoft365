@@ -654,6 +654,17 @@ describe(commands.DOCTOR, () => {
     });
   });
 
+  it('fails validation if output does not equal text.', (done) => {
+    const actual = command.validate({
+      options: {
+        output: 'json'
+      }
+    });
+
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
   it('fails SP2019 compatibility check for SPFx v1.5.0', (done) => {
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
