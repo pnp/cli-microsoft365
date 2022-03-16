@@ -7,7 +7,7 @@ Obtain a new access token for the Microsoft Graph and use it an HTTP request.
 === "PowerShell"
 
     ```powershell
-    $token = m365 util accesstoken get --resource https://graph.microsoft.com --new
+    $token = m365 util accesstoken get --resource https://graph.microsoft.com --new --output text
     $me = Invoke-RestMethod -Uri https://graph.microsoft.com/v1.0/me -Headers @{"Authorization"="Bearer $token"}
     $me
     ```
@@ -19,7 +19,7 @@ Obtain a new access token for the Microsoft Graph and use it an HTTP request.
 
     # requires jq: https://stedolan.github.io/jq/
 
-    token=`m365 util accesstoken get --resource https://graph.microsoft.com --new`
+    token=`m365 util accesstoken get --resource https://graph.microsoft.com --new --output text`
     me=`curl https://graph.microsoft.com/v1.0/me -H "Authorization: Bearer $token"`
     echo $me | jq
     ```
