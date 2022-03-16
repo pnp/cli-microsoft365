@@ -7,9 +7,9 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
-const command: Command = require('./app-delete');
+const command: Command = require('./app-remove');
 
-describe(commands.APP_DELETE, () => {
+describe(commands.APP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
@@ -84,11 +84,21 @@ describe(commands.APP_DELETE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.APP_DELETE), true);
+    assert.strictEqual(command.name.startsWith(commands.APP_REMOVE), true);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.strictEqual((alias && alias.indexOf(commands.APP_DELETE) > -1), true);
   });
 
   it('fails validation if appId and objectId specified', () => {

@@ -22,14 +22,18 @@ interface Options extends GlobalOptions {
   id?: string;
 }
 
-class AadAppRoleDeleteCommand extends GraphCommand {
+class AadAppRoleRemoveCommand extends GraphCommand {
 
   public get name(): string {
-    return commands.APP_ROLE_DELETE;
+    return commands.APP_ROLE_REMOVE;
   }
 
   public get description(): string {
-    return 'Deletes role from the specified Azure AD app registration';
+    return 'Removes role from the specified Azure AD app registration';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.APP_ROLE_DELETE];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -44,6 +48,7 @@ class AadAppRoleDeleteCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    this.showDeprecationWarning(logger, commands.APP_ROLE_DELETE, commands.APP_ROLE_REMOVE);
 
     const deleteAppRole: () => void = (): void => {
       this
@@ -59,7 +64,7 @@ class AadAppRoleDeleteCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to delete the App role ?`
+        message: `Are you sure you want to remove the app role ?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -259,4 +264,4 @@ class AadAppRoleDeleteCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadAppRoleDeleteCommand();
+module.exports = new AadAppRoleRemoveCommand();

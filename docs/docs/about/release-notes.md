@@ -39,7 +39,7 @@
 
 **Azure Active Directory:**
 
-- [aad app delete](../cmd/aad/app/app-delete.md) - removes an Azure AD app registration [#3008](https://github.com/pnp/cli-microsoft365/issues/3008)
+- [aad app remove](../cmd/aad/app/app-remove.md) - removes an Azure AD app registration [#3008](https://github.com/pnp/cli-microsoft365/issues/3008)
 - [aad o365group conversation list](../cmd/aad/o365group/o365group-conversation-list.md) - lists conversations for the specified Microsoft 365 group [#3030](https://github.com/pnp/cli-microsoft365/issues/3030)
 
 **Microsoft 365:**
@@ -356,7 +356,7 @@
 
 **Azure Active Directory:**
 
-- [aad app role delete](../cmd/aad/app/app-role-delete.md) - deletes role from the specified Azure AD app registration [#2150](https://github.com/pnp/cli-microsoft365/issues/2150)
+- [aad app role remove](../cmd/aad/app/app-role-remove.md) - deletes role from the specified Azure AD app registration [#2150](https://github.com/pnp/cli-microsoft365/issues/2150)
 - [aad app set](../cmd/aad/app/app-set.md) - updates Azure AD app registration [#2448](https://github.com/pnp/cli-microsoft365/issues/2448)
 - [aad o365group recyclebinitem clear](../cmd/aad/o365group/o365group-recyclebinitem-clear.md) - clears Microsoft 365 Groups from the recycle bin in the current tenant [#2033](https://github.com/pnp/cli-microsoft365/issues/2033)
 
