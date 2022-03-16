@@ -32,7 +32,7 @@ nav:
         - app get: 'cmd/aad/app/app-get.md'
         - app set: 'cmd/aad/app/app-set.md'
         - app role add: 'cmd/aad/app/app-role-add.md'
-        - app role delete: 'cmd/aad/app/app-role-delete.md'
+        - app role delete: 'cmd/aad/app/app-role-remove.md'
         - app role list: 'cmd/aad/app/app-role-list.md'
       - approleassignment:
         - approleassignment add: 'cmd/aad/approleassignment/approleassignment-add.md'

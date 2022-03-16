@@ -8,6 +8,7 @@ export default {
   APP_SET: `${prefix} app set`,
   APP_ROLE_ADD: `${prefix} app role add`,
   APP_ROLE_LIST: `${prefix} app role list`,
+  APP_ROLE_REMOVE: `${prefix} app role remove`,
   APP_ROLE_DELETE: `${prefix} app role delete`,
   APPROLEASSIGNMENT_ADD: `${prefix} approleassignment add`,
   APPROLEASSIGNMENT_LIST: `${prefix} approleassignment list`,

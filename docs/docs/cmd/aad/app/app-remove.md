@@ -9,6 +9,7 @@ m365 aad app remove [options]
 ```
 
 ## Alias
+
 ```sh
 m365 aad app delete [options]
 ```

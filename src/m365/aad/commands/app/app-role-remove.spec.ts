@@ -7,9 +7,9 @@ import Command from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
-const command: Command = require('./app-role-delete');
+const command: Command = require('./app-role-remove');
 
-describe(commands.APP_ROLE_DELETE, () => {
+describe(commands.APP_ROLE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
@@ -57,13 +57,22 @@ describe(commands.APP_ROLE_DELETE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.APP_ROLE_DELETE), true);
+    assert.strictEqual(command.name.startsWith(commands.APP_ROLE_REMOVE), true);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.strictEqual((alias && alias.indexOf(commands.APP_ROLE_DELETE) > -1), true);
+  });
 
   it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and --confirm option specified', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
