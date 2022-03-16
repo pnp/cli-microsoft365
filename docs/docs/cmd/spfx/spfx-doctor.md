@@ -13,20 +13,10 @@ m365 spfx doctor [options]
 `-e, --env [env]`
 : Version of SharePoint for which to check compatibility: `sp2016|sp2019|spo`
 
-`-h, --help`
-: output usage information
+--8<-- "docs/cmd/_global.md"
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text,csv,md`. Default `json`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+!!! info
+    the output type `text` is the only format supported for this commandlet.
 
 !!! important
     Checks ran by this command are based on what is officially supported by Microsoft. It's possible that using different package managers or packages versions will work just fine.
