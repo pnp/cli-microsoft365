@@ -1,6 +1,6 @@
 # Run CLI for Microsoft 365 in a Docker Container
 
-You can use Docker to run a standalone Linux container with CLI for Microsoft 365 and PowerShell pre-installed, with command completion (tab) automatically configured for you in both bash and PowerShell, without having to install any of the required dependencies on your host machine.
+You can use Docker to run a standalone Linux container with CLI for Microsoft 365 and PowerShell pre-installed, with command completion (tab) automatically configured for you in both `bash` and `pwsh`, without having to install any of the required dependencies on your host machine. We've also included some useful utilities in the container for you such as `curl`, `jq` and `jmespath-terminal`.
 
 ## Prerequisites
 
@@ -32,7 +32,7 @@ docker run --rm -it m365pnp/cli-microsoft365:latest pwsh
 
 We regularly release beta versions of the CLI, to install and run the latest beta release use the `next` tag.
 
-```
+```sh
 docker run --rm -it m365pnp/cli-microsoft365:next
 ```
 
@@ -42,15 +42,26 @@ We have published Docker images for every minor release of v3 of CLI for Microso
 
 To install and run a specific version of the CLI, state the version number as a tag after the image name.
 
-```
+```sh
 docker run --rm -it m365pnp/cli-microsoft365:3.0.0
 ```
 
 You can also install and run specific beta versions of the CLI, state the beta version as a tag after the image name.
 
-```
+```sh
 docker run --rm -it m365pnp/cli-microsoft365:3.4.0-beta.0dbd08d
 ```
+
+## Using JMESPath Terminal to author JMESPath queries
+
+One of the best ways to learn the JMESPath language is to experiment by creating your own JMESPath expressions, to make this easier for you we have bundled the JMESPath Terminal library to make it easy for you to see the results of your JMESPath expressions immediately as you type.
+
+The JMESPath Terminal accepts piped JSON input in both `bash` and `pwsh` prompts, for example, executing `m365 tenant serviceannouncement health list | jpterm` will pipe the response output from the command into a JMESPath Terminal interactive session.
+
+![JMESPath Terminal](../images/run-cli-in-docker-container/jpterm-example.png)
+
+!!! info
+    For more information on how to use JMESPath Terminal, please consult the [documenation](https://github.com/jmespath/jmespath.terminal).
 
 ## Execute script in container
 
@@ -58,13 +69,13 @@ In scenarios where you may already have a script that uses the CLI for Microsoft
 
 For example, lets say we have a script called `test.sh` and we want to execute that script inside the container. We can do this by mapping the current working directory on our host machine to the working directory in the container `(-v)`, pass `bash` as the shell we want to use and the name of the file that we want to execute as additional arguments.
 
-```
+```sh
 docker run -it -v ${PWD}:/home/cli-microsoft365/scripts m365pnp/cli-microsoft365:latest bash scripts/test.sh
 ```
 
 Alternatively, if we want to execute a PowerShell script, you can do this in the same way.
 
-```
+```sh
 docker run -it -v ${PWD}:/home/cli-microsoft365/scripts m365pnp/cli-microsoft365:latest pwsh scripts/test.ps1
 ```
 
@@ -89,7 +100,7 @@ docker run --rm -it -v ${PWD}:/home/cli-microsoft365/scripts -e "CLIMICROSOFT365
 
 We can reference the environment variables passed in to the `docker run` command and use them in the script, in this example, passing the username and password variables into the `m365 login` command to login in to Microsoft 365 using password authentication.
 
-```
+```sh
 m365 login --authType password --userName $env:M365_USER --password $env:M365_PASSWORD
 ```
 
@@ -97,7 +108,7 @@ m365 login --authType password --userName $env:M365_USER --password $env:M365_PA
 
 We will be regularly updating the images of the `latest` and `next` tags, to ensure you have the most upto date version of these images, you can update your local image using `docker pull` specifying the version you want to update using the relevant tag.
 
-```
+```sh
 docker pull m365pnp/cli-microsoft365:latest
 ```
 
@@ -105,7 +116,7 @@ docker pull m365pnp/cli-microsoft365:latest
 
 If you would like to remove an image from your host machine, you can use the `rmi` command, specifying the version you wish to remove as a tag after the image name.
 
-```
+```sh
 docker rmi m365pnp/cli-microsoft365:latest
 ```
 
