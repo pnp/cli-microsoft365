@@ -161,6 +161,10 @@ export default abstract class Command {
     ];
   }
 
+  public optionSets(): string[][] | undefined {
+    return;
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public validate(args: any): boolean | string {
     return true;

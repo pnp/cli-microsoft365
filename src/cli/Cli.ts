@@ -161,7 +161,7 @@ export class Cli {
         if (!shouldPrompt) {
           return this.closeWithError(`Required option ${this.commandToExecute.options[i].name} not specified`, this.optionsFromArgs, true);
         }
-        
+
         if (i === 0) {
           Cli.log('Provide values for the following parameters:');
         }
@@ -202,6 +202,23 @@ export class Cli {
     if (optionsWithoutShorts.options.output === undefined) {
       optionsWithoutShorts.options.output = this.getSettingWithDefaultValue<string | undefined>(settingsNames.output, undefined);
     }
+
+    // Validate the Option sets provided in the command
+    const optionsSets: string[][] | undefined = this.commandToExecute.command.optionSets();
+    const argsOptions: string[] = Object.keys(this.optionsFromArgs.options);
+    const cmdArgs = this.optionsFromArgs;
+    optionsSets?.forEach((optionSet) => {
+      if (optionSet.length > 0) {
+        const commonOptions = argsOptions.filter(opt => optionSet.includes(opt));
+        if (commonOptions.length === 0) {
+          return this.closeWithError(`Specify either ${optionSet.map(opt => opt).join(',')}.`, cmdArgs, false);
+        }
+        if (commonOptions.length > 1) {
+          return this.closeWithError(`Specify either ${optionSet.map(opt => opt).join(',')} but not multiple.`, cmdArgs, false);
+        }
+      }
+    });
+
 
     const validationResult: boolean | string = this.commandToExecute.command.validate(optionsWithoutShorts);
     if (typeof validationResult === 'string') {
