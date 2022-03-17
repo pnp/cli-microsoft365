@@ -47,6 +47,33 @@ class MockCommand extends AnonymousCommand {
   }
 }
 
+class MockCommandWithOptionSets extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock optionsets';
+  }
+  public get description(): string {
+    return 'Mock command with option sets';
+  }
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '--opt1 [name]'
+      },
+      {
+        option: '--opt2 [name]'
+      }
+    ];
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
+  }
+  public optionSets(): string[][] | undefined {
+    return [['opt1', 'opt2']];
+  }
+  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
+    cb();
+  }
+}
+
 class MockCommandWithAlias extends AnonymousCommand {
   public get name(): string {
     return 'cli mock alias';
@@ -145,6 +172,7 @@ describe('Cli', () => {
   let markshellStub: sinon.SinonStub;
   let mockCommandActionSpy: sinon.SinonSpy;
   let mockCommand: Command;
+  let mockCommandWithOptionSets: Command;
   let mockCommandWithAlias: Command;
   let mockCommandWithValidation: Command;
 
@@ -160,6 +188,7 @@ describe('Cli', () => {
     mockCommand = new MockCommand();
     mockCommandWithAlias = new MockCommandWithAlias();
     mockCommandWithValidation = new MockCommandWithValidation();
+    mockCommandWithOptionSets = new MockCommandWithOptionSets();
     mockCommandActionSpy = sinon.spy(mockCommand, 'action');
 
     return new Promise((resolve) => {
@@ -173,6 +202,7 @@ describe('Cli', () => {
   beforeEach(() => {
     cli = Cli.getInstance();
     (cli as any).loadCommand(mockCommand);
+    (cli as any).loadCommand(mockCommandWithOptionSets);
     (cli as any).loadCommand(mockCommandWithAlias);
     (cli as any).loadCommand(mockCommandWithValidation);
   });
@@ -428,6 +458,34 @@ describe('Cli', () => {
       .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(cliErrorStub.calledWith(chalk.red(`Error: Required option parameterX not specified`)));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it(`shows error when optionSets validation fails - at least one option is specified`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'optionsets'])
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
+        try {
+          assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt1, opt2.')));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it(`shows error when optionSets validation fails - multiple options are specified`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue'])
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
+        try {
+          assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt1, opt2, but not multiple.')));
           done();
         }
         catch (e) {
@@ -784,7 +842,7 @@ describe('Cli', () => {
       .then(_ => {
         try {
           // 12 commands from the folder + 3 mocks
-          assert.strictEqual(cli.commands.length, 12 + 3);
+          assert.strictEqual(cli.commands.length, 12 + 4);
           done();
         }
         catch (e) {
@@ -1377,7 +1435,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  4 commands'));
+      assert(cliLogStub.calledWith('  cli *  5 commands'));
       done();
     }
     catch (e) {
@@ -1397,7 +1455,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli mock *   2 commands'));
+      assert(cliLogStub.calledWith('  cli mock *   3 commands'));
       done();
     }
     catch (e) {
@@ -1417,7 +1475,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  4 commands'));
+      assert(cliLogStub.calledWith('  cli *  5 commands'));
       done();
     }
     catch (e) {
