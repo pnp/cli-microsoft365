@@ -32,6 +32,9 @@
 - fixed creating AAD app with public client from manifest [#3132](https://github.com/pnp/cli-microsoft365/issues/3132)
 - fixed creating AAD app with a approle from manifest [#3131](https://github.com/pnp/cli-microsoft365/issues/3131)
 - fixed creating AAD app with a secret from manifest [#3130](https://github.com/pnp/cli-microsoft365/issues/3130)
+- removes the delete .editorconfig spfx project upgrade rule [#3126](https://github.com/pnp/cli-microsoft365/issues/3126)
+- fixes 'Authenticate with and call the Microsoft Graph' sample [#3145](https://github.com/pnp/cli-microsoft365/pull/3145)
+- renamed 'aad app delete' and 'aad app role delete' [#3133](https://github.com/pnp/cli-microsoft365/issues/3133)
 
 ## [v5.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.0.0)
 
