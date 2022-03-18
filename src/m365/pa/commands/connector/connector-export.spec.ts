@@ -7,7 +7,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import flowCommands from '../../../flow/commands';
 import commands from '../../commands';
 const command: Command = require('./connector-export');
@@ -46,14 +46,14 @@ describe(commands.CONNECTOR_EXPORT, () => {
   afterEach(() => {
     mkdirSyncStub.reset();
     writeFileSyncStub.reset();
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       fs.existsSync
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent,
       fs.mkdirSync,

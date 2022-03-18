@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as sinon from 'sinon';
 import { v4 } from 'uuid';
 import { Logger } from '../../cli';
-import Utils from '../../Utils';
+import { sinonUtil } from '../../utils';
 import { PcfInitVariables } from './commands/pcf/pcf-init/pcf-init-variables';
 import TemplateInstantiator from './template-instantiator';
 
@@ -45,7 +45,7 @@ describe('TemplateInstantiator', () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.mkdirSync,
       fs.copyFileSync,

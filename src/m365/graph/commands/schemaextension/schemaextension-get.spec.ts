@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./schemaextension-get');
 
@@ -38,13 +38,13 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -119,7 +119,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });

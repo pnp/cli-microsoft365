@@ -3,10 +3,8 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import SpoCommand from '../../../base/SpoCommand';
-import { ClientSvc, IdentityResponse } from '../../ClientSvc';
+import { ContextInfo, IdentityResponse, spo, validation } from '../../../../utils';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 import { SpoPropertyBagBaseCommand } from './propertybag-base';
 
 export interface CommandArgs {
@@ -36,23 +34,21 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const clientSvcCommons: ClientSvc = new ClientSvc(logger, this.debug);
-
     let webIdentityResp: IdentityResponse;
 
-    this
+    spo
       .getRequestDigest(args.options.webUrl)
       .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
         this.formDigestValue = contextResponse.FormDigestValue;
 
-        return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
+        return spo.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
       })
       .then((identityResp: IdentityResponse): Promise<boolean> => {
         webIdentityResp = identityResp;
 
         // Check if web no script enabled or not
         // Cannot set property bag value if no script is enabled
-        return this.isNoScriptSite(identityResp, args.options, clientSvcCommons);
+        return this.isNoScriptSite(identityResp, args.options, logger);
       })
       .then((isNoScriptSite: boolean): Promise<IdentityResponse> => {
         if (isNoScriptSite) {
@@ -62,7 +58,7 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
         const opts: Options = args.options;
         if (opts.folder) {
           // get the folder guid instead of the web guid
-          return clientSvcCommons.getFolderIdentity(webIdentityResp.objectIdentity, opts.webUrl, opts.folder, this.formDigestValue);
+          return spo.getFolderIdentity(webIdentityResp.objectIdentity, opts.webUrl, opts.folder, this.formDigestValue);
         }
 
         return new Promise<IdentityResponse>(resolve => { return resolve(webIdentityResp); });
@@ -77,8 +73,8 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
     return SpoPropertyBagBaseCommand.setProperty(options.key, options.value, options.webUrl, this.formDigestValue, identityResp, logger, this.debug, options.folder);
   }
 
-  private isNoScriptSite(webIdentityResp: IdentityResponse, options: Options, clientSvcCommons: ClientSvc): Promise<boolean> {
-    return SpoPropertyBagBaseCommand.isNoScriptSite(options.webUrl, this.formDigestValue, webIdentityResp, clientSvcCommons);
+  private isNoScriptSite(webIdentityResp: IdentityResponse, options: Options, logger: Logger): Promise<boolean> {
+    return SpoPropertyBagBaseCommand.isNoScriptSite(options.webUrl, this.formDigestValue, webIdentityResp, logger, this.debug);
   }
 
   public options(): CommandOption[] {
@@ -102,7 +98,7 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (SpoCommand.isValidSharePointUrl(args.options.webUrl) !== true) {
+    if (validation.isValidSharePointUrl(args.options.webUrl) !== true) {
       return 'Missing required option url';
     }
 

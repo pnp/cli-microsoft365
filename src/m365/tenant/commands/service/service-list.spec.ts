@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { accessToken, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./service-list');
 
@@ -58,7 +58,7 @@ describe(commands.SERVICE_LIST, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub(Utils, 'getTenantIdFromAccessToken').callsFake(() => '31537af4-6d77-4bb9-a681-d2394888ea26');
+    sinon.stub(accessToken, 'getTenantIdFromAccessToken').callsFake(() => '31537af4-6d77-4bb9-a681-d2394888ea26');
 
     auth.service.connected = true;
     if (!auth.service.accessTokens[auth.defaultResource]) {
@@ -86,16 +86,16 @@ describe(commands.SERVICE_LIST, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent,
-      Utils.getTenantIdFromAccessToken
+      accessToken.getTenantIdFromAccessToken
     ]);
     auth.service.connected = false;
   });

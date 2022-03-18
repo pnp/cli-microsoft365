@@ -4,7 +4,7 @@ import appInsights from '../../appInsights';
 import auth from '../../Auth';
 import { Logger } from '../../cli';
 import Command, { CommandError } from '../../Command';
-import Utils from '../../Utils';
+import { sinonUtil } from '../../utils';
 import commands from './commands';
 const command: Command = require('./logout');
 
@@ -35,7 +35,7 @@ describe(commands.LOGOUT, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -89,7 +89,7 @@ describe(commands.LOGOUT, () => {
   });
 
   it('correctly handles error while clearing persisted connection info', (done) => {
-    Utils.restore(auth.clearConnectionInfo);
+    sinonUtil.restore(auth.clearConnectionInfo);
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     const logoutSpy = sinon.spy(auth.service, 'logout');
     auth.service.connected = true;
@@ -102,7 +102,7 @@ describe(commands.LOGOUT, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           auth.clearConnectionInfo,
           auth.service.logout
         ]);
@@ -123,7 +123,7 @@ describe(commands.LOGOUT, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           auth.clearConnectionInfo,
           auth.service.logout
         ]);
@@ -132,7 +132,7 @@ describe(commands.LOGOUT, () => {
   });
 
   it('correctly handles error when restoring auth information', (done) => {
-    Utils.restore(auth.restoreAuth);
+    sinonUtil.restore(auth.restoreAuth);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     command.action(logger, { options: {} } as any, (err?: any) => {
       try {
@@ -143,7 +143,7 @@ describe(commands.LOGOUT, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           auth.clearConnectionInfo
         ]);
       }

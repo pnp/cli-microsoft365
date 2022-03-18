@@ -3,7 +3,8 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -14,7 +15,7 @@ interface Options extends GlobalOptions {
   type: string;
 }
 
-class TeamsChatListCommand extends GraphItemsListCommand<any> {
+class TeamsChatListCommand extends GraphCommand {
   public get name(): string {
     return commands.CHAT_LIST;
   }
@@ -31,10 +32,10 @@ class TeamsChatListCommand extends GraphItemsListCommand<any> {
     const filter = args.options.type !== undefined ? `?$filter=chatType eq '${args.options.type}'` : '';
     const endpoint: string = `${this.resource}/v1.0/chats${filter}`;
 
-    this
-      .getAllItems(endpoint, logger, true)
-      .then((): void => {
-        logger.log(this.items);
+    odata
+      .getAllItems(endpoint, logger)
+      .then((items): void => {
+        logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

@@ -3,6 +3,7 @@ site_url: https://pnp.github.io/cli-microsoft365/
 nav:
   - Home:
     - 'index.md'
+    - v5 Upgrade Guidance: 'v5-upgrade-guidance.md'
     - v4 Upgrade Guidance: 'v4-upgrade-guidance.md'
     - v3 Upgrade Guidance: 'v3-upgrade-guidance.md'
   - User Guide:
@@ -51,6 +52,7 @@ nav:
       - o365group:
         - o365group add: 'cmd/aad/o365group/o365group-add.md'
         - o365group conversation list: 'cmd/aad/o365group/o365group-conversation-list.md'
+        - o365group conversation post list: 'cmd/aad/o365group/o365group-conversation-post-list.md'
         - o365group get: 'cmd/aad/o365group/o365group-get.md'
         - o365group list: 'cmd/aad/o365group/o365group-list.md'
         - o365group recyclebinitem list: 'cmd/aad/o365group/o365group-recyclebinitem-list.md'
@@ -189,14 +191,14 @@ nav:
       - plan:
         - plan add: 'cmd/planner/plan/plan-add.md'
         - plan get: 'cmd/planner/plan/plan-get.md'
+        - plan details get: 'cmd/planner/plan/plan-details-get.md'
         - plan list: 'cmd/planner/plan/plan-list.md'
       - task:
         - task add: 'cmd/planner/task/task-add.md'
         - task get: 'cmd/planner/task/task-get.md'
         - task list: 'cmd/planner/task/task-list.md'
         - task set: 'cmd/planner/task/task-set.md'
-        - details:
-          - details get: 'cmd/planner/task/task-details-get.md'
+        - task details get: 'cmd/planner/task/task-details-get.md'
     - Power Apps (pa):
       - app:
         - app get: 'cmd/pa/app/app-get.md'
@@ -231,6 +233,9 @@ nav:
         - run get: 'cmd/flow/run/run-get.md'
         - run list: 'cmd/flow/run/run-list.md'
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
+    - Power Platform (pp):
+      - managementapp:
+        - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
     - Search (search):
       - externalconnection:
         - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
@@ -446,6 +451,7 @@ nav:
         - site groupify: 'cmd/spo/site/site-groupify.md'
         - site list: 'cmd/spo/site/site-list.md'
         - site recyclebinitem list: 'cmd/spo/site/site-recyclebinitem-list.md'
+        - site recyclebinitem restore: 'cmd/spo/site/site-recyclebinitem-restore.md'
         - site remove: 'cmd/spo/site/site-remove.md'
         - site rename: 'cmd/spo/site/site-rename.md'
         - site set: 'cmd/spo/site/site-set.md'
@@ -596,7 +602,7 @@ nav:
         - user set: 'cmd/aad/o365group/o365group-user-set.md'
         - user app add: 'cmd/teams/user/user-app-add.md'
         - user app list: 'cmd/teams/user/user-app-list.md'
-        - user app remove: 'cmd/teams/user/user-app-remove.md'    
+        - user app remove: 'cmd/teams/user/user-app-remove.md'
     - To Do (todo):
       - list:
         - list add: 'cmd/todo/list/list-add.md'
@@ -702,6 +708,7 @@ nav:
       - 'Lists site collection owners': 'sample-scripts/spo/list-site-collection-owners.md'
       - 'Monitor site collections storage usage': 'sample-scripts/spo/monitor-site-collection-storage-usage.md'
       - 'How to perform operations not covered by the CLI for Microsoft 365': 'sample-scripts/spo/perform-operations-not-covered-by-cli-for-microsoft-365.md'
+      - 'Planner migration to SharePoint list': 'sample-scripts/spo/planner-migrate-sharepoint-list.md'
       - 'Remove a Site Collection Admin User from all Site Collections': 'sample-scripts/spo/remove-siteCollection-admin-user.md'
       - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'
       - 'Remove pending SharePoint API permission requests': 'sample-scripts/spo/remove-pending-api-permission-requests.md'

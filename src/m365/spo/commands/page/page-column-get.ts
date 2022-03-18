@@ -3,6 +3,7 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { CanvasSection, ClientSidePage } from './clientsidepages';
@@ -84,7 +85,7 @@ class SpoPageColumnGetCommand extends SpoCommand {
       return `${args.options.column} is not a number`;
     }
 
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

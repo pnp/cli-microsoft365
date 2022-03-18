@@ -3,8 +3,8 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { Reply } from '../../Reply';
 
@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   messageId: string;
 }
 
-class TeamsMessageReplyListCommand extends GraphItemsListCommand<Reply>  {
+class TeamsMessageReplyListCommand extends GraphCommand  {
   public get name(): string {
     return commands.MESSAGE_REPLY_LIST;
   }
@@ -34,16 +34,16 @@ class TeamsMessageReplyListCommand extends GraphItemsListCommand<Reply>  {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const endpoint: string = `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${args.options.channelId}/messages/${args.options.messageId}/replies`;
 
-    this
-      .getAllItems(endpoint, logger, true)
-      .then((): void => {
+    odata
+      .getAllItems<Reply>(endpoint, logger)
+      .then((items): void => {
         if (args.options.output !== 'json') {
-          this.items.forEach(i => {
+          items.forEach(i => {
             i.body = i.body.content as any;
           });
         }
 
-        logger.log(this.items);
+        logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -66,11 +66,11 @@ class TeamsMessageReplyListCommand extends GraphItemsListCommand<Reply>  {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.teamId)) {
+    if (!validation.isValidGuid(args.options.teamId)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 
-    if (!Utils.isValidTeamsChannelId(args.options.channelId as string)) {
+    if (!validation.isValidTeamsChannelId(args.options.channelId as string)) {
       return `${args.options.channelId} is not a valid Teams ChannelId`;
     }
 

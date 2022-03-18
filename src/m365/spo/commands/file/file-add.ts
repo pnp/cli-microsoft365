@@ -7,10 +7,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { fsUtil, spo, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { FolderExtensions } from '../../FolderExtensions';
 
 interface CommandArgs {
   options: Options;
@@ -88,10 +87,9 @@ class SpoFileAddCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const folderPath: string = Utils.getServerRelativePath(args.options.webUrl, args.options.folder);
+    const folderPath: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folder);
     const fullPath: string = path.resolve(args.options.path);
-    const fileName: string = Utils.getSafeFileName(path.basename(fullPath));
-    const folderExtensions: FolderExtensions = new FolderExtensions(logger, this.debug);
+    const fileName: string = fsUtil.getSafeFileName(path.basename(fullPath));
 
     let isCheckedOut: boolean = false;
     let listSettings: ListSettings;
@@ -118,7 +116,7 @@ class SpoFileAddCommand extends SpoCommand {
 
     request.get<void>(requestOptions).catch((): Promise<void> => {
       // folder does not exist so will attempt to create the folder tree
-      return folderExtensions.ensureFolder(args.options.webUrl, folderPath);
+      return spo.ensureFolder(args.options.webUrl, folderPath, logger, this.debug);
     })
       .then((): Promise<void> => {
         if (args.options.checkOut) {
@@ -379,7 +377,7 @@ class SpoFileAddCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }

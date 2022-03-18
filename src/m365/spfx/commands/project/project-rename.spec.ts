@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./project-rename');
 
@@ -43,7 +43,7 @@ describe(commands.PROJECT_RENAME, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       (command as any).generateNewId,
       (command as any).getProjectRoot,
       (command as any).getProject,
@@ -54,7 +54,7 @@ describe(commands.PROJECT_RENAME, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent
     ]);
   });

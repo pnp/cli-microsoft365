@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import Utils from '../../../../../../Utils';
+import { sinonUtil } from '../../../../../../utils';
 import { Project, TsFile } from '../../model';
 import { Finding } from '../Finding';
 import { FN016004_TS_property_pane_property_import } from './FN016004_TS_property_pane_property_import';
@@ -11,7 +11,7 @@ describe('FN016004_TS_property_pane_property_import', () => {
   let findings: Finding[];
   let rule: FN016004_TS_property_pane_property_import;
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
       (TsRule as any).getParentOfType

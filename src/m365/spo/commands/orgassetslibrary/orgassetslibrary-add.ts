@@ -5,9 +5,9 @@ import {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { spo, ContextInfo, ClientSvcResponse, ClientSvcResponseContents, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -41,12 +41,12 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
     const thumbnailSchema: string = typeof args.options.thumbnailUrl === 'undefined' ? `<Parameter Type="Null" />` : `<Parameter Type="String">${args.options.thumbnailUrl}</Parameter>`;
 
-    this
+    spo
       .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
 
-        return this.getRequestDigest(spoAdminUrl);
+        return spo.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         const requestOptions: any = {
@@ -72,12 +72,12 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidThumbnailUrl = SpoCommand.isValidSharePointUrl((args.options.thumbnailUrl as string));
+    const isValidThumbnailUrl = validation.isValidSharePointUrl((args.options.thumbnailUrl as string));
     if (typeof args.options.thumbnailUrl !== 'undefined' && isValidThumbnailUrl !== true) {
       return isValidThumbnailUrl;
     }
 
-    return SpoCommand.isValidSharePointUrl(args.options.libraryUrl);
+    return validation.isValidSharePointUrl(args.options.libraryUrl);
   }
 
   public options(): CommandOption[] {

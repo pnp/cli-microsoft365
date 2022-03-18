@@ -6,10 +6,9 @@ import {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { ListItemInstance } from './ListItemInstance';
 
 interface CommandArgs {
@@ -142,7 +141,7 @@ class SpoListItemSetCommand extends SpoCommand {
             logger.logToStderr(`getting request digest for systemUpdate request`);
           }
 
-          return this.getRequestDigest(args.options.webUrl);
+          return spo.getRequestDigest(args.options.webUrl);
         }
         else {
           return Promise.resolve(undefined as any);
@@ -295,7 +294,7 @@ class SpoListItemSetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
@@ -309,7 +308,7 @@ class SpoListItemSetCommand extends SpoCommand {
     }
 
     if (args.options.listId &&
-      !Utils.isValidGuid(args.options.listId)) {
+      !validation.isValidGuid(args.options.listId)) {
       return `${args.options.listId} in option listId is not a valid GUID`;
     }
 

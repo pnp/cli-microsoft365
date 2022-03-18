@@ -33,23 +33,23 @@ A new chat conversation will be created if no existing conversation with the par
 Send a message to a Microsoft Teams chat conversation by id
 
 ```sh
-m365 teams chat message send --chatId 19:2da4c29f6d7041eca70b638b43d45437@thread.v2
+m365 teams chat message send --chatId 19:2da4c29f6d7041eca70b638b43d45437@thread.v2 --message "Welcome to Teams"
 ```
 
 Send a message to a single person
 
 ```sh
-m365 teams chat message send --userEmails alexw@contoso.com
+m365 teams chat message send --userEmails alexw@contoso.com --message "Welcome to Teams"
 ```
 
 Send a message to a group of people
 
 ```sh
-m365 teams chat message send --userEmails alexw@contoso.com,meganb@contoso.com
+m365 teams chat message send --userEmails alexw@contoso.com,meganb@contoso.com --message "Welcome to Teams"
 ```
 
 Send a message to a chat conversation finding it by display name
 
 ```sh
-m365 teams chat message send --chatName "Just a conversation"
+m365 teams chat message send --chatName "Just a conversation" --message "Welcome to Teams"
 ```

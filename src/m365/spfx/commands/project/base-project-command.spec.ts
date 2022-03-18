@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import { BaseProjectCommand } from "./base-project-command";
 import { Project } from "./model";
 
@@ -22,7 +22,7 @@ class MockCommand extends BaseProjectCommand {
 
 describe('BaseProjectCommand', () => {
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.readFileSync,
       fs.existsSync
     ]);

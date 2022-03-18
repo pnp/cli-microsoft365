@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./app-role-delete');
 
@@ -41,7 +41,7 @@ describe(commands.APP_ROLE_DELETE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.patch,
       Cli.prompt
@@ -49,7 +49,7 @@ describe(commands.APP_ROLE_DELETE, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -1726,7 +1726,7 @@ describe(commands.APP_ROLE_DELETE, () => {
 
   it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and the prompt is confirmed (debug)', (done) => {
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -1817,7 +1817,7 @@ describe(commands.APP_ROLE_DELETE, () => {
 
   it('deletes an app role when the role is in enabled state and valid appId, role name and prompt is confirmed', (done) => {
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -1922,7 +1922,7 @@ describe(commands.APP_ROLE_DELETE, () => {
 
   it('deletes an app role when the role is in enabled state and valid appId, role id and prompt is confirmed (debug)', (done) => {
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -2027,7 +2027,7 @@ describe(commands.APP_ROLE_DELETE, () => {
   it('aborts deleting app role when prompt is not confirmed', (done) => {
     // represents the aad app get request called when the prompt is confirmed
     const patchStub = sinon.stub(request, 'get');
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -2045,7 +2045,7 @@ describe(commands.APP_ROLE_DELETE, () => {
   it('aborts deleting app role when prompt is not confirmed (debug)', (done) => {
     // represents the aad app get request called when the prompt is confirmed
     const patchStub = sinon.stub(request, 'get');
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });

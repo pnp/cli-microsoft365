@@ -1,6 +1,6 @@
 # aad o365group add
 
-Creates Microsoft 365 Group
+Creates a Microsoft 365 Group
 
 ## Usage
 
@@ -28,6 +28,18 @@ m365 aad o365group add [options]
 `--isPrivate [isPrivate]`
 : Set to `true` if the Microsoft 365 Group should be private and to `false` if it should be public (default)
 
+`--allowMembersToPost [allowMembersToPost]`
+: Set if only group members should be able to post conversations to the group
+
+`--hideGroupInOutlook [hideGroupInOutlook]`
+: Set to hide the group in Outlook experiences
+
+`--subscribeNewGroupMembers [subscribeNewGroupMembers]`
+: Set to subscribe all new group members to receive group conversation emails when new messages are posted in the group
+
+`--welcomeEmailDisabled [welcomeEmailDisabled]`
+: Set to not send welcome emails to new group members
+
 `-l, --logoPath [logoPath]`
 : Local path to the image file to use as group logo
 
@@ -43,29 +55,53 @@ If an invalid user is provided in the comma-separated list or Owners or Members,
 Create a public Microsoft 365 Group
 
 ```sh
-m365 aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance
 ```
 
 Create a private Microsoft 365 Group
 
 ```sh
-m365 aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --isPrivate true
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --isPrivate true
 ```
 
 Create a public Microsoft 365 Group and set specified users as its owners
 
 ```sh
-m365 aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --owners "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --owners "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
 Create a public Microsoft 365 Group and set specified users as its members
 
 ```sh
-m365 aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
+```
+
+Create a public Microsoft 365 Group and allows only group members to be able to post conversations to the group.
+
+```sh
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --allowMembersToPost
+```
+
+Create a public Microsoft 365 Group and hides it from the Outlook experiences (web and client).
+
+```sh
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --hideGroupInOutlook
+```
+
+Create a public Microsoft 365 Group and subscribe all new group members to receive group conversation emails when new messages are posted in the group.
+
+```sh
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --subscribeNewGroupMembers
+```
+
+Create a public Microsoft 365 Group and set to not send welcome emails to new group members.
+
+```sh
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --welcomeEmailDisabled
 ```
 
 Create a public Microsoft 365 Group and set its logo
 
 ```sh
-m365 aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --logoPath images/logo.png
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --logoPath images/logo.png
 ```

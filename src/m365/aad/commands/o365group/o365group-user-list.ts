@@ -4,8 +4,8 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   groupId: string;
 }
 
-class AadO365GroupUserListCommand extends GraphItemsListCommand<User> {
+class AadO365GroupUserListCommand extends GraphCommand {
   public get name(): string {
     return commands.O365GROUP_USER_LIST;
   }
@@ -33,45 +33,50 @@ class AadO365GroupUserListCommand extends GraphItemsListCommand<User> {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    let users: User[] = [];
+
     this
       .getOwners(logger, args.options.groupId)
-      .then((): Promise<void> => {
-        if (args.options.role === "Owner") {
-          return Promise.resolve();
+      .then((owners): Promise<User[]> => {
+        users = owners;
+
+        if (args.options.role === 'Owner') {
+          return Promise.resolve([]);
         }
 
         return this.getMembersAndGuests(logger, args.options.groupId);
       })
-      .then(
-        (): void => {
-          if (args.options.role) {
-            this.items = this.items.filter(i => i.userType === args.options.role);
-          }
+      .then((membersAndGuests): void => {
+        users = users.concat(membersAndGuests);
 
-          logger.log(this.items);
-          cb();
-        },
-        (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb)
-      );
+        if (args.options.role) {
+          users = users.filter(i => i.userType === args.options.role);
+        }
+
+        logger.log(users);
+        cb();
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getOwners(logger: Logger, groupId: string): Promise<void> {
+  private getOwners(logger: Logger, groupId: string): Promise<User[]> {
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
 
-    return this.getAllItems(endpoint, logger, true).then(
-      (): void => {
+    return odata
+      .getAllItems<User>(endpoint, logger)
+      .then(users => {
         // Currently there is a bug in the Microsoft Graph that returns Owners as
         // userType 'member'. We therefore update all returned user as owner
-        for (const i in this.items) {
-          this.items[i].userType = "Owner";
-        }
-      }
-    );
+        users.forEach(user => {
+          user.userType = 'Owner';
+        });
+
+        return users;
+      });
   }
 
-  private getMembersAndGuests(logger: Logger, groupId: string): Promise<void> {
+  private getMembersAndGuests(logger: Logger, groupId: string): Promise<User[]> {
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
-    return this.getAllItems(endpoint, logger, false);
+    return odata.getAllItems<User>(endpoint, logger);
   }
 
   public options(): CommandOption[] {
@@ -90,7 +95,7 @@ class AadO365GroupUserListCommand extends GraphItemsListCommand<User> {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.groupId as string)) {
+    if (!validation.isValidGuid(args.options.groupId as string)) {
       return `${args.options.groupId} is not a valid GUID`;
     }
 

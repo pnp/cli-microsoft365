@@ -4,8 +4,8 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   groupId: string;
 }
 
-class AadO365GroupConversationListCommand extends GraphItemsListCommand<Conversation> {
+class AadO365GroupConversationListCommand extends GraphCommand {
   public get name(): string {
     return commands.O365GROUP_CONVERSATION_LIST;
   }
@@ -30,10 +30,10 @@ class AadO365GroupConversationListCommand extends GraphItemsListCommand<Conversa
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getAllItems(`${this.resource}/v1.0/groups/${args.options.groupId}/conversations`, logger, true)
-      .then((): void => {
-        logger.log(this.items);
+    odata
+      .getAllItems<Conversation>(`${this.resource}/v1.0/groups/${args.options.groupId}/conversations`, logger)
+      .then((conversations): void => {
+        logger.log(conversations);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -49,7 +49,7 @@ class AadO365GroupConversationListCommand extends GraphItemsListCommand<Conversa
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.groupId as string)) {
+    if (!validation.isValidGuid(args.options.groupId as string)) {
       return `${args.options.groupId} is not a valid GUID`;
     }
 

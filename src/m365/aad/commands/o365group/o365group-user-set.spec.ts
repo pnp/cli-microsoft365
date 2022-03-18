@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import teamsCommands from '../../../teams/commands';
 import commands from '../../commands';
 const command: Command = require('./o365group-user-set');
@@ -37,7 +37,7 @@ describe(commands.O365GROUP_USER_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post,
       request.delete
@@ -45,7 +45,7 @@ describe(commands.O365GROUP_USER_SET, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);

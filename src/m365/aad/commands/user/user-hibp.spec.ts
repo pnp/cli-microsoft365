@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { Logger } from '../../../../cli';
 import { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command = require('./user-hibp');
 
@@ -29,7 +29,7 @@ describe(commands.USER_HIBP, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get
     ]);
   });

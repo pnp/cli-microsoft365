@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import Utils from '../../../../../../Utils';
+import { sinonUtil } from '../../../../../../utils';
 import { Project } from '../../model';
 import { Finding } from '../Finding';
 import { FN014005_CODE_settingsfile } from './FN014005_CODE_settingsfile';
@@ -10,7 +10,7 @@ describe('FN014005_CODE_settingsfile', () => {
   let findings: Finding[];
   let rule: FN014005_CODE_settingsfile;
   afterEach(() => {
-    Utils.restore(fs.existsSync);
+    sinonUtil.restore(fs.existsSync);
   });
 
   beforeEach(() => {

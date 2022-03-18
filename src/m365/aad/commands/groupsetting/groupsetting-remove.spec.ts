@@ -6,7 +6,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./groupsetting-remove');
 
@@ -43,7 +43,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.delete,
       global.setTimeout,
       Cli.prompt
@@ -51,7 +51,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       fs.readFileSync,
       appInsights.trackEvent
@@ -174,7 +174,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
   it('removes the group setting when prompt confirmed', (done) => {
     const postStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -192,7 +192,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
   it('removes the group setting when prompt confirmed (debug)', (done) => {
     const postStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });

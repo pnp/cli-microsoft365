@@ -1,14 +1,15 @@
 import { RoomList } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
   options: GlobalOptions;
 }
 
-class OutlookRoomListListCommand extends GraphItemsListCommand<RoomList> {
+class OutlookRoomListListCommand extends GraphCommand {
   public get name(): string {
     return commands.ROOMLIST_LIST;
   }
@@ -22,10 +23,10 @@ class OutlookRoomListListCommand extends GraphItemsListCommand<RoomList> {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getAllItems(`${this.resource}/v1.0/places/microsoft.graph.roomlist`, logger, true)
-      .then((): void => {
-        logger.log(this.items);
+    odata
+      .getAllItems<RoomList>(`${this.resource}/v1.0/places/microsoft.graph.roomlist`, logger)
+      .then((roomLists): void => {
+        logger.log(roomLists);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

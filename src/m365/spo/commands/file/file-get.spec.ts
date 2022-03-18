@@ -7,7 +7,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./file-get');
 
@@ -39,14 +39,14 @@ describe(commands.FILE_GET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       fs.createWriteStream
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -364,7 +364,7 @@ describe(commands.FILE_GET, () => {
   it('fails validation if path doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/project-x', id: 'b2307a39-e878-458b-bc90-03bc578531d6', asFile: true, path: 'abc', fileName: 'test.docx' } });
-    Utils.restore(fs.existsSync);
+    sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
   });
 
@@ -410,7 +410,7 @@ describe(commands.FILE_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           fs.createWriteStream
         ]);
       }
@@ -460,7 +460,7 @@ describe(commands.FILE_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           fs.createWriteStream
         ]);
       }

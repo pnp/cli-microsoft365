@@ -14,7 +14,7 @@ import config from '../config';
 import GlobalOptions from '../GlobalOptions';
 import request from '../request';
 import { settingsNames } from '../settingsNames';
-import Utils from '../Utils';
+import { formatting, fsUtil } from '../utils';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
 const packageJSON = require('../../package.json');
@@ -152,12 +152,32 @@ export class Cli {
       }
     }
 
-    // validate options
-    // validate required options
+    const shouldPrompt = this.getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
+
+    let inquirer: Inquirer | undefined;
     for (let i = 0; i < this.commandToExecute.options.length; i++) {
       if (this.commandToExecute.options[i].required &&
         typeof this.optionsFromArgs.options[this.commandToExecute.options[i].name] === 'undefined') {
-        return this.closeWithError(`Required option ${this.commandToExecute.options[i].name} not specified`, this.optionsFromArgs, true);
+        if (!shouldPrompt) {
+          return this.closeWithError(`Required option ${this.commandToExecute.options[i].name} not specified`, this.optionsFromArgs, true);
+        }
+        
+        if (i === 0) {
+          Cli.log('Provide values for the following parameters:');
+        }
+
+        if (!inquirer) {
+          inquirer = require('inquirer');
+        }
+
+        const missingRequireOptionValue = await (inquirer as Inquirer)
+          .prompt({
+            name: 'missingRequireOptionValue',
+            message: `${this.commandToExecute.options[i].name}: `
+          })
+          .then(result => result.missingRequireOptionValue);
+
+        this.optionsFromArgs.options[this.commandToExecute.options[i].name] = missingRequireOptionValue;
       }
     }
 
@@ -300,7 +320,7 @@ export class Cli {
   }
 
   public loadAllCommands(): void {
-    const files: string[] = Utils.readdirR(this.commandsFolder) as string[];
+    const files: string[] = fsUtil.readdirR(this.commandsFolder) as string[];
 
     files.forEach(file => {
       if (file.indexOf(`${path.sep}commands${path.sep}`) > -1 &&
@@ -538,7 +558,7 @@ export class Cli {
           }
 
           logStatement = logStatement.map((s: any) =>
-            Utils.filterObject(s, currentCommand.defaultProperties as string[]));
+            formatting.filterObject(s, currentCommand.defaultProperties as string[]));
         }
       }
     }

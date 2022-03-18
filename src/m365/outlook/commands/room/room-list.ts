@@ -4,7 +4,8 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -15,7 +16,7 @@ interface Options extends GlobalOptions {
   roomlistEmail?: string;
 }
 
-class OutlookRoomListCommand extends GraphItemsListCommand<Room> {
+class OutlookRoomListCommand extends GraphCommand {
   public get name(): string {
     return commands.ROOM_LIST;
   }
@@ -41,10 +42,10 @@ class OutlookRoomListCommand extends GraphItemsListCommand<Room> {
       endpoint = `${this.resource}/v1.0/places/${args.options.roomlistEmail}/microsoft.graph.roomlist/rooms`;
     }
 
-    this
-      .getAllItems(endpoint, logger, true)
-      .then((): void => {
-        logger.log(this.items);
+    odata
+      .getAllItems<Room>(endpoint, logger)
+      .then((rooms): void => {
+        logger.log(rooms);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

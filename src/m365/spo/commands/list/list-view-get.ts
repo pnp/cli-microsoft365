@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -51,7 +51,7 @@ class SpoListViewGetCommand extends SpoCommand {
       listRestUrl = `/lists/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
     }
     else if (args.options.listUrl) {
-      const listServerRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
 
       listRestUrl = `/GetList('${encodeURIComponent(listServerRelativeUrl)}')`;
     }
@@ -101,7 +101,7 @@ class SpoListViewGetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
@@ -111,7 +111,7 @@ class SpoListViewGetCommand extends SpoCommand {
     }
 
     if (args.options.listId &&
-      !Utils.isValidGuid(args.options.listId)) {
+      !validation.isValidGuid(args.options.listId)) {
       return `${args.options.listId} in option listId is not a valid GUID`;
     }
 
@@ -124,7 +124,7 @@ class SpoListViewGetCommand extends SpoCommand {
     }
 
     if (args.options.viewId &&
-      !Utils.isValidGuid(args.options.viewId)) {
+      !validation.isValidGuid(args.options.viewId)) {
       return `${args.options.viewId} in option viewId is not a valid GUID`;
     }
 

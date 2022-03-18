@@ -1,14 +1,14 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import Utils from './Utils';
+import { sinonUtil } from './utils';
 
 const env = Object.assign({}, process.env);
 
 describe('appInsights', () => {
 
   afterEach(() => {
-    Utils.restore(fs.existsSync);
+    sinonUtil.restore(fs.existsSync);
     delete require.cache[require.resolve('./appInsights')];
     process.env = env;
   });

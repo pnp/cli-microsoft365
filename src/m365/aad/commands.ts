@@ -23,6 +23,7 @@ export default {
   O365GROUP_GET: `${prefix} o365group get`,
   O365GROUP_LIST: `${prefix} o365group list`,
   O365GROUP_CONVERSATION_LIST: `${prefix} o365group conversation list`,
+  O365GROUP_CONVERSATION_POST_LIST: `${prefix} o365group conversation post list`,
   O365GROUP_RECYCLEBINITEM_CLEAR: `${prefix} o365group recyclebinitem clear`,
   O365GROUP_RECYCLEBINITEM_LIST: `${prefix} o365group recyclebinitem list`,
   O365GROUP_RECYCLEBINITEM_RESTORE: `${prefix} o365group recyclebinitem restore`,

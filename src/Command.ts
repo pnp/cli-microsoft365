@@ -4,8 +4,8 @@ import auth from './Auth';
 import { Cli } from './cli';
 import { Logger } from './cli/Logger';
 import GlobalOptions from './GlobalOptions';
-import { GraphResponseError } from './m365/base/GraphResponseError';
 import request from './request';
+import { GraphResponseError } from './utils';
 
 export interface CommandOption {
   option: string;

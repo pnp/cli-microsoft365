@@ -5,7 +5,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -81,7 +81,7 @@ class AadAppRoleDeleteCommand extends GraphCommand {
           logger.logToStderr(`Deleting role with ${appRoleDeleteIdentifierNameValue} from Azure AD app ${aadApp.id}...`);
         }
 
-        // Find the role search criteria provided by the user.     
+        // Find the role search criteria provided by the user.
         const appRoleDeleteIdentifierProperty = args.options.name ? `displayName` : (args.options.claim ? `value` : `id`);
         const appRoleDeleteIdentifierValue = args.options.name ? args.options.name : (args.options.claim ? args.options.claim : args.options.id);
 
@@ -250,7 +250,7 @@ class AadAppRoleDeleteCommand extends GraphCommand {
     }
 
     if (args.options.id) {
-      if (!Utils.isValidGuid(args.options.id)) {
+      if (!validation.isValidGuid(args.options.id)) {
         return `${args.options.id} is not a valid GUID`;
       }
     }

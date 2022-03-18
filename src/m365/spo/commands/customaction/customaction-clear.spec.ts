@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./customaction-clear');
 
@@ -58,14 +58,14 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       Cli.prompt
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -119,7 +119,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should abort custom actions clear when prompt not confirmed', (done) => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
     
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -138,7 +138,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -155,7 +155,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
         done(e);
       }
       finally {
-        Utils.restore((command as any)['clearScopedCustomActions']);
+        sinonUtil.restore((command as any)['clearScopedCustomActions']);
       }
     });
   });
@@ -187,7 +187,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
         done(e);
       }
       finally {
-        Utils.restore((command as any)['clearScopedCustomActions']);
+        sinonUtil.restore((command as any)['clearScopedCustomActions']);
       }
     });
   });
@@ -218,7 +218,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
         done(e);
       }
       finally {
-        Utils.restore((command as any)['clearScopedCustomActions']);
+        sinonUtil.restore((command as any)['clearScopedCustomActions']);
       }
     });
   });
@@ -243,7 +243,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
         done(e);
       }
       finally {
-        Utils.restore((command as any)['clearScopedCustomActions']);
+        sinonUtil.restore((command as any)['clearScopedCustomActions']);
       }
     });
   });
@@ -266,7 +266,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
         done(e);
       }
       finally {
-        Utils.restore((command as any)['clearScopedCustomActions']);
+        sinonUtil.restore((command as any)['clearScopedCustomActions']);
       }
     });
   });
@@ -382,7 +382,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = command.options();
-    Utils.restore(Command.prototype.options);
+    sinonUtil.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 

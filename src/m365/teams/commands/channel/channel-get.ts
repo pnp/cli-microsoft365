@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import { Channel } from '../../Channel';
 import commands from '../../commands';
@@ -168,7 +168,7 @@ class TeamsChannelGetCommand extends GraphCommand {
       return 'Specify teamId or teamName, one is required';
     }
 
-    if (args.options.teamId && !Utils.isValidGuid(args.options.teamId as string)) {
+    if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 
@@ -192,7 +192,7 @@ class TeamsChannelGetCommand extends GraphCommand {
       return 'Specify channelId, channelName or primary, one is required';
     }
 
-    if (args.options.channelId && !Utils.isValidTeamsChannelId(args.options.channelId as string)) {
+    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
       return `${args.options.channelId} is not a valid Teams ChannelId`;
     }
 

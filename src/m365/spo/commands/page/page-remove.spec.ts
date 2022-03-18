@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./page-remove');
 
@@ -30,8 +30,13 @@ describe(commands.PAGE_REMOVE, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon
-      .stub(command as any, 'getRequestDigest')
-      .callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+      .stub(spo, 'getRequestDigest')
+      .callsFake(() => Promise.resolve({
+        FormDigestValue: 'ABC',
+        FormDigestTimeoutSeconds: 1800,
+        FormDigestExpiresAt: new Date(),
+        WebFullUrl: 'https://contoso.sharepoint.com'
+      }));
     auth.service.connected = true;
   });
 
@@ -57,16 +62,16 @@ describe(commands.PAGE_REMOVE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       Cli.prompt
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      (command as any).getRequestDigest,
+      spo.getRequestDigest,
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
@@ -158,7 +163,7 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('removes a modern page with confirm prompt', (done) => {
     fakeRestCalls();
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: true });
@@ -185,7 +190,7 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('removes a modern page (debug) with confirm prompt', (done) => {
     fakeRestCalls();
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: true });
@@ -240,7 +245,7 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('should abort page removal when prompt not confirmed', (done) => {
     const postCallSpy = fakeRestCalls();
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -266,7 +271,7 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('automatically appends the .aspx extension', (done) => {
     fakeRestCalls();
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -296,7 +301,7 @@ describe(commands.PAGE_REMOVE, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });

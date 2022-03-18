@@ -5,6 +5,7 @@ import Command, {
   CommandErrorWithOutput
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import * as spoWebGetCommand from '../web/web-get';
@@ -306,7 +307,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.url);
+    return validation.isValidSharePointUrl(args.options.url);
   }
 }
 

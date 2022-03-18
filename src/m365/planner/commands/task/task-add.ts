@@ -3,7 +3,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { formatting, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -260,7 +260,7 @@ class PlannerTaskAddCommand extends GraphCommand {
 
     const promises: Promise<{ value: User[] }>[] = userArr.map(user => {
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${Utils.encodeQueryParameter(user)}'&$select=id,userPrincipalName`,
+        url: `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(user)}'&$select=id,userPrincipalName`,
         headers: {
           'content-type': 'application/json'
         },
@@ -328,7 +328,7 @@ class PlannerTaskAddCommand extends GraphCommand {
       return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
     }
 
-    if (args.options.ownerGroupId && !Utils.isValidGuid(args.options.ownerGroupId as string)) {
+    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
       return `${args.options.ownerGroupId} is not a valid GUID`;
     }
 
@@ -340,11 +340,11 @@ class PlannerTaskAddCommand extends GraphCommand {
       return 'Specify either bucketId or bucketName but not both';
     }
 
-    if (args.options.startDateTime && !Utils.isValidISODateTime(args.options.startDateTime)) {
+    if (args.options.startDateTime && !validation.isValidISODateTime(args.options.startDateTime)) {
       return 'The startDateTime is not a valid ISO date string';
     }
 
-    if (args.options.dueDateTime && !Utils.isValidISODateTime(args.options.dueDateTime)) {
+    if (args.options.dueDateTime && !validation.isValidISODateTime(args.options.dueDateTime)) {
       return 'The dueDateTime is not a valid ISO date string';
     }
 
@@ -356,7 +356,7 @@ class PlannerTaskAddCommand extends GraphCommand {
       return `percentComplete should be between 0 and 100 `;
     }
 
-    if (args.options.assignedToUserIds && !Utils.isValidGuidArray(args.options.assignedToUserIds.split(','))) {
+    if (args.options.assignedToUserIds && !validation.isValidGuidArray(args.options.assignedToUserIds.split(','))) {
       return 'assignedToUserIds contains invalid GUID';
     }
 

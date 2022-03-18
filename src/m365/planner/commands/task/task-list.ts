@@ -3,8 +3,8 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -24,7 +24,7 @@ interface BetaPlannerTask extends PlannerTask {
   priority?: number;
 }
 
-class PlannerTaskListCommand extends GraphItemsListCommand<PlannerTask> {
+class PlannerTaskListCommand extends GraphCommand {
   public get name(): string {
     return commands.TASK_LIST;
   }
@@ -58,44 +58,44 @@ class PlannerTaskListCommand extends GraphItemsListCommand<PlannerTask> {
     if (bucketId || bucketName) {
       this
         .getBucketId(args)
-        .then((retrievedBucketId: string): Promise<void> => {
+        .then((retrievedBucketId: string): Promise<PlannerTask[]> => {
           bucketId = retrievedBucketId;
-          return this.getAllItems(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`, logger, true);
+          return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`, logger);
         })
-        .then((): Promise<void> => {
-          taskItems = this.items;
-          return this.getAllItems(`${this.resource}/beta/planner/buckets/${bucketId}/tasks`, logger, true);
+        .then((tasks): Promise<BetaPlannerTask[]> => {
+          taskItems = tasks;
+          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/planner/buckets/${bucketId}/tasks`, logger);
         })
-        .then((): void => {
-          logger.log(this.mergeTaskPriority(taskItems, this.items));
+        .then((betaTasks): void => {
+          logger.log(this.mergeTaskPriority(taskItems, betaTasks));
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
     else if (planId || planName) {
       this
         .getPlanId(args)
-        .then((retrievedPlanId: string): Promise<void> => {
+        .then((retrievedPlanId: string): Promise<PlannerTask[]> => {
           planId = retrievedPlanId;
-          return this.getAllItems(`${this.resource}/v1.0/planner/plans/${planId}/tasks`, logger, true);
+          return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/plans/${planId}/tasks`, logger);
         })
-        .then((): Promise<void> => {
-          taskItems = this.items;
-          return this.getAllItems(`${this.resource}/beta/planner/plans/${planId}/tasks`, logger, true);
+        .then((tasks): Promise<BetaPlannerTask[]> => {
+          taskItems = tasks;
+          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/planner/plans/${planId}/tasks`, logger);
         })
-        .then((): void => {
-          logger.log(this.mergeTaskPriority(taskItems, this.items));
+        .then((betaTasks): void => {
+          logger.log(this.mergeTaskPriority(taskItems, betaTasks));
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
     else {
-      this
-        .getAllItems(`${this.resource}/v1.0/me/planner/tasks`, logger, true)
-        .then((): Promise<void> => {
-          taskItems = this.items;
-          return this.getAllItems(`${this.resource}/beta/me/planner/tasks`, logger, true);
+      odata
+        .getAllItems<PlannerTask>(`${this.resource}/v1.0/me/planner/tasks`, logger)
+        .then((tasks): Promise<BetaPlannerTask[]> => {
+          taskItems = tasks;
+          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/me/planner/tasks`, logger);
         })
-        .then((): void => {
-          logger.log(this.mergeTaskPriority(taskItems, this.items));
+        .then((betaTasks): void => {
+          logger.log(this.mergeTaskPriority(taskItems, betaTasks));
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
@@ -245,7 +245,7 @@ class PlannerTaskListCommand extends GraphItemsListCommand<PlannerTask> {
       return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
     }
 
-    if (args.options.ownerGroupId && !Utils.isValidGuid(args.options.ownerGroupId as string)) {
+    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
       return `${args.options.ownerGroupId} is not a valid GUID`;
     }
 

@@ -8,6 +8,7 @@ const settingsNames = {
   errorOutput: 'errorOutput',
   output: 'output',
   printErrorsAsPlainText: 'printErrorsAsPlainText',
+  prompt: 'prompt',
   showHelpOnFailure: 'showHelpOnFailure'
 };
 

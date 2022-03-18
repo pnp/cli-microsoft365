@@ -4,7 +4,7 @@ import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./accesstoken-get');
 
@@ -36,7 +36,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.ensureAccessToken
     ]);
     auth.service.accessTokens = {};
@@ -44,7 +44,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent,
       auth.restoreAuth
     ]);

@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./task-add');
 
@@ -194,14 +194,14 @@ describe(commands.TASK_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -439,7 +439,7 @@ describe(commands.TASK_ADD, () => {
   });
 
   it('correctly adds planner bucket with title, bucketId, planName, and ownerGroupName', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
         return Promise.resolve({
@@ -479,7 +479,7 @@ describe(commands.TASK_ADD, () => {
   });
 
   it('correctly adds planner task with title, bucketId, planName, and ownerGroupId', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '0d0402ee-970f-4951-90b5-2f24519d2e40')`) {
         return Promise.resolve({
@@ -524,7 +524,7 @@ describe(commands.TASK_ADD, () => {
   });
 
   it('correctly adds planner task with title, planId, and bucketName', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/8QZEH7b3wkS_bGQobscsM5gADCBb/buckets`) {
         return Promise.resolve({
@@ -579,8 +579,8 @@ describe(commands.TASK_ADD, () => {
   });
 
   it('correctly adds planner task with title, bucketId, planId, and assignedToUserNames', (done) => {
-    Utils.restore(request.get);
-    Utils.restore(request.post);
+    sinonUtil.restore(request.get);
+    sinonUtil.restore(request.post);
 
     const options: any = {
       title: 'My Planner Task',
@@ -623,8 +623,8 @@ describe(commands.TASK_ADD, () => {
   });
 
   it('correctly adds planner task with title, bucketId, planId, and description', (done) => {
-    Utils.restore(request.get);
-    Utils.restore(request.patch);
+    sinonUtil.restore(request.get);
+    sinonUtil.restore(request.patch);
 
     const options: any = {
       title: 'My Planner Task',
@@ -673,7 +673,7 @@ describe(commands.TASK_ADD, () => {
   });
   
   it('fails when no bucket is found', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/8QZEH7b3wkS_bGQobscsM5gADCBb/buckets`) {
         return Promise.resolve({
@@ -702,7 +702,7 @@ describe(commands.TASK_ADD, () => {
   });
   
   it('fails when an invalid user is specified', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
@@ -743,7 +743,7 @@ describe(commands.TASK_ADD, () => {
   });
 
   it('fails validation when ownerGroupName not found', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
         return Promise.resolve({ value: [] });
@@ -770,7 +770,7 @@ describe(commands.TASK_ADD, () => {
   });
 
   it('fails validation when planName not found', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
         return Promise.resolve(groupByDisplayNameResponse);
@@ -800,7 +800,7 @@ describe(commands.TASK_ADD, () => {
   });
 
   it('fails validation when task details endpoint fails', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
 
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details`) {
@@ -830,7 +830,7 @@ describe(commands.TASK_ADD, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     command.action(logger, { options: { debug: false } } as any, (err?: any) => {

@@ -3,8 +3,8 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { TeamsApp } from '../../TeamsApp';
 
@@ -22,7 +22,7 @@ interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
 }
 
-class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
+class TeamsAppListCommand extends GraphCommand {
   public get name(): string {
     return commands.APP_LIST;
   }
@@ -110,16 +110,16 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     this
       .getEndpointUrl(args)
-      .then((endpoint: string): Promise<void> => this.getAllItems(endpoint, logger, true))
-      .then((): void => {
+      .then(endpoint => odata.getAllItems<TeamsApp>(endpoint, logger))
+      .then((items): void => {
         if (args.options.teamId || args.options.teamName) {
-          this.items.forEach(t => {
+          items.forEach(t => {
             t.displayName = (t as any).teamsApp.displayName;
             t.distributionMethod = (t as any).teamsApp.distributionMethod;
           });
         }
 
-        logger.log(this.items);
+        logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -146,7 +146,7 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
       return 'Specify either teamId or teamName, but not both.';
     }
 
-    if (args.options.teamId && !Utils.isValidGuid(args.options.teamId)) {
+    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 

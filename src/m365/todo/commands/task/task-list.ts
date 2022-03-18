@@ -2,7 +2,8 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { ToDoTask } from '../../ToDoTask';
 
@@ -15,7 +16,7 @@ interface Options extends GlobalOptions {
   listId?: string;
 }
 
-class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
+class TodoTaskListCommand extends GraphCommand {
   public get name(): string {
     return commands.TASK_LIST;
   }
@@ -65,14 +66,14 @@ class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
       .getTodoListId(args)
       .then((listId: string): Promise<any> => {
         const endpoint: string = `${this.resource}/v1.0/me/todo/lists/${listId}/tasks`;
-        return this.getAllItems(endpoint, logger, true);
+        return odata.getAllItems(endpoint, logger);
       })
-      .then((): void => {
+      .then((items: ToDoTask[]): void => {
         if (args.options.output === 'json') {
-          logger.log(this.items);
+          logger.log(items);
         }
         else {
-          logger.log(this.items.map(m => {
+          logger.log(items.map(m => {
             return {
               id: m.id,
               title: m.title,

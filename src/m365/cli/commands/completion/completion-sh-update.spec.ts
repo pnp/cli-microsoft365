@@ -4,7 +4,7 @@ import appInsights from '../../../../appInsights';
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli';
 import Command from '../../../../Command';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./completion-sh-update');
 
@@ -40,7 +40,7 @@ describe(commands.COMPLETION_SH_UPDATE, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent,
       autocomplete.generateShCompletion
     ]);
