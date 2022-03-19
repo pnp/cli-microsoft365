@@ -1,5 +1,6 @@
 import { DeviceCodeResponse } from "@azure/msal-common";
 import type * as Msal from '@azure/msal-node';
+import type * as clipboard from 'clipboardy';
 import type * as NodeForge from 'node-forge';
 import type * as open from 'open';
 import { FileTokenStorage } from './auth/FileTokenStorage';
@@ -87,6 +88,7 @@ export enum CertificateType {
 
 export class Auth {
   private _open: typeof open | undefined;
+  private _clipboardy: typeof clipboard | undefined;
   private _authServer: AuthServer | undefined;
   private deviceCodeRequest?: Msal.DeviceCodeRequest;
   private _service: Service;
@@ -369,6 +371,18 @@ export class Auth {
       }
 
       (this._open as typeof open)(response.verificationUri);
+    }
+
+    if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.copyDeviceCodeToClipboard, false)) {
+      // _clipboardy is never set before hitting this line, but this check
+      // is implemented so that we can support lazy loading
+      // but also stub it for testing
+      /* c8 ignore next 3 */
+      if (!this._clipboardy) {
+        this._clipboardy = require('clipboardy');
+      }
+
+      (this._clipboardy as typeof clipboard).writeSync(response.userCode);
     }
   }
 

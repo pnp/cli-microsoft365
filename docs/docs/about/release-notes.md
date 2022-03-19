@@ -4,13 +4,40 @@
 
 ### New commands
 
+**Azure Active Directory:**
+
+- [m365 aad o365group conversation post list](../cmd/aad/o365group/o365group-conversation-post-list.md) - lists conversation posts of a Microsoft 365 Group [#3017](https://github.com/pnp/cli-microsoft365/issues/3017)
+
 **Planner:**
 
 - [planner plan details get](../cmd/planner/plan/plan-details-get.md) - retrieve the planner details about the specified plan [#3051](https://github.com/pnp/cli-microsoft365/issues/3051)
 
+**Power Platform:**
+
+- [pp managementapp add](../cmd/pp/managementapp/managementapp-add.md) - registers management application for Power Platform [#2917](https://github.com/pnp/cli-microsoft365/issues/2917)
+
+**SharePoint:**
+
+- [spo site recyclebinitem restore](../cmd/spo/site/site-recyclebinitem-restore.md) - restores given items from the site recycle bin [#2882](https://github.com/pnp/cli-microsoft365/issues/2882)
+
 ### Changes
 
 - refactored helper methods [#2989](https://github.com/pnp/cli-microsoft365/issues/2989)
+- added prompting for missing required values [#2837](https://github.com/pnp/cli-microsoft365/issues/2837)
+- extended 'aad o365group add' command with `resourceBehaviorOptions` [#3080](https://github.com/pnp/cli-microsoft365/issues/3080)
+- refactored 'teams chat message send' [#3106](https://github.com/pnp/cli-microsoft365/issues/3106), [#3107](https://github.com/pnp/cli-microsoft365/issues/3107), [#3123](https://github.com/pnp/cli-microsoft365/issues/3123)
+- added planner migration sample [#3013](https://github.com/pnp/cli-microsoft365/issues/3013)
+- fixed 'spfx project upgrade' invalid allowed value [#3109](https://github.com/pnp/cli-microsoft365/issues/3109)
+- added support for upgrading SPFx projects to v1.15.0-beta.1 [#3117](https://github.com/pnp/cli-microsoft365/issues/3117)
+- fixed creating AAD app with public client from manifest [#3132](https://github.com/pnp/cli-microsoft365/issues/3132)
+- fixed creating AAD app with a approle from manifest [#3131](https://github.com/pnp/cli-microsoft365/issues/3131)
+- fixed creating AAD app with a secret from manifest [#3130](https://github.com/pnp/cli-microsoft365/issues/3130)
+- removes the delete .editorconfig spfx project upgrade rule [#3126](https://github.com/pnp/cli-microsoft365/issues/3126)
+- fixes 'Authenticate with and call the Microsoft Graph' sample [#3145](https://github.com/pnp/cli-microsoft365/pull/3145)
+- renamed 'aad app delete' and 'aad app role delete' [#3133](https://github.com/pnp/cli-microsoft365/issues/3133)
+- removed dependencies on Office 365 Communication API [#3143](https://github.com/pnp/cli-microsoft365/issues/3143)
+- added 'Owner group member' sample [#2219](https://github.com/pnp/cli-microsoft365/issues/2219)
+- added the 'copyDeviceCodeToClipboard' config setting [#3129](https://github.com/pnp/cli-microsoft365/issues/3129)
 
 ## [v5.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.0.0)
 
@@ -18,7 +45,7 @@
 
 **Azure Active Directory:**
 
-- [aad app delete](../cmd/aad/app/app-delete.md) - removes an Azure AD app registration [#3008](https://github.com/pnp/cli-microsoft365/issues/3008)
+- [aad app remove](../cmd/aad/app/app-remove.md) - removes an Azure AD app registration [#3008](https://github.com/pnp/cli-microsoft365/issues/3008)
 - [aad o365group conversation list](../cmd/aad/o365group/o365group-conversation-list.md) - lists conversations for the specified Microsoft 365 group [#3030](https://github.com/pnp/cli-microsoft365/issues/3030)
 
 **Microsoft 365:**
@@ -335,7 +362,7 @@
 
 **Azure Active Directory:**
 
-- [aad app role delete](../cmd/aad/app/app-role-delete.md) - deletes role from the specified Azure AD app registration [#2150](https://github.com/pnp/cli-microsoft365/issues/2150)
+- [aad app role remove](../cmd/aad/app/app-role-remove.md) - deletes role from the specified Azure AD app registration [#2150](https://github.com/pnp/cli-microsoft365/issues/2150)
 - [aad app set](../cmd/aad/app/app-set.md) - updates Azure AD app registration [#2448](https://github.com/pnp/cli-microsoft365/issues/2448)
 - [aad o365group recyclebinitem clear](../cmd/aad/o365group/o365group-recyclebinitem-clear.md) - clears Microsoft 365 Groups from the recycle bin in the current tenant [#2033](https://github.com/pnp/cli-microsoft365/issues/2033)
 

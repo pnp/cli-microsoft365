@@ -1,10 +1,12 @@
+import { DeviceCodeResponse } from "@azure/msal-common";
 import * as msal from '@azure/msal-node';
 import * as assert from 'assert';
+import * as clipboard from 'clipboardy';
+import type * as Configstore from 'configstore';
 import * as fs from 'fs';
 import 'node-forge';
+import * as open from 'open';
 import * as sinon from 'sinon';
-import type * as Configstore from 'configstore';
-import { DeviceCodeResponse } from "@azure/msal-common";
 import { Auth, AuthType, CertificateType, InteractiveAuthorizationCodeResponse, InteractiveAuthorizationErrorResponse, Service } from './Auth';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
@@ -13,7 +15,6 @@ import { Cli, Logger } from './cli';
 import { CommandError } from './Command';
 import request from './request';
 import { sinonUtil } from './utils';
-import * as open from 'open';
 
 class MockTokenStorage implements TokenStorage {
   public get(): Promise<string> {
@@ -45,6 +46,7 @@ describe('Auth', () => {
   let cli: Cli;
   let response: DeviceCodeResponse;
   let openStub: sinon.SinonStub;
+  let clipboardStub: sinon.SinonStub;
   let getSettingWithDefaultValueStub: sinon.SinonStub;
   const resource: string = 'https://contoso.sharepoint.com';
   let loggerSpy: sinon.SinonSpy;
@@ -101,7 +103,9 @@ describe('Auth', () => {
     });
     loggerSpy = sinon.spy(logger, 'log');
     (auth as any)._open = open;
+    (auth as any)._clipboardy = clipboard;
     openStub = sinon.stub(auth as any, '_open').callsFake(() => { });
+    clipboardStub = sinon.stub((auth as any)._clipboardy, 'writeSync').callsFake(() => 'clippy');
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => 'key'));
   });
 
@@ -121,6 +125,7 @@ describe('Auth', () => {
       tokenCache.getAllAccounts
     ]);
     openStub.restore();
+    clipboardStub.restore();
     getSettingWithDefaultValueStub.restore();
   });
 
@@ -427,9 +432,14 @@ describe('Auth', () => {
     });
   });
 
-  it('opens the browser with the login ', () => {
+  it('opens the browser with the login', () => {
     (auth as any).processDeviceCodeCallback(response, logger, false);
     assert(openStub.called);
+  });
+
+  it('copies the device code to the clipboard', () => {
+    (auth as any).processDeviceCodeCallback(response, logger, false);
+    assert(clipboardStub.called);
   });
 
   it('writes response from the device code request (debug)', () => {

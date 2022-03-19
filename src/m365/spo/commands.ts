@@ -184,6 +184,7 @@ export default {
   SITE_LIST: `${prefix} site list`,
   SITE_INPLACERECORDSMANAGEMENT_SET: `${prefix} site inplacerecordsmanagement set`,
   SITE_RECYCLEBINITEM_LIST: `${prefix} site recyclebinitem list`,
+  SITE_RECYCLEBINITEM_RESTORE: `${prefix} site recyclebinitem restore`,
   SITE_REMOVE: `${prefix} site remove`,
   SITE_RENAME: `${prefix} site rename`,
   SITE_SET: `${prefix} site set`,

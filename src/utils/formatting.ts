@@ -70,5 +70,9 @@ export const formatting = {
 
   removeSingleLineComments(s: string): string {
     return stripJsonComments(s);
+  },
+
+  splitAndTrim(s: string): string[] {
+    return s.split(',').map(c => c.trim());
   }
 };

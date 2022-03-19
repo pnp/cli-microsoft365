@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 // uncomment to support upgrading to preview releases
-// import { prerelease } from 'semver';
+import { prerelease } from 'semver';
 import { Logger } from '../../../../cli';
 import { CommandError, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -29,6 +29,9 @@ interface Options extends GlobalOptions {
 }
 
 class SpfxProjectUpgradeCommand extends BaseProjectCommand {
+  private static packageManagers: string[] = ['npm', 'pnpm', 'yarn'];
+  private static shells: string[] = ['bash', 'powershell', 'cmd'];  
+
   public constructor() {
     super();
   }
@@ -67,7 +70,8 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     '1.12.1',
     '1.13.0',
     '1.13.1',
-    '1.14.0'
+    '1.14.0',
+    '1.15.0-beta.1'
   ];
   private static packageCommands = {
     npm: {
@@ -170,9 +174,9 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.toVersion = args.options.toVersion || this.supportedVersions[this.supportedVersions.length - 1];
     // uncomment to support upgrading to preview releases
-    // if (prerelease(telemetryProps.toVersion) && !args.options.preview) {
-    //   telemetryProps.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
-    // }
+    if (prerelease(telemetryProps.toVersion) && !args.options.preview) {
+      telemetryProps.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
+    }
     telemetryProps.packageManager = args.options.packageManager || 'npm';
     telemetryProps.shell = args.options.shell || 'bash';
     telemetryProps.preview = args.options.preview;
@@ -188,15 +192,15 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
 
     this.toVersion = args.options.toVersion ? args.options.toVersion : this.supportedVersions[this.supportedVersions.length - 1];
     // uncomment to support upgrading to preview releases
-    // if (!args.options.toVersion &&
-    //   !args.options.preview &&
-    //   prerelease(this.toVersion)) {
-    //   // no version and no preview specified while the current version to
-    //   // upgrade to is a prerelease so let's grab the first non-preview version
-    //   // since we're supporting only one preview version, it's sufficient for
-    //   // us to take second to last version
-    //   this.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
-    // }
+    if (!args.options.toVersion &&
+      !args.options.preview &&
+      prerelease(this.toVersion)) {
+      // no version and no preview specified while the current version to
+      // upgrade to is a prerelease so let's grab the first non-preview version
+      // since we're supporting only one preview version, it's sufficient for
+      // us to take second to last version
+      this.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
+    }
     this.packageManager = args.options.packageManager || 'npm';
     this.shell = args.options.shell || 'bash';
 
@@ -691,11 +695,11 @@ ${f.resolution}
       },
       {
         option: '--packageManager [packageManager]',
-        autocomplete: ['npm', 'pnpm', 'yarn']
+        autocomplete: SpfxProjectUpgradeCommand.packageManagers
       },
       {
         option: '--shell [shell]',
-        autocomplete: ['bash', 'powershell', 'cmd']
+        autocomplete: SpfxProjectUpgradeCommand.shells
       },
       {
         option: '--preview'
@@ -713,14 +717,14 @@ ${f.resolution}
 
   public validate(args: CommandArgs): boolean | string {
     if (args.options.packageManager) {
-      if (['npm', 'pnpm', 'yarn'].indexOf(args.options.packageManager) < 0) {
-        return `${args.options.packageManager} is not a supported package manager. Supported package managers are npm, pnpm and yarn`;
+      if (SpfxProjectUpgradeCommand.packageManagers.indexOf(args.options.packageManager) < 0) {
+        return `${args.options.packageManager} is not a supported package manager. Supported package managers are ${SpfxProjectUpgradeCommand.packageManagers.join(', ')}`;
       }
     }
 
     if (args.options.shell) {
-      if (['bash', 'powershell', 'logger'].indexOf(args.options.shell) < 0) {
-        return `${args.options.shell} is not a supported shell. Supported shells are bash, powershell and cmd`;
+      if (SpfxProjectUpgradeCommand.shells.indexOf(args.options.shell) < 0) {
+        return `${args.options.shell} is not a supported shell. Supported shells are ${SpfxProjectUpgradeCommand.shells.join(', ')}`;
       }
     }
 

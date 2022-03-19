@@ -28,12 +28,12 @@ nav:
     - Azure Active Directory (aad):
       - app:
         - app add: 'cmd/aad/app/app-add.md'
-        - app delete: 'cmd/aad/app/app-delete.md'
         - app get: 'cmd/aad/app/app-get.md'
+        - app remove: 'cmd/aad/app/app-remove.md'
         - app set: 'cmd/aad/app/app-set.md'
         - app role add: 'cmd/aad/app/app-role-add.md'
-        - app role delete: 'cmd/aad/app/app-role-delete.md'
         - app role list: 'cmd/aad/app/app-role-list.md'
+        - app role remove: 'cmd/aad/app/app-role-remove.md'
       - approleassignment:
         - approleassignment add: 'cmd/aad/approleassignment/approleassignment-add.md'
         - approleassignment list: 'cmd/aad/approleassignment/approleassignment-list.md'
@@ -52,6 +52,7 @@ nav:
       - o365group:
         - o365group add: 'cmd/aad/o365group/o365group-add.md'
         - o365group conversation list: 'cmd/aad/o365group/o365group-conversation-list.md'
+        - o365group conversation post list: 'cmd/aad/o365group/o365group-conversation-post-list.md'
         - o365group get: 'cmd/aad/o365group/o365group-get.md'
         - o365group list: 'cmd/aad/o365group/o365group-list.md'
         - o365group recyclebinitem list: 'cmd/aad/o365group/o365group-recyclebinitem-list.md'
@@ -118,8 +119,6 @@ nav:
       - permission:
         - permission list: 'cmd/app/permission/permission-list.md'
     - Microsoft 365 tenant (tenant):
-      - auditlog:
-        - auditlog report: 'cmd/tenant/auditlog/auditlog-report.md'
       - id:
         - id get: 'cmd/tenant/id/id-get.md'
       - report:
@@ -129,10 +128,6 @@ nav:
         - report office365activationsuserdetail: 'cmd/tenant/report/report-office365activationsuserdetail.md'
         - report office365activationsusercounts: 'cmd/tenant/report/report-office365activationsusercounts.md'
         - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
-      - service:
-        - service list: 'cmd/tenant/service/service-list.md'
-        - service message list: 'cmd/tenant/service/service-message-list.md'
-        - service report historicalservicestatus: 'cmd/tenant/service/service-report-historicalservicestatus.md'
       - service announcement:
         - serviceannouncement health get: 'cmd/tenant/serviceannouncement/serviceannouncement-health-get.md'
         - serviceannouncement health list: 'cmd/tenant/serviceannouncement/serviceannouncement-health-list.md'
@@ -140,8 +135,6 @@ nav:
         - serviceannouncement healthissue list: 'cmd/tenant/serviceannouncement/serviceannouncement-healthissue-list.md'
         - serviceannouncement message get: 'cmd/tenant/serviceannouncement/serviceannouncement-message-get.md'
         - serviceannouncement message list: 'cmd/tenant/serviceannouncement/serviceannouncement-message-list.md'
-      - status:
-        - status list: 'cmd/tenant/status/status-list.md'
     - Microsoft Graph (graph):
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
@@ -198,8 +191,7 @@ nav:
         - task get: 'cmd/planner/task/task-get.md'
         - task list: 'cmd/planner/task/task-list.md'
         - task set: 'cmd/planner/task/task-set.md'
-        - details:
-          - details get: 'cmd/planner/task/task-details-get.md'
+        - task details get: 'cmd/planner/task/task-details-get.md'
     - Power Apps (pa):
       - app:
         - app get: 'cmd/pa/app/app-get.md'
@@ -234,6 +226,9 @@ nav:
         - run get: 'cmd/flow/run/run-get.md'
         - run list: 'cmd/flow/run/run-list.md'
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
+    - Power Platform (pp):
+      - managementapp:
+        - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
     - Search (search):
       - externalconnection:
         - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
@@ -449,6 +444,7 @@ nav:
         - site groupify: 'cmd/spo/site/site-groupify.md'
         - site list: 'cmd/spo/site/site-list.md'
         - site recyclebinitem list: 'cmd/spo/site/site-recyclebinitem-list.md'
+        - site recyclebinitem restore: 'cmd/spo/site/site-recyclebinitem-restore.md'
         - site remove: 'cmd/spo/site/site-remove.md'
         - site rename: 'cmd/spo/site/site-rename.md'
         - site set: 'cmd/spo/site/site-set.md'
@@ -599,7 +595,7 @@ nav:
         - user set: 'cmd/aad/o365group/o365group-user-set.md'
         - user app add: 'cmd/teams/user/user-app-add.md'
         - user app list: 'cmd/teams/user/user-app-list.md'
-        - user app remove: 'cmd/teams/user/user-app-remove.md'    
+        - user app remove: 'cmd/teams/user/user-app-remove.md'
     - To Do (todo):
       - list:
         - list add: 'cmd/todo/list/list-add.md'
@@ -676,6 +672,7 @@ nav:
       - 'Add multiple folders in libraries using a csv file': 'sample-scripts/spo/add-multiple-folders-in-libraries-using-csv-file.md'
       - 'Add multiple lists in multiple sites': 'sample-scripts/spo/add-multiple-lists-in-multiple-sites.md'
       - 'Add users to the Associated SharePoint Groups from a CSV File': 'sample-scripts/spo/add-users-associatedspgroup-site-csv-file.md'
+      - 'Change group membership of all SharePoint Online sites': 'sample-scripts/spo/change-owner-group-membership.md'
       - 'Copy files to another SharePoint Library in another site': 'sample-scripts/spo/copy-files-to-another-library.md'
       - 'Copy list items between SharePoint lists': 'sample-scripts/spo/copy-listitems-sharepointlist.md'
       - 'Delete all (non-group connected) modern SharePoint sites': 'sample-scripts/spo/delete-non-group-connected-modern-sites.md'
@@ -705,6 +702,7 @@ nav:
       - 'Lists site collection owners': 'sample-scripts/spo/list-site-collection-owners.md'
       - 'Monitor site collections storage usage': 'sample-scripts/spo/monitor-site-collection-storage-usage.md'
       - 'How to perform operations not covered by the CLI for Microsoft 365': 'sample-scripts/spo/perform-operations-not-covered-by-cli-for-microsoft-365.md'
+      - 'Planner migration to SharePoint list': 'sample-scripts/spo/planner-migrate-sharepoint-list.md'
       - 'Remove a Site Collection Admin User from all Site Collections': 'sample-scripts/spo/remove-siteCollection-admin-user.md'
       - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'
       - 'Remove pending SharePoint API permission requests': 'sample-scripts/spo/remove-pending-api-permission-requests.md'

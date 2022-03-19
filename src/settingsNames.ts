@@ -1,5 +1,6 @@
 const settingsNames = {
   autoOpenBrowserOnLogin: 'autoOpenBrowserOnLogin',
+  copyDeviceCodeToClipboard: 'copyDeviceCodeToClipboard',
   csvEscape: 'csvEscape',
   csvHeader: 'csvHeader',
   csvQuote: 'csvQuote',
@@ -8,6 +9,7 @@ const settingsNames = {
   errorOutput: 'errorOutput',
   output: 'output',
   printErrorsAsPlainText: 'printErrorsAsPlainText',
+  prompt: 'prompt',
   showHelpOnFailure: 'showHelpOnFailure'
 };
 
