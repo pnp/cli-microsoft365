@@ -35,8 +35,9 @@
 - removes the delete .editorconfig spfx project upgrade rule [#3126](https://github.com/pnp/cli-microsoft365/issues/3126)
 - fixes 'Authenticate with and call the Microsoft Graph' sample [#3145](https://github.com/pnp/cli-microsoft365/pull/3145)
 - renamed 'aad app delete' and 'aad app role delete' [#3133](https://github.com/pnp/cli-microsoft365/issues/3133)
-- removes dependencies on Office 365 Communication API [#3143](https://github.com/pnp/cli-microsoft365/issues/3143)
-- Adds 'Owner group member' sample [#2219](https://github.com/pnp/cli-microsoft365/issues/2219)
+- removed dependencies on Office 365 Communication API [#3143](https://github.com/pnp/cli-microsoft365/issues/3143)
+- added 'Owner group member' sample [#2219](https://github.com/pnp/cli-microsoft365/issues/2219)
+- added the 'copyDeviceCodeToClipboard' config setting [#3129](https://github.com/pnp/cli-microsoft365/issues/3129)
 
 ## [v5.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.0.0)
 
