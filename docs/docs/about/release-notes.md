@@ -19,6 +19,7 @@
 **SharePoint:**
 
 - [spo site recyclebinitem restore](../cmd/spo/site/site-recyclebinitem-restore.md) - restores given items from the site recycle bin [#2882](https://github.com/pnp/cli-microsoft365/issues/2882)
+- [spo app teamspackage download](../cmd/spo/app/app-teamspackage-download.md) - downloads Teams app package for an SPFx solution [#2934](https://github.com/pnp/cli-microsoft365/issues/2934)
 
 ### Changes
 
@@ -40,6 +41,7 @@
 - added the 'copyDeviceCodeToClipboard' config setting [#3129](https://github.com/pnp/cli-microsoft365/issues/3129)
 - extended spfx doctor command with default output type as text [#3125](https://github.com/pnp/cli-microsoft365/issues/3125)
 - extended command definition with validating option sets [#2998](https://github.com/pnp/cli-microsoft365/issues/2998)
+- Adds jmespath-terminal to Dockerfile [#3147](https://github.com/pnp/cli-microsoft365/issues/3147)
 
 ## [v5.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.0.0)
 
