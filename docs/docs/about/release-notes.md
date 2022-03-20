@@ -38,6 +38,8 @@
 - removed dependencies on Office 365 Communication API [#3143](https://github.com/pnp/cli-microsoft365/issues/3143)
 - added 'Owner group member' sample [#2219](https://github.com/pnp/cli-microsoft365/issues/2219)
 - added the 'copyDeviceCodeToClipboard' config setting [#3129](https://github.com/pnp/cli-microsoft365/issues/3129)
+- extended spfx doctor command with default output type as text [#3125](https://github.com/pnp/cli-microsoft365/issues/3125)
+- extended command definition with validating option sets [#2998](https://github.com/pnp/cli-microsoft365/issues/2998)
 
 ## [v5.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.0.0)
 
