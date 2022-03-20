@@ -3,7 +3,6 @@ import type * as Configstore from 'configstore';
 import * as fs from 'fs';
 import type { Inquirer } from 'inquirer';
 import type * as JMESPath from 'jmespath';
-import type * as Markshell from 'markshell';
 import * as minimist from 'minimist';
 import * as os from 'os';
 import * as path from 'path';
@@ -14,7 +13,7 @@ import config from '../config';
 import GlobalOptions from '../GlobalOptions';
 import request from '../request';
 import { settingsNames } from '../settingsNames';
-import { formatting, fsUtil } from '../utils';
+import { formatting, fsUtil, md } from '../utils';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
 const packageJSON = require('../../package.json');
@@ -696,25 +695,7 @@ export class Cli {
 
     if (fs.existsSync(helpFilePath)) {
       Cli.log();
-
-      // because of prism, loading markshell slows down CLI a lot
-      // let's lazy-load it only when it's needed (help was requested)
-      const markshell: typeof Markshell = require('markshell');
-      const chalk: typeof Chalk = require('chalk');
-      const theme = markshell.getTheme();
-      const admonitionStyles = theme.admonitions.getStyles();
-      admonitionStyles.indent.beforeIndent = 0;
-      admonitionStyles.indent.titleIndent = 3;
-      admonitionStyles.indent.afterIndent = 0;
-      theme.admonitions.setStyles(admonitionStyles);
-      theme.indents.definitionList = 2;
-      theme.headline = chalk.white;
-      theme.inlineCode = chalk.cyan;
-      theme.sourceCodeTheme = 'solarizelight';
-      theme.includePath = path.join(this.commandsFolder, '..', '..', 'docs');
-      markshell.setTheme(theme);
-
-      Cli.log(markshell.toRawContent(helpFilePath));
+      Cli.log(md.md2plain(fs.readFileSync(helpFilePath, 'utf8'), path.join(this.commandsFolder, '..', '..', 'docs')));
     }
   }
 

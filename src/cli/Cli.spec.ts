@@ -2,7 +2,6 @@ import * as assert from 'assert';
 import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as inquirer from 'inquirer';
-import * as markshell from 'markshell';
 import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
@@ -11,7 +10,7 @@ import appInsights from '../appInsights';
 import Command, { CommandArgs, CommandError, CommandOption, CommandTypes } from '../Command';
 import AnonymousCommand from '../m365/base/AnonymousCommand';
 import { settingsNames } from '../settingsNames';
-import { sinonUtil } from '../utils';
+import { md, sinonUtil } from '../utils';
 import { Logger } from './Logger';
 import Table = require('easy-table');
 const packageJSON = require('../../package.json');
@@ -169,7 +168,7 @@ describe('Cli', () => {
   let cliErrorStub: sinon.SinonStub;
   let cliFormatOutputSpy: sinon.SinonSpy;
   let processExitStub: sinon.SinonStub;
-  let markshellStub: sinon.SinonStub;
+  let md2plainSpy: sinon.SinonSpy;
   let mockCommandActionSpy: sinon.SinonSpy;
   let mockCommand: Command;
   let mockCommandWithOptionSets: Command;
@@ -183,7 +182,7 @@ describe('Cli', () => {
     cliErrorStub = sinon.stub((Cli as any), 'error');
     cliFormatOutputSpy = sinon.spy((Cli as any), 'formatOutput');
     processExitStub = sinon.stub(process, 'exit');
-    markshellStub = sinon.stub(markshell, 'toRawContent');
+    md2plainSpy = sinon.spy(md, 'md2plain');
 
     mockCommand = new MockCommand();
     mockCommandWithAlias = new MockCommandWithAlias();
@@ -213,7 +212,7 @@ describe('Cli', () => {
     cliErrorStub.reset();
     cliFormatOutputSpy.resetHistory();
     processExitStub.reset();
-    markshellStub.reset();
+    md2plainSpy.resetHistory();
     mockCommandActionSpy.resetHistory();
     sinonUtil.restore([
       Cli.executeCommand,
@@ -238,7 +237,7 @@ describe('Cli', () => {
       (Cli as any).error,
       (Cli as any).formatOutput,
       process.exit,
-      markshell.toRawContent,
+      md.md2plain,
       appInsights.trackEvent,
       cli.getSettingWithDefaultValue
     ]);
@@ -316,11 +315,13 @@ describe('Cli', () => {
 
   it('shows help for the specific command when help specified followed by a valid command name', (done) => {
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.md'));
+    const originalFsReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8'));
     cli
       .execute(rootFolder, ['help', 'cli', 'mock'])
       .then(_ => {
         try {
-          assert(markshellStub.called);
+          assert(md2plainSpy.called);
           done();
         }
         catch (e) {
@@ -331,11 +332,13 @@ describe('Cli', () => {
 
   it('shows help for the specific command when valid command name specified followed by --help', (done) => {
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.md'));
+    const originalFsReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8'));
     cli
       .execute(rootFolder, ['cli', 'mock', '--help'])
       .then(_ => {
         try {
-          assert(markshellStub.called);
+          assert(md2plainSpy.called);
           done();
         }
         catch (e) {
@@ -346,11 +349,13 @@ describe('Cli', () => {
 
   it('shows help for the specific command when valid command name specified followed by -h', (done) => {
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.md'));
+    const originalFsReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8'));
     cli
       .execute(rootFolder, ['cli', 'mock', '-h'])
       .then(_ => {
         try {
-          assert(markshellStub.called);
+          assert(md2plainSpy.called);
           done();
         }
         catch (e) {
@@ -364,7 +369,7 @@ describe('Cli', () => {
       .execute(path.join(rootFolder, '..', 'm365'), ['status', '-h'])
       .then(_ => {
         try {
-          assert(markshellStub.called);
+          assert(md2plainSpy.called);
           done();
         }
         catch (e) {
@@ -375,6 +380,8 @@ describe('Cli', () => {
 
   it('shows help for the specific command when help specified followed by a valid command alias', (done) => {
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().endsWith('.md'));
+    const originalFsReadFileSync = fs.readFileSync;
+    sinon.stub(fs, 'readFileSync').callsFake(() => originalFsReadFileSync(path.join(rootFolder, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8'));
     cli
       .execute(rootFolder, ['help', 'cli', 'mock', 'alt'])
       .then(_ => {
