@@ -10,7 +10,7 @@ import { sinonUtil } from '../../../utils';
 import commands from '../commands';
 const command: Command = require('./app-get');
 
-describe(commands.APP_GET, () => {
+describe(commands.GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -63,7 +63,7 @@ describe(commands.APP_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.APP_GET), true);
+    assert.strictEqual(command.name.startsWith(commands.GET), true);
   });
 
   it('has a description', () => {

@@ -7,7 +7,7 @@ import commands from '../commands';
 
 class AppGetCommand extends AppCommand {
   public get name(): string {
-    return commands.APP_GET;
+    return commands.GET;
   }
 
   public get description(): string {
