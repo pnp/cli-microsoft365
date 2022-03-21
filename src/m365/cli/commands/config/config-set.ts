@@ -36,6 +36,7 @@ class CliConfigSetCommand extends AnonymousCommand {
 
     switch (args.options.key) {
       case settingsNames.autoOpenBrowserOnLogin:
+      case settingsNames.autoOpenLinksInBrowser:
       case settingsNames.copyDeviceCodeToClipboard:
       case settingsNames.csvHeader:
       case settingsNames.csvQuoted:

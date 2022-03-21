@@ -361,7 +361,8 @@ export class Auth {
 
     logger.log(response.message);
 
-    if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenBrowserOnLogin, false)) {
+    if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenBrowserOnLogin, false)
+      || Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false)) {
       // _open is never set before hitting this line, but this check
       // is implemented so that we can support lazy loading
       // but also stub it for testing
