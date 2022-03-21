@@ -1,8 +1,9 @@
 import { Logger } from '../../../../cli';
 import request from '../../../../request';
-import GraphCommand from '../../../base/GraphCommand';
+import PowerPlatformListCommand from '../../../base/PowerPlatformListCommand';
 import commands from '../../commands';
-class PpManagementAppListCommand extends GraphCommand {
+
+class PpManagementAppListCommand extends PowerPlatformListCommand<{applicationId: string}> {
   public get name(): string {
     return commands.MANAGEMENTAPP_LIST;
   }
@@ -11,14 +12,9 @@ class PpManagementAppListCommand extends GraphCommand {
     return 'Lists management applications for Power Platform';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['applicationId'];
-  }
-
   public commandAction(logger: Logger, args: any, cb: () => void): void {
     const requestOptions: any = {
-      // This should be refactored once we implement a PowerPlatform base class as api.bap will differ between envs.
-      url: `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-06-01`,
+      url: `${this.resource}/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-06-01`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
