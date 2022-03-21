@@ -71,7 +71,7 @@ export default abstract class Command {
     }
   }
 
-  protected showWarning(logger: Logger, warning: string): void {
+  protected warn(logger: Logger, warning: string): void {
     const chalk: typeof Chalk = require('chalk');
     logger.logToStderr(chalk.yellow(warning));
   }

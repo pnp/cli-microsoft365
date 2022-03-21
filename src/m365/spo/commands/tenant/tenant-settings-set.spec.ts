@@ -8,6 +8,7 @@ import config from '../../../../config';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
+import * as chalk from 'chalk';
 const command: Command = require('./tenant-settings-set');
 
 describe(commands.TENANT_SETTINGS_SET, () => {
@@ -401,7 +402,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     }, () => {
       try {
-        assert.strictEqual(loggerStderrLogSpy.calledOnceWith("WARNING: Make sure to also enable the Azure AD one-time passcode authentication preview. If it is not enabled then SharePoint will not use Azure AD B2B even if EnableAzureADB2BIntegration is set to true. Learn more at http://aka.ms/spo-b2b-integration."), true);        
+        assert.strictEqual(loggerStderrLogSpy.calledWith(chalk.yellow("WARNING: Make sure to also enable the Azure AD one-time passcode authentication preview. If it is not enabled then SharePoint will not use Azure AD B2B even if EnableAzureADB2BIntegration is set to true. Learn more at http://aka.ms/spo-b2b-integration.")), true);        
         done();
       }
       catch (e) {
