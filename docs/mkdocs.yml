@@ -116,6 +116,7 @@ nav:
         - convert pdf: 'cmd/file/convert/convert-pdf.md'
       - list: 'cmd/file/file-list.md'
     - Microsoft 365 apps (app):
+      - get: 'cmd/app/app-get.md'
       - permission:
         - permission list: 'cmd/app/permission/permission-list.md'
     - Microsoft 365 tenant (tenant):
