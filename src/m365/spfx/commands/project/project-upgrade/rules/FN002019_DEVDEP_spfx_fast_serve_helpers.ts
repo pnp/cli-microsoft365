@@ -11,8 +11,8 @@ export class FN002019_DEVDEP_spfx_fast_serve_helpers extends DependencyRule {
   }
 
   customCondition(project: Project): boolean {
-    return (typeof project.packageJson !== 'undefined' &&
+    return typeof project.packageJson !== 'undefined' &&
     typeof project.packageJson.devDependencies !== 'undefined' &&
-    typeof project.packageJson.devDependencies['spfx-fast-serve-helpers'] !== 'undefined');
+    typeof project.packageJson.devDependencies['spfx-fast-serve-helpers'] !== 'undefined';
   }
 }
