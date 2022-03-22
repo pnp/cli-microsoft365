@@ -27,6 +27,7 @@ import { FN002002_DEVDEP_microsoft_sp_module_interfaces } from "./rules/FN002002
 import { FN002003_DEVDEP_microsoft_sp_webpart_workbench } from "./rules/FN002003_DEVDEP_microsoft_sp_webpart_workbench";
 import { FN002009_DEVDEP_microsoft_sp_tslint_rules } from "./rules/FN002009_DEVDEP_microsoft_sp_tslint_rules";
 import { FN002011_DEVDEP_microsoft_rush_stack_compiler_2_9 } from "./rules/FN002011_DEVDEP_microsoft_rush_stack_compiler_2_9";
+import { FN002019_DEVDEP_spfx_fast_serve_helpers } from "./rules/FN002019_DEVDEP_spfx_fast_serve_helpers";
 import { FN010001_YORC_version } from "./rules/FN010001_YORC_version";
 import { FN020001_RES_types_react } from "./rules/FN020001_RES_types_react";
 import { FN021001_PKG_main } from "./rules/FN021001_PKG_main";
@@ -61,6 +62,7 @@ module.exports = [
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.9.1'),
   new FN002009_DEVDEP_microsoft_sp_tslint_rules('1.9.1'),
   new FN002011_DEVDEP_microsoft_rush_stack_compiler_2_9('0.7.16'),
+  new FN002019_DEVDEP_spfx_fast_serve_helpers('1.11.0'),
   new FN010001_YORC_version('1.9.1'),
   new FN020001_RES_types_react('16.8.8'),
   new FN021001_PKG_main(true, "lib/index.js"),

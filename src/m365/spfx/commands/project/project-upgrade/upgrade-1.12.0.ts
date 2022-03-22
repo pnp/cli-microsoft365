@@ -32,6 +32,7 @@ import { FN002014_DEVDEP_types_es6_promise } from "./rules/FN002014_DEVDEP_types
 import { FN002015_DEVDEP_types_react } from "./rules/FN002015_DEVDEP_types_react";
 import { FN002016_DEVDEP_types_react_dom } from "./rules/FN002016_DEVDEP_types_react_dom";
 import { FN002017_DEVDEP_microsoft_rush_stack_compiler_3_7 } from "./rules/FN002017_DEVDEP_microsoft_rush_stack_compiler_3_7";
+import { FN002019_DEVDEP_spfx_fast_serve_helpers } from "./rules/FN002019_DEVDEP_spfx_fast_serve_helpers";
 import { FN010001_YORC_version } from "./rules/FN010001_YORC_version";
 import { FN012013_TSC_exclude } from "./rules/FN012013_TSC_exclude";
 import { FN012017_TSC_extends } from "./rules/FN012017_TSC_extends";
@@ -76,6 +77,7 @@ module.exports = [
   new FN002014_DEVDEP_types_es6_promise('', false),
   new FN002015_DEVDEP_types_react('16.9.36'),
   new FN002016_DEVDEP_types_react_dom('16.9.8'),
+  new FN002019_DEVDEP_spfx_fast_serve_helpers('1.12.0'),
   new FN010001_YORC_version('1.12.0'),
   new FN012013_TSC_exclude([], false),
   new FN012017_TSC_extends('./node_modules/@microsoft/rush-stack-compiler-3.7/includes/tsconfig-web.json'),
