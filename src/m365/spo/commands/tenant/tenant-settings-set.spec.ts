@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command, { CommandError } from '../../../../Command';
+import Command, { CommandError, CommandTypes } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -85,6 +85,11 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('configures command types', () => {
+    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
+    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
   });
 
   it('supports debug mode', () => {
@@ -398,7 +403,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
     command.action(logger, {
       options: {
-        EnableAzureADB2BIntegration: 'true'
+        EnableAzureADB2BIntegration: true
       }
     }, () => {
       try {

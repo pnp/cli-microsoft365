@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError, CommandOption, CommandTypes
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -97,8 +97,8 @@ export interface Options extends GlobalOptions {
   AllowedDomainListForSyncClient: string[];
   DisabledWebPartIds: string[];
   DisableCustomAppAuthentication: boolean;
-  EnableAzureADB2BIntegration: string;
-  SyncAadB2BManagementPolicy: string;
+  EnableAzureADB2BIntegration: boolean;
+  SyncAadB2BManagementPolicy: boolean;
 }
 
 class SpoTenantSettingsSetCommand extends SpoCommand {
@@ -108,6 +108,15 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
 
   public get description(): string {
     return 'Sets tenant global settings';
+  }
+  
+  public types(): CommandTypes {
+    return {
+      boolean: [
+        'EnableAzureADB2BIntegration',
+        'SyncAadB2BManagementPolicy'
+      ]
+    };
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -285,7 +294,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
           return;
         }
 
-        if (args.options.EnableAzureADB2BIntegration === 'true') {
+        if (args.options.EnableAzureADB2BIntegration === true) {
           this.warn(logger, 'WARNING: Make sure to also enable the Azure AD one-time passcode authentication preview. If it is not enabled then SharePoint will not use Azure AD B2B even if EnableAzureADB2BIntegration is set to true. Learn more at http://aka.ms/spo-b2b-integration.');
         }
 
