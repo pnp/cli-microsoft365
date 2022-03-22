@@ -227,6 +227,8 @@ nav:
         - run list: 'cmd/flow/run/run-list.md'
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Power Platform (pp):
+      - environment:
+        - environment list: 'cmd/pp/managementapp/environment/environment-list.md' 
       - managementapp:
         - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
     - Search (search):
