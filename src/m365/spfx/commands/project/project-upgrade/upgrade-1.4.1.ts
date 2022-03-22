@@ -1,3 +1,4 @@
+import { FN002019_DEVDEP_spfx_fast_serve_helpers } from './rules/FN002019_DEVDEP_spfx_fast_serve_helpers';
 import { FN001001_DEP_microsoft_sp_core_library } from "./rules/FN001001_DEP_microsoft_sp_core_library";
 import { FN001002_DEP_microsoft_sp_lodash_subset } from "./rules/FN001002_DEP_microsoft_sp_lodash_subset";
 import { FN001003_DEP_microsoft_sp_office_ui_fabric_core } from "./rules/FN001003_DEP_microsoft_sp_office_ui_fabric_core";
@@ -37,5 +38,6 @@ module.exports = [
   new FN002001_DEVDEP_microsoft_sp_build_web('1.4.1'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.4.1'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.4.1'),
+  new FN002019_DEVDEP_spfx_fast_serve_helpers('~1.4.0'),
   new FN010001_YORC_version('1.4.1')
 ]; 
