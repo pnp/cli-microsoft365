@@ -6,7 +6,11 @@
 
 **Azure Active Directory:**
 
-- [m365 aad o365group conversation post list](../cmd/aad/o365group/o365group-conversation-post-list.md) - lists conversation posts of a Microsoft 365 Group [#3017](https://github.com/pnp/cli-microsoft365/issues/3017)
+- [aad o365group conversation post list](../cmd/aad/o365group/o365group-conversation-post-list.md) - lists conversation posts of a Microsoft 365 Group [#3017](https://github.com/pnp/cli-microsoft365/issues/3017)
+
+**Microsoft 365 apps:**
+
+- [app get](../cmd/app/app-get.md) - retrieves information about the current Azure AD app [#2942](https://github.com/pnp/cli-microsoft365/issues/2942)
 
 **Planner:**
 
@@ -20,6 +24,10 @@
 
 - [spo site recyclebinitem restore](../cmd/spo/site/site-recyclebinitem-restore.md) - restores given items from the site recycle bin [#2882](https://github.com/pnp/cli-microsoft365/issues/2882)
 - [spo app teamspackage download](../cmd/spo/app/app-teamspackage-download.md) - downloads Teams app package for an SPFx solution [#2934](https://github.com/pnp/cli-microsoft365/issues/2934)
+
+**SharePoint Framework:**
+
+- [spfx project doctor](../cmd/spfx/project/project-doctor.md) - validates correctness of a SharePoint Framework project [#3057](https://github.com/pnp/cli-microsoft365/issues/3057)
 
 ### Changes
 
@@ -41,7 +49,8 @@
 - added the 'copyDeviceCodeToClipboard' config setting [#3129](https://github.com/pnp/cli-microsoft365/issues/3129)
 - extended spfx doctor command with default output type as text [#3125](https://github.com/pnp/cli-microsoft365/issues/3125)
 - extended command definition with validating option sets [#2998](https://github.com/pnp/cli-microsoft365/issues/2998)
-- Adds jmespath-terminal to Dockerfile [#3147](https://github.com/pnp/cli-microsoft365/issues/3147)
+- added jmespath-terminal to Dockerfile [#3147](https://github.com/pnp/cli-microsoft365/issues/3147)
+- added missing tests to 'spo recyclebin item restore' [#2882](https://github.com/pnp/cli-microsoft365/issues/2882)
 
 ## [v5.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.0.0)
 
