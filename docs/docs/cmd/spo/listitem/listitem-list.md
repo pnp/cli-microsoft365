@@ -13,7 +13,7 @@ m365 spo listitem list [options]
 `-u, --webUrl <webUrl>`
 : URL of the site from which the item should be retrieved
 
-`-i, --id <id>`
+`-i, --id [id]`
 : ID of the list to retrieve items from. Specify `id` or `title` but not both
 
 `-t, --title [title]`
