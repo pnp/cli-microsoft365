@@ -50,7 +50,7 @@ module.exports = [
   new FN002001_DEVDEP_microsoft_sp_build_web('1.14.0'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.14.0'),
   new FN002009_DEVDEP_microsoft_sp_tslint_rules('1.14.0'),
-  new FN002019_DEVDEP_spfx_fast_serve_helpers('~1.14.0'),
+  new FN002019_DEVDEP_spfx_fast_serve_helpers('1.14.0'),
   new FN006004_CFG_PS_developer('1.14.0'),
   new FN006005_CFG_PS_metadata(),
   new FN006006_CFG_PS_features(),

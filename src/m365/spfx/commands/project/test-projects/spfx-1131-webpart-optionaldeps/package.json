@@ -33,6 +33,6 @@
     "gulp": "~4.0.2",
     "ajv": "~5.2.2",
     "@types/webpack-env": "1.13.1",
-    "spfx-fast-serve-helpers": "~1.13.0"
+    "spfx-fast-serve-helpers": "1.13.0"
   }
 }

@@ -62,7 +62,7 @@ module.exports = [
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.9.1'),
   new FN002009_DEVDEP_microsoft_sp_tslint_rules('1.9.1'),
   new FN002011_DEVDEP_microsoft_rush_stack_compiler_2_9('0.7.16'),
-  new FN002019_DEVDEP_spfx_fast_serve_helpers('~1.11.0'),
+  new FN002019_DEVDEP_spfx_fast_serve_helpers('1.11.0'),
   new FN010001_YORC_version('1.9.1'),
   new FN020001_RES_types_react('16.8.8'),
   new FN021001_PKG_main(true, "lib/index.js"),

@@ -77,7 +77,7 @@ module.exports = [
   new FN002014_DEVDEP_types_es6_promise('', false),
   new FN002015_DEVDEP_types_react('16.9.36'),
   new FN002016_DEVDEP_types_react_dom('16.9.8'),
-  new FN002019_DEVDEP_spfx_fast_serve_helpers('~1.12.0'),
+  new FN002019_DEVDEP_spfx_fast_serve_helpers('1.12.0'),
   new FN010001_YORC_version('1.12.0'),
   new FN012013_TSC_exclude([], false),
   new FN012017_TSC_extends('./node_modules/@microsoft/rush-stack-compiler-3.7/includes/tsconfig-web.json'),

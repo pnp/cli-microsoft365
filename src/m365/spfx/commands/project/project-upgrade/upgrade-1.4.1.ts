@@ -38,6 +38,6 @@ module.exports = [
   new FN002001_DEVDEP_microsoft_sp_build_web('1.4.1'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.4.1'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.4.1'),
-  new FN002019_DEVDEP_spfx_fast_serve_helpers('~1.4.0'),
+  new FN002019_DEVDEP_spfx_fast_serve_helpers('1.4.0'),
   new FN010001_YORC_version('1.4.1')
 ]; 
