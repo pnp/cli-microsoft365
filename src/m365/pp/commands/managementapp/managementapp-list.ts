@@ -1,9 +1,13 @@
 import { Logger } from '../../../../cli';
-import request from '../../../../request';
-import PowerPlatformListCommand from '../../../base/PowerPlatformListCommand';
+import { odata } from '../../../../utils';
+import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
 import commands from '../../commands';
 
-class PpManagementAppListCommand extends PowerPlatformListCommand<{applicationId: string}> {
+export interface ManagementApp {
+  applicationId: string
+}
+
+class PpManagementAppListCommand extends PowerPlatformCommand {
   public get name(): string {
     return commands.MANAGEMENTAPP_LIST;
   }
@@ -13,20 +17,12 @@ class PpManagementAppListCommand extends PowerPlatformListCommand<{applicationId
   }
 
   public commandAction(logger: Logger, args: any, cb: () => void): void {
-    const requestOptions: any = {
-      url: `${this.resource}/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-06-01`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
+    const endpoint = `${this.resource}/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-06-01`;
 
-    request
-      .get<{ value: any }>(requestOptions)
-      .then((res: { value: any[] }): void => {
-        if (res.value && res.value.length > 0) {
-          logger.log(res.value);
-        }
+    odata
+      .getAllItems<ManagementApp>(endpoint, logger)
+      .then((managementApps): void => {
+        logger.log(managementApps);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
