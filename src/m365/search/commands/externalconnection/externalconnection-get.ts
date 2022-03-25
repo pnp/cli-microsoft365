@@ -2,7 +2,6 @@ import { Logger } from '../../../../cli';
 import { ExternalConnectors } from '@microsoft/microsoft-graph-types';
 import GraphCommand from '../../../base/GraphCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-import { validation } from '../../../../utils';
 import commands from '../../commands';
 import { CommandOption } from '../../../../Command';
 import request from '../../../../request';
@@ -17,7 +16,6 @@ interface Options extends GlobalOptions {
 }
 
 class SearchExternalConnectionGetCommand extends GraphCommand {
-  private items: ExternalConnectors.ExternalConnection[] = [];
 
   public get name(): string {
     return commands.EXTERNALCONNECTION_GET;
@@ -41,7 +39,7 @@ class SearchExternalConnectionGetCommand extends GraphCommand {
       endpoint += `/'${encodeURIComponent(args.options.id)}'`;
     }
     else {
-      endpoint += `?$filter=displayName eq '${encodeURIComponent(args.options.name as string)}'`;
+      endpoint += `?$filter=name eq '${encodeURIComponent(args.options.name as string)}'`;
     }
 
     const requestOptions: any = {
@@ -51,11 +49,14 @@ class SearchExternalConnectionGetCommand extends GraphCommand {
       },
       responseType: 'json'
     };
+
     request.get<ExternalConnectors.ExternalConnection>(requestOptions)
-      .then((): void => {
-        logger.log(this.items);
+      .then((res: ExternalConnectors.ExternalConnection): void => {
+        logger.log(res);
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }, (err: any): void => {
+        this.handleRejectedODataJsonPromise(err, logger, cb);
+      });
   }
 
   public options(): CommandOption[] {
@@ -73,16 +74,12 @@ class SearchExternalConnectionGetCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!args.options.name && !args.options.displayName) {
-      return 'Specify either name or displayName';
+    if (!args.options.name && !args.options.id) {
+      return 'Specify either name or id';
     }
 
-    if (args.options.name && args.options.displayName) {
-      return 'Specify either name or displayName but not both';
-    }
-
-    if (args.options.name && !validation.isValidGuid(args.options.name)) {
-      return `${args.options.name} is not a valid GUID`;
+    if (args.options.name && args.options.id) {
+      return 'Specify either name or id but not both';
     }
 
     return true;
