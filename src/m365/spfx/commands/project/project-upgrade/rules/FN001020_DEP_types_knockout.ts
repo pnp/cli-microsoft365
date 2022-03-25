@@ -1,5 +1,5 @@
-import { Utils } from "../";
-import { Project } from "../../model";
+import { spfx } from "../../../../../../utils";
+import { Project } from '../../project-model';
 import { DependencyRule } from "./DependencyRule";
 
 export class FN001020_DEP_types_knockout extends DependencyRule {
@@ -12,6 +12,6 @@ export class FN001020_DEP_types_knockout extends DependencyRule {
   }
 
   customCondition(project: Project): boolean {
-    return Utils.isKnockoutProject(project);
+    return spfx.isKnockoutProject(project);
   }
 }

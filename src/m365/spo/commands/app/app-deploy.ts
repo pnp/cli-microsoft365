@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { spo, validation } from '../../../../utils';
 import commands from '../../commands';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
 
@@ -44,7 +44,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     let appCatalogUrl: string = '';
 
-    this
+    spo
       .getSpoUrl(logger, this.debug)
       .then((spoUrl: string): Promise<string> => {
         return this.getAppCatalogSiteUrl(logger, spoUrl, args);
@@ -142,12 +142,12 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
       return 'Specify either the id or the name but not both';
     }
 
-    if (args.options.id && !Utils.isValidGuid(args.options.id)) {
+    if (args.options.id && !validation.isValidGuid(args.options.id)) {
       return `${args.options.id} is not a valid GUID`;
     }
 
     if (args.options.appCatalogUrl) {
-      return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+      return validation.isValidSharePointUrl(args.options.appCatalogUrl);
     }
 
     return true;

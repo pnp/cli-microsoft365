@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./bucket-add');
 
@@ -152,14 +152,14 @@ describe(commands.BUCKET_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -332,7 +332,7 @@ describe(commands.BUCKET_ADD, () => {
   });
 
   it('fails validation when ownerGroupName not found', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
         return Promise.resolve({ value: [] });
@@ -359,7 +359,7 @@ describe(commands.BUCKET_ADD, () => {
   });
 
   it('fails validation when planName not found', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
         return Promise.resolve(groupByDisplayNameResponse);
@@ -389,7 +389,7 @@ describe(commands.BUCKET_ADD, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject("An error has occurred.");
     });

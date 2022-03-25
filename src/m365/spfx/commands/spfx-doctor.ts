@@ -432,8 +432,8 @@ class SpfxDoctorCommand extends AnonymousCommand {
         fix: 'Install Node.js v12 or v14'
       },
       react: {
-        range: '16.9.0',
-        fix: 'npm i react@16.9.0'
+        range: '16.9.36',
+        fix: 'npm i react@16.9.36'
       },
       sp: SharePointVersion.SPO,
       yo: {
@@ -451,8 +451,8 @@ class SpfxDoctorCommand extends AnonymousCommand {
         fix: 'Install Node.js v12 or v14'
       },
       react: {
-        range: '16.9.0',
-        fix: 'npm i react@16.9.0'
+        range: '16.9.51',
+        fix: 'npm i react@16.9.51'
       },
       sp: SharePointVersion.SPO,
       yo: {
@@ -470,8 +470,27 @@ class SpfxDoctorCommand extends AnonymousCommand {
         fix: 'Install Node.js v12 or v14'
       },
       react: {
-        range: '16.9.0',
-        fix: 'npm i react@16.9.0'
+        range: '16.9.51',
+        fix: 'npm i react@16.9.51'
+      },
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^4',
+        fix: 'npm i -g yo@4'
+      }
+    },
+    '1.14.0': {
+      gulp: {
+        range: '^4',
+        fix: 'npm i -g gulp@4'
+      },
+      node: {
+        range: '^12 || ^14',
+        fix: 'Install Node.js v12 or v14'
+      },
+      react: {
+        range: '16.9.51',
+        fix: 'npm i react@16.9.51'
       },
       sp: SharePointVersion.SPO,
       yo: {
@@ -490,6 +509,10 @@ class SpfxDoctorCommand extends AnonymousCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+    if (!args.options.output) {
+      args.options.output = 'text';
+    }
+
     logger.log(' ');
     logger.log('CLI for Microsoft 365 SharePoint Framework doctor');
     logger.log('Verifying configuration of your system for working with the SharePoint Framework');
@@ -805,6 +828,10 @@ class SpfxDoctorCommand extends AnonymousCommand {
       if (!sp) {
         return `${args.options.env} is not a valid SharePoint version. Valid versions are sp2016, sp2019 or spo`;
       }
+    }
+
+    if (args.options.output && args.options.output !== 'text') {
+      return `The output option only accepts the type 'text'`;
     }
 
     return true;

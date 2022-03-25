@@ -4,7 +4,7 @@ import appInsights from '../../../appInsights';
 import { Logger } from '../../../cli';
 import Command from '../../../Command';
 import config from '../../../config';
-import Utils from '../../../Utils';
+import { sinonUtil } from '../../../utils';
 import commands from '../commands';
 const command: Command = require('./cli-consent');
 
@@ -43,7 +43,7 @@ describe(commands.CONSENT, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent
     ]);
   });

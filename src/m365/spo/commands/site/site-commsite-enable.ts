@@ -5,10 +5,9 @@ import {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -38,7 +37,7 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
     const designPackageId: string = args.options.designPackageId || '{d604dac3-50d3-405e-9ab9-d4713cda74ef}';
     let spoAdminUrl: string = '';
 
-    this
+    spo
       .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
@@ -47,7 +46,7 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
           logger.logToStderr(`Retrieving request digest...`);
         }
 
-        return this.getRequestDigest(spoAdminUrl);
+        return spo.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         const requestOptions: any = {
@@ -55,7 +54,7 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
           headers: {
             'X-RequestDigest': res.FormDigestValue
           },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><Method Name="EnableCommSite" Id="5" ObjectPathId="3"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.url)}</Parameter><Parameter Type="Guid">${Utils.escapeXml(designPackageId)}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><Method Name="EnableCommSite" Id="5" ObjectPathId="3"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.url)}</Parameter><Parameter Type="Guid">${formatting.escapeXml(designPackageId)}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
         };
 
         return request.post(requestOptions);
@@ -88,11 +87,11 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
 
   public validate(args: CommandArgs): boolean | string {
     if (args.options.designPackageId &&
-      !Utils.isValidGuid(args.options.designPackageId)) {
+      !validation.isValidGuid(args.options.designPackageId)) {
       return `${args.options.designPackageId} is not a valid GUID`;
     }
 
-    return SpoCommand.isValidSharePointUrl(args.options.url);
+    return validation.isValidSharePointUrl(args.options.url);
   }
 }
 

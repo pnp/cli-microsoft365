@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./conversationmember-list');
 
@@ -258,13 +258,13 @@ describe(commands.CONVERSATIONMEMBER_LIST, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -396,16 +396,6 @@ describe(commands.CONVERSATIONMEMBER_LIST, () => {
     const actual = command.validate({
       options: {
         teamName: "Human Resources",
-        channelName: "Private Channel"
-      }
-    });
-    assert.strictEqual(actual, true);
-  });
-
-  it('validates for a correct teamId and channelName input', () => {
-    const actual = command.validate({
-      options: {
-        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelName: "Private Channel"
       }
     });

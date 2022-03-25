@@ -1,6 +1,6 @@
-import { Finding } from "../";
-import { Project } from "../../model";
-import { JsonRule } from "./JsonRule";
+import { JsonRule } from '../../JsonRule';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model';
 
 export abstract class ResolutionRule extends JsonRule {
   constructor(protected packageName: string, protected packageVersion: string) {

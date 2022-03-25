@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model/Finding';
 import { FN005002_CFG_DAS_workingDir } from './FN005002_CFG_DAS_workingDir';
 
 describe('FN005002_CFG_DAS_workingDir', () => {

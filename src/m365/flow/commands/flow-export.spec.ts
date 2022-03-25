@@ -6,7 +6,7 @@ import auth from '../../../Auth';
 import { Logger } from '../../../cli';
 import Command, { CommandError } from '../../../Command';
 import request from '../../../request';
-import Utils from '../../../Utils';
+import { sinonUtil } from '../../../utils';
 import commands from '../commands';
 const command: Command = require('./flow-export');
 
@@ -140,7 +140,7 @@ describe(commands.EXPORT, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post,
       fs.writeFileSync
@@ -148,7 +148,7 @@ describe(commands.EXPORT, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -390,7 +390,7 @@ describe(commands.EXPORT, () => {
   it('fails validation if specified path doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, path: '/path/not/found.zip' } });
-    Utils.restore(fs.existsSync);
+    sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
   });
 

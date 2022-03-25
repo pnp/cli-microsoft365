@@ -5,7 +5,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import commands from '../../commands';
 
@@ -116,7 +116,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.flow)) {
+    if (!validation.isValidGuid(args.options.flow)) {
       return `${args.options.flow} is not a valid GUID`;
     }
 

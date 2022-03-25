@@ -1,6 +1,7 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command, { CommandError, CommandErrorWithOutput, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import * as spoSiteClassicAddCommand from '../site/site-classic-add';
@@ -154,7 +155,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }

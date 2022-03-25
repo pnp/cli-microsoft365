@@ -5,11 +5,9 @@ import {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, IdentityResponse, spo, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
-import { ClientSvc, IdentityResponse } from '../../ClientSvc';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -32,25 +30,24 @@ class SpoFolderRenameCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const clientSvc: ClientSvc = new ClientSvc(logger, this.debug);
     let formDigestValue: string = '';
 
-    this
+    spo
       .getRequestDigest(args.options.webUrl)
       .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
         formDigestValue = contextResponse.FormDigestValue;
 
-        return clientSvc.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
+        return spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
       })
       .then((webIdentityResp: IdentityResponse): Promise<IdentityResponse> => {
-        return clientSvc.getFolderIdentity(webIdentityResp.objectIdentity, args.options.webUrl, args.options.folderUrl, formDigestValue);
+        return spo.getFolderIdentity(webIdentityResp.objectIdentity, args.options.webUrl, args.options.folderUrl, formDigestValue);
       })
       .then((folderObjectIdentity: IdentityResponse): Promise<void> => {
         if (this.verbose) {
           logger.logToStderr(`Renaming folder ${args.options.folderUrl} to ${args.options.name}`);
         }
 
-        const serverRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
+        const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
         const serverRelativeUrlWithoutOldFolder: string = serverRelativeUrl.substring(0, serverRelativeUrl.lastIndexOf('/'));
         const renamedServerRelativeUrl: string = `${serverRelativeUrlWithoutOldFolder}/${args.options.name}`;
 
@@ -95,7 +92,7 @@ class SpoFolderRenameCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

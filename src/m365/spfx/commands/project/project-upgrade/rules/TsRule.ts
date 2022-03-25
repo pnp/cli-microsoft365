@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as ts from 'typescript';
-import { Occurrence } from "../";
-import { Rule } from "./Rule";
+import { Occurrence } from '../../report-model';
+import { Rule } from '../../Rule';
 
 export abstract class TsRule extends Rule {
   get resolution(): string {

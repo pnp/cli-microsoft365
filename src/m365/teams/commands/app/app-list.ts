@@ -1,11 +1,11 @@
+import { Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { Team } from '../../Team';
 import { TeamsApp } from '../../TeamsApp';
 
 interface CommandArgs {
@@ -18,7 +18,11 @@ interface Options extends GlobalOptions {
   teamName?: string;
 }
 
-class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
+interface ExtendedGroup extends Group {
+  resourceProvisioningOptions: string[];
+}
+
+class TeamsAppListCommand extends GraphCommand {
   public get name(): string {
     return commands.APP_LIST;
   }
@@ -44,8 +48,8 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
       return Promise.resolve(args.options.teamId);
     }
 
-    const teamRequestOptions: any = {
-      url: `${this.resource}/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -53,11 +57,15 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
     };
 
     return request
-      .get<{ value: Team[] }>(teamRequestOptions)
+      .get<{ value: ExtendedGroup[] }>(requestOptions)
       .then(response => {
-        const teamItem: Team | undefined = response.value[0];
+        const groupItem: ExtendedGroup | undefined = response.value[0];
 
-        if (!teamItem) {
+        if (!groupItem) {
+          return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
+        }
+
+        if (groupItem.resourceProvisioningOptions.indexOf('Team') === -1) {
           return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
         }
 
@@ -65,7 +73,7 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
           return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${response.value.map(x => x.id)}`);
         }
 
-        return Promise.resolve(teamItem.id);
+        return Promise.resolve(groupItem.id as string);
       });
   }
 
@@ -102,16 +110,16 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     this
       .getEndpointUrl(args)
-      .then((endpoint: string): Promise<void> => this.getAllItems(endpoint, logger, true))
-      .then((): void => {
+      .then(endpoint => odata.getAllItems<TeamsApp>(endpoint, logger))
+      .then((items): void => {
         if (args.options.teamId || args.options.teamName) {
-          this.items.forEach(t => {
+          items.forEach(t => {
             t.displayName = (t as any).teamsApp.displayName;
             t.distributionMethod = (t as any).teamsApp.distributionMethod;
           });
         }
 
-        logger.log(this.items);
+        logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -138,7 +146,7 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
       return 'Specify either teamId or teamName, but not both.';
     }
 
-    if (args.options.teamId && !Utils.isValidGuid(args.options.teamId)) {
+    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 

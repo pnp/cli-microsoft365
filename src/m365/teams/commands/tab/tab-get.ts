@@ -1,15 +1,15 @@
+import { Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import { Channel } from '../../Channel';
 import commands from '../../commands';
 import { Tab } from '../../Tab';
-import { Team } from '../../Team';
 
 interface CommandArgs {
   options: Options;
@@ -22,6 +22,10 @@ interface Options extends GlobalOptions {
   channelName?: string;
   tabId?: string;
   tabName?: string;
+}
+
+interface ExtendedGroup extends Group {
+  resourceProvisioningOptions: string[];
 }
 
 class TeamsTabGetCommand extends GraphCommand {
@@ -52,8 +56,8 @@ class TeamsTabGetCommand extends GraphCommand {
       return Promise.resolve(args.options.teamId);
     }
 
-    const teamRequestOptions: any = {
-      url: `${this.resource}/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -61,11 +65,15 @@ class TeamsTabGetCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: Team[] }>(teamRequestOptions)
+      .get<{ value: ExtendedGroup[] }>(requestOptions)
       .then(response => {
-        const teamItem: Team | undefined = response.value[0];
+        const groupItem: ExtendedGroup | undefined = response.value[0];
 
-        if (!teamItem) {
+        if (!groupItem) {
+          return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
+        }
+
+        if (groupItem.resourceProvisioningOptions.indexOf('Team') === -1) {
           return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
         }
 
@@ -73,7 +81,7 @@ class TeamsTabGetCommand extends GraphCommand {
           return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${response.value.map(x => x.id)}`);
         }
 
-        return Promise.resolve(teamItem.id);
+        return Promise.resolve(groupItem.id as string);
       });
   }
 
@@ -194,7 +202,7 @@ class TeamsTabGetCommand extends GraphCommand {
       return 'Specify teamId or teamName, one is required';
     }
 
-    if (args.options.teamId && !Utils.isValidGuid(args.options.teamId as string)) {
+    if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 
@@ -206,7 +214,7 @@ class TeamsTabGetCommand extends GraphCommand {
       return 'Specify channelId or channelName, one is required';
     }
 
-    if (args.options.channelId && !Utils.isValidTeamsChannelId(args.options.channelId as string)) {
+    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
       return `${args.options.channelId} is not a valid Teams ChannelId`;
     }
 
@@ -218,7 +226,7 @@ class TeamsTabGetCommand extends GraphCommand {
       return 'Specify tabId or tabName, one is required';
     }
 
-    if (args.options.tabId && !Utils.isValidGuid(args.options.tabId as string)) {
+    if (args.options.tabId && !validation.isValidGuid(args.options.tabId as string)) {
       return `${args.options.tabId} is not a valid GUID`;
     }
 

@@ -6,7 +6,7 @@ import * as sinon from 'sinon';
 import auth from './Auth';
 import { Logger } from './cli';
 import _request from './request';
-import Utils from './Utils';
+import { sinonUtil } from './utils';
 
 describe('Request', () => {
   const logger: Logger = {
@@ -25,7 +25,7 @@ describe('Request', () => {
 
   afterEach(() => {
     _request.debug = false;
-    Utils.restore([
+    sinonUtil.restore([
       global.setTimeout,
       https.request,
       (_request as any).req,
@@ -390,7 +390,7 @@ describe('Request', () => {
         return Promise.resolve({ data: {} });
       }
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       timeout = to;
       fn();
       return {} as any;
@@ -430,7 +430,7 @@ describe('Request', () => {
         return Promise.resolve({ data: {} });
       }
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       timeout = to;
       fn();
       return {} as any;
@@ -472,7 +472,7 @@ describe('Request', () => {
         return Promise.resolve({ data: {} });
       }
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       timeout = to;
       fn();
       return {} as any;
@@ -511,7 +511,7 @@ describe('Request', () => {
         return Promise.resolve({ data: {} });
       }
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -555,7 +555,7 @@ describe('Request', () => {
         return Promise.resolve({ data: {} });
       }
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn, to) => {
       timeout = to;
       fn();
       return {} as any;
@@ -594,7 +594,7 @@ describe('Request', () => {
         return Promise.resolve({ data: {} });
       }
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -632,7 +632,7 @@ describe('Request', () => {
         return Promise.reject('Error');
       }
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -674,7 +674,7 @@ describe('Request', () => {
         return Promise.resolve({ data: {} });
       }
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });

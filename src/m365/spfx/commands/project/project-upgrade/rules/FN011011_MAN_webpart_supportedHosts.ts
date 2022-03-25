@@ -1,5 +1,5 @@
-import { Finding, Occurrence } from "../";
-import { Project } from "../../model";
+import { Finding, Occurrence } from '../../report-model';
+import { Project } from '../../project-model';
 import { ManifestRule } from "./ManifestRule";
 
 export class FN011011_MAN_webpart_supportedHosts extends ManifestRule {

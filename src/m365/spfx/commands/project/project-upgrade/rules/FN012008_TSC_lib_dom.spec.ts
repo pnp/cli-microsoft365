@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model/Finding';
 import { FN012008_TSC_lib_dom } from './FN012008_TSC_lib_dom';
 
 describe('FN012008_TSC_lib_dom', () => {

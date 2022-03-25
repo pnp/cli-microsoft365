@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./web-set');
 
@@ -17,7 +17,7 @@ describe(commands.WEB_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -39,13 +39,13 @@ describe(commands.WEB_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.patch
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -454,7 +454,7 @@ describe(commands.WEB_SET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, welcomePage: 'https://contoso.sharepoint.com/sites/team-a/SitePages/Home.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a'} } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, welcomePage: 'https://contoso.sharepoint.com/sites/team-a/SitePages/Home.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("The WelcomePage property must be a path that is relative to the folder, and the path cannot contain two consecutive periods (..).")));
         done();
@@ -507,7 +507,7 @@ describe(commands.WEB_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the webUrl is a valid SharePoint URL', () => {
+  it('passes validation when the webUrl is a valid SharePoint URL and quickLaunch set to "true"', () => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: 'true' } });
     assert.strictEqual(actual, true);
   });

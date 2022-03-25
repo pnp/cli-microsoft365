@@ -5,9 +5,9 @@ import {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { spo, ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -31,12 +31,12 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
     let spoAdminUrl: string = '';
 
     const removeLibrary: () => void = (): void => {
-      this
+      spo
         .getSpoAdminUrl(logger, this.debug)
         .then((_spoAdminUrl: string): Promise<ContextInfo> => {
           spoAdminUrl = _spoAdminUrl;
 
-          return this.getRequestDigest(spoAdminUrl);
+          return spo.getRequestDigest(spoAdminUrl);
         })
         .then((res: ContextInfo): Promise<string> => {
           const requestOptions: any = {

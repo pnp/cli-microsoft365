@@ -7,7 +7,7 @@ import {
   CommandError, CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import AnonymousCommand from "../../../base/AnonymousCommand";
 import commands from '../../commands';
 import TemplateInstantiator from "../../template-instantiator";
@@ -110,7 +110,7 @@ class PaPcfInitCommand extends AnonymousCommand {
     }
 
     const workingDirectoryName: string = path.basename(process.cwd());
-    if (!Utils.isValidFileName(workingDirectoryName)) {
+    if (!validation.isValidFileName(workingDirectoryName)) {
       return `Empty or invalid project name '${workingDirectoryName}'`;
     }
 
@@ -119,7 +119,7 @@ class PaPcfInitCommand extends AnonymousCommand {
         return `Value of 'name' is invalid. Only characters within the ranges [A - Z], [a - z] or [0 - 9] are allowed. The first character may not be a number.`;
       }
 
-      if (Utils.isJavascriptReservedWord(args.options.name)) {
+      if (validation.isJavaScriptReservedWord(args.options.name)) {
         return `The value '${args.options.name}' passed for 'name' is a reserved word.`;
       }
     }
@@ -132,7 +132,7 @@ class PaPcfInitCommand extends AnonymousCommand {
         return `Value of 'namespace' is invalid. Only characters within the ranges [A - Z], [a - z], [0 - 9], or '.' are allowed. The first and last character may not be the '.' character. Consecutive '.' characters are not allowed. Numbers are not allowed as the first character or immediately after a period.`;
       }
 
-      if (Utils.isJavascriptReservedWord(args.options.namespace)) {
+      if (validation.isJavaScriptReservedWord(args.options.namespace)) {
         return `The value '${args.options.namespace}' passed for 'namespace' is or includes a reserved word.`;
       }
     }

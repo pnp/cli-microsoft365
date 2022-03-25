@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -18,7 +19,7 @@ class SpoHideDefaultThemesGetCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
+    spo
       .getSpoAdminUrl(logger, this.debug)
       .then((spoAdminUrl: string): Promise<any> => {
         if (this.verbose) {

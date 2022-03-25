@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./app-instance-list');
 
@@ -40,13 +40,13 @@ describe(commands.APP_INSTANCE_LIST, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -81,7 +81,7 @@ describe(commands.APP_INSTANCE_LIST, () => {
       if ((opts.url as string).indexOf('/_api/web/AppTiles') > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             value: [
               {
@@ -127,7 +127,7 @@ describe(commands.APP_INSTANCE_LIST, () => {
       if ((opts.url as string).indexOf('/_api/web/AppTiles') > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve(JSON.stringify({ value: [] }));
         }
       }
@@ -151,7 +151,7 @@ describe(commands.APP_INSTANCE_LIST, () => {
       if ((opts.url as string).indexOf('/_api/web/AppTiles') > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve(JSON.stringify({ value: [] }));
         }
       }

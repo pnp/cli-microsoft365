@@ -6,6 +6,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { spo, validation } from '../../../../utils';
 import commands from '../../commands';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
 
@@ -41,7 +42,7 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     const overwrite: boolean = args.options.overwrite || false;
 
-    this
+    spo
       .getSpoUrl(logger, this.debug)
       .then((spoUrl: string): Promise<string> => {
         return this.getAppCatalogSiteUrl(logger, spoUrl, args);
@@ -122,7 +123,7 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
     }
 
     if (args.options.appCatalogUrl) {
-      return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+      return validation.isValidSharePointUrl(args.options.appCatalogUrl);
     }
 
     return true;

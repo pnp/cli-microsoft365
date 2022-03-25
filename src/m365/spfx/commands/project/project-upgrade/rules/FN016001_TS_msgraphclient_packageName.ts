@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
-import { Finding, Occurrence } from "../";
-import { Project } from "../../model";
+import { Project } from '../../project-model';
+import { Finding, Occurrence } from '../../report-model';
 import { TsRule } from "./TsRule";
 
 export class FN016001_TS_msgraphclient_packageName extends TsRule {

@@ -4,10 +4,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ContextInfo, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -46,11 +45,11 @@ class SpoSiteDesignAddCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let spoUrl: string = '';
 
-    this
+    spo
       .getSpoUrl(logger, this.debug)
       .then((_spoUrl: string): Promise<ContextInfo> => {
         spoUrl = _spoUrl;
-        return this.getRequestDigest(spoUrl);
+        return spo.getRequestDigest(spoUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         const info: any = {
@@ -130,7 +129,7 @@ class SpoSiteDesignAddCommand extends SpoCommand {
     const siteScripts = args.options.siteScripts.split(',');
     for (let i: number = 0; i < siteScripts.length; i++) {
       const trimmedId: string = siteScripts[i].trim();
-      if (!Utils.isValidGuid(trimmedId)) {
+      if (!validation.isValidGuid(trimmedId)) {
         return `${trimmedId} is not a valid GUID`;
       }
     }

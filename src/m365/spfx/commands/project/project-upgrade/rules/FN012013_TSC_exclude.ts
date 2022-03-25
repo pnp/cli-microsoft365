@@ -1,6 +1,6 @@
-import { Finding } from "../";
-import { Project, TsConfigJson } from "../../model";
-import { JsonRule } from "./JsonRule";
+import { JsonRule } from '../../JsonRule';
+import { Project, TsConfigJson } from '../../project-model';
+import { Finding } from '../../report-model';
 
 export class FN012013_TSC_exclude extends JsonRule {
   constructor(private exclude: string[], private add: boolean = true) {

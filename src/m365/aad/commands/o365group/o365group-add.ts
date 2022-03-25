@@ -1,3 +1,4 @@
+import { Group, User } from '@microsoft/microsoft-graph-types';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
@@ -6,10 +7,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { Group, User } from '@microsoft/microsoft-graph-types';
-import Utils from '../../../../Utils';
 
 interface CommandArgs {
   options: Options;
@@ -23,6 +23,10 @@ interface Options extends GlobalOptions {
   members?: string;
   isPrivate?: string;
   logoPath?: string;
+  allowMembersToPost?: boolean;
+  hideGroupInOutlook?: boolean;
+  subscribeNewGroupMembers?: boolean;
+  welcomeEmailDisabled?: boolean;
 }
 
 class AadO365GroupAddCommand extends GraphCommand {
@@ -33,16 +37,46 @@ class AadO365GroupAddCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Creates Microsoft 365 Group';
+    return 'Creates a Microsoft 365 Group';
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.owners = typeof args.options.owners !== 'undefined';
+    telemetryProps.members = typeof args.options.members !== 'undefined';
+    telemetryProps.logoPath = typeof args.options.logoPath !== 'undefined';
+    telemetryProps.isPrivate = typeof args.options.isPrivate !== 'undefined';
+    telemetryProps.allowMembersToPost = (!(!args.options.allowMembersToPost)).toString();
+    telemetryProps.hideGroupInOutlook = (!(!args.options.hideGroupInOutlook)).toString();
+    telemetryProps.subscribeNewGroupMembers = (!(!args.options.subscribeNewGroupMembers)).toString();
+    telemetryProps.welcomeEmailDisabled = (!(!args.options.welcomeEmailDisabled)).toString();
+    return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let group: Group;
     let ownerIds: string[] = [];
     let memberIds: string[] = [];
+    const resourceBehaviorOptionsCollection: string[] = [];
 
     if (this.verbose) {
       logger.logToStderr(`Creating Microsoft 365 Group...`);
+    }
+
+    if (args.options.allowMembersToPost) {
+      resourceBehaviorOptionsCollection.push("allowMembersToPost");
+    }
+
+    if (args.options.hideGroupInOutlook) {
+      resourceBehaviorOptionsCollection.push("hideGroupInOutlook");
+    }
+
+    if (args.options.subscribeNewGroupMembers) {
+      resourceBehaviorOptionsCollection.push("subscribeNewGroupMembers");
+    }
+
+    if (args.options.welcomeEmailDisabled) {
+      resourceBehaviorOptionsCollection.push("welcomeEmailDisabled");
     }
 
     const requestOptions: any = {
@@ -59,6 +93,7 @@ class AadO365GroupAddCommand extends GraphCommand {
         ],
         mailEnabled: true,
         mailNickname: args.options.mailNickname,
+        resourceBehaviorOptions: resourceBehaviorOptionsCollection,
         securityEnabled: false,
         visibility: args.options.isPrivate === 'true' ? 'Private' : 'Public'
       }
@@ -158,7 +193,7 @@ class AadO365GroupAddCommand extends GraphCommand {
 
     promises = userArr.map(user => {
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${Utils.encodeQueryParameter(user)}'&$select=id,userPrincipalName`,
+        url: `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(user)}'&$select=id,userPrincipalName`,
         headers: {
           'content-type': 'application/json'
         },
@@ -232,6 +267,18 @@ class AadO365GroupAddCommand extends GraphCommand {
       },
       {
         option: '--isPrivate [isPrivate]'
+      },
+      {
+        option: '--allowMembersToPost [allowMembersToPost]'
+      },
+      {
+        option: '--hideGroupInOutlook [hideGroupInOutlook]'
+      },
+      {
+        option: '--subscribeNewGroupMembers [subscribeNewGroupMembers]'
+      },
+      {
+        option: '--welcomeEmailDisabled [welcomeEmailDisabled]'
       },
       {
         option: '-l, --logoPath [logoPath]'

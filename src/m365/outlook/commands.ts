@@ -15,5 +15,7 @@ export default {
   REPORT_MAILBOXUSAGEMAILBOXCOUNT: `${prefix} report mailboxusagemailboxcount`,
   REPORT_MAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS: `${prefix} report mailboxusagequotastatusmailboxcounts`,
   REPORT_MAILBOXUSAGESTORAGE: `${prefix} report mailboxusagestorage`,
+  ROOM_LIST: `${prefix} room list`,
+  ROOMLIST_LIST: `${prefix} roomlist list`,
   SENDMAIL: `${prefix} sendmail`
 };

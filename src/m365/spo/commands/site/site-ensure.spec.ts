@@ -4,7 +4,7 @@ import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 import * as spoWebGetCommand from '../web/web-get';
 import * as spoSiteAddCommand from './site-add';
@@ -37,14 +37,14 @@ describe(commands.SITE_ENSURE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       Cli.executeCommand,
       Cli.executeCommandWithOutput
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -63,7 +63,7 @@ describe(commands.SITE_ENSURE, () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
       if (command === spoWebGetCommand) {
         return Promise.reject({
-          error: new CommandError('Request failed with status code 404')
+          error: new CommandError('404 FILE NOT FOUND')
         });
       }
 
@@ -101,7 +101,7 @@ describe(commands.SITE_ENSURE, () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
       if (command === spoWebGetCommand) {
         return Promise.reject({
-          error: new CommandError('Request failed with status code 404')
+          error: new CommandError('404 FILE NOT FOUND')
         });
       }
 
@@ -688,7 +688,7 @@ describe(commands.SITE_ENSURE, () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === spoWebGetCommand) {
         return Promise.reject({
-          error: new CommandError('Request failed with status code 404')
+          error: new CommandError('404 FILE NOT FOUND')
         });
       }
 

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { PackageSolutionJson, Project } from '../../model';
-import { Finding } from '../Finding';
+import { PackageSolutionJson, Project } from '../../project-model';
+import { Finding } from '../../report-model/Finding';
 import { FN006006_CFG_PS_features } from './FN006006_CFG_PS_features';
 
 describe('FN006006_CFG_PS_features', () => {

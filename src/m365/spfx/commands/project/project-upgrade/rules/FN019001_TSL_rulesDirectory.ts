@@ -1,6 +1,6 @@
-import { Project } from "../../model";
-import { Finding } from "../Finding";
-import { JsonRule } from "./JsonRule";
+import { JsonRule } from '../../JsonRule';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model';
 
 export class FN019001_TSL_rulesDirectory extends JsonRule {
   constructor() {

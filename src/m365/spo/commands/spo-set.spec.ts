@@ -4,7 +4,7 @@ import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
 import { Logger } from '../../../cli';
 import Command, { CommandError } from '../../../Command';
-import Utils from '../../../Utils';
+import { sinonUtil } from '../../../utils';
 import commands from '../commands';
 const command: Command = require('./spo-set');
 
@@ -39,7 +39,7 @@ describe(commands.SET, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       auth.storeConnectionInfo,
       appInsights.trackEvent
@@ -100,7 +100,7 @@ describe(commands.SET, () => {
 
   it('throws error when setting the password fails', (done) => {
     auth.service.connected = true;
-    Utils.restore(auth.storeConnectionInfo);
+    sinonUtil.restore(auth.storeConnectionInfo);
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.reject('An error has occurred while setting the password'));
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {

@@ -6,7 +6,7 @@ import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./storageentity-set');
 
@@ -18,7 +18,12 @@ describe(commands.STORAGEENTITY_SET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -40,15 +45,16 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
-      request.post
+    sinonUtil.restore([
+      request.post,
+      spo.getSpoAdminUrl
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      (command as any).getRequestDigest,
+      spo.getRequestDigest,
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
@@ -282,7 +288,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
     const options = command.options();
-    Utils.restore(Command.prototype.options);
+    sinonUtil.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
@@ -308,7 +314,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('handles promise rejection', (done) => {
-    sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.reject('error'));
+    sinon.stub(spo, 'getSpoAdminUrl').callsFake(() => Promise.reject('error'));
 
     command.action(logger, {
       options: { debug: true, key: 'Property1', value: 'Lorem', description: 'ipsum', comment: 'dolor', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }

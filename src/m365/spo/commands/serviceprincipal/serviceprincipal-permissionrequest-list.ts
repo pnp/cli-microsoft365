@@ -4,9 +4,9 @@ import {
 } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
+import { spo, ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { SPOWebAppServicePrincipalPermissionRequest } from './SPOWebAppServicePrincipalPermissionRequest';
 
 class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
@@ -25,7 +25,7 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
   public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
-    this
+    spo
       .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
@@ -34,7 +34,7 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
           logger.logToStderr(`Retrieving request digest...`);
         }
 
-        return this.getRequestDigest(spoAdminUrl);
+        return spo.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         const requestOptions: any = {

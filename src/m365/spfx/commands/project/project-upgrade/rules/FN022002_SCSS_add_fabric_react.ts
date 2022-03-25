@@ -1,7 +1,7 @@
-import { Occurrence, Utils } from "../";
-import { Project, ScssFile } from "../../model";
-import { Finding } from "../Finding";
-import { ScssRule } from "./ScssRule";
+import { spfx } from '../../../../../../utils';
+import { Project, ScssFile } from '../../project-model';
+import { Finding, Occurrence } from '../../report-model';
+import { ScssRule } from './ScssRule';
 
 export class FN022002_SCSS_add_fabric_react extends ScssRule {
   constructor(private importValue: string, private addIfContains?: string) {
@@ -37,7 +37,7 @@ export class FN022002_SCSS_add_fabric_react extends ScssRule {
   }
 
   visit(project: Project, findings: Finding[]): void {
-    if (Utils.isReactProject(project) === false) {
+    if (spfx.isReactProject(project) === false) {
       return;
     }
 

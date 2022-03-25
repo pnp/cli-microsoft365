@@ -1,11 +1,12 @@
+import { PlannerPlan } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -19,7 +20,7 @@ interface Options extends GlobalOptions {
   ownerGroupName?: string;
 }
 
-class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
+class PlannerPlanGetCommand extends GraphCommand {
   public get name(): string {
     return commands.PLAN_GET;
   }
@@ -53,9 +54,9 @@ class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
     else {
       this
         .getGroupId(args)
-        .then((groupId: string): Promise<void> => this.getAllItems(`${this.resource}/v1.0/groups/${groupId}/planner/plans`, logger, true, 'minimal'))
-        .then((): void => {
-          const filteredPlan = this.items.filter((plan: any) => plan.title === args.options.title);
+        .then((groupId: string): Promise<PlannerPlan[]> => odata.getAllItems<PlannerPlan>(`${this.resource}/v1.0/groups/${groupId}/planner/plans`, logger, 'minimal'))
+        .then((plans): void => {
+          const filteredPlan = plans.filter((plan: any) => plan.title === args.options.title);
           if (filteredPlan && filteredPlan.length > 0) {
             logger.log(filteredPlan);
           }
@@ -139,7 +140,7 @@ class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
       return 'Specify either ownerGroupId or ownerGroupName but not both';
     }
 
-    if (args.options.ownerGroupId && !Utils.isValidGuid(args.options.ownerGroupId as string)) {
+    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
       return `${args.options.ownerGroupId} is not a valid GUID`;
     }
 

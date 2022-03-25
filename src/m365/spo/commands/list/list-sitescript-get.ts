@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { ListInstance } from './ListInstance';
@@ -67,7 +67,7 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
     request
       .get<ListInstance>(requestOptions)
       .then((listInstance: ListInstance): Promise<any> => {
-        const listAbsoluteUrl = Utils.getAbsoluteUrl(args.options.webUrl, listInstance.RootFolder.ServerRelativeUrl);
+        const listAbsoluteUrl = urlUtil.getAbsoluteUrl(args.options.webUrl, listInstance.RootFolder.ServerRelativeUrl);
         const requestUrl = `${args.options.webUrl}/_api/Microsoft_SharePoint_Utilities_WebTemplateExtensions_SiteScriptUtility_GetSiteScriptFromList`;
         const requestOptions: any = {
           url: requestUrl,
@@ -115,13 +115,13 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
 
     if (args.options.listId) {
-      if (!Utils.isValidGuid(args.options.listId)) {
+      if (!validation.isValidGuid(args.options.listId)) {
         return `${args.options.listId} is not a valid GUID`;
       }
     }

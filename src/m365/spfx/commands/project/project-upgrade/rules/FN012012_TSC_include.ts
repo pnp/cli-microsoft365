@@ -1,6 +1,6 @@
-import { Finding } from "../";
-import { Project, TsConfigJson } from "../../model";
-import { JsonRule } from "./JsonRule";
+import { JsonRule } from '../../JsonRule';
+import { Project, TsConfigJson } from '../../project-model';
+import { Finding } from '../../report-model';
 
 export class FN012012_TSC_include extends JsonRule {
   constructor(private include: string[]) {

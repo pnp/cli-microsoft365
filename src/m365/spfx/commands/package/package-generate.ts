@@ -6,7 +6,7 @@ import { v4 } from 'uuid';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
+import { fsUtil } from '../../../../utils';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import commands from '../../commands';
 
@@ -104,9 +104,9 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
         logger.log('Copying files...');
       }
       const src: string = path.join(__dirname, 'package-generate', 'assets');
-      Utils.copyRecursiveSync(src, tmpDir, s => SpfxPackageGenerateCommand.replaceTokens(s, tokens));
+      fsUtil.copyRecursiveSync(src, tmpDir, s => SpfxPackageGenerateCommand.replaceTokens(s, tokens));
 
-      const files: string[] = Utils.readdirR(tmpDir) as string[];
+      const files: string[] = fsUtil.readdirR(tmpDir) as string[];
       if (this.verbose) {
         logger.log('Processing files...');
       }
@@ -146,7 +146,7 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
       if (!this.archive) {
         this.archive = new AdmZip();
       }
-      const filesToZip: string[] = Utils.readdirR(tmpDir) as string[];
+      const filesToZip: string[] = fsUtil.readdirR(tmpDir) as string[];
       filesToZip.forEach(f => {
         if (this.debug) {
           logger.log(`Adding ${f} to archive...`);

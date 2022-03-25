@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import { Logger } from '../../../cli';
 import Command from '../../../Command';
-import Utils from '../../../Utils';
+import { sinonUtil } from '../../../utils';
 import commands from '../commands';
 import Sinon = require('sinon');
 
@@ -40,7 +40,7 @@ describe(commands.ISSUE, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent
     ]);
   });

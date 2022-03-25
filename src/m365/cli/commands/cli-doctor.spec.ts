@@ -5,7 +5,7 @@ import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
 import { Cli, Logger } from '../../../cli';
 import Command from '../../../Command';
-import Utils from '../../../Utils';
+import { sinonUtil } from '../../../utils';
 import commands from '../commands';
 const packageJSON = require('../../../../package.json');
 
@@ -20,6 +20,7 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    sinon.stub(Cli.getInstance().config, 'all').value({});
   });
 
   beforeEach(() => {
@@ -39,7 +40,7 @@ describe(commands.DOCTOR, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       os.platform,
       os.version,
       os.release,
@@ -48,9 +49,10 @@ describe(commands.DOCTOR, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      Cli.getInstance().config.all
     ]);
     auth.service.connected = false;
   });
@@ -592,6 +594,7 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service, 'tenant').value('common');
     sinon.stub(auth.service, 'authType').value(0);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    sinonUtil.restore(Cli.getInstance().config.all);
     sinon.stub(Cli.getInstance().config, 'all').value({ "showHelpOnFailure": false });
 
     command.action(logger, { options: {} }, () => {

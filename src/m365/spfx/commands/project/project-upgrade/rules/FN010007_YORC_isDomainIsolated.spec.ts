@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model/Finding';
 import { FN010007_YORC_isDomainIsolated } from './FN010007_YORC_isDomainIsolated';
 
 describe('FN010007_YORC_isDomainIsolated', () => {

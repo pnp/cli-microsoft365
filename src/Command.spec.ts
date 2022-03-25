@@ -9,7 +9,7 @@ import Command, {
   CommandError, CommandOption,
   CommandTypes
 } from './Command';
-import Utils from './Utils';
+import { sinonUtil } from './utils';
 
 class MockCommand1 extends Command {
   public get name(): string {
@@ -154,14 +154,14 @@ describe('Command', () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       process.exit
     ]);
     auth.service.connected = false;
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent,
       auth.restoreAuth
     ]);

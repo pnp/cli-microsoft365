@@ -6,7 +6,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./o365group-recyclebinitem-clear');
 
@@ -43,7 +43,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.delete,
       Cli.prompt
@@ -51,7 +51,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       fs.readFileSync,
       appInsights.trackEvent
@@ -298,7 +298,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
 
   it('aborts clearing the O365 Group recyclebin items when prompt not confirmed', (done) => {
     const deleteSpy = sinon.spy(request, 'delete');
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -315,7 +315,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
 
   it('aborts clearing the recycle bin items when prompt not confirmed (debug)', (done) => {
     const deleteSpy = sinon.spy(request, 'delete');
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -395,7 +395,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -501,7 +501,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });

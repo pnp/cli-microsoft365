@@ -1,11 +1,12 @@
+import { PlannerBucket } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -19,7 +20,7 @@ interface Options extends GlobalOptions {
   ownerGroupName?: string;
 }
 
-class PlannerBucketListCommand extends GraphItemsListCommand<any> {
+class PlannerBucketListCommand extends GraphCommand {
   public get name(): string {
     return commands.BUCKET_LIST;
   }
@@ -44,9 +45,9 @@ class PlannerBucketListCommand extends GraphItemsListCommand<any> {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getPlanId(args)
-      .then((planId: string): Promise<void> => this.getAllItems(`${this.resource}/v1.0/planner/plans/${planId}/buckets`, logger, true))
-      .then((): void => {
-        logger.log(this.items);
+      .then((planId: string): Promise<PlannerBucket[]> => odata.getAllItems<PlannerBucket>(`${this.resource}/v1.0/planner/plans/${planId}/buckets`, logger))
+      .then((buckets): void => {
+        logger.log(buckets);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -143,7 +144,7 @@ class PlannerBucketListCommand extends GraphItemsListCommand<any> {
       return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
     }
 
-    if (args.options.ownerGroupId && !Utils.isValidGuid(args.options.ownerGroupId as string)) {
+    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
       return `${args.options.ownerGroupId} is not a valid GUID`;
     }
 

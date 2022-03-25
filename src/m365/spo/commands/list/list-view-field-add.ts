@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -160,25 +160,25 @@ class SpoListViewFieldAddCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
 
     if (args.options.listId) {
-      if (!Utils.isValidGuid(args.options.listId)) {
+      if (!validation.isValidGuid(args.options.listId)) {
         return `${args.options.listId} is not a valid GUID`;
       }
     }
 
     if (args.options.viewId) {
-      if (!Utils.isValidGuid(args.options.viewId)) {
+      if (!validation.isValidGuid(args.options.viewId)) {
         return `${args.options.viewId} is not a valid GUID`;
       }
     }
 
     if (args.options.fieldId) {
-      if (!Utils.isValidGuid(args.options.fieldId)) {
+      if (!validation.isValidGuid(args.options.fieldId)) {
         return `${args.options.fieldId} is not a valid GUID`;
       }
     }

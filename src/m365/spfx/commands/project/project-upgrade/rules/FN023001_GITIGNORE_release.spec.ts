@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model';
 import { FN023001_GITIGNORE_release } from './FN023001_GITIGNORE_release';
 
 describe('FN023001_GITIGNORE_release', () => {

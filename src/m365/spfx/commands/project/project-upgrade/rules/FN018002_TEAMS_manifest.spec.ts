@@ -3,16 +3,16 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import Utils from '../../../../../../Utils';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
+import { sinonUtil } from '../../../../../../utils';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model';
 import { FN018002_TEAMS_manifest } from './FN018002_TEAMS_manifest';
 
 describe('FN018002_TEAMS_manifest', () => {
   let findings: Finding[];
   let rule: FN018002_TEAMS_manifest;
   afterEach(() => {
-    Utils.restore(fs.existsSync);
+    sinonUtil.restore(fs.existsSync);
   });
 
   beforeEach(() => {

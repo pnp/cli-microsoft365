@@ -11,8 +11,10 @@ import { Logger } from '.';
 import appInsights from '../appInsights';
 import Command, { CommandArgs, CommandError } from '../Command';
 import config from '../config';
+import GlobalOptions from '../GlobalOptions';
+import request from '../request';
 import { settingsNames } from '../settingsNames';
-import Utils from '../Utils';
+import { formatting, fsUtil } from '../utils';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
 const packageJSON = require('../../package.json');
@@ -33,7 +35,7 @@ export class Cli {
    */
   public currentCommandName: string | undefined;
   private optionsFromArgs: { options: minimist.ParsedArgs } | undefined;
-  private commandsFolder: string = '';
+  public commandsFolder: string = '';
   private static instance: Cli;
 
   private _config: Configstore | undefined;
@@ -150,12 +152,32 @@ export class Cli {
       }
     }
 
-    // validate options
-    // validate required options
+    const shouldPrompt = this.getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
+
+    let inquirer: Inquirer | undefined;
     for (let i = 0; i < this.commandToExecute.options.length; i++) {
       if (this.commandToExecute.options[i].required &&
         typeof this.optionsFromArgs.options[this.commandToExecute.options[i].name] === 'undefined') {
-        return this.closeWithError(`Required option ${this.commandToExecute.options[i].name} not specified`, this.optionsFromArgs, true);
+        if (!shouldPrompt) {
+          return this.closeWithError(`Required option ${this.commandToExecute.options[i].name} not specified`, this.optionsFromArgs, true);
+        }
+
+        if (i === 0) {
+          Cli.log('Provide values for the following parameters:');
+        }
+
+        if (!inquirer) {
+          inquirer = require('inquirer');
+        }
+
+        const missingRequireOptionValue = await (inquirer as Inquirer)
+          .prompt({
+            name: 'missingRequireOptionValue',
+            message: `${this.commandToExecute.options[i].name}: `
+          })
+          .then(result => result.missingRequireOptionValue);
+
+        this.optionsFromArgs.options[this.commandToExecute.options[i].name] = missingRequireOptionValue;
       }
     }
 
@@ -180,6 +202,23 @@ export class Cli {
     if (optionsWithoutShorts.options.output === undefined) {
       optionsWithoutShorts.options.output = this.getSettingWithDefaultValue<string | undefined>(settingsNames.output, undefined);
     }
+
+    // validate options sets defined by the command
+    const optionsSets: string[][] | undefined = this.commandToExecute.command.optionSets();
+    const argsOptions: string[] = Object.keys(this.optionsFromArgs.options);
+    const cmdArgs = this.optionsFromArgs;
+    optionsSets?.forEach((optionSet) => {
+      const commonOptions = argsOptions.filter(opt => optionSet.includes(opt));
+
+      if (commonOptions.length === 0) {
+        return this.closeWithError(`Specify one of the following options: ${optionSet.map(opt => opt).join(', ')}.`, cmdArgs, true);
+      }
+
+      if (commonOptions.length > 1) {
+        return this.closeWithError(`Specify one of the following options: ${optionSet.map(opt => opt).join(', ')}, but not multiple.`, cmdArgs, true);
+      }
+    });
+
 
     const validationResult: boolean | string = this.commandToExecute.command.validate(optionsWithoutShorts);
     if (typeof validationResult === 'string') {
@@ -230,24 +269,42 @@ export class Cli {
     });
   }
 
-  public static executeCommandWithOutput(command: Command, args: { options: minimist.ParsedArgs }): Promise<CommandOutput> {
+  public static executeCommandWithOutput(command: Command, args: { options: minimist.ParsedArgs }, listener?: {
+    stdout?: (message: any) => void,
+    stderr?: (message: any) => void
+  }): Promise<CommandOutput> {
     return new Promise((resolve: (result: CommandOutput) => void, reject: (error: any) => void): void => {
       const log: string[] = [];
       const logErr: string[] = [];
       const logger: Logger = {
         log: (message: any): void => {
-          log.push(Cli.formatOutput(message, args.options));
+          const formattedMessage = Cli.formatOutput(message, args.options);
+          if (listener && listener.stdout) {
+            listener.stdout(formattedMessage);
+          }
+          log.push(formattedMessage);
         },
         logRaw: (message: any): void => {
-          log.push(Cli.formatOutput(message, args.options));
+          const formattedMessage = Cli.formatOutput(message, args.options);
+          if (listener && listener.stdout) {
+            listener.stdout(formattedMessage);
+          }
+          log.push(formattedMessage);
         },
         logToStderr: (message: any): void => {
+          if (listener && listener.stderr) {
+            listener.stderr(message);
+          }
           logErr.push(message);
         }
       };
 
       if (args.options.debug) {
-        Cli.log(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
+        const message = `Executing command ${command.name} with options ${JSON.stringify(args)}`;
+        if (listener && listener.stderr) {
+          listener.stderr(message);
+        }
+        logErr.push(message);
       }
 
       // store the current command name, if any and set the name to the name of
@@ -255,10 +312,14 @@ export class Cli {
       const cli = Cli.getInstance();
       const parentCommandName: string | undefined = cli.currentCommandName;
       cli.currentCommandName = command.getCommandName();
+      // store the current logger if any
+      const currentLogger: Logger | undefined = request.logger;
 
       command.action(logger, args as any, (err: any): void => {
         // restore the original command name
         cli.currentCommandName = parentCommandName;
+        // restore the original logger
+        request.logger = currentLogger;
 
         if (err) {
           return reject({
@@ -276,7 +337,7 @@ export class Cli {
   }
 
   public loadAllCommands(): void {
-    const files: string[] = Utils.readdirR(this.commandsFolder) as string[];
+    const files: string[] = fsUtil.readdirR(this.commandsFolder) as string[];
 
     files.forEach(file => {
       if (file.indexOf(`${path.sep}commands${path.sep}`) > -1 &&
@@ -421,7 +482,7 @@ export class Cli {
     return minimist(args, minimistOptions);
   }
 
-  private static formatOutput(logStatement: any, options: any): any {
+  private static formatOutput(logStatement: any, options: GlobalOptions): any {
     if (logStatement instanceof Date) {
       return logStatement.toString();
     }
@@ -491,11 +552,11 @@ export class Cli {
       return logStatement.join(os.EOL);
     }
 
-    // if output type has been set to 'text', process the retrieved
+    // if output type has been set to 'text' or 'csv', process the retrieved
     // data so that returned objects contain only default properties specified
     // on the current command. If there is no current command or the
     // command doesn't specify default properties, return original data
-    if (options.output === 'text') {
+    if (options.output === 'text' || options.output === 'csv') {
       const cli: Cli = Cli.getInstance();
       const currentCommand: CommandInfo | undefined = cli.commandToExecute;
 
@@ -514,9 +575,23 @@ export class Cli {
           }
 
           logStatement = logStatement.map((s: any) =>
-            Utils.filterObject(s, currentCommand.defaultProperties as string[]));
+            formatting.filterObject(s, currentCommand.defaultProperties as string[]));
         }
       }
+    }
+
+    if (options.output === 'csv') {
+      const { stringify } = require('csv-stringify/sync');
+      const cli = Cli.getInstance();
+
+      // https://csv.js.org/stringify/options/
+      return stringify(logStatement, {
+        header: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvHeader, true),
+        escape: cli.getSettingWithDefaultValue(settingsNames.csvEscape, '"'),
+        quote: cli.config.get(settingsNames.csvQuote),
+        quoted: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuoted, false),
+        quotedEmpty: cli.getSettingWithDefaultValue<boolean>(settingsNames.csvQuotedEmpty, false)
+      });
     }
 
     // display object as a list of key-value pairs

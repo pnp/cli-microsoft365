@@ -1,11 +1,11 @@
+import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
-import { GroupUser } from '../../../aad/commands/o365group/GroupUser';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -17,7 +17,9 @@ interface Options extends GlobalOptions {
   teamId: string;
 }
 
-class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
+class TeamsUserListCommand extends GraphCommand {
+  private items: User[] = [];
+
   public get name(): string {
     return commands.USER_LIST;
   }
@@ -35,14 +37,16 @@ class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getOwners(logger, args.options.teamId)
-      .then((): Promise<void> => {
+      .then((): Promise<User[]> => {
         if (args.options.role === "Owner") {
-          return Promise.resolve();
+          return Promise.resolve([]);
         }
 
         return this.getMembersAndGuests(logger, args.options.teamId);
       })
-      .then((): void => {
+      .then((items): void => {
+        this.items = this.items.concat(items);
+
         // Filter out duplicate added values for owners (as they are returned as members as well)
         // this aligns the output with what is displayed in the Teams UI
         this.items = this.items.filter((groupUser, index, self) =>
@@ -63,7 +67,9 @@ class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
   private getOwners(logger: Logger, groupId: string): Promise<void> {
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
 
-    return this.getAllItems(endpoint, logger, true).then((): void => {
+    return odata.getAllItems<User>(endpoint, logger).then((items): void => {
+      this.items = this.items.concat(items);
+
       // Currently there is a bug in the Microsoft Graph that returns Owners as
       // userType 'member'. We therefore update all returned user as owner
       for (const i in this.items) {
@@ -72,9 +78,9 @@ class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
     });
   }
 
-  private getMembersAndGuests(logger: Logger, groupId: string): Promise<void> {
+  private getMembersAndGuests(logger: Logger, groupId: string): Promise<User[]> {
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
-    return this.getAllItems(endpoint, logger, false);
+    return odata.getAllItems(endpoint, logger);
   }
 
   public options(): CommandOption[] {
@@ -93,7 +99,7 @@ class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.teamId as string)) {
+    if (!validation.isValidGuid(args.options.teamId as string)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 

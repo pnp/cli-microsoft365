@@ -1,3 +1,4 @@
+import { Group } from '@microsoft/microsoft-graph-types';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
@@ -6,7 +7,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./o365group-set');
 
@@ -18,7 +19,7 @@ describe(commands.O365GROUP_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     auth.service.connected = true;
   });
@@ -41,7 +42,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       request.put,
       request.patch,
@@ -51,7 +52,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       fs.readFileSync,
       appInsights.trackEvent
@@ -70,7 +71,7 @@ describe(commands.O365GROUP_SET, () => {
   it('updates Microsoft 365 Group display name', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
-        if (JSON.stringify(opts.data) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify(<Group>{
           displayName: 'My group'
         })) {
           return Promise.resolve();
@@ -94,7 +95,7 @@ describe(commands.O365GROUP_SET, () => {
   it('updates Microsoft 365 Group description (debug)', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
-        if (JSON.stringify(opts.data) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify(<Group>{
           description: 'My group'
         })) {
           return Promise.resolve();
@@ -118,7 +119,7 @@ describe(commands.O365GROUP_SET, () => {
   it('updates Microsoft 365 Group to public', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
-        if (JSON.stringify(opts.data) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify(<Group>{
           visibility: 'Public'
         })) {
           return Promise.resolve();
@@ -142,7 +143,7 @@ describe(commands.O365GROUP_SET, () => {
   it('updates Microsoft 365 Group to private', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
-        if (JSON.stringify(opts.data) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify(<Group>{
           visibility: 'Private'
         })) {
           return Promise.resolve();
@@ -237,7 +238,7 @@ describe(commands.O365GROUP_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -261,7 +262,7 @@ describe(commands.O365GROUP_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -529,7 +530,7 @@ describe(commands.O365GROUP_SET, () => {
   it('fails validation if logoPath points to a non-existent file', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'invalid' } });
-    Utils.restore(fs.existsSync);
+    sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
   });
 
@@ -539,7 +540,7 @@ describe(commands.O365GROUP_SET, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
     const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } });
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);
@@ -552,7 +553,7 @@ describe(commands.O365GROUP_SET, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
     const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } });
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
     ]);

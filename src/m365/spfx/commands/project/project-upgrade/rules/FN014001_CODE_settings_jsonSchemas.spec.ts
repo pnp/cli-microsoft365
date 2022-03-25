@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model/Finding';
 import { FN014001_CODE_settings_jsonSchemas } from './FN014001_CODE_settings_jsonSchemas';
 
 describe('FN014001_CODE_settings_jsonSchemas', () => {

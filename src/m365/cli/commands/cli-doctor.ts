@@ -2,7 +2,7 @@ import * as os from 'os';
 import auth, { AuthType } from '../../../Auth';
 import { Cli, Logger } from '../../../cli';
 import Command from '../../../Command';
-import Utils from '../../../Utils';
+import { validation } from '../../../utils';
 import commands from '../commands';
 const packageJSON = require('../../../../package.json');
 
@@ -52,7 +52,7 @@ class CliDoctorCommand extends Command {
       cliVersion: packageJSON.version,
       nodeVersion: process.version,
       cliAadAppId: auth.service.appId,
-      cliAadAppTenant: Utils.isValidGuid(auth.service.tenant) ? 'single' : auth.service.tenant,
+      cliAadAppTenant: validation.isValidGuid(auth.service.tenant) ? 'single' : auth.service.tenant,
       authMode: AuthType[auth.service.authType],
       cliEnvironment: process.env.CLIMICROSOFT365_ENV ? process.env.CLIMICROSOFT365_ENV : '',
       cliConfig: Cli.getInstance().config.all,

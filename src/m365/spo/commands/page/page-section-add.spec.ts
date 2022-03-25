@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./page-section-add');
 
@@ -35,11 +35,11 @@ describe(commands.PAGE_SECTION_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([request.post, request.get]);
+    sinonUtil.restore([request.post, request.get]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);

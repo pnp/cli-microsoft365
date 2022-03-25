@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import { Logger } from '../../../../cli';
 import Command from '../../../../Command';
-import Utils from '../../../../Utils';
+import { fsUtil, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./package-generate');
 
@@ -40,7 +40,7 @@ describe(commands.PACKAGE_GENERATE, () => {
       }
     };
     sinon.stub(fs, 'mkdtempSync').callsFake(_ => '/tmp/abc');
-    sinon.stub(Utils, 'readdirR').callsFake(_ => ['file1.png', 'file.json']);
+    sinon.stub(fsUtil, 'readdirR').callsFake(_ => ['file1.png', 'file.json']);
     sinon.stub(fs, 'readFileSync').callsFake(_ => 'abc');
     sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     sinon.stub(fs, 'rmdirSync').callsFake(_ => { });
@@ -54,7 +54,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       (command as any).generateNewId,
       admZipMock.addFile,
       admZipMock.addLocalFile,
@@ -66,13 +66,13 @@ describe(commands.PACKAGE_GENERATE, () => {
       fs.rmdirSync,
       fs.statSync,
       fs.writeFileSync,
-      Utils.copyRecursiveSync,
-      Utils.readdirR
+      fsUtil.copyRecursiveSync,
+      fsUtil.readdirR
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent
     ]);
   });
@@ -134,7 +134,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   });
 
   it('creates a package exposed as a Teams tab', done => {
-    Utils.restore([fs.readFileSync, fs.writeFileSync]);
+    sinonUtil.restore([fs.readFileSync, fs.writeFileSync]);
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$supportedHosts$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     command.action(logger, {
@@ -159,7 +159,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   });
 
   it('creates a package exposed as a Teams personal app', done => {
-    Utils.restore([fs.readFileSync, fs.writeFileSync]);
+    sinonUtil.restore([fs.readFileSync, fs.writeFileSync]);
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$supportedHosts$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     command.action(logger, {
@@ -184,7 +184,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   });
 
   it('creates a package exposed as a Teams tab and personal app', done => {
-    Utils.restore([fs.readFileSync, fs.writeFileSync]);
+    sinonUtil.restore([fs.readFileSync, fs.writeFileSync]);
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$supportedHosts$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     command.action(logger, {
@@ -209,7 +209,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   });
 
   it('handles exception when creating a temp folder failed', done => {
-    Utils.restore(fs.mkdtempSync);
+    sinonUtil.restore(fs.mkdtempSync);
     sinon.stub(fs, 'mkdtempSync').throws(new Error('An error has occurred'));
     const archiveWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
     command.action(logger, {
@@ -258,7 +258,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   });
 
   it('removes the temp directory after the package has been created', done => {
-    Utils.restore(fs.rmdirSync);
+    sinonUtil.restore(fs.rmdirSync);
     const fsrmdirSyncSpy = sinon.stub(fs, 'rmdirSync').callsFake(_ => { });
     command.action(logger, {
       options: {
@@ -283,7 +283,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   });
 
   it('removes the temp directory if creating the package failed', done => {
-    Utils.restore(fs.rmdirSync);
+    sinonUtil.restore(fs.rmdirSync);
     const fsrmdirSyncSpy = sinon.stub(fs, 'rmdirSync').callsFake(_ => { });
     sinon.stub(admZipMock, 'writeZip').throws(new Error('An error has occurred'));
     command.action(logger, {
@@ -309,7 +309,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   });
 
   it('prompts user to remove the temp directory manually if removing it automatically failed', done => {
-    Utils.restore(fs.rmdirSync);
+    sinonUtil.restore(fs.rmdirSync);
     sinon.stub(fs, 'rmdirSync').throws(new Error('An error has occurred'));
     command.action(logger, {
       options: {
@@ -333,7 +333,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   });
 
   it('leaves unknown token as-is', done => {
-    Utils.restore([fs.readFileSync, fs.writeFileSync]);
+    sinonUtil.restore([fs.readFileSync, fs.writeFileSync]);
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$token$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     command.action(logger, {
@@ -358,7 +358,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   });
 
   it('exposes page context globally', done => {
-    Utils.restore([fs.readFileSync, fs.writeFileSync]);
+    sinonUtil.restore([fs.readFileSync, fs.writeFileSync]);
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$exposePageContextGlobally$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     command.action(logger, {
@@ -383,7 +383,7 @@ describe(commands.PACKAGE_GENERATE, () => {
   });
 
   it('exposes Teams context globally', done => {
-    Utils.restore([fs.readFileSync, fs.writeFileSync]);
+    sinonUtil.restore([fs.readFileSync, fs.writeFileSync]);
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$exposeTeamsContextGlobally$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     command.action(logger, {

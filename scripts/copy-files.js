@@ -25,6 +25,8 @@ const copyFile = (file, sourceDir, destinationDir) => {
   fs.copyFileSync(file, path.join(destinationFilePath, fileName));
 };
 
+fs.copyFileSync('src/api.d.ts', 'dist/api.d.ts');
+
 const assetsDir = 'dist/m365/spfx/commands/project/project-upgrade/assets';
 mkdirNotExistsSync(assetsDir);
 fs.copyFileSync('src/m365/spfx/commands/project/project-upgrade/assets/tab20x20.png', path.join(assetsDir, 'tab20x20.png'));

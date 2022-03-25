@@ -4,6 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { Feature } from './Feature';
@@ -80,7 +81,7 @@ class SpoFeatureListCommand extends SpoCommand {
       }
     }
 
-    return SpoCommand.isValidSharePointUrl(args.options.url);
+    return validation.isValidSharePointUrl(args.options.url);
   }
 }
 
