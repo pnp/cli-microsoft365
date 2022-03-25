@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { v4 } from 'uuid';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
@@ -6,8 +7,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { accessToken, odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
+import { M365RcJson } from '../../../base/M365RcJson';
 import commands from '../../commands';
 
 interface ServicePrincipalInfo {
@@ -33,6 +35,12 @@ interface AppInfo {
   id: string;
   tenantId: string;
   secret?: string;
+  // used when multiple secrets have been defined in the manifest
+  // in v6 we'll remove secret from AppInfo and just use secrets
+  secrets?: {
+    displayName: string;
+    value: string;
+  }[];
 }
 
 interface CommandArgs {
@@ -48,6 +56,7 @@ interface Options extends GlobalOptions {
   name?: string;
   platform?: string;
   redirectUris?: string;
+  save?: boolean;
   scopeAdminConsentDescription?: string;
   scopeAdminConsentDisplayName?: string;
   scopeConsentBy?: string;
@@ -56,10 +65,11 @@ interface Options extends GlobalOptions {
   withSecret: boolean;
 }
 
-class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
+class AadAppAddCommand extends GraphCommand {
   private static aadApplicationPlatform: string[] = ['spa', 'web', 'publicClient'];
   private static aadAppScopeConsentBy: string[] = ['admins', 'adminsAndUsers'];
   private manifest: any;
+  private appName: string = '';
 
   public get name(): string {
     return commands.APP_ADD;
@@ -89,21 +99,29 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
     this
       .resolveApis(args, logger)
       .then(apis => this.createAppRegistration(args, apis, logger))
+      .then(appInfo => {
+        // based on the assumption that we're adding AAD app to the current
+        // directory. If we in the future extend the command with allowing
+        // users to create AAD app in a different directory, we'll need to
+        // adjust this
+        appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
+        return Promise.resolve(appInfo);
+      })
       .then(appInfo => this.updateAppFromManifest(args, appInfo))
       .then(appInfo => this.configureUri(args, appInfo, logger))
       .then(appInfo => this.configureSecret(args, appInfo, logger))
+      .then(appInfo => this.saveAppInfo(args, appInfo, logger))
       .then((_appInfo: AppInfo): void => {
         const appInfo: any = {
           appId: _appInfo.appId,
           objectId: _appInfo.id,
-          // based on the assumption that we're adding AAD app to the current
-          // directory. If we in the future extend the command with allowing
-          // users to create AAD app in a different directory, we'll need to
-          // adjust this
-          tenantId: Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken)
+          tenantId: _appInfo.tenantId
         };
         if (_appInfo.secret) {
           appInfo.secret = _appInfo.secret;
+        }
+        if (_appInfo.secrets) {
+          appInfo.secrets = _appInfo.secrets;
         }
 
         logger.log(appInfo);
@@ -120,6 +138,7 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
     if (!applicationInfo.displayName && this.manifest) {
       applicationInfo.displayName = this.manifest.name;
     }
+    this.appName = applicationInfo.displayName;
 
     if (apis.length > 0) {
       applicationInfo.requiredResourceAccess = apis;
@@ -162,14 +181,18 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
       return Promise.resolve(appInfo);
     }
 
-    const manifest: any = JSON.parse(args.options.manifest);
+    const v2Manifest: any = JSON.parse(args.options.manifest);
     // remove properties that might be coming from the original app that was
     // used to create the manifest and which can't be updated
-    delete manifest.id;
-    delete manifest.appId;
-    delete manifest.publisherDomain;
+    delete v2Manifest.id;
+    delete v2Manifest.appId;
+    delete v2Manifest.publisherDomain;
+    // extract secrets from the manifest. Store them in a separate variable
+    // and remove them from the manifest because we need to create them
+    // separately
+    const secrets: { name: string, expirationDate: Date }[] = this.getSecretsFromManifest(v2Manifest);
     // Azure Portal returns v2 manifest whereas the Graph API expects a v1.6
-    const transformedManifest = this.transformManifest(manifest);
+    const graphManifest = this.transformManifest(v2Manifest);
 
     const updateAppRequestOptions: any = {
       url: `${this.resource}/v1.0/myorganization/applications/${appInfo.id}`,
@@ -177,12 +200,86 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
         'content-type': 'application/json'
       },
       responseType: 'json',
-      data: transformedManifest
+      data: graphManifest
+    };
+
+    return request
+      .patch(updateAppRequestOptions)
+      .then(_ => this.updatePreAuthorizedAppsFromManifest(v2Manifest, appInfo))
+      .then(_ => this.createSecrets(secrets, appInfo));
+  }
+
+  private getSecretsFromManifest(manifest: any): { name: string, expirationDate: Date }[] {
+    if (!manifest.passwordCredentials || manifest.passwordCredentials.length === 0) {
+      return [];
+    }
+
+    const secrets = manifest.passwordCredentials.map((c: any) => {
+      const startDate = new Date(c.startDate);
+      const endDate = new Date(c.endDate);
+      const expirationDate = new Date();
+      expirationDate.setMilliseconds(endDate.valueOf() - startDate.valueOf());
+
+      return {
+        name: c.displayName,
+        expirationDate
+      };
+    });
+
+    // delete the secrets from the manifest so that we won't try to set them
+    // from the manifest
+    delete manifest.passwordCredentials;
+
+    return secrets;
+  }
+
+  private updatePreAuthorizedAppsFromManifest(manifest: any, appInfo: AppInfo): Promise<AppInfo> {
+    if (!manifest ||
+      !manifest.preAuthorizedApplications ||
+      manifest.preAuthorizedApplications.length === 0) {
+      return Promise.resolve(appInfo);
+    }
+
+    const graphManifest: any = {
+      api: {
+        preAuthorizedApplications: manifest.preAuthorizedApplications
+      }
+    };
+
+    graphManifest.api.preAuthorizedApplications.forEach((p: any) => {
+      p.delegatedPermissionIds = p.permissionIds;
+      delete p.permissionIds;
+    });
+
+    const updateAppRequestOptions: any = {
+      url: `${this.resource}/v1.0/myorganization/applications/${appInfo.id}`,
+      headers: {
+        'content-type': 'application/json'
+      },
+      responseType: 'json',
+      data: graphManifest
     };
 
     return request
       .patch(updateAppRequestOptions)
       .then(_ => Promise.resolve(appInfo));
+  }
+
+  private createSecrets(secrets: { name: string, expirationDate: Date }[], appInfo: AppInfo): Promise<AppInfo> {
+    if (secrets.length === 0) {
+      return Promise.resolve(appInfo);
+    }
+
+    return Promise
+      .all(secrets.map(secret => this.createSecret({
+        appObjectId: appInfo.id,
+        displayName: secret.name,
+        expirationDate: secret.expirationDate
+      })))
+      .then(secrets => {
+        appInfo.secrets = secrets;
+        return appInfo;
+      });
   }
 
   private transformManifest(v2Manifest: any): any {
@@ -221,7 +318,7 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
     graphManifest.api.acceptMappedClaims = v2Manifest.acceptMappedClaims;
     delete graphManifest.acceptMappedClaims;
 
-    graphManifest.publicClient = v2Manifest.allowPublicClient;
+    graphManifest.isFallbackPublicClient = v2Manifest.allowPublicClient;
     delete graphManifest.allowPublicClient;
 
     graphManifest.info.termsOfServiceUrl = v2Manifest.informationalUrls?.termsOfService;
@@ -250,10 +347,18 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
 
     graphManifest.api.oauth2PermissionScopes = v2Manifest.oauth2Permissions;
     delete graphManifest.oauth2Permissions;
+    if (graphManifest.api.oauth2PermissionScopes) {
+      graphManifest.api.oauth2PermissionScopes.forEach((scope: any) => {
+        delete scope.lang;
+        delete scope.origin;
+      });
+    }
 
     delete graphManifest.oauth2RequiredPostResponse;
 
-    graphManifest.api.preAuthorizedApplications = v2Manifest.preAuthorizedApplications;
+    // MS Graph doesn't support creating OAuth2 permissions and pre-authorized
+    // apps in one request. This is why we need to remove it here and do it in
+    // the next request
     delete graphManifest.preAuthorizedApplications;
 
     if (v2Manifest.replyUrlsWithType) {
@@ -272,6 +377,12 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
 
     graphManifest.web.homePageUrl = v2Manifest.signInUrl;
     delete graphManifest.signInUrl;
+
+    if (graphManifest.appRoles) {
+      graphManifest.appRoles.forEach((role: any) => {
+        delete role.lang;
+      });
+    }
 
     return graphManifest;
   }
@@ -327,15 +438,15 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
       logger.logToStderr('Resolving requested APIs...');
     }
 
-    return this
-      .getAllItems(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles`, logger, true)
-      .then(_ => {
+    return odata
+      .getAllItems<ServicePrincipalInfo>(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles`, logger)
+      .then(servicePrincipals => {
         try {
-          const resolvedApis = this.getRequiredResourceAccessForApis(args.options.apisDelegated, 'Scope', logger);
+          const resolvedApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisDelegated, 'Scope', logger);
           if (this.debug) {
             logger.logToStderr(`Resolved delegated permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
           }
-          const resolvedApplicationApis = this.getRequiredResourceAccessForApis(args.options.apisApplication, 'Role', logger);
+          const resolvedApplicationApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisApplication, 'Role', logger);
           if (this.debug) {
             logger.logToStderr(`Resolved application permissions: ${JSON.stringify(resolvedApplicationApis, null, 2)}`);
           }
@@ -362,7 +473,7 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
       });
   }
 
-  private getRequiredResourceAccessForApis(apis: string | undefined, scopeType: string, logger: Logger): RequiredResourceAccess[] {
+  private getRequiredResourceAccessForApis(servicePrincipals: ServicePrincipalInfo[], apis: string | undefined, scopeType: string, logger: Logger): RequiredResourceAccess[] {
     if (!apis) {
       return [];
     }
@@ -378,7 +489,7 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
         logger.logToStderr(`Permission name: ${permissionName}`);
         logger.logToStderr(`Service principal name: ${servicePrincipalName}`);
       }
-      const servicePrincipal = this.items.find(sp => (
+      const servicePrincipal = servicePrincipals.find(sp => (
         sp.servicePrincipalNames.indexOf(servicePrincipalName) > -1 ||
         sp.servicePrincipalNames.indexOf(`${servicePrincipalName}/`) > -1));
       if (!servicePrincipal) {
@@ -418,18 +529,32 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
       logger.logToStderr(`Configure Azure AD app secret...`);
     }
 
-    const secretExpirationDate = new Date();
-    secretExpirationDate.setFullYear(secretExpirationDate.getFullYear() + 1);
+    return this
+      .createSecret({ appObjectId: appInfo.id })
+      .then(secret => {
+        appInfo.secret = secret.value;
+        return Promise.resolve(appInfo);
+      });
+  }
+
+  private createSecret({ appObjectId, displayName = undefined, expirationDate = undefined }: { appObjectId: string, displayName?: string, expirationDate?: Date }): Promise<{ displayName: string, value: string }> {
+    let secretExpirationDate = expirationDate;
+    if (!secretExpirationDate) {
+      secretExpirationDate = new Date();
+      secretExpirationDate.setFullYear(secretExpirationDate.getFullYear() + 1);
+    }
+
+    const secretName = displayName ?? 'Default';
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/myorganization/applications/${appInfo.id}/addPassword`,
+      url: `${this.resource}/v1.0/myorganization/applications/${appObjectId}/addPassword`,
       headers: {
         'content-type': 'application/json'
       },
       responseType: 'json',
       data: {
         passwordCredential: {
-          displayName: 'Default',
+          displayName: secretName,
           endDateTime: secretExpirationDate.toISOString()
         }
       }
@@ -437,10 +562,58 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
 
     return request
       .post<{ secretText: string }>(requestOptions)
-      .then((password: { secretText: string; }): Promise<AppInfo> => {
-        appInfo.secret = password.secretText;
+      .then((password: { secretText: string; }) => Promise.resolve({
+        displayName: secretName,
+        value: password.secretText
+      }));
+  }
+
+  private saveAppInfo(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
+    if (!args.options.save) {
+      return Promise.resolve(appInfo);
+    }
+
+    const filePath: string = '.m365rc.json';
+
+    if (this.verbose) {
+      logger.logToStderr(`Saving Azure AD app registration information to the ${filePath} file...`);
+    }
+
+    let m365rc: M365RcJson = {};
+    if (fs.existsSync(filePath)) {
+      if (this.debug) {
+        logger.logToStderr(`Reading existing ${filePath}...`);
+      }
+
+      try {
+        const fileContents: string = fs.readFileSync(filePath, 'utf8');
+        if (fileContents) {
+          m365rc = JSON.parse(fileContents);
+        }
+      }
+      catch (e) {
+        logger.logToStderr(`Error reading ${filePath}: ${e}. Please add app info to ${filePath} manually.`);
         return Promise.resolve(appInfo);
-      });
+      }
+    }
+
+    if (!m365rc.apps) {
+      m365rc.apps = [];
+    }
+
+    m365rc.apps.push({
+      appId: appInfo.appId,
+      name: this.appName
+    });
+
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(m365rc, null, 2));
+    }
+    catch (e) {
+      logger.logToStderr(`Error writing ${filePath}: ${e}. Please add app info to ${filePath} manually.`);
+    }
+
+    return Promise.resolve(appInfo);
   }
 
   public options(): CommandOption[] {
@@ -488,6 +661,9 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
       },
       {
         option: '--manifest [manifest]'
+      },
+      {
+        option: '--save'
       }
     ];
 

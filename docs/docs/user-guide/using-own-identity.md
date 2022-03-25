@@ -1,4 +1,4 @@
-# Using your own Azure AD identity
+# Use your own Azure AD identity
 
 When you use the CLI for Microsoft 365 to connect to your tenant for the first time, you are presented with a `Permissions requested` prompt from Azure, by accepting this prompt you are consenting to using the `PnP Microsoft 365 Management Shell` Azure AD application with your tenant as well as the permissions that it requires.
 
@@ -49,7 +49,7 @@ This will refresh the `Authentication` blade and will display the Redirect URI w
 !!! info
     This Redirect URI is specific to the use of authentication methods that do not use a web interface for authenticating users and are therefore called `Native Clients`. This is the category that the CLI for Microsoft 365 falls into.
 
-Moving on, we can skip over the `Supported account type` section, as this is defaulted to `Accounts in this organizational directory only (<tenant> only - Single tenant)` meaning, that only users within the current tenant directory can use this application. In the `Advanced settings` section, we need to enable the `Default client type` toggle, as we are using the `Device code flow` method to authenticate to our tenant using the CLI for Microsoft 365.
+Moving on, we can skip over the `Supported account type` section, as this is defaulted to `Accounts in this organizational directory only (<tenant> only - Single tenant)` meaning, that only users within the current tenant directory can use this application. In the `Advanced settings` section, we need to enable the `Allow public client flows` toggle, as we are using the `Device code flow` method to authenticate to our tenant using the CLI for Microsoft 365.
 
 [![Advanced settings](../images/using-own-identity/advanced-settings.png)](../images/using-own-identity/advanced-settings.png)
 
@@ -138,8 +138,6 @@ m365 spo site get --url https://trinder365dev.sharepoint.com -o json
 The JSON representation of the SharePoint Online site will be returned to the console.
 
 Congratulations! You have just configured the CLI for Microsoft 365 to use your own custom application with custom permissions from your own Azure Active Directory.
-
-[![Congratulations](../images/using-own-identity/congratulations.png)](../images/using-own-identity/congratulations.png)
 
 ## Persisting environment variables
 

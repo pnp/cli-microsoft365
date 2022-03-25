@@ -5,7 +5,7 @@ import { SinonSandbox } from 'sinon';
 import appInsights from '../../../appInsights';
 import { Logger } from '../../../cli';
 import Command, { CommandError, CommandTypes } from '../../../Command';
-import Utils from '../../../Utils';
+import { sinonUtil } from '../../../utils';
 import commands from '../commands';
 const command: Command = require('./spfx-doctor');
 
@@ -49,7 +49,7 @@ describe(commands.DOCTOR, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       sandbox,
       child_process.exec,
       process.platform
@@ -57,7 +57,7 @@ describe(commands.DOCTOR, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent
     ]);
   });
@@ -654,6 +654,17 @@ describe(commands.DOCTOR, () => {
     });
   });
 
+  it('fails validation if output does not equal text.', (done) => {
+    const actual = command.validate({
+      options: {
+        output: 'json'
+      }
+    });
+
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
   it('fails SP2019 compatibility check for SPFx v1.5.0', (done) => {
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
@@ -797,7 +808,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^10.0.0 required')));
+        assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^10 required')));
         assert(loggerLogSpy.calledWith('- Install Node.js v10'), 'No fix provided');
         done();
       }
@@ -824,7 +835,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^8.0.0 || ^10.0.0 required')));
+        assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^8 || ^10 required')));
         assert(loggerLogSpy.calledWith('- Install Node.js v10'), 'No fix provided');
         done();
       }
@@ -901,7 +912,7 @@ describe(commands.DOCTOR, () => {
     command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(loggerLogSpy.calledWith(getStatus(1, 'yo not found')));
-        assert(loggerLogSpy.calledWith('- npm i -g yo'), 'No fix provided');
+        assert(loggerLogSpy.calledWith('- npm i -g yo@3'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -958,7 +969,7 @@ describe(commands.DOCTOR, () => {
     command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(loggerLogSpy.calledWith(getStatus(1, 'gulp not found')));
-        assert(loggerLogSpy.calledWith('- npm i -g gulp'), 'No fix provided');
+        assert(loggerLogSpy.calledWith('- npm i -g gulp@3'), 'No fix provided');
         done();
       }
       catch (e) {

@@ -3,8 +3,8 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { Message } from '../../Message';
 
@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   since?: string;
 }
 
-class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
+class TeamsMessageListCommand extends GraphCommand {
   public get name(): string {
     return commands.MESSAGE_LIST;
   }
@@ -35,16 +35,16 @@ class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
     const deltaExtension: string = args.options.since !== undefined ? `/delta?$filter=lastModifiedDateTime gt ${args.options.since}` : '';
     const endpoint: string = `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${args.options.channelId}/messages${deltaExtension}`;
 
-    this
-      .getAllItems(endpoint, logger, true)
-      .then((): void => {
+    odata
+      .getAllItems<Message>(endpoint, logger)
+      .then((items): void => {
         if (args.options.output !== 'json') {
-          this.items.forEach(i => {
+          items.forEach(i => {
             i.body = i.body.content as any;
           });
         }
 
-        logger.log(this.items);
+        logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -67,19 +67,19 @@ class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.teamId)) {
+    if (!validation.isValidGuid(args.options.teamId)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 
-    if (!Utils.isValidTeamsChannelId(args.options.channelId as string)) {
+    if (!validation.isValidTeamsChannelId(args.options.channelId as string)) {
       return `${args.options.channelId} is not a valid Teams ChannelId`;
     }
 
-    if (args.options.since && !Utils.isValidISODateDashOnly(args.options.since as string)) {
+    if (args.options.since && !validation.isValidISODateDashOnly(args.options.since as string)) {
       return `${args.options.since} is not a valid ISO Date (with dash separator)`;
     }
 
-    if (args.options.since && !Utils.isDateInRange(args.options.since as string, 8)) {
+    if (args.options.since && !validation.isDateInRange(args.options.since as string, 8)) {
       return `${args.options.since} is not in the last 8 months (for delta messages)`;
     }
 

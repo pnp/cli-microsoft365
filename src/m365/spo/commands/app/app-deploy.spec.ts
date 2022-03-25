@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./app-deploy');
 
@@ -40,7 +40,7 @@ describe(commands.APP_DEPLOY, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post,
       Cli.prompt
@@ -48,7 +48,7 @@ describe(commands.APP_DEPLOY, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -76,7 +76,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -101,7 +101,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -117,7 +117,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -142,7 +142,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -158,7 +158,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -183,7 +183,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -211,7 +211,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -249,7 +249,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -287,7 +287,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -325,7 +325,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -352,7 +352,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -378,7 +378,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -394,7 +394,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -420,7 +420,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -436,7 +436,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -462,7 +462,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -478,7 +478,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -503,7 +503,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -519,7 +519,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -544,7 +544,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -560,7 +560,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve();
         }
       }
@@ -588,7 +588,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore([
+        sinonUtil.restore([
           request.post,
           request.get
         ]);
@@ -604,7 +604,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.reject({
             error: {
               'odata.error': {
@@ -631,7 +631,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -644,7 +644,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.reject({
             error: {
               'odata.error': {
@@ -671,7 +671,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -748,7 +748,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.reject({ error: 'An error has occurred' });
         }
       }
@@ -765,7 +765,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -778,7 +778,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.reject({ error: 'An error has occurred' });
         }
       }
@@ -795,7 +795,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -807,7 +807,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.reject({ error: JSON.stringify({ message: 'An error has occurred' }) });
         }
       }
@@ -824,7 +824,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -835,7 +835,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.reject({ error: JSON.stringify({ message: 'An error has occurred' }) });
         }
       }
@@ -852,7 +852,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -863,7 +863,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.reject({
             error: {
               'odata.error': {
@@ -889,7 +889,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });
@@ -900,7 +900,7 @@ describe(commands.APP_DEPLOY, () => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.reject({
             error: {
               'odata.error': {
@@ -926,7 +926,7 @@ describe(commands.APP_DEPLOY, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.post);
+        sinonUtil.restore(request.post);
       }
     });
   });

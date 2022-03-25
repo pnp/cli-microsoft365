@@ -6,10 +6,9 @@ import {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { Term } from './Term';
 
 interface CommandArgs {
@@ -48,11 +47,11 @@ class SpoTermGetCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
-    this
+    spo
       .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
-        return this.getRequestDigest(spoAdminUrl);
+        return spo.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
@@ -65,9 +64,9 @@ class SpoTermGetCommand extends SpoCommand {
           data = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="13" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><StaticMethod Id="6" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="7" ParentId="6" Name="GetDefaultSiteCollectionTermStore" /><Method Id="13" ParentId="7" Name="GetTerm"><Parameters><Parameter Type="Guid">{${args.options.id}}</Parameter></Parameters></Method></ObjectPaths></Request>`;
         }
         else {
-          const termGroupQuery: string = args.options.termGroupId ? `<Method Id="98" ParentId="96" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termGroupId}}</Parameter></Parameters></Method>` : `<Method Id="98" ParentId="96" Name="GetByName"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.termGroupName)}</Parameter></Parameters></Method>`;
-          const termSetQuery: string = args.options.termSetId ? `<Method Id="103" ParentId="101" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termSetId}}</Parameter></Parameters></Method>` : `<Method Id="103" ParentId="101" Name="GetByName"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.termSetName)}</Parameter></Parameters></Method>`;
-          data = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="91" ObjectPathId="90" /><ObjectIdentityQuery Id="92" ObjectPathId="90" /><ObjectPath Id="94" ObjectPathId="93" /><ObjectIdentityQuery Id="95" ObjectPathId="93" /><ObjectPath Id="97" ObjectPathId="96" /><ObjectPath Id="99" ObjectPathId="98" /><ObjectIdentityQuery Id="100" ObjectPathId="98" /><ObjectPath Id="102" ObjectPathId="101" /><ObjectPath Id="104" ObjectPathId="103" /><ObjectIdentityQuery Id="105" ObjectPathId="103" /><ObjectPath Id="107" ObjectPathId="106" /><ObjectPath Id="109" ObjectPathId="108" /><ObjectIdentityQuery Id="110" ObjectPathId="108" /><Query Id="111" ObjectPathId="108"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><StaticMethod Id="90" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="93" ParentId="90" Name="GetDefaultSiteCollectionTermStore" /><Property Id="96" ParentId="93" Name="Groups" />${termGroupQuery}<Property Id="101" ParentId="98" Name="TermSets" />${termSetQuery}<Property Id="106" ParentId="103" Name="Terms" /><Method Id="108" ParentId="106" Name="GetByName"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.name)}</Parameter></Parameters></Method></ObjectPaths></Request>`;
+          const termGroupQuery: string = args.options.termGroupId ? `<Method Id="98" ParentId="96" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termGroupId}}</Parameter></Parameters></Method>` : `<Method Id="98" ParentId="96" Name="GetByName"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.termGroupName)}</Parameter></Parameters></Method>`;
+          const termSetQuery: string = args.options.termSetId ? `<Method Id="103" ParentId="101" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termSetId}}</Parameter></Parameters></Method>` : `<Method Id="103" ParentId="101" Name="GetByName"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.termSetName)}</Parameter></Parameters></Method>`;
+          data = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="91" ObjectPathId="90" /><ObjectIdentityQuery Id="92" ObjectPathId="90" /><ObjectPath Id="94" ObjectPathId="93" /><ObjectIdentityQuery Id="95" ObjectPathId="93" /><ObjectPath Id="97" ObjectPathId="96" /><ObjectPath Id="99" ObjectPathId="98" /><ObjectIdentityQuery Id="100" ObjectPathId="98" /><ObjectPath Id="102" ObjectPathId="101" /><ObjectPath Id="104" ObjectPathId="103" /><ObjectIdentityQuery Id="105" ObjectPathId="103" /><ObjectPath Id="107" ObjectPathId="106" /><ObjectPath Id="109" ObjectPathId="108" /><ObjectIdentityQuery Id="110" ObjectPathId="108" /><Query Id="111" ObjectPathId="108"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><StaticMethod Id="90" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="93" ParentId="90" Name="GetDefaultSiteCollectionTermStore" /><Property Id="96" ParentId="93" Name="Groups" />${termGroupQuery}<Property Id="101" ParentId="98" Name="TermSets" />${termSetQuery}<Property Id="106" ParentId="103" Name="Terms" /><Method Id="108" ParentId="106" Name="GetByName"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.name)}</Parameter></Parameters></Method></ObjectPaths></Request>`;
         }
 
         const requestOptions: any = {
@@ -140,7 +139,7 @@ class SpoTermGetCommand extends SpoCommand {
     }
 
     if (args.options.id) {
-      if (!Utils.isValidGuid(args.options.id)) {
+      if (!validation.isValidGuid(args.options.id)) {
         return `${args.options.id} is not a valid GUID`;
       }
     }
@@ -160,7 +159,7 @@ class SpoTermGetCommand extends SpoCommand {
     }
 
     if (args.options.termGroupId) {
-      if (!Utils.isValidGuid(args.options.termGroupId)) {
+      if (!validation.isValidGuid(args.options.termGroupId)) {
         return `${args.options.termGroupId} is not a valid GUID`;
       }
     }
@@ -170,7 +169,7 @@ class SpoTermGetCommand extends SpoCommand {
     }
 
     if (args.options.termSetId) {
-      if (!Utils.isValidGuid(args.options.termSetId)) {
+      if (!validation.isValidGuid(args.options.termSetId)) {
         return `${args.options.termSetId} is not a valid GUID`;
       }
     }

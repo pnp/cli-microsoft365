@@ -5,7 +5,7 @@ import Command, {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { accessToken } from '../../../../utils';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -28,7 +28,7 @@ class TenantIdGetCommand extends Command {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let domainName: string = args.options.domainName;
     if (!domainName) {
-      const userName: string = Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
+      const userName: string = accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
       domainName = userName.split('@')[1];
     }
 

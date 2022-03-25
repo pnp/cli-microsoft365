@@ -4,6 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { ListInstanceCollection } from "./ListInstanceCollection";
@@ -67,7 +68,7 @@ class SpoListListCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

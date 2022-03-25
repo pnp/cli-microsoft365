@@ -6,7 +6,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./approleassignment-add');
 
@@ -59,14 +59,14 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -198,7 +198,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     });
   });
 
-  it('rejects if not app roles found for the specified resource option value', (done) => {
+  it('rejects if app roles are not found for the specified resource option value', (done) => {
     postRequestStub();
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
@@ -223,7 +223,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     });
   });
 
-  it('rejects if not app roles found for the specified resource option value', (done) => {
+  it('rejects if app role scope not found for the specified resource option value', (done) => {
     postRequestStub();
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {

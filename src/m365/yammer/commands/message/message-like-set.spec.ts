@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 
 const command: Command = require('./message-like-set');
@@ -42,7 +42,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.delete,
       request.post,
       Cli.prompt
@@ -50,7 +50,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -95,17 +95,17 @@ describe(commands.MESSAGE_LIKE_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('enable must be true or false', () => {
+  it('passes validation if enabled set to "true"', () => {
     const actual = command.validate({ options: { id: 10123123, enable: 'true' } });
     assert.strictEqual(actual, true);
   });
 
-  it('enable must be true or false', () => {
+  it('passes validation if enabled set to "true"', () => {
     const actual = command.validate({ options: { id: 10123123, enable: 'false' } });
     assert.strictEqual(actual, true);
   });
 
-  it('enable must be true or false', () => {
+  it('does not pass validation if enable not set to either "true" or "false"', () => {
     const actual = command.validate({ options: { id: 10123123, enable: 'fals' } });
     assert.notStrictEqual(actual, true);
   });
@@ -241,7 +241,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -258,7 +258,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   it('Aborts execution when enabled set to false and confirmation is not given', (done) => {
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });

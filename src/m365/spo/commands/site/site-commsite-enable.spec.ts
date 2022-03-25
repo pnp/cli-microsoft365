@@ -6,7 +6,7 @@ import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./site-commsite-enable');
 
@@ -17,7 +17,12 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.resolve('ABC'); });
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -38,15 +43,15 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      (command as any).getRequestDigest,
+      spo.getRequestDigest,
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
@@ -207,13 +212,6 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
       options: { url: 'http://contoso.sharepoint.com' }
     });
     assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when valid site URL specified', () => {
-    const actual = command.validate({
-      options: { url: 'https://contoso.sharepoint.com' }
-    });
-    assert.strictEqual(actual, true);
   });
 
   it('passes validation when valid site URL specified', () => {

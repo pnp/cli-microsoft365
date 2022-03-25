@@ -1,3 +1,4 @@
+import { Group } from '@microsoft/microsoft-graph-types';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
@@ -6,7 +7,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -47,7 +48,7 @@ class AadO365GroupSetCommand extends GraphCommand {
         logger.logToStderr(`Updating Microsoft 365 Group ${args.options.id}...`);
       }
 
-      const update: any = {};
+      const update: Group = {};
       if (args.options.displayName) {
         update.displayName = args.options.displayName;
       }
@@ -255,7 +256,7 @@ class AadO365GroupSetCommand extends GraphCommand {
       return 'Specify at least one property to update';
     }
 
-    if (!Utils.isValidGuid(args.options.id)) {
+    if (!validation.isValidGuid(args.options.id)) {
       return `${args.options.id} is not a valid GUID`;
     }
 

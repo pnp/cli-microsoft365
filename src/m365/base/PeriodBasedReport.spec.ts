@@ -6,7 +6,7 @@ import auth from '../../Auth';
 import { Logger } from '../../cli';
 import { CommandError } from '../../Command';
 import request from '../../request';
-import Utils from '../../Utils';
+import { sinonUtil } from '../../utils';
 import PeriodBasedReport from './PeriodBasedReport';
 
 class MockCommand extends PeriodBasedReport {
@@ -54,14 +54,14 @@ describe('PeriodBasedReport', () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       fs.writeFileSync
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent,
       auth.restoreAuth
     ]);

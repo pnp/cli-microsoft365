@@ -4,7 +4,7 @@ import Command, {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import commands from '../../commands';
 import * as paAppListCommand from '../app/app-list';
@@ -139,7 +139,7 @@ class PaAppGetCommand extends AzmgmtCommand {
       return 'Specify either name or displayName but not both';
     }
 
-    if (args.options.name && !Utils.isValidGuid(args.options.name)) {
+    if (args.options.name && !validation.isValidGuid(args.options.name)) {
       return `${args.options.name} is not a valid GUID`;
     }
 

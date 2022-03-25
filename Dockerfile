@@ -21,7 +21,9 @@ RUN apk add --no-cache \
   shadow \
   bash-completion \
   nodejs \
-  npm
+  npm \
+  python3 \
+  py3-pip
 
 RUN adduser --system cli-microsoft365
 USER cli-microsoft365
@@ -31,16 +33,17 @@ WORKDIR /home/cli-microsoft365
 ENV 0="/bin/bash" \
   SHELL="bash" \
   NPM_CONFIG_PREFIX=/home/cli-microsoft365/.npm-global \
-  PATH=$PATH:/home/cli-microsoft365/.npm-global/bin \
+  PATH=$PATH:/home/cli-microsoft365/.npm-global/bin:/home/cli-microsoft365/.local/bin \
   CLIMICROSOFT365_ENV="docker"
 
-RUN bash -c 'echo "export PATH=$PATH:/home/cli-microsoft365/.npm-global/bin" >> ~/.bash_profile' \
-  && bash -c 'echo "export NPM_CONFIG_PREFIX=/home/cli-microsoft365/.npm-global" >> ~/.bash_profile' \
+RUN bash -c 'echo "export PATH=$PATH:/home/cli-microsoft365/.npm-global/bin:/home/.local/bin" >> ~/.bash_profile' \
   && bash -c 'echo "export CLIMICROSOFT365_ENV=\"docker\"" >> ~/.bash_profile' \
   && bash -c 'npm i -g @pnp/cli-microsoft365@${CLI_VERSION} --production --quiet --no-progress' \ 
   && bash -c 'echo "source /etc/profile.d/bash_completion.sh" >> ~/.bash_profile' \
   && bash -c 'npm cache clean --force' \
   && bash -c 'm365 cli completion sh setup' \
   && pwsh -c 'm365 cli completion pwsh setup --profile $profile'
+
+RUN pip install jmespath-terminal
 
 CMD [ "bash", "-l" ]

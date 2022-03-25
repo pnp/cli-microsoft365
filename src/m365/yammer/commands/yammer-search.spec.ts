@@ -5,7 +5,7 @@ import auth from '../../../Auth';
 import { Logger } from '../../../cli';
 import Command, { CommandError } from '../../../Command';
 import request from '../../../request';
-import Utils from '../../../Utils';
+import { sinonUtil } from '../../../utils';
 import commands from '../commands';
 const command: Command = require('./yammer-search');
 
@@ -219,13 +219,13 @@ describe(commands.SEARCH, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -298,12 +298,12 @@ describe(commands.SEARCH, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('query must be a string', () => {
+  it('passes validation if queryText is a string', () => {
     const actual = command.validate({ options: { queryText: 'abc' } });
     assert.strictEqual(actual, true);
   });
 
-  it('query must be a string', () => {
+  it('does not pass validation if queryText is a number', () => {
     const actual = command.validate({ options: { queryText: 123 } });
     assert.notStrictEqual(actual, true);
   });

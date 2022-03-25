@@ -10,7 +10,8 @@ import { Cli, CommandOutput } from '.';
 import appInsights from '../appInsights';
 import Command, { CommandArgs, CommandError, CommandOption, CommandTypes } from '../Command';
 import AnonymousCommand from '../m365/base/AnonymousCommand';
-import Utils from '../Utils';
+import { settingsNames } from '../settingsNames';
+import { sinonUtil } from '../utils';
 import { Logger } from './Logger';
 import Table = require('easy-table');
 const packageJSON = require('../../package.json');
@@ -42,6 +43,33 @@ class MockCommand extends AnonymousCommand {
   }
   public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     logger.log(args.options.parameterX);
+    cb();
+  }
+}
+
+class MockCommandWithOptionSets extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock optionsets';
+  }
+  public get description(): string {
+    return 'Mock command with option sets';
+  }
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '--opt1 [name]'
+      },
+      {
+        option: '--opt2 [name]'
+      }
+    ];
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
+  }
+  public optionSets(): string[][] | undefined {
+    return [['opt1', 'opt2']];
+  }
+  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     cb();
   }
 }
@@ -144,6 +172,7 @@ describe('Cli', () => {
   let markshellStub: sinon.SinonStub;
   let mockCommandActionSpy: sinon.SinonSpy;
   let mockCommand: Command;
+  let mockCommandWithOptionSets: Command;
   let mockCommandWithAlias: Command;
   let mockCommandWithValidation: Command;
 
@@ -159,6 +188,7 @@ describe('Cli', () => {
     mockCommand = new MockCommand();
     mockCommandWithAlias = new MockCommandWithAlias();
     mockCommandWithValidation = new MockCommandWithValidation();
+    mockCommandWithOptionSets = new MockCommandWithOptionSets();
     mockCommandActionSpy = sinon.spy(mockCommand, 'action');
 
     return new Promise((resolve) => {
@@ -172,6 +202,7 @@ describe('Cli', () => {
   beforeEach(() => {
     cli = Cli.getInstance();
     (cli as any).loadCommand(mockCommand);
+    (cli as any).loadCommand(mockCommandWithOptionSets);
     (cli as any).loadCommand(mockCommandWithAlias);
     (cli as any).loadCommand(mockCommandWithValidation);
   });
@@ -184,7 +215,7 @@ describe('Cli', () => {
     processExitStub.reset();
     markshellStub.reset();
     mockCommandActionSpy.resetHistory();
-    Utils.restore([
+    sinonUtil.restore([
       Cli.executeCommand,
       fs.existsSync,
       fs.readFileSync,
@@ -196,18 +227,20 @@ describe('Cli', () => {
       // eslint-disable-next-line no-console
       console.error,
       mockCommand.commandAction,
-      mockCommand.processOptions
+      mockCommand.processOptions,
+      Cli.prompt
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       (Cli as any).log,
       (Cli as any).error,
       (Cli as any).formatOutput,
       process.exit,
       markshell.toRawContent,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      cli.getSettingWithDefaultValue
     ]);
   });
 
@@ -412,7 +445,14 @@ describe('Cli', () => {
       });
   });
 
-  it(`fails validation if a required option is missing`, (done) => {
+  it(`does not prompt and fails validation if a required option is missing`, (done) => {
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return undefined;
+      }
+      return defaultValue;
+    });
+
     cli
       .execute(rootFolder, ['cli', 'mock'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
@@ -424,6 +464,56 @@ describe('Cli', () => {
           done(e);
         }
       });
+  });
+
+  it(`shows error when optionSets validation fails - at least one option is specified`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'optionsets'])
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
+        try {
+          assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt1, opt2.')));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it(`shows error when optionSets validation fails - multiple options are specified`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', 'optionsets', '--opt1', 'testvalue', '--opt2', 'testvalue'])
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
+        try {
+          assert(cliErrorStub.calledWith(chalk.red('Error: Specify one of the following options: opt1, opt2, but not multiple.')));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it(`prompts for required options`, (done) => {
+    const promptStub: sinon.SinonStub = sinon.stub(inquirer, 'prompt').callsFake(() => Promise.resolve({ missingRequireOptionValue: "test" }) as any);
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.prompt) {
+        return 'true';
+      }
+      return defaultValue;
+    });
+
+    cli
+      .execute(rootFolder, ['cli', 'mock'])
+      .then(_ => {
+        try {
+          assert(promptStub.called);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
   });
 
   it(`calls command's validation method when defined`, (done) => {
@@ -631,7 +721,61 @@ describe('Cli', () => {
       .then((output: CommandOutput) => {
         try {
           assert.strictEqual(output.stdout, 'Raw output');
-          assert.strictEqual(output.stderr, 'Debug output');
+          assert.strictEqual(output.stderr, ['Executing command cli mock output with options {"options":{"_":[],"debug":true,"output":"text"}}', 'Debug output'].join(os.EOL));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it('captures command stdout output in a listener when specified', (done) => {
+    let output: string = '';
+    const commandWithOutput: MockCommandWithOutput = new MockCommandWithOutput();
+    Cli
+      .executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text' } }, {
+        stdout: (message) => output = message
+      })
+      .then(_ => {
+        try {
+          assert.strictEqual(output, 'Command output');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it('captures command raw stdout output in a listener when specified', (done) => {
+    let output: string = '';
+    const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
+    Cli
+      .executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text' } }, {
+        stdout: (message) => output = message
+      })
+      .then(_ => {
+        try {
+          assert.strictEqual(output, 'Raw output');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it('captures command stderr output in a listener when specified', (done) => {
+    const output: string[] = [];
+    const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
+    Cli
+      .executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text', debug: true } }, {
+        stderr: (message) => output.push(message)
+      })
+      .then(_ => {
+        try {
+          assert.deepStrictEqual(output, ['Executing command cli mock output with options {"options":{"_":[],"output":"text","debug":true}}', 'Debug output']);
           done();
         }
         catch (e) {
@@ -649,20 +793,6 @@ describe('Cli', () => {
       .then(_ => {
         try {
           assert(promptStub.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
-  });
-
-  it('logs command name when executing command with output in debug mode', (done) => {
-    Cli
-      .executeCommandWithOutput(mockCommand, { options: { debug: true, _: [] } })
-      .then(_ => {
-        try {
-          assert(cliLogStub.calledWith('Executing command cli mock with options {"options":{"debug":true,"_":[]}}'));
           done();
         }
         catch (e) {
@@ -712,7 +842,7 @@ describe('Cli', () => {
       .then(_ => {
         try {
           // 12 commands from the folder + 3 mocks
-          assert.strictEqual(cli.commands.length, 12 + 3);
+          assert.strictEqual(cli.commands.length, 12 + 4);
           done();
         }
         catch (e) {
@@ -829,6 +959,166 @@ describe('Cli', () => {
     }
   });
 
+  it('properly handles new line characters in JSON output', (done) => {
+    const input = {
+      "_ObjectIdentity_": "b61700a0-9062-3000-659e-7f5738e3385a|908bed80-a04a-4433-b4a0-883d9847d110:1b11f502-9eb0-401a-b164-68933e6e9443\nSiteProperties\nhttps%3a%2f%2fm365x954810.sharepoint.com%2fsites%2fsite1617"
+    };
+    const expected = [
+      '{',
+      '  "_ObjectIdentity_": "b61700a0-9062-3000-659e-7f5738e3385a|908bed80-a04a-4433-b4a0-883d9847d110:1b11f502-9eb0-401a-b164-68933e6e9443\\\\\\nSiteProperties\\\\\\nhttps%3a%2f%2fm365x954810.sharepoint.com%2fsites%2fsite1617"',
+      '}'
+    ].join('\n');
+    const actual = (Cli as any).formatOutput(input, { output: 'json' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('formats object with array as csv', (done) => {
+    const input =
+      [{
+        "header1": "value1item1",
+        "header2": "value2item1"
+      },
+      {
+        "header1": "value1item2",
+        "header2": "value2item2"
+      }
+      ];
+    const expected = "header1,header2\nvalue1item1,value2item1\nvalue1item2,value2item2\n";
+    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('formats a simple object as csv', (done) => {
+    const input =
+    {
+      "header1": "value1item1",
+      "header2": "value2item1"
+    };
+    const expected = "header1,header2\nvalue1item1,value2item1\n";
+    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('does not produce headers when csvHeader config is set to false ', (done) => {
+    const input =
+    {
+      "header1": "value1item1",
+      "header2": "value2item1"
+    };
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.csvHeader) {
+        return false;
+      }
+      return defaultValue;
+    });
+
+    const expected = "value1item1,value2item1\n";
+    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('quotes all non-empty fields even if not required when csvQuoted config is set to true', (done) => {
+    const input =
+    {
+      "header1": "value1item1",
+      "header2": "value2item1"
+    };
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.csvQuoted) {
+        return true;
+      }
+      return defaultValue;
+    });
+
+    const expected = "\"header1\",\"header2\"\n\"value1item1\",\"value2item1\"\n";
+    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('quotes all empty fields if csvQuotedEmpty config is set to true', (done) => {
+    const input =
+    {
+      "header1": "value1item1",
+      "header2": ""
+    };
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.csvQuotedEmpty) {
+        return true;
+      }
+      return defaultValue;
+    });
+
+    const expected = "header1,header2\nvalue1item1,\"\"\n";
+    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('quotes all fields with character set in csvQuote config', (done) => {
+    const input =
+    {
+      "header1": "value1item1",
+      "header2": "value2item1"
+    };
+    sinon.stub(Cli.getInstance(), 'getSettingWithDefaultValue').callsFake((settingName, defaultValue) => {
+      if (settingName === settingsNames.csvQuoted) {
+        return true;
+      }
+      return defaultValue;
+    });
+    sinon.stub(Cli.getInstance().config, 'get').callsFake((settingName) => {
+      if (settingName === settingsNames.csvQuote) {
+        return "_";
+      }
+      return null;
+    });
+
+    const expected = "_header1_,_header2_\n_value1item1_,_value2item1_\n";
+    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
   it('formats simple output as text', (done) => {
     const o = false;
     const actual = (Cli as any).formatOutput(o, { output: 'text' });
@@ -847,7 +1137,7 @@ describe('Cli', () => {
     assert.strictEqual(actual, d.toString());
   });
 
-  it('formats object output as transposed table', (done) => {
+  it('formats object output as transposed table when passing seqential props', (done) => {
     const o = { prop1: 'value1', prop2: 'value2' };
     const actual = (Cli as any).formatOutput(o, { output: 'text' });
     const t = new Table();
@@ -1145,7 +1435,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  4 commands'));
+      assert(cliLogStub.calledWith('  cli *  5 commands'));
       done();
     }
     catch (e) {
@@ -1165,7 +1455,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli mock *   2 commands'));
+      assert(cliLogStub.calledWith('  cli mock *   3 commands'));
       done();
     }
     catch (e) {
@@ -1185,7 +1475,7 @@ describe('Cli', () => {
     (cli as any).printAvailableCommands();
 
     try {
-      assert(cliLogStub.calledWith('  cli *  4 commands'));
+      assert(cliLogStub.calledWith('  cli *  5 commands'));
       done();
     }
     catch (e) {
@@ -1283,21 +1573,21 @@ describe('Cli', () => {
   });
 
   it(`logs output to console`, () => {
-    Utils.restore((Cli as any).log);
+    sinonUtil.restore((Cli as any).log);
     const consoleLogSpy: sinon.SinonSpy = sinon.stub(console, 'log').callsFake(() => { });
     (Cli as any).log('Message');
     assert(consoleLogSpy.calledWith('Message'));
   });
 
   it(`logs empty line to console when no message specified`, () => {
-    Utils.restore((Cli as any).log);
+    sinonUtil.restore((Cli as any).log);
     const consoleLogSpy: sinon.SinonSpy = sinon.stub(console, 'log').callsFake(() => { });
     (Cli as any).log();
     assert(consoleLogSpy.calledWith());
   });
 
   it(`logs error to console stderr`, () => {
-    Utils.restore((Cli as any).error);
+    sinonUtil.restore((Cli as any).error);
     const consoleErrorSpy: sinon.SinonSpy = sinon.stub(console, 'error').callsFake(() => { });
     (Cli as any).error('Message');
     assert(consoleErrorSpy.calledWith('Message'));
@@ -1306,7 +1596,7 @@ describe('Cli', () => {
   it(`logs error to console stdout when stdout configured as error output`, () => {
     const config = cli.config;
     sinon.stub(config, 'get').callsFake(() => 'stdout');
-    Utils.restore((Cli as any).error);
+    sinonUtil.restore((Cli as any).error);
     const consoleErrorSpy: sinon.SinonSpy = sinon.stub(console, 'error').callsFake(() => { });
     const consoleLogSpy: sinon.SinonSpy = sinon.stub(console, 'log').callsFake(() => { });
 

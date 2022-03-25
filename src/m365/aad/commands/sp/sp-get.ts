@@ -4,21 +4,21 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import AadCommand from '../../../base/AadCommand';
+import { validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   appId?: string;
   displayName?: string;
   objectId?: string;
 }
 
-class AadSpGetCommand extends AadCommand {
+class AadSpGetCommand extends GraphCommand {
   public get name(): string {
     return commands.SP_GET;
   }
@@ -35,39 +35,67 @@ class AadSpGetCommand extends AadCommand {
     return telemetryProps;
   }
 
+  private getSpId(args: CommandArgs): Promise<string> {
+    if (args.options.objectId) {
+      return Promise.resolve(args.options.objectId);
+    }
+
+    let spMatchQuery: string = '';
+    if (args.options.displayName) {
+      spMatchQuery = `displayName eq '${encodeURIComponent(args.options.displayName)}'`;
+    }
+    else if (args.options.appId) {
+      spMatchQuery = `appId eq '${encodeURIComponent(args.options.appId)}'`;
+    }
+
+    const idRequestOptions: any = {
+      url: `${this.resource}/v1.0/servicePrincipals?$filter=${spMatchQuery}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    return request
+      .get<{ value: { id: string; }[] }>(idRequestOptions)
+      .then(response => {
+        const spItem: { id: string } | undefined = response.value[0];
+
+        if (!spItem) {
+          return Promise.reject(`The specified Azure AD app does not exist`);
+        }
+
+        if (response.value.length > 1) {
+          return Promise.reject(`Multiple Azure AD apps with name ${args.options.displayName} found: ${response.value.map(x => x.id)}`);
+        }
+
+        return Promise.resolve(spItem.id);
+      });
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
       logger.logToStderr(`Retrieving service principal information...`);
     }
 
-    let spMatchQuery: string = '';
-    if (args.options.appId) {
-      spMatchQuery = `appId eq '${encodeURIComponent(args.options.appId)}'`;
-    }
-    else if (args.options.objectId) {
-      spMatchQuery = `objectId eq '${encodeURIComponent(args.options.objectId)}'`;
-    }
-    else {
-      spMatchQuery = `displayName eq '${encodeURIComponent(args.options.displayName as string)}'`;
-    }
+    this
+      .getSpId(args)
+      .then((id: string): Promise<void> => {
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/servicePrincipals/${id}`,
+          headers: {
+            accept: 'application/json;odata.metadata=none',
+            'content-type': 'application/json;odata.metadata=none'
+          },
+          responseType: 'json'
+        };
 
-    const requestOptions: any = {
-      url: `${this.resource}/myorganization/servicePrincipals?api-version=1.6&$filter=${spMatchQuery}`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    request
-      .get<{ value: any[] }>(requestOptions)
-      .then((res: { value: any[] }): void => {
-        if (res.value && res.value.length > 0) {
-          logger.log(res.value[0]);
-        }
-
+        return request.get(requestOptions);
+      })
+      .then((res: any): void => {
+        logger.log(res);
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -96,11 +124,11 @@ class AadSpGetCommand extends AadCommand {
       return 'Specify either appId, objectId or displayName';
     }
 
-    if (args.options.appId && !Utils.isValidGuid(args.options.appId)) {
+    if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
       return `${args.options.appId} is not a valid appId GUID`;
     }
 
-    if (args.options.objectId && !Utils.isValidGuid(args.options.objectId)) {
+    if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
       return `${args.options.objectId} is not a valid objectId GUID`;
     }
 

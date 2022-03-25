@@ -17,6 +17,31 @@ interface Options extends GlobalOptions {
   asAdmin: boolean;
 }
 
+interface Trigger {
+  type: string;
+  kind?: string;
+}
+
+interface Action {
+  type: string;
+  swaggerOperationId?: string;
+}
+
+interface Flow {
+  actions?: string;
+  description?: string;
+  displayName?: string;
+  properties: {
+    displayName: string;
+    definitionSummary: {
+      actions: Action[];
+      description: string;
+      triggers: Trigger[];
+    };
+  },
+  triggers: string;
+}
+
 class FlowGetCommand extends AzmgmtCommand {
   public get name(): string {
     return commands.GET;
@@ -44,14 +69,15 @@ class FlowGetCommand extends AzmgmtCommand {
     };
 
     request
-      .get(requestOptions)
-      .then((res: any): void => {
+      .get<Flow>(requestOptions)
+      .then((res): void => {
         res.displayName = res.properties.displayName;
         res.description = res.properties.definitionSummary.description || '';
-        res.triggers = Object.keys(res.properties.definition.triggers).join(', ');
-        res.actions = Object.keys(res.properties.definition.actions).join(', ');
+        res.triggers = res.properties.definitionSummary.triggers.map((t: Trigger) => (t.type + (t.kind ? "-" + t.kind : '')) as string).join(', ');
+        res.actions = res.properties.definitionSummary.actions.map((a: Action) => (a.type + (a.swaggerOperationId ? "-" + a.swaggerOperationId : '')) as string).join(', ');
 
         logger.log(res);
+
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }

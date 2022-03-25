@@ -4,9 +4,9 @@ import {
 } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
+import { spo, ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 class SpoTenantSettingsListCommand extends SpoCommand {
   public get name(): string {
@@ -20,11 +20,11 @@ class SpoTenantSettingsListCommand extends SpoCommand {
   public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
-    this
+    spo
       .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
-        return this.getRequestDigest(spoAdminUrl);
+        return spo.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         const requestOptions: any = {

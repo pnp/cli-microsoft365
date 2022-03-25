@@ -5,11 +5,10 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
-import Utils from '../../../../Utils';
+import { fsUtil, packageManager, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
-import { Manifest, Project, VsCode } from './model';
-import { FindingToReport, Utils as Utils1 } from './project-upgrade/';
-import { Finding } from './project-upgrade/Finding';
+import { Manifest, Project, VsCode } from './project-model';
+import { Finding, FindingToReport } from './report-model';
 const command: Command = require('./project-upgrade');
 
 describe(commands.PROJECT_UPGRADE, () => {
@@ -55,7 +54,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       (command as any).getProjectRoot,
       (command as any).getProjectVersion,
       fs.existsSync,
@@ -63,12 +62,12 @@ describe(commands.PROJECT_UPGRADE, () => {
       fs.statSync,
       fs.writeFileSync,
       fs.mkdirSync,
-      Utils1.getAllFiles
+      fsUtil.readdirR
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent
     ]);
   });
@@ -405,7 +404,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     sinon.stub(command as any, 'getProjectVersion').callsFake(_ => '0.0.1');
 
     command.action(logger, { options: {} } as any, (err?: any) => {
-      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`CLI for Microsoft 365 doesn't support upgrading projects build on SharePoint Framework v0.0.1`, 4)));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`CLI for Microsoft 365 doesn't support upgrading projects built using SharePoint Framework v0.0.1`, 4)));
     });
   });
 
@@ -413,7 +412,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     sinon.stub(command as any, 'getProjectVersion').callsFake(_ => '1.5.0');
 
     command.action(logger, { options: { toVersion: '1.5.0' } } as any, (err?: any) => {
-      assert.strictEqual(typeof(err), 'undefined', 'Returns error');
+      assert.strictEqual(typeof (err), 'undefined', 'Returns error');
       assert(log.indexOf(`Project doesn't need to be upgraded`) > -1, `Doesn't return info message`);
     });
   });
@@ -709,7 +708,9 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   //#region npm
   it(`doesn't return any dependencies from command npm for npm package manager`, () => {
-    (command as any).mapPackageManagerCommand('npm', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    packageManager.mapPackageManagerCommand({
+      command: 'npm', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn, packageMgr: 'npm'
+    });
     assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
     assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
     assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
@@ -717,7 +718,9 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it(`returns 1 exact dependency to be installed for npm i -SE for npm package manager`, () => {
-    (command as any).mapPackageManagerCommand('npm i -SE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    packageManager.mapPackageManagerCommand({
+      command: 'npm i -SE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn, packageMgr: 'npm'
+    });
     assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
     assert.strictEqual(packagesDepExact.length, 1, 'Incorrect number of dev deps to install');
     assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
@@ -725,7 +728,9 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it(`returns 1 exact dev dependency to be installed for npm i -DE for npm package manager`, () => {
-    (command as any).mapPackageManagerCommand('npm i -DE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    packageManager.mapPackageManagerCommand({
+      command: 'npm i -DE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn, packageMgr: 'npm'
+    });
     assert.strictEqual(packagesDevExact.length, 1, 'Incorrect number of deps to install');
     assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
     assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
@@ -733,7 +738,9 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it(`returns 1 dependency to uninstall for npm un -S for npm package manager`, () => {
-    (command as any).mapPackageManagerCommand('npm un -S package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    packageManager.mapPackageManagerCommand({
+      command: 'npm un -S package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn, packageMgr: 'npm'
+    });
     assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
     assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
     assert.strictEqual(packagesDepUn.length, 1, 'Incorrect number of deps to uninstall');
@@ -741,7 +748,9 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it(`returns 1 dev dependency to uninstall for npm un -D for npm package manager`, () => {
-    (command as any).mapPackageManagerCommand('npm un -D package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    packageManager.mapPackageManagerCommand({
+      command: 'npm un -D package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn, packageMgr: 'npm'
+    });
     assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
     assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
     assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
@@ -749,22 +758,46 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it(`returns command to install dependency for 1 dep for npm package manager`, () => {
-    const commands: string[] = (command as any).reducePackageManagerCommand(['package'], [], [], []);
+    const commands: string[] = packageManager.reducePackageManagerCommand({
+      packagesDepExact: ['package'],
+      packagesDevExact: [],
+      packagesDepUn: [],
+      packagesDevUn: [],
+      packageMgr: 'npm'
+    });
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['npm i -SE package']));
   });
 
   it(`returns command to install dev dependency for 1 dev dep for npm package manager`, () => {
-    const commands: string[] = (command as any).reducePackageManagerCommand([], ['package'], [], []);
+    const commands: string[] = packageManager.reducePackageManagerCommand({
+      packagesDepExact: [],
+      packagesDevExact: ['package'],
+      packagesDepUn: [],
+      packagesDevUn: [],
+      packageMgr: 'npm'
+    });
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['npm i -DE package']));
   });
 
   it(`returns command to uninstall dependency for 1 dep for npm package manager`, () => {
-    const commands: string[] = (command as any).reducePackageManagerCommand([], [], ['package'], []);
+    const commands: string[] = packageManager.reducePackageManagerCommand({
+      packagesDepExact: [],
+      packagesDevExact: [],
+      packagesDepUn: ['package'],
+      packagesDevUn: [],
+      packageMgr: 'npm'
+    });
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['npm un -S package']));
   });
 
   it(`returns command to uninstall dev dependency for 1 dev dep for npm package manager`, () => {
-    const commands: string[] = (command as any).reducePackageManagerCommand([], [], [], ['package']);
+    const commands: string[] = packageManager.reducePackageManagerCommand({
+      packagesDepExact: [],
+      packagesDevExact: [],
+      packagesDepUn: [],
+      packagesDevUn: ['package'],
+      packageMgr: 'npm'
+    });
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['npm un -D package']));
   });
   //#endregion
@@ -772,7 +805,9 @@ describe(commands.PROJECT_UPGRADE, () => {
   //#region pnpm
   it(`doesn't return any dependencies from command pnpm for pnpm package manager`, () => {
     (command as any).packageManager = 'pnpm';
-    (command as any).mapPackageManagerCommand('pnpm', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    packageManager.mapPackageManagerCommand({
+      command: 'pnpm', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn, packageMgr: 'pnpm'
+    });
     assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
     assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
     assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
@@ -781,7 +816,9 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it(`returns 1 exact dependency to be installed for pnpm i -E for pnpm package manager`, () => {
     (command as any).packageManager = 'pnpm';
-    (command as any).mapPackageManagerCommand('pnpm i -E package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    packageManager.mapPackageManagerCommand({
+      command: 'pnpm i -E package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn, packageMgr: 'pnpm'
+    });
     assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
     assert.strictEqual(packagesDepExact.length, 1, 'Incorrect number of dev deps to install');
     assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
@@ -790,7 +827,9 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it(`returns 1 exact dev dependency to be installed for pnpm i -DE for npm package manager`, () => {
     (command as any).packageManager = 'pnpm';
-    (command as any).mapPackageManagerCommand('pnpm i -DE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    packageManager.mapPackageManagerCommand({
+      command: 'pnpm i -DE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn, packageMgr: 'pnpm'
+    });
     assert.strictEqual(packagesDevExact.length, 1, 'Incorrect number of deps to install');
     assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
     assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
@@ -799,7 +838,9 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it(`returns 1 dev dependency to uninstall for pnpm un for npm package manager`, () => {
     (command as any).packageManager = 'pnpm';
-    (command as any).mapPackageManagerCommand('pnpm un package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    packageManager.mapPackageManagerCommand({
+      command: 'pnpm un package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn, packageMgr: 'pnpm'
+    });
     assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
     assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
     assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
@@ -808,25 +849,49 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it(`returns command to install dependency for 1 dep for pnpm package manager`, () => {
     (command as any).packageManager = 'pnpm';
-    const commands: string[] = (command as any).reducePackageManagerCommand(['package'], [], [], []);
+    const commands: string[] = packageManager.reducePackageManagerCommand({
+      packagesDepExact: ['package'],
+      packagesDevExact: [],
+      packagesDepUn: [],
+      packagesDevUn: [],
+      packageMgr: 'pnpm'
+    });
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['pnpm i -E package']));
   });
 
   it(`returns command to install dev dependency for 1 dev dep for pnpm package manager`, () => {
     (command as any).packageManager = 'pnpm';
-    const commands: string[] = (command as any).reducePackageManagerCommand([], ['package'], [], []);
+    const commands: string[] = packageManager.reducePackageManagerCommand({
+      packagesDepExact: [],
+      packagesDevExact: ['package'],
+      packagesDepUn: [],
+      packagesDevUn: [],
+      packageMgr: 'pnpm'
+    });
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['pnpm i -DE package']));
   });
 
   it(`returns command to uninstall dependency for 1 dep for pnpm package manager`, () => {
     (command as any).packageManager = 'pnpm';
-    const commands: string[] = (command as any).reducePackageManagerCommand([], [], ['package'], []);
+    const commands: string[] = packageManager.reducePackageManagerCommand({
+      packagesDepExact: [],
+      packagesDevExact: [],
+      packagesDepUn: ['package'],
+      packagesDevUn: [],
+      packageMgr: 'pnpm'
+    });
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['pnpm un package']));
   });
 
-  it(`returns command to uninstall dev dependency for 1 dev dep for npm package manager`, () => {
+  it(`returns command to uninstall dev dependency for 1 dev dep for pnpm package manager`, () => {
     (command as any).packageManager = 'pnpm';
-    const commands: string[] = (command as any).reducePackageManagerCommand([], [], [], ['package']);
+    const commands: string[] = packageManager.reducePackageManagerCommand({
+      packagesDepExact: [],
+      packagesDevExact: [],
+      packagesDepUn: [],
+      packagesDevUn: ['package'],
+      packageMgr: 'pnpm'
+    });
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['pnpm un package']));
   });
   //#endregion
@@ -834,7 +899,9 @@ describe(commands.PROJECT_UPGRADE, () => {
   //#region yarn
   it(`doesn't return any dependencies from command yarn for yarn package manager`, () => {
     (command as any).packageManager = 'yarn';
-    (command as any).mapPackageManagerCommand('yarn', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    packageManager.mapPackageManagerCommand({
+      command: 'yarn', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn, packageMgr: 'yarn'
+    });
     assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
     assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
     assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
@@ -843,7 +910,9 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it(`returns 1 exact dependency to be installed for yarn add -E for pnpm package manager`, () => {
     (command as any).packageManager = 'yarn';
-    (command as any).mapPackageManagerCommand('yarn add -E package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    packageManager.mapPackageManagerCommand({
+      command: 'yarn add -E package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn, packageMgr: 'yarn'
+    });
     assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
     assert.strictEqual(packagesDepExact.length, 1, 'Incorrect number of dev deps to install');
     assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
@@ -852,7 +921,9 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it(`returns 1 exact dev dependency to be installed for yarn add -DE for npm package manager`, () => {
     (command as any).packageManager = 'yarn';
-    (command as any).mapPackageManagerCommand('yarn add -DE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    packageManager.mapPackageManagerCommand({
+      command: 'yarn add -DE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn, packageMgr: 'yarn'
+    });
     assert.strictEqual(packagesDevExact.length, 1, 'Incorrect number of deps to install');
     assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
     assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
@@ -861,7 +932,9 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it(`returns 1 dev dependency to uninstall for yarn un for npm package manager`, () => {
     (command as any).packageManager = 'yarn';
-    (command as any).mapPackageManagerCommand('yarn remove package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
+    packageManager.mapPackageManagerCommand({
+      command: 'yarn remove package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn, packageMgr: 'yarn'
+    });
     assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
     assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
     assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
@@ -870,31 +943,61 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it(`returns command to install dependency for 1 dep for yarn package manager`, () => {
     (command as any).packageManager = 'yarn';
-    const commands: string[] = (command as any).reducePackageManagerCommand(['package'], [], [], []);
+    const commands: string[] = packageManager.reducePackageManagerCommand({
+      packagesDepExact: ['package'],
+      packagesDevExact: [],
+      packagesDepUn: [],
+      packagesDevUn: [],
+      packageMgr: 'yarn'
+    });
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['yarn add -E package']));
   });
 
   it(`returns command to install dev dependency for 1 dev dep for yarn package manager`, () => {
     (command as any).packageManager = 'yarn';
-    const commands: string[] = (command as any).reducePackageManagerCommand([], ['package'], [], []);
+    const commands: string[] = packageManager.reducePackageManagerCommand({
+      packagesDepExact: [],
+      packagesDevExact: ['package'],
+      packagesDepUn: [],
+      packagesDevUn: [],
+      packageMgr: 'yarn'
+    });
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['yarn add -DE package']));
   });
 
   it(`returns command to uninstall dependency for 1 dep for yarn package manager`, () => {
     (command as any).packageManager = 'yarn';
-    const commands: string[] = (command as any).reducePackageManagerCommand([], [], ['package'], []);
+    const commands: string[] = packageManager.reducePackageManagerCommand({
+      packagesDepExact: [],
+      packagesDevExact: [],
+      packagesDepUn: ['package'],
+      packagesDevUn: [],
+      packageMgr: 'yarn'
+    });
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['yarn remove package']));
   });
 
   it(`returns command to uninstall dev dependency for 1 dev dep for yarn package manager`, () => {
     (command as any).packageManager = 'yarn';
-    const commands: string[] = (command as any).reducePackageManagerCommand([], [], [], ['package']);
+    const commands: string[] = packageManager.reducePackageManagerCommand({
+      packagesDepExact: [],
+      packagesDevExact: [],
+      packagesDepUn: [],
+      packagesDevUn: ['package'],
+      packageMgr: 'yarn'
+    });
     assert.strictEqual(JSON.stringify(commands), JSON.stringify(['yarn remove package']));
   });
   //#endregion
 
   it(`returns no commands to run when no dependencies found`, () => {
-    const commands: string[] = (command as any).reducePackageManagerCommand([], [], [], []);
+    const commands: string[] = packageManager.reducePackageManagerCommand({
+      packagesDepExact: [],
+      packagesDevExact: [],
+      packagesDepUn: [],
+      packagesDevUn: [],
+      packageMgr: 'npm'
+    });
     assert.strictEqual(JSON.stringify(commands), JSON.stringify([]));
   });
 
@@ -2288,7 +2391,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 23);
+      assert.strictEqual(findings.length, 22);
     });
   });
 
@@ -2297,7 +2400,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 27);
+      assert.strictEqual(findings.length, 26);
     });
   });
 
@@ -2306,7 +2409,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 23);
+      assert.strictEqual(findings.length, 22);
     });
   });
 
@@ -2315,7 +2418,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 24);
+      assert.strictEqual(findings.length, 23);
     });
   });
 
@@ -2324,7 +2427,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 29);
+      assert.strictEqual(findings.length, 28);
     });
   });
 
@@ -2333,7 +2436,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 34);
+      assert.strictEqual(findings.length, 33);
     });
   });
   //#endregion
@@ -2450,6 +2553,183 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
   //#endregion
 
+  //#region 1.13.0
+  it('e2e: shows correct number of findings for upgrading application customizer 1.13.0 project to 1.13.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1130-applicationcustomizer'));
+
+    command.action(logger, { options: { toVersion: '1.13.1', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 9);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.13.0 project to 1.13.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1130-fieldcustomizer-react'));
+
+    command.action(logger, { options: { toVersion: '1.13.1', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 8);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.13.0 project to 1.13.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1130-listviewcommandset'));
+
+    command.action(logger, { options: { toVersion: '1.13.1', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 9);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.13.0 project to 1.13.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1130-webpart-nolib'));
+
+    command.action(logger, { options: { toVersion: '1.13.1', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 10);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.13.0 project to 1.13.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1130-webpart-react'));
+
+    command.action(logger, { options: { toVersion: '1.13.1', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 10);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.13.0 project to 1.13.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1130-webpart-optionaldeps'));
+
+    command.action(logger, { options: { toVersion: '1.13.1', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 20);
+    });
+  });
+  //#endregion
+
+  //#region 1.13.1
+  it('e2e: shows correct number of findings for upgrading application customizer 1.13.1 project to 1.14.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-applicationcustomizer'));
+
+    command.action(logger, { options: { toVersion: '1.14.0', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 11);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.13.1 project to 1.14.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-fieldcustomizer-react'));
+
+    command.action(logger, { options: { toVersion: '1.14.0', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 10);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.13.1 project to 1.14.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-listviewcommandset'));
+
+    command.action(logger, { options: { toVersion: '1.14.0', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 11);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.13.1 project to 1.14.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-nolib'));
+
+    command.action(logger, { options: { toVersion: '1.14.0', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 13);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.13.1 project to 1.14.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-react'));
+
+    command.action(logger, { options: { toVersion: '1.14.0', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 13);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.13.1 project to 1.14.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-optionaldeps'));
+
+    command.action(logger, { options: { toVersion: '1.14.0', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 23);
+    });
+  });
+  //#endregion
+
+  //#region 1.14.0
+  it('e2e: shows correct number of findings for upgrading application customizer 1.14.0 project to 1.15.0-beta.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1140-applicationcustomizer'));
+
+    command.action(logger, { options: { toVersion: '1.15.0-beta.1', output: 'json', preview: true } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 13);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.14.0 project to 1.15.0-beta.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1140-fieldcustomizer-react'));
+
+    command.action(logger, { options: { toVersion: '1.15.0-beta.1', output: 'json', preview: true } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 13);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.14.0 project to 1.15.0-beta.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1140-listviewcommandset'));
+
+    command.action(logger, { options: { toVersion: '1.15.0-beta.1', output: 'json', preview: true } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 13);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.14.0 project to 1.15.0-beta.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1140-webpart-nolib'));
+
+    command.action(logger, { options: { toVersion: '1.15.0-beta.1', output: 'json', preview: true } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 14);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.14.0 project to 1.15.0-beta.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1140-webpart-react'));
+
+    command.action(logger, { options: { toVersion: '1.15.0-beta.1', output: 'json', preview: true } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 15);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.14.0 project to 1.15.0-beta.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1140-webpart-optionaldeps'));
+
+    command.action(logger, { options: { toVersion: '1.15.0-beta.1', output: 'json', preview: true } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 24);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading ace 1.14.0 project to 1.15.0-beta.1', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1140-ace'));
+
+    command.action(logger, { options: { toVersion: '1.15.0-beta.1', output: 'json', preview: true } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 11);
+    });
+  });
+  //#endregion
+
   //#region superseded rules
   it('ignores superseded findings (1.1.0 > 1.2.0)', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-110-webpart-react'));
@@ -2496,13 +2776,13 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
-  // it('upgrades project to the latest preview version using the preview option', () => {
-  //   sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1120-webpart-nolib'));
+  it('upgrades project to the latest preview version using the preview option', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-nolib'));
 
-  //   command.action(logger, { options: { preview: true } } as any, () => {
-  //     assert(log[0].indexOf('1.13.0') > -1);
-  //   });
-  // });
+    command.action(logger, { options: { preview: true } } as any, () => {
+      assert(log[0].indexOf('1.15.0-beta.1') > -1);
+    });
+  });
 
   it('returns markdown report with output format md', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph'));
@@ -2523,13 +2803,13 @@ describe(commands.PROJECT_UPGRADE, () => {
   it('writes CodeTour upgrade report to .tours folder when in tour output mode. Creates the folder when it does not exist', () => {
     const projectPath: string = 'src/m365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph';
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
-    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(_ => {});
+    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     const existsSyncOriginal = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake(path => {
       if (path.toString().indexOf('.tours') > -1) {
         return false;
       }
-      
+
       return existsSyncOriginal(path);
     });
     const mkDirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => '');
@@ -2543,13 +2823,13 @@ describe(commands.PROJECT_UPGRADE, () => {
   it('writes CodeTour upgrade report to .tours folder when in tour output mode. Does not create the folder when it already exists', () => {
     const projectPath: string = 'src/m365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph';
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
-    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(_ => {});
+    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     const existsSyncOriginal = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake(path => {
       if (path.toString().indexOf('.tours') > -1) {
         return true;
       }
-      
+
       return existsSyncOriginal(path);
     });
     const mkDirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => '');
@@ -2616,8 +2896,8 @@ describe(commands.PROJECT_UPGRADE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when logger shell specified', () => {
-    const actual = command.validate({ options: { shell: 'logger' } });
+  it('passes validation when cmd shell specified', () => {
+    const actual = command.validate({ options: { shell: 'cmd' } });
     assert.strictEqual(actual, true);
   });
 });

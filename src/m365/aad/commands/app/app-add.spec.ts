@@ -1,11 +1,12 @@
 import * as assert from 'assert';
+import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 import * as mocks from './app-add.mock';
 const command: Command = require('./app-add');
@@ -45,16 +46,19 @@ describe(commands.APP_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.patch,
-      request.post
+      request.post,
+      fs.existsSync,
+      fs.readFileSync,
+      fs.writeFileSync
     ]);
     (command as any).manifest = undefined;
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -2586,8 +2590,7 @@ describe(commands.APP_ADD, () => {
           "api": {
             "acceptMappedClaims": null,
             "knownClientApplications": [],
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
+            "oauth2PermissionScopes": []
           },
           "info": {
             "termsOfServiceUrl": null,
@@ -2612,7 +2615,7 @@ describe(commands.APP_ADD, () => {
               "http://localhost"
             ]
           },
-          "publicClient": null,
+          "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
         return Promise.resolve();
@@ -2815,8 +2818,7 @@ describe(commands.APP_ADD, () => {
           "api": {
             "acceptMappedClaims": null,
             "knownClientApplications": [],
-            "oauth2PermissionScopes": [],
-            "preAuthorizedApplications": []
+            "oauth2PermissionScopes": []
           },
           "info": {},
           "web": {
@@ -2835,7 +2837,7 @@ describe(commands.APP_ADD, () => {
               "http://localhost"
             ]
           },
-          "publicClient": null,
+          "isFallbackPublicClient": null,
           "displayName": "My app"
         })) {
         return Promise.resolve();
@@ -2989,6 +2991,2375 @@ describe(commands.APP_ADD, () => {
           objectId: '3a0388de-2988-4a97-a068-ff4e2b218752',
           tenantId: ''
         }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('creates AAD app reg for a web app from a manifest with pre-authorized apps', (done) => {
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+    sinon.stub(request, 'patch').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "addIns": [],
+          "appRoles": [],
+          "createdDateTime": "2022-02-07T08:51:18Z",
+          "description": null,
+          "certification": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [
+            "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+          ],
+          "keyCredentials": [],
+          "notes": null,
+          "optionalClaims": null,
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "oauth2PermissionScopes": [
+              {
+                "adminConsentDescription": "Access as a user",
+                "adminConsentDisplayName": "Access as a user",
+                "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+                "isEnabled": true,
+                "type": "User",
+                "userConsentDescription": null,
+                "userConsentDisplayName": null,
+                "value": "access_as_user"
+              }
+            ]
+          },
+          "info": {
+            "termsOfServiceUrl": null,
+            "supportUrl": null,
+            "privacyStatementUrl": null,
+            "marketingUrl": null,
+            "logoUrl": null
+          },
+          "web": {
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            },
+            "redirectUris": [],
+            "logoutUrl": null,
+            "homePageUrl": null
+          },
+          "spa": {
+            "redirectUris": [
+              "http://localhost/auth",
+              "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
+            ]
+          },
+          "isFallbackPublicClient": null,
+          "displayName": "My app"
+        })) {
+          return Promise.resolve();
+        }
+
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "api": {
+            "preAuthorizedApplications": [
+              {
+                "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              },
+              {
+                "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              }
+            ]
+          }
+        })) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
+          "deletedDateTime": null,
+          "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
+          "applicationTemplateId": null,
+          "disabledByMicrosoftStatus": null,
+          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
+          "displayName": "Angular Teams app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "publisherDomain": "M365x61791022.onmicrosoft.com",
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "defaultRedirectUri": null,
+          "certification": null,
+          "optionalClaims": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          },
+          "spa": {
+            "redirectUris": []
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+
+    const manifest = {
+      "id": "95cfe30d-ed44-4f9d-b73d-c66560f72e83",
+      "acceptMappedClaims": null,
+      "accessTokenAcceptedVersion": null,
+      "addIns": [],
+      "allowPublicClient": null,
+      "appId": "ff254847-12c7-44cf-921e-8883dbd622a7",
+      "appRoles": [],
+      "oauth2AllowUrlPathMatching": false,
+      "createdDateTime": "2022-02-07T08:51:18Z",
+      "description": null,
+      "certification": null,
+      "disabledByMicrosoftStatus": null,
+      "groupMembershipClaims": null,
+      "identifierUris": [
+        "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+      ],
+      "informationalUrls": {
+        "termsOfService": null,
+        "support": null,
+        "privacy": null,
+        "marketing": null
+      },
+      "keyCredentials": [],
+      "knownClientApplications": [],
+      "logoUrl": null,
+      "logoutUrl": null,
+      "name": "My app",
+      "notes": null,
+      "oauth2AllowIdTokenImplicitFlow": false,
+      "oauth2AllowImplicitFlow": false,
+      "oauth2Permissions": [
+        {
+          "adminConsentDescription": "Access as a user",
+          "adminConsentDisplayName": "Access as a user",
+          "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+          "isEnabled": true,
+          "lang": null,
+          "origin": "Application",
+          "type": "User",
+          "userConsentDescription": null,
+          "userConsentDisplayName": null,
+          "value": "access_as_user"
+        }
+      ],
+      "oauth2RequirePostResponse": false,
+      "optionalClaims": null,
+      "orgRestrictions": [],
+      "parentalControlSettings": {
+        "countriesBlockedForMinors": [],
+        "legalAgeGroupRule": "Allow"
+      },
+      "passwordCredentials": [],
+      "preAuthorizedApplications": [
+        {
+          "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+          "permissionIds": [
+            "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+          ]
+        },
+        {
+          "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+          "permissionIds": [
+            "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+          ]
+        }
+      ],
+      "publisherDomain": "contoso.onmicrosoft.com",
+      "replyUrlsWithType": [
+        {
+          "url": "http://localhost/auth",
+          "type": "Spa"
+        },
+        {
+          "url": "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth",
+          "type": "Spa"
+        }
+      ],
+      "requiredResourceAccess": [
+        {
+          "resourceAppId": "00000003-0000-0000-c000-000000000000",
+          "resourceAccess": [
+            {
+              "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+              "type": "Scope"
+            }
+          ]
+        }
+      ],
+      "samlMetadataUrl": null,
+      "serviceManagementReference": null,
+      "signInUrl": null,
+      "signInAudience": "AzureADMyOrg",
+      "tags": [],
+      "tokenEncryptionKeyId": null
+    };
+
+    (command as any).manifest = manifest;
+    command.action(logger, {
+      options: {
+        debug: false,
+        manifest: JSON.stringify(manifest)
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('creates AAD app reg for a web app from a manifest with public client flows enabled', (done) => {
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+    sinon.stub(request, 'patch').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "addIns": [],
+          "appRoles": [],
+          "createdDateTime": "2022-02-07T08:51:18Z",
+          "description": null,
+          "certification": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [
+            "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+          ],
+          "keyCredentials": [],
+          "notes": null,
+          "optionalClaims": null,
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "oauth2PermissionScopes": [
+              {
+                "adminConsentDescription": "Access as a user",
+                "adminConsentDisplayName": "Access as a user",
+                "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+                "isEnabled": true,
+                "type": "User",
+                "userConsentDescription": null,
+                "userConsentDisplayName": null,
+                "value": "access_as_user"
+              }
+            ]
+          },
+          "info": {
+            "termsOfServiceUrl": null,
+            "supportUrl": null,
+            "privacyStatementUrl": null,
+            "marketingUrl": null,
+            "logoUrl": null
+          },
+          "web": {
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            },
+            "redirectUris": [],
+            "logoutUrl": null,
+            "homePageUrl": null
+          },
+          "spa": {
+            "redirectUris": [
+              "http://localhost/auth",
+              "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
+            ]
+          },
+          "isFallbackPublicClient": true,
+          "displayName": "My app"
+        })) {
+          return Promise.resolve();
+        }
+
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "api": {
+            "preAuthorizedApplications": [
+              {
+                "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              },
+              {
+                "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              }
+            ]
+          }
+        })) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
+          "deletedDateTime": null,
+          "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
+          "applicationTemplateId": null,
+          "disabledByMicrosoftStatus": null,
+          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
+          "displayName": "Angular Teams app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "publisherDomain": "M365x61791022.onmicrosoft.com",
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "defaultRedirectUri": null,
+          "certification": null,
+          "optionalClaims": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          },
+          "spa": {
+            "redirectUris": []
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+
+    const manifest = {
+      "id": "95cfe30d-ed44-4f9d-b73d-c66560f72e83",
+      "acceptMappedClaims": null,
+      "accessTokenAcceptedVersion": null,
+      "addIns": [],
+      "allowPublicClient": true,
+      "appId": "ff254847-12c7-44cf-921e-8883dbd622a7",
+      "appRoles": [],
+      "oauth2AllowUrlPathMatching": false,
+      "createdDateTime": "2022-02-07T08:51:18Z",
+      "description": null,
+      "certification": null,
+      "disabledByMicrosoftStatus": null,
+      "groupMembershipClaims": null,
+      "identifierUris": [
+        "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+      ],
+      "informationalUrls": {
+        "termsOfService": null,
+        "support": null,
+        "privacy": null,
+        "marketing": null
+      },
+      "keyCredentials": [],
+      "knownClientApplications": [],
+      "logoUrl": null,
+      "logoutUrl": null,
+      "name": "My app",
+      "notes": null,
+      "oauth2AllowIdTokenImplicitFlow": false,
+      "oauth2AllowImplicitFlow": false,
+      "oauth2Permissions": [
+        {
+          "adminConsentDescription": "Access as a user",
+          "adminConsentDisplayName": "Access as a user",
+          "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+          "isEnabled": true,
+          "lang": null,
+          "origin": "Application",
+          "type": "User",
+          "userConsentDescription": null,
+          "userConsentDisplayName": null,
+          "value": "access_as_user"
+        }
+      ],
+      "oauth2RequirePostResponse": false,
+      "optionalClaims": null,
+      "orgRestrictions": [],
+      "parentalControlSettings": {
+        "countriesBlockedForMinors": [],
+        "legalAgeGroupRule": "Allow"
+      },
+      "passwordCredentials": [],
+      "preAuthorizedApplications": [
+        {
+          "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+          "permissionIds": [
+            "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+          ]
+        },
+        {
+          "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+          "permissionIds": [
+            "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+          ]
+        }
+      ],
+      "publisherDomain": "contoso.onmicrosoft.com",
+      "replyUrlsWithType": [
+        {
+          "url": "http://localhost/auth",
+          "type": "Spa"
+        },
+        {
+          "url": "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth",
+          "type": "Spa"
+        }
+      ],
+      "requiredResourceAccess": [
+        {
+          "resourceAppId": "00000003-0000-0000-c000-000000000000",
+          "resourceAccess": [
+            {
+              "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+              "type": "Scope"
+            }
+          ]
+        }
+      ],
+      "samlMetadataUrl": null,
+      "serviceManagementReference": null,
+      "signInUrl": null,
+      "signInAudience": "AzureADMyOrg",
+      "tags": [],
+      "tokenEncryptionKeyId": null
+    };
+
+    (command as any).manifest = manifest;
+    command.action(logger, {
+      options: {
+        debug: false,
+        manifest: JSON.stringify(manifest)
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('creates AAD app reg for a web app from a manifest with public client flows disabled', (done) => {
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+    sinon.stub(request, 'patch').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "addIns": [],
+          "appRoles": [],
+          "createdDateTime": "2022-02-07T08:51:18Z",
+          "description": null,
+          "certification": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [
+            "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+          ],
+          "keyCredentials": [],
+          "notes": null,
+          "optionalClaims": null,
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "oauth2PermissionScopes": [
+              {
+                "adminConsentDescription": "Access as a user",
+                "adminConsentDisplayName": "Access as a user",
+                "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+                "isEnabled": true,
+                "type": "User",
+                "userConsentDescription": null,
+                "userConsentDisplayName": null,
+                "value": "access_as_user"
+              }
+            ]
+          },
+          "info": {
+            "termsOfServiceUrl": null,
+            "supportUrl": null,
+            "privacyStatementUrl": null,
+            "marketingUrl": null,
+            "logoUrl": null
+          },
+          "web": {
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            },
+            "redirectUris": [],
+            "logoutUrl": null,
+            "homePageUrl": null
+          },
+          "spa": {
+            "redirectUris": [
+              "http://localhost/auth",
+              "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
+            ]
+          },
+          "isFallbackPublicClient": false,
+          "displayName": "My app"
+        })) {
+          return Promise.resolve();
+        }
+
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "api": {
+            "preAuthorizedApplications": [
+              {
+                "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              },
+              {
+                "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              }
+            ]
+          }
+        })) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
+          "deletedDateTime": null,
+          "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
+          "applicationTemplateId": null,
+          "disabledByMicrosoftStatus": null,
+          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
+          "displayName": "Angular Teams app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "publisherDomain": "M365x61791022.onmicrosoft.com",
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "defaultRedirectUri": null,
+          "certification": null,
+          "optionalClaims": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          },
+          "spa": {
+            "redirectUris": []
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+
+    const manifest = {
+      "id": "95cfe30d-ed44-4f9d-b73d-c66560f72e83",
+      "acceptMappedClaims": null,
+      "accessTokenAcceptedVersion": null,
+      "addIns": [],
+      "allowPublicClient": false,
+      "appId": "ff254847-12c7-44cf-921e-8883dbd622a7",
+      "appRoles": [],
+      "oauth2AllowUrlPathMatching": false,
+      "createdDateTime": "2022-02-07T08:51:18Z",
+      "description": null,
+      "certification": null,
+      "disabledByMicrosoftStatus": null,
+      "groupMembershipClaims": null,
+      "identifierUris": [
+        "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+      ],
+      "informationalUrls": {
+        "termsOfService": null,
+        "support": null,
+        "privacy": null,
+        "marketing": null
+      },
+      "keyCredentials": [],
+      "knownClientApplications": [],
+      "logoUrl": null,
+      "logoutUrl": null,
+      "name": "My app",
+      "notes": null,
+      "oauth2AllowIdTokenImplicitFlow": false,
+      "oauth2AllowImplicitFlow": false,
+      "oauth2Permissions": [
+        {
+          "adminConsentDescription": "Access as a user",
+          "adminConsentDisplayName": "Access as a user",
+          "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+          "isEnabled": true,
+          "lang": null,
+          "origin": "Application",
+          "type": "User",
+          "userConsentDescription": null,
+          "userConsentDisplayName": null,
+          "value": "access_as_user"
+        }
+      ],
+      "oauth2RequirePostResponse": false,
+      "optionalClaims": null,
+      "orgRestrictions": [],
+      "parentalControlSettings": {
+        "countriesBlockedForMinors": [],
+        "legalAgeGroupRule": "Allow"
+      },
+      "passwordCredentials": [],
+      "preAuthorizedApplications": [
+        {
+          "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+          "permissionIds": [
+            "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+          ]
+        },
+        {
+          "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+          "permissionIds": [
+            "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+          ]
+        }
+      ],
+      "publisherDomain": "contoso.onmicrosoft.com",
+      "replyUrlsWithType": [
+        {
+          "url": "http://localhost/auth",
+          "type": "Spa"
+        },
+        {
+          "url": "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth",
+          "type": "Spa"
+        }
+      ],
+      "requiredResourceAccess": [
+        {
+          "resourceAppId": "00000003-0000-0000-c000-000000000000",
+          "resourceAccess": [
+            {
+              "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+              "type": "Scope"
+            }
+          ]
+        }
+      ],
+      "samlMetadataUrl": null,
+      "serviceManagementReference": null,
+      "signInUrl": null,
+      "signInAudience": "AzureADMyOrg",
+      "tags": [],
+      "tokenEncryptionKeyId": null
+    };
+
+    (command as any).manifest = manifest;
+    command.action(logger, {
+      options: {
+        debug: false,
+        manifest: JSON.stringify(manifest)
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('creates AAD app reg for a web app from a manifest with secrets', (done) => {
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+    sinon.stub(request, 'patch').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "addIns": [],
+          "appRoles": [],
+          "createdDateTime": "2022-02-07T08:51:18Z",
+          "description": null,
+          "certification": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [
+            "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+          ],
+          "keyCredentials": [],
+          "notes": null,
+          "optionalClaims": null,
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "oauth2PermissionScopes": [
+              {
+                "adminConsentDescription": "Access as a user",
+                "adminConsentDisplayName": "Access as a user",
+                "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+                "isEnabled": true,
+                "type": "User",
+                "userConsentDescription": null,
+                "userConsentDisplayName": null,
+                "value": "access_as_user"
+              }
+            ]
+          },
+          "info": {
+            "termsOfServiceUrl": null,
+            "supportUrl": null,
+            "privacyStatementUrl": null,
+            "marketingUrl": null,
+            "logoUrl": null
+          },
+          "web": {
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            },
+            "redirectUris": [],
+            "logoutUrl": null,
+            "homePageUrl": null
+          },
+          "spa": {
+            "redirectUris": [
+              "http://localhost/auth",
+              "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
+            ]
+          },
+          "isFallbackPublicClient": null,
+          "displayName": "My app"
+        })) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
+          "deletedDateTime": null,
+          "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
+          "applicationTemplateId": null,
+          "disabledByMicrosoftStatus": null,
+          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
+          "displayName": "Angular Teams app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "publisherDomain": "M365x61791022.onmicrosoft.com",
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "defaultRedirectUri": null,
+          "certification": null,
+          "optionalClaims": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          },
+          "spa": {
+            "redirectUris": []
+          }
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379/addPassword') {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#microsoft.graph.passwordCredential",
+          "customKeyIdentifier": null,
+          "displayName": "mysecret",
+          "endDateTime": "2120-12-31T14:58:16.875Z",
+          "hint": "VtJ",
+          "keyId": "17dc40d4-7c81-47dd-a3cb-41df4aed1130",
+          "secretText": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5",
+          "startDateTime": "2020-12-31T14:58:19.2307535Z"
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+
+    const manifest = {
+      "id": "95cfe30d-ed44-4f9d-b73d-c66560f72e83",
+      "acceptMappedClaims": null,
+      "accessTokenAcceptedVersion": null,
+      "addIns": [],
+      "allowPublicClient": null,
+      "appId": "ff254847-12c7-44cf-921e-8883dbd622a7",
+      "appRoles": [],
+      "oauth2AllowUrlPathMatching": false,
+      "createdDateTime": "2022-02-07T08:51:18Z",
+      "description": null,
+      "certification": null,
+      "disabledByMicrosoftStatus": null,
+      "groupMembershipClaims": null,
+      "identifierUris": [
+        "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+      ],
+      "informationalUrls": {
+        "termsOfService": null,
+        "support": null,
+        "privacy": null,
+        "marketing": null
+      },
+      "keyCredentials": [],
+      "knownClientApplications": [],
+      "logoUrl": null,
+      "logoutUrl": null,
+      "name": "My app",
+      "notes": null,
+      "oauth2AllowIdTokenImplicitFlow": false,
+      "oauth2AllowImplicitFlow": false,
+      "oauth2Permissions": [
+        {
+          "adminConsentDescription": "Access as a user",
+          "adminConsentDisplayName": "Access as a user",
+          "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+          "isEnabled": true,
+          "lang": null,
+          "origin": "Application",
+          "type": "User",
+          "userConsentDescription": null,
+          "userConsentDisplayName": null,
+          "value": "access_as_user"
+        }
+      ],
+      "oauth2RequirePostResponse": false,
+      "optionalClaims": null,
+      "orgRestrictions": [],
+      "parentalControlSettings": {
+        "countriesBlockedForMinors": [],
+        "legalAgeGroupRule": "Allow"
+      },
+      "passwordCredentials": [
+        {
+          "customKeyIdentifier": null,
+          "endDate": "2022-09-14T17:30:13.968Z",
+          "keyId": "5d7f98e2-5847-4d20-ad25-82e30f2ec6e0",
+          "startDate": "2022-03-14T18:30:13.968Z",
+          "value": null,
+          "createdOn": "2022-03-14T18:30:33.2818539Z",
+          "hint": "zC7",
+          "displayName": "mysecret"
+        }
+      ],
+      "preAuthorizedApplications": [],
+      "publisherDomain": "contoso.onmicrosoft.com",
+      "replyUrlsWithType": [
+        {
+          "url": "http://localhost/auth",
+          "type": "Spa"
+        },
+        {
+          "url": "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth",
+          "type": "Spa"
+        }
+      ],
+      "requiredResourceAccess": [
+        {
+          "resourceAppId": "00000003-0000-0000-c000-000000000000",
+          "resourceAccess": [
+            {
+              "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+              "type": "Scope"
+            }
+          ]
+        }
+      ],
+      "samlMetadataUrl": null,
+      "serviceManagementReference": null,
+      "signInUrl": null,
+      "signInAudience": "AzureADMyOrg",
+      "tags": [],
+      "tokenEncryptionKeyId": null
+    };
+
+    (command as any).manifest = manifest;
+    command.action(logger, {
+      options: {
+        debug: false,
+        manifest: JSON.stringify(manifest)
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+          tenantId: '',
+          secrets: [{
+            "displayName": "mysecret",
+            "value": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5"
+          }]
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('creates AAD app reg for a web app from a manifest with app roles', (done) => {
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+    sinon.stub(request, 'patch').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "addIns": [],
+          "appRoles": [
+            {
+              "allowedMemberTypes": [
+                "User"
+              ],
+              "description": "myAppRole",
+              "displayName": "myAppRole",
+              "id": "d212e66a-8927-469d-be76-f121e287ffb0",
+              "isEnabled": true,
+              "origin": "Application",
+              "value": "123"
+            }
+          ],
+          "createdDateTime": "2022-02-07T08:51:18Z",
+          "description": null,
+          "certification": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [
+            "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+          ],
+          "keyCredentials": [],
+          "notes": null,
+          "optionalClaims": null,
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "oauth2PermissionScopes": [
+              {
+                "adminConsentDescription": "Access as a user",
+                "adminConsentDisplayName": "Access as a user",
+                "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+                "isEnabled": true,
+                "type": "User",
+                "userConsentDescription": null,
+                "userConsentDisplayName": null,
+                "value": "access_as_user"
+              }
+            ]
+          },
+          "info": {
+            "termsOfServiceUrl": null,
+            "supportUrl": null,
+            "privacyStatementUrl": null,
+            "marketingUrl": null,
+            "logoUrl": null
+          },
+          "web": {
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            },
+            "redirectUris": [],
+            "logoutUrl": null,
+            "homePageUrl": null
+          },
+          "spa": {
+            "redirectUris": [
+              "http://localhost/auth",
+              "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
+            ]
+          },
+          "isFallbackPublicClient": null,
+          "displayName": "My app"
+        })) {
+          return Promise.resolve();
+        }
+
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "api": {
+            "preAuthorizedApplications": [
+              {
+                "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              },
+              {
+                "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              }
+            ]
+          }
+        })) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
+          "deletedDateTime": null,
+          "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
+          "applicationTemplateId": null,
+          "disabledByMicrosoftStatus": null,
+          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
+          "displayName": "Angular Teams app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "publisherDomain": "M365x61791022.onmicrosoft.com",
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "defaultRedirectUri": null,
+          "certification": null,
+          "optionalClaims": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          },
+          "spa": {
+            "redirectUris": []
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+
+    const manifest = {
+      "id": "95cfe30d-ed44-4f9d-b73d-c66560f72e83",
+      "acceptMappedClaims": null,
+      "accessTokenAcceptedVersion": null,
+      "addIns": [],
+      "allowPublicClient": null,
+      "appId": "ff254847-12c7-44cf-921e-8883dbd622a7",
+      "appRoles": [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "myAppRole",
+          "displayName": "myAppRole",
+          "id": "d212e66a-8927-469d-be76-f121e287ffb0",
+          "isEnabled": true,
+          "lang": null,
+          "origin": "Application",
+          "value": "123"
+        }
+      ],
+      "oauth2AllowUrlPathMatching": false,
+      "createdDateTime": "2022-02-07T08:51:18Z",
+      "description": null,
+      "certification": null,
+      "disabledByMicrosoftStatus": null,
+      "groupMembershipClaims": null,
+      "identifierUris": [
+        "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+      ],
+      "informationalUrls": {
+        "termsOfService": null,
+        "support": null,
+        "privacy": null,
+        "marketing": null
+      },
+      "keyCredentials": [],
+      "knownClientApplications": [],
+      "logoUrl": null,
+      "logoutUrl": null,
+      "name": "My app",
+      "notes": null,
+      "oauth2AllowIdTokenImplicitFlow": false,
+      "oauth2AllowImplicitFlow": false,
+      "oauth2Permissions": [
+        {
+          "adminConsentDescription": "Access as a user",
+          "adminConsentDisplayName": "Access as a user",
+          "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+          "isEnabled": true,
+          "lang": null,
+          "origin": "Application",
+          "type": "User",
+          "userConsentDescription": null,
+          "userConsentDisplayName": null,
+          "value": "access_as_user"
+        }
+      ],
+      "oauth2RequirePostResponse": false,
+      "optionalClaims": null,
+      "orgRestrictions": [],
+      "parentalControlSettings": {
+        "countriesBlockedForMinors": [],
+        "legalAgeGroupRule": "Allow"
+      },
+      "passwordCredentials": [],
+      "preAuthorizedApplications": [
+        {
+          "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+          "permissionIds": [
+            "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+          ]
+        },
+        {
+          "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+          "permissionIds": [
+            "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+          ]
+        }
+      ],
+      "publisherDomain": "contoso.onmicrosoft.com",
+      "replyUrlsWithType": [
+        {
+          "url": "http://localhost/auth",
+          "type": "Spa"
+        },
+        {
+          "url": "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth",
+          "type": "Spa"
+        }
+      ],
+      "requiredResourceAccess": [
+        {
+          "resourceAppId": "00000003-0000-0000-c000-000000000000",
+          "resourceAccess": [
+            {
+              "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+              "type": "Scope"
+            }
+          ]
+        }
+      ],
+      "samlMetadataUrl": null,
+      "serviceManagementReference": null,
+      "signInUrl": null,
+      "signInAudience": "AzureADMyOrg",
+      "tags": [],
+      "tokenEncryptionKeyId": null
+    };
+
+    (command as any).manifest = manifest;
+    command.action(logger, {
+      options: {
+        debug: false,
+        manifest: JSON.stringify(manifest)
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`creates AAD app reg with just the name. Doesn't save the app info if not requested`, (done) => {
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(fsWriteFileSyncSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Creates the file it doesn't exist`, (done) => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [{
+            appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+            name: 'My AAD app'
+          }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Writes to the existing empty file`, (done) => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => '');
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [{
+            appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+            name: 'My AAD app'
+          }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents`, (done) => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
+      "apps": [
+        {
+          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+          "name": "M365 app"
+        }
+      ]
+    }));
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [
+            {
+              "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+              "name": "M365 app"
+            },
+            {
+              appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+              name: 'My AAD app'
+            }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents (debug)`, (done) => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
+      "apps": [
+        {
+          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+          "name": "M365 app"
+        }
+      ]
+    }));
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        name: 'My AAD app',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [
+            {
+              "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+              "name": "M365 app"
+            },
+            {
+              appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+              name: 'My AAD app'
+            }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`doesn't save app info in the .m365rc.json file when there was error reading file contents`, (done) => {
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(fsWriteFileSyncSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`doesn't save app info in the .m365rc.json file when file has invalid JSON`, (done) => {
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => '{');
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(fsWriteFileSyncSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`doesn't fail execution when error occurred while saving app info`, (done) => {
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('Error occurred while saving app info'); });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {

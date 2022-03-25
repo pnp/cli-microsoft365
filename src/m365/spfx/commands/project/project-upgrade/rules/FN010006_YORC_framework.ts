@@ -1,6 +1,6 @@
-import { Finding } from "../";
-import { Project } from "../../model";
-import { JsonRule } from "./JsonRule";
+import { JsonRule } from '../../JsonRule';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model';
 
 export class FN010006_YORC_framework extends JsonRule {
   constructor(private framework: string, private add: boolean) {

@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./task-set');
 
@@ -39,7 +39,7 @@ describe(commands.TASK_SET, () => {
       "contentType": "text"
     }
   };
-  
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -66,7 +66,7 @@ describe(commands.TASK_SET, () => {
       }
       return Promise.reject();
     });
- 
+
 
     sinon.stub(request, 'get').callsFake((opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks%20List'`) {
@@ -77,7 +77,7 @@ describe(commands.TASK_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.patch,
       Date.now
@@ -85,7 +85,7 @@ describe(commands.TASK_SET, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -104,7 +104,7 @@ describe(commands.TASK_SET, () => {
     command.action(logger, {
       options: {
         id: 'abc',
-        title:"New task",
+        title: "New task",
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA=='
       }
     } as any, () => {
@@ -122,9 +122,9 @@ describe(commands.TASK_SET, () => {
     command.action(logger, {
       options: {
         id: 'abc',
-        title:"New task",
+        title: "New task",
         listName: 'Tasks List',
-        status:"notStarted",
+        status: "notStarted",
         debug: true
       }
     } as any, () => {
@@ -138,10 +138,10 @@ describe(commands.TASK_SET, () => {
     });
   });
 
-  
+
 
   it('rejects if no tasks list is found with the specified list name', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks%20List'`) {
         return Promise.resolve(
@@ -156,7 +156,7 @@ describe(commands.TASK_SET, () => {
     command.action(logger, {
       options: {
         id: 'abc',
-        title:"New task",
+        title: "New task",
         listName: 'Tasks List',
         debug: true
       }
@@ -172,7 +172,7 @@ describe(commands.TASK_SET, () => {
   });
 
   it('handles error correctly', (done) => {
-    Utils.restore(request.patch);
+    sinonUtil.restore(request.patch);
     sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
@@ -181,7 +181,7 @@ describe(commands.TASK_SET, () => {
       options: {
         listName: "Tasks List",
         id: 'abc',
-        title:"New task"
+        title: "New task"
       }
     } as any, (err?: any) => {
       try {
@@ -218,41 +218,32 @@ describe(commands.TASK_SET, () => {
   it('fails validation if id not passed', () => {
     const actual = command.validate({
       options: {
-        title: 'New Task',  
-        listName: 'Tasks List'    
+        title: 'New Task',
+        listName: 'Tasks List'
       }
     });
     assert.notStrictEqual(actual, true);
   });
-  it('fails validation if id not passed', () => {
-    const actual = command.validate({
-      options: {
-        title: 'New Task',  
-        listName: 'Tasks List'    
-      }
-    });
-    assert.notStrictEqual(actual, true);
-  });
- 
+
   it('fails validation if status is not allowed value', () => {
     const options: any = {
       title: 'New Task',
       id: 'abc',
-      status:"test",
+      status: "test",
       listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA=='
-  
+
     };
     const actual = command.validate({ options: options });
-    assert.strictEqual(actual,'test is not a valid value. Allowed values are notStarted|inProgress|completed|waitingOnOthers|deferred');
+    assert.strictEqual(actual, 'test is not a valid value. Allowed values are notStarted|inProgress|completed|waitingOnOthers|deferred');
   });
   it('correctly validates the arguments', () => {
     const actual = command.validate({
       options: {
         title: 'New Task',
         id: 'abc',
-        status:"notStarted",
+        status: "notStarted",
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA=='
-  
+
       }
     });
     assert.strictEqual(actual, true);

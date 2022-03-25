@@ -6,13 +6,11 @@ import {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ClientSvcResponse, ClientSvcResponseContents, formatting, FormDigestInfo, spo, SpoOperation, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
 import { DeletedSiteProperties } from './DeletedSiteProperties';
 import { SiteProperties } from './SiteProperties';
-import { SpoOperation } from './SpoOperation';
 
 interface CommandArgs {
   options: Options;
@@ -114,7 +112,7 @@ class SpoSiteAddCommand extends SpoCommand {
     const isTeamSite: boolean = args.options.type !== 'CommunicationSite';
     let spoUrl: string = '';
 
-    this
+    spo
       .getSpoUrl(logger, this.debug)
       .then((_spoUrl: string): Promise<CreateGroupExResponse> => {
         spoUrl = _spoUrl;
@@ -242,12 +240,12 @@ class SpoSiteAddCommand extends SpoCommand {
   public createClassicSite(logger: Logger, args: CommandArgs, cb: () => void): void {
     this.dots = '';
 
-    this
+    spo
       .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
         this.spoAdminUrl = _spoAdminUrl;
 
-        return this.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
+        return spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<boolean> => {
         this.context = res;
@@ -277,7 +275,7 @@ class SpoSiteAddCommand extends SpoCommand {
         }
       })
       .then((): Promise<FormDigestInfo> => {
-        return this.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
+        return spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<string> => {
         this.context = res;
@@ -298,7 +296,7 @@ class SpoSiteAddCommand extends SpoCommand {
           headers: {
             'X-RequestDigest': this.context.FormDigestValue
           },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query><Query Id="8" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="CreateSite"><Parameters><Parameter TypeId="{11f84fff-b8cf-47b6-8b50-34e692656606}"><Property Name="CompatibilityLevel" Type="Int32">0</Property><Property Name="Lcid" Type="UInt32">${lcid}</Property><Property Name="Owner" Type="String">${Utils.escapeXml(args.options.owners)}</Property><Property Name="StorageMaximumLevel" Type="Int64">${storageQuota}</Property><Property Name="StorageWarningLevel" Type="Int64">${storageQuotaWarningLevel}</Property><Property Name="Template" Type="String">${Utils.escapeXml(webTemplate)}</Property><Property Name="TimeZoneId" Type="Int32">${args.options.timeZone}</Property><Property Name="Title" Type="String">${Utils.escapeXml(args.options.title)}</Property><Property Name="Url" Type="String">${Utils.escapeXml(args.options.url)}</Property><Property Name="UserCodeMaximumLevel" Type="Double">${resourceQuota}</Property><Property Name="UserCodeWarningLevel" Type="Double">${resourceQuotaWarningLevel}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query><Query Id="8" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="CreateSite"><Parameters><Parameter TypeId="{11f84fff-b8cf-47b6-8b50-34e692656606}"><Property Name="CompatibilityLevel" Type="Int32">0</Property><Property Name="Lcid" Type="UInt32">${lcid}</Property><Property Name="Owner" Type="String">${formatting.escapeXml(args.options.owners)}</Property><Property Name="StorageMaximumLevel" Type="Int64">${storageQuota}</Property><Property Name="StorageWarningLevel" Type="Int64">${storageQuotaWarningLevel}</Property><Property Name="Template" Type="String">${formatting.escapeXml(webTemplate)}</Property><Property Name="TimeZoneId" Type="Int32">${args.options.timeZone}</Property><Property Name="Title" Type="String">${formatting.escapeXml(args.options.title)}</Property><Property Name="Url" Type="String">${formatting.escapeXml(args.options.url)}</Property><Property Name="UserCodeMaximumLevel" Type="Double">${resourceQuota}</Property><Property Name="UserCodeWarningLevel" Type="Double">${resourceQuotaWarningLevel}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
         };
 
         return request.post(requestOptions);
@@ -319,7 +317,17 @@ class SpoSiteAddCommand extends SpoCommand {
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots);
+              spo.waitUntilFinished({
+                operationId: JSON.stringify(operation._ObjectIdentity_),
+                siteUrl: this.spoAdminUrl as string,
+                resolve,
+                reject,
+                logger,
+                currentContext: this.context as FormDigestInfo,
+                dots: this.dots,
+                verbose: this.verbose,
+                debug: this.debug
+              });
             }, operation.PollingInterval);
           }
         });
@@ -329,7 +337,7 @@ class SpoSiteAddCommand extends SpoCommand {
 
   private siteExistsInTheRecycleBin(url: string, logger: Logger): Promise<boolean> {
     return new Promise<boolean>((resolve: (exists: boolean) => void, reject: (error: any) => void): void => {
-      this
+      spo
         .ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
@@ -343,7 +351,7 @@ class SpoSiteAddCommand extends SpoCommand {
             headers: {
               'X-RequestDigest': this.context.FormDigestValue
             },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="197" ObjectPathId="196" /><ObjectPath Id="199" ObjectPathId="198" /><Query Id="200" ObjectPathId="198"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="196" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="198" ParentId="196" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></ObjectPaths></Request>`
+            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="197" ObjectPathId="196" /><ObjectPath Id="199" ObjectPathId="198" /><Query Id="200" ObjectPathId="198"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="196" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="198" ParentId="196" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></ObjectPaths></Request>`
           };
 
           return request.post(requestOptions);
@@ -379,7 +387,7 @@ class SpoSiteAddCommand extends SpoCommand {
             headers: {
               'X-RequestDigest': (this.context as FormDigestInfo).FormDigestValue
             },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="181" ObjectPathId="180" /><Query Id="182" ObjectPathId="180"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="180" ParentId="175" Name="GetDeletedSitePropertiesByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="181" ObjectPathId="180" /><Query Id="182" ObjectPathId="180"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="180" ParentId="175" Name="GetDeletedSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
           };
 
           return request.post(requestOptions);
@@ -417,7 +425,7 @@ class SpoSiteAddCommand extends SpoCommand {
 
   private deleteSiteFromTheRecycleBin(url: string, wait: boolean, logger: Logger): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      this
+      spo
         .ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
@@ -431,7 +439,7 @@ class SpoSiteAddCommand extends SpoCommand {
             headers: {
               'X-RequestDigest': this.context.FormDigestValue
             },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="185" ObjectPathId="184" /><Query Id="186" ObjectPathId="184"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="184" ParentId="175" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${formatting.escapeXml(url)}</Parameter></Parameters></Method><Constructor Id="175" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
           };
 
           return request.post(requestOptions);
@@ -451,7 +459,17 @@ class SpoSiteAddCommand extends SpoCommand {
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots);
+              spo.waitUntilFinished({
+                operationId: JSON.stringify(operation._ObjectIdentity_),
+                siteUrl: this.spoAdminUrl as string,
+                resolve,
+                reject,
+                logger,
+                currentContext: this.context as FormDigestInfo,
+                dots: this.dots,
+                verbose: this.verbose,
+                debug: this.debug
+              });
             }, operation.PollingInterval);
           }
         });
@@ -558,7 +576,7 @@ class SpoSiteAddCommand extends SpoCommand {
         return 'Required option url missing';
       }
 
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+      const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
       }
@@ -576,7 +594,7 @@ class SpoSiteAddCommand extends SpoCommand {
       }
 
       if (args.options.siteDesignId) {
-        if (!Utils.isValidGuid(args.options.siteDesignId)) {
+        if (!validation.isValidGuid(args.options.siteDesignId)) {
           return `${args.options.siteDesignId} is not a valid GUID`;
         }
       }
@@ -594,7 +612,7 @@ class SpoSiteAddCommand extends SpoCommand {
         return 'Required option url missing';
       }
 
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+      const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
       }

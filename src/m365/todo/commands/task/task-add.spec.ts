@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./task-add');
 
@@ -76,7 +76,7 @@ describe(commands.TASK_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post,
       Date.now
@@ -84,7 +84,7 @@ describe(commands.TASK_ADD, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -135,7 +135,7 @@ describe(commands.TASK_ADD, () => {
   });
 
   it('rejects if no tasks list is found with the specified list name', (done) => {
-    Utils.restore(request.get);
+    sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks%20List'`) {
         return Promise.resolve(
@@ -165,7 +165,7 @@ describe(commands.TASK_ADD, () => {
   });
 
   it('handles error correctly', (done) => {
-    Utils.restore(request.post);
+    sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });

@@ -1,6 +1,6 @@
 import * as path from 'path';
-import { Occurrence } from "../";
-import { Rule } from "./Rule";
+import { Occurrence } from '../../report-model';
+import { Rule } from '../../Rule';
 
 export abstract class ScssRule extends Rule {
   get resolutionType(): string {

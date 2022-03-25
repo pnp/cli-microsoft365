@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Finding, Occurrence } from "../";
-import { Manifest, Project } from "../../model";
-import { Rule } from "./Rule";
+import { Manifest, Project } from '../../project-model';
+import { Finding, Occurrence } from '../../report-model';
+import { Rule } from '../../Rule';
 
 export class FN018003_TEAMS_tab20x20_png extends Rule {
   /**

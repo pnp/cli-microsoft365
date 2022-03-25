@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { Cli, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import { settingsNames } from '../../../../settingsNames';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./config-get');
 
@@ -29,7 +29,7 @@ describe(commands.CONFIG_GET, () => {
   });
 
   afterEach(() => {
-    Utils.restore(Cli.getInstance().config.get);
+    sinonUtil.restore(Cli.getInstance().config.get);
   });
 
   it('has correct name', () => {

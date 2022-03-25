@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./folder-remove');
 
@@ -60,14 +60,14 @@ describe(commands.FOLDER_REMOVE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       Cli.prompt
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -100,7 +100,7 @@ describe(commands.FOLDER_REMOVE, () => {
   });
 
   it('aborts removing folder when prompt not confirmed', (done) => {
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -118,7 +118,7 @@ describe(commands.FOLDER_REMOVE, () => {
   it('removes the folder when prompt confirmed', (done) => {
     stubPostResponses();
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -162,7 +162,7 @@ describe(commands.FOLDER_REMOVE, () => {
   it('should send params for remove request for sites/test1', (done) => {
     const request: sinon.SinonStub = stubPostResponses();
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -187,7 +187,7 @@ describe(commands.FOLDER_REMOVE, () => {
   it('should send params for recycle request when recycle is set to true', (done) => {
     const request: sinon.SinonStub = stubPostResponses();
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
@@ -214,7 +214,7 @@ describe(commands.FOLDER_REMOVE, () => {
   it('should show error on request reject', (done) => {
     stubPostResponses(new Promise((resp, rej) => rej('error1')));
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });

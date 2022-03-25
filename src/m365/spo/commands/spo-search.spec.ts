@@ -5,7 +5,7 @@ import auth from '../../../Auth';
 import { Logger } from '../../../cli';
 import Command, { CommandError } from '../../../Command';
 import request from '../../../request';
-import Utils from '../../../Utils';
+import { sinonUtil } from '../../../utils';
 import commands from '../commands';
 import { ResultTableRow } from './search/datatypes/ResultTableRow';
 import { SearchResult } from './search/datatypes/SearchResult';
@@ -316,13 +316,13 @@ describe(commands.SEARCH, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);

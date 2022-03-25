@@ -6,7 +6,7 @@ import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError, CommandTypes } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 import * as SpoContentTypeGetCommand from './contenttype-get';
 const command: Command = require('./contenttype-add');
@@ -20,7 +20,12 @@ describe(commands.CONTENTTYPE_ADD, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -43,7 +48,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post,
       Cli.executeCommandWithOutput
@@ -51,9 +56,9 @@ describe(commands.CONTENTTYPE_ADD, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      (command as any).getRequestDigest,
+      spo.getRequestDigest,
       appInsights.trackEvent
     ]);
     auth.service.connected = false;

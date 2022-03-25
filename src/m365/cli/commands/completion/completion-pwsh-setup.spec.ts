@@ -7,7 +7,7 @@ import appInsights from '../../../../appInsights';
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./completion-pwsh-setup');
 
@@ -39,7 +39,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.mkdirSync,
       fs.writeFileSync,
@@ -48,7 +48,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       appInsights.trackEvent,
       autocomplete.generateShCompletion
     ]);
@@ -114,7 +114,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     });
   });
 
-  it('creates profile file when it does not exist and appends the completion script to it', (done) => {
+  it('creates profile file when it does not exist and appends the completion script to it (debug)', (done) => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().indexOf('.ps1') < 0);
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });

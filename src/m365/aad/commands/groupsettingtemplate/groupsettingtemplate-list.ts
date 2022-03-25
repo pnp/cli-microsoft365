@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { GroupSettingTemplate } from './GroupSettingTemplate';
 
@@ -8,7 +9,7 @@ interface CommandArgs {
   options: GlobalOptions;
 }
 
-class AadGroupSettingTemplateListCommand extends GraphItemsListCommand<GroupSettingTemplate> {
+class AadGroupSettingTemplateListCommand extends GraphCommand {
   public get name(): string {
     return commands.GROUPSETTINGTEMPLATE_LIST;
   }
@@ -22,10 +23,10 @@ class AadGroupSettingTemplateListCommand extends GraphItemsListCommand<GroupSett
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getAllItems(`${this.resource}/v1.0/groupSettingTemplates`, logger, true)
-      .then((): void => {
-        logger.log(this.items);
+    odata
+      .getAllItems<GroupSettingTemplate>(`${this.resource}/v1.0/groupSettingTemplates`, logger)
+      .then((templates): void => {
+        logger.log(templates);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

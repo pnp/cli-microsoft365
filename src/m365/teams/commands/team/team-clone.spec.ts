@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./team-clone');
 
@@ -16,7 +16,7 @@ describe(commands.TEAM_CLONE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -38,13 +38,13 @@ describe(commands.TEAM_CLONE, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -146,18 +146,6 @@ describe(commands.TEAM_CLONE, () => {
       }
     });
     assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if visibility is set to private', () => {
-    const actual = command.validate({
-      options: {
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: "Library Assist",
-        partsToClone: "apps,tabs,settings,channels,members",
-        visibility: "private"
-      }
-    });
-    assert.strictEqual(actual, true);
   });
 
   it('passes validation if visibility is set to private', () => {

@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./hubsite-unregister');
 
@@ -19,7 +19,12 @@ describe(commands.HUBSITE_UNREGISTER, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    }));
     auth.service.connected = true;
   });
 
@@ -46,16 +51,16 @@ describe(commands.HUBSITE_UNREGISTER, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post,
       Cli.prompt
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      (command as any).getRequestDigest,
+      spo.getRequestDigest,
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
@@ -76,7 +81,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/site/UnregisterHubSite' &&
         opts.headers &&
         opts.headers.accept &&
-        opts.headers.accept.indexOf('application/json') === 0) {
+        (opts.headers.accept as string).indexOf('application/json') === 0) {
         return Promise.resolve();
       }
 
@@ -113,7 +118,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
   });
 
   it('aborts unregistering hub site when prompt not confirmed', (done) => {
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -135,14 +140,14 @@ describe(commands.HUBSITE_UNREGISTER, () => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/sales/_api/site/UnregisterHubSite' &&
         opts.headers &&
         opts.headers.accept &&
-        opts.headers.accept.indexOf('application/json') === 0) {
+        (opts.headers.accept as string).indexOf('application/json') === 0) {
         return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
     });
 
-    Utils.restore(Cli.prompt);
+    sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });

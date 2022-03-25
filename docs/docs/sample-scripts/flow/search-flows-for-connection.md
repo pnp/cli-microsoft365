@@ -4,35 +4,37 @@ Author: [Albert-Jan Schot](https://www.cloudappie.nl/search-flows-connections/)
 
 Search all flows as, an administrator, for a specific search string and report results. This sample allows you to get a report of all flows that are connected to a specific site or list. The `$searchString` can be any value but results are the best when using a GUID or site collection URL.
 
-```powershell tab="PowerShell"
-Write-Output "Retrieving all environments"
+=== "PowerShell"
 
-$environments = m365 flow environment list -o json | ConvertFrom-Json
-$searchString = "15f5b014-9508-4941-b564-b4ab1b863a7a" #listGuid
-$path = "exportedflow.json";
+    ```powershell
+    Write-Output "Retrieving all environments"
 
-ForEach ($env in $environments) {
-    Write-Output "Processing $($env.displayName)..."
+    $environments = m365 flow environment list -o json | ConvertFrom-Json
+    $searchString = "15f5b014-9508-4941-b564-b4ab1b863a7a" #listGuid
+    $path = "exportedflow.json";
 
-    $flows = m365 flow list --environment $env.name --asAdmin -o json | ConvertFrom-Json
+    ForEach ($env in $environments) {
+        Write-Output "Processing $($env.displayName)..."
 
-    ForEach ($flow in $flows) {
-        Write-Output "Processing $($flow.displayName)..."
-        m365 flow export --id $flow.name --environment $env.name --format json --path $path
+        $flows = m365 flow list --environment $env.name --asAdmin -o json | ConvertFrom-Json
 
-        $flowData = Get-Content -Path $path -ErrorAction SilentlyContinue
+        ForEach ($flow in $flows) {
+            Write-Output "Processing $($flow.displayName)..."
+            m365 flow export --id $flow.name --environment $env.name --format json --path $path
 
-        if ($null -ne $flowData) {
-            if ($flowData.Contains($searchString)) {
-                Write-Output $($flow.displayName + "contains your search string" + $searchString)
-                Write-Output $flow.id
+            $flowData = Get-Content -Path $path -ErrorAction SilentlyContinue
+
+            if ($null -ne $flowData) {
+                if ($flowData.Contains($searchString)) {
+                    Write-Output $($flow.displayName + "contains your search string" + $searchString)
+                    Write-Output $flow.id
+                }
+
+                Remove-Item $path -Confirm:$false
             }
-
-            Remove-Item $path -Confirm:$false
         }
     }
-}
-```
+    ```
 
 Keywords:
 

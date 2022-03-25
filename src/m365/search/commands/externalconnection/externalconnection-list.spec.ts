@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
@@ -12,15 +12,18 @@ const command: Command = require('./externalconnection-list');
 describe(commands.EXTERNALCONNECTION_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
 
   const externalConnectionListResponse: any = {
-    configuration: {
-      authorizedAppIds: []
-    },
-    description: 'Test connection that will not do anything',
-    id: 'TestConnectionForCLI',
-    name: 'Test Connection for CLI'
+    value: [
+      {
+        configuration: {
+          authorizedAppIds: []
+        },
+        description: 'Test connection that will not do anything',
+        id: 'TestConnectionForCLI',
+        name: 'Test Connection for CLI'
+      }
+    ]
   };
 
   before(() => {
@@ -42,7 +45,6 @@ describe(commands.EXTERNALCONNECTION_LIST, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -62,43 +64,36 @@ describe(commands.EXTERNALCONNECTION_LIST, () => {
 
   
   it('correctly handles error', (done) => {
-    logger.logRaw('testing the error');
-
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "Error",
-          "message": "An error has occurred",
-          "innerError": {
-            "request-id": "9b0df954-93b5-4de9-8b99-43c204a8aaf8",
-            "date": "2018-04-24T18:56:48"
-          }
-        }
-      });
+      return Promise.reject('An error has occurred');
     });
 
     command.action(logger, {
       options: {
         debug: false
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(loggerLogSpy.calledWith(externalConnectionListResponse));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
         done(e);
       }
-      finally {
-        Utils.restore(request.get);
-      }
     });
   });
 
   it('lists an external connection', (done) => {
-    command.action(logger, { } as any, () => {
+    const postStub = sinon.stub(request, 'get').callsFake((opts: any) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
+        return Promise.resolve(externalConnectionListResponse);
+      }
+      return Promise.reject('Invalid request');
+    });
+    
+    command.action(logger, { options: {} } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith(externalConnectionListResponse));
+        assert.deepStrictEqual(postStub.getCall(0).returnValue, Promise.resolve(externalConnectionListResponse));
         done();
       }
       catch (e) {

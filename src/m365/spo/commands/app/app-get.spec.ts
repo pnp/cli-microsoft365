@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./app-get');
 
@@ -16,7 +16,7 @@ describe(commands.APP_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -38,14 +38,14 @@ describe(commands.APP_GET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       Cli.prompt
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
@@ -69,7 +69,7 @@ describe(commands.APP_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
             Title: 'online-client-side-solution',
@@ -96,7 +96,7 @@ describe(commands.APP_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
@@ -109,7 +109,7 @@ describe(commands.APP_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
             Title: 'online-client-side-solution',
@@ -136,7 +136,7 @@ describe(commands.APP_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
@@ -149,7 +149,7 @@ describe(commands.APP_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
             Title: 'online-client-side-solution',
@@ -176,7 +176,7 @@ describe(commands.APP_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
@@ -189,7 +189,7 @@ describe(commands.APP_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
             Title: 'online-client-side-solution',
@@ -216,7 +216,7 @@ describe(commands.APP_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
@@ -229,7 +229,7 @@ describe(commands.APP_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
             Title: 'online-client-side-solution',
@@ -262,7 +262,7 @@ describe(commands.APP_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
@@ -276,7 +276,7 @@ describe(commands.APP_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
             Title: 'online-client-side-solution',
@@ -309,7 +309,7 @@ describe(commands.APP_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
@@ -322,7 +322,7 @@ describe(commands.APP_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
             Title: 'online-client-side-solution',
@@ -355,7 +355,7 @@ describe(commands.APP_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
@@ -392,7 +392,7 @@ describe(commands.APP_GET, () => {
     });
   });
 
-  it('retrieves information about the app with the specified name from the specified tenant app catalog', (done) => {
+  it('retrieves information about the app with the specified name from the specified tenant app catalog via prompt', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
@@ -407,7 +407,7 @@ describe(commands.APP_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.resolve({
             ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
             Title: 'online-client-side-solution',
@@ -448,7 +448,7 @@ describe(commands.APP_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.reject({
             error: {
               'odata.error': {
@@ -475,7 +475,7 @@ describe(commands.APP_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
@@ -488,7 +488,7 @@ describe(commands.APP_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.reject({
             error: {
               'odata.error': {
@@ -515,7 +515,7 @@ describe(commands.APP_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
@@ -528,7 +528,7 @@ describe(commands.APP_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.reject({ error: 'An error has occurred' });
         }
       }
@@ -545,7 +545,7 @@ describe(commands.APP_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
@@ -559,7 +559,7 @@ describe(commands.APP_GET, () => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
           return Promise.reject({
             error: {
               'odata.error': {
@@ -585,18 +585,13 @@ describe(commands.APP_GET, () => {
         done(e);
       }
       finally {
-        Utils.restore(request.get);
+        sinonUtil.restore(request.get);
       }
     });
   });
 
   it('fails validation if neither the id nor the name options are specified', () => {
     const actual = command.validate({ options: {} });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when invalid scope is specified', () => {
-    const actual = command.validate({ options: { id: '123', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'foo' } });
     assert.notStrictEqual(actual, true);
   });
 
@@ -640,11 +635,6 @@ describe(commands.APP_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the id option specified', () => {
-    const actual = command.validate({ options: { id: 'f8b52a45-61d5-4264-81c9-c3bbd203e7d0' } });
-    assert.strictEqual(actual, true);
-  });
-
   it('passes validation when the name option specified', () => {
     const actual = command.validate({ options: { name: 'solution.sppkg' } });
     assert.strictEqual(actual, true);
@@ -667,11 +657,6 @@ describe(commands.APP_GET, () => {
 
   it('passes validation when the scope is specified with \'sitecollection\'', () => {
     const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'sitecollection' } });
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation when no scope is specified', () => {
-    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4' } });
     assert.strictEqual(actual, true);
   });
 

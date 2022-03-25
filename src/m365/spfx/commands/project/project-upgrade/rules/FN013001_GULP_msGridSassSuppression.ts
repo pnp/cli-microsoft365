@@ -1,6 +1,6 @@
-import { Finding } from "../";
-import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { Finding } from '../../report-model';
+import { Project } from '../../project-model';
+import { Rule } from '../../Rule';
 
 export class FN013001_GULP_msGridSassSuppression extends Rule {
   constructor() {

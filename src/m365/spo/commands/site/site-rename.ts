@@ -2,9 +2,9 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { FormDigestInfo, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { FormDigestInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -50,12 +50,12 @@ class SpoSiteRenameCommand extends SpoCommand {
     let spoAdminUrl: string = "";
     const options = args.options;
 
-    this
+    spo
       .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
         spoAdminUrl = _spoAdminUrl;
 
-        return this.getRequestDigest(spoAdminUrl);
+        return spo.getRequestDigest(spoAdminUrl);
       })
       .then((res: FormDigestInfo): Promise<SiteRenameJob> => {
         this.context = res;

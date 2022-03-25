@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model/Finding';
 import { FN011009_MAN_webpart_safeWithCustomScriptDisabled } from './FN011009_MAN_webpart_safeWithCustomScriptDisabled';
 
 describe('FN011009_MAN_webpart_safeWithCustomScriptDisabled', () => {

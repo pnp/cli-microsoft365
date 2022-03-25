@@ -3,11 +3,9 @@ import { CommandOption } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ClientSvcResponse, ClientSvcResponseContents, formatting, FormDigestInfo, spo, SpoOperation, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
-import { SpoOperation } from './SpoOperation';
 
 interface CommandArgs {
   options: Options;
@@ -63,17 +61,17 @@ class SpoSiteClassicSetCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this.dots = '';
 
-    this
+    spo
       .getTenantId(logger, this.debug)
       .then((_tenantId: string): Promise<string> => {
         this.tenantId = _tenantId;
 
-        return this.getSpoAdminUrl(logger, this.debug);
+        return spo.getSpoAdminUrl(logger, this.debug);
       })
       .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
         this.spoAdminUrl = _spoAdminUrl;
 
-        return this.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
+        return spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<string> => {
         this.context = res;
@@ -108,7 +106,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
         const updates: string[] = [];
 
         if (args.options.title) {
-          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="Title"><Parameter Type="String">${Utils.escapeXml(args.options.title)}</Parameter></SetProperty>`);
+          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="Title"><Parameter Type="String">${formatting.escapeXml(args.options.title)}</Parameter></SetProperty>`);
         }
         if (args.options.sharing) {
           const sharing: number = ['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly'].indexOf(args.options.sharing);
@@ -167,12 +165,22 @@ class SpoSiteClassicSetCommand extends SpoCommand {
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots);
+              spo.waitUntilFinished({
+                operationId: JSON.stringify(operation._ObjectIdentity_),
+                siteUrl: this.spoAdminUrl as string,
+                resolve,
+                reject,
+                logger,
+                currentContext: this.context as FormDigestInfo,
+                dots: this.dots,
+                debug: this.debug,
+                verbose: this.verbose
+              });
             }, operation.PollingInterval);
           }
         });
       })
-      .then(_ => this.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug))
+      .then(_ => spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug))
       .then((res: FormDigestInfo): Promise<void> => {
         this.context = res;
         return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
@@ -191,7 +199,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
             });
         });
       })
-      .then(_ => this.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug))
+      .then(_ => spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug))
       .then((res: FormDigestInfo): Promise<void> => {
         this.context = res;
 
@@ -226,7 +234,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
           headers: {
             'X-RequestDigest': (this.context as FormDigestInfo).FormDigestValue
           },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="7" ObjectPathId="5" Name="LockState"><Parameter Type="String">${Utils.escapeXml(args.options.lockState)}</Parameter></SetProperty><ObjectPath Id="9" ObjectPathId="8" /><ObjectIdentityQuery Id="10" ObjectPathId="5" /><Query Id="11" ObjectPathId="8"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="5" ParentId="3" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="8" ParentId="5" Name="Update" /><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="7" ObjectPathId="5" Name="LockState"><Parameter Type="String">${formatting.escapeXml(args.options.lockState)}</Parameter></SetProperty><ObjectPath Id="9" ObjectPathId="8" /><ObjectIdentityQuery Id="10" ObjectPathId="5" /><Query Id="11" ObjectPathId="8"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="5" ParentId="3" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="8" ParentId="5" Name="Update" /><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
         };
 
         return request.post(requestOptions);
@@ -252,7 +260,17 @@ class SpoSiteClassicSetCommand extends SpoCommand {
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots);
+              spo.waitUntilFinished({
+                operationId: JSON.stringify(operation._ObjectIdentity_),
+                siteUrl: this.spoAdminUrl as string,
+                resolve,
+                reject,
+                logger,
+                currentContext: this.context as FormDigestInfo,
+                dots: this.dots,
+                debug: this.debug,
+                verbose: this.verbose
+              });
             }, operation.PollingInterval);
           }
         });
@@ -262,7 +280,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
 
   private setAdmin(logger: Logger, siteUrl: string, principal: string): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      this
+      spo
         .ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
@@ -271,7 +289,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
             headers: {
               'X-RequestDigest': this.context.FormDigestValue
             },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="48" ObjectPathId="47" /></Actions><ObjectPaths><Method Id="47" ParentId="34" Name="SetSiteAdmin"><Parameters><Parameter Type="String">${Utils.escapeXml(siteUrl)}</Parameter><Parameter Type="String">${Utils.escapeXml(principal)}</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Constructor Id="34" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="48" ObjectPathId="47" /></Actions><ObjectPaths><Method Id="47" ParentId="34" Name="SetSiteAdmin"><Parameters><Parameter Type="String">${formatting.escapeXml(siteUrl)}</Parameter><Parameter Type="String">${formatting.escapeXml(principal)}</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Constructor Id="34" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
           };
 
           return request.post(requestOptions);
@@ -341,7 +359,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }

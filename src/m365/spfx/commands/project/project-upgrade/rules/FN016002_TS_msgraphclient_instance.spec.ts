@@ -1,9 +1,9 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import Utils from '../../../../../../Utils';
-import { Project, TsFile } from '../../model';
-import { Finding } from '../Finding';
+import { sinonUtil } from '../../../../../../utils';
+import { Project, TsFile } from '../../project-model';
+import { Finding } from '../../report-model/Finding';
 import { FN016002_TS_msgraphclient_instance } from './FN016002_TS_msgraphclient_instance';
 import { TsRule } from './TsRule';
 
@@ -11,7 +11,7 @@ describe('FN016002_TS_msgraphclient_instance', () => {
   let findings: Finding[];
   let rule: FN016002_TS_msgraphclient_instance;
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync,
       fs.readFileSync,
       (TsRule as any).getParentOfType

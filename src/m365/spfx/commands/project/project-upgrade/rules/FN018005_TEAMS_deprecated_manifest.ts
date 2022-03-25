@@ -1,7 +1,7 @@
-import { Finding } from "../";
-import { Project } from "../../model";
-import { FN018002_TEAMS_manifest } from "./FN018002_TEAMS_manifest";
-import { Rule } from "./Rule";
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model';
+import { Rule } from '../../Rule';
+import { FN018002_TEAMS_manifest } from './FN018002_TEAMS_manifest';
 
 export class FN018005_TEAMS_deprecated_manifest extends Rule {
   constructor() {

@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./site-rename');
 
@@ -18,8 +18,7 @@ describe(commands.SITE_RENAME, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return { FormDigestValue: 'abc' }; });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -30,7 +29,7 @@ describe(commands.SITE_RENAME, () => {
   beforeEach(() => {
     const futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
-    sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate, WebFullUrl: 'https://contoso.sharepoint.com/sites/hr' }); });
 
     log = [];
     logger = {
@@ -49,17 +48,16 @@ describe(commands.SITE_RENAME, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.get,
       request.post,
-      (command as any).ensureFormDigest
+      spo.getRequestDigest
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      (command as any).getRequestDigest,
       appInsights.trackEvent,
       global.setTimeout
     ]);
@@ -298,7 +296,7 @@ describe(commands.SITE_RENAME, () => {
       if ((opts.url as string).indexOf('/_api/SiteRenameJobs/GetJobsBySiteUrl') > -1 &&
         opts.headers &&
         opts.headers['X-AttemptNumber'] &&
-        parseInt(opts.headers['X-AttemptNumber']) <= 1) {
+        parseInt(opts.headers['X-AttemptNumber'] as string) <= 1) {
         return Promise.resolve(
           {
             "odata.metadata": "https://contoso-admin.sharepoint.com/_api/$metadata#SP.ApiData.SiteRenameJobEntityDatas",
@@ -328,7 +326,7 @@ describe(commands.SITE_RENAME, () => {
       else if ((opts.url as string).indexOf('/_api/SiteRenameJobs/GetJobsBySiteUrl') > -1 &&
         opts.headers &&
         opts.headers['X-AttemptNumber'] &&
-        parseInt(opts.headers['X-AttemptNumber']) > 1) {
+        parseInt(opts.headers['X-AttemptNumber'] as string) > 1) {
         return Promise.resolve(
           {
             "odata.metadata": "https://contoso-admin.sharepoint.com/_api/$metadata#SP.ApiData.SiteRenameJobEntityDatas",

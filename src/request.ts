@@ -2,7 +2,7 @@ import Axios, { AxiosError, AxiosInstance, AxiosPromise, AxiosRequestConfig, Axi
 import { Stream } from 'stream';
 import auth, { Auth } from './Auth';
 import { Logger } from './cli';
-import Utils from './Utils';
+import { formatting } from './utils';
 const packageJSON = require('../package.json');
 
 class Request {
@@ -28,13 +28,13 @@ class Request {
           if (config.responseType !== 'stream') {
             properties.push('data');
           }
-          this._logger.logToStderr(JSON.stringify(Utils.filterObject(config, properties), null, 2));
+          this._logger.logToStderr(JSON.stringify(formatting.filterObject(config, properties), null, 2));
         }
         return config;
       });
       // since we're stubbing requests, response interceptor is never called in
       // tests, so let's exclude it from coverage
-      /* c8 ignore next 22 */
+      /* c8 ignore next 26 */
       this.req.interceptors.response.use((response: AxiosResponse): AxiosResponse => {
         if (this._logger) {
           this._logger.logToStderr('Response:');
@@ -43,7 +43,10 @@ class Request {
             response.headers['content-type'].indexOf('json') > -1) {
             properties.push('data');
           }
-          this._logger.logToStderr(JSON.stringify(Utils.filterObject(response, properties), null, 2));
+          this._logger.logToStderr(JSON.stringify({
+            url: response.config.url,
+            ...formatting.filterObject(response, properties)
+          }, null, 2));
         }
         return response;
       }, (error: AxiosError): void => {
@@ -51,7 +54,8 @@ class Request {
           const properties: string[] = ['status', 'statusText', 'headers'];
           this._logger.logToStderr('Request error:');
           this._logger.logToStderr(JSON.stringify({
-            ...Utils.filterObject(error.response, properties),
+            url: error.config.url,
+            ...formatting.filterObject(error.response, properties),
             error: (error as any).error
           }, null, 2));
         }
@@ -60,7 +64,11 @@ class Request {
     }
   }
 
-  public set logger(logger: Logger) {
+  public get logger(): Logger | undefined {
+    return this._logger;
+  }
+
+  public set logger(logger: Logger | undefined) {
     this._logger = logger;
   }
 
@@ -73,7 +81,9 @@ class Request {
       decompress: true,
       responseType: 'text',
       /* c8 ignore next */
-      transformResponse: [data => data]
+      transformResponse: [data => data],
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity
     });
     // since we're stubbing requests, request interceptor is never called in
     // tests, so let's exclude it from coverage

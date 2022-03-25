@@ -5,9 +5,9 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { urlUtil, spo, ContextInfo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -68,9 +68,9 @@ class SpoFileCopyCommand extends SpoCommand {
       })
       .then((): Promise<any> => {
         // all preconditions met, now create copy job
-        const sourceAbsoluteUrl = this.urlCombine(webUrl, args.options.sourceUrl);
+        const sourceAbsoluteUrl = urlUtil.urlCombine(webUrl, args.options.sourceUrl);
         const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
-        const requestUrl: string = this.urlCombine(webUrl, '/_api/site/CreateCopyJobs');
+        const requestUrl: string = urlUtil.urlCombine(webUrl, '/_api/site/CreateCopyJobs');
         const requestOptions: any = {
           url: requestUrl,
           headers: {
@@ -78,7 +78,7 @@ class SpoFileCopyCommand extends SpoCommand {
           },
           data: {
             exportObjectUris: [sourceAbsoluteUrl],
-            destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
+            destinationUri: urlUtil.urlCombine(tenantUrl, args.options.targetUrl),
             options: {
               "AllowSchemaMismatch": allowSchemaMismatch,
               "IgnoreVersionHistory": true
@@ -97,7 +97,17 @@ class SpoFileCopyCommand extends SpoCommand {
           const progressPollInterval: number = 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
 
           setTimeout(() => {
-            this.waitUntilCopyJobFinished(copyJobInfo, webUrl, progressPollInterval, resolve, reject, logger, this.dots);
+            spo.waitUntilCopyJobFinished({
+              copyJobInfo,
+              siteUrl: webUrl,
+              pollingInterval: progressPollInterval,
+              resolve,
+              reject,
+              logger,
+              dots: this.dots,
+              debug: this.debug,
+              verbose: this.verbose
+            });
           }, progressPollInterval);
         });
       })
@@ -129,12 +139,12 @@ class SpoFileCopyCommand extends SpoCommand {
    */
   private recycleFile(tenantUrl: string, targetUrl: string, filename: string, logger: Logger): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      const targetFolderAbsoluteUrl: string = this.urlCombine(tenantUrl, targetUrl);
+      const targetFolderAbsoluteUrl: string = urlUtil.urlCombine(tenantUrl, targetUrl);
 
       // since the target WebFullUrl is unknown we can use getRequestDigestForSite
       // to get it from target folder absolute url.
       // Similar approach used here Microsoft.SharePoint.Client.Web.WebUrlFromFolderUrlDirect
-      this
+      spo
         .getRequestDigest(targetFolderAbsoluteUrl)
         .then((contextResponse: ContextInfo): void => {
           if (this.debug) {
@@ -205,7 +215,7 @@ class SpoFileCopyCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

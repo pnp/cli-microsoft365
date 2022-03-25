@@ -1,15 +1,15 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
-import Utils from '../../../../../../Utils';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
+import { sinonUtil } from '../../../../../../utils';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model/Finding';
 import { FN014006_CODE_launch_sourceMapPathOverrides } from './FN014006_CODE_launch_sourceMapPathOverrides';
 
 describe('FN014006_CODE_launch_sourceMapPathOverrides', () => {
   let findings: Finding[];
   let rule: FN014006_CODE_launch_sourceMapPathOverrides;
   afterEach(() => {
-    Utils.restore(fs.existsSync);
+    sinonUtil.restore(fs.existsSync);
   });
 
   beforeEach(() => {

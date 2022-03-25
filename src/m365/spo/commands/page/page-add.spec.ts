@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./page-add');
 
@@ -17,7 +17,12 @@ describe(commands.PAGE_ADD, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    }));
     auth.service.connected = true;
   });
 
@@ -38,15 +43,15 @@ describe(commands.PAGE_ADD, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.post
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      (command as any).getRequestDigest,
+      spo.getRequestDigest,
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
@@ -1292,6 +1297,31 @@ describe(commands.PAGE_ADD, () => {
 
   it('passes validation if layout type is Article', () => {
     const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Article' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if layout type is SingleWebPartAppPage', () => {
+    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'SingleWebPartAppPage' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if layout type is RepostPage', () => {
+    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'RepostPage' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if layout type is HeaderlessSearchResults', () => {
+    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'HeaderlessSearchResults' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if layout type is Spaces', () => {
+    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Spaces' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if layout type is Topic', () => {
+    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Topic' } });
     assert.strictEqual(actual, true);
   });
 

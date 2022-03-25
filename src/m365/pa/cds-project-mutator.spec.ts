@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as path from 'path';
-import { XMLSerializer } from 'xmldom';
+import { XMLSerializer } from '@xmldom/xmldom';
 import CdsProjectMutator from './cds-project-mutator';
 
 describe('CdsProjectMutator', () => {

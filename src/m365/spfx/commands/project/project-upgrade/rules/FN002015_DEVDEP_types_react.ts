@@ -1,5 +1,5 @@
-import { Utils } from "../";
-import { Project } from "../../model";
+import { spfx } from "../../../../../../utils";
+import { Project } from '../../project-model';
 import { DependencyRule } from "./DependencyRule";
 
 export class FN002015_DEVDEP_types_react extends DependencyRule {
@@ -12,6 +12,6 @@ export class FN002015_DEVDEP_types_react extends DependencyRule {
   }
 
   customCondition(project: Project): boolean {
-    return Utils.isReactProject(project);
+    return spfx.isReactProject(project);
   }
 }

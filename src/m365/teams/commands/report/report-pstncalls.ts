@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -39,7 +39,7 @@ class TeamsReportPstncallsCommand extends GraphCommand {
     const toDateTimeParameter: string = encodeURIComponent(args.options.toDateTime ? args.options.toDateTime : new Date().toISOString());
 
     const requestOptions: any = {
-      url: `${this.resource}/beta/communications/callRecords/getPstnCalls(fromDateTime=${encodeURIComponent(args.options.fromDateTime)},toDateTime=${toDateTimeParameter})`,
+      url: `${this.resource}/v1.0/communications/callRecords/getPstnCalls(fromDateTime=${encodeURIComponent(args.options.fromDateTime)},toDateTime=${toDateTimeParameter})`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -69,12 +69,12 @@ class TeamsReportPstncallsCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidISODateDashOnly(args.options.fromDateTime)) {
+    if (!validation.isValidISODateDashOnly(args.options.fromDateTime)) {
       return 'The fromDateTime is not a valid ISO date string (YYYY-MM-DD)';
     }
 
     if (args.options.toDateTime &&
-      !Utils.isValidISODateDashOnly(args.options.toDateTime)) {
+      !validation.isValidISODateDashOnly(args.options.toDateTime)) {
       return 'The toDateTime is not a valid ISO date string (YYYY-MM-DD)';
     }
 

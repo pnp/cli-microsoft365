@@ -5,12 +5,11 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { ContextInfo, spo, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 import { ClientSidePageProperties } from './ClientSidePageProperties';
-import { Page } from './Page';
+import { Page, supportedPageLayouts, supportedPromoteAs } from './Page';
 
 interface CommandArgs {
   options: Options;
@@ -53,7 +52,7 @@ class SpoPageAddCommand extends SpoCommand {
     let requestDigest: string = '';
     let itemId: string = '';
     let pageName: string = args.options.name;
-    const serverRelativeSiteUrl: string = Utils.getServerRelativeSiteUrl(args.options.webUrl);
+    const serverRelativeSiteUrl: string = urlUtil.getServerRelativeSiteUrl(args.options.webUrl);
     const fileNameWithoutExtension: string = pageName.replace('.aspx', '');
     let bannerImageUrl: string = '';
     let canvasContent1: string = '';
@@ -62,7 +61,7 @@ class SpoPageAddCommand extends SpoCommand {
     let pageId: number | null = null;
     const pageDescription: string = args.options.description || "";
 
-    this
+    spo
       .getRequestDigest(args.options.webUrl)
       .then((res: ContextInfo): Promise<{ UniqueId: string }> => {
         requestDigest = res.FormDigestValue;
@@ -334,11 +333,11 @@ class SpoPageAddCommand extends SpoCommand {
       },
       {
         option: '-l, --layoutType [layoutType]',
-        autocomplete: ['Article', 'Home']
+        autocomplete: supportedPageLayouts
       },
       {
         option: '-p, --promoteAs [promoteAs]',
-        autocomplete: ['HomePage', 'NewsPage', 'Template']
+        autocomplete: supportedPromoteAs
       },
       {
         option: '--commentsEnabled'
@@ -359,29 +358,26 @@ class SpoPageAddCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
     }
 
     if (args.options.layoutType &&
-      args.options.layoutType !== 'Article' &&
-      args.options.layoutType !== 'Home') {
-      return `${args.options.layoutType} is not a valid option for layoutType. Allowed values Article|Home`;
+      supportedPageLayouts.indexOf(args.options.layoutType) < 0) {
+      return `${args.options.layoutType} is not a valid option for layoutType. Allowed values ${supportedPageLayouts.join(', ')}`;
     }
 
     if (args.options.promoteAs &&
-      args.options.promoteAs !== 'HomePage' &&
-      args.options.promoteAs !== 'NewsPage' &&
-      args.options.promoteAs !== 'Template') {
-      return `${args.options.promoteAs} is not a valid option for promoteAs. Allowed values HomePage|NewsPage|Template`;
+      supportedPromoteAs.indexOf(args.options.promoteAs) < 0) {
+      return `${args.options.promoteAs} is not a valid option for promoteAs. Allowed values ${supportedPromoteAs.join(', ')}`;
     }
 
     if (args.options.promoteAs === 'HomePage' && args.options.layoutType !== 'Home') {
       return 'You can only promote home pages as site home page';
     }
 
-    if (args.options.promoteAs === 'NewsPage' && args.options.layoutType === 'Home') {
+    if (args.options.promoteAs === 'NewsPage' && args.options.layoutType  && args.options.layoutType !== 'Article') {
       return 'You can only promote article pages as news article';
     }
 

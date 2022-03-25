@@ -1,6 +1,6 @@
-import { Finding } from "../";
-import { Project } from "../../model";
-import { JsonRule } from "./JsonRule";
+import { JsonRule } from '../../JsonRule';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model';
 
 export class FN005002_CFG_DAS_workingDir extends JsonRule {
   constructor(private workingDir: string) {

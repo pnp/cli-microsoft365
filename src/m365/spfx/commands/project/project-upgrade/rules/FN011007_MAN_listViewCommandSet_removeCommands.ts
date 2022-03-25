@@ -1,5 +1,5 @@
-import { Finding, Occurrence } from "../";
-import { CommandSetManifest, Project } from "../../model";
+import { Finding, Occurrence } from '../../report-model';
+import { CommandSetManifest, Project } from '../../project-model';
 import { ManifestRule } from "./ManifestRule";
 
 export class FN011007_MAN_listViewCommandSet_removeCommands extends ManifestRule {

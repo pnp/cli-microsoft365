@@ -1,11 +1,11 @@
+import { PlannerTask } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { odata, validation } from '../../../../utils';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { Task } from '../../Task';
 
 interface CommandArgs {
   options: Options;
@@ -20,7 +20,11 @@ interface Options extends GlobalOptions {
   ownerGroupName?: string;
 }
 
-class PlannerTaskListCommand extends GraphItemsListCommand<Task> {
+interface BetaPlannerTask extends PlannerTask {
+  priority?: number;
+}
+
+class PlannerTaskListCommand extends GraphCommand {
   public get name(): string {
     return commands.TASK_LIST;
   }
@@ -45,34 +49,53 @@ class PlannerTaskListCommand extends GraphItemsListCommand<Task> {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const bucketId: string | undefined = args.options.bucketId;
     const bucketName: string | undefined = args.options.bucketName;
-    const planId: string | undefined = args.options.planId;
+    let bucketId: string | undefined = args.options.bucketId;
     const planName: string | undefined = args.options.planName;
+    let planId: string | undefined = args.options.planId;
+    let taskItems: PlannerTask[] = [];
 
     if (bucketId || bucketName) {
       this
         .getBucketId(args)
-        .then((bucketId: string): Promise<void> => this.getAllItems(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`, logger, true))
-        .then((): void => {
-          logger.log(this.items);
+        .then((retrievedBucketId: string): Promise<PlannerTask[]> => {
+          bucketId = retrievedBucketId;
+          return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`, logger);
+        })
+        .then((tasks): Promise<BetaPlannerTask[]> => {
+          taskItems = tasks;
+          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/planner/buckets/${bucketId}/tasks`, logger);
+        })
+        .then((betaTasks): void => {
+          logger.log(this.mergeTaskPriority(taskItems, betaTasks));
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
     else if (planId || planName) {
       this
         .getPlanId(args)
-        .then((planId: string): Promise<void> => this.getAllItems(`${this.resource}/v1.0/planner/plans/${planId}/tasks`, logger, true))
-        .then((): void => {
-          logger.log(this.items);
+        .then((retrievedPlanId: string): Promise<PlannerTask[]> => {
+          planId = retrievedPlanId;
+          return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/plans/${planId}/tasks`, logger);
+        })
+        .then((tasks): Promise<BetaPlannerTask[]> => {
+          taskItems = tasks;
+          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/planner/plans/${planId}/tasks`, logger);
+        })
+        .then((betaTasks): void => {
+          logger.log(this.mergeTaskPriority(taskItems, betaTasks));
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
     else {
-      this
-        .getAllItems(`${this.resource}/v1.0/me/planner/tasks`, logger, true)
-        .then((): void => {
-          logger.log(this.items);
+      odata
+        .getAllItems<PlannerTask>(`${this.resource}/v1.0/me/planner/tasks`, logger)
+        .then((tasks): Promise<BetaPlannerTask[]> => {
+          taskItems = tasks;
+          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/me/planner/tasks`, logger);
+        })
+        .then((betaTasks): void => {
+          logger.log(this.mergeTaskPriority(taskItems, betaTasks));
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
@@ -161,6 +184,20 @@ class PlannerTaskListCommand extends GraphItemsListCommand<Task> {
       });
   }
 
+  private mergeTaskPriority(taskItems: PlannerTask[], betaTaskItems: BetaPlannerTask[]): BetaPlannerTask[] {
+    const findBetaTask = (id: string) => betaTaskItems.find(task => task.id === id);
+
+    taskItems.forEach(task => {
+      const betaTaskItem = findBetaTask(task.id as string);
+      if (betaTaskItem) {
+        const { priority } = betaTaskItem;
+        Object.assign(task, { priority });
+      }
+    });
+
+    return taskItems;
+  }
+
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
@@ -208,7 +245,7 @@ class PlannerTaskListCommand extends GraphItemsListCommand<Task> {
       return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
     }
 
-    if (args.options.ownerGroupId && !Utils.isValidGuid(args.options.ownerGroupId as string)) {
+    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
       return `${args.options.ownerGroupId} is not a valid GUID`;
     }
 

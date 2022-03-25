@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./list-view-set');
 
@@ -17,7 +17,12 @@ describe(commands.LIST_VIEW_SET, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
+    sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
+      FormDigestValue: 'ABC',
+      FormDigestTimeoutSeconds: 1800,
+      FormDigestExpiresAt: new Date(),
+      WebFullUrl: 'https://contoso.sharepoint.com'
+    }));
     auth.service.connected = true;
   });
 
@@ -38,15 +43,16 @@ describe(commands.LIST_VIEW_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       request.patch
     ]);
   });
 
   after(() => {
-    Utils.restore([
+    sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      spo.getRequestDigest
     ]);
     auth.service.connected = false;
   });
@@ -64,7 +70,7 @@ describe(commands.LIST_VIEW_SET, () => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('List%201')/views/getByTitle('All%20items')`) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0 &&
+          (opts.headers.accept as string).indexOf('application/json') === 0 &&
           opts.headers['X-RequestDigest'] &&
           JSON.stringify(opts.data) === JSON.stringify({ Title: 'All events' })) {
           return Promise.resolve();
@@ -90,7 +96,7 @@ describe(commands.LIST_VIEW_SET, () => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('List%201')/views/getByTitle('All%20items')`) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0 &&
+          (opts.headers.accept as string).indexOf('application/json') === 0 &&
           opts.headers['X-RequestDigest'] &&
           JSON.stringify(opts.data) === JSON.stringify({ Title: 'All events' })) {
           return Promise.resolve();
@@ -116,7 +122,7 @@ describe(commands.LIST_VIEW_SET, () => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'330f29c5-5c4c-465f-9f4b-7903020ae1cf')/views/getById('330f29c5-5c4c-465f-9f4b-7903020ae1ce')`) {
         if (opts.headers &&
           opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0 &&
+          (opts.headers.accept as string).indexOf('application/json') === 0 &&
           opts.headers['X-RequestDigest'] &&
           JSON.stringify(opts.data) === JSON.stringify({ Title: 'All events', CustomFormatter: 'abc' })) {
           return Promise.resolve();

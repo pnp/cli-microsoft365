@@ -38,7 +38,6 @@ import { FN012017_TSC_extends } from "./rules/FN012017_TSC_extends";
 import { FN012018_TSC_lib_es2015_promise } from "./rules/FN012018_TSC_lib_es2015_promise";
 import { FN012019_TSC_types_es6_promise } from "./rules/FN012019_TSC_types_es6_promise";
 import { FN013002_GULP_serveTask } from "./rules/FN013002_GULP_serveTask";
-import { FN015006_FILE_editorconfig } from "./rules/FN015006_FILE_editorconfig";
 import { FN019002_TSL_extends } from "./rules/FN019002_TSL_extends";
 import { FN021002_PKG_engines } from "./rules/FN021002_PKG_engines";
 
@@ -83,7 +82,6 @@ module.exports = [
   new FN012018_TSC_lib_es2015_promise(),
   new FN012019_TSC_types_es6_promise(false),
   new FN013002_GULP_serveTask(),
-  new FN015006_FILE_editorconfig(false),
   new FN019002_TSL_extends('./node_modules/@microsoft/sp-tslint-rules/base-tslint.json'),
   new FN021002_PKG_engines(false)
 ];

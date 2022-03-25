@@ -1,4 +1,4 @@
-import { Project } from "../../model";
+import { Project } from '../../project-model';
 import { DependencyRule } from "./DependencyRule";
 
 export class FN001021_DEP_microsoft_sp_property_pane extends DependencyRule {
@@ -12,6 +12,7 @@ export class FN001021_DEP_microsoft_sp_property_pane extends DependencyRule {
 
   customCondition(project: Project): boolean {
     return !!project.packageJson &&
+      !!project.packageJson.dependencies &&
       !!project.packageJson.dependencies['@microsoft/sp-webpart-base'];
   }
 }

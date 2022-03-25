@@ -1,6 +1,6 @@
-import { Finding } from "../";
-import { Project } from "../../model";
-import { JsonRule } from "./JsonRule";
+import { JsonRule } from '../../JsonRule';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model';
 
 export abstract class PackageRule extends JsonRule {
   constructor(protected propertyName: string, protected add: boolean, protected propertyValue?: string) {

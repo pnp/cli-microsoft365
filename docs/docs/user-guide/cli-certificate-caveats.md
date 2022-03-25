@@ -17,10 +17,6 @@ When you decide to use the CLI with your own Azure AD app to execute SharePoint 
 
 [![Azure AD application permissions highlighted in Azure AD](../images/cli-certificate-caveats/min-app-permissions-to-list-SP-sites.png)](../images/cli-certificate-caveats/min-app-permissions-to-list-SP-sites.png)
 
-Here is the result:
-
-[![Result of running the m365 spo site list command](../images/cli-certificate-caveats/spo-list-sites-result.png)](../images/cli-certificate-caveats/spo-list-sites-result.png)
-
 ## I get an error: 403, "AccessDenied Either scp or roles claim need to be present in the token" when executing a CLI for Microsoft 365 SharePoint command. What does it mean
 
 It means that the Azure AD application that the CLI is running under does not have Microsoft Graph `Sites.Read.All` application permission granted. If you are trying to use the CLI with a certificate login and SharePoint, you would have to allow Microsoft Graph `Sites.Read.All` application permissions to the Azure AD app.
@@ -29,12 +25,7 @@ It means that the Azure AD application that the CLI is running under does not ha
 
 This error can occur when you use the CLI with a certificate login and try to create a new SharePoint Team site that uses Microsoft 365 group (WebTemplate: #GROUP). Getting this error is a known issue with the CLI and the SharePoint APIs, but there is a workaround. The workaround is to use the `m365 aad o365group add` command to create Team Sites.
 
-If your goal is to create team sites, you can use the `m365 aad o365group add` command. The command is calling a Microsoft API that creates a Microsoft 365 group with a SharePoint site collection associated with the group.
-
-Here is how to do it:
-[![Arrow pointing from a modern site URL to the Microsoft 365 group's mail nickname](../images/cli-certificate-caveats/create-team-site-using-spo-o365group-add.png)](../images/cli-certificate-caveats/create-team-site-using-spo-o365group-add.png)
-
-As I mentioned above, when creating a Microsoft 365 Group, the Microsoft 365 APIs create a site collection with it. The `mailNickname` property is the site URL of the site collection. You can combine the `m365 aad o365group add` command with `m365 spo site set` to change additional properties of the site not available in the `m365 aad o365group add` command. From the screenshot above, you can see that the `spo site set` command is used to change the site classification after having created the group and a SharePoint site. Combining these two commands will give you the same functionality as the `spo site add` command.
+If your goal is to create team sites, you can use the `m365 aad o365group add` command. The command is calling a Microsoft API that creates a Microsoft 365 group with a SharePoint site collection associated with the group. When creating a Microsoft 365 Group, the Microsoft 365 APIs create a site collection with it. The `mailNickname` property is the last portion of the site URL of the SharePoint Online site collection (https://yourtentantName.sharepoint.com/sites/mailNickname}). You can combine the `m365 aad o365group add` command with `m365 spo site set` to change additional properties of the site not available in the `m365 aad o365group add` command. 
 
 ### What are the minimum permissions required to use the `m365 aad o365group add` command
 

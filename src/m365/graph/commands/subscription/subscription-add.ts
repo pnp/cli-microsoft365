@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -179,7 +179,7 @@ class GraphSubscriptionAddCommand extends GraphCommand {
       return `The specified changeType is invalid. Valid options are 'created', 'updated' and 'deleted'`;
     }
 
-    if (args.options.expirationDateTime && !Utils.isValidISODateTime(args.options.expirationDateTime)) {
+    if (args.options.expirationDateTime && !validation.isValidISODateTime(args.options.expirationDateTime)) {
       return 'The expirationDateTime is not a valid ISO date string';
     }
 

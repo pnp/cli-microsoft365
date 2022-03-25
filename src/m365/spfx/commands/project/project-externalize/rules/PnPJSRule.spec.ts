@@ -1,8 +1,8 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import Utils from '../../../../../../Utils';
-import { Project } from '../../model';
+import { sinonUtil } from '../../../../../../utils';
+import { Project } from '../../project-model';
 import { PnPJsRule } from './PnPJsRule';
 
 describe('PnPJsRule', () => {
@@ -10,6 +10,15 @@ describe('PnPJsRule', () => {
 
   beforeEach(() => {
     rule = new PnPJsRule();
+  });
+
+  it(`doesn't return notification when project has no dependencies`, async () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {}
+    };
+    const findings = await rule.visit(project);
+    assert.strictEqual(findings.entries.length, 0);
   });
 
   it('returns notification if dependency is here', async () => {
@@ -38,7 +47,7 @@ describe('PnPJsRule', () => {
     assert.strictEqual(findings.entries.length, 0);
   });
 
-  it('doesnt return a shadow require when the type of component is not recognized', async () => {
+  it(`doesn't return a shadow require when the type of component is not recognized`, async () => {
     const project: Project = {
       path: 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react',
       packageJson: {
@@ -60,7 +69,7 @@ describe('PnPJsRule', () => {
     assert.strictEqual(findings.suggestions.length, 0);
   });
   afterEach(() => {
-    Utils.restore([
+    sinonUtil.restore([
       fs.existsSync
     ]);
   });

@@ -4,11 +4,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import commands from '../../commands';
 
 interface CommandArgs {
-  options: Options;
-}
-
-interface Options extends GlobalOptions {
-  id?: string;
+  options: GlobalOptions;
 }
 
 class SearchExternalConnectionListCommand extends GraphItemsListCommand<any> {
@@ -17,21 +13,16 @@ class SearchExternalConnectionListCommand extends GraphItemsListCommand<any> {
   }
 
   public get description(): string {
-    return 'Adds a new External Connection for Microsoft Search';
+    return 'Lists all external connections';
   }
-  
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let urlStub = 'v1.0/external/connections';
-    if (args.options.id !== null){
-      urlStub += `?$filter=id eq ${args.options.id}`;
-    }
-    
     this
       .getAllItems(`${this.resource}/${urlStub}`, logger, true)
       .then((): void => {
         logger.log(this.items);
         cb();
-      });
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public defaultProperties(): string[] | undefined { 

@@ -20,10 +20,10 @@ m365 spo page add [options]
 : Title of the page to create. If not specified, will use the page name as its title
 
 `-l, --layoutType [layoutType]`
-: Layout of the page. Allowed values `Article,Home`. Default `Article`
+: Layout of the page. Allowed values `Article`, `Home`, `SingleWebPartAppPage`, `RepostPage`,`HeaderlessSearchResults`, `Spaces`, `Topic`. Default `Article`
 
 `-p, --promoteAs [promoteAs]`
-: Create the page for a specific purpose. Allowed values `HomePage,NewsPage`
+: Create the page for a specific purpose. Allowed values `HomePage`, `NewsPage`
 
 `--commentsEnabled`
 : Set to enable comments on the page

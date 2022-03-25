@@ -1,10 +1,13 @@
 import { Logger } from '../../../../cli';
 import request from '../../../../request';
-import Utils from '../../../../Utils';
+import { urlUtil } from '../../../../utils';
 import { ClientSidePageProperties } from './ClientSidePageProperties';
 import { CanvasColumn, CanvasSection, ClientSidePage, ClientSidePart } from './clientsidepages';
 import { PageItem } from './PageItem';
 import { getControlTypeDisplayName } from './pageMethods';
+
+export const supportedPageLayouts = ['Article', 'Home', 'SingleWebPartAppPage', 'RepostPage', 'HeaderlessSearchResults', 'Spaces', 'Topic'];
+export const supportedPromoteAs = ['HomePage', 'NewsPage', 'Template'];
 
 export class Page {
   public static getPage(name: string, webUrl: string, logger: Logger, debug: boolean, verbose: boolean): Promise<ClientSidePage> {
@@ -16,7 +19,7 @@ export class Page {
       const pageName: string = this.getPageNameWithExtension(name);
 
       const requestOptions: any = {
-        url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
+        url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
         headers: {
           'content-type': 'application/json;charset=utf-8',
           accept: 'application/json;odata=nometadata'

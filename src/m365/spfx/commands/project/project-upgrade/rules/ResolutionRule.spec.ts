@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model';
 import { ResolutionRule } from './ResolutionRule';
 
 class ResRule extends ResolutionRule {

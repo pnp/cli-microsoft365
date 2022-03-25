@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { Cli, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import { settingsNames } from '../../../../settingsNames';
-import Utils from '../../../../Utils';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./config-reset');
 
@@ -27,7 +27,7 @@ describe(commands.CONFIG_RESET, () => {
   });
 
   after(() => {
-    Utils.restore(Cli.getInstance().config.set);
+    sinonUtil.restore(Cli.getInstance().config.set);
   });
 
   it('has correct name', () => {

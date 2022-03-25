@@ -1,4 +1,4 @@
-# Installing the CLI for Microsoft 365
+# Install the CLI for Microsoft 365
 
 Thank you for your interest in the CLI for Microsoft 365. Following information will help you install the CLI for Microsoft 365 and keep it up to date.
 
@@ -18,7 +18,7 @@ To install the CLI for Microsoft 365, in the command line execute:
 npm install -g @pnp/cli-microsoft365
 ```
 
-<script src="https://asciinema.org/a/158191.js" id="asciicast-158191" async></script>
+<script id="asciicast-445659" src="https://asciinema.org/a/445659.js" async></script>
 
 If you're using Yarn, you can install the CLI for Microsoft 365 by executing:
 
@@ -82,7 +82,7 @@ npm install -g @pnp/cli-microsoft365@latest
 This will download and install the latest public version of the CLI for Microsoft 365. If you want to update to the latest beta version of the CLI, replace `@latest` with `@next`.
 
 !!! important
-    New version of the CLI for Microsoft 365 often contains new commands. Don't forget to update command completion for your terminal to get suggestions for the latest commands added in the CLI. For more information see the article on [command completion](../concepts/completion.md).
+    New version of the CLI for Microsoft 365 often contains new commands. Don't forget to update command completion for your terminal to get suggestions for the latest commands added in the CLI. For more information see the article on [command completion](completion.md).
 
 ## Uninstall the CLI
 

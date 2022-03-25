@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Project } from "../../model";
-import { Finding } from "../Finding";
-import { Rule } from "./Rule";
+import { Project } from '../../project-model';
+import { Finding } from "../../report-model/Finding";
+import { Rule } from '../../Rule';
 
 export abstract class FileAddRemoveRule extends Rule {
   constructor(protected filePath: string, protected add: boolean, private contents?: string) {

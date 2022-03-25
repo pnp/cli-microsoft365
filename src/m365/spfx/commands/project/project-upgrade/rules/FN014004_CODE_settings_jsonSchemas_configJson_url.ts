@@ -1,6 +1,6 @@
-import { Finding } from "../";
-import { Project, VsCodeSettingsJsonJsonSchema } from "../../model";
-import { JsonRule } from "./JsonRule";
+import { JsonRule } from '../../JsonRule';
+import { Project, VsCodeSettingsJsonJsonSchema } from '../../project-model';
+import { Finding } from '../../report-model';
 
 export class FN014004_CODE_settings_jsonSchemas_configJson_url extends JsonRule {
   constructor(private url: string) {

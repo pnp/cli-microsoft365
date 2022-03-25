@@ -5,7 +5,7 @@ import {
 } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
-import Utils from '../../../Utils';
+import { validation } from '../../../utils';
 import AzmgmtCommand from '../../base/AzmgmtCommand';
 import commands from '../commands';
 
@@ -106,7 +106,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.name)) {
+    if (!validation.isValidGuid(args.options.name)) {
       return `${args.options.name} is not a valid GUID`;
     }
 
