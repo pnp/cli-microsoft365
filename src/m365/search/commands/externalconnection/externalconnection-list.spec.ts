@@ -96,30 +96,13 @@ describe(commands.EXTERNALCONNECTION_LIST, () => {
   });
 
   it('lists an external connection', (done) => {
-    const postStub = sinon.stub(request, 'get').callsFake((opts: any) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
-        return Promise.resolve(externalConnectionListResponse);
-      }
-      return Promise.reject('Invalid request');
-    });
-    
-    const options: any = {
-      debug: false,
-      externalConnectionId: 'TestConnectionForCLI',
-      externalConnectionName: 'Test Connection for CLI',
-      externalConnectionDescription: 'Test connection that will not do anything'
-    };
-  
-    command.action(logger, { options: options } as any, () => {
+    command.action(logger, { } as any, () => {
       try {
-        assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionListResponse);
+        assert(loggerLogSpy.calledWith(externalConnectionListResponse));
         done();
       }
       catch (e) {
         done(e);
-      }
-      finally {
-        Utils.restore(request.get);
       }
     });
   });
