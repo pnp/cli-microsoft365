@@ -45,9 +45,11 @@ export const chatUtil = {
    * @param value the string to convert
    */
   convertParticipantStringToArray(value: string): string[] {
-    if (value.indexOf(',') === -1)
+    if (value.indexOf(',') === -1) {
       return value.trim().toLowerCase().split(' ').filter(e => e && e !== '');
-    else
+    } 
+    else {
       return value.trim().toLowerCase().split(',').filter(e => e && e !== '');
+    }
   }
-}
+};
