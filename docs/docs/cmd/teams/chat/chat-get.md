@@ -1,6 +1,6 @@
 # teams chat get
 
-Get a Microsoft Teams chat conversation.
+Get a Microsoft Teams chat conversation by id, participants or chat name.
 
 ## Usage
 

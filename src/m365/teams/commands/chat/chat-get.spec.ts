@@ -331,6 +331,27 @@ describe(commands.CHAT_GET, () => {
     });
   });
   
+  /*
+   * In PowerShell, when not using double quotes with your string array, the comma is interpreted by powershell.
+   * The string input is split and concatenated with a space. Hence we test the same participant string using a space.
+   */
+  it('gets chat conversation to existing conversation using participants (multiple) - PowerShell version', (done) => {
+    command.action(logger, {
+      options: {
+        participants: "AndrewK@M365x214355.onmicrosoft.com DaveK@M365x214355.onmicrosoft.com"
+      }
+    }, (err?: any) => {
+      try {
+        assert(loggerLogSpy.calledWith(singleChatResponse));
+        assert.strictEqual(err, undefined);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+  
   it('fails retrieving chat conversation with nonexistent name', (done) => {    
     command.action(logger, {
       options: {
@@ -397,7 +418,7 @@ describe(commands.CHAT_GET, () => {
       try {
         assert.strictEqual(
           JSON.stringify(err),
-          JSON.stringify(new CommandError(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${[
+          JSON.stringify(new CommandError(`Multiple chat conversations with these participants found. Please disambiguate:${os.EOL}${[
             `- 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2 - Megan Bowen_Alex Wilber_Sundar Ganesan_ArchivedChat - ${new Date("2021-12-22T13:13:11.023Z").toLocaleString()}`,
             `- 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2 - CC Call v3 - ${new Date("2021-10-18T16:56:30.205Z").toLocaleString()}`
           ].join(os.EOL)}`)));                              
