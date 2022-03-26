@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -62,7 +62,7 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.get
     ]);
   });
 
@@ -124,6 +124,32 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
     command.action(logger, { options: options }, () => {
       try {
         assert(loggerLogSpy.calledWith(externalConnectionGetResponseWithAppIDs));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails to get external connection when team does not exists', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      const matchingItemNumber = (opts.url as string).indexOf(`/v1.0/external/connections?$filter=name eq 'sjalfj'`);
+      
+      if (matchingItemNumber > -1) {
+        return Promise.resolve({ value: [] });
+      }
+      return Promise.reject('The specified external connection does not exist');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Test App'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified external connection does not exist`)));
         done();
       }
       catch (e) {
