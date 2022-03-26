@@ -158,6 +158,25 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
     });
   });
 
+  it('fails validation if neither id or name is set', () => {
+    const actual = command.validate({
+      options: {
+        broken: 'Broken'
+      }
+    });
+    assert.notStrictEqual(actual, false);
+  });
+
+  it('fails validation if id and name is set', () => {
+    const actual = command.validate({
+      options: {
+        id: 'Id',
+        name: 'Name'
+      }
+    });
+    assert.notStrictEqual(actual, false);
+  });
+
   it('fails validation if id is less than 3 characters', (done) => {
     const actual = command.validate({
       options: {
