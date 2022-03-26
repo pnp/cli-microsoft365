@@ -36,7 +36,7 @@ class SearchExternalConnectionGetCommand extends GraphCommand {
     let endpoint: string = `${this.resource}/v1.0/external/connections`;
     
     if (args.options.id) {
-      endpoint += `/'${encodeURIComponent(args.options.id)}'`;
+      endpoint += `/${encodeURIComponent(args.options.id)}`;
     }
     else {
       endpoint += `?$filter=name eq '${encodeURIComponent(args.options.name as string)}'`;

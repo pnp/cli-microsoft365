@@ -12,6 +12,7 @@ const command: Command = require('./externalconnection-get');
 describe(commands.EXTERNALCONNECTION_GET, () => {
   let log: string[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
 
   const externalConnectionGetResponse: any = {
     configuration: {
@@ -31,8 +32,8 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
       ]
     },
     description: 'Test connection that will not do anything',
-    id: 'TestConnectionForCLI',
-    name: 'Test Connection for CLI'
+    id: 'TestConnectionForCLIWithAppIDs',
+    name: 'Test Connection for CLI with App IDs'
   };
 
   before(() => {
@@ -55,6 +56,8 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
       }
     };
     (command as any).items = [];
+    
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -80,8 +83,8 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   });
 
   it('gets an external connection', (done: any) => {
-    const postStub = sinon.stub(request, 'get').callsFake((opts: any) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/TestConnectionForCLI`) {
         return Promise.resolve(externalConnectionGetResponse);
       }
       return Promise.reject('Invalid request');
@@ -92,9 +95,10 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
       name: 'Test Connection for CLI',
       description: 'Test connection that will not do anything'
     };
-    command.action(logger, { options: options } as any, () => {
+
+    command.action(logger, { options: options }, () => {
       try {
-        assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionGetResponse);
+        assert(loggerLogSpy.calledWith(externalConnectionGetResponse));
         done();
       }
       catch (e) {
@@ -104,72 +108,22 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   });
 
   it('gets an external connection with authorized app id', (done: any) => {
-    const postStub = sinon.stub(request, 'get').callsFake((opts: any) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
-        return Promise.resolve(externalConnectionGetResponse);
-      }
-      return Promise.reject('Invalid request');
-    });
-    const options: any = {
-      debug: false,
-      id: 'TestConnectionForCLI',
-      name: 'Test Connection for CLI',
-      description: 'Test connection that will not do anything',
-      authorizedAppIds: '00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'
-    };
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionGetResponseWithAppIDs);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('gets an external connection with authorised app IDs', (done: any) => {
-    const postStub = sinon.stub(request, 'post').callsFake((opts: any) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/TestConnectionForCLIWithAppIDs`) {
         return Promise.resolve(externalConnectionGetResponseWithAppIDs);
       }
       return Promise.reject('Invalid request');
     });
     const options: any = {
       debug: false,
-      id: 'TestConnectionForCLI',
-      name: 'Test Connection for CLI',
-      description: 'Test connection that will not do anything',
-      authorizedAppIds: '00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'
+      id: 'TestConnectionForCLIWithAppIDs',
+      name: 'Test Connection for CLI With App IDs',
+      description: 'Test connection that will not do anything'
     };
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionGetResponseWithAppIDs);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
 
-  it('correctly handles error', (done) => {
-    sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "Error",
-          "message": "An error has occurred",
-          "innerError": {
-            "request-id": "9b0df954-93b5-4de9-8b99-43c204a8aaf8",
-            "date": "2018-04-24T18:56:48"
-          }
-        }
-      });
-    });
-
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
+    command.action(logger, { options: options }, () => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
+        assert(loggerLogSpy.calledWith(externalConnectionGetResponseWithAppIDs));
         done();
       }
       catch (e) {
@@ -181,8 +135,7 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   it('fails validation if id is less than 3 characters', (done) => {
     const actual = command.validate({
       options: {
-        id: 'T',
-        name: 'Test Connection for CLI'
+        id: 'T'
       }
     });
     assert.notStrictEqual(actual, false);
@@ -192,8 +145,7 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   it('fails validation if id is more than 32 characters', (done) => {
     const actual = command.validate({
       options: {
-        id: 'TestConnectionForCLIXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-        name: 'Test Connection for CLI'
+        id: 'TestConnectionForCLIXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
       }
     });
     assert.notStrictEqual(actual, false);
@@ -203,8 +155,7 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   it('fails validation if id is not alphanumeric', (done) => {
     const actual = command.validate({
       options: {
-        id: 'Test_Connection!',
-        name: 'Test Connection for CLI'
+        id: 'Test_Connection!'
       }
     });
     assert.notStrictEqual(actual, false);
@@ -214,8 +165,7 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   it('fails validation if id starts with Microsoft', () => {
     const actual = command.validate({
       options: {
-        id: 'MicrosoftTestConnectionForCLI',
-        name: 'Test Connection for CLI'
+        id: 'MicrosoftTestConnectionForCLI'
       }
     });
     assert.notStrictEqual(actual, false);
@@ -224,8 +174,7 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   it('fails validation if id is SharePoint', () => {
     const actual = command.validate({
       options: {
-        id: 'SharePoint',
-        name: 'Test Connection for CLI'
+        id: 'SharePoint'
       }
     });
     assert.notStrictEqual(actual, false);
@@ -234,8 +183,7 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   it('passes validation for a valid id', () => {
     const actual = command.validate({
       options: {
-        id: 'myapp',
-        name: 'Test Connection for CLI'
+        id: 'myapp'
       }
     });
     assert.strictEqual(actual, true);
