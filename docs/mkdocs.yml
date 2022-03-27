@@ -231,7 +231,8 @@ nav:
         - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
     - Search (search):
       - externalconnection:
-        - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
+        - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md',
+        - externalconnection remove: 'cmd/search/externalconnection/externalconnection-remove.md'
     - Skype (skype):
       - report:
         - report activitycounts: 'cmd/skype/report/report-activitycounts.md'
