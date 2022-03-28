@@ -5,7 +5,7 @@ Lists memberships in the specified Microsoft Teams team channel
 ## Usage
 
 ```sh
-m365 teams channel list [options]
+m365 teams channel membership list [options]
 ```
 
 ## Options

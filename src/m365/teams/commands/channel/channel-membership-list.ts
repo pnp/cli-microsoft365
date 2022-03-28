@@ -20,15 +20,15 @@ interface Options extends GlobalOptions {
   role?: string;
 }
 
-class TeamsChannelUserListCommand extends GraphCommand {
-  private teamId: string = "";
+class TeamsChannelMembershipListCommand extends GraphCommand {
+  private teamId: string = '';
 
   public get name(): string {
     return commands.CHANNEL_MEMBERSHIP_LIST;
   }
 
   public get description(): string {
-    return 'Lists users in the specified Microsoft Teams team channel';
+    return 'Lists memberships in the specified Microsoft Teams team channel';
   }
 
   public defaultProperties(): string[] | undefined {
@@ -58,7 +58,7 @@ class TeamsChannelUserListCommand extends GraphCommand {
       })
       .then((memberships): void => {
         if (args.options.role) {
-          if (args.options.role === "member") {
+          if (args.options.role === 'member') {
             // Members have no role value
             memberships = memberships.filter(i => i.roles!.length === 0);
           }
@@ -135,20 +135,20 @@ class TeamsChannelUserListCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: "--teamId [teamId]"
+        option: '--teamId [teamId]'
       },
       {
-        option: "--teamName [teamName]"
+        option: '--teamName [teamName]'
       },
       {
-        option: "--channelId [channelId]"
+        option: '--channelId [channelId]'
       },
       {
-        option: "--channelName [channelName]"
+        option: '--channelName [channelName]'
       },
       {
-        option: "-r, --role [role]",
-        autocomplete: ["owner", "member", "guest"]
+        option: '-r, --role [role]',
+        autocomplete: ['owner', 'member', 'guest']
       }
     ];
 
@@ -187,4 +187,4 @@ class TeamsChannelUserListCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsChannelUserListCommand();
+module.exports = new TeamsChannelMembershipListCommand();
