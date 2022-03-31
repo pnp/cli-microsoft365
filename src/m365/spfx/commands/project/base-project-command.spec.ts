@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { sinonUtil } from '../../../../utils';
 import { BaseProjectCommand } from "./base-project-command";
-import { Project } from "./model";
+import { Project } from "./project-model";
 
 class MockCommand extends BaseProjectCommand {
   public get name(): string {

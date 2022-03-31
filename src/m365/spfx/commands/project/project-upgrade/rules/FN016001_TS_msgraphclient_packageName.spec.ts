@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import { sinonUtil } from '../../../../../../utils';
-import { Project, TsFile } from '../../model';
-import { Finding } from '../Finding';
+import { Project, TsFile } from '../../project-model';
+import { Finding } from '../../report-model/Finding';
 import { FN016001_TS_msgraphclient_packageName } from './FN016001_TS_msgraphclient_packageName';
 import { TsRule } from './TsRule';
 

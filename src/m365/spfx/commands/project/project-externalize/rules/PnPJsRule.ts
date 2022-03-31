@@ -1,5 +1,5 @@
 import { ExternalizeEntry, FileEdit } from "../";
-import { Project } from "../../model";
+import { Project } from '../../project-model';
 import { VisitationResult } from '../VisitationResult';
 import { BasicDependencyRule } from "./BasicDependencyRule";
 
@@ -82,7 +82,7 @@ export class PnPJsRule extends BasicDependencyRule {
     const moduleConfiguration = this.pnpModules.find(x => x.key === moduleName);
 
     if (project.packageJson && moduleConfiguration) {
-      const version: string | undefined = project.packageJson.dependencies[moduleName];
+      const version: string | undefined = project.packageJson.dependencies?.[moduleName];
 
       if (version) {
         result.push({

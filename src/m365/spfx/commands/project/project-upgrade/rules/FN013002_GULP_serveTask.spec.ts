@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model/Finding';
 import { FN013002_GULP_serveTask } from './FN013002_GULP_serveTask';
 
 describe('FN013002_GULP_serveTask', () => {

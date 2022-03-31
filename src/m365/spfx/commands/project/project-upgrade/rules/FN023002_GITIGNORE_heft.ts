@@ -1,6 +1,6 @@
-import { Finding } from "../";
-import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { Finding } from "../../report-model";
+import { Project } from "../../project-model";
+import { Rule } from '../../Rule';
 
 export class FN023002_GITIGNORE_heft extends Rule {
   constructor() {

@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import { sinonUtil } from '../../../../../../utils';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
+import { Project } from '../../project-model';
+import { Finding } from '../../report-model/Finding';
 import { FileAddRemoveRule } from './FileAddRemoveRule';
 
 class FileAddRule extends FileAddRemoveRule {

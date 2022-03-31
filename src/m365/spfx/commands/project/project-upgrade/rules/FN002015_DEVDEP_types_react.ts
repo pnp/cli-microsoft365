@@ -1,5 +1,5 @@
 import { spfx } from "../../../../../../utils";
-import { Project } from "../../model";
+import { Project } from '../../project-model';
 import { DependencyRule } from "./DependencyRule";
 
 export class FN002015_DEVDEP_types_react extends DependencyRule {

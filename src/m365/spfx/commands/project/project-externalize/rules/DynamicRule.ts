@@ -2,7 +2,7 @@ import { AxiosRequestConfig } from 'axios';
 import * as fs from 'fs';
 import { ExternalizeEntry } from "../";
 import request from '../../../../../../request';
-import { Project } from "../../model";
+import { Project } from '../../project-model';
 import { VisitationResult } from '../VisitationResult';
 import { BasicDependencyRule } from "./BasicDependencyRule";
 
@@ -19,7 +19,8 @@ export class DynamicRule extends BasicDependencyRule {
   private fileVariationSuffixes = ['.min', '.bundle', '-min', '.bundle.min'];
 
   public visit(project: Project): Promise<VisitationResult> {
-    if (!project.packageJson) {
+    if (!project.packageJson ||
+      !project.packageJson.dependencies) {
       return Promise.resolve({ entries: [], suggestions: [] });
     }
 
@@ -40,7 +41,7 @@ export class DynamicRule extends BasicDependencyRule {
   }
 
   private getExternalEntryForPackage(packageName: string, project: Project): Promise<ExternalizeEntry | undefined> {
-    const version: string | undefined = project.packageJson && project.packageJson.dependencies[packageName];
+    const version: string | undefined = project.packageJson!.dependencies![packageName];
     const filesPaths: string[] = this.getFilePath(packageName).map(x => this.cleanFilePath(x));
 
     if (!version || filesPaths.length === 0) {

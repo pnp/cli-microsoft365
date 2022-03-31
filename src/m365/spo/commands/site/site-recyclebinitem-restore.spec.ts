@@ -130,7 +130,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     assert.equal(result, undefined);
   });
 
-  it('catch error when restores all items from recycle', (done) => {
+  it('catches error when restores all items from recyclebin', (done) => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('Invalid request');
     });
@@ -151,5 +151,60 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
         done(e);
       }
     });
+  });
+
+  it('verifies that the command will fail when one of the promises fails', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.data.ids).filter((chunk: string) => chunk === 'fail').length > 0) {
+        return Promise.reject('Invalid item');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        output: 'json',
+        debug: true,
+        siteUrl: 'https://contoso.sharepoint.com',
+        ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9412, 1adcf0d6-3733-4c13-b883-c84a27905af4, fail, 641e5c65-a981-4910-b094-c212115b6d54, 5fb84a1f-6ab5-4d07-a6aa-31bba6de9526, 1adcf0d6-3733-4c13-b883-c84a27905cfd, 241e5c65-a981-4910-b094-c212115b6d5f, dc25898c-c977-4443-a821-5535e852975f, ccfb360c-7804-4e81-9cc8-8ea1a4fa53e0, a7598f93-7a7e-45c8-84db-7071bfec2840, 67786192-76b4-42f4-a8e3-aa0c5b00f96b, 5d32c945-a4a9-4b61-94ab-5de7095b2322, 241e5c65-a981-4910-b094-c212115b6d5f, dc25898c-c977-4443-a821-5535e852975f, ccfb360c-7804-4e81-9cc8-8ea1a4fa53e0, a7598f93-7a7e-45c8-84db-7071bfec2840, 67786192-76b4-42f4-a8e3-aa0c5b00f96b, 5d32c945-a4a9-4b61-94ab-5de7095b2322, 241e5c65-a981-4910-b094-c212115b6d5f, dc25898c-c977-4443-a821-5535e852975f, ccfb360c-7804-4e81-9cc8-8ea1a4fa53e0, a7598f93-7a7e-45c8-84db-7071bfec2840, 67786192-76b4-42f4-a8e3-aa0c5b00f96b'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Invalid item')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('restores specified items from the recycle bin in multiple chunks', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/site/RecycleBin/RestoreByIds') > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const result = command.action(logger, {
+      options: {
+        output: 'json',
+        debug: true,
+        siteUrl: 'https://contoso.sharepoint.com',
+        ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9412, 1adcf0d6-3733-4c13-b883-c84a27905af4, 641e5c65-a981-4910-b094-c212115b6d54, 5fb84a1f-6ab5-4d07-a6aa-31bba6de9526, 1adcf0d6-3733-4c13-b883-c84a27905cfd, 241e5c65-a981-4910-b094-c212115b6d5f, dc25898c-c977-4443-a821-5535e852975f, ccfb360c-7804-4e81-9cc8-8ea1a4fa53e0, a7598f93-7a7e-45c8-84db-7071bfec2840, 67786192-76b4-42f4-a8e3-aa0c5b00f96b, 5d32c945-a4a9-4b61-94ab-5de7095b2322, 241e5c65-a981-4910-b094-c212115b6d5f, dc25898c-c977-4443-a821-5535e852975f, ccfb360c-7804-4e81-9cc8-8ea1a4fa53e0, a7598f93-7a7e-45c8-84db-7071bfec2840, 67786192-76b4-42f4-a8e3-aa0c5b00f96b, 5d32c945-a4a9-4b61-94ab-5de7095b2322, 241e5c65-a981-4910-b094-c212115b6d5f, dc25898c-c977-4443-a821-5535e852975f, ccfb360c-7804-4e81-9cc8-8ea1a4fa53e0, a7598f93-7a7e-45c8-84db-7071bfec2840, 67786192-76b4-42f4-a8e3-aa0c5b00f96b, 5d32c945-a4a9-4b61-94ab-5de7095b2322'
+      }
+    }, () => {
+      try {
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+
+    assert.equal(result, undefined);
   });
 });

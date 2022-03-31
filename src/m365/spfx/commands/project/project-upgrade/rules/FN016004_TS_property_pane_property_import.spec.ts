@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import { sinonUtil } from '../../../../../../utils';
-import { Project, TsFile } from '../../model';
-import { Finding } from '../Finding';
+import { Project, TsFile } from '../../project-model';
+import { Finding } from '../../report-model';
 import { FN016004_TS_property_pane_property_import } from './FN016004_TS_property_pane_property_import';
 import { TsRule } from './TsRule';
 

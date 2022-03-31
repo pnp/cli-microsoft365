@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as sinon from 'sinon';
 import request from '../../../../../../request';
 import { sinonUtil } from '../../../../../../utils';
-import { Project } from '../../model';
+import { Project } from '../../project-model';
 import { DynamicRule } from './DynamicRule';
 
 describe('DynamicRule', () => {
@@ -21,10 +21,19 @@ describe('DynamicRule', () => {
     ]);
   });
 
-  it('doesn\'t return anything if project json is missing', async () => {
+  it(`doesn't return anything if package.json is missing`, async () => {
     const project: Project = {
       path: '/usr/tmp',
       packageJson: undefined
+    };
+    const findings = await rule.visit(project);
+    assert.strictEqual(findings.entries.length, 0);
+  });
+
+  it(`doesn't return anything if project has no dependencies`, async () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {}
     };
     const findings = await rule.visit(project);
     assert.strictEqual(findings.entries.length, 0);

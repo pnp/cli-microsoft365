@@ -6,16 +6,14 @@ import { prerelease } from 'semver';
 import { Logger } from '../../../../cli';
 import { CommandError, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import { Dictionary, fsUtil, Hash, packageManager } from '../../../../utils';
 import commands from '../../commands';
 import { BaseProjectCommand } from './base-project-command';
-import { Project } from './model';
-import { Dictionary, Finding, Hash } from './project-upgrade/';
-import { FindingToReport } from './project-upgrade/FindingToReport';
-import { FindingTour } from './project-upgrade/FindingTour';
-import { FindingTourStep } from './project-upgrade/FindingTourStep';
+import { Project } from './project-model';
 import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_npm_dedupe';
-import { Rule } from './project-upgrade/rules/Rule';
-import { ReportData, ReportDataModification } from './ReportData';
+import { Finding, FindingToReport, FindingTour, FindingTourStep } from './report-model';
+import { Rule } from './Rule';
+import { ReportData, ReportDataModification } from './report-model/ReportData';
 
 interface CommandArgs {
   options: Options;
@@ -73,88 +71,6 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     '1.14.0',
     '1.15.0-beta.1'
   ];
-  private static packageCommands = {
-    npm: {
-      install: 'npm i -SE',
-      installDev: 'npm i -DE',
-      uninstall: 'npm un -S',
-      uninstallDev: 'npm un -D'
-    },
-    pnpm: {
-      install: 'pnpm i -E',
-      installDev: 'pnpm i -DE',
-      uninstall: 'pnpm un',
-      uninstallDev: 'pnpm un'
-    },
-    yarn: {
-      install: 'yarn add -E',
-      installDev: 'yarn add -DE',
-      uninstall: 'yarn remove',
-      uninstallDev: 'yarn remove'
-    }
-  };
-
-  private static copyCommands = {
-    bash: {
-      copyCommand: 'cp',
-      copyDestinationParam: ' '
-    },
-    powershell: {
-      copyCommand: 'Copy-Item',
-      copyDestinationParam: ' -Destination '
-    },
-    cmd: {
-      copyCommand: 'copy',
-      copyDestinationParam: ' '
-    }
-  };
-
-  private static createDirectoryCommands = {
-    bash: {
-      createDirectoryCommand: 'mkdir',
-      createDirectoryPathParam: ' "',
-      createDirectoryNameParam: '/',
-      createDirectoryItemTypeParam: '"'
-    },
-    powershell: {
-      createDirectoryCommand: 'New-Item',
-      createDirectoryPathParam: ' -Path "',
-      createDirectoryNameParam: '" -Name "',
-      createDirectoryItemTypeParam: '" -ItemType "directory"'
-    },
-    cmd: {
-      createDirectoryCommand: 'mkdir',
-      createDirectoryPathParam: ' "',
-      createDirectoryNameParam: '\\',
-      createDirectoryItemTypeParam: '"'
-    }
-  };
-
-  private static addFileCommands = {
-    bash: {
-      addFileCommand: 'cat > [FILEPATH] << EOF [FILECONTENT]EOF'
-    },
-    powershell: {
-      addFileCommand: `@"[FILECONTENT]"@ | Out-File -FilePath "[FILEPATH]"
-      `
-    },
-    cmd: {
-      addFileCommand: `echo [FILECONTENT] > "[FILEPATH]"
-      `
-    }
-  };
-
-  private static removeFileCommands = {
-    bash: {
-      removeFileCommand: 'rm'
-    },
-    powershell: {
-      removeFileCommand: 'Remove-Item'
-    },
-    cmd: {
-      removeFileCommand: 'del'
-    }
-  };
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_UNSUPPORTED_TO_VERSION: number = 2;
@@ -217,7 +133,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
 
     const pos: number = this.supportedVersions.indexOf(this.projectVersion);
     if (pos < 0) {
-      cb(new CommandError(`CLI for Microsoft 365 doesn't support upgrading projects build on SharePoint Framework v${this.projectVersion}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_FROM_VERSION));
+      cb(new CommandError(`CLI for Microsoft 365 doesn't support upgrading projects built using SharePoint Framework v${this.projectVersion}`, SpfxProjectUpgradeCommand.ERROR_UNSUPPORTED_FROM_VERSION));
       return;
     }
 
@@ -318,34 +234,34 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
       // matches must be in this particular order to avoid false matches, eg.
       // uninstallDev contains install
       if (f.resolution.startsWith('uninstallDev')) {
-        f.resolution = f.resolution.replace('uninstallDev', this.getPackageManagerCommand('uninstallDev'));
+        f.resolution = f.resolution.replace('uninstallDev', packageManager.getPackageManagerCommand('uninstallDev', this.packageManager));
         return;
       }
       if (f.resolution.startsWith('installDev')) {
-        f.resolution = f.resolution.replace('installDev', this.getPackageManagerCommand('installDev'));
+        f.resolution = f.resolution.replace('installDev', packageManager.getPackageManagerCommand('installDev', this.packageManager));
         return;
       }
       if (f.resolution.startsWith('uninstall')) {
-        f.resolution = f.resolution.replace('uninstall', this.getPackageManagerCommand('uninstall'));
+        f.resolution = f.resolution.replace('uninstall', packageManager.getPackageManagerCommand('uninstall', this.packageManager));
         return;
       }
       if (f.resolution.startsWith('install')) {
-        f.resolution = f.resolution.replace('install', this.getPackageManagerCommand('install'));
+        f.resolution = f.resolution.replace('install', packageManager.getPackageManagerCommand('install', this.packageManager));
         return;
       }
 
       // copy support for multiple shells
       if (f.resolution.startsWith('copy_cmd')) {
-        f.resolution = f.resolution.replace('copy_cmd', this.getCopyCommand('copyCommand'));
-        f.resolution = f.resolution.replace('DestinationParam', this.getCopyCommand('copyDestinationParam'));
+        f.resolution = f.resolution.replace('copy_cmd', fsUtil.getCopyCommand('copyCommand', this.shell));
+        f.resolution = f.resolution.replace('DestinationParam', fsUtil.getCopyCommand('copyDestinationParam', this.shell));
         return;
       }
       // createdir support for multiple shells
       if (f.resolution.startsWith('create_dir_cmd')) {
-        f.resolution = f.resolution.replace('create_dir_cmd', this.getDirectoryCommand('createDirectoryCommand'));
-        f.resolution = f.resolution.replace('NameParam', this.getDirectoryCommand('createDirectoryNameParam'));
-        f.resolution = f.resolution.replace('PathParam', this.getDirectoryCommand('createDirectoryPathParam'));
-        f.resolution = f.resolution.replace('ItemTypeParam', this.getDirectoryCommand('createDirectoryItemTypeParam'));
+        f.resolution = f.resolution.replace('create_dir_cmd', fsUtil.getDirectoryCommand('createDirectoryCommand', this.shell));
+        f.resolution = f.resolution.replace('NameParam', fsUtil.getDirectoryCommand('createDirectoryNameParam', this.shell));
+        f.resolution = f.resolution.replace('PathParam', fsUtil.getDirectoryCommand('createDirectoryPathParam', this.shell));
+        f.resolution = f.resolution.replace('ItemTypeParam', fsUtil.getDirectoryCommand('createDirectoryItemTypeParam', this.shell));
         return;
       }
       // 'Add' support for multiple shells
@@ -358,7 +274,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
         const contentEnd: number = f.resolution.indexOf('[AFTERCONTENT]');
         const fileContent: string = f.resolution.substring(contentStart, contentEnd);
 
-        f.resolution = this.getAddCommand('addFileCommand');
+        f.resolution = fsUtil.getAddCommand('addFileCommand', this.shell);
         f.resolution = f.resolution.replace('[FILECONTENT]', fileContent);
         f.resolution = f.resolution.replace('[FILEPATH]', filePath);
         f.resolution = f.resolution.replace('[BEFOREPATH]', ' ');
@@ -369,7 +285,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
       }
       // 'Remove' support for multiple shells
       if (f.resolution.startsWith('remove_cmd')) {
-        f.resolution = f.resolution.replace('remove_cmd', this.getRemoveCommand('removeFileCommand'));
+        f.resolution = f.resolution.replace('remove_cmd', fsUtil.getRemoveCommand('removeFileCommand', this.shell));
         return;
       }
     });
@@ -410,10 +326,10 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
       (reportData.packageManagerCommands
         .concat(reportData.commandsToExecute
           .filter((command) =>
-            command.indexOf(this.getPackageManagerCommand('install')) === -1 &&
-            command.indexOf(this.getPackageManagerCommand('installDev')) === -1 &&
-            command.indexOf(this.getPackageManagerCommand('uninstall')) === -1 &&
-            command.indexOf(this.getPackageManagerCommand('uninstallDev')) === -1))).join(os.EOL), os.EOL,
+            command.indexOf(packageManager.getPackageManagerCommand('install', this.packageManager)) === -1 &&
+            command.indexOf(packageManager.getPackageManagerCommand('installDev', this.packageManager)) === -1 &&
+            command.indexOf(packageManager.getPackageManagerCommand('uninstall', this.packageManager)) === -1 &&
+            command.indexOf(packageManager.getPackageManagerCommand('uninstallDev', this.packageManager)) === -1))).join(os.EOL), os.EOL,
       os.EOL,
       Object.keys(reportData.modificationPerFile).map(file => {
         return [
@@ -484,10 +400,10 @@ ${f.resolution}
       (reportData.packageManagerCommands
         .concat(reportData.commandsToExecute
           .filter((command) =>
-            command.indexOf(this.getPackageManagerCommand('install')) === -1 &&
-            command.indexOf(this.getPackageManagerCommand('installDev')) === -1 &&
-            command.indexOf(this.getPackageManagerCommand('uninstall')) === -1 &&
-            command.indexOf(this.getPackageManagerCommand('uninstallDev')) === -1))).join(os.EOL), os.EOL,
+            command.indexOf(packageManager.getPackageManagerCommand('install', this.packageManager)) === -1 &&
+            command.indexOf(packageManager.getPackageManagerCommand('installDev', this.packageManager)) === -1 &&
+            command.indexOf(packageManager.getPackageManagerCommand('uninstall', this.packageManager)) === -1 &&
+            command.indexOf(packageManager.getPackageManagerCommand('uninstallDev', this.packageManager)) === -1))).join(os.EOL), os.EOL,
       '```', os.EOL,
       os.EOL,
       '### Modify files', os.EOL,
@@ -582,8 +498,14 @@ ${f.resolution}
       if (f.resolutionType === 'cmd') {
         if (f.resolution.indexOf('npm') > -1 ||
           f.resolution.indexOf('yarn') > -1) {
-          this.mapPackageManagerCommand(f.resolution, packagesDevExact,
-            packagesDepExact, packagesDepUn, packagesDevUn);
+          packageManager.mapPackageManagerCommand({
+            command: f.resolution,
+            packagesDevExact,
+            packagesDepExact,
+            packagesDepUn,
+            packagesDevUn,
+            packageMgr: this.packageManager
+          });
         }
         else {
           commandsToExecute.push(f.resolution);
@@ -604,8 +526,13 @@ ${f.resolution}
       }
     });
 
-    const packageManagerCommands: string[] = this.reducePackageManagerCommand(
-      packagesDepExact, packagesDevExact, packagesDepUn, packagesDevUn);
+    const packageManagerCommands: string[] = packageManager.reducePackageManagerCommand({
+      packagesDepExact,
+      packagesDevExact,
+      packagesDepUn,
+      packagesDevUn,
+      packageMgr: this.packageManager
+    });
 
     if (this.packageManager === 'npm') {
       const dedupeFinding: FindingToReport[] = findings.filter(f => f.id === 'FN017001');
@@ -620,72 +547,6 @@ ${f.resolution}
       modificationPerFile: modificationPerFile,
       modificationTypePerFile: modificationTypePerFile
     };
-  }
-
-  private mapPackageManagerCommand(command: string, packagesDevExact: string[],
-    packagesDepExact: string[], packagesDepUn: string[], packagesDevUn: string[]): void {
-    // matches must be in this particular order to avoid false matches, eg.
-    // uninstallDev contains install
-    if (command.startsWith(`${this.getPackageManagerCommand('uninstallDev')} `)) {
-      packagesDevUn.push(command.replace(this.getPackageManagerCommand('uninstallDev'), '').trim());
-      return;
-    }
-    if (command.startsWith(`${this.getPackageManagerCommand('installDev')} `)) {
-      packagesDevExact.push(command.replace(this.getPackageManagerCommand('installDev'), '').trim());
-      return;
-    }
-    if (command.startsWith(`${this.getPackageManagerCommand('uninstall')} `)) {
-      packagesDepUn.push(command.replace(this.getPackageManagerCommand('uninstall'), '').trim());
-      return;
-    }
-    if (command.startsWith(`${this.getPackageManagerCommand('install')} `)) {
-      packagesDepExact.push(command.replace(this.getPackageManagerCommand('install'), '').trim());
-    }
-  }
-
-  private reducePackageManagerCommand(packagesDepExact: string[], packagesDevExact: string[],
-    packagesDepUn: string[], packagesDevUn: string[]): string[] {
-    const commandsToExecute: string[] = [];
-
-    // uninstall commands must come first otherwise there is a chance that
-    // whatever we recommended to install, will be immediately uninstalled
-    if (packagesDepUn.length > 0) {
-      commandsToExecute.push(`${this.getPackageManagerCommand('uninstall')} ${packagesDepUn.join(' ')}`);
-    }
-
-    if (packagesDevUn.length > 0) {
-      commandsToExecute.push(`${this.getPackageManagerCommand('uninstallDev')} ${packagesDevUn.join(' ')}`);
-    }
-
-    if (packagesDepExact.length > 0) {
-      commandsToExecute.push(`${this.getPackageManagerCommand('install')} ${packagesDepExact.join(' ')}`);
-    }
-
-    if (packagesDevExact.length > 0) {
-      commandsToExecute.push(`${this.getPackageManagerCommand('installDev')} ${packagesDevExact.join(' ')}`);
-    }
-
-    return commandsToExecute;
-  }
-
-  private getPackageManagerCommand(command: string): string {
-    return (SpfxProjectUpgradeCommand.packageCommands as any)[this.packageManager][command];
-  }
-
-  private getCopyCommand(command: string): string {
-    return (SpfxProjectUpgradeCommand.copyCommands as any)[this.shell][command];
-  }
-
-  private getDirectoryCommand(command: string): string {
-    return (SpfxProjectUpgradeCommand.createDirectoryCommands as any)[this.shell][command];
-  }
-
-  private getAddCommand(command: string): string {
-    return (SpfxProjectUpgradeCommand.addFileCommands as any)[this.shell][command];
-  }
-
-  private getRemoveCommand(command: string): string {
-    return (SpfxProjectUpgradeCommand.removeFileCommands as any)[this.shell][command];
   }
 
   public options(): CommandOption[] {

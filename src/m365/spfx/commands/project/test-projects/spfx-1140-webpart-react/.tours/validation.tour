@@ -1,0 +1,10 @@
+{
+  "title": "Validate project spfx-1140-webpart-react",
+  "steps": [
+    {
+      "file": ".tours/validation.tour",
+      "title": "RECOMMENDED: Delete tour",
+      "description": "### THAT'S IT!!!\r\nOnce you have tested that your project has no more issues, you can delete the `.tour` folder and its contents. Otherwise, you'll be prompted to launch this CodeTour every time you open this project."
+    }
+  ]
+}

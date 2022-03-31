@@ -5,7 +5,7 @@ import { CommandError, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import commands from '../../commands';
 import { BaseProjectCommand } from './base-project-command';
-import { External, ExternalConfiguration, Project } from './model';
+import { External, ExternalConfiguration, Project } from './project-model';
 import { ExternalizeEntry, FileEdit } from './project-externalize/';
 import { BasicDependencyRule } from './project-externalize/rules';
 import rules = require('./project-externalize/DefaultRules');
