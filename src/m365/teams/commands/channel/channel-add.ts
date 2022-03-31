@@ -16,6 +16,8 @@ interface Options extends GlobalOptions {
   teamName?: string;
   name: string;
   description?: string;
+  type: string;
+  owner: string;
 }
 
 class TeamsChannelAddCommand extends GraphCommand {
@@ -32,6 +34,8 @@ class TeamsChannelAddCommand extends GraphCommand {
     telemetryProps.description = typeof args.options.description !== 'undefined';
     telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
     telemetryProps.teamName = typeof args.options.teamName !== 'undefined';
+    telemetryProps.type = args.options.type || 'standard';
+    telemetryProps.owner = typeof args.options.owner !== 'undefined';
     return telemetryProps;
   }
 
@@ -67,24 +71,40 @@ class TeamsChannelAddCommand extends GraphCommand {
       });
   }
 
+  private createChannel(args: CommandArgs, teamId: string): Promise<void> {
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/teams/${teamId}/channels`,
+      headers: {
+        accept: 'application/json;odata.metadata=none',
+        'content-type': 'application/json;odata=nometadata'
+      },
+      data: {
+        membershipType: args.options.type || 'standard',
+        displayName: args.options.name
+      },
+      responseType: 'json'
+    };
+
+    if (args.options.type === 'private') {
+      // Private channels must have at least 1 owner
+      requestOptions.data.members = [
+        {
+          '@odata.type': '#microsoft.graph.aadUserConversationMember',
+          'user@odata.bind': `https://graph.microsoft.com/v1.0/users('${args.options.owner}')`,
+          roles: ['owner']
+        }
+      ];
+    }
+
+    return request.post(requestOptions);
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getTeamId(args)
-      .then((teamId: string): Promise<void> => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/teams/${teamId}/channels`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json;odata=nometadata'
-          },
-          data: {
-            displayName: args.options.name
-          },
-          responseType: 'json'
-        };
-
-        return request.post(requestOptions);
-      })
+      .then((teamId: string): Promise<void> =>
+        this.createChannel(args, teamId)
+      )
       .then((res: any): void => {
         logger.log(res);
         cb();
@@ -104,6 +124,13 @@ class TeamsChannelAddCommand extends GraphCommand {
       },
       {
         option: '-d, --description [description]'
+      },
+      {
+        option: '--type [type]',
+        autocomplete: ['standard', 'private']
+      },
+      {
+        option: '--owner [owner]'
       }
     ];
 
@@ -122,6 +149,18 @@ class TeamsChannelAddCommand extends GraphCommand {
 
     if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
       return `${args.options.teamId} is not a valid GUID`;
+    }
+
+    if (args.options.type && ['standard', 'private'].indexOf(args.options.type) === -1) {
+      return `${args.options.type} is not a valid type value. Allowed values standard|private.`;
+    }
+
+    if (args.options.type === 'private' && !args.options.owner) {
+      return 'Specify owner when creating a private channel.';
+    }
+
+    if (args.options.type !== 'private' && args.options.owner) {
+      return 'Specify owner only when creating a private channel.';
     }
 
     return true;
