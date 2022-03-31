@@ -87,7 +87,7 @@ describe(commands.CHANNEL_ADD, () => {
   it('fails validation if the teamId is not a valid guid.', (done) => {
     const actual = command.validate({
       options: {
-        teamId: '61703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        teamId: 'invalid GUID',
         name: 'Architecture Discussion',
         description: 'Architecture'
       }
@@ -96,12 +96,62 @@ describe(commands.CHANNEL_ADD, () => {
     done();
   });
 
-  it('validates for a correct input.', (done) => {
+  it('fails validation if unkown type is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        name: 'Architecture Discussion',
+        type: 'invalid'
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if owner is not specified when creating private channel.', (done) => {
+    const actual = command.validate({
+      options: {
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        name: 'Architecture Discussion',
+        type: 'private'
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if owner is specified when not creating private channel.', (done) => {
+    const actual = command.validate({
+      options: {
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        name: 'Architecture Discussion',
+        owner: 'John.Doe@contoso.com'
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('validates for a correct general channel input.', (done) => {
     const actual = command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture',
         description: 'Architecture meeting'
+      }
+    });
+    assert.strictEqual(actual, true);
+    done();
+  });
+
+  it('validates for a correct private channel input.', (done) => {
+    const actual = command.validate({
+      options: {
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        name: 'Architecture',
+        description: 'Architecture meeting',
+        type: 'private',
+        owner: 'john.doe@contoso.com'
       }
     });
     assert.strictEqual(actual, true);
@@ -260,6 +310,41 @@ describe(commands.CHANNEL_ADD, () => {
           "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
           "displayName": "Architecture Discussion",
           "description": null
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('creates private channel within the Microsoft Teams team by team id', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402/channels`) {
+        return Promise.resolve({
+          "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
+          "displayName": "Architecture Discussion",
+          "membershipType": "private"
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        name: 'Architecture Discussion',
+        type: 'private',
+        owner: 'john.doe@contoso.com'
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith({
+          "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
+          "displayName": "Architecture Discussion",
+          "membershipType": "private"
         }));
         done();
       }
