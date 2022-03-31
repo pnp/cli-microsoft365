@@ -34,6 +34,8 @@ class TeamsChannelAddCommand extends GraphCommand {
     telemetryProps.description = typeof args.options.description !== 'undefined';
     telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
     telemetryProps.teamName = typeof args.options.teamName !== 'undefined';
+    telemetryProps.type = args.options.type || 'standard';
+    telemetryProps.owner = typeof args.options.owner !== 'undefined';
     return telemetryProps;
   }
 
