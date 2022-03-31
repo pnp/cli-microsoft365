@@ -49,6 +49,15 @@ m365 aad app add [options]
 `--scopeAdminConsentDescription [scopeAdminConsentDescription]`
 : Scope admin consent description
 
+`--certificateFile [certificateFile]`
+: Path to the file with certificate public key. Specify either `certificateFile` or `certificateBase64Encoded`
+
+`--certificateBase64Encoded [certificateBase64Encoded]`
+: Base64-encoded string with certificate public key. Specify either `certificateFile` or `certificateBase64Encoded`
+
+`--certificateDisplayName [certificateDisplayName]`
+: Display name for the certificate. If not given, the displayName will be set to the certificate subject. When specified, also specify either `certificateFile` or `certificateBase64Encoded`
+
 `--manifest [manifest]`
 : Azure AD app manifest as retrieved from the Azure Portal to create the app registration from
 
@@ -151,4 +160,10 @@ Create new Azure AD app registration with the specified name. Store information 
 
 ```sh
 m365 aad app add --name 'My AAD app' --save
+```
+
+Create new Azure AD app registration with a certificate
+
+```sh
+m365 aad app add --name 'My AAD app' --certificateDisplayName "Some certificate name" --certificateFile c:\temp\some-certificate.cer
 ```
