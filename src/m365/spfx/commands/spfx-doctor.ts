@@ -73,7 +73,6 @@ enum SharePointVersion {
 interface SpfxVersionPrerequisites {
   gulp: VersionCheck;
   node: VersionCheck;
-  react: VersionCheck;
   sp: SharePointVersion;
   yo: VersionCheck;
 }
@@ -88,10 +87,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
       node: {
         range: '^6',
         fix: 'Install Node.js v6'
-      },
-      react: {
-        range: '^15',
-        fix: 'npm i react@15'
       },
       sp: SharePointVersion.All,
       yo: {
@@ -108,10 +103,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
         range: '^6',
         fix: 'Install Node.js v6'
       },
-      react: {
-        range: '^15',
-        fix: 'npm i react@15'
-      },
       sp: SharePointVersion.All,
       yo: {
         range: '^3',
@@ -126,10 +117,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
       node: {
         range: '^6',
         fix: 'Install Node.js v6'
-      },
-      react: {
-        range: '^15',
-        fix: 'npm i react@15'
       },
       sp: SharePointVersion.SP2019 | SharePointVersion.SPO,
       yo: {
@@ -146,10 +133,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
         range: '^6',
         fix: 'Install Node.js v6'
       },
-      react: {
-        range: '^15',
-        fix: 'npm i react@15'
-      },
       sp: SharePointVersion.SP2019 | SharePointVersion.SPO,
       yo: {
         range: '^3',
@@ -164,10 +147,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
       node: {
         range: '^6 || ^8',
         fix: 'Install Node.js v8'
-      },
-      react: {
-        range: '^15',
-        fix: 'npm i react@15'
       },
       sp: SharePointVersion.SP2019 | SharePointVersion.SPO,
       yo: {
@@ -184,10 +163,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
         range: '^6 || ^8',
         fix: 'Install Node.js v8'
       },
-      react: {
-        range: '^15',
-        fix: 'npm i react@15'
-      },
       sp: SharePointVersion.SPO,
       yo: {
         range: '^3',
@@ -202,10 +177,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
       node: {
         range: '^6 || ^8',
         fix: 'Install Node.js v8'
-      },
-      react: {
-        range: '^15',
-        fix: 'npm i react@15'
       },
       sp: SharePointVersion.SPO,
       yo: {
@@ -222,10 +193,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
         range: '^6 || ^8',
         fix: 'Install Node.js v8'
       },
-      react: {
-        range: '^15',
-        fix: 'npm i react@15'
-      },
       sp: SharePointVersion.SPO,
       yo: {
         range: '^3',
@@ -240,10 +207,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
       node: {
         range: '^8',
         fix: 'Install Node.js v8'
-      },
-      react: {
-        range: '16.3.2',
-        fix: 'npm i react@16.3.2'
       },
       sp: SharePointVersion.SPO,
       yo: {
@@ -260,10 +223,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
         range: '^8',
         fix: 'Install Node.js v8'
       },
-      react: {
-        range: '16.3.2',
-        fix: 'npm i react@16.3.2'
-      },
       sp: SharePointVersion.SPO,
       yo: {
         range: '^3',
@@ -278,10 +237,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
       node: {
         range: '^8',
         fix: 'Install Node.js v8'
-      },
-      react: {
-        range: '16.7.0',
-        fix: 'npm i react@16.7.0'
       },
       sp: SharePointVersion.SPO,
       yo: {
@@ -298,10 +253,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
         range: '^8',
         fix: 'Install Node.js v8'
       },
-      react: {
-        range: '16.7.0',
-        fix: 'npm i react@16.7.0'
-      },
       sp: SharePointVersion.SPO,
       yo: {
         range: '^3',
@@ -316,10 +267,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
       node: {
         range: '^8 || ^10',
         fix: 'Install Node.js v10'
-      },
-      react: {
-        range: '16.7.0',
-        fix: 'npm i react@16.7.0'
       },
       sp: SharePointVersion.SPO,
       yo: {
@@ -336,10 +283,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
         range: '^8 || ^10',
         fix: 'Install Node.js v10'
       },
-      react: {
-        range: '16.8.5',
-        fix: 'npm i react@16.8.5'
-      },
       sp: SharePointVersion.SPO,
       yo: {
         range: '^3',
@@ -354,10 +297,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
       node: {
         range: '^10',
         fix: 'Install Node.js v10'
-      },
-      react: {
-        range: '16.8.5',
-        fix: 'npm i react@16.8.5'
       },
       sp: SharePointVersion.SPO,
       yo: {
@@ -374,10 +313,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
         range: '^10',
         fix: 'Install Node.js v10'
       },
-      react: {
-        range: '16.8.5',
-        fix: 'npm i react@16.8.5'
-      },
       sp: SharePointVersion.SPO,
       yo: {
         range: '^3',
@@ -392,10 +327,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
       node: {
         range: '^10',
         fix: 'Install Node.js v10'
-      },
-      react: {
-        range: '16.8.5',
-        fix: 'npm i react@16.8.5'
       },
       sp: SharePointVersion.SPO,
       yo: {
@@ -412,10 +343,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
         range: '^12',
         fix: 'Install Node.js v12'
       },
-      react: {
-        range: '16.9.0',
-        fix: 'npm i react@16.9.0'
-      },
       sp: SharePointVersion.SPO,
       yo: {
         range: '^3',
@@ -430,10 +357,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
       node: {
         range: '^12 || ^14',
         fix: 'Install Node.js v12 or v14'
-      },
-      react: {
-        range: '16.9.36',
-        fix: 'npm i react@16.9.36'
       },
       sp: SharePointVersion.SPO,
       yo: {
@@ -450,10 +373,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
         range: '^12 || ^14',
         fix: 'Install Node.js v12 or v14'
       },
-      react: {
-        range: '16.9.51',
-        fix: 'npm i react@16.9.51'
-      },
       sp: SharePointVersion.SPO,
       yo: {
         range: '^4',
@@ -469,10 +388,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
         range: '^12 || ^14',
         fix: 'Install Node.js v12 or v14'
       },
-      react: {
-        range: '16.9.51',
-        fix: 'npm i react@16.9.51'
-      },
       sp: SharePointVersion.SPO,
       yo: {
         range: '^4',
@@ -487,10 +402,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
       node: {
         range: '^12 || ^14',
         fix: 'Install Node.js v12 or v14'
-      },
-      react: {
-        range: '16.9.51',
-        fix: 'npm i react@16.9.51'
       },
       sp: SharePointVersion.SPO,
       yo: {
@@ -545,7 +456,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
       .then(_ => this.checkNodeVersion(prerequisites, fixes, logger))
       .then(_ => this.checkYo(prerequisites, fixes, logger))
       .then(_ => this.checkGulp(prerequisites, fixes, logger))
-      .then(_ => this.checkReact(prerequisites, fixes, logger))
       .then(_ => this.checkTypeScript(fixes, logger))
       .then(_ => {
         if (fixes.length > 0) {
@@ -625,14 +535,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
           logger.log(this.getStatus(CheckStatus.Failure, `gulp not found`));
           fixes.push(prerequisites.gulp.fix);
         }
-      });
-  }
-
-  private checkReact(prerequisites: SpfxVersionPrerequisites, fixes: string[], logger: Logger): Promise<void> {
-    return this
-      .getPackageVersion('react', PackageSearchMode.LocalOnly, HandlePromise.Continue, logger)
-      .then((reactVersion: string): void => {
-        this.checkStatus('react', reactVersion, prerequisites.react, OptionalOrRequired.Optional, fixes, logger);
       });
   }
 
@@ -776,15 +678,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
   }
 
   private checkStatus(what: string, versionFound: string, versionCheck: VersionCheck, optionalOrRequired: OptionalOrRequired, fixes: string[], logger: Logger): void {
-    if (!versionFound) {
-      // TODO: we might need this code in the future if SPFx introduces required
-      // prerequisites with a specific version
-      // if (optionalOrRequired === OptionalOrRequired.Required) {
-      //   logger.log(this.getStatus(CheckStatus.Failure, `${what} not found, v${versionCheck.range} required`));
-      //   fixes.push(versionCheck.fix);
-      // }
-    }
-    else {
+    if (versionFound) {
       if (satisfies(versionFound, versionCheck.range)) {
         logger.log(this.getStatus(CheckStatus.Success, `${what} v${versionFound}`));
       }

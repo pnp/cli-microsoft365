@@ -85,9 +85,6 @@ describe(commands.DOCTOR, () => {
         case 'gulp':
           callback(undefined, packageVersionResponse(packageName, '3.9.1'));
           break;
-        case 'react':
-          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
-          break;
         case 'typescript':
           callback(undefined, '{}');
           break;
@@ -103,7 +100,6 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.22.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -128,9 +124,6 @@ describe(commands.DOCTOR, () => {
         case 'gulp':
           callback(undefined, packageVersionResponse(packageName, '3.9.1'));
           break;
-        case 'react':
-          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
-          break;
         case 'typescript':
           callback(undefined, '{}');
           break;
@@ -146,7 +139,6 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -175,9 +167,6 @@ describe(commands.DOCTOR, () => {
         case 'gulp':
           callback(undefined, packageVersionResponse(packageName, '3.9.1'));
           break;
-        case 'react':
-          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
-          break;
         case 'typescript':
           callback(undefined, '{}');
           break;
@@ -193,7 +182,6 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -222,9 +210,6 @@ describe(commands.DOCTOR, () => {
         case 'gulp':
           callback(undefined, packageVersionResponse(packageName, '3.9.1'));
           break;
-        case 'react':
-          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
-          break;
         case 'typescript':
           callback(undefined, '{}');
           break;
@@ -240,7 +225,6 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -269,9 +253,6 @@ describe(commands.DOCTOR, () => {
         case 'gulp':
           callback(undefined, packageVersionResponse(packageName, '3.9.1'));
           break;
-        case 'react':
-          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
-          break;
         case 'typescript':
           callback(undefined, '{}');
           break;
@@ -287,7 +268,6 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -312,9 +292,6 @@ describe(commands.DOCTOR, () => {
         case 'gulp':
           callback(undefined, packageVersionResponse(packageName, '3.9.1'));
           break;
-        case 'react':
-          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
-          break;
         case 'typescript':
           callback(undefined, '{}');
           break;
@@ -330,7 +307,6 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -355,9 +331,6 @@ describe(commands.DOCTOR, () => {
         case 'gulp':
           callback(undefined, packageVersionResponse(packageName, '3.9.1'));
           break;
-        case 'react':
-          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
-          break;
         case 'typescript':
           callback(undefined, '{}');
           break;
@@ -373,7 +346,6 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -402,9 +374,6 @@ describe(commands.DOCTOR, () => {
         case 'gulp':
           callback(undefined, packageVersionResponse(packageName, '3.9.1'));
           break;
-        case 'react':
-          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
-          break;
         case 'typescript':
           callback(undefined, '{}');
           break;
@@ -420,7 +389,6 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -449,9 +417,6 @@ describe(commands.DOCTOR, () => {
         case 'gulp':
           callback(undefined, packageVersionResponse(packageName, '3.9.1'));
           break;
-        case 'react':
-          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
-          break;
         case 'typescript':
           callback(undefined, '{}');
           break;
@@ -467,7 +432,6 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -496,9 +460,6 @@ describe(commands.DOCTOR, () => {
         case 'gulp':
           callback(undefined, packageVersionResponse(packageName, '3.9.1'));
           break;
-        case 'react':
-          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
-          break;
         case 'typescript':
           callback(undefined, '{}');
           break;
@@ -514,7 +475,6 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -970,151 +930,6 @@ describe(commands.DOCTOR, () => {
       try {
         assert(loggerLogSpy.calledWith(getStatus(1, 'gulp not found')));
         assert(loggerLogSpy.calledWith('- npm i -g gulp@3'), 'No fix provided');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('passes react check when react not found', (done) => {
-    const sandbox = sinon.createSandbox();
-    sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
-      const packageName: string = file.split(' ')[2];
-      switch (packageName) {
-        case '@microsoft/sp-core-library':
-          callback(undefined, packageVersionResponse(packageName, '1.10.0'));
-          break;
-        default:
-          callback(new Error(`${file} ENOENT`));
-      }
-      return {} as child_process.ChildProcess;
-    });
-
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(!loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'react found');
-        assert(!loggerLogSpy.calledWith(getStatus(1, 'react not found, v16.8.5 required')), 'react not found');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('passes react check when react meets single range prerequisite', (done) => {
-    const sandbox = sinon.createSandbox();
-    sandbox.stub(process, 'version').value('v8.0.0');
-    sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
-      const packageName: string = file.split(' ')[2];
-      switch (packageName) {
-        case '@microsoft/sp-core-library':
-          callback(undefined, packageVersionResponse(packageName, '1.6.0'));
-          break;
-        case 'react':
-          callback(undefined, packageVersionResponse(packageName, '15.0.0'));
-          break;
-        default:
-          callback(new Error(`${file} ENOENT`));
-      }
-      return {} as child_process.ChildProcess;
-    });
-
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'react v15.0.0')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('passes react check when react meets specific version prerequisite', (done) => {
-    const sandbox = sinon.createSandbox();
-    sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
-      const packageName: string = file.split(' ')[2];
-      switch (packageName) {
-        case '@microsoft/sp-core-library':
-          callback(undefined, packageVersionResponse(packageName, '1.10.0'));
-          break;
-        case 'react':
-          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
-          break;
-        default:
-          callback(new Error(`${file} ENOENT`));
-      }
-      return {} as child_process.ChildProcess;
-    });
-
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails react check when react does not meet single range prerequisite', (done) => {
-    const sandbox = sinon.createSandbox();
-    sandbox.stub(process, 'version').value('v8.0.0');
-    sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
-      const packageName: string = file.split(' ')[2];
-      switch (packageName) {
-        case '@microsoft/sp-core-library':
-          callback(undefined, packageVersionResponse(packageName, '1.6.0'));
-          break;
-        case 'react':
-          callback(undefined, packageVersionResponse(packageName, '16.0.0'));
-          break;
-        default:
-          callback(new Error(`${file} ENOENT`));
-      }
-      return {} as child_process.ChildProcess;
-    });
-
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'react v16.0.0 found, v^15 required')));
-        assert(loggerLogSpy.calledWith('- npm i react@15'), 'No fix provided');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails react check when react does not meet specific version prerequisite', (done) => {
-    const sandbox = sinon.createSandbox();
-    sandbox.stub(process, 'version').value('v10.18.0');
-    sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
-      const packageName: string = file.split(' ')[2];
-      switch (packageName) {
-        case '@microsoft/sp-core-library':
-          callback(undefined, packageVersionResponse(packageName, '1.10.0'));
-          break;
-        case 'react':
-          callback(undefined, packageVersionResponse(packageName, '16.8.6'));
-          break;
-        default:
-          callback(new Error(`${file} ENOENT`));
-      }
-      return {} as child_process.ChildProcess;
-    });
-
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'react v16.8.6 found, v16.8.5 required')));
-        assert(loggerLogSpy.calledWith('- npm i react@16.8.5'), 'No fix provided');
         done();
       }
       catch (e) {
