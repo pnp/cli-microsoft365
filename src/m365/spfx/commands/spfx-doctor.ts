@@ -678,22 +678,22 @@ class SpfxDoctorCommand extends AnonymousCommand {
   }
 
   private checkStatus(what: string, versionFound: string, versionCheck: VersionCheck, optionalOrRequired: OptionalOrRequired, fixes: string[], logger: Logger): void {
-    // if (!versionFound) {
-    // TODO: we might need this code in the future if SPFx introduces required
-    // prerequisites with a specific version
-    // if (optionalOrRequired === OptionalOrRequired.Required) {
-    //   logger.log(this.getStatus(CheckStatus.Failure, `${what} not found, v${versionCheck.range} required`));
-    //   fixes.push(versionCheck.fix);
-    // }
-    // }
+    if (versionFound) {
+      if (satisfies(versionFound, versionCheck.range)) {
+        logger.log(this.getStatus(CheckStatus.Success, `${what} v${versionFound}`));
+      }
+      else {
+        logger.log(this.getStatus(CheckStatus.Failure, `${what} v${versionFound} found, v${versionCheck.range} required`));
+        fixes.push(versionCheck.fix);
+      }
+    }
     // else {
-    if (satisfies(versionFound, versionCheck.range)) {
-      logger.log(this.getStatus(CheckStatus.Success, `${what} v${versionFound}`));
-    }
-    else {
-      logger.log(this.getStatus(CheckStatus.Failure, `${what} v${versionFound} found, v${versionCheck.range} required`));
-      fixes.push(versionCheck.fix);
-    }
+    //   TODO: we might need this code in the future if SPFx introduces required
+    //   prerequisites with a specific version
+    //   if (optionalOrRequired === OptionalOrRequired.Required) {
+    //     logger.log(this.getStatus(CheckStatus.Failure, `${what} not found, v${versionCheck.range} required`));
+    //     fixes.push(versionCheck.fix);
+    //   }
     // }
   }
 
