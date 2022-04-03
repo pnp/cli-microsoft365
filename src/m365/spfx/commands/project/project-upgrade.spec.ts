@@ -2779,7 +2779,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   it('upgrades project to the latest preview version using the preview option', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-nolib'));
 
-    command.action(logger, { options: { preview: true } } as any, () => {
+    command.action(logger, { options: { output: 'text', preview: true } } as any, () => {
       assert(log[0].indexOf('1.15.0-beta.1') > -1);
     });
   });
@@ -2792,10 +2792,18 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
-  it('returns text report with output format default', () => {
+  it('returns json report with output format default', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph'));
 
     command.action(logger, { options: { toVersion: '1.6.0' } } as any, () => {
+      assert(JSON.stringify(log[0]).indexOf('"resolution":') > -1);
+    });
+  });
+
+  it('returns text report with output format text', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph'));
+
+    command.action(logger, { options: { output: 'text', toVersion: '1.6.0' } } as any, () => {
       assert(log[0].indexOf('Execute in ') > -1);
     });
   });
