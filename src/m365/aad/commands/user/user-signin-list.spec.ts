@@ -235,6 +235,28 @@ describe(commands.USER_SIGNIN_LIST, () => {
       }
     });
   });
+  it('lists all signins by userId in the tenant (verbose)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/auditLogs/signIns?$filter=userId eq '737002f2-9582-4068-b706-044e09481897'`) {
+        return Promise.resolve(
+          jsonOutput
+        );
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { verbose: true, userId: '737002f2-9582-4068-b706-044e09481897' } }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(
+          jsonOutput.value
+        ));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
   it('lists all signins by appId in the tenant (verbose)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/auditLogs/signIns?$filter=appId eq 'de8bc8b5-d9f9-48b1-a8ad-b748da725064'`) {
@@ -323,7 +345,18 @@ describe(commands.USER_SIGNIN_LIST, () => {
       }
     });
   });
-
+  it('fails validation if userId and userName specified', () => {
+    const actual = command.validate({ options: { userId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064', userName: 'Graph explorer' } });
+    assert.notStrictEqual(actual, true);
+  });
+  it('fails validation if the userId is not a valid GUID', () => {
+    const actual = command.validate({ options: { userId: 'not-c49b-4fd4-8223-28f0ac3a6402' } });
+    assert.notStrictEqual(actual, true);
+  });
+  it('passes validation if the userId is a valid GUID', () => {
+    const actual = command.validate({ options: { userId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } });
+    assert.strictEqual(actual, true);
+  });
   it('fails validation if appId and appDisplayName specified', () => {
     const actual = command.validate({ options: { appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064', appDisplayName: 'Graph explorer' } });
     assert.notStrictEqual(actual, true);

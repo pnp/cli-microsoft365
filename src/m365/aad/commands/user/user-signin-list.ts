@@ -14,6 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   userName?: string;
+  userId?: string;
   appDisplayName?: string;
   appId?: string;
 }
@@ -30,6 +31,7 @@ class AadUserSigninListCommand extends GraphCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.userName = typeof args.options.userName !== 'undefined';
+    telemetryProps.userId = typeof args.options.userId !== 'undefined';
     telemetryProps.appDisplayName = typeof args.options.appDisplayName !== 'undefined';
     telemetryProps.appId = typeof args.options.appId !== 'undefined';
     return telemetryProps;
@@ -42,8 +44,10 @@ class AadUserSigninListCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let endpoint: string = `${this.resource}/v1.0/auditLogs/signIns`;
     let filter: string = "";
-    if (args.options.userName) {
-      filter = `?$filter=userPrincipalName eq '${encodeURIComponent(args.options.userName as string)}'`;
+    if (args.options.userName || args.options.userId) {
+      filter = args.options.userId ?
+        `?$filter=userId eq '${encodeURIComponent(args.options.userId as string)}'` :
+        `?$filter=userPrincipalName eq '${encodeURIComponent(args.options.userName as string)}'`;
     }
     if (args.options.appId || args.options.appDisplayName) {
       filter += filter ? " and " : "?$filter=";
@@ -66,6 +70,9 @@ class AadUserSigninListCommand extends GraphCommand {
         option: '-n, --userName [userName]'
       },
       {
+        option: '--userId [userId]'
+      },
+      {
         option: '--appDisplayName [appDisplayName]'
       },
       {
@@ -76,8 +83,14 @@ class AadUserSigninListCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
   public validate(args: CommandArgs): boolean | string {
+    if (args.options.userId && args.options.userName) {
+      return 'Specify either userId or userName, but not both';
+    }
     if (args.options.appId && args.options.appDisplayName) {
       return 'Specify either appId or appDisplayName, but not both';
+    }
+    if (args.options.userId && !validation.isValidGuid(args.options.userId as string)) {
+      return `${args.options.userId} is not a valid GUID`;
     }
     if (args.options.appId && !validation.isValidGuid(args.options.appId as string)) {
       return `${args.options.appId} is not a valid GUID`;
