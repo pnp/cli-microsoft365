@@ -1,5 +1,18 @@
 # Release notes
 
+## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
+
+### New commands
+
+**Teams:**
+
+- [aad teams chat get](../cmd/teams/chat/chat-get.md) - Get a Microsoft Teams chat conversation by id, participants or chat name [#3017](https://github.com/pnp/cli-microsoft365/issues/2899)
+
+### Changes
+
+- replaces markshell with a plain-text output [#3142](https://github.com/pnp/cli-microsoft365/issues/3142)
+- fixes restoring group associated with site [#3101](https://github.com/pnp/cli-microsoft365/issues/3101)
+
 ## [v5.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.1.0)
 
 ### New commands
