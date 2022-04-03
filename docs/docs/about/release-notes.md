@@ -6,7 +6,8 @@
 
 **Teams:**
 
-- [aad teams chat get](../cmd/teams/chat/chat-get.md) - Get a Microsoft Teams chat conversation by id, participants or chat name [#3017](https://github.com/pnp/cli-microsoft365/issues/2899)
+- [teams channel membership list](../cmd/teams/channel/channel-membership-list.md) - Lists users for the specified Microsoft Teams channel [#3176](https://github.com/pnp/cli-microsoft365/issues/3176)
+- [teams chat get](../cmd/teams/chat/chat-get.md) - Get a Microsoft Teams chat conversation by id, participants or chat name [#3017](https://github.com/pnp/cli-microsoft365/issues/3017)
 
 ### Changes
 
