@@ -248,7 +248,7 @@ export class Cli {
       // the command to execute
       const cli = Cli.getInstance();
       const parentCommandName: string | undefined = cli.currentCommandName;
-      cli.currentCommandName = command.getCommandName();
+      cli.currentCommandName = command.getCommandName(cli.currentCommandName);
 
       command.action(logger, args as any, (err: any): void => {
         // restore the original command name
