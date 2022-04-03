@@ -687,14 +687,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
         fixes.push(versionCheck.fix);
       }
     }
-    // else {
-    //   TODO: we might need this code in the future if SPFx introduces required
-    //   prerequisites with a specific version
-    //   if (optionalOrRequired === OptionalOrRequired.Required) {
-    //     logger.log(this.getStatus(CheckStatus.Failure, `${what} not found, v${versionCheck.range} required`));
-    //     fixes.push(versionCheck.fix);
-    //   }
-    // }
   }
 
   private getStatus(result: CheckStatus, message: string) {
