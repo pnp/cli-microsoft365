@@ -14,6 +14,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   teamId?: string;
   teamName?: string;
+  type?: string;
 }
 
 class TeamsChannelListCommand extends GraphCommand{
@@ -71,7 +72,11 @@ class TeamsChannelListCommand extends GraphCommand{
     this
       .getTeamId(args)
       .then((teamId: string): Promise<Channel[]> => {
-        const endpoint: string = `${this.resource}/v1.0/teams/${teamId}/channels`;
+        let endpoint: string = `${this.resource}/v1.0/teams/${teamId}/channels`;
+        if (args.options.type) {
+          endpoint += `?$filter=membershipType eq '${args.options.type}'`;
+        }
+
         return odata.getAllItems<Channel>(endpoint, logger);
       })
       .then((items): void => {
@@ -87,6 +92,10 @@ class TeamsChannelListCommand extends GraphCommand{
       },
       {
         option: '--teamName [teamName]'
+      },
+      {
+        option: '--type [type]',
+        autocomplete: ['standard', 'private']
       }
     ];
 
@@ -105,6 +114,10 @@ class TeamsChannelListCommand extends GraphCommand{
 
     if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
       return `${args.options.teamId} is not a valid GUID`;
+    }
+
+    if (args.options.type && ['standard', 'private'].indexOf(args.options.type.toLowerCase()) === -1) {
+      return `${args.options.type} is not a valid type value. Allowed values standard|private`;
     }
 
     return true;
