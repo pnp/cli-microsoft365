@@ -25,6 +25,10 @@ class AppGetCommand extends AppCommand {
     Cli
       .executeCommandWithOutput(AadAppGetCommand as Command, { options: { ...options, _: [] } })
       .then((appGetOutput: CommandOutput): void => {
+        if (this.verbose) {
+          logger.logToStderr(appGetOutput.stderr);
+        }
+
         logger.log(JSON.parse(appGetOutput.stdout));
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));

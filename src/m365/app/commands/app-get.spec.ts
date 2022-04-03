@@ -14,6 +14,7 @@ describe(commands.GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -44,6 +45,7 @@ describe(commands.GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -114,7 +116,7 @@ describe(commands.GET, () => {
     });
   });
 
-  it(`should get an Azure AD app registration by its app (client) ID.`, (done) => {
+  it(`gets an Azure AD app registration by its app (client) ID.`, (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
         return Promise.resolve({
@@ -153,6 +155,52 @@ describe(commands.GET, () => {
         assert.strictEqual(call.args[0].id, '340a4aa3-1af6-43ac-87d8-189819003952');
         assert.strictEqual(call.args[0].appId, '9b1b1e42-794b-4c71-93ac-5ed92488b67f');
         assert.strictEqual(call.args[0].displayName, 'My App');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`shows underlying debug information in debug mode`, (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
+        return Promise.resolve({
+          value: [
+            {
+              "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+              "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+              "createdDateTime": "2019-10-29T17:46:55Z",
+              "displayName": "My App",
+              "description": null
+            }
+          ]
+        });
+      }
+
+      if ((opts.url as string).indexOf('/v1.0/myorganization/applications/') > -1) {
+        return Promise.resolve({
+          "id": "340a4aa3-1af6-43ac-87d8-189819003952",
+          "appId": "9b1b1e42-794b-4c71-93ac-5ed92488b67f",
+          "createdDateTime": "2019-10-29T17:46:55Z",
+          "displayName": "My App",
+          "description": null
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f',
+        debug: true
+      }
+    }, () => {
+      try {
+        const call: sinon.SinonSpyCall = loggerLogToStderrSpy.firstCall;
+        assert(call.args[0].includes('Executing command aad app get with options'));
         done();
       }
       catch (e) {
