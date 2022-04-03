@@ -184,7 +184,12 @@ export default abstract class Command {
   public async processOptions(options: any): Promise<void> {
   }
 
-  public getCommandName(): string {
+  public getCommandName(alias?: string): string {
+    if (alias &&
+      this.alias()?.includes(alias)) {
+      return alias;
+    }
+
     let commandName: string = this.name;
     let pos: number = commandName.indexOf('<');
     const pos1: number = commandName.indexOf('[');
