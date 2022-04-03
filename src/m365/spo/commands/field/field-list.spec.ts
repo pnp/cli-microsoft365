@@ -77,6 +77,12 @@ describe(commands.FIELD_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('fails validation if title and id are specified together', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', listTitle: 'Demo List', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+
   it('supports debug mode', () => {
     const options = command.options();
     let containsOption = false;

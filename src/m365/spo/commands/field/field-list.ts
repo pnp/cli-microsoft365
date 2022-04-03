@@ -81,6 +81,10 @@ class SpoFieldListCommand extends SpoCommand {
     if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
       return `${args.options.listId} is not a valid GUID`;
     }
+
+    if (args.options.listId && args.options.listTitle) {
+      return `Specify list id or title but not both`;
+    }
     
     return true;
   }
