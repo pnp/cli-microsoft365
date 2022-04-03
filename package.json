@@ -25,7 +25,7 @@
     "test": "npm run test:version && npm run lint && npm run test:cov",
     "test:version": "node scripts/check-version.js",
     "test:cov": "c8 npm run test:test",
-    "test:test": "mocha \"dist/**/*.spec.js\" --timeout 10000",
+    "test:test": "mocha",
     "lint": "eslint --ext .ts src"
   },
   "keywords": [

@@ -23,11 +23,7 @@
       "request": "launch",
       "name": "Debug Tests",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-      "args": [
-        "dist/**/*.spec.js",
-        "--timeout",
-        "10000"
-      ],
+      "args": [],
       "skipFiles": [
         "<node_internals>/**"
       ]
