@@ -304,6 +304,7 @@ nav:
       - field:
         - field add: 'cmd/spo/field/field-add.md'
         - field get: 'cmd/spo/field/field-get.md'
+        - field list: 'cmd/spo/field/field-list.md'
         - field remove: 'cmd/spo/field/field-remove.md'
         - field set: 'cmd/spo/field/field-set.md'
       - file:
