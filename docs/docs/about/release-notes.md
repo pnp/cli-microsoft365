@@ -1,5 +1,19 @@
 # Release notes
 
+## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
+
+### New commands
+
+**Teams:**
+
+- [teams channel membership list](../cmd/teams/channel/channel-membership-list.md) - Lists users for the specified Microsoft Teams channel [#3176](https://github.com/pnp/cli-microsoft365/issues/3176)
+- [teams chat get](../cmd/teams/chat/chat-get.md) - Get a Microsoft Teams chat conversation by id, participants or chat name [#3017](https://github.com/pnp/cli-microsoft365/issues/3017)
+
+### Changes
+
+- replaces markshell with a plain-text output [#3142](https://github.com/pnp/cli-microsoft365/issues/3142)
+- fixes restoring group associated with site [#3101](https://github.com/pnp/cli-microsoft365/issues/3101)
+
 ## [v5.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.1.0)
 
 ### New commands
