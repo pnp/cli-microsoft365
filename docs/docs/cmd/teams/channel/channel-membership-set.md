@@ -23,7 +23,7 @@ m365 teams channel membership set [options]
 : The display name of the Microsoft Teams team channel. Specify either `channelId` or `channelName` but not both
 
 `--userName [userName]`
-: User's UPN (user principal name, eg. johndoe@example.com). Specify either userName, userId or id but not multiple.
+: User's UPN (user principal name, e.g. johndoe@example.com). Specify either userName, userId or id but not multiple.
 
 `--userId [userId]`
 : User's Azure AD Id. Specify either userName, userId or id but not multiple.
@@ -32,7 +32,7 @@ m365 teams channel membership set [options]
 : Channel membership Id of a user. Specify either userName, userId or id but not multiple.
 
 `-r, --role <role>`
-: Filter the results to only users with the given role: owner, member.
+: The role to be assigned to the user: owner, member.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -41,11 +41,11 @@ m365 teams channel membership set [options]
 Updates the role of the user _johndoe@example.com_ to owner in the Microsoft Teams team with id 00000000-0000-0000-0000-000000000000 and channel id 00:00000000000000000000000000000000@thread.skype
 
 ```sh
-m365 teams channel membership set --teamId 00000000-0000-0000-0000-000000000000 --channelId 00:00000000000000000000000000000000@thread.skype --userName "johndoe@example.com" --roles owner
+m365 teams channel membership set --teamId 00000000-0000-0000-0000-000000000000 --channelId 00:00000000000000000000000000000000@thread.skype --userName "johndoe@example.com" --role owner
 ```
 
 Updates the role of the user with id 00000000-0000-0000-0000-000000000000 to member in the Microsoft Teams team with name _Team Name_ and channel with name _Channel Name_
 
 ```sh
-m365 teams channel membership set --teamName "Team Name" --channelName "Channel Name" --userId 00000000-0000-0000-0000-000000000000 --roles member
+m365 teams channel membership set --teamName "Team Name" --channelName "Channel Name" --userId 00000000-0000-0000-0000-000000000000 --role member
 ```
