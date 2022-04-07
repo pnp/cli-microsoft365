@@ -13,6 +13,12 @@
 
 - replaces markshell with a plain-text output [#3142](https://github.com/pnp/cli-microsoft365/issues/3142)
 - fixes restoring group associated with site [#3101](https://github.com/pnp/cli-microsoft365/issues/3101)
+- fixed default output in spfx project upgrade [#3060](https://github.com/pnp/cli-microsoft365/issues/3060)
+- fixed removing modern sites [#3186](https://github.com/pnp/cli-microsoft365/issues/3186)
+- moved mocha settings to `.mocharc.json` [#3180](https://github.com/pnp/cli-microsoft365/issues/3180)
+- extended `app get` with debug information [#3165](https://github.com/pnp/cli-microsoft365/issues/3165)
+- fixed showing deprecation messages [#3151](https://github.com/pnp/cli-microsoft365/issues/3151)
+- added the `autoOpenLinksInBrowser` setting and implemented it in `login` and `reconsent` [#3118](https://github.com/pnp/cli-microsoft365/issues/3118)
 
 ## [v5.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.1.0)
 
