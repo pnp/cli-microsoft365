@@ -52,9 +52,9 @@ function convertHyperlinks(md: string): string {
 }
 
 function convertCodeFences(md: string): string {
-  const regex = new RegExp('^```.*?' + EOL + '(.*?)```' + EOL, 'gms');
+  const regex = new RegExp('^```.*?' + EOL + '(.*?)```', 'gms');
   return md.replace(regex, (match, code: string) => {
-    return `  ${code}${EOL}`;
+    return `  ${code}`;
   });
 }
 
