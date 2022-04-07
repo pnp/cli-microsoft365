@@ -7,10 +7,10 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
-const command: Command = require('./channel-membership-set');
+const command: Command = require('./channel-member-set');
 
-describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
-  const membershipResponse = {
+describe(commands.CHANNEL_MEMBER_SET, () => {
+  const memberResponse = {
     "id": "00000",
     "roles": [],
     "displayName": "User",
@@ -71,7 +71,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CHANNEL_MEMBERSHIP_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.CHANNEL_MEMBER_SET), true);
   });
 
   it('has a description', () => {
@@ -398,7 +398,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
 
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members/00000') > -1) {
-        return Promise.resolve(membershipResponse);
+        return Promise.resolve(memberResponse);
       }
 
       return Promise.reject('Invalid request');
@@ -413,7 +413,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith(membershipResponse));
+        assert(loggerLogSpy.calledWith(memberResponse));
 
         done();
       }
@@ -469,7 +469,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
 
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members/00000') > -1) {
-        return Promise.resolve(membershipResponse);
+        return Promise.resolve(memberResponse);
       }
 
       return Promise.reject('Invalid request');
@@ -484,7 +484,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith(membershipResponse));
+        assert(loggerLogSpy.calledWith(memberResponse));
 
         done();
       }
@@ -494,7 +494,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
     });
   });
 
-  it('fails to get membership when membership does not exist by userId', (done) => {
+  it('fails to get member when member does not exist by userId', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) > -1) {
         return Promise.resolve({
@@ -530,7 +530,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
     });
   });
 
-  it('fails to get membership when membership does not return userId', (done) => {
+  it('fails to get member when member does not return userId', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) > -1) {
         return Promise.resolve({
@@ -565,7 +565,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
     });
   });
 
-  it('fails to get membership when membership does not exist by userName', (done) => {
+  it('fails to get member when member does not exist by userName', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
@@ -601,7 +601,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
     });
   });
 
-  it('fails to get membership when membership does not return email', (done) => {
+  it('fails to get member when member does not return email', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
@@ -636,7 +636,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
     });
   });
 
-  it('fails to get membership when membership does multiple exist with username', (done) => {
+  it('fails to get member when member does multiple exist with username', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
@@ -677,7 +677,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
     });
   });
 
-  it('correctly get membership id by user id', (done) => {
+  it('correctly get member id by user id', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
@@ -696,7 +696,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
 
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members/00000') > -1) {
-        return Promise.resolve(membershipResponse);
+        return Promise.resolve(memberResponse);
       }
 
       return Promise.reject('Invalid request');
@@ -711,7 +711,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith(membershipResponse));
+        assert(loggerLogSpy.calledWith(memberResponse));
 
         done();
       }
@@ -721,7 +721,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
     });
   });
 
-  it('correctly get membership id by user name', (done) => {
+  it('correctly get member id by user name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
@@ -740,7 +740,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
 
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members/00000') > -1) {
-        return Promise.resolve(membershipResponse);
+        return Promise.resolve(memberResponse);
       }
 
       return Promise.reject('Invalid request');
@@ -755,7 +755,7 @@ describe(commands.CHANNEL_MEMBERSHIP_SET, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith(membershipResponse));
+        assert(loggerLogSpy.calledWith(memberResponse));
 
         done();
       }

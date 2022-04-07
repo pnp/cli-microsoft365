@@ -23,16 +23,16 @@ interface Options extends GlobalOptions {
   role: string;
 }
 
-class TeamsChannelMembershipSetCommand extends GraphCommand {
+class TeamsChannelMemberSetCommand extends GraphCommand {
   private teamId: string = '';
   private channelId: string = '';
 
   public get name(): string {
-    return commands.CHANNEL_MEMBERSHIP_SET;
+    return commands.CHANNEL_MEMBER_SET;
   }
 
   public get description(): string {
-    return 'Updates the role of the specified user in the specified Microsoft Teams private team channel';
+    return 'Updates the role of the specified member in the specified Microsoft Teams private team channel';
   }
 
   public defaultProperties(): string[] | undefined {
@@ -60,11 +60,11 @@ class TeamsChannelMembershipSetCommand extends GraphCommand {
       })
       .then((channelId: string): Promise<string> => {
         this.channelId = channelId;
-        return this.getMembershipId(args);
+        return this.getMemberId(args);
       })
-      .then((membershipId: string) => {
+      .then((memberId: string) => {
         const requestOptions: any = {
-          url: `${this.resource}/v1.0/teams/${this.teamId}/channels/${this.channelId}/members/${membershipId}`,
+          url: `${this.resource}/v1.0/teams/${this.teamId}/channels/${this.channelId}/members/${memberId}`,
           headers: {
             'accept': 'application/json;odata.metadata=none',
             'Prefer': 'return=representation'
@@ -78,8 +78,8 @@ class TeamsChannelMembershipSetCommand extends GraphCommand {
 
         return request.patch(requestOptions);
       })
-      .then((membership): void => {
-        logger.log(membership);
+      .then((member): void => {
+        logger.log(member);
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -144,7 +144,7 @@ class TeamsChannelMembershipSetCommand extends GraphCommand {
       });
   }
 
-  private getMembershipId(args: CommandArgs): Promise<string> {
+  private getMemberId(args: CommandArgs): Promise<string> {
     if (args.options.id) {
       return Promise.resolve(args.options.id);
     }
@@ -255,4 +255,4 @@ class TeamsChannelMembershipSetCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsChannelMembershipSetCommand();
+module.exports = new TeamsChannelMemberSetCommand();
