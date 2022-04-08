@@ -1,4 +1,4 @@
-import { Logger } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
 import type * as open from 'open';
 import {
   CommandOption
@@ -8,6 +8,7 @@ import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { validation } from '../../../../utils/validation';
+import { settingsNames } from '../../../../settingsNames';
 
 interface CommandArgs {
   options: Options;
@@ -16,7 +17,6 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   appId: string;
   preview?: boolean;
-  autoOpenBrowser?: boolean;
 }
 
 class AadAppOpenCommand extends GraphCommand {
@@ -34,7 +34,6 @@ class AadAppOpenCommand extends GraphCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.appId = typeof args.options.appId !== 'undefined';
     telemetryProps.preview = typeof args.options.preview !== 'undefined';
-    telemetryProps.autoOpenBrowser = typeof args.options.autoOpenBrowser !== 'undefined';
     return telemetryProps;
   }
 
@@ -77,10 +76,10 @@ class AadAppOpenCommand extends GraphCommand {
       const previewPrefix = args.options.preview === true ? "preview." : "";
       const url = `https://${previewPrefix}portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`;
 
-      if (!args.options.autoOpenBrowser) {
+      if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) === false) {
         logger.log(`Use a web browser to open the page ${url}`);
         return resolve();
-      } 
+      }      
       
       logger.log(`Opening the following page in your browser: ${url}`);
       
@@ -104,8 +103,7 @@ class AadAppOpenCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       { option: '--appId <appId>' },
-      { option: '--preview' },
-      { option: '--autoOpenBrowser' }
+      { option: '--preview' }
     ];
 
     const parentOptions: CommandOption[] = super.options();

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,7 +13,9 @@ const command: Command = require('./app-open');
 describe(commands.APP_OPEN, () => {
   let log: string[];
   let logger: Logger;
+  let cli: Cli;
   let openStub: sinon.SinonStub;
+  let getSettingWithDefaultValueStub: sinon.SinonStub;
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
@@ -24,6 +26,7 @@ describe(commands.APP_OPEN, () => {
 
   beforeEach(() => {
     log = [];
+    cli = Cli.getInstance();
     logger = {
       log: (msg: string) => {
         log.push(msg);
@@ -38,6 +41,7 @@ describe(commands.APP_OPEN, () => {
     loggerLogSpy = sinon.spy(logger, 'log');
     (command as any)._open = open;
     openStub = sinon.stub(command as any, '_open').callsFake(() => Promise.resolve(null));
+    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => false));
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq 'acc848e9-e8ec-4feb-a521-8d58b5482e09'&$select=id`) {
         return Promise.resolve({ value: [{ "id": "05b10a2d-62db-420c-8626-55f3a5e7865b" }] });
@@ -53,6 +57,7 @@ describe(commands.APP_OPEN, () => {
       request.get
     ]);
     openStub.restore();
+    getSettingWithDefaultValueStub.restore();
   });
 
   after(() => {
@@ -198,12 +203,14 @@ describe(commands.APP_OPEN, () => {
   });
 
   it('shows message with url when the app specified with the appId is found (using autoOpenInBrowser)', (done) => {
+    getSettingWithDefaultValueStub.restore();
+    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
+
     const appId = "acc848e9-e8ec-4feb-a521-8d58b5482e09";
     command.action(logger, {
       options: {
         debug: false,
-        appId: appId,
-        autoOpenBrowser: true
+        appId: appId
       }
     }, (err?: any) => {
       try {
@@ -218,13 +225,15 @@ describe(commands.APP_OPEN, () => {
   });
 
   it('shows message with preview-url when the app specified with the appId is found (using autoOpenInBrowser)', (done) => {
+    getSettingWithDefaultValueStub.restore();
+    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
+
     const appId = "acc848e9-e8ec-4feb-a521-8d58b5482e09";
     command.action(logger, {
       options: {
         debug: false,
         appId: appId,
-        preview: true,
-        autoOpenBrowser: true
+        preview: true
       }
     }, (err?: any) => {
       try {        
@@ -241,14 +250,15 @@ describe(commands.APP_OPEN, () => {
   it('throws error when open in browser fails', (done) => {
     openStub.restore();
     openStub = sinon.stub(command as any, '_open').callsFake(() => Promise.reject("An error occurred"));
+    getSettingWithDefaultValueStub.restore();
+    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
 
     const appId = "acc848e9-e8ec-4feb-a521-8d58b5482e09";
     command.action(logger, {
       options: {
         debug: false,
         appId: appId,
-        preview: true,
-        autoOpenBrowser: true
+        preview: true
       }
     }, (err?: any) => {
       try {        
