@@ -88,7 +88,7 @@ class SpoFileCheckoutCommand extends SpoCommand {
     }
 
     if (args.options.id && args.options.fileUrl) {
-      return 'Specify either id or fileUrl not both';
+      return 'Specify either id or fileUrl but not both';
     }
 
     if (!args.options.id && !args.options.fileUrl) {
