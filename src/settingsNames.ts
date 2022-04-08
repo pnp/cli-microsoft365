@@ -1,5 +1,6 @@
 const settingsNames = {
   autoOpenBrowserOnLogin: 'autoOpenBrowserOnLogin',
+  autoOpenLinksInBrowser: 'autoOpenLinksInBrowser',
   copyDeviceCodeToClipboard: 'copyDeviceCodeToClipboard',
   csvEscape: 'csvEscape',
   csvHeader: 'csvHeader',

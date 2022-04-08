@@ -75,7 +75,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
                     logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameters 'skipRecycleBin' and 'wait' will not be applicable.`));
                   }
 
-                  return this.deleteGroupifiedSite(group.id, logger);
+                  return this.deleteGroup(group.id, logger);
                 })
                 .catch((err: any) => {
                   if (err.response.status === 404) {
@@ -107,7 +107,8 @@ class SpoSiteRemoveCommand extends SpoCommand {
                   else {
                     return Promise.reject(err);
                   }
-                });
+                })
+                .then(_ => this.deleteSite(args.options.url, args.options.wait, logger));
             }
           })
           .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
@@ -349,7 +350,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
       });
   }
 
-  private deleteGroupifiedSite(groupId: string | undefined, logger: Logger): Promise<void> {
+  private deleteGroup(groupId: string | undefined, logger: Logger): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Removing Microsoft 365 Group: ${groupId}...`);
     }

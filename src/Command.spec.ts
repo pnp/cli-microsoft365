@@ -187,6 +187,11 @@ describe('Command', () => {
     assert.strictEqual(cmd.getCommandName(), 'Mock command 2');
   });
 
+  it('returns alias when command ran using an alias', () => {
+    const cmd = new MockCommand1();
+    assert.strictEqual(cmd.getCommandName('mc1'), 'mc1');
+  });
+
   it('displays error message when it\'s serialized in the error property', () => {
     const mock = new MockCommand2();
     mock.handlePromiseError({

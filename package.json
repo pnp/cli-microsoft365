@@ -1,6 +1,6 @@
 {
   "name": "@pnp/cli-microsoft365",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "description": "Manage Microsoft 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/api.js",
@@ -25,7 +25,7 @@
     "test": "npm run test:version && npm run lint && npm run test:cov",
     "test:version": "node scripts/check-version.js",
     "test:cov": "c8 npm run test:test",
-    "test:test": "mocha \"dist/**/*.spec.js\" --timeout 10000",
+    "test:test": "mocha",
     "lint": "eslint --ext .ts src"
   },
   "keywords": [
@@ -193,7 +193,6 @@
     "inquirer": "^8.2.0",
     "jmespath": "^0.16.0",
     "json-to-ast": "^2.1.0",
-    "markshell": "^1.3.8",
     "minimist": "^1.2.5",
     "node-forge": "^1.2.1",
     "omelette": "^0.4.17",

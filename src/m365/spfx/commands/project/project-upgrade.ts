@@ -291,6 +291,9 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     });
 
     switch (args.options.output) {
+      case 'text':
+        logger.log(this.getTextReport(findingsToReport));
+        break;
       case 'json':
         logger.log(findingsToReport);
         break;
@@ -301,7 +304,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
         logger.log(this.getMdReport(findingsToReport));
         break;
       default:
-        logger.log(this.getTextReport(findingsToReport));
+        logger.log(findingsToReport);
     }
 
     cb();
