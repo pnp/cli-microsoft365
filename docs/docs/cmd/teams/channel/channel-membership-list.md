@@ -19,7 +19,7 @@ m365 teams channel membership list [options]
 `--channelId [channelId]`
 : The Id of the Microsoft Teams team channel. Specify either `channelId` or `channelName` but not both
 
-`channelName [channelName]`
+`--channelName [channelName]`
 : The display name of the Microsoft Teams team channel. Specify either `channelId` or `channelName` but not both
 
 `-r, --role [role]`
