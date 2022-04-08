@@ -19,6 +19,9 @@
 - extended `app get` with debug information [#3165](https://github.com/pnp/cli-microsoft365/issues/3165)
 - fixed showing deprecation messages [#3151](https://github.com/pnp/cli-microsoft365/issues/3151)
 - added the `autoOpenLinksInBrowser` setting and implemented it in `login` and `reconsent` [#3118](https://github.com/pnp/cli-microsoft365/issues/3118)
+- fixed 'spo file checkout' validation messages [#3201](https://github.com/pnp/cli-microsoft365/issues/3201)
+- extended spo tenant settings with options to enable B2B integration [#3110](https://github.com/pnp/cli-microsoft365/issues/3110)
+- fixed 'teams channel membership list' missing documentation dashes [#3209](https://github.com/pnp/cli-microsoft365/issues/3209)
 
 ## [v5.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.1.0)
 
