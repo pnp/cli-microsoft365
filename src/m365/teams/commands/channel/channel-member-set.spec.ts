@@ -78,10 +78,6 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id', 'roles', 'displayName', 'userId', 'email']);
-  });
-
   it('fails validation if required options are not passed', (done) => {
     const actual = command.validate({
       options: {
