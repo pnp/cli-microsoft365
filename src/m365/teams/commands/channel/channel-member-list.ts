@@ -20,15 +20,19 @@ interface Options extends GlobalOptions {
   role?: string;
 }
 
-class TeamsChannelMembershipListCommand extends GraphCommand {
+class TeamsChannelMemberListCommand extends GraphCommand {
   private teamId: string = '';
 
   public get name(): string {
-    return commands.CHANNEL_MEMBERSHIP_LIST;
+    return commands.CHANNEL_MEMBER_LIST;
   }
 
   public get description(): string {
-    return 'Lists memberships in the specified Microsoft Teams team channel';
+    return 'Lists members of the specified Microsoft Teams team channel';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.CONVERSATIONMEMBER_LIST];
   }
 
   public defaultProperties(): string[] | undefined {
@@ -187,4 +191,4 @@ class TeamsChannelMembershipListCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsChannelMembershipListCommand();
+module.exports = new TeamsChannelMemberListCommand();

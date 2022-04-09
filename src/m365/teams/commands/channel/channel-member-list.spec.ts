@@ -7,9 +7,9 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
-const command: Command = require('./channel-membership-list');
+const command: Command = require('./channel-member-list');
 
-describe(commands.CHANNEL_MEMBERSHIP_LIST, () => {
+describe(commands.CHANNEL_MEMBER_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -51,11 +51,16 @@ describe(commands.CHANNEL_MEMBERSHIP_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CHANNEL_MEMBERSHIP_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.CHANNEL_MEMBER_LIST), true);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
   });
 
   it('fails validation if both teamId and teamName options are not passed', (done) => {
