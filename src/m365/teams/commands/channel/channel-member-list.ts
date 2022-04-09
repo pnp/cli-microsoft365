@@ -20,15 +20,19 @@ interface Options extends GlobalOptions {
   role?: string;
 }
 
-class TeamsChannelMembershipListCommand extends GraphCommand {
+class TeamsChannelMemberListCommand extends GraphCommand {
   private teamId: string = '';
 
   public get name(): string {
-    return commands.CHANNEL_MEMBERSHIP_LIST;
+    return commands.CHANNEL_MEMBER_LIST;
   }
 
   public get description(): string {
-    return 'Lists memberships in the specified Microsoft Teams team channel';
+    return 'Lists members of the specified Microsoft Teams team channel';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.CONVERSATIONMEMBER_LIST];
   }
 
   public defaultProperties(): string[] | undefined {
@@ -46,6 +50,8 @@ class TeamsChannelMembershipListCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    this.showDeprecationWarning(logger, commands.CONVERSATIONMEMBER_LIST, commands.CHANNEL_MEMBER_LIST);
+
     this
       .getTeamId(args)
       .then((teamId: string): Promise<string> => {
@@ -135,13 +141,13 @@ class TeamsChannelMembershipListCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--teamId [teamId]'
+        option: '-i, --teamId [teamId]'
       },
       {
         option: '--teamName [teamName]'
       },
       {
-        option: '--channelId [channelId]'
+        option: '-c, --channelId [channelId]'
       },
       {
         option: '--channelName [channelName]'
@@ -177,6 +183,10 @@ class TeamsChannelMembershipListCommand extends GraphCommand {
       return 'Specify channelId or channelName, one is required';
     }
 
+    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
+      return `${args.options.channelId} is not a valid Teams Channel ID`;
+    }
+
     if (args.options.role) {
       if (['owner', 'member', 'guest'].indexOf(args.options.role) === -1) {
         return `${args.options.role} is not a valid role value. Allowed values owner|member|guest`;
@@ -187,4 +197,4 @@ class TeamsChannelMembershipListCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsChannelMembershipListCommand();
+module.exports = new TeamsChannelMemberListCommand();

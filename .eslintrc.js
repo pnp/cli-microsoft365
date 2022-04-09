@@ -37,7 +37,6 @@ const dictionary = [
   'list',
   'management',
   'member',
-  'membership',
   'messaging',
   'news',
   'oauth2',
