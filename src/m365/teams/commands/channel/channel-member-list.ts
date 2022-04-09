@@ -50,6 +50,8 @@ class TeamsChannelMemberListCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    this.showDeprecationWarning(logger, commands.CONVERSATIONMEMBER_LIST, commands.CHANNEL_MEMBER_LIST);
+
     this
       .getTeamId(args)
       .then((teamId: string): Promise<string> => {
