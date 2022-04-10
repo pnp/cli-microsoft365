@@ -20,6 +20,7 @@ import { FN001032_DEP_microsoft_sp_page_context } from "./rules/FN001032_DEP_mic
 import { FN002001_DEVDEP_microsoft_sp_build_web } from "./rules/FN002001_DEVDEP_microsoft_sp_build_web";
 import { FN002002_DEVDEP_microsoft_sp_module_interfaces } from "./rules/FN002002_DEVDEP_microsoft_sp_module_interfaces";
 import { FN002009_DEVDEP_microsoft_sp_tslint_rules } from "./rules/FN002009_DEVDEP_microsoft_sp_tslint_rules";
+import { FN002019_DEVDEP_spfx_fast_serve_helpers } from "./rules/FN002019_DEVDEP_spfx_fast_serve_helpers";
 import { FN006004_CFG_PS_developer } from "./rules/FN006004_CFG_PS_developer";
 import { FN006005_CFG_PS_metadata } from "./rules/FN006005_CFG_PS_metadata";
 import { FN006006_CFG_PS_features } from "./rules/FN006006_CFG_PS_features";
@@ -49,6 +50,7 @@ module.exports = [
   new FN002001_DEVDEP_microsoft_sp_build_web('1.14.0'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.14.0'),
   new FN002009_DEVDEP_microsoft_sp_tslint_rules('1.14.0'),
+  new FN002019_DEVDEP_spfx_fast_serve_helpers('1.14.0'),
   new FN006004_CFG_PS_developer('1.14.0'),
   new FN006005_CFG_PS_metadata(),
   new FN006006_CFG_PS_features(),

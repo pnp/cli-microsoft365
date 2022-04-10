@@ -16,6 +16,7 @@ import { FN001032_DEP_microsoft_sp_page_context } from "./rules/FN001032_DEP_mic
 import { FN002001_DEVDEP_microsoft_sp_build_web } from "./rules/FN002001_DEVDEP_microsoft_sp_build_web";
 import { FN002002_DEVDEP_microsoft_sp_module_interfaces } from "./rules/FN002002_DEVDEP_microsoft_sp_module_interfaces";
 import { FN002003_DEVDEP_microsoft_sp_webpart_workbench } from "./rules/FN002003_DEVDEP_microsoft_sp_webpart_workbench";
+import { FN002019_DEVDEP_spfx_fast_serve_helpers } from './rules/FN002019_DEVDEP_spfx_fast_serve_helpers';
 import { FN010001_YORC_version } from "./rules/FN010001_YORC_version";
 
 module.exports = [
@@ -37,5 +38,6 @@ module.exports = [
   new FN002001_DEVDEP_microsoft_sp_build_web('1.4.1'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.4.1'),
   new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.4.1'),
+  new FN002019_DEVDEP_spfx_fast_serve_helpers('1.4.0'),
   new FN010001_YORC_version('1.4.1')
 ]; 

@@ -27,6 +27,7 @@ import { FN002009_DEVDEP_microsoft_sp_tslint_rules } from "./rules/FN002009_DEVD
 import { FN002015_DEVDEP_types_react } from "./rules/FN002015_DEVDEP_types_react";
 import { FN002017_DEVDEP_microsoft_rush_stack_compiler_3_7 } from "./rules/FN002017_DEVDEP_microsoft_rush_stack_compiler_3_7";
 import { FN002018_DEVDEP_microsoft_rush_stack_compiler_3_9 } from "./rules/FN002018_DEVDEP_microsoft_rush_stack_compiler_3_9";
+import { FN002019_DEVDEP_spfx_fast_serve_helpers } from "./rules/FN002019_DEVDEP_spfx_fast_serve_helpers";
 import { FN006004_CFG_PS_developer } from "./rules/FN006004_CFG_PS_developer";
 import { FN007002_CFG_S_initialPage } from "./rules/FN007002_CFG_S_initialPage";
 import { FN007003_CFG_S_api } from "./rules/FN007003_CFG_S_api";
@@ -67,6 +68,7 @@ module.exports = [
   new FN002015_DEVDEP_types_react('16.9.51'),
   new FN002017_DEVDEP_microsoft_rush_stack_compiler_3_7('', false),
   new FN002018_DEVDEP_microsoft_rush_stack_compiler_3_9('0.4.47'),
+  new FN002019_DEVDEP_spfx_fast_serve_helpers('1.13.0'),
   new FN006004_CFG_PS_developer('1.13.0'),
   new FN007002_CFG_S_initialPage('https://enter-your-SharePoint-site/_layouts/workbench.aspx'),
   new FN007003_CFG_S_api(),

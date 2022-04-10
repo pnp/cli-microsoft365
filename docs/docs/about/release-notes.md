@@ -6,13 +6,14 @@
 
 **Power Platform:**
 
-- [pp environment list](../cmd/pp/environment/environment-list.md) - Lists Microsoft Power Platform environments [#3061](https://github.com/pnp/cli-microsoft365/issues/3061)
+- [pp environment list](../cmd/pp/environment/environment-list.md) - lists Microsoft Power Platform environments [#3061](https://github.com/pnp/cli-microsoft365/issues/3061)
+- [pp managementapp list](../cmd/pp/managementapp/managementapp-list.md) - lists management applications for Power Platform [#2977](https://github.com/pnp/cli-microsoft365/issues/2977)
 
 **Teams:**
 
-- [teams channel member set](../cmd/teams/channel/channel-member-set.md) - Updates the role of the specified member in the specified Microsoft Teams private team channel [#3177](https://github.com/pnp/cli-microsoft365/issues/3177)
-- [teams channel membership list](../cmd/teams/channel/channel-membership-list.md) - Lists users for the specified Microsoft Teams channel [#3176](https://github.com/pnp/cli-microsoft365/issues/3176)
-- [teams chat get](../cmd/teams/chat/chat-get.md) - Get a Microsoft Teams chat conversation by id, participants or chat name [#3017](https://github.com/pnp/cli-microsoft365/issues/3017)
+- [teams channel member set](../cmd/teams/channel/channel-member-set.md) - updates the role of the specified member in the specified Microsoft Teams private team channel [#3177](https://github.com/pnp/cli-microsoft365/issues/3177)
+- [teams channel membership list](../cmd/teams/channel/channel-membership-list.md) - lists users for the specified Microsoft Teams channel [#3176](https://github.com/pnp/cli-microsoft365/issues/3176)
+- [teams chat get](../cmd/teams/chat/chat-get.md) - gets a Microsoft Teams chat conversation by id, participants or chat name [#3017](https://github.com/pnp/cli-microsoft365/issues/3017)
 
 ### Changes
 
@@ -27,8 +28,10 @@
 - fixed 'spo file checkout' validation messages [#3201](https://github.com/pnp/cli-microsoft365/issues/3201)
 - extended spo tenant settings with options to enable B2B integration [#3110](https://github.com/pnp/cli-microsoft365/issues/3110)
 - fixed 'teams channel membership list' missing documentation dashes [#3209](https://github.com/pnp/cli-microsoft365/issues/3209)
-- extends 'teams channel list' command with support for type filtering. Closes [#3191](https://github.com/pnp/cli-microsoft365/issues/3191)
-- extends 'teams channel add' command with private channel support. Closes [#3181](https://github.com/pnp/cli-microsoft365/issues/3181)
+- extended 'teams channel list' command with support for type filtering [#3191](https://github.com/pnp/cli-microsoft365/issues/3191)
+- extended 'teams channel add' command with private channel support [#3181](https://github.com/pnp/cli-microsoft365/issues/3181)
+- fixed unescaped md code chars in help commands [#3202](https://github.com/pnp/cli-microsoft365/issues/3202)
+- extended spfx project upgrade with guidance for SPFx fast serve [#3154](https://github.com/pnp/cli-microsoft365/issues/3154)
 
 ## [v5.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.1.0)
 
