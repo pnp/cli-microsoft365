@@ -88,11 +88,11 @@ class SpoFileCheckoutCommand extends SpoCommand {
     }
 
     if (args.options.id && args.options.fileUrl) {
-      return 'Specify either URL or UniqueId but not both';
+      return 'Specify either id or fileUrl but not both';
     }
 
     if (!args.options.id && !args.options.fileUrl) {
-      return 'Specify URL or UniqueId, one is required';
+      return 'Specify id or fileUrl, one is required';
     }
 
     return true;

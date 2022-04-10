@@ -227,6 +227,8 @@ nav:
         - run list: 'cmd/flow/run/run-list.md'
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Power Platform (pp):
+      - environment:
+        - environment list: 'cmd/pp/managementapp/environment/environment-list.md' 
       - managementapp:
         - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
     - Search (search):
@@ -541,6 +543,7 @@ nav:
         - channel add: 'cmd/teams/channel/channel-add.md'
         - channel get: 'cmd/teams/channel/channel-get.md'
         - channel list: 'cmd/teams/channel/channel-list.md'
+        - channel member set: 'cmd/teams/channel/channel-member-set.md'
         - channel membership list: 'cmd/teams/channel/channel-membership-list.md'
         - channel remove: 'cmd/teams/channel/channel-remove.md'
         - channel set: 'cmd/teams/channel/channel-set.md'

@@ -88,6 +88,17 @@ describe(commands.CHANNEL_LIST, () => {
     done();
   });
 
+  it('fails validation when invalid type specified', (done) => {
+    const actual = command.validate({
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        type: 'Invalid'
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName']);
   });
@@ -308,6 +319,74 @@ describe(commands.CHANNEL_LIST, () => {
               "isFavoriteByDefault": null,
               "email": "",
               "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
+            }
+          ]
+        ));
+
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly lists all channels in a Microsoft teams team with specified type parameter', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels?$filter=membershipType eq 'private'`) {
+        return Promise.resolve({
+          value: [
+            {
+              "id": "19:e14b10cd0b684901b53d14e89aa4221f@thread.skype",
+              "displayName": "Development",
+              "description": null,
+              "isFavoriteByDefault": null,
+              "email": "",
+              "webUrl": "https://teams.microsoft.com/l/channel/19%3ae14b10cd0b684901b53d14e89aa4221f%40thread.skype/Development?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8",
+              "membershipType": "private"
+            },
+            {
+              "id": "19:12ff25ec5325468dba1f73522cd08248@thread.skype",
+              "displayName": "Social",
+              "description": null,
+              "isFavoriteByDefault": null,
+              "email": "",
+              "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8",
+              "membershipType": "private"
+            }
+          ]
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        teamId: '00000000-0000-0000-0000-000000000000',
+        type: 'private'
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(
+          [
+            {
+              "id": "19:e14b10cd0b684901b53d14e89aa4221f@thread.skype",
+              "displayName": "Development",
+              "description": null,
+              "isFavoriteByDefault": null,
+              "email": "",
+              "webUrl": "https://teams.microsoft.com/l/channel/19%3ae14b10cd0b684901b53d14e89aa4221f%40thread.skype/Development?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8",
+              "membershipType": "private"
+            },
+            {
+              "id": "19:12ff25ec5325468dba1f73522cd08248@thread.skype",
+              "displayName": "Social",
+              "description": null,
+              "isFavoriteByDefault": null,
+              "email": "",
+              "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8",
+              "membershipType": "private"
             }
           ]
         ));
