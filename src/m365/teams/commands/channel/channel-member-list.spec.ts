@@ -107,8 +107,19 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         channelName: 'Channel Name'
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if channelId is not a valid channel ID', (done) => {
+    const actual = command.validate({
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: 'Invalid channel ID'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -123,7 +134,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         role: 'Invalid'
       }
     });
@@ -135,7 +146,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         role: 'owner'
       }
     });
@@ -147,7 +158,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         role: 'member'
       }
     });
@@ -159,7 +170,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         role: 'guest'
       }
     });
@@ -171,7 +182,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype'
+        channelId: '19:00000000000000000000000000000000@thread.skype'
       }
     });
     assert.strictEqual(actual, true);

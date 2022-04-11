@@ -183,6 +183,10 @@ class TeamsChannelMemberListCommand extends GraphCommand {
       return 'Specify channelId or channelName, one is required';
     }
 
+    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
+      return `${args.options.channelId} is not a valid Teams Channel ID`;
+    }
+
     if (args.options.role) {
       if (['owner', 'member', 'guest'].indexOf(args.options.role) === -1) {
         return `${args.options.role} is not a valid role value. Allowed values owner|member|guest`;
