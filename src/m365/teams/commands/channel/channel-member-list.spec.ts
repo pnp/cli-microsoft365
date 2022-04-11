@@ -119,7 +119,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: 'Invalid channel ID'
+        channelId: 'Invalid'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -463,7 +463,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
         });
       }
 
-      if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members') > -1) {
+      if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members') > -1) {
         return Promise.resolve({
           "value": []
         });
@@ -477,7 +477,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
         debug: false,
         output: 'json',
         teamName: 'Team name',
-        channelId: '00:00000000000000000000000000000000@thread.skype'
+        channelId: '19:00000000000000000000000000000000@thread.skype'
       }
     }, () => {
       try {
@@ -499,20 +499,20 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
         return Promise.resolve({
           "value": [
             {
-              "id": "00:00000000000000000000000000000000@thread.skype",
+              "id": "19:00000000000000000000000000000000@thread.skype",
               "createdDateTime": "2000-01-01T00:00:00.000Z",
               "displayName": "General",
               "description": "Test Team",
               "isFavoriteByDefault": null,
               "email": "00000000.tenant.onmicrosoft.com@emea.teams.ms",
-              "webUrl": "https://teams.microsoft.com/l/channel/00:00000000000000000000000000000000@thread.skype/General?groupId=00000000-0000-0000-0000-000000000000&tenantId=00000000-0000-0000-0000-000000000001",
+              "webUrl": "https://teams.microsoft.com/l/channel/19:00000000000000000000000000000000@thread.skype/General?groupId=00000000-0000-0000-0000-000000000000&tenantId=00000000-0000-0000-0000-000000000001",
               "membershipType": "standard"
             }
           ]
         });
       }
 
-      if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members') > -1) {
+      if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members') > -1) {
         return Promise.resolve({
           "value": []
         });
@@ -593,7 +593,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
 
   it('outputs all data in json output mode', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
           value: [
             {
@@ -638,7 +638,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
         debug: false,
         output: 'json',
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype'
+        channelId: '19:00000000000000000000000000000000@thread.skype'
       }
     }, () => {
       try {
@@ -688,7 +688,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
 
   it('fails when filtering on member role is incorrect', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
           value: [
             {
@@ -733,7 +733,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
         debug: false,
         output: 'json',
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         role: 'member'
       }
     }, () => {
@@ -762,7 +762,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
 
   it('fails when filtering on owner role is incorrect', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
           value: [
             {
@@ -807,7 +807,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
         debug: false,
         output: 'json',
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         role: 'owner'
       }
     }, () => {
@@ -838,7 +838,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
 
   it('fails when filtering on guest role is incorrect', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
           value: [
             {
@@ -883,7 +883,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
         debug: false,
         output: 'json',
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         role: 'guest'
       }
     }, () => {
