@@ -24,13 +24,17 @@ interface Options extends GlobalOptions {
   owner: boolean;
 }
 
-class TeamsConversationMemberAddCommand extends GraphCommand {
+class TeamsChannelMemberAddCommand extends GraphCommand {
   public get name(): string {
-    return commands.CONVERSATIONMEMBER_ADD;
+    return commands.CHANNEL_MEMBER_ADD;
   }
 
   public get description(): string {
     return 'Adds a conversation member in a private channel.';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.CONVERSATIONMEMBER_ADD];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -46,6 +50,8 @@ class TeamsConversationMemberAddCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    this.showDeprecationWarning(logger, commands.CONVERSATIONMEMBER_ADD, commands.CHANNEL_MEMBER_ADD);
+
     let teamId: string = '';
     let channelId: string = '';
 
@@ -72,6 +78,14 @@ class TeamsConversationMemberAddCommand extends GraphCommand {
       })
       .then(_ => cb(),
         (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  }
+
+  public optionSets(): string[][] | undefined {
+    return [
+      [ 'teamId', 'teamName' ],
+      [ 'channelId', 'channelName' ],
+      [ 'userId', 'userDisplayName' ]
+    ];
   }
 
   public options(): CommandOption[] {
@@ -104,36 +118,12 @@ class TeamsConversationMemberAddCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (args.options.teamId && args.options.teamName) {
-      return 'Specify either teamId or teamName, but not both.';
-    }
-
-    if (!args.options.teamId && !args.options.teamName) {
-      return 'Specify teamId or teamName, one is required';
-    }
-
     if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
 
-    if (args.options.channelId && args.options.channelName) {
-      return 'Specify either channelId or channelName, but not both.';
-    }
-
-    if (!args.options.channelId && !args.options.channelName) {
-      return 'Specify channelId or channelName, one is required';
-    }
-
     if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
       return `${args.options.channelId} is not a valid Teams ChannelId`;
-    }
-
-    if (args.options.userId && args.options.userDisplayName) {
-      return 'Specify either userId or userDisplayName, but not both.';
-    }
-
-    if (!args.options.userId && !args.options.userDisplayName) {
-      return 'Specify userId or userDisplayName, one is required';
     }
 
     return true;
@@ -256,4 +246,4 @@ class TeamsConversationMemberAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsConversationMemberAddCommand();
+module.exports = new TeamsChannelMemberAddCommand();

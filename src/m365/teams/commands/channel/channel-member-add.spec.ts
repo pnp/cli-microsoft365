@@ -8,9 +8,9 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
-const command: Command = require('./conversationmember-add');
+const command: Command = require('./channel-member-add');
 
-describe(commands.CONVERSATIONMEMBER_ADD, () => {
+describe(commands.CHANNEL_MEMBER_ADD, () => {
   //#region Mocked Responses 
   const multipleTeamsResponse: any = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
@@ -344,29 +344,21 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.CONVERSATIONMEMBER_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.CHANNEL_MEMBER_ADD), true);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if teamId, channelId, and userId are not specified', () => {
-    const actual = command.validate({
-      options: {
-        debug: false
-      }
-    });
-    assert.notStrictEqual(actual, true);
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.strictEqual((alias && alias.indexOf(commands.CONVERSATIONMEMBER_ADD) !== -1), true);
   });
 
-  it('fails validation if teamName, channelName, and userDisplayName are not specified', () => {
-    const actual = command.validate({
-      options: {
-        debug: false
-      }
-    });
-    assert.notStrictEqual(actual, true);
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets();
+    assert.deepStrictEqual(optionSets, [[ 'teamId', 'teamName' ], [ 'channelId', 'channelName' ], [ 'userId', 'userDisplayName' ]]);
   });
 
   it('fails validation if the teamId is not a valid guid', () => {
@@ -402,75 +394,6 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
     });
     assert.notStrictEqual(actual, true);
     done();
-  });
-
-  it('fails validation if the channelName is empty', () => {
-    const actual = command.validate({
-      options: {
-        teamName: "Human Resources",
-        channelName: "",
-        userId: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
-      }
-    });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the teamName is empty', () => {
-    const actual = command.validate({
-      options: {
-        teamName: "",
-        channelName: "Private Channel",
-        userId: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
-      }
-    });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the userDisplayName is empty', () => {
-    const actual = command.validate({
-      options: {
-        teamName: "Human Resources",
-        channelName: "Private Channel",
-        userDisplayName: ""
-      }
-    });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if teamName and teamId are specified', () => {
-    const actual = command.validate({
-      options: {
-        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
-        teamName: "Human Resources",
-        channelName: "Private Channel",
-        userId: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
-      }
-    });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if channelName and channelId are specified', () => {
-    const actual = command.validate({
-      options: {
-        teamName: "Human Resources",
-        channelName: "Private Channel",
-        channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
-        userId: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
-      }
-    });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if userId and userDisplayName are specified', () => {
-    const actual = command.validate({
-      options: {
-        teamName: "Human Resources",
-        channelName: "Private Channel",
-        userId: "f410f714-29e3-43f7-874d-d7d35c33eaf1",
-        userDisplayName: "admin@contoso.com"
-      }
-    });
-    assert.notStrictEqual(actual, true);
   });
 
   it('validates for a correct teamId, channelId, and userId input', () => {
