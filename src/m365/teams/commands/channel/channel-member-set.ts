@@ -229,6 +229,10 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
       return 'Specify channelId or channelName, one is required';
     }
 
+    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
+      return `${args.options.channelId} is not a valid Teams Channel ID`;
+    }
+
     if ((args.options.userName && args.options.userId) || 
       (args.options.userName && args.options.id) || 
       (args.options.userId && args.options.id)) {
