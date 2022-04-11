@@ -545,6 +545,7 @@ nav:
         - channel add: 'cmd/teams/channel/channel-add.md'
         - channel get: 'cmd/teams/channel/channel-get.md'
         - channel list: 'cmd/teams/channel/channel-list.md'
+        - channel member add: 'cmd/teams/channel/channel-member-add.md'
         - channel member list: 'cmd/teams/channel/channel-member-list.md'
         - channel member set: 'cmd/teams/channel/channel-member-set.md'
         - channel remove: 'cmd/teams/channel/channel-remove.md'
@@ -555,8 +556,6 @@ nav:
         - chat member list: 'cmd/teams/chat/chat-member-list.md'
         - chat message list: 'cmd/teams/chat/chat-message-list.md'
         - chat message send: 'cmd/teams/chat/chat-message-send.md'
-      - conversationmember:
-        - conversationmember add: 'cmd/teams/conversationmember/conversationmember-add.md'
       - funsettings:
         - funsettings list: 'cmd/teams/funsettings/funsettings-list.md'
         - funsettings set: 'cmd/teams/funsettings/funsettings-set.md'

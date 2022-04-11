@@ -1,8 +1,14 @@
-# teams conversationmember add
+# teams channel member add
 
-Adds a conversation member in a private channel
+Adds a specified member in the specified Microsoft Teams private team channel
 
 ## Usage
+
+```sh
+m365 teams channel member add [options]
+```
+
+## Alias
 
 ```sh
 m365 teams conversationmember add [options]
@@ -44,11 +50,11 @@ You can only add members and owners of a Team to a private channel.
 Add members to a channel based on their id or user principal name
 
 ```sh
-m365 teams conversationmember add --teamId 47d6625d-a540-4b59-a4ab-19b787e40593 --channelId 19:586a8b9e36c4479bbbd378e439a96df2@thread.skype --userId "85a50aa1-e5b8-48ac-b8ce-8e338033c366,john.doe@contoso.com"
+m365 teams channel member add --teamId 47d6625d-a540-4b59-a4ab-19b787e40593 --channelId 19:586a8b9e36c4479bbbd378e439a96df2@thread.skype --userId "85a50aa1-e5b8-48ac-b8ce-8e338033c366,john.doe@contoso.com"
 ```
 
 Add owners to a channel based on their display names
 
 ```sh
-m365 teams conversationmember add --teamName "Human Resources" --channelName "Private Channel" --userDisplayName "Anne Matthews,John Doe" --owner
+m365 teams channel member add --teamName "Human Resources" --channelName "Private Channel" --userDisplayName "Anne Matthews,John Doe" --owner
 ```

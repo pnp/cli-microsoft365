@@ -10,6 +10,7 @@ export default {
   CHANNEL_ADD: `${prefix} channel add`,
   CHANNEL_GET: `${prefix} channel get`,
   CHANNEL_LIST: `${prefix} channel list`,
+  CHANNEL_MEMBER_ADD: `${prefix} channel member add`,
   CHANNEL_MEMBER_LIST: `${prefix} channel member list`,
   CHANNEL_MEMBER_SET: `${prefix} channel member set`,
   CHANNEL_REMOVE: `${prefix} channel remove`,
