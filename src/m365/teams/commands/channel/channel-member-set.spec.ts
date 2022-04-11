@@ -92,7 +92,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         teamName: 'Team Name',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         role: 'owner'
       }
@@ -105,7 +105,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         role: 'owner'
       }
@@ -130,8 +130,21 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         channelName: 'Channel Name',
+        id: '00000',
+        role: 'owner'
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if channelId is invalid', (done) => {
+    const actual = command.validate({
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: 'Invalid',
         id: '00000',
         role: 'owner'
       }
@@ -144,7 +157,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         role: 'owner'
       }
     });
@@ -156,7 +169,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'Demo.User@contoso.onmicrosoft.com',
         userId: '00000000-0000-0000-0000-000000000000',
         role: 'owner'
@@ -170,7 +183,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'Demo.User@contoso.onmicrosoft.com',
         id: '00000',
         role: 'owner'
@@ -184,7 +197,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000-0000-0000-000000000000',
         id: '00000',
         role: 'owner'
@@ -198,7 +211,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'Demo.User@contoso.onmicrosoft.com',
         userId: '00000000-0000-0000-0000-000000000000',
         id: '00000',
@@ -213,7 +226,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000',
         role: 'owner'
       }
@@ -226,7 +239,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         role: 'Invalid'
       }
@@ -239,7 +252,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         role: 'owner'
       }
@@ -252,7 +265,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         role: 'member'
       }
@@ -265,7 +278,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         role: 'owner'
       }
@@ -286,7 +299,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     command.action(logger, {
       options: {
         teamName: 'Team Name',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         role: 'owner'
       }
@@ -326,7 +339,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     command.action(logger, {
       options: {
         teamName: 'Team Name',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         role: 'owner'
       }
@@ -368,7 +381,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     command.action(logger, {
       options: {
         teamName: 'Team Name',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         role: 'owner'
       }
@@ -393,7 +406,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members/00000') > -1) {
+      if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members/00000') > -1) {
         return Promise.resolve(memberResponse);
       }
 
@@ -403,7 +416,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     command.action(logger, {
       options: {
         teamName: 'Team Name',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         role: 'owner'
       }
@@ -454,7 +467,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
         return Promise.resolve({
           value: [
             {
-              "id": "00:00000000000000000000000000000000@thread.skype"
+              "id": "19:00000000000000000000000000000000@thread.skype"
             }
           ]
         });
@@ -464,7 +477,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members/00000') > -1) {
+      if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members/00000') > -1) {
         return Promise.resolve(memberResponse);
       }
 
@@ -492,7 +505,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
 
   it('fails to get member when member does not exist by userId', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) > -1) {
         return Promise.resolve({
           value: [
             {
@@ -511,7 +524,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     command.action(logger, {
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000-0000-0000-000000000000',
         role: 'owner'
       }
@@ -528,7 +541,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
 
   it('fails to get member when member does not return userId', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) > -1) {
         return Promise.resolve({
           value: [
             {
@@ -546,7 +559,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     command.action(logger, {
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000-0000-0000-000000000000',
         role: 'owner'
       }
@@ -563,7 +576,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
 
   it('fails to get member when member does not exist by userName', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
           value: [
             {
@@ -582,7 +595,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     command.action(logger, {
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
         role: 'owner'
       }
@@ -599,7 +612,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
 
   it('fails to get member when member does not return email', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
           value: [
             {
@@ -617,7 +630,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     command.action(logger, {
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
         role: 'owner'
       }
@@ -634,7 +647,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
 
   it('fails to get member when member does multiple exist with username', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
           value: [
             {
@@ -658,7 +671,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     command.action(logger, {
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
         role: 'owner'
       }
@@ -675,7 +688,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
 
   it('correctly get member id by user id', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
           value: [
             {
@@ -691,7 +704,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members/00000') > -1) {
+      if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members/00000') > -1) {
         return Promise.resolve(memberResponse);
       }
 
@@ -701,7 +714,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     command.action(logger, {
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000-0000-0000-000000000000',
         role: 'owner'
       }
@@ -719,7 +732,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
 
   it('correctly get member id by user name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
           value: [
             {
@@ -735,7 +748,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
 
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/00:00000000000000000000000000000000@thread.skype/members/00000') > -1) {
+      if ((opts.url as string).indexOf('/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members/00000') > -1) {
         return Promise.resolve(memberResponse);
       }
 
@@ -745,7 +758,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     command.action(logger, {
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
         role: 'owner'
       }
