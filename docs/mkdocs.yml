@@ -130,6 +130,8 @@ nav:
         - report office365activationsuserdetail: 'cmd/tenant/report/report-office365activationsuserdetail.md'
         - report office365activationsusercounts: 'cmd/tenant/report/report-office365activationsusercounts.md'
         - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
+      - security:
+        - security alerts list: 'cmd/tenant/security/security-alerts-list.md'
       - service announcement:
         - serviceannouncement health get: 'cmd/tenant/serviceannouncement/serviceannouncement-health-get.md'
         - serviceannouncement health list: 'cmd/tenant/serviceannouncement/serviceannouncement-health-list.md'
