@@ -573,6 +573,8 @@ nav:
         - app remove: 'cmd/teams/app/app-remove.md'
         - app uninstall: 'cmd/teams/app/app-uninstall.md'
         - app update: 'cmd/teams/app/app-update.md'
+      - cache:
+        - cache remove: 'cmd/teams/cache/cache-remove.md'
       - channel:
         - channel add: 'cmd/teams/channel/channel-add.md'
         - channel get: 'cmd/teams/channel/channel-get.md'
