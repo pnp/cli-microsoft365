@@ -70,5 +70,5 @@ m365 planner task list --bucketName "My Bucket" --planId "iVPMIgdku0uFlou-KLNg6M
 List the Microsoft Planner tasks in the bucket _My Bucket_ belonging to plan _My Plan_ in group _My Group_
 
 ```sh
-m365 planner bucket tasks list --bucketName "My Bucket" --planName "My Plan" --ownerGroupName "My Group"
+m365 planner task list --bucketName "My Bucket" --planName "My Plan" --ownerGroupName "My Group"
 ```
