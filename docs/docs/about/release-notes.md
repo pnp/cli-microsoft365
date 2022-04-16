@@ -166,6 +166,7 @@
 
 - [aad group list](../cmd/aad/group/group-list.md) - lists Azure AD groups [#2622](https://github.com/pnp/cli-microsoft365/issues/2622)
 - [aad user hibp](../cmd/aad/user/user-hibp.md) - allows you to retrieve all accounts that have been pwned with the specified username [#2476](https://github.com/pnp/cli-microsoft365/issues/2476)
+- [aad user signin list](../cmd/aad/user/user-signin-list.md) - retrieves the Azure AD user sign-ins for your tenant [#2910](https://github.com/pnp/cli-microsoft365/issues/2910)
 
 **Planner:**
 
@@ -234,6 +235,11 @@
 - updated 'teams message get' command to Graph v1.0 API [#2678](https://github.com/pnp/cli-microsoft365/issues/2678)
 - replaced custom group and user types with MS Graph types [#2436](https://github.com/pnp/cli-microsoft365/issues/2436)
 - updated default terminal profile in devcontainer [#2664](https://github.com/pnp/cli-microsoft365/issues/2664)
+- Renamed 'teams channel membership list' to 'teams channel member list' command [#3215](https://github.com/pnp/cli-microsoft365/issues/3215)
+- Renamed 'teams conversationmember add' to 'teams channel member add' command [#3174](https://github.com/pnp/cli-microsoft365/issues/3174)
+- Adds 'teams channel member set' channelId validation [#3222](https://github.com/pnp/cli-microsoft365/issues/3222)
+- Updated 'planner task list' samples [#3232](https://github.com/pnp/cli-microsoft365/issues/3232)
+- Corrects 'teams app install' options [#3217](https://github.com/pnp/cli-microsoft365/issues/3217)
 
 ## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
 
