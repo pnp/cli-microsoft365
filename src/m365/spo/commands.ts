@@ -95,6 +95,7 @@ export default {
   LIST_LABEL_SET: `${prefix} list label set`,
   LIST_LIST: `${prefix} list list`,
   LIST_REMOVE: `${prefix} list remove`,
+  LIST_ROLEINHERITANCE_RESET: `${prefix} list roleinheritance reset`,
   LIST_SET: `${prefix} list set`,
   LIST_SITESCRIPT_GET: `${prefix} list sitescript get`,
   LIST_VIEW_GET: `${prefix} list view get`,
