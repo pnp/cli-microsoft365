@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   clearExistingPermissions?: boolean;
 }
 
-class SpoListRoleinheritanceBreakCommand extends SpoCommand {
+class SpoListRoleInHeritanceBreakCommand extends SpoCommand {
   public get name(): string {
     return commands.LIST_ROLEINHERITANCE_BREAK;
   }
@@ -102,4 +102,4 @@ class SpoListRoleinheritanceBreakCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListRoleinheritanceBreakCommand();
+module.exports = new SpoListRoleInHeritanceBreakCommand();
