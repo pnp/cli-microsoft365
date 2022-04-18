@@ -59,6 +59,7 @@ describe('Lazy loading commands', () => {
       'spo sp set',
       'teams conversationmember add',
       'teams conversationmember list',
+      'teams conversationmember remove',
       'teams user add',
       'teams user list',
       'teams user remove',
