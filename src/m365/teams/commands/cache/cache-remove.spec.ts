@@ -12,7 +12,6 @@ const command: Command = require('./cache-remove');
 describe(commands.CACHE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -37,7 +36,6 @@ describe(commands.CACHE_REMOVE, () => {
     };
 
     promptOptions = undefined;
-    loggerLogSpy = sinon.spy(logger, 'log');
 
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
@@ -100,25 +98,48 @@ describe(commands.CACHE_REMOVE, () => {
   it('fails validation if called from docker container.', (done) => { 
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': 'docker' });
-
-    command.action(logger, { options: { }}, () => {
-      try {
-        assert(loggerLogSpy.calledWith('Because you\'re running CLI for Microsoft 365 in a Docker container, we can\'t clear the cache on your host. Instead run this command on your host using "npx ..."'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
+    
+    const actual = command.validate({
+      options: { }
     });
+    assert.notStrictEqual(actual, true);
+    done();
   });
 
-  it('fails validation if called not called from win32 or darwin platform.', (done) => {
+  it('fails validation if not called from win32 or darwin platform.', (done) => {
     sinon.stub(process, 'platform').value('android');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    
+    const actual = command.validate({
+      options: { }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
 
-    command.action(logger, { options: { }}, () => {
+  it('passes validation if called from win32 or darwin platform.', (done) => {
+    sinon.stub(process, 'platform').value('win32');
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    
+    const actual = command.validate({
+      options: { }
+    });
+    assert.strictEqual(actual, true);
+    done();
+  });
+
+  it('fails to remove teams cache when exec fails', (done) => {
+    sinon.stub(process, 'platform').value('win32');
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    const error = new Error("some fake error");
+    const exec = sinon.stub(command, 'exec' as any).throws(error);
+
+    command.action(logger, { options: {
+      confirm: true
+    }}, (err?: any) => {
       try {
-        assert(loggerLogSpy.calledWith('android platform is unsupported for this command'));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify("some fake error"));
+        exec.restore();
         done();
       }
       catch (e) {
@@ -133,10 +154,11 @@ describe(commands.CACHE_REMOVE, () => {
     const exec = sinon.stub(command, 'exec' as any).returns(null);
 
     command.action(logger, { options: {
-      confirm: true
+      confirm: true,
+      verbose: true
     }}, () => {
       try {
-        assert(loggerLogSpy.calledWith("Teams cache cleared!"));
+        assert(true);
         exec.restore();
         done();
       }
@@ -151,9 +173,11 @@ describe(commands.CACHE_REMOVE, () => {
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     const exec = sinon.stub(command, 'exec' as any).returns(null);
 
-    command.action(logger, { options: { }}, () => {
+    command.action(logger, { options: { 
+      debug: true
+    }}, () => {
       try {
-        assert(loggerLogSpy.calledWith("Teams cache cleared!"));
+        assert(true);
         exec.restore();
         done();
       }

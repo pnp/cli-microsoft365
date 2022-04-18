@@ -17,6 +17,17 @@ m365 teams cache remove [options]
 
 ## Remarks
 
+### Clear the Microsoft Teams cache  
+
+This command will execute the following steps.
+
+- Stop the Microsoft Teams client.
+This will kill all the running `Teams.exe` tasks.
+
+- Clear the Microsoft Teams cached files.
+For `Windows` it will delete all files and folders in the %appdata%\Microsoft\Teams directory.
+For `macOS` it will delete all files and folders in the  ~/Library/Application Support/Microsoft/Teams directory.
+
 !!! note
     - You won't lose any user data by clearing the cache.
     - Restarting Teams after you clear the cache might take longer than usual because the Teams cache files have to be rebuilt.
