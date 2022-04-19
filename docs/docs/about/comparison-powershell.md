@@ -413,7 +413,7 @@ Get-PnPTeamsChannel|SharePointPnPPowerShellOnline|[teams channel get](../cmd/tea
 Get-PnPTeamsChannelMessage|SharePointPnPPowerShellOnline|[teams message get](../cmd/teams/message/message-get.md), [teams message list](../cmd/teams/message/message-list.md)
 Get-PnPTeamsTab|SharePointPnPPowerShellOnline|[teams tab list](../cmd/teams/tab/tab-list.md)
 Get-PnPTeamsTeam|SharePointPnPPowerShellOnline|[teams team list](../cmd/teams/team/team-list.md)
-Get-PnPTeamsUser|SharePointPnPPowerShellOnline|[teams user list](../cmd/aad/o365group/o365group-user-list.md)
+Get-PnPTeamsUser|SharePointPnPPowerShellOnline|[teams user list](../cmd/teams/user/user-list.md)
 Get-PnPTenant|SharePointPnPPowerShellOnline|[spo tenant settings list](../cmd/spo/tenant/tenant-settings-list.md)
 Get-PnPTenantAppCatalogUrl|SharePointPnPPowerShellOnline|[spo tenant appcatalogurl get](../cmd/spo/tenant/tenant-appcatalogurl-get.md)
 Get-PnPTenantCdnEnabled|SharePointPnPPowerShellOnline|[spo cdn get](../cmd/spo/cdn/cdn-get.md)
