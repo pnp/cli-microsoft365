@@ -99,7 +99,7 @@ class PlannerBucketSetCommand extends GraphCommand {
         return request.get<{ value:PlannerBucket[] }>(requestOptions);
       })
       .then(buckets => {
-        const filteredBuckets = buckets.value.filter(b => args.options.name.toLowerCase() === b.name!.toLowerCase());
+        const filteredBuckets = buckets.value.filter(b => args.options.name!.toLowerCase() === b.name!.toLowerCase());
 
         if (!filteredBuckets.length) {
           return Promise.reject(`The specified bucket ${args.options.name} does not exist`);
@@ -134,7 +134,7 @@ class PlannerBucketSetCommand extends GraphCommand {
         return request.get<{ value: PlannerPlan[] }>(requestOptions);
       })
       .then(plans => {
-        const filteredPlans = plans.value.filter(p => p.title!.toLowerCase() === planName.toLowerCase());
+        const filteredPlans = plans.value.filter(p => p.title!.toLowerCase() === planName!.toLowerCase());
 
         if (!filteredPlans.length) {
           return Promise.reject(`The specified plan ${planName} does not exist`);
@@ -156,7 +156,7 @@ class PlannerBucketSetCommand extends GraphCommand {
     }
 
     const requestOptions: AxiosRequestConfig = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(ownerGroupName)}'`,
+      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(ownerGroupName!)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
