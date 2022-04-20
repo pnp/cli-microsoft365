@@ -53,7 +53,7 @@ class PlannerBucketSetCommand extends GraphCommand {
           url: `${this.resource}/v1.0/planner/buckets/${bucket.id}`,
           headers: {
             accept: 'application/json;odata.metadata=none',
-            'if-match': (<any>bucket)['@odata.etag']
+            'if-match': (bucket as any)['@odata.etag']
           },
           responseType: 'json',
           data: {}
