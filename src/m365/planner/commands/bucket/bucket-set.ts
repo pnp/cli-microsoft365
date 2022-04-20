@@ -13,14 +13,14 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
-  name: string;
-  planId: string;
-  planName: string;
-  ownerGroupId: string;
-  ownerGroupName: string;
-  newName: string;
-  orderHint: string;
+  id?: string;
+  name?: string;
+  planId?: string;
+  planName?: string;
+  ownerGroupId?: string;
+  ownerGroupName?: string;
+  newName?: string;
+  orderHint?: string;
 }
 
 class PlannerBucketSetCommand extends GraphCommand {
