@@ -99,7 +99,7 @@ class PlannerBucketSetCommand extends GraphCommand {
         return request.get<{ value:PlannerBucket[] }>(requestOptions);
       })
       .then(buckets => {
-        const filteredBuckets = buckets.value.filter(b => args.options.name.toLowerCase() === b.name?.toLowerCase());
+        const filteredBuckets = buckets.value.filter(b => args.options.name.toLowerCase() === b.name!.toLowerCase());
 
         if (!filteredBuckets.length) {
           return Promise.reject(`The specified bucket ${args.options.name} does not exist`);
