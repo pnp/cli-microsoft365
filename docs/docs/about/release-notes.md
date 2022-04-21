@@ -16,7 +16,7 @@
 **Teams:**
 
 - [teams channel member set](../cmd/teams/channel/channel-member-set.md) - updates the role of the specified member in the specified Microsoft Teams private team channel [#3177](https://github.com/pnp/cli-microsoft365/issues/3177)
-- [teams channel membership list](../cmd/teams/channel/channel-membership-list.md) - lists users for the specified Microsoft Teams channel [#3176](https://github.com/pnp/cli-microsoft365/issues/3176)
+- teams channel membership list - lists users for the specified Microsoft Teams channel [#3176](https://github.com/pnp/cli-microsoft365/issues/3176)
 - [teams chat get](../cmd/teams/chat/chat-get.md) - gets a Microsoft Teams chat conversation by id, participants or chat name [#3017](https://github.com/pnp/cli-microsoft365/issues/3017)
 
 ### Changes
@@ -604,7 +604,7 @@
 
 **Teams:**
 
-- [teams conversationmember add](../cmd/teams/conversationmember/conversationmember-add.md) - adds a conversation member in a private channel [#1986](https://github.com/pnp/cli-microsoft365/issues/1986)
+- teams conversationmember add - adds a conversation member in a private channel [#1986](https://github.com/pnp/cli-microsoft365/issues/1986)
 
 ### Changes
 
@@ -689,7 +689,7 @@
 
 **Microsoft 365:**
 
-- [tenant auditlog report](../cmd/tenant/auditlog/auditlog-report.md) - gets audit logs from the Office 365 Management API [#1739](https://github.com/pnp/cli-microsoft365/issues/1739)
+- tenant auditlog report - gets audit logs from the Office 365 Management API [#1739](https://github.com/pnp/cli-microsoft365/issues/1739)
 
 **File:**
 
@@ -785,7 +785,7 @@
 
 **Teams:**
 
-- [teams conversationmember list](../cmd/teams/conversationmember/conversationmember-list.md) - lists all conversational members of a channel [#1880](https://github.com/pnp/cli-microsoft365/issues/1880)
+- teams conversationmember list - lists all conversational members of a channel [#1880](https://github.com/pnp/cli-microsoft365/issues/1880)
 
 **To Do:**
 
@@ -855,9 +855,9 @@
 
 **Microsoft 365:**
 
-- [tenant service list](../cmd/tenant/service/service-list.md) - gets services available in Microsoft 365 [#1740](https://github.com/pnp/cli-microsoft365/issues/1740)
-- [tenant service message list](../cmd/tenant/service/service-message-list.md) - gets service messages Microsoft 365 [#1741](https://github.com/pnp/cli-microsoft365/issues/1741)
-- [tenant service report historicalservicestatus](../cmd/tenant/service/service-report-historicalservicestatus.md) - gets the historical service status of Microsoft 365 Services of the last 7 days [#1742](https://github.com/pnp/cli-microsoft365/issues/1742)
+- tenant service list - gets services available in Microsoft 365 [#1740](https://github.com/pnp/cli-microsoft365/issues/1740)
+- tenant service message list - gets service messages Microsoft 365 [#1741](https://github.com/pnp/cli-microsoft365/issues/1741)
+- tenant service report historicalservicestatus - gets the historical service status of Microsoft 365 Services of the last 7 days [#1742](https://github.com/pnp/cli-microsoft365/issues/1742)
 
 **Outlook:**
 
@@ -1060,7 +1060,7 @@
 
 **Microsoft 365:**
 
-- [tenant status list](../cmd/tenant/status/status-list.md) - gets health status of the different services in Microsoft 365 [#1272](https://github.com/pnp/cli-microsoft365/issues/1272)
+- tenant status list - gets health status of the different services in Microsoft 365 [#1272](https://github.com/pnp/cli-microsoft365/issues/1272)
 
 **SharePoint:**
 

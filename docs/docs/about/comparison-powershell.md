@@ -367,7 +367,7 @@ Get-PnPMicrosoft365Group|SharePointPnPPowerShellOnline|[aad o365group get](../cm
 Get-PnPMicrosoft365GroupMembers|SharePointPnPPowerShellOnline|[aad o365group user list](../cmd/aad/o365group/o365group-user-list.md)
 Get-PnPMicrosoft365GroupOwners|SharePointPnPPowerShellOnline|[aad o365group user list](../cmd/aad/o365group/o365group-user-list.md)
 Get-PnPNavigationNode|SharePointPnPPowerShellOnline|[spo navigation node list](../cmd/spo/navigation/navigation-node-list.md)
-Get-PnPOffice365CurrentServiceStatus|SharePointPnPPowerShellOnline|[tenant status list](../cmd/tenant/status/status-list.md)
+Get-PnPOffice365CurrentServiceStatus|SharePointPnPPowerShellOnline|
 Get-PnPOffice365HistoricalServiceStatus|SharePointPnPPowerShellOnline|
 Get-PnPOffice365ServiceMessage|SharePointPnPPowerShellOnline|
 Get-PnPOffice365Services|SharePointPnPPowerShellOnline|
