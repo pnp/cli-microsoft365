@@ -43,6 +43,7 @@
 - corrected 'teams app install' options [#3217](https://github.com/pnp/cli-microsoft365/issues/3217)
 - changed listTitle to title in spo listitem list docs [#3099](https://github.com/pnp/cli-microsoft365/issues/3099)
 - removed react check from 'spfx doctor' command [#3162](https://github.com/pnp/cli-microsoft365/issues/3162)
+- added support for upgrading SPFx projects to 1.15.0-beta.6 [#3243](https://github.com/pnp/cli-microsoft365/issues/3243)
 
 ## [v5.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.1.0)
 
