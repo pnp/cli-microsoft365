@@ -183,6 +183,7 @@ nav:
         - bucket add: 'cmd/planner/bucket/bucket-add.md'
         - bucket list: 'cmd/planner/bucket/bucket-list.md'
         - bucket set: 'cmd/planner/bucket/bucket-set.md'
+        - bucket remove: 'cmd/planner/bucket/bucket-remove.md'
       - plan:
         - plan add: 'cmd/planner/plan/plan-add.md'
         - plan get: 'cmd/planner/plan/plan-get.md'
@@ -666,6 +667,8 @@ nav:
       - 'Scan for Microsoft 365 Groups created with user''s first or last name' : 'sample-scripts/aad/flag-groups-with-user-names.md'
     - Microsoft Graph:
       - 'Authenticate with and call the Microsoft Graph' : 'sample-scripts/graph/call-graph.md'
+    - Planner:
+      - 'Add multiple tasks': sample-scripts/planner/add-multiple-tasks.md
     - Power Automate:
       - 'Cancel all running flow runs for a flow in an environment': 'sample-scripts/flow/cancel-all-running-flow-runs.md'
       - 'Export a single Flow to a Logic App' : 'sample-scripts/flow/export-flow-logicapp.md'
