@@ -752,35 +752,35 @@ nav:
     - 'Release notes': 'about/release-notes.md'
     - License: 'about/license.md'
 theme:
-  name: 'material'
-  palette:
-    primary: 'red'
-  logo: 'images/pnp-cli-microsoft365-white.svg'
-  features:
-    - navigation.tabs
+    name: 'material'
+    palette:
+        primary: 'red'
+    logo: 'images/pnp-cli-microsoft365-white.svg'
+    features:
+        - navigation.tabs
 google_analytics:
-  - 'UA-110480857-1'
-  - 'auto'
+    - 'UA-110480857-1'
+    - 'auto'
 extra_css:
-  - 'css/styles2.css'
+    - 'css/styles2.css'
 markdown_extensions:
-  - admonition
-  - toc:
-      permalink: true
-  - pymdownx.highlight
-  - pymdownx.snippets
-  - pymdownx.superfences
-  - pymdownx.tabbed
-  - def_list
+    - admonition
+    - toc:
+          permalink: true
+    - pymdownx.highlight
+    - pymdownx.snippets
+    - pymdownx.superfences
+    - pymdownx.tabbed
+    - def_list
 extra:
-  social:
-    - icon: fontawesome/brands/github
-      link: 'https://github.com/pnp/cli-microsoft365'
-    - icon: fontawesome/brands/twitter
-      link: 'https://twitter.com/climicrosoft365'
-    - icon: fontawesome/brands/youtube
-      link: 'http://aka.ms/sppnp-videos'
-    - icon: fontawesome/solid/link
-      link: 'https://aka.ms/sppnp'
+    social:
+        - icon: fontawesome/brands/github
+          link: 'https://github.com/pnp/cli-microsoft365'
+        - icon: fontawesome/brands/twitter
+          link: 'https://twitter.com/climicrosoft365'
+        - icon: fontawesome/brands/youtube
+          link: 'http://aka.ms/sppnp-videos'
+        - icon: fontawesome/solid/link
+          link: 'https://aka.ms/sppnp'
 repo_url: http://github.com/pnp/cli-microsoft365
 edit_uri: blob/main/docs/docs
