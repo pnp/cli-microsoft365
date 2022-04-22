@@ -183,6 +183,7 @@ nav:
     - Planner (planner):
       - bucket:
         - bucket add: 'cmd/planner/bucket/bucket-add.md'
+        - bucket get: 'cmd/planner/bucket/bucket-get.md'
         - bucket list: 'cmd/planner/bucket/bucket-list.md'
         - bucket set: 'cmd/planner/bucket/bucket-set.md'
         - bucket remove: 'cmd/planner/bucket/bucket-remove.md'
