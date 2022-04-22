@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils';
+import { urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -14,6 +14,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
+  listUrl?: string;
 }
 
 class SpoFieldListCommand extends SpoCommand {
@@ -37,6 +38,11 @@ class SpoFieldListCommand extends SpoCommand {
     }
     else if (args.options.listTitle) {
       listUrl = `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/`;
+    }
+    else if (args.options.listUrl) {
+      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+
+      listUrl = `GetList('${encodeURIComponent(listServerRelativeUrl)}')/`;
     }
 
     const requestOptions: any = {
@@ -65,6 +71,9 @@ class SpoFieldListCommand extends SpoCommand {
       },
       {
         option: '-i --listId [listId]'
+      },
+      {
+        option: '--listUrl [listUrl]'
       }   
     ];
 
@@ -82,8 +91,9 @@ class SpoFieldListCommand extends SpoCommand {
       return `${args.options.listId} is not a valid GUID`;
     }
 
-    if (args.options.listId && args.options.listTitle) {
-      return `Specify list id or title but not both`;
+    const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
+    if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
+      return `Specify either list id or title or list url`;
     }
     
     return true;
