@@ -78,9 +78,9 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if both id and title options are not passed', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
-    assert.notStrictEqual(actual, true);
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets();
+    assert.deepStrictEqual(optionSets, [[ 'listId', 'listTitle' ]]);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
@@ -103,14 +103,9 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
     assert(actual);
   });
 
-  it('fails validation if both id and title options are passed', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents' } });
-    assert.notStrictEqual(actual, true);
-  });
-
   it('reset role inheritance on list by title', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\)/resetroleinheritance') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/resetroleinheritance') > -1) {
         return Promise.resolve();
       }
 
@@ -123,9 +118,9 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test'
       }
-    }, () => {
+    }, (err: any) => {
       try {
-        assert(true);
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -149,9 +144,9 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '202b8199-b9de-43fd-9737-7f213f51c991'
       }
-    }, () => {
+    }, (err: any) => {
       try {
-        assert(true);
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -161,9 +156,9 @@ describe(commands.LIST_ROLEINHERITANCE_RESET, () => {
   });
 
   it('list role inheritance reset command handles reject request correctly', (done) => {
-    const err = 'Invalid request';
+    const err = 'request rejected';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\)/resetroleinheritance') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/resetroleinheritance') > -1) {
         return Promise.reject(err);
       }
 

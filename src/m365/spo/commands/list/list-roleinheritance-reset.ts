@@ -25,18 +25,24 @@ class SpoListRoleInHeritanceResetCommand extends SpoCommand {
     return 'Restore role inheritance on list or library.';
   }
 
+  public optionSets(): string[][] | undefined {
+    return [
+      [ 'listId', 'listTitle' ]
+    ];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.logToStderr(`reset role inheritance of list in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Reset role inheritance of list in site at ${args.options.webUrl}...`);
     }
 
-    let requestUrl: string = '';
+    let requestUrl: string = `${args.options.webUrl}/_api/web/lists`;
 
     if (args.options.listId) {
-      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')`;
+      requestUrl += `(guid'${encodeURIComponent(args.options.listId)}')`;
     }
     else {
-      requestUrl = `${args.options.webUrl}/_api/web/lists/getbytitle('${encodeURIComponent(args.options.listTitle as string)}')`;
+      requestUrl += `/getbytitle('${encodeURIComponent(args.options.listTitle as string)}')`;
     }
 
     const requestOptions: any = {
@@ -51,7 +57,7 @@ class SpoListRoleInHeritanceResetCommand extends SpoCommand {
 
     request
       .post(requestOptions)
-      .then((): void => { cb(); }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -79,14 +85,6 @@ class SpoListRoleInHeritanceResetCommand extends SpoCommand {
 
     if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
       return `${args.options.id} is not a valid GUID`;
-    }
-
-    if (args.options.listId && args.options.listTitle) {
-      return 'Specify id or title, but not both';
-    }
-
-    if (!args.options.listId && !args.options.listTitle) {
-      return 'Specify id or title';
     }
 
     return true;
