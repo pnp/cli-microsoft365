@@ -78,9 +78,9 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if both id and title options are not passed', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
-    assert.notStrictEqual(actual, true);
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets();
+    assert.deepStrictEqual(optionSets, [[ 'listId', 'listTitle' ]]);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
@@ -103,14 +103,9 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
     assert(actual);
   });
 
-  it('fails validation if both id and title options are passed', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents' } });
-    assert.notStrictEqual(actual, true);
-  });
-
   it('break role inheritance on list by title', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\)/breakroleinheritance(false)') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/breakroleinheritance(true)') > -1) {
         return Promise.resolve();
       }
 
@@ -123,9 +118,9 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test'
       }
-    }, () => {
+    }, (err: any) => {
       try {
-        assert(true);
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -136,7 +131,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
 
   it('break role inheritance on list by title and clear all permissions', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\)/breakroleinheritance(true)') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/breakroleinheritance(false)') > -1) {
         return Promise.resolve();
       }
 
@@ -150,9 +145,9 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
         listTitle: 'test',
         clearExistingPermissions: true
       }
-    }, () => {
+    }, (err: any) => {
       try {
-        assert(true);
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -163,7 +158,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
 
   it('break role inheritance on list by id', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'202b8199-b9de-43fd-9737-7f213f51c991\')/breakroleinheritance(false)') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists(guid\'202b8199-b9de-43fd-9737-7f213f51c991\')/breakroleinheritance(true)') > -1) {
         return Promise.resolve();
       }
 
@@ -176,9 +171,9 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '202b8199-b9de-43fd-9737-7f213f51c991'
       }
-    }, () => {
+    }, (err: any) => {
       try {
-        assert(true);
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -189,7 +184,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
 
   it('break role inheritance on list by id and clear all permissions', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'202b8199-b9de-43fd-9737-7f213f51c991\')/breakroleinheritance(true)') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists(guid\'202b8199-b9de-43fd-9737-7f213f51c991\')/breakroleinheritance(false)') > -1) {
         return Promise.resolve();
       }
 
@@ -203,9 +198,9 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
         listId: '202b8199-b9de-43fd-9737-7f213f51c991',
         clearExistingPermissions: true
       }
-    }, () => {
+    }, (err: any) => {
       try {
-        assert(true);
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -215,9 +210,9 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
   });
 
   it('list role inheritance break command handles reject request correctly', (done) => {
-    const err = 'Invalid request';
+    const err = 'request rejected';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\)/breakroleinheritance(false)') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/breakroleinheritance(true)') > -1) {
         return Promise.reject(err);
       }
 
