@@ -8,6 +8,10 @@
 
 - [aad user signin list](../cmd/aad/user/user-signin-list.md) - retrieves the Azure AD user sign-ins for your tenant [#2910](https://github.com/pnp/cli-microsoft365/issues/2910)
 
+**Planner:**
+
+- [planner bucket set](../cmd/planner/bucket/bucket-set.md) - updates a Microsoft Planner bucket [#3230](https://github.com/pnp/cli-microsoft365/issues/3230)
+
 **Power Platform:**
 
 - [pp environment list](../cmd/pp/environment/environment-list.md) - lists Microsoft Power Platform environments [#3061](https://github.com/pnp/cli-microsoft365/issues/3061)
@@ -15,6 +19,7 @@
 
 **Teams:**
 
+- [teams channel member remove](../cmd/teams/channel/channel-member-remove.md) - remove the specified member from the specified Microsoft Teams private team channel [#3175](https://github.com/pnp/cli-microsoft365/issues/3175)
 - [teams channel member set](../cmd/teams/channel/channel-member-set.md) - updates the role of the specified member in the specified Microsoft Teams private team channel [#3177](https://github.com/pnp/cli-microsoft365/issues/3177)
 - teams channel membership list - lists users for the specified Microsoft Teams channel [#3176](https://github.com/pnp/cli-microsoft365/issues/3176)
 - [teams chat get](../cmd/teams/chat/chat-get.md) - gets a Microsoft Teams chat conversation by id, participants or chat name [#3017](https://github.com/pnp/cli-microsoft365/issues/3017)
@@ -44,6 +49,7 @@
 - changed listTitle to title in spo listitem list docs [#3099](https://github.com/pnp/cli-microsoft365/issues/3099)
 - removed react check from 'spfx doctor' command [#3162](https://github.com/pnp/cli-microsoft365/issues/3162)
 - added support for upgrading SPFx projects to 1.15.0-beta.6 [#3243](https://github.com/pnp/cli-microsoft365/issues/3243)
+- fixed options descriptions for `planner task set` [#3245](https://github.com/pnp/cli-microsoft365/issues/3245)
 
 ## [v5.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.1.0)
 
