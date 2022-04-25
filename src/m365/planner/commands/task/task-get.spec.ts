@@ -12,6 +12,69 @@ const command: Command = require('./task-get');
 describe(commands.TASK_GET, () => {
   let log: string[];
   let logger: Logger;
+  const validTaskId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
+  const validTaskTitle = 'Task name';
+  const validBucketId = 'vncYUXCRBke28qMLB-d4xJcACtNz';
+  const validBucketName = 'Bucket name';
+  const validPlanId = 'oUHpnKBFekqfGE_PS6GGUZcAFY7b';
+  const validPlanName = 'Plan name';
+  const validOwnerGroupName = 'Group name';
+  const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
+  const invalidOwnerGroupId = 'Invalid GUID';
+
+  const multipleGroupResponse = {
+    "value": [
+      {
+        "id": validOwnerGroupId,
+        "displayName": validOwnerGroupName
+      },
+      {
+        "id": validOwnerGroupId,
+        "displayName": validOwnerGroupName
+      }
+    ]
+  };
+
+  const multiplePlanResponse = {
+    "value": [
+      {
+        "id": validPlanId,
+        "title": validPlanName
+      },
+      {
+        "id": validPlanId,
+        "title": validPlanName
+      }
+    ]
+  };
+
+  const multipleBucketByNameResponse = {
+    "value": [
+      {
+        "@odata.etag": "W/\"JzEtQnVja2V0QEBAQEBAQEBAQEBAQEBARCc=\"",
+        "name": validBucketName,
+        "id": validBucketId
+      },
+      {
+        "@odata.etag": "W/\"JzEtQnVja2V0QEBAQEBAQEBAQEBAQEBARCc=\"",
+        "name": validBucketName,
+        "id": validBucketId
+      }
+    ]
+  };
+
+  const multipleTasksByNameResponse = {
+    "value": [
+      {
+        "title": validTaskId,
+        "id": validTaskId
+      },
+      {
+        "name": validTaskId,
+        "id": validTaskId
+      }
+    ]
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -55,6 +118,316 @@ describe(commands.TASK_GET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('fails validation when title is used without bucket id', () => {
+    const actual = command.validate({
+      options: {
+        title: validTaskTitle
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when title is used with both bucket id and bucketname', () => {
+    const actual = command.validate({
+      options: {
+        title: validTaskTitle,
+        bucketId: validBucketId,
+        bucketName: validBucketName
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when bucket name is used without plan name or plan id', () => {
+    const actual = command.validate({
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when bucket name is used with both plan name and plan id', () => {
+    const actual = command.validate({
+      options: {
+        name: validBucketName,
+        bucketName: validBucketName,
+        planId: validPlanId,
+        planName: validPlanName,
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when plan name is used without owner group name or owner group id', () => {
+    const actual = command.validate({
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planName: validPlanName
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when plan name is used with both owner group name and owner group id', () => {
+    const actual = command.validate({
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planName: validPlanName,
+        ownerGroupName: validOwnerGroupName,
+        ownerGroupId: validOwnerGroupId
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when owner group id is not a guid', () => {
+    const actual = command.validate({
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planName: validPlanName,
+        ownerGroupId: invalidOwnerGroupId
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('validates for a correct input with id', () => {
+    const actual = command.validate({
+      options: {
+        id: validTaskId
+      }
+    });
+    assert.strictEqual(actual, true);
+  });
+
+  it('validates for a correct input with name', () => {
+    const actual = command.validate({
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planName: validPlanName,
+        ownerGroupName: validOwnerGroupName
+      }
+    });
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation when no groups found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+        return Promise.resolve({"value": []});
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planName: validPlanName,
+        ownerGroupName: validOwnerGroupName
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified ownerGroup ${validOwnerGroupName} does not exist`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+  
+  it('fails validation when multiple groups found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+        return Promise.resolve(multipleGroupResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planName: validPlanName,
+        ownerGroupName: validOwnerGroupName
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple owner groups with name ${validOwnerGroupName} found: ${multipleGroupResponse.value.map(x => x.id)}`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when no plans found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=owner eq '${validOwnerGroupId}'`) {
+        return Promise.resolve({"value": []});
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planName: validPlanName,
+        ownerGroupId: validOwnerGroupId
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified plan ${validPlanName} does not exist`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  
+  it('fails validation when multiple plans found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=owner eq '${validOwnerGroupId}'`) {
+        return Promise.resolve(multiplePlanResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planName: validPlanName,
+        ownerGroupId: validOwnerGroupId
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple plans with name ${validPlanName} found: ${multiplePlanResponse.value.map(x => x.id)}`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when no buckets found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+        return Promise.resolve({"value": []});
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planId: validPlanId
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified bucket ${validBucketName} does not exist`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when multiple buckets found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+        return Promise.resolve(multipleBucketByNameResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planId: validPlanId
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple buckets with name ${validBucketName} found: ${multipleBucketByNameResponse.value.map(x => x.id)}`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when no tasks found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
+        return Promise.resolve({"value": []});
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketId: validBucketId
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified task ${validTaskTitle} does not exist`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when multiple buckets found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
+        return Promise.resolve(multipleTasksByNameResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketId: validBucketId
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple tasks with title ${validTaskTitle} found: ${multipleTasksByNameResponse.value.map(x => x.id)}`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('successfully handles item found', (done) => {
