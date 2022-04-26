@@ -56,9 +56,6 @@ jobs:
         nodeBuild: [16]
         include:
           - os: ubuntu-latest
-            nodeRun: 12
-            nodeBuild: 16
-          - os: ubuntu-latest
             nodeRun: 14
             nodeBuild: 16
 
