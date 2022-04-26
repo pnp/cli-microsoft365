@@ -183,6 +183,7 @@ nav:
         - bucket add: 'cmd/planner/bucket/bucket-add.md'
         - bucket list: 'cmd/planner/bucket/bucket-list.md'
         - bucket remove: 'cmd/planner/bucket/bucket-remove.md'
+        - bucket set: 'cmd/planner/bucket/bucket-set.md'
       - plan:
         - plan add: 'cmd/planner/plan/plan-add.md'
         - plan get: 'cmd/planner/plan/plan-get.md'
@@ -230,7 +231,7 @@ nav:
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Power Platform (pp):
       - environment:
-        - environment list: 'cmd/pp/managementapp/environment/environment-list.md' 
+        - environment list: 'cmd/pp/environment/environment-list.md' 
       - managementapp:
         - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
         - managementapp list: 'cmd/pp/managementapp/managementapp-list.md'
@@ -548,6 +549,7 @@ nav:
         - channel list: 'cmd/teams/channel/channel-list.md'
         - channel member add: 'cmd/teams/channel/channel-member-add.md'
         - channel member list: 'cmd/teams/channel/channel-member-list.md'
+        - channel member remove: 'cmd/teams/channel/channel-member-remove.md'
         - channel member set: 'cmd/teams/channel/channel-member-set.md'
         - channel remove: 'cmd/teams/channel/channel-remove.md'
         - channel set: 'cmd/teams/channel/channel-set.md'

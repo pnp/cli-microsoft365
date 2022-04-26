@@ -162,8 +162,7 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.x
-      - run: pip install mkdocs-material==7.1.7
-      - run: pip install pymdown-extensions==9.0
+      - run: pip install mkdocs-material==7.1.7 pymdown-extensions==9.0 pygments==2.11
       - run: mkdocs gh-deploy --force -m "[ci skip]"
         working-directory: docs
   deploy_docker:
