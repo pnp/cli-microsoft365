@@ -1,0 +1,39 @@
+# spo listitem roleinheritance reset
+
+Restores the role inheritance of list item, file, or folder
+
+## Usage
+
+```sh
+m365 spo listitem roleinheritance reset [options]
+```
+
+## Options
+
+`-u, --webUrl <webUrl>`
+: URL of the site from which the item should be retrieved
+
+`--id <id>`
+: ID of the item to retrieve
+
+`--listId [listId]`
+: ID of the list. Specify listId or listTitle but not both
+
+`--listTitle [listTitle]`
+: Title of the list. Specify listId or listTitle but not both
+
+--8<-- "docs/cmd/_global.md"
+
+## Examples
+
+Restore role inheritance of list item with id 8 from list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+m365 spo listitem roleinheritance reset --webUrl https://contoso.sharepoint.com/sites/project-x --id 8 --listId 0cd891ef-afce-4e55-b836-fce03286cccf
+```
+
+Restore role inheritance of list item with id 8 from list with title _test_ located in site _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+m365 spo listitem roleinheritance reset --webUrl https://contoso.sharepoint.com/sites/project-x --id 8 --listTitle test
+```
