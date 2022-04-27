@@ -119,6 +119,7 @@ export default {
   LISTITEM_RECORD_DECLARE: `${prefix} listitem record declare`,
   LISTITEM_RECORD_UNDECLARE: `${prefix} listitem record undeclare`,
   LISTITEM_REMOVE: `${prefix} listitem remove`,
+  LISTITEM_ROLEINHERITANCE_RESET: `${prefix} listitem roleinheritance reset`,
   LISTITEM_SET: `${prefix} listitem set`,
   MAIL_SEND: `${prefix} mail send`,
   NAVIGATION_NODE_ADD: `${prefix} navigation node add`,
