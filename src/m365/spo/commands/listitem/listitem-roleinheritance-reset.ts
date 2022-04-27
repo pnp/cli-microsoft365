@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   listTitle?: string;
 }
 
-class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
+class SpoListItemRoleInHeritanceResetCommand extends SpoCommand {
   public get name(): string {
     return commands.LISTITEM_ROLEINHERITANCE_RESET;
   }
@@ -104,4 +104,4 @@ class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListItemRoleInheritanceResetCommand();
+module.exports = new SpoListItemRoleInHeritanceResetCommand();
