@@ -126,7 +126,7 @@ class PlannerTaskGetCommand extends GraphCommand {
       .getGroupId(options)
       .then((groupId: string) => {
         const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/plans?$filter=(owner eq '${groupId}')&$select=id,title`,
+          url: `${this.resource}/v1.0/planner/plans?$filter=owner eq '${groupId}'&$select=id,title`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
