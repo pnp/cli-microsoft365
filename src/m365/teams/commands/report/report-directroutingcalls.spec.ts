@@ -66,8 +66,7 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get,
-      sinon.useFakeTimers
+      request.get
     ]);
   });
 
@@ -165,7 +164,7 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
 
   it('gets directroutingcalls in teams with no toDateTime specified', (done) => {
     const now = new Date();
-    sinon.useFakeTimers(now);
+    const fakeTimers = sinon.useFakeTimers(now);
     const toDateTime: string = encodeURIComponent(now.toISOString());
 
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
@@ -184,6 +183,9 @@ describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
       }
       catch (e) {
         done(e);
+      }
+      finally {
+        fakeTimers.restore();
       }
     });
   });
