@@ -1,5 +1,17 @@
 # Release notes
 
+## [v5.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.3.0)
+
+### New commands
+
+**Planner:**
+
+- [planner bucket remove](../cmd/planner/bucket/bucket-remove.md) - removes a Microsoft Planner bucket from a plan [#2742](https://github.com/pnp/cli-microsoft365/issues/2742)
+
+### Changes
+
+- added 'add multiple tasks in Planner' sample [#2245](https://github.com/pnp/cli-microsoft365/issues/2245)
+
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
 ### New commands
