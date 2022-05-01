@@ -70,7 +70,8 @@ class PlannerTaskGetCommand extends GraphCommand {
         return request.get<{ value: PlannerTask[] }>(requestOptions);
       })
       .then((response) => {
-        const tasks: PlannerTask[] | undefined = response.value.filter(val => val.title === options.title);
+        const title = options.title as string;
+        const tasks: PlannerTask[] | undefined = response.value.filter(val => val.title?.toLocaleLowerCase() === title.toLocaleLowerCase());
         
         if (!tasks.length) {
           return Promise.reject(`The specified task ${options.title} does not exist`);
@@ -103,7 +104,8 @@ class PlannerTaskGetCommand extends GraphCommand {
         return request.get<{ value: PlannerBucket[] }>(requestOptions);
       })
       .then((response) => {
-        const buckets: PlannerBucket[] | undefined = response.value.filter(val => val.name === options.bucketName);
+        const bucketName = options.bucketName as string;
+        const buckets: PlannerBucket[] | undefined = response.value.filter(val => val.name?.toLocaleLowerCase() === bucketName.toLocaleLowerCase());
         
         if (!buckets.length) {
           return Promise.reject(`The specified bucket ${options.bucketName} does not exist`);
@@ -136,7 +138,8 @@ class PlannerTaskGetCommand extends GraphCommand {
         return request.get<{ value: PlannerPlan[] }>(requestOptions);
       })
       .then((response) => {
-        const plans: PlannerPlan[] | undefined = response.value.filter(val => val.title === options.planName);
+        const planName = options.planName as string;
+        const plans: PlannerPlan[] | undefined = response.value.filter(val => val.title?.toLocaleLowerCase() === planName.toLocaleLowerCase());
         
         if (!plans.length) {
           return Promise.reject(`The specified plan ${options.planName} does not exist`);

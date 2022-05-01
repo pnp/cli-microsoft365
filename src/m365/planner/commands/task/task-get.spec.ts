@@ -322,7 +322,7 @@ describe(commands.TASK_GET, () => {
   it('fails validation when no plans found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=owner eq '${validOwnerGroupId}'&$select=id,title`) {
-        return Promise.resolve({"value": []});
+        return Promise.resolve({"value": [ { "id": "" } ]});
       }
 
       return Promise.reject('Invalid Request');
@@ -377,7 +377,7 @@ describe(commands.TASK_GET, () => {
   it('fails validation when no buckets found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
-        return Promise.resolve({"value": []});
+        return Promise.resolve({"value": [ { "id": "" } ]});
       }
 
       return Promise.reject('Invalid Request');
@@ -429,7 +429,7 @@ describe(commands.TASK_GET, () => {
   it('fails validation when no tasks found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
-        return Promise.resolve({"value": []});
+        return Promise.resolve({"value": [ { "id": "" } ]});
       }
 
       return Promise.reject('Invalid Request');
