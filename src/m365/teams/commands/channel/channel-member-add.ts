@@ -200,6 +200,10 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
           return Promise.reject(`The specified channel '${args.options.channelName}' does not exist in the Microsoft Teams team with ID '${teamId}'`);
         }
 
+        if (channelItem.membershipType !== "private") {
+          return Promise.reject(`The specified channel is not a private channel`);
+        }
+
         return Promise.resolve(channelItem.id);
       }, err => { return Promise.reject(err); });
   }

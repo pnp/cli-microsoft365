@@ -174,6 +174,10 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
           return Promise.reject(`The specified channel does not exist in the Microsoft Teams team`);
         }
 
+        if (channelItem.membershipType !== "private") {
+          return Promise.reject(`The specified channel is not a private channel`);
+        }
+
         return Promise.resolve(channelItem.id);
       });
   }
