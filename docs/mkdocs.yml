@@ -442,6 +442,8 @@ nav:
         - report siteusagepages: 'cmd/spo/report/report-siteusagepages.md'
         - report siteusagesitecounts: 'cmd/spo/report/report-siteusagesitecounts.md'
         - report siteusagestorage: 'cmd/spo/report/report-siteusagestorage.md'
+      - roledefinition:
+        - roledefinition list: 'cmd/spo/roledefinition/roledefinition-list.md'
       - serviceprincipal:
         - serviceprincipal grant add: 'cmd/spo/serviceprincipal/serviceprincipal-grant-add.md'
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'
