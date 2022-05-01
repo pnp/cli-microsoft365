@@ -740,17 +740,6 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
     });
   });
 
-  it('rejects invalid vendor name', () => {
-    const vendor = 'foo';
-    const actual = command.validate({ options: { vendor: vendor } });
-    assert.strictEqual(actual, `${vendor} is not a valid vendor. Allowed values are Azure Advanced Threat Protection, Azure Security Center, Microsoft Cloud App Security, Azure Active Directory Identity Protection, Azure Sentinel, Microsoft Defender ATP`);
-  });
-
-  it('doesn\'t fail validation if the optional vendor option not specified', () => {
-    const actual = command.validate({ options: {} });
-    assert.strictEqual(actual, true);
-  });
-
   it('correctly handles random API error', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));

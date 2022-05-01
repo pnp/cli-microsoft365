@@ -11,7 +11,7 @@ m365 tenant security alerts list [options]
 ## Options
 
 `--vendor [vendor]`
-: The vendor to return alerts for. Allowed values `Azure Advanced Threat Protection`, `Azure Security Center`, `Microsoft Cloud App Security`, `Azure Active Directory Identity Protection`, `Azure Sentinel`, `Microsoft Defender ATP`. If omitted, all alerts are returned
+: The vendor to return alerts for. Possible values `Azure Advanced Threat Protection`, `Azure Security Center`, `Microsoft Cloud App Security`, `Azure Active Directory Identity Protection`, `Azure Sentinel`, `Microsoft Defender ATP`. If omitted, all alerts are returned
 
 --8<-- "docs/cmd/_global.md"
 

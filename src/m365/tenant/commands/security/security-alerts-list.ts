@@ -90,16 +90,6 @@ class TenantSecurityAlertsListCommand extends GraphCommand {
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
   }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.vendor) {
-      if (['azure advanced threat protection', 'azure security center', 'microsoft cloud app security', 'azure active directory identity protection', 'azure sentinel', 'microsoft defender atp'].indexOf(args.options.vendor.toLowerCase()) < 0) {
-        return `${args.options.vendor} is not a valid vendor. Allowed values are Azure Advanced Threat Protection, Azure Security Center, Microsoft Cloud App Security, Azure Active Directory Identity Protection, Azure Sentinel, Microsoft Defender ATP`;
-      }
-    }
-
-    return true;
-  }
 }
 
 module.exports = new TenantSecurityAlertsListCommand();
