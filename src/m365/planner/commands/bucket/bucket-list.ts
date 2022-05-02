@@ -3,9 +3,10 @@ import { Logger } from '../../../../cli';
 import {
   CommandOption
 } from '../../../../Command';
+import { accessToken, odata, validation } from '../../../../utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { odata, validation } from '../../../../utils';
+import Auth from '../../../../Auth';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -43,6 +44,11 @@ class PlannerBucketListCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+      this.handleError('This command does not support application permissions.', logger, cb);
+      return;
+    }
+    
     this
       .getPlanId(args)
       .then((planId: string): Promise<PlannerBucket[]> => odata.getAllItems<PlannerBucket>(`${this.resource}/v1.0/planner/plans/${planId}/buckets`, logger))

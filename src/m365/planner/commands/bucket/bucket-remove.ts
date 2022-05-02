@@ -4,11 +4,12 @@ import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
 } from '../../../../Command';
-import { validation } from '../../../../utils';
+import { accessToken, validation } from '../../../../utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import Auth from '../../../../Auth';
 
 interface CommandArgs {
   options: Options;
@@ -46,6 +47,11 @@ class PlannerBucketRemoveCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+      this.handleError('This command does not support application permissions.', logger, cb);
+      return;
+    }
+    
     const removeBucket: () => void = (): void => {
       this
         .getBucket(args)

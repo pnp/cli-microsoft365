@@ -1,10 +1,12 @@
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
+import { Task } from '../../Task';
+import { accessToken } from '../../../../utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { Task } from '../../Task';
+import Auth from '../../../../Auth';
 
 interface CommandArgs {
   options: Options;
@@ -24,6 +26,11 @@ class PlannerTaskGetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+      this.handleError('This command does not support application permissions.', logger, cb);
+      return;
+    }
+
     const requestOptions: any = {
       url: `${this.resource}/beta/planner/tasks/${encodeURIComponent(args.options.id)}`,
       headers: {
