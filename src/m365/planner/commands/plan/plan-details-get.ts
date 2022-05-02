@@ -1,9 +1,10 @@
 import { Group, PlannerPlan, PlannerPlanDetails } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
+import { accessToken, odata, validation } from '../../../../utils';
+import Auth from '../../../../Auth';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { odata, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -39,6 +40,11 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+      this.handleError('This command does not support application permissions.', logger, cb);
+      return;
+    }
+    
     this
       .getGroupId(args)
       .then((groupId: string): Promise<string> => {

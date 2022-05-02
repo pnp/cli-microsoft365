@@ -1,11 +1,12 @@
 import { Group, PlannerBucket, PlannerPlan, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
+import { AppliedCategories } from '../../AppliedCategories';
+import { accessToken, formatting, validation } from '../../../../utils';
+import Auth from '../../../../Auth';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { formatting, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
-import { AppliedCategories } from '../../AppliedCategories';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -68,6 +69,11 @@ class PlannerTaskSetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+      this.handleError('This command does not support application permissions.', logger, cb);
+      return;
+    }
+    
     this
       .getBucketId(args.options)
       .then(bucketId => {
