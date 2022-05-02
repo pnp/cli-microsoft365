@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { sinonUtil } from '../../../../utils';
+import { accessToken, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./bucket-add');
 
@@ -116,6 +116,7 @@ describe(commands.BUCKET_ADD, () => {
   });
 
   beforeEach(() => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets` &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -154,7 +155,8 @@ describe(commands.BUCKET_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post
+      request.post,
+      accessToken.isAppOnlyAccessToken
     ]);
   });
 
@@ -350,6 +352,26 @@ describe(commands.BUCKET_ADD, () => {
     }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified owner group does not exist`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when using app only access token', (done) => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    command.action(logger, {
+      options: {
+        name: 'My Planner Bucket',
+        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
         done();
       }
       catch (e) {
