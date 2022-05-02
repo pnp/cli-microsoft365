@@ -78,6 +78,11 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
     assert(containsTypeOption);
   });
 
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets();
+    assert.deepStrictEqual(optionSets, [['listId', 'listTitle']]);
+  });
+
   it('fails validation if the webUrl option is not a valid SharePoint site URL', (done) => {
     const actual = command.validate({ options: { webUrl: 'foo', id: 8, listTitle: 'Demo List' } });
     assert.notStrictEqual(actual, true);
@@ -87,18 +92,6 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
   it('passes validation if the webUrl option is a valid SharePoint site URL', (done) => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 8, listId: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
     assert(actual);
-    done();
-  });
-
-  it('fails validation if both listId and listTitle options are not passed', (done) => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 8 } });
-    assert.notStrictEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if both listId and listTitle options are passed', (done) => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 8, listId: '0cd891ef-afce-4e55-b836-fce03286cccf', listTitle: 'Demo List' } });
-    assert.notStrictEqual(actual, true);
     done();
   });
 

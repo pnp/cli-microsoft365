@@ -58,6 +58,12 @@ class SpoListItemRoleInHeritanceResetCommand extends SpoCommand {
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
+  public optionSets(): string[][] | undefined {
+    return [
+      ['listId', 'listTitle']
+    ];
+  }
+
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
@@ -82,14 +88,6 @@ class SpoListItemRoleInHeritanceResetCommand extends SpoCommand {
     const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
-    }
-
-    if (!args.options.listId && !args.options.listTitle) {
-      return `Specify listId or listTitle`;
-    }
-
-    if (args.options.listId && args.options.listTitle) {
-      return `Specify listId or listTitle but not both`;
     }
 
     if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
