@@ -8,10 +8,14 @@
 
 - [planner bucket remove](../cmd/planner/bucket/bucket-remove.md) - removes a Microsoft Planner bucket from a plan [#2742](https://github.com/pnp/cli-microsoft365/issues/2742)
 
+**SharePoint Online:**
+
+- [spo field list](../cmd/spo/field/field-list.md) - retrieves columns for the specified list or site [#2695](https://github.com/pnp/cli-microsoft365/issues/2695)
+
 ### Changes
 
 - added 'add multiple tasks in Planner' sample [#2245](https://github.com/pnp/cli-microsoft365/issues/2245)
-- removes testing on Node@12 [#3212](https://github.com/pnp/cli-microsoft365/issues/3212)
+- removed testing on Node@12 [#3212](https://github.com/pnp/cli-microsoft365/issues/3212)
 
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
