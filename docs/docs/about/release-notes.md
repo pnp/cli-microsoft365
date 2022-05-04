@@ -8,10 +8,19 @@
 
 - [planner bucket remove](../cmd/planner/bucket/bucket-remove.md) - removes a Microsoft Planner bucket from a plan [#2742](https://github.com/pnp/cli-microsoft365/issues/2742)
 
+**SharePoint Online:**
+
+- [spo field list](../cmd/spo/field/field-list.md) - retrieves columns for the specified list or site [#2695](https://github.com/pnp/cli-microsoft365/issues/2695)
+
+**Tenant:**
+
+- [tenant security alerts list](../cmd/tenant/security/security-alerts-list.md) - gets the security alerts for a tenant [#2635](https://github.com/pnp/cli-microsoft365/issues/2635)
+
 ### Changes
 
 - added 'add multiple tasks in Planner' sample [#2245](https://github.com/pnp/cli-microsoft365/issues/2245)
-- removes testing on Node@12 [#3212](https://github.com/pnp/cli-microsoft365/issues/3212)
+- removed testing on Node@12 [#3212](https://github.com/pnp/cli-microsoft365/issues/3212)
+- extends 'planner task get' [#3229](https://github.com/pnp/cli-microsoft365/issues/3229)
 
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
