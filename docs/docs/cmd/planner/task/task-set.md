@@ -23,10 +23,10 @@ m365 planner task set [options]
 : Name of the bucket to move the task to. The bucket needs to exist in the selected plan. Specify either `bucketId` or `bucketName` but not both.
 
 `--planId [planId]`
-: ID of the plan to move the task to. Specify either `planId` or `planName` but not both.
+: ID of the plan to which the bucket belongs to. Specify either `planId` or `planName` when using `bucketName`.
 
 `--planName [planName]`
-: Name of the plan to move the task to. Specify either `planId` or `planName` but not both.
+: Name of the plan to which the bucket belongs to. Specify either `planId` or `planName` when using `bucketName`.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.

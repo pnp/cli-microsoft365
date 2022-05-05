@@ -1,5 +1,27 @@
 # Release notes
 
+## [v5.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.3.0)
+
+### New commands
+
+**Planner:**
+
+- [planner bucket remove](../cmd/planner/bucket/bucket-remove.md) - removes a Microsoft Planner bucket from a plan [#2742](https://github.com/pnp/cli-microsoft365/issues/2742)
+
+**SharePoint Online:**
+
+- [spo field list](../cmd/spo/field/field-list.md) - retrieves columns for the specified list or site [#2695](https://github.com/pnp/cli-microsoft365/issues/2695)
+
+**Tenant:**
+
+- [tenant security alerts list](../cmd/tenant/security/security-alerts-list.md) - gets the security alerts for a tenant [#2635](https://github.com/pnp/cli-microsoft365/issues/2635)
+
+### Changes
+
+- added 'add multiple tasks in Planner' sample [#2245](https://github.com/pnp/cli-microsoft365/issues/2245)
+- removed testing on Node@12 [#3212](https://github.com/pnp/cli-microsoft365/issues/3212)
+- extends 'planner task get' [#3229](https://github.com/pnp/cli-microsoft365/issues/3229)
+
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
 ### New commands
@@ -8,6 +30,10 @@
 
 - [aad user signin list](../cmd/aad/user/user-signin-list.md) - retrieves the Azure AD user sign-ins for your tenant [#2910](https://github.com/pnp/cli-microsoft365/issues/2910)
 
+**Planner:**
+
+- [planner bucket set](../cmd/planner/bucket/bucket-set.md) - updates a Microsoft Planner bucket [#3230](https://github.com/pnp/cli-microsoft365/issues/3230)
+
 **Power Platform:**
 
 - [pp environment list](../cmd/pp/environment/environment-list.md) - lists Microsoft Power Platform environments [#3061](https://github.com/pnp/cli-microsoft365/issues/3061)
@@ -15,8 +41,9 @@
 
 **Teams:**
 
+- [teams channel member remove](../cmd/teams/channel/channel-member-remove.md) - remove the specified member from the specified Microsoft Teams private team channel [#3175](https://github.com/pnp/cli-microsoft365/issues/3175)
 - [teams channel member set](../cmd/teams/channel/channel-member-set.md) - updates the role of the specified member in the specified Microsoft Teams private team channel [#3177](https://github.com/pnp/cli-microsoft365/issues/3177)
-- [teams channel membership list](../cmd/teams/channel/channel-membership-list.md) - lists users for the specified Microsoft Teams channel [#3176](https://github.com/pnp/cli-microsoft365/issues/3176)
+- teams channel membership list - lists users for the specified Microsoft Teams channel [#3176](https://github.com/pnp/cli-microsoft365/issues/3176)
 - [teams chat get](../cmd/teams/chat/chat-get.md) - gets a Microsoft Teams chat conversation by id, participants or chat name [#3017](https://github.com/pnp/cli-microsoft365/issues/3017)
 
 ### Changes
@@ -43,6 +70,8 @@
 - corrected 'teams app install' options [#3217](https://github.com/pnp/cli-microsoft365/issues/3217)
 - changed listTitle to title in spo listitem list docs [#3099](https://github.com/pnp/cli-microsoft365/issues/3099)
 - removed react check from 'spfx doctor' command [#3162](https://github.com/pnp/cli-microsoft365/issues/3162)
+- added support for upgrading SPFx projects to 1.15.0-beta.6 [#3243](https://github.com/pnp/cli-microsoft365/issues/3243)
+- fixed options descriptions for `planner task set` [#3245](https://github.com/pnp/cli-microsoft365/issues/3245)
 
 ## [v5.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.1.0)
 
@@ -604,7 +633,7 @@
 
 **Teams:**
 
-- [teams conversationmember add](../cmd/teams/conversationmember/conversationmember-add.md) - adds a conversation member in a private channel [#1986](https://github.com/pnp/cli-microsoft365/issues/1986)
+- teams conversationmember add - adds a conversation member in a private channel [#1986](https://github.com/pnp/cli-microsoft365/issues/1986)
 
 ### Changes
 
@@ -689,7 +718,7 @@
 
 **Microsoft 365:**
 
-- [tenant auditlog report](../cmd/tenant/auditlog/auditlog-report.md) - gets audit logs from the Office 365 Management API [#1739](https://github.com/pnp/cli-microsoft365/issues/1739)
+- tenant auditlog report - gets audit logs from the Office 365 Management API [#1739](https://github.com/pnp/cli-microsoft365/issues/1739)
 
 **File:**
 
@@ -785,7 +814,7 @@
 
 **Teams:**
 
-- [teams conversationmember list](../cmd/teams/conversationmember/conversationmember-list.md) - lists all conversational members of a channel [#1880](https://github.com/pnp/cli-microsoft365/issues/1880)
+- teams conversationmember list - lists all conversational members of a channel [#1880](https://github.com/pnp/cli-microsoft365/issues/1880)
 
 **To Do:**
 
@@ -855,9 +884,9 @@
 
 **Microsoft 365:**
 
-- [tenant service list](../cmd/tenant/service/service-list.md) - gets services available in Microsoft 365 [#1740](https://github.com/pnp/cli-microsoft365/issues/1740)
-- [tenant service message list](../cmd/tenant/service/service-message-list.md) - gets service messages Microsoft 365 [#1741](https://github.com/pnp/cli-microsoft365/issues/1741)
-- [tenant service report historicalservicestatus](../cmd/tenant/service/service-report-historicalservicestatus.md) - gets the historical service status of Microsoft 365 Services of the last 7 days [#1742](https://github.com/pnp/cli-microsoft365/issues/1742)
+- tenant service list - gets services available in Microsoft 365 [#1740](https://github.com/pnp/cli-microsoft365/issues/1740)
+- tenant service message list - gets service messages Microsoft 365 [#1741](https://github.com/pnp/cli-microsoft365/issues/1741)
+- tenant service report historicalservicestatus - gets the historical service status of Microsoft 365 Services of the last 7 days [#1742](https://github.com/pnp/cli-microsoft365/issues/1742)
 
 **Outlook:**
 
@@ -1060,7 +1089,7 @@
 
 **Microsoft 365:**
 
-- [tenant status list](../cmd/tenant/status/status-list.md) - gets health status of the different services in Microsoft 365 [#1272](https://github.com/pnp/cli-microsoft365/issues/1272)
+- tenant status list - gets health status of the different services in Microsoft 365 [#1272](https://github.com/pnp/cli-microsoft365/issues/1272)
 
 **SharePoint:**
 

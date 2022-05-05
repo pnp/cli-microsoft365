@@ -40,6 +40,7 @@ export default {
   FEATURE_LIST: `${prefix} feature list`,
   FIELD_ADD: `${prefix} field add`,
   FIELD_GET: `${prefix} field get`,
+  FIELD_LIST: `${prefix} field list`,
   FIELD_REMOVE: `${prefix} field remove`,
   FIELD_SET: `${prefix} field set`,
   FILE_ADD: `${prefix} file add`,

@@ -130,6 +130,8 @@ nav:
         - report office365activationsuserdetail: 'cmd/tenant/report/report-office365activationsuserdetail.md'
         - report office365activationsusercounts: 'cmd/tenant/report/report-office365activationsusercounts.md'
         - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
+      - security:
+        - security alerts list: 'cmd/tenant/security/security-alerts-list.md'
       - service announcement:
         - serviceannouncement health get: 'cmd/tenant/serviceannouncement/serviceannouncement-health-get.md'
         - serviceannouncement health list: 'cmd/tenant/serviceannouncement/serviceannouncement-health-list.md'
@@ -183,6 +185,8 @@ nav:
         - bucket add: 'cmd/planner/bucket/bucket-add.md'
         - bucket get: 'cmd/planner/bucket/bucket-get.md'
         - bucket list: 'cmd/planner/bucket/bucket-list.md'
+        - bucket set: 'cmd/planner/bucket/bucket-set.md'
+        - bucket remove: 'cmd/planner/bucket/bucket-remove.md'
       - plan:
         - plan add: 'cmd/planner/plan/plan-add.md'
         - plan get: 'cmd/planner/plan/plan-get.md'
@@ -230,7 +234,7 @@ nav:
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Power Platform (pp):
       - environment:
-        - environment list: 'cmd/pp/managementapp/environment/environment-list.md' 
+        - environment list: 'cmd/pp/environment/environment-list.md' 
       - managementapp:
         - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
         - managementapp list: 'cmd/pp/managementapp/managementapp-list.md'
@@ -303,6 +307,7 @@ nav:
       - field:
         - field add: 'cmd/spo/field/field-add.md'
         - field get: 'cmd/spo/field/field-get.md'
+        - field list: 'cmd/spo/field/field-list.md'
         - field remove: 'cmd/spo/field/field-remove.md'
         - field set: 'cmd/spo/field/field-set.md'
       - file:
@@ -548,6 +553,7 @@ nav:
         - channel list: 'cmd/teams/channel/channel-list.md'
         - channel member add: 'cmd/teams/channel/channel-member-add.md'
         - channel member list: 'cmd/teams/channel/channel-member-list.md'
+        - channel member remove: 'cmd/teams/channel/channel-member-remove.md'
         - channel member set: 'cmd/teams/channel/channel-member-set.md'
         - channel remove: 'cmd/teams/channel/channel-remove.md'
         - channel set: 'cmd/teams/channel/channel-set.md'
@@ -665,6 +671,8 @@ nav:
       - 'Scan for Microsoft 365 Groups created with user''s first or last name' : 'sample-scripts/aad/flag-groups-with-user-names.md'
     - Microsoft Graph:
       - 'Authenticate with and call the Microsoft Graph' : 'sample-scripts/graph/call-graph.md'
+    - Planner:
+      - 'Add multiple tasks': sample-scripts/planner/add-multiple-tasks.md
     - Power Automate:
       - 'Cancel all running flow runs for a flow in an environment': 'sample-scripts/flow/cancel-all-running-flow-runs.md'
       - 'Export a single Flow to a Logic App' : 'sample-scripts/flow/export-flow-logicapp.md'
@@ -748,35 +756,35 @@ nav:
     - 'Release notes': 'about/release-notes.md'
     - License: 'about/license.md'
 theme:
-  name: 'material'
-  palette:
-    primary: 'red'
-  logo: 'images/pnp-cli-microsoft365-white.svg'
-  features:
-    - navigation.tabs
+    name: 'material'
+    palette:
+        primary: 'red'
+    logo: 'images/pnp-cli-microsoft365-white.svg'
+    features:
+        - navigation.tabs
 google_analytics:
-  - 'UA-110480857-1'
-  - 'auto'
+    - 'UA-110480857-1'
+    - 'auto'
 extra_css:
-  - 'css/styles2.css'
+    - 'css/styles2.css'
 markdown_extensions:
-  - admonition
-  - toc:
-      permalink: true
-  - pymdownx.highlight
-  - pymdownx.snippets
-  - pymdownx.superfences
-  - pymdownx.tabbed
-  - def_list
+    - admonition
+    - toc:
+          permalink: true
+    - pymdownx.highlight
+    - pymdownx.snippets
+    - pymdownx.superfences
+    - pymdownx.tabbed
+    - def_list
 extra:
-  social:
-    - icon: fontawesome/brands/github
-      link: 'https://github.com/pnp/cli-microsoft365'
-    - icon: fontawesome/brands/twitter
-      link: 'https://twitter.com/climicrosoft365'
-    - icon: fontawesome/brands/youtube
-      link: 'http://aka.ms/sppnp-videos'
-    - icon: fontawesome/solid/link
-      link: 'https://aka.ms/sppnp'
+    social:
+        - icon: fontawesome/brands/github
+          link: 'https://github.com/pnp/cli-microsoft365'
+        - icon: fontawesome/brands/twitter
+          link: 'https://twitter.com/climicrosoft365'
+        - icon: fontawesome/brands/youtube
+          link: 'http://aka.ms/sppnp-videos'
+        - icon: fontawesome/solid/link
+          link: 'https://aka.ms/sppnp'
 repo_url: http://github.com/pnp/cli-microsoft365
 edit_uri: blob/main/docs/docs
