@@ -4,7 +4,7 @@ import { odata } from "./odata";
 const graphResource = 'https://graph.microsoft.com';
 
 export const planner = {
-  async getPlansByGroupId(groupId: string): Promise<PlannerPlan[]> {
+  getPlansByGroupId(groupId: string): Promise<PlannerPlan[]> {
     return odata.getAllItems<PlannerPlan>(`${graphResource}/v1.0/groups/${groupId}/planner/plans`, undefined as any);
   }
 };

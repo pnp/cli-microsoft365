@@ -1,4 +1,4 @@
-import assert = require('assert');
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import request from "../request";
 import { planner } from './planner';
@@ -9,11 +9,11 @@ const validPlanName = 'Plan name';
 const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
 
 const singlePlanResponse = {
-  "value": [
+  value: [
     {
-      "id": validPlanId,
-      "title": validPlanName,
-      "owner": validOwnerGroupId
+      id: validPlanId,
+      title: validPlanName,
+      owner: validOwnerGroupId
     }
   ]
 };
