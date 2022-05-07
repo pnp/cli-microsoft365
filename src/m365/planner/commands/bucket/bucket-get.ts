@@ -1,4 +1,4 @@
-import { PlannerBucket } from '@microsoft/microsoft-graph-types';
+import { PlannerBucket, PlannerPlan, Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { AxiosRequestConfig } from 'axios';
 import {
@@ -16,7 +16,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id?: string;
-  title?: string;
+  name?: string;
   planId?: string;
   planName?: string;
   ownerGroupId?: string;
@@ -35,16 +35,12 @@ class PlannerBucketGetCommand extends GraphCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.title = typeof args.options.title !== 'undefined';
+    telemetryProps.name = typeof args.options.name !== 'undefined';
     telemetryProps.planId = typeof args.options.planId !== 'undefined';
     telemetryProps.planName = typeof args.options.planName !== 'undefined';
     telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
     telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
     return telemetryProps;
-  }
-
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'name', 'planId', 'orderHint'];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -58,8 +54,9 @@ class PlannerBucketGetCommand extends GraphCommand {
   }
 
   private getBucketId (args: CommandArgs): Promise<string> {
-    if (args.options.id) {
-      return Promise.resolve(args.options.id);
+    const { id, name } = args.options;
+    if (id) {
+      return Promise.resolve(id);
     }
 
     return this
@@ -73,67 +70,79 @@ class PlannerBucketGetCommand extends GraphCommand {
           responseType: 'json'
         };
 
-        return request.get<{ value: { id: string; name: string; }[] }>(requestOptions);
+        return request.get<{ value:PlannerBucket[] }>(requestOptions);
       })
-      .then(response => {
-        const bucket: { id: string; name: string; } | undefined = response.value.find(val => val.name === args.options.title);
+      .then(buckets => {
+        const filteredBuckets = buckets.value.filter(b => name!.toLowerCase() === b.name!.toLowerCase());
 
-        if (!bucket) {
-          return Promise.reject(`The specified bucket does not exist`);
+        if (!filteredBuckets.length) {
+          return Promise.reject(`The specified bucket ${name} does not exist`);
+        }
+        
+        if (filteredBuckets.length > 1) {
+          return Promise.reject(`Multiple buckets with name ${name} found: ${filteredBuckets.map(x => x.id)}`);
         }
 
-        return Promise.resolve(bucket.id);
+        return Promise.resolve(filteredBuckets[0].id!.toString());
       });     
   }
 
   private getPlanId(args: CommandArgs): Promise<string> {
-    if (args.options.planId) {
-      return Promise.resolve(args.options.planId);
+    const { planId, planName } = args.options;
+
+    if (planId) {
+      return Promise.resolve(planId);
     }
 
     return this
       .getGroupId(args)
-      .then((groupId: string) => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/plans?$filter=(owner eq '${groupId}')`,
+      .then(groupId => {
+        const requestOptions: AxiosRequestConfig = {
+          url: `${this.resource}/v1.0/planner/plans?$filter=owner eq '${groupId}'`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json'
         };
 
-        return request.get<{ value: { id: string; title: string; }[] }>(requestOptions);
+        return request.get<{ value: PlannerPlan[] }>(requestOptions);
       })
-      .then(response => {
-        const plan: { id: string; title: string; } | undefined = response.value.find(val => val.title === args.options.planName);
+      .then(plans => {
+        const filteredPlans = plans.value.filter(p => p.title!.toLowerCase() === planName!.toLowerCase());
 
-        if (!plan) {
-          return Promise.reject(`The specified plan does not exist`);
+        if (filteredPlans.length === 0) {
+          return Promise.reject(`The specified plan ${planName} does not exist`);
         }
 
-        return Promise.resolve(plan.id);
+        if (filteredPlans.length > 1) {
+          return Promise.reject(`Multiple plans with name ${planName} found: ${filteredPlans.map(x => x.id)}`);
+        }
+
+        return Promise.resolve(filteredPlans[0].id!);
       });
   }
 
   private async getBucketById(id: string): Promise<PlannerBucket> {
     const requestOptions: AxiosRequestConfig = {
-      url: `${this.resource}/v1.0/planner/buckets/${encodeURIComponent(id)}`,
+      url: `${this.resource}/v1.0/planner/buckets/${id}`,
       headers: {
-        accept: 'application/json;odata.metadata=none'
+        accept: 'application/json'
       },
-      responseType: 'json'      
+      responseType: 'json'
     };
 
     return request.get<PlannerBucket>(requestOptions);    
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {
-    if (args.options.ownerGroupId) {
-      return Promise.resolve(args.options.ownerGroupId);
+    const { ownerGroupId, ownerGroupName } = args.options;
+
+    if (ownerGroupId) {
+      return Promise.resolve(ownerGroupId);
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.ownerGroupName as string)}'`,
+      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(ownerGroupName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -141,15 +150,17 @@ class PlannerBucketGetCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: { id: string; }[] }>(requestOptions)
+      .get<{ value: Group[] }>(requestOptions)
       .then(response => {
-        const group: { id: string; } | undefined = response.value[0];
-
-        if (!group) {
-          return Promise.reject(`The specified owner group does not exist`);
+        if (!response.value.length) {
+          return Promise.reject(`The specified owner group ${ownerGroupName} does not exist`);
         }
 
-        return Promise.resolve(group.id);
+        if (response.value.length > 1) {
+          return Promise.reject(`Multiple owner groups with name ${ownerGroupName} found: ${response.value.map(x => x.id)}`);
+        }
+
+        return Promise.resolve(response.value[0].id!);
       });
   }
 
@@ -159,7 +170,7 @@ class PlannerBucketGetCommand extends GraphCommand {
         option: '-i, --id [id]'
       },
       {
-        option: '-t, --title [title]'
+        option: '--name [name]'
       },
       {
         option: '--planId [planId]'
@@ -180,32 +191,43 @@ class PlannerBucketGetCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!args.options.id && !args.options.title) {
-      return 'Specify either id or title';
+    if (args.options.id) {
+      if (args.options.planId || args.options.planName || args.options.ownerGroupId || args.options.ownerGroupName) {
+        return 'Don\'t specify planId, planName, ownerGroupId or ownerGroupName when using id';
+      }
+      if (args.options.name) {
+        return 'Specify either id or name';
+      }
     }
 
-    if (args.options.id && args.options.title) {
-      return 'Specify either id or title';
-    }
+    if (args.options.name) {
+      if (!args.options.planId && !args.options.planName) {
+        return 'Specify either planId or planName when using name';
+      }
 
-    if (args.options.title && !args.options.planId && !args.options.planName) {
-      return 'Specify either planId or planName';
-    }
+      if (args.options.planId && args.options.planName) {
+        return 'Specify either planId or planName when using name but not both';
+      }
 
-    if (args.options.title && args.options.planId && args.options.planName) {
-      return 'Specify either planId or planName but not both';
-    }
+      if (args.options.planName) {
+        if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName when using planName';
+        }
 
-    if (args.options.title && args.options.planName && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName';
-    }
+        if (args.options.ownerGroupId && args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
+        }
 
-    if (args.options.title && args.options.planName && args.options.ownerGroupId && args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
-    }
-
-    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-      return `${args.options.ownerGroupId} is not a valid GUID`;
+        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
+          return `${args.options.ownerGroupId} is not a valid GUID`;
+        }
+      }
+      
+      if (args.options.planId) {
+        if (args.options.ownerGroupId || args.options.ownerGroupName) {
+          return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
+        }
+      }
     }
 
     return true;

@@ -10,123 +10,92 @@ import commands from '../../commands';
 const command: Command = require('./bucket-get');
 
 describe(commands.BUCKET_GET, () => {
-  const bucketGetResponseValue = {
-    "name": "Planner Bucket A",
-    "planId": "iVPMIgdku0uFlou-KLNg6MkAE1O2",
-    "orderHint": "85752723360752+",
-    "id": "FtzysDykv0-9s9toWiZhdskAD67z"
-  };
-  
-  const bucketsInPlan = {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.plannerBucket)",
-    "@odata.count": 2,
-    "value":[
+
+  const validBucketId = 'vncYUXCRBke28qMLB-d4xJcACtNz';
+  const validBucketName = 'Bucket name';
+  const validPlanId = 'oUHpnKBFekqfGE_PS6GGUZcAFY7b';
+  const validPlanName = 'Plan name';
+  const validOwnerGroupName = 'Group name';
+  const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
+  const invalidOwnerGroupId = 'Invalid GUID';
+
+  const singleGroupResponse = {
+    "value": [
       {
-        "@odata.etag": "W/\"JzEtQnVja2V0QEBAQEBAQEBAQEBAQEBAcCc=\"",
-        "name": "Planner Bucket A",
-        "planId": "iVPMIgdku0uFlou-KLNg6MkAE1O2",
-        "orderHint": "858553C",
-        "id": "FtzysDykv0-9s9toWiZhdskAD67z"
-      },
-      {
-        "@odata.etag": "W/\"JzEtQnVja2V0QEBAQEBAQEBAQEBAQEBAcCc=\"",
-        "name": "Planner Bucket B",
-        "planId": "iVPMIgdku0uFlou-KLNg6MkAE1O2",
-        "orderHint": "8585567758821058646P:",
-        "id": "4Hb4fpEt2kiBIIKXPWPSs5gAL-RL"
+        "id": validOwnerGroupId,
+        "displayName": validOwnerGroupName
       }
     ]
   };
 
-  const groupByDisplayNameResponse: any = {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
+  const multipleGroupResponse = {
     "value": [
       {
-        "id": "0d0402ee-970f-4951-90b5-2f24519d2e40",
-        "deletedDateTime": null,
-        "classification": null,
-        "createdDateTime": "2021-06-08T11:04:45Z",
-        "creationOptions": [],
-        "description": "My Planner Group",
-        "displayName": "My Planner Group",
-        "expirationDateTime": null,
-        "groupTypes": [
-          "Unified"
-        ],
-        "isAssignableToRole": null,
-        "mail": "MyPlannerGroup@contoso.onmicrosoft.com",
-        "mailEnabled": true,
-        "mailNickname": "My Planner Group",
-        "membershipRule": null,
-        "membershipRuleProcessingState": null,
-        "onPremisesDomainName": null,
-        "onPremisesLastSyncDateTime": null,
-        "onPremisesNetBiosName": null,
-        "onPremisesSamAccountName": null,
-        "onPremisesSecurityIdentifier": null,
-        "onPremisesSyncEnabled": null,
-        "preferredDataLocation": null,
-        "preferredLanguage": null,
-        "proxyAddresses": [
-          "SPO:SPO_e13f6193-fb01-43e8-8e8d-557796b82ebf@SPO_cc6fafe9-dd93-497c-b521-1d971b1471c7",
-          "SMTP:MyPlannerGroup@contoso.onmicrosoft.com"
-        ],
-        "renewedDateTime": "2021-06-08T11:04:45Z",
-        "resourceBehaviorOptions": [],
-        "resourceProvisioningOptions": [],
-        "securityEnabled": false,
-        "securityIdentifier": "S-1-12-1-218366702-1230083855-573552016-1076796785",
-        "theme": null,
-        "visibility": "Private",
-        "onPremisesProvisioningErrors": []
+        "id": validOwnerGroupId,
+        "displayName": validOwnerGroupName
+      },
+      {
+        "id": validOwnerGroupId,
+        "displayName": validOwnerGroupName
       }
     ]
   };
 
-  const plansInOwnerGroup: any = {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#planner/plans",
-    "@odata.count": 2,
+  const singlePlanResponse = {
     "value": [
       {
-        "@odata.etag": "W/\"JzEtUGxhbiAgQEBAQEBAQEBAQEBAQEBASCc=\"",
-        "createdDateTime": "2021-06-08T12:24:57.3312829Z",
-        "owner": "f3f985d0-a4e0-4891-83f6-08d88bf44e5e",
-        "title": "My Planner Plan",
-        "id": "iVPMIgdku0uFlou-KLNg6MkAE1O2",
-        "createdBy": {
-          "user": {
-            "displayName": null,
-            "id": "73829066-5f0a-4745-8f72-12a17bacadea"
-          },
-          "application": {
-            "displayName": null,
-            "id": "09abbdfd-ed25-47ee-a2d9-a627aa1c90f3"
-          }
-        }
+        "id": validPlanId,
+        "title": validPlanName
+      }
+    ]
+  };
+
+  const multiplePlanResponse = {
+    "value": [
+      {
+        "id": validPlanId,
+        "title": validPlanName
       },
       {
-        "@odata.etag": "W/\"JzEtUGxhbiAgQEBAQEBAQEBAQEBAQEBASCc=\"",
-        "createdDateTime": "2021-06-08T12:25:09.3751058Z",
-        "owner": "f3f985d0-a4e0-4891-83f6-08d88bf44e5e",
-        "title": "Sample Plan",
-        "id": "uO1bj3fdekKuMitpeJqaj8kADBxO",
-        "createdBy": {
-          "user": {
-            "displayName": null,
-            "id": "73829066-5f0a-4745-8f72-12a17bacadea"
-          },
-          "application": {
-            "displayName": null,
-            "id": "09abbdfd-ed25-47ee-a2d9-a627aa1c90f3"
-          }
-        }
+        "id": validPlanId,
+        "title": validPlanName
+      }
+    ]
+  };
+
+  const singleBucketByNameResponse = {
+    "value": [
+      {
+        "@odata.etag": "W/\"JzEtQnVja2V0QEBAQEBAQEBAQEBAQEBARCc=\"",
+        "name": validBucketName,
+        "id": validBucketId
+      }
+    ]
+  };
+
+  const singleBucketByIdResponse = {
+    "@odata.etag": "W/\"JzEtQnVja2V0QEBAQEBAQEBAQEBAQEBARCc=\"",
+    "name": validBucketName,
+    "id": validBucketId
+  };
+
+  const multipleBucketByNameResponse = {
+    "value": [
+      {
+        "@odata.etag": "W/\"JzEtQnVja2V0QEBAQEBAQEBAQEBAQEBARCc=\"",
+        "name": validBucketName,
+        "id": validBucketId
+      },
+      {
+        "@odata.etag": "W/\"JzEtQnVja2V0QEBAQEBAQEBAQEBAQEBARCc=\"",
+        "name": validBucketName,
+        "id": validBucketId
       }
     ]
   };
 
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -135,21 +104,6 @@ describe(commands.BUCKET_GET, () => {
   });
 
   beforeEach(() => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
-        return Promise.resolve(groupByDisplayNameResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
-        return Promise.resolve(plansInOwnerGroup);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets`) {
-        return Promise.resolve(bucketsInPlan);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z`) {
-        return Promise.resolve(bucketGetResponseValue);
-      }
-      return Promise.reject('Invalid Request');
-    });
     log = [];
     logger = {
       log: (msg: string) => {
@@ -162,13 +116,13 @@ describe(commands.BUCKET_GET, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      request.patch
     ]);
   });
 
@@ -177,7 +131,6 @@ describe(commands.BUCKET_GET, () => {
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
-    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -188,247 +141,139 @@ describe(commands.BUCKET_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id', 'name', 'planId', 'orderHint']);
-  });
-
-  it('fails validation if neither the id nor title are provided.', (done) => {
+  it('fails validation when id and name are specified', () => {
     const actual = command.validate({
       options: {
-        debug: true
+        id: validBucketId,
+        name: validBucketName
       }
     });
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both Id and title are specified', (done) => {
+  it('fails validation when id and plan details are specified', () => {
     const actual = command.validate({
       options: {
-        id: 'FtzysDykv0-9s9toWiZhdskAD67z',
-        title: 'Planner Bucket A'
+        id: validBucketId,
+        planId: validPlanId
       }
     });
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when planName is specified without ownerGroupId or ownerGroupName', (done) => {
+  it('fails validation when name is used without plan id or planname', () => {
     const actual = command.validate({
       options: {
-        title: 'Planner Bucket A',
-        planName: 'My Planner Plan'
+        name: validBucketName
       }
     });
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when planName is specified with both ownerGroupId and ownerGroupName', (done) => {
+  it('fails validation when name is used with both plan id and planname', () => {
     const actual = command.validate({
       options: {
-        title: "Planner Bucket A",
-        planName: 'My Planner Plan',
-        ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
-        ownerGroupName: 'My Planner Group'
+        name: validBucketName,
+        planId: validPlanId,
+        planName: validPlanName
       }
     });
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid planId with title is specified', (done) => {
+  it('fails validation when plan name is used without owner group name or owner group id', () => {
     const actual = command.validate({
       options: {
-        title: 'Planner Bucket A',
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
+        name: validBucketName,
+        planName: validPlanName
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when name is used with both owner group name and owner group id', () => {
+    const actual = command.validate({
+      options: {
+        name: validBucketName,
+        planName: validPlanName,
+        ownerGroupName: validOwnerGroupName,
+        ownerGroupId: validOwnerGroupId
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when owner group id is not a guid', () => {
+    const actual = command.validate({
+      options: {
+        name: validBucketName,
+        planName: validPlanName,
+        ownerGroupId: invalidOwnerGroupId
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when plan id is used with owner group name', () => {
+    const actual = command.validate({
+      options: {
+        name: validBucketName,
+        planId: validPlanId,
+        ownerGroupName: validOwnerGroupName
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when plan id is used with owner group id', () => {
+    const actual = command.validate({
+      options: {
+        name: validBucketName,
+        planId: validPlanId,
+        ownerGroupId: validOwnerGroupId
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('validates for a correct input with id', () => {
+    const actual = command.validate({
+      options: {
+        id: validBucketId
       }
     });
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid title, planName, ownerGroupId are specified', (done) => {
+  it('validates for a correct input with name', () => {
     const actual = command.validate({
       options: {
-        title: 'Planner Bucket A',
-        planName: 'My Planner Plan',
-        ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
+        name: validBucketName,
+        planName: validPlanName,
+        ownerGroupName: validOwnerGroupName
       }
     });
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid title, planName and ownerGroupName are specified', (done) => {
-    const actual = command.validate({
-      options: {
-        title: 'Planner Bucket A',
-        planName: 'My Planner Plan',
-        ownerGroupName: 'My Planner Group'
-      }
-    });
-    assert.strictEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if the ownerGroupId is not a valid guid.', (done) => {
-    const actual = command.validate({
-      options: {
-        title: 'Planner Bucket A',
-        planName: 'My Planner Plan',
-        ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    });
-    assert.notStrictEqual(actual, true);
-    done();
-  });
-
-  it('correctly gets planner buckets with Id', (done) => {
-    const options: any = {
-      debug: false,
-      id: 'FtzysDykv0-9s9toWiZhdskAD67z'
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(bucketGetResponseValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('correctly gets planner bucket with title, planName and ownerGroupName', (done) => {
-    const options: any = {
-      debug: false,
-      title: 'Planner Bucket A',
-      planName: 'My Planner Plan',
-      ownerGroupName: 'My Planner Group'
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(bucketGetResponseValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('correctly gets planner bucket with title, planId', (done) => {
-    const options: any = {
-      debug: false,
-      title: 'Planner Bucket A',
-      planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(bucketGetResponseValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-  
-  it('correctly gets planner bucket with title, planName, ownerGroupId ', (done) => {
-    const options: any = {
-      debug: false,
-      title: 'Planner Bucket A',
-      planName: 'My Planner Plan',
-      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(bucketGetResponseValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails validation when ownerGroupName not found', (done) => {
-    sinonUtil.restore(request.get);
+  it('fails validation when no groups found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
-        return Promise.resolve({ value: [] });
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+        return Promise.resolve({"value": []});
       }
-      return Promise.reject('Invalid request');
-    });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        title: 'Planner Bucket A',
-        planName: 'My Planner Plan',
-        ownerGroupName: 'foo'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified owner group does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails validation if neither the planId nor planName are provided.', (done) => {
-    const actual = command.validate({
-      options: {
-        debug: true,
-        title: 'Planner Bucket A'
-      }
-    });
-    assert.notStrictEqual(actual, true);
-    done();
-  });
-
-  it('fails validation when both planId and planName are specified', (done) => {
-    const actual = command.validate({
-      options: {
-        title: 'Planner Bucket A',
-        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        planName: 'My Planner'
-      }
-    });
-    assert.notStrictEqual(actual, true);
-    done();
-  });
-
-  it('fails validation when planName not found', (done) => {
-    sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
-        return Promise.resolve(groupByDisplayNameResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
-        return Promise.resolve({ value: [] });
-      }
       return Promise.reject('Invalid Request');
     });
 
     command.action(logger, {
       options: {
-        debug: false,
-        title: 'Planner Bucket A',
-        planName: 'My Planner',
-        ownerGroupName: 'My Planner Group'
+        name: validBucketName,
+        planName: validPlanName,
+        ownerGroupName: validOwnerGroupName
       }
     }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified plan does not exist`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified owner group ${validOwnerGroupName} does not exist`)));
         done();
       }
       catch (e) {
@@ -437,31 +282,24 @@ describe(commands.BUCKET_GET, () => {
     });
   });
 
-  it('fails validation when bucket is not found', (done) => {
-    sinonUtil.restore(request.get);
+  it('fails validation when multiple groups found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
-        return Promise.resolve(groupByDisplayNameResponse);
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+        return Promise.resolve(multipleGroupResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
-        return Promise.resolve(plansInOwnerGroup);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets`) {
-        return Promise.resolve({ value: [] });
-      }
+
       return Promise.reject('Invalid Request');
     });
 
     command.action(logger, {
       options: {
-        debug: false,
-        title: 'foo',
-        planName: 'My Planner Plan',
-        ownerGroupName: 'My Planner Group'
+        name: validBucketName,
+        planName: validPlanName,
+        ownerGroupName: validOwnerGroupName
       }
     }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified bucket does not exist`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple owner groups with name ${validOwnerGroupName} found: ${multipleGroupResponse.value.map(x => x.id)}`)));
         done();
       }
       catch (e) {
@@ -470,15 +308,159 @@ describe(commands.BUCKET_GET, () => {
     });
   });
 
-  it('correctly handles API OData error', (done) => {
-    sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject("An error has occurred.");
+  it('fails validation when no plans found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=owner eq '${validOwnerGroupId}'`) {
+        return Promise.resolve({"value": []});
+      }
+
+      return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
+    command.action(logger, {
+      options: {
+        name: validBucketName,
+        planName: validPlanName,
+        ownerGroupId: validOwnerGroupId
+      }
+    }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified plan ${validPlanName} does not exist`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when multiple plans found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=owner eq '${validOwnerGroupId}'`) {
+        return Promise.resolve(multiplePlanResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        name: validBucketName,
+        planName: validPlanName,
+        ownerGroupId: validOwnerGroupId
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple plans with name ${validPlanName} found: ${multiplePlanResponse.value.map(x => x.id)}`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when no buckets found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+        return Promise.resolve({"value": [] });
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        name: validBucketName,
+        planId: validPlanId
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified bucket ${validBucketName} does not exist`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when multiple buckets found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+        return Promise.resolve(multipleBucketByNameResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        name: validBucketName,
+        planId: validPlanId
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple buckets with name ${validBucketName} found: ${multipleBucketByNameResponse.value.map(x => x.id)}`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Correctly gets bucket by id', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
+        return Promise.resolve(singleBucketByIdResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        id: validBucketId
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', err?.message);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Correctly gets bucket by name', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+        return Promise.resolve(singleGroupResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=owner eq '${validOwnerGroupId}'`) {
+        return Promise.resolve(singlePlanResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+        return Promise.resolve(singleBucketByNameResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
+        return Promise.resolve(singleBucketByIdResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+    
+    command.action(logger, {
+      options: {
+        name: validBucketName,
+        planName: validPlanName,
+        ownerGroupName: validOwnerGroupName
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', err?.message);
         done();
       }
       catch (e) {
