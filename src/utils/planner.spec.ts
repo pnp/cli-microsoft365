@@ -8,15 +8,12 @@ const validPlanId = 'oUHpnKBFekqfGE_PS6GGUZcAFY7b';
 const validPlanName = 'Plan name';
 const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
 
-const multiplePlanResponse = {
+const singlePlanResponse = {
   "value": [
     {
       "id": validPlanId,
-      "title": validPlanName
-    },
-    {
-      "id": validPlanId,
-      "title": validPlanName
+      "title": validPlanName,
+      "owner": validOwnerGroupId
     }
   ]
 };
@@ -30,14 +27,14 @@ describe('utils/planner', () => {
 
   it('correctly get all plans related to a specific group.', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=owner eq '${validOwnerGroupId}'`) {
-        return multiplePlanResponse;
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return singlePlanResponse;
       }
 
       return 'Invalid Request';
     });
 
     const actual = await planner.getPlansByGroupId(validOwnerGroupId);
-    assert.strictEqual(actual, multiplePlanResponse.value);
+    assert.strictEqual(actual, singlePlanResponse.value);
   });
 });

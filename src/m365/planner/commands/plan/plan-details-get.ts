@@ -3,7 +3,8 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { odata, validation } from '../../../../utils';
+import { validation } from '../../../../utils';
+import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -43,7 +44,7 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
       .getGroupId(args)
       .then((groupId: string): Promise<string> => {
         this.groupId = groupId;
-        return this.getPlanId(args, logger);
+        return this.getPlanId(args);
       })
       .then((planId: string): Promise<PlannerPlanDetails> => {
         args.options.planId = planId;
@@ -89,13 +90,13 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
       });
   }
 
-  private getPlanId(args: CommandArgs, logger: Logger): Promise<string> {
+  private getPlanId(args: CommandArgs): Promise<string> {
     if (args.options.planId) {
       return Promise.resolve(args.options.planId);
     }
 
-    return odata
-      .getAllItems<PlannerPlan>(`${this.resource}/v1.0/groups/${this.groupId}/planner/plans`, logger)
+    return planner
+      .getPlansByGroupId(this.groupId)
       .then((plans: PlannerPlan[]): Promise<string> => {
         const plansMatchingName = plans.filter((plan: PlannerPlan) => plan.title === args.options.planTitle);
 
