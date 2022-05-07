@@ -22,11 +22,10 @@ export const odata = {
   async getAllItems<T>(url: string, logger: Logger, metadata?: 'none' | 'minimal' | 'full'): Promise<T[]> {
     let items: T[] = [];
 
-    metadata ??= 'none';
     const requestOptions: any = {
       url: url,
       headers: {
-        accept: `application/json;odata.metadata=${metadata}`
+        accept: `application/json;odata.metadata=${metadata ?? 'none'}`
       },
       responseType: 'json'
     };
