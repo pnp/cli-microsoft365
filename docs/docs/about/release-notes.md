@@ -11,6 +11,8 @@
 **SharePoint Online:**
 
 - [spo field list](../cmd/spo/field/field-list.md) - retrieves columns for the specified list or site [#2695](https://github.com/pnp/cli-microsoft365/issues/2695)
+- [spo list roleinheritance break](../cmd/spo/list/list-roleinheritance-break.md) - breaks role inheritance on list or library [#3198](https://github.com/pnp/cli-microsoft365/issues/3198)
+- [spo list roleinheritance reset](../cmd/spo/list/list-roleinheritance-reset.md) - restores role inheritance on list or library [#3220](https://github.com/pnp/cli-microsoft365/issues/3220)
 
 **Tenant:**
 
@@ -20,7 +22,7 @@
 
 - added 'add multiple tasks in Planner' sample [#2245](https://github.com/pnp/cli-microsoft365/issues/2245)
 - removed testing on Node@12 [#3212](https://github.com/pnp/cli-microsoft365/issues/3212)
-- extends 'planner task get' [#3229](https://github.com/pnp/cli-microsoft365/issues/3229)
+- extended 'planner task get' [#3229](https://github.com/pnp/cli-microsoft365/issues/3229)
 
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
