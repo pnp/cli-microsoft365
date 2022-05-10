@@ -14,7 +14,7 @@ const getRequestOptions = (url: string, metadata: 'none' | 'minimal' | 'full'): 
 
 export const aadGroup = {
   /**
-   * Retrieve a unique group.
+   * Retrieve a single group.
    * @param id Group ID.
    */
   async getGroupById(id: string): Promise<Group> {
