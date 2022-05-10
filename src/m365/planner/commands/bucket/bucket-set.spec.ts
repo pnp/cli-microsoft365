@@ -51,19 +51,6 @@ describe(commands.BUCKET_SET, () => {
     ]
   };
 
-  const multiplePlanResponse = {
-    "value": [
-      {
-        "id": validPlanId,
-        "title": validPlanName
-      },
-      {
-        "id": validPlanId,
-        "title": validPlanName
-      }
-    ]
-  };
-
   const singleBucketByNameResponse = {
     "value": [
       {
@@ -338,58 +325,6 @@ describe(commands.BUCKET_SET, () => {
     });
   });
 
-  it('fails validation when no plans found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=owner eq '${validOwnerGroupId}'`) {
-        return Promise.resolve({"value": []});
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    command.action(logger, {
-      options: {
-        name: validBucketName,
-        planName: validPlanName,
-        ownerGroupId: validOwnerGroupId
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified plan ${validPlanName} does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails validation when multiple plans found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=owner eq '${validOwnerGroupId}'`) {
-        return Promise.resolve(multiplePlanResponse);
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    command.action(logger, {
-      options: {
-        name: validBucketName,
-        planName: validPlanName,
-        ownerGroupId: validOwnerGroupId
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple plans with name ${validPlanName} found: ${multiplePlanResponse.value.map(x => x.id)}`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('fails validation when no buckets found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
@@ -477,7 +412,7 @@ describe(commands.BUCKET_SET, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
         return Promise.resolve(singleGroupResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=owner eq '${validOwnerGroupId}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return Promise.resolve(singlePlanResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
@@ -499,6 +434,44 @@ describe(commands.BUCKET_SET, () => {
         name: validBucketName,
         planName: validPlanName,
         ownerGroupName: validOwnerGroupName,
+        newName: 'New bucket name',
+        orderHint: validOrderHint
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', err?.message);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Correctly updates bucket by name with group ID', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return Promise.resolve(singlePlanResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+        return Promise.resolve(singleBucketByNameResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        name: validBucketName,
+        planName: validPlanName,
+        ownerGroupId: validOwnerGroupId,
         newName: 'New bucket name',
         orderHint: validOrderHint
       }

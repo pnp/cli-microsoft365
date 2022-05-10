@@ -37,7 +37,7 @@ class TeamsChatMessageListCommand extends GraphCommand {
     const endpoint: string = `${this.resource}/v1.0/chats/${args.options.chatId}/messages`;
 
     odata
-      .getAllItems<ExtendedMessage>(endpoint, logger)
+      .getAllItems<ExtendedMessage>(endpoint)
       .then((items): void => {
         if (args.options.output !== 'json') {
           items.forEach(i => {

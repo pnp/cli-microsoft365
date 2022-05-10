@@ -1,10 +1,11 @@
-import { Group, PlannerPlan, PlannerPlanDetails } from '@microsoft/microsoft-graph-types';
+import { Group, PlannerPlanDetails } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
-import { accessToken, odata, validation } from '../../../../utils';
+import { accessToken, validation } from '../../../../utils';
 import Auth from '../../../../Auth';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -49,7 +50,7 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
       .getGroupId(args)
       .then((groupId: string): Promise<string> => {
         this.groupId = groupId;
-        return this.getPlanId(args, logger);
+        return this.getPlanId(args);
       })
       .then((planId: string): Promise<PlannerPlanDetails> => {
         args.options.planId = planId;
@@ -95,26 +96,14 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
       });
   }
 
-  private getPlanId(args: CommandArgs, logger: Logger): Promise<string> {
+  private getPlanId(args: CommandArgs): Promise<string> {
     if (args.options.planId) {
       return Promise.resolve(args.options.planId);
     }
 
-    return odata
-      .getAllItems<PlannerPlan>(`${this.resource}/v1.0/groups/${this.groupId}/planner/plans`, logger)
-      .then((plans: PlannerPlan[]): Promise<string> => {
-        const plansMatchingName = plans.filter((plan: PlannerPlan) => plan.title === args.options.planTitle);
-
-        if (plansMatchingName && plansMatchingName.length > 0) {
-          if (plansMatchingName.length > 1) {
-            return Promise.reject(`Multiple plans with name ${args.options.planTitle} found: ${plansMatchingName.map(x => x.id)}`);
-          }
-
-          return Promise.resolve(plansMatchingName[0].id as string);
-        }
-
-        return Promise.reject(`The specified plan title does not exist`);
-      });
+    return planner
+      .getPlanByName(args.options.planTitle!, this.groupId)
+      .then(plan => plan.id!);
   }
 
   private getPlanDetails(args: CommandArgs): Promise<PlannerPlanDetails> {

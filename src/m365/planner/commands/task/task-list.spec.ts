@@ -271,7 +271,7 @@ describe(commands.TASK_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
         return Promise.resolve(groupByDisplayNameResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
         return Promise.resolve(plansInOwnerGroup);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets`) {
@@ -561,7 +561,7 @@ describe(commands.TASK_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
         return Promise.resolve(groupByDisplayNameResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
         return Promise.resolve(plansInOwnerGroup);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
@@ -598,56 +598,6 @@ describe(commands.TASK_LIST, () => {
     }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified bucket does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails validation when planName not found', (done) => {
-    sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
-        return Promise.resolve(groupByDisplayNameResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets`) {
-        return Promise.resolve(bucketListResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
-        return Promise.resolve(taskListResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
-        return Promise.resolve(taskListResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/planner/tasks`) {
-        return Promise.resolve(taskListResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/beta/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/tasks`) {
-        return Promise.resolve(taskListBetaResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/beta/planner/buckets/FtzysDykv0-9s9toWiZhdskAD67z/tasks`) {
-        return Promise.resolve(taskListBetaResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/beta/me/planner/tasks`) {
-        return Promise.resolve(taskListBetaResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
-        return Promise.resolve({ value: [] });
-      }
-      return Promise.reject('Invalid Request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: false,
-        planName: 'foo',
-        ownerGroupName: 'My Planner Group'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified plan does not exist`)));
         done();
       }
       catch (e) {

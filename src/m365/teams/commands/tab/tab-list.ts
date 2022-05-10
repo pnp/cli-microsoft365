@@ -34,7 +34,7 @@ class TeamsTabListCommand extends GraphCommand {
     const endpoint: string = `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${encodeURIComponent(args.options.channelId)}/tabs?$expand=teamsApp`;
 
     odata
-      .getAllItems<Tab>(endpoint, logger)
+      .getAllItems<Tab>(endpoint)
       .then((items): void => {
         items.forEach(i => {
           (i as any).teamsAppTabId = i.teamsApp.id;

@@ -1,10 +1,11 @@
-import { Group, PlannerBucket, PlannerPlan, PlannerTask } from '@microsoft/microsoft-graph-types';
+import { Group, PlannerBucket, PlannerTask } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import { accessToken } from '../../../../utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
+import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import Auth from '../../../../Auth';
@@ -133,31 +134,8 @@ class PlannerTaskGetCommand extends GraphCommand {
 
     return this
       .getGroupId(options)
-      .then((groupId: string) => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/plans?$filter=owner eq '${groupId}'&$select=id,title`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-
-        return request.get<{ value: PlannerPlan[] }>(requestOptions);
-      })
-      .then((response) => {
-        const planName = options.planName as string;
-        const plans: PlannerPlan[] | undefined = response.value.filter(val => val.title?.toLocaleLowerCase() === planName.toLocaleLowerCase());
-        
-        if (!plans.length) {
-          return Promise.reject(`The specified plan ${options.planName} does not exist`);
-        }
-
-        if (plans.length > 1) {
-          return Promise.reject(`Multiple plans with name ${options.planName} found: ${plans.map(x => x.id)}`);
-        }
-
-        return Promise.resolve(plans[0].id as string);
-      });
+      .then(groupId => planner.getPlanByName(options.planName!, groupId))
+      .then(plan => plan.id!);
   }
 
   private getGroupId(options: Options): Promise<string> {

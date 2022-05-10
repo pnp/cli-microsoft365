@@ -108,14 +108,14 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     }    
 
     return args.options.userEmails 
-      ? this.ensureChatIdByUserEmails(args.options.userEmails, logger)
-      : this.getChatIdByName(args.options.chatName as string, logger);
+      ? this.ensureChatIdByUserEmails(args.options.userEmails)
+      : this.getChatIdByName(args.options.chatName as string);
   }
 
-  private async ensureChatIdByUserEmails(userEmailsOption: string, logger: Logger): Promise<string> {
+  private async ensureChatIdByUserEmails(userEmailsOption: string): Promise<string> {
     const userEmails = chatUtil.convertParticipantStringToArray(userEmailsOption);
     const currentUserEmail = accessToken.getUserNameFromAccessToken(Auth.service.accessTokens[this.resource].accessToken).toLowerCase();
-    const existingChats = await chatUtil.findExistingChatsByParticipants([currentUserEmail, ...userEmails], logger);
+    const existingChats = await chatUtil.findExistingChatsByParticipants([currentUserEmail, ...userEmails]);
     
     if (!existingChats || existingChats.length === 0) {
       const chat = await this.createConversation([currentUserEmail, ...userEmails]);
@@ -133,8 +133,8 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     throw new Error(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`);
   }
 
-  private async getChatIdByName(chatName: string, logger: Logger): Promise<string> {
-    const existingChats = await chatUtil.findExistingGroupChatsByName(chatName, logger);
+  private async getChatIdByName(chatName: string): Promise<string> {
+    const existingChats = await chatUtil.findExistingGroupChatsByName(chatName);
 
     if (!existingChats || existingChats.length === 0) {
       throw new Error('No chat conversation was found with this name.');

@@ -36,7 +36,7 @@ class TeamsMessageListCommand extends GraphCommand {
     const endpoint: string = `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${args.options.channelId}/messages${deltaExtension}`;
 
     odata
-      .getAllItems<Message>(endpoint, logger)
+      .getAllItems<Message>(endpoint)
       .then((items): void => {
         if (args.options.output !== 'json') {
           items.forEach(i => {

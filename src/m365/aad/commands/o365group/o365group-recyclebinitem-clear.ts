@@ -34,7 +34,7 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const clearO365GroupRecycleBinItems: () => void = (): void => {
-      this.processRecycleBinItemsClear(logger).then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      this.processRecycleBinItemsClear().then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
     };
 
     if (args.options.confirm) {
@@ -57,13 +57,13 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphCommand {
     }
   }
 
-  public processRecycleBinItemsClear(logger: Logger): Promise<any> {
+  public processRecycleBinItemsClear(): Promise<any> {
     const filter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
     const topCount: string = '&$top=100';
     const endpoint: string = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${filter}${topCount}`;
 
     return odata
-      .getAllItems<DirectoryObject>(endpoint, logger)
+      .getAllItems<DirectoryObject>(endpoint)
       .then((recycleBinItems): Promise<any> => {
         if (recycleBinItems.length === 0) {
           return Promise.resolve();

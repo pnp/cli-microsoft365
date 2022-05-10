@@ -54,19 +54,6 @@ describe(commands.TASK_GET, () => {
     ]
   };
 
-  const multiplePlanResponse = {
-    "value": [
-      {
-        "id": validPlanId,
-        "title": validPlanName
-      },
-      {
-        "id": validPlanId,
-        "title": validPlanName
-      }
-    ]
-  };
-
   const singleBucketByNameResponse = {
     "value": [
       {
@@ -340,61 +327,6 @@ describe(commands.TASK_GET, () => {
     });
   });
 
-  it('fails validation when no plans found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=owner eq '${validOwnerGroupId}'&$select=id,title`) {
-        return Promise.resolve({"value": [ { "id": "" } ]});
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    command.action(logger, {
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planName: validPlanName,
-        ownerGroupId: validOwnerGroupId
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified plan ${validPlanName} does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  
-  it('fails validation when multiple plans found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=owner eq '${validOwnerGroupId}'&$select=id,title`) {
-        return Promise.resolve(multiplePlanResponse);
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    command.action(logger, {
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planName: validPlanName,
-        ownerGroupId: validOwnerGroupId
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple plans with name ${validPlanName} found: ${multiplePlanResponse.value.map(x => x.id)}`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('fails validation when no buckets found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
@@ -497,12 +429,12 @@ describe(commands.TASK_GET, () => {
     });
   });
 
-  it('Correctly deletes bucket by name', (done) => {
+  it('Correctly gets task by name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'&$select=id`) {
         return Promise.resolve(singleGroupResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=owner eq '${validOwnerGroupId}'&$select=id,title`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return Promise.resolve(singlePlanResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
@@ -524,6 +456,42 @@ describe(commands.TASK_GET, () => {
         bucketName: validBucketName,
         planName: validPlanName,
         ownerGroupName: validOwnerGroupName
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(taskResponse));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Correctly gets task by name with group ID', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return Promise.resolve(singlePlanResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
+        return Promise.resolve(singleBucketByNameResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
+        return Promise.resolve(singleTaskByTitleResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/${encodeURIComponent(validTaskId)}`) {
+        return Promise.resolve(taskResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planName: validPlanName,
+        ownerGroupId: validOwnerGroupId
       }
     }, () => {
       try {

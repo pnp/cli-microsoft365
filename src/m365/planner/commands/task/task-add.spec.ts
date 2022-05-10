@@ -464,7 +464,7 @@ describe(commands.TASK_ADD, () => {
   it('correctly adds planner bucket with title, bucketId, planName, and ownerGroupName', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
         return Promise.resolve({
           value: [
             {
@@ -504,7 +504,7 @@ describe(commands.TASK_ADD, () => {
   it('correctly adds planner task with title, bucketId, planName, and ownerGroupId', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '0d0402ee-970f-4951-90b5-2f24519d2e40')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
         return Promise.resolve({
           value: [
             {
@@ -784,36 +784,6 @@ describe(commands.TASK_ADD, () => {
     }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified owner group does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails validation when planName not found', (done) => {
-    sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
-        return Promise.resolve(groupByDisplayNameResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
-        return Promise.resolve({ value: [] });
-      }
-      return Promise.reject('Invalid Request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: false,
-        name: 'My Planner Bucket',
-        planName: 'foo',
-        ownerGroupName: 'My Planner Group'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified plan does not exist`)));
         done();
       }
       catch (e) {

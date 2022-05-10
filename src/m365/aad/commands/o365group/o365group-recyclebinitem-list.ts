@@ -46,7 +46,7 @@ class AadO365GroupRecycleBinItemListCommand extends GraphCommand {
     const endpoint: string = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${filter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
 
     odata
-      .getAllItems<DirectoryObject>(endpoint, logger)
+      .getAllItems<DirectoryObject>(endpoint)
       .then((recycleBinItems): void => {
         logger.log(recycleBinItems);
         cb();

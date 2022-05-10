@@ -1,4 +1,4 @@
-import { PlannerBucket, PlannerPlan, Group } from '@microsoft/microsoft-graph-types';
+import { PlannerBucket, Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { AxiosRequestConfig } from 'axios';
 import {
@@ -10,6 +10,7 @@ import { accessToken, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import Auth from '../../../../Auth';
+import { planner } from '../../../../utils/planner';
 
 interface CommandArgs {
   options: Options;
@@ -102,30 +103,8 @@ class PlannerBucketGetCommand extends GraphCommand {
 
     return this
       .getGroupId(args)
-      .then(groupId => {
-        const requestOptions: AxiosRequestConfig = {
-          url: `${this.resource}/v1.0/planner/plans?$filter=owner eq '${groupId}'`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-
-        return request.get<{ value: PlannerPlan[] }>(requestOptions);
-      })
-      .then(plans => {
-        const filteredPlans = plans.value.filter(p => p.title!.toLowerCase() === planName!.toLowerCase());
-
-        if (filteredPlans.length === 0) {
-          return Promise.reject(`The specified plan ${planName} does not exist`);
-        }
-
-        if (filteredPlans.length > 1) {
-          return Promise.reject(`Multiple plans with name ${planName} found: ${filteredPlans.map(x => x.id)}`);
-        }
-
-        return Promise.resolve(filteredPlans[0].id!);
-      });
+      .then(groupId => planner.getPlanByName(planName!, groupId))
+      .then(plan => plan.id!);
   }
 
   private async getBucketById(id: string): Promise<PlannerBucket> {

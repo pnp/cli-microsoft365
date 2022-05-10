@@ -1,4 +1,3 @@
-import { Logger } from "../cli";
 import request from "../request";
 
 export interface ODataResponse<T> {
@@ -19,7 +18,7 @@ export interface GraphResponseError {
 }
 
 export const odata = {
-  async getAllItems<T>(url: string, logger: Logger, metadata?: 'none' | 'minimal' | 'full'): Promise<T[]> {
+  async getAllItems<T>(url: string, metadata?: 'none' | 'minimal' | 'full'): Promise<T[]> {
     let items: T[] = [];
 
     const requestOptions: any = {
@@ -35,7 +34,7 @@ export const odata = {
 
     const nextLink = res['@odata.nextLink'] ?? res.nextLink;
     if (nextLink) {
-      const nextPageItems = await odata.getAllItems<T>(nextLink, logger, metadata);
+      const nextPageItems = await odata.getAllItems<T>(nextLink, metadata);
       items = items.concat(nextPageItems);
     }
     
