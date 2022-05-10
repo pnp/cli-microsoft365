@@ -57,7 +57,7 @@ class AadUserSigninListCommand extends GraphCommand {
     }
     endpoint += filter;
     odata
-      .getAllItems<SignIn>(endpoint, logger)
+      .getAllItems<SignIn>(endpoint)
       .then((signins): void => {
         logger.log(signins);
         cb();

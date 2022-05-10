@@ -66,7 +66,7 @@ class TodoTaskListCommand extends GraphCommand {
       .getTodoListId(args)
       .then((listId: string): Promise<any> => {
         const endpoint: string = `${this.resource}/v1.0/me/todo/lists/${listId}/tasks`;
-        return odata.getAllItems(endpoint, logger);
+        return odata.getAllItems(endpoint);
       })
       .then((items: ToDoTask[]): void => {
         if (args.options.output === 'json') {

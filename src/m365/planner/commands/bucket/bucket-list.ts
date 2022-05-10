@@ -46,7 +46,7 @@ class PlannerBucketListCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getPlanId(args)
-      .then((planId: string): Promise<PlannerBucket[]> => odata.getAllItems<PlannerBucket>(`${this.resource}/v1.0/planner/plans/${planId}/buckets`, logger))
+      .then((planId: string): Promise<PlannerBucket[]> => odata.getAllItems<PlannerBucket>(`${this.resource}/v1.0/planner/plans/${planId}/buckets`))
       .then((buckets): void => {
         logger.log(buckets);
         cb();

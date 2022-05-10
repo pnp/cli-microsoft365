@@ -43,7 +43,7 @@ class TeamsChatGetCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
-      .getChatId(logger, args)
+      .getChatId(args)
       .then(chatId => this.getChatDetailsById(chatId as string))
       .then((chat: Chat) => {
         logger.log(chat);
@@ -96,14 +96,14 @@ class TeamsChatGetCommand extends GraphCommand {
     return true;
   }
 
-  private async getChatId(logger: Logger, args: CommandArgs): Promise<string> {
+  private async getChatId(args: CommandArgs): Promise<string> {
     if (args.options.id) {
       return args.options.id;
     }    
     
     return args.options.participants 
-      ? this.getChatIdByParticipants(args.options.participants, logger)
-      : this.getChatIdByName(args.options.name as string, logger);
+      ? this.getChatIdByParticipants(args.options.participants)
+      : this.getChatIdByName(args.options.name as string);
   }
   
   private async getChatDetailsById(id: string): Promise<Chat> {
@@ -118,10 +118,10 @@ class TeamsChatGetCommand extends GraphCommand {
     return request.get<Chat>(requestOptions);    
   }
 
-  private async getChatIdByParticipants(participantsString: string, logger: Logger): Promise<string> {
+  private async getChatIdByParticipants(participantsString: string): Promise<string> {
     const participants = chatUtil.convertParticipantStringToArray(participantsString);
     const currentUserEmail = accessToken.getUserNameFromAccessToken(Auth.service.accessTokens[this.resource].accessToken).toLowerCase();
-    const existingChats = await chatUtil.findExistingChatsByParticipants([currentUserEmail, ...participants], logger);
+    const existingChats = await chatUtil.findExistingChatsByParticipants([currentUserEmail, ...participants]);
     
     if (!existingChats || existingChats.length === 0) {
       throw new Error('No chat conversation was found with these participants.');
@@ -138,8 +138,8 @@ class TeamsChatGetCommand extends GraphCommand {
     throw new Error(`Multiple chat conversations with these participants found. Please disambiguate:${os.EOL}${disambiguationText}`);
   }
   
-  private async getChatIdByName(name: string, logger: Logger): Promise<string> {
-    const existingChats = await chatUtil.findExistingGroupChatsByName(name, logger);
+  private async getChatIdByName(name: string): Promise<string> {
+    const existingChats = await chatUtil.findExistingGroupChatsByName(name);
 
     if (!existingChats || existingChats.length === 0) {
       throw new Error('No chat conversation was found with this name.');

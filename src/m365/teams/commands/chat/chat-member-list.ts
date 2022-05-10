@@ -32,7 +32,7 @@ class TeamsChatMemberListCommand extends GraphCommand {
     const endpoint: string = `${this.resource}/v1.0/chats/${args.options.chatId}/members`;
 
     odata
-      .getAllItems(endpoint, logger)
+      .getAllItems(endpoint)
       .then((items): void => {
         logger.log(items);
         cb();

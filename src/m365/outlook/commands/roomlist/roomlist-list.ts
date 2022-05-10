@@ -24,7 +24,7 @@ class OutlookRoomListListCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     odata
-      .getAllItems<RoomList>(`${this.resource}/v1.0/places/microsoft.graph.roomlist`, logger)
+      .getAllItems<RoomList>(`${this.resource}/v1.0/places/microsoft.graph.roomlist`)
       .then((roomLists): void => {
         logger.log(roomLists);
         cb();

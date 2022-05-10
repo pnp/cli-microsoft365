@@ -41,7 +41,7 @@ class TeamsUserAppListCommand extends GraphCommand {
         userId = _userId.value;
         const endpoint: string = `${this.resource}/v1.0/users/${encodeURIComponent(userId)}/teamwork/installedApps?$expand=teamsAppDefinition`;
 
-        return odata.getAllItems<TeamsAppInstallation>(endpoint, logger);
+        return odata.getAllItems<TeamsAppInstallation>(endpoint);
       })
       .then((items): void => {
         items.forEach(i => {
