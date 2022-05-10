@@ -6,6 +6,7 @@ import {
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { odata, validation } from '../../../../utils';
+import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -44,8 +45,8 @@ class PlannerPlanGetCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (args.options.id) {
-      this
-        .getPlan(args)
+      planner
+        .getPlanById(args.options.id)
         .then((res: any): void => {
           logger.log(res);
           cb();
@@ -89,18 +90,6 @@ class PlannerPlanGetCommand extends GraphCommand {
 
         return Promise.resolve(group.id);
       });
-  }
-
-  private getPlan(args: CommandArgs): Promise<any> {
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/plans/${args.options.id}`,
-      headers: {
-        'accept': 'application/json'
-      },
-      responseType: 'json'
-    };
-
-    return request.get(requestOptions);
   }
 
   public options(): CommandOption[] {
