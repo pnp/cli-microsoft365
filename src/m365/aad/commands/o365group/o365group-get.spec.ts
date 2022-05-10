@@ -442,7 +442,7 @@ describe(commands.O365GROUP_GET, () => {
 
     command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c843' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c843' does not exist or one of its queried reference-property objects are not present.`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Group with ID 1caf7dcd-7e83-4c3a-94f7-932a1299c843 was not found.')));
         done();
       }
       catch (e) {
