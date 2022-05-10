@@ -45,8 +45,9 @@ describe('utils/planner', () => {
 
     try {
       await planner.getPlanById(validPlanId);
-      assert.fail('No error message thrown.')
-    } catch (ex) {
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
       assert.deepStrictEqual(ex, Error(`Planner plan with id ${validPlanId} was not found.`));
     }
   });

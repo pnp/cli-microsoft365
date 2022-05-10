@@ -18,7 +18,8 @@ export const planner = {
     
     try {
       return await request.get<PlannerPlan>(requestOptions);
-    } catch (ex) {
+    }
+    catch (ex) {
       throw Error(`Planner plan with id ${id} was not found.`);
     }
   }
