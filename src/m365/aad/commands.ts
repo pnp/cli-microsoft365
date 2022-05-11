@@ -4,7 +4,6 @@ export default {
   APP_ADD: `${prefix} app add`,
   APP_DELETE: `${prefix} app delete`,
   APP_GET: `${prefix} app get`,
-  APP_OPEN: `${prefix} app open`,
   APP_REMOVE: `${prefix} app remove`,  
   APP_ROLE_ADD: `${prefix} app role add`,
   APP_ROLE_DELETE: `${prefix} app role delete`,

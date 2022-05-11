@@ -1,29 +1,26 @@
-import { Cli, Logger } from '../../../../cli';
+import { Cli, Logger } from '../../../cli';
 import type * as open from 'open';
-import {
-  CommandOption
-} from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
-import { validation } from '../../../../utils/validation';
-import { settingsNames } from '../../../../settingsNames';
+import { validation } from '../../../utils/validation';
+import { settingsNames } from '../../../settingsNames';
+import AppCommand from '../../base/AppCommand';
+import GlobalOptions from '../../../GlobalOptions';
+import commands from '../commands';
+import { CommandOption } from '../../../Command';
 
 interface CommandArgs {
   options: Options;
 }
 
 interface Options extends GlobalOptions {
-  appId: string;
+  appId?: string;
   preview?: boolean;
 }
 
-class AadAppOpenCommand extends GraphCommand {
+class AppOpenCommand extends AppCommand {
   private _open: typeof open | undefined;
 
   public get name(): string {
-    return commands.APP_OPEN;
+    return commands.OPEN;
   }
 
   public get description(): string {
@@ -37,44 +34,15 @@ class AadAppOpenCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .checkAppRegistrationExists(args, logger)
-      .then(_ => this.logOrOpenUrl(args, logger))
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {    
+    this.logOrOpenUrl(args, logger)
       .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
-  private checkAppRegistrationExists(args: CommandArgs, logger: Logger): Promise<void> {    
-    const { appId } = args.options;
-
-    if (this.verbose) {
-      logger.logToStderr(`Check if Azure AD app ${appId} exists...`);
-    }
-
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/myorganization/applications?$filter=appId eq '${encodeURIComponent(appId)}'&$select=id`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: { id: string }[] }>(requestOptions)
-      .then((res: { value: { id: string }[] }): Promise<void> => {
-        if (res.value.length === 1) {
-          return Promise.resolve();
-        }
-
-        return Promise.reject(`No Azure AD application registration with ID ${appId} found`);
-      });
-  }
-
   private logOrOpenUrl(args: CommandArgs, logger: Logger): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const { appId } = args.options;
+    return new Promise((resolve, reject) => {            
       const previewPrefix = args.options.preview === true ? "preview." : "";
-      const url = `https://${previewPrefix}portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${appId}/isMSAApp/`;
+      const url = `https://${previewPrefix}portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/${this.appId}/isMSAApp/`;
 
       if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenLinksInBrowser, false) === false) {
         logger.log(`Use a web browser to open the page ${url}`);
@@ -102,7 +70,7 @@ class AadAppOpenCommand extends GraphCommand {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
-      { option: '--appId <appId>' },
+      { option: '--appId [appId]' },
       { option: '--preview' }
     ];
 
@@ -111,12 +79,12 @@ class AadAppOpenCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {    
-    if (!validation.isValidGuid(args.options.appId as string)) {
+    if (args.options.appId && !validation.isValidGuid(args.options.appId as string)) {
       return `${args.options.appId} is not a valid GUID`;
     }
-
+    
     return true;
   }
 }
 
-module.exports = new AadAppOpenCommand();
+module.exports = new AppOpenCommand();
