@@ -190,16 +190,17 @@ nav:
         - bucket remove: 'cmd/planner/bucket/bucket-remove.md'
       - plan:
         - plan add: 'cmd/planner/plan/plan-add.md'
-        - plan get: 'cmd/planner/plan/plan-get.md'
         - plan details get: 'cmd/planner/plan/plan-details-get.md'
+        - plan get: 'cmd/planner/plan/plan-get.md'
         - plan list: 'cmd/planner/plan/plan-list.md'
       - task:
         - task add: 'cmd/planner/task/task-add.md'
+        - task details get: 'cmd/planner/task/task-details-get.md'
         - task get: 'cmd/planner/task/task-get.md'
         - task list: 'cmd/planner/task/task-list.md'
+        - task reference add: 'cmd/planner/task/task-reference-add.md'
         - task reference list: 'cmd/planner/task/task-reference-list.md'
         - task set: 'cmd/planner/task/task-set.md'
-        - task details get: 'cmd/planner/task/task-details-get.md'
     - Power Apps (pa):
       - app:
         - app get: 'cmd/pa/app/app-get.md'
