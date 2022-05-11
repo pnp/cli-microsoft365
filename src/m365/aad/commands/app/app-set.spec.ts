@@ -1169,6 +1169,13 @@ describe(commands.APP_SET, () => {
     assert.notStrictEqual(actual, true);
   });
   
+  it('passes validation if certificateFile specified with certificateDisplayName', () => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+      
+    const actual = command.validate({ options: { name: 'My AAD app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' } });
+    assert.strictEqual(actual, true);
+  });
+  
   it('fails validation when certificate file is not found', () => {    
     sinon.stub(fs, 'existsSync').callsFake(_ => false);    
     
