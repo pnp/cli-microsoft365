@@ -11,7 +11,7 @@ m365 spo listitem roleinheritance reset [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site from which the item should be retrieved
+: URL of the site from which the item role inheritance should be reset
 
 `--id <id>`
 : ID of the item to retrieve

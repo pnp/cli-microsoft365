@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   listTitle?: string;
 }
 
-class SpoListItemRoleInHeritanceResetCommand extends SpoCommand {
+class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
   public get name(): string {
     return commands.LISTITEM_ROLEINHERITANCE_RESET;
   }
@@ -91,7 +91,7 @@ class SpoListItemRoleInHeritanceResetCommand extends SpoCommand {
     }
 
     if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-      return `${args.options.id} is not a valid GUID`;
+      return `${args.options.listId} is not a valid GUID`;
     }
 
     if (isNaN(args.options.id)) {
@@ -102,4 +102,4 @@ class SpoListItemRoleInHeritanceResetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListItemRoleInHeritanceResetCommand();
+module.exports = new SpoListItemRoleInheritanceResetCommand();

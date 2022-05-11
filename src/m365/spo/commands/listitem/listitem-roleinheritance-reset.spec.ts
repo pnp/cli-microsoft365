@@ -83,34 +83,34 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
     assert.deepStrictEqual(optionSets, [['listId', 'listTitle']]);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', (done) => {
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
     const actual = command.validate({ options: { webUrl: 'foo', id: 8, listTitle: 'Demo List' } });
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', (done) => {
+  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 8, listId: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
-    assert(actual);
-    done();
+    assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the listId option is not a valid GUID', (done) => {
+  it('fails validation if the listId option is not a valid GUID', () => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 8, listId: 'foo' } });
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('passes validation if the listId option is a valid GUID', (done) => {
+  it('passes validation if the listId option is a valid GUID', () => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 8, listId: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
-    assert(actual);
-    done();
+    assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the specified id is not a number', (done) => {
+  it('fails validation if the specified id is not a number', () => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', id: 'a' } });
     assert.notStrictEqual(actual, true);
-    done();
+  });
+
+  it('passes validation if the specified id is a number', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', id: '4' } });
+    assert.strictEqual(actual, true);
   });
 
   it('reset role inheritance on list item by list title', (done) => {
