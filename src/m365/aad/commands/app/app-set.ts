@@ -143,10 +143,9 @@ class AadAppSetCommand extends GraphCommand {
         'content-type': 'application/json;odata.metadata=none'
       },
       responseType: 'json'
-    };
+    };    
 
-    return request
-      .get<Application>(getAppRequestOptions)
+    return request.get<Application>(getAppRequestOptions)
       .then((application: Application): Promise<void> => {
         const publicClientRedirectUris: string[] = (application.publicClient as PublicClientApplication).redirectUris as string[];
         const spaRedirectUris: string[] = (application.spa as SpaApplication).redirectUris as string[];
@@ -223,73 +222,86 @@ class AadAppSetCommand extends GraphCommand {
       logger.logToStderr(`Setting certificate for Azure AD app...`);
     }
 
-    return this.getCertificateBase64Encoded(args, logger).then((certificateBase64Encoded) => {
-      const getAppRequestOptions: AxiosRequestConfig = {
-        url: `${this.resource}/v1.0/myorganization/applications/${objectId}?$select=keyCredentials`,
-        headers: {
-          'content-type': 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
+    const certificateBase64Encoded = this.getCertificateBase64Encoded(args, logger);
+    
+    return this.getCurrentKeyCredentialsList(args, objectId, certificateBase64Encoded, logger)
+      .then(currentKeyCredentials => {
+        if (this.verbose) {
+          logger.logToStderr(`Adding new keyCredential to list`);
+        }
+        
+        // The KeyCredential graph type defines the 'key' property as 'NullableOption<number>'
+        // while it is a base64 encoded string. This is why a cast to any is used here.
+        const keyCredentials = currentKeyCredentials.filter(existingCredential => existingCredential.key !== certificateBase64Encoded as any);
+            
+        const newKeyCredential = {
+          type: "AsymmetricX509Cert",          
+          usage: "Verify",
+          displayName: args.options.certificateDisplayName,
+          key: certificateBase64Encoded
+        } as any;
+  
+        keyCredentials.push(newKeyCredential);
+  
+        return Promise.resolve(keyCredentials);
+      })
+      .then(keyCredentials => this.updateKeyCredentials(objectId, keyCredentials, logger));    
+  }
 
-      return request
-        .get<Application>(getAppRequestOptions)
-        .then((application: Application): Promise<void> => {
-          
-          const keyCredentials = application.keyCredentials as KeyCredential[];
-          
-          // The graph types of  defines the 'key' property of KeyCredential as 'NullableOption<number>'
-          // while it is a base64 encoded string. This is any is used here.
-          if (keyCredentials.every(existingCredential => existingCredential.key !== certificateBase64Encoded as any)) {
-            const newKeyCredential = {
-              type: "AsymmetricX509Cert",          
-              usage: "Verify",
-              displayName: args.options.certificateDisplayName,
-              key: certificateBase64Encoded
-            } as any;
+  private getCertificateBase64Encoded(args: CommandArgs, logger: Logger): string {
+    if (args.options.certificateBase64Encoded) {
+      return args.options.certificateBase64Encoded;
+    }
+    
+    if (this.debug) {
+      logger.logToStderr(`Reading existing ${args.options.certificateFile}...`);
+    }
 
-            keyCredentials.push(newKeyCredential);
-               
-            const requestOptions: AxiosRequestConfig = {
-              url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
-              headers: {
-                'content-type': 'application/json;odata.metadata=none'
-              },
-              responseType: 'json',
-              data: {
-                keyCredentials: keyCredentials
-              }
-            };
+    try {
+      return fs.readFileSync(args.options.certificateFile as string, {encoding: 'base64'});
+    }
+    catch (e) {
+      throw new Error(`Error reading certificate file: ${e}. Please add the certificate using base64 option '--certificateBase64Encoded'.`);
+    }
+  }
+  
+  // We first retrieve existing certificates because we need to specify the full list of certificates when updating the app.
+  private getCurrentKeyCredentialsList(args: CommandArgs, objectId: string, certificateBase64Encoded: string, logger: Logger): Promise<KeyCredential[]> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving current keyCredentials list for app`);
+    }
+    
+    const getAppRequestOptions: AxiosRequestConfig = {
+      url: `${this.resource}/v1.0/myorganization/applications/${objectId}?$select=keyCredentials`,
+      headers: {
+        'content-type': 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };    
 
-            return request.patch(requestOptions);
-          }
-
-          return Promise.resolve();
-        })
-        .then(_ => Promise.resolve());
+    return request.get<Application>(getAppRequestOptions).then((application) => {
+      return Promise.resolve(application.keyCredentials || []);
     });
   }
 
-  private getCertificateBase64Encoded(args: CommandArgs, logger: Logger): Promise<string> {
-    if (args.options.certificateBase64Encoded) {
-      return Promise.resolve(args.options.certificateBase64Encoded);
-    }
-    
-    if (fs.existsSync(args.options.certificateFile as string)) {
-      if (this.debug) {
-        logger.logToStderr(`Reading existing ${args.options.certificateFile}...`);
-      }
+  private updateKeyCredentials(objectId: string, keyCredentials: KeyCredential[], logger: Logger): Promise<void> {
 
-      try {
-        const fileContents = fs.readFileSync(args.options.certificateFile as string, {encoding: 'base64'});
-        return Promise.resolve(fileContents);
-      }
-      catch (e) {
-        return Promise.reject(`Error reading certificate file: ${e}. Please add the certificate using base64 option '--certificateBase64Encoded'.`);
-      }
+    if (this.verbose) {
+      logger.logToStderr(`Updating keyCredentials in AAD app`);
     }
 
-    return Promise.reject(`Certificate file not found`);
+    const requestOptions: AxiosRequestConfig = {
+      url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
+      headers: {
+        'content-type': 'application/json;odata.metadata=none'
+      },
+      responseType: 'json',
+      data: {
+        keyCredentials: keyCredentials
+      }
+    };
+
+    return request.patch(requestOptions);
   }
 
   public options(): CommandOption[] {
@@ -333,6 +345,10 @@ class AadAppSetCommand extends GraphCommand {
     if (args.options.certificateDisplayName && !args.options.certificateFile && !args.options.certificateBase64Encoded) {
       return 'When you specify certificateDisplayName you also need to specify certificateFile or certificateBase64Encoded';
     }    
+
+    if (args.options.certificateFile && !fs.existsSync(args.options.certificateFile as string)) {
+      return 'Certificate file not found';
+    }
 
     if (args.options.redirectUris && !args.options.platform) {
       return `When you specify redirectUris you also need to specify platform`;

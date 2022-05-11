@@ -853,6 +853,54 @@ describe(commands.APP_SET, () => {
     });
   });
 
+  it('adds new certificate using base64 string (with null keyCredentials)', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
+        return Promise.resolve(appDetailsResponse);
+      } 
+      else if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83?$select=keyCredentials`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",          
+          "keyCredentials": null
+        });
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+    sinon.stub(request, 'patch').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "keyCredentials": [{
+            "type": "AsymmetricX509Cert",          
+            "usage": "Verify",
+            "displayName": "some certificate",
+            "key": "somecertificatebase64string"
+          }]
+        })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83',
+        certificateDisplayName: 'some certificate',
+        certificateBase64Encoded: 'somecertificatebase64string'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', err?.message);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('adds new certificate using certificate file', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
@@ -895,72 +943,6 @@ describe(commands.APP_SET, () => {
     }, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('does not add new certificate when key is already present', (done) => {
-    sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
-        return Promise.resolve(appDetailsResponse);
-      } 
-      else if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83?$select=keyCredentials`) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",          
-          "keyCredentials": [{
-            "type": "AsymmetricX509Cert",          
-            "usage": "Verify",
-            "displayName": "some certificate",
-            "key": "somecertificatebase64string"
-          }]
-        });
-      }
-
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
-    });
-    
-    command.action(logger, {
-      options: {
-        debug: true,
-        objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83',
-        certificateDisplayName: 'some certificate',
-        certificateBase64Encoded: 'somecertificatebase64string'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-  
-  it('handles error when certificate file is not found', (done) => {
-    sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
-        return Promise.resolve(appDetailsResponse);
-      } 
-     
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
-    });    
-    sinon.stub(fs, 'existsSync').callsFake(_ => false);    
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83',
-        certificateDisplayName: 'some certificate',
-        certificateFile: 'C:\\temp\\some-certificate.cer'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `Certificate file not found`);
         done();
       }
       catch (e) {
@@ -1184,6 +1166,13 @@ describe(commands.APP_SET, () => {
   
   it('fails validation if both certificateBase64Encoded and certificateFile are specified', () => {
     const actual = command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', certificateFile: 'c:\\temp\\some-certificate.cer', certificateBase64Encoded: 'somebase64string' } });
+    assert.notStrictEqual(actual, true);
+  });
+  
+  it('fails validation when certificate file is not found', () => {    
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);    
+    
+    const actual = command.validate({ options: { debug: true, objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83', certificateDisplayName: 'some certificate', certificateFile: 'C:\\temp\\some-certificate.cer' } });
     assert.notStrictEqual(actual, true);
   });
 

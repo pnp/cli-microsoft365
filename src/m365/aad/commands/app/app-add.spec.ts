@@ -2623,27 +2623,6 @@ describe(commands.APP_ADD, () => {
     });
   });
   
-  it('returns error when certificate file is not found', (done) => {    
-    sinon.stub(fs, 'existsSync').callsFake(_ => false);    
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        name: 'My AAD app',
-        certificateDisplayName: 'some certificate',
-        certificateFile: 'C:\\temp\\some-certificate.cer'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `Certificate file not found`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-  
   it('returns error when certificate file cannot be read', (done) => {    
     sinon.stub(fs, 'existsSync').callsFake(_ => true);    
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error("An error has occurred"); });
@@ -5632,6 +5611,13 @@ describe(commands.APP_ADD, () => {
 
   it('fails validation if specified platform value is not valid', () => {
     const actual = command.validate({ options: { name: 'My AAD app', platform: 'abc' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when certificate file is not found', () => {    
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);    
+    
+    const actual = command.validate({ options: { debug: true, name: 'My AAD app', certificateDisplayName: 'some certificate', certificateFile: 'C:\\temp\\some-certificate.cer' } });
     assert.notStrictEqual(actual, true);
   });
 

@@ -594,21 +594,17 @@ class AadAppAddCommand extends GraphCommand {
       return Promise.resolve(args.options.certificateBase64Encoded);
     }
     
-    if (fs.existsSync(args.options.certificateFile as string)) {
-      if (this.debug) {
-        logger.logToStderr(`Reading existing ${args.options.certificateFile}...`);
-      }
-
-      try {
-        const fileContents = fs.readFileSync(args.options.certificateFile as string, {encoding: 'base64'});
-        return Promise.resolve(fileContents);
-      }
-      catch (e) {
-        return Promise.reject(`Error reading certificate file: ${e}. Please add the certificate using base64 option '--certificateBase64Encoded'.`);
-      }
+    if (this.debug) {
+      logger.logToStderr(`Reading existing ${args.options.certificateFile}...`);
     }
 
-    return Promise.reject(`Certificate file not found`);
+    try {
+      const fileContents = fs.readFileSync(args.options.certificateFile as string, {encoding: 'base64'});
+      return Promise.resolve(fileContents);
+    }
+    catch (e) {
+      return Promise.reject(`Error reading certificate file: ${e}. Please add the certificate using base64 option '--certificateBase64Encoded'.`);
+    }  
   }
 
   private saveAppInfo(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
@@ -744,6 +740,10 @@ class AadAppAddCommand extends GraphCommand {
     if (args.options.certificateDisplayName && !args.options.certificateFile && !args.options.certificateBase64Encoded) {
       return 'When you specify certificateDisplayName you also need to specify certificateFile or certificateBase64Encoded';
     }    
+
+    if (args.options.certificateFile && !fs.existsSync(args.options.certificateFile as string)) {
+      return 'Certificate file not found';
+    }
 
     if (args.options.scopeName) {
       if (!args.options.uri) {

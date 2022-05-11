@@ -48,6 +48,8 @@ For best performance use the `objectId` option to reference the Azure AD applica
 
 If the command finds multiple Azure AD application registrations with the specified app name, it will prompt you to disambiguate which app it should use, listing the discovered object IDs.
 
+When a certificate is specified it will be added to the list of certificates of the app without changing existing certificates.
+
 ## Examples
 
 Update the app URI of the Azure AD application registration specified by its object ID
