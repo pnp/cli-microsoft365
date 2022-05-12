@@ -32,7 +32,7 @@ describe('utils/aadGroup', () => {
     assert.strictEqual(actual, singleGroupResponse);
   });
 
-  it('display error message when group is not found.', async () => {
+  it('throws error message when group is not found.', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}`) {
         throw Error('Group not found.');
@@ -48,5 +48,63 @@ describe('utils/aadGroup', () => {
     catch (ex) {
       assert.deepStrictEqual(ex, Error(`Group with ID ${validGroupId} was not found.`));
     }
+  });
+
+  it('throws error message when no group was found using getGroupByDisplayName', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validGroupName)}'`) {
+        return { value: [] };
+      }
+
+      return 'Invalid Request';
+    });
+
+    try {
+      await aadGroup.getGroupByDisplayName(validGroupName);
+      assert.fail('Error expected, but was not thrown.')
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`The specified group '${validGroupName}' does not exist.`))
+    }
+  });
+
+  it('throws error message when multiple groups were found using getGroupByDisplayName', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validGroupName)}'`) {
+        return {
+          value: [
+            { id: validGroupId, displayName: validGroupName },
+            { id: validGroupId, displayName: validGroupName }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    try {
+      await aadGroup.getGroupByDisplayName(validGroupName);
+      assert.fail('Error expected, but was not thrown.')
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`Multiple groups with name '${validGroupName}' found: ${[validGroupId, validGroupId]}.`))
+    }
+  });
+
+  it('correctly get single group by name using getGroupByDisplayName', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validGroupName)}'`) {
+        return {
+          value: [
+            singleGroupResponse
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await aadGroup.getGroupByDisplayName(validGroupName);
+    assert.deepStrictEqual(actual, singleGroupResponse);
   });
 }); 
