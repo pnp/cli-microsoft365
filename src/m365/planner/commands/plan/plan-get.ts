@@ -55,11 +55,10 @@ class PlannerPlanGetCommand extends GraphCommand {
     else {
       this
         .getGroupId(args)
-        .then((groupId: string): Promise<PlannerPlan[]> => planner.getPlansByGroupId(groupId))
-        .then((plans): void => {
-          const filteredPlan = plans.filter((plan: any) => plan.title === args.options.title);
-          if (filteredPlan && filteredPlan.length > 0) {
-            logger.log(filteredPlan);
+        .then(groupId => planner.getPlanByName(args.options.title!, groupId))
+        .then((plan): void => {
+          if (plan) {
+            logger.log(plan);
           }
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));

@@ -202,16 +202,8 @@ class PlannerTaskAddCommand extends GraphCommand {
 
     return this
       .getGroupId(args)
-      .then((groupId: string) => planner.getPlansByGroupId(groupId))
-      .then((response) => {
-        const plan: PlannerPlan | undefined = response.find(val => val.title === args.options.planName);
-
-        if (!plan) {
-          return Promise.reject(`The specified plan does not exist`);
-        }
-
-        return Promise.resolve(plan.id as string);
-      });
+      .then((groupId: string) => planner.getPlanByName(args.options.planName!, groupId))
+      .then(plan => plan.id!);
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {

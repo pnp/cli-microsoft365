@@ -96,20 +96,8 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
     }
 
     return planner
-      .getPlansByGroupId(this.groupId)
-      .then((plans: PlannerPlan[]): Promise<string> => {
-        const plansMatchingName = plans.filter((plan: PlannerPlan) => plan.title === args.options.planTitle);
-
-        if (plansMatchingName && plansMatchingName.length > 0) {
-          if (plansMatchingName.length > 1) {
-            return Promise.reject(`Multiple plans with name ${args.options.planTitle} found: ${plansMatchingName.map(x => x.id)}`);
-          }
-
-          return Promise.resolve(plansMatchingName[0].id as string);
-        }
-
-        return Promise.reject(`The specified plan title does not exist`);
-      });
+      .getPlanByName(args.options.planTitle!, this.groupId)
+      .then(plan => plan.id!);
   }
 
   private getPlanDetails(args: CommandArgs): Promise<PlannerPlanDetails> {

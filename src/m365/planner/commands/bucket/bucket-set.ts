@@ -123,20 +123,8 @@ class PlannerBucketSetCommand extends GraphCommand {
 
     return this
       .getGroupId(args)
-      .then(groupId => planner.getPlansByGroupId(groupId))
-      .then(plans => {
-        const filteredPlans = plans.filter(p => p.title!.toLowerCase() === planName!.toLowerCase());
-
-        if (filteredPlans.length === 0) {
-          return Promise.reject(`The specified plan ${planName} does not exist`);
-        }
-
-        if (filteredPlans.length > 1) {
-          return Promise.reject(`Multiple plans with name ${planName} found: ${filteredPlans.map(x => x.id)}`);
-        }
-
-        return Promise.resolve(filteredPlans[0].id!);
-      });
+      .then(groupId => planner.getPlanByName(planName!, groupId))
+      .then(plan => plan.id!);
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {

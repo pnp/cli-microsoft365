@@ -60,16 +60,8 @@ class PlannerBucketListCommand extends GraphCommand {
 
     return this
       .getGroupId(args)
-      .then((groupId: string) => planner.getPlansByGroupId(groupId))
-      .then(response => {
-        const plan = response.find(val => val.title === args.options.planName);
-
-        if (!plan) {
-          return Promise.reject(`The specified plan does not exist`);
-        }
-
-        return Promise.resolve(plan.id!);
-      });
+      .then(groupId => planner.getPlanByName(args.options.planName!, groupId))
+      .then(plan => plan.id!);
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {

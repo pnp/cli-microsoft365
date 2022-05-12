@@ -1,6 +1,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import request from "../request";
+import { PlannerPlan } from '@microsoft/microsoft-graph-types';
 import { planner } from './planner';
 import { sinonUtil } from "./sinonUtil";
 
@@ -8,7 +9,7 @@ const validPlanId = 'oUHpnKBFekqfGE_PS6GGUZcAFY7b';
 const validPlanName = 'Plan name';
 const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
 
-const singlePlanResponse = {
+const singlePlanResponse: PlannerPlan = {
   id: validPlanId,
   title: validPlanName,
   owner: validOwnerGroupId
@@ -16,12 +17,8 @@ const singlePlanResponse = {
 
 const multiplePlanResponse = {
   value: [
-    {
-      id: validPlanId,
-      title: validPlanName,
-      owner: validOwnerGroupId
-    }
-  ]
+    singlePlanResponse
+  ] as PlannerPlan[]
 };
 
 describe('utils/planner', () => {
@@ -71,7 +68,63 @@ describe('utils/planner', () => {
       assert.fail('No error message thrown.');
     }
     catch (ex) {
-      assert.deepStrictEqual(ex, Error(`Planner plan with id ${validPlanId} was not found.`));
+      assert.deepStrictEqual(ex, Error(`Planner plan with id '${validPlanId}' was not found.`));
+    }
+  });
+
+  it('correctly get plan by name.', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return multiplePlanResponse;
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await planner.getPlanByName(validPlanName, validOwnerGroupId);
+    assert.strictEqual(actual, singlePlanResponse);
+  });
+
+  it('fails to get plan when plan doesn not exist', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        const response = {...multiplePlanResponse};
+        response.value[0].title = "Wrong title";
+        return response;
+      }
+
+      return 'Invalid Request';
+    });
+
+    try {
+      await planner.getPlanByName(validPlanName, validOwnerGroupId);
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`The specified plan '${validPlanName}' does not exist.`));
+    }
+  });
+
+  it('fails to get plan when multiple plans have the same name', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return {
+          value: [
+            { title: validPlanName, id: validPlanId },
+            { title: validPlanName, id: validPlanId }
+          ]
+        };
+      }
+
+      return 'Invalid Request';
+    });
+
+    try {
+      await planner.getPlanByName(validPlanName, validOwnerGroupId);
+      assert.fail('No error message thrown.');
+    }
+    catch (ex) {
+      assert.deepStrictEqual(ex, Error(`Multiple plans with name '${validPlanName}' found: ${[validPlanId, validPlanId]}.`));
     }
   });
 });

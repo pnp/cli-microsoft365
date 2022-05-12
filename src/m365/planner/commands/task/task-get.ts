@@ -127,21 +127,8 @@ class PlannerTaskGetCommand extends GraphCommand {
 
     return this
       .getGroupId(options)
-      .then(groupId => planner.getPlansByGroupId(groupId))
-      .then(response => {
-        const planName = options.planName as string;
-        const plans: PlannerPlan[] | undefined = response.filter(val => val.title?.toLocaleLowerCase() === planName.toLocaleLowerCase());
-        
-        if (!plans.length) {
-          return Promise.reject(`The specified plan ${options.planName} does not exist`);
-        }
-
-        if (plans.length > 1) {
-          return Promise.reject(`Multiple plans with name ${options.planName} found: ${plans.map(x => x.id)}`);
-        }
-
-        return Promise.resolve(plans[0].id as string);
-      });
+      .then(groupId => planner.getPlanByName(options.planName!, groupId))
+      .then(plan => plan.id!);
   }
 
   private getGroupId(options: Options): Promise<string> {

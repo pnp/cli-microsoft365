@@ -15,7 +15,7 @@ const getRequestOptions = (url: string, metadata: 'none' | 'minimal' | 'full'): 
 
 export const planner = {
   /**
-   * Get Microsoft Planner plan by ID.
+   * Get Planner plan by ID.
    * @param id Planner ID.
    */
   async getPlanById(id: string): Promise<PlannerPlan> {
@@ -25,15 +25,35 @@ export const planner = {
       return await request.get<PlannerPlan>(requestOptions);
     }
     catch (ex) {
-      throw Error(`Planner plan with id ${id} was not found.`);
+      throw Error(`Planner plan with id '${id}' was not found.`);
     }
   },
 
   /**
-   * Get all plans for a specific group.
+   * Get all Planner plans for a specific group.
    * @param groupId Group ID.
    */
   getPlansByGroupId(groupId: string): Promise<PlannerPlan[]> {
     return odata.getAllItems<PlannerPlan>(`${graphResource}/v1.0/groups/${groupId}/planner/plans`, 'none');
+  },
+
+  /**
+   * Get Planner plan by name in a specific group. 
+   * @param name Name of the Planner plan. Case insensitive.
+   * @param groupId Owner group ID .
+   */
+  async getPlanByName(name: string, groupId: string): Promise<PlannerPlan> {
+    const plans = await this.getPlansByGroupId(groupId);
+    const filteredPlans = plans.filter(p => p.title && p.title.toLowerCase() === name.toLowerCase());
+
+    if (!filteredPlans.length) {
+      throw new Error(`The specified plan '${name}' does not exist.`);
+    }
+
+    if (filteredPlans.length > 1) {
+      throw new Error(`Multiple plans with name '${name}' found: ${filteredPlans.map(x => x.id)}.`);
+    }
+
+    return filteredPlans[0];
   }
 };
