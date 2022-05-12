@@ -1,10 +1,11 @@
-import { Group, PlannerBucket, PlannerPlan } from '@microsoft/microsoft-graph-types';
+import { Group, PlannerBucket } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
+import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -122,19 +123,9 @@ class PlannerBucketSetCommand extends GraphCommand {
 
     return this
       .getGroupId(args)
-      .then(groupId => {
-        const requestOptions: AxiosRequestConfig = {
-          url: `${this.resource}/v1.0/planner/plans?$filter=owner eq '${groupId}'`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-
-        return request.get<{ value: PlannerPlan[] }>(requestOptions);
-      })
+      .then(groupId => planner.getPlansByGroupId(groupId))
       .then(plans => {
-        const filteredPlans = plans.value.filter(p => p.title!.toLowerCase() === planName!.toLowerCase());
+        const filteredPlans = plans.filter(p => p.title!.toLowerCase() === planName!.toLowerCase());
 
         if (filteredPlans.length === 0) {
           return Promise.reject(`The specified plan ${planName} does not exist`);

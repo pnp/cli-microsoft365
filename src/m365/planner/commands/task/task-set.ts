@@ -4,6 +4,7 @@ import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
+import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import { AppliedCategories } from '../../AppliedCategories';
 import commands from '../../commands';
@@ -288,19 +289,9 @@ class PlannerTaskSetCommand extends GraphCommand {
 
     return this
       .getGroupId(options)
-      .then((groupId: string) => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/plans?$filter=(owner eq '${groupId}')&$select=id,title`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-
-        return request.get<{ value: PlannerPlan[] }>(requestOptions);
-      })
+      .then((groupId: string) => planner.getPlansByGroupId(groupId))
       .then((response) => {
-        const plan: PlannerPlan | undefined = response.value.find(val => val.title === options.planName);
+        const plan: PlannerPlan | undefined = response.find(val => val.title === options.planName);
 
         if (!plan) {
           return Promise.reject(`The specified plan does not exist`);

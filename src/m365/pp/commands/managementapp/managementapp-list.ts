@@ -20,7 +20,7 @@ class PpManagementAppListCommand extends PowerPlatformCommand {
     const endpoint = `${this.resource}/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-06-01`;
 
     odata
-      .getAllItems<ManagementApp>(endpoint, logger)
+      .getAllItems<ManagementApp>(endpoint)
       .then((managementApps): void => {
         logger.log(managementApps);
         cb();

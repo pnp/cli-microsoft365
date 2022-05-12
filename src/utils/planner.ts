@@ -1,4 +1,5 @@
 import request from "../request";
+import { odata } from "./odata";
 import { PlannerPlan } from "@microsoft/microsoft-graph-types";
 import { AxiosRequestConfig } from "axios";
 
@@ -13,6 +14,10 @@ const getRequestOptions = (url: string, metadata: 'none' | 'minimal' | 'full'): 
 });
 
 export const planner = {
+  /**
+   * Get Microsoft Planner plan by ID.
+   * @param id Planner ID.
+   */
   async getPlanById(id: string): Promise<PlannerPlan> {
     const requestOptions = getRequestOptions(`${graphResource}/v1.0/planner/plans/${id}`, 'none');
     
@@ -22,5 +27,13 @@ export const planner = {
     catch (ex) {
       throw Error(`Planner plan with id ${id} was not found.`);
     }
+  },
+
+  /**
+   * Get all plans for a specific group.
+   * @param groupId Group ID.
+   */
+  getPlansByGroupId(groupId: string): Promise<PlannerPlan[]> {
+    return odata.getAllItems<PlannerPlan>(`${graphResource}/v1.0/groups/${groupId}/planner/plans`, 'none');
   }
 };

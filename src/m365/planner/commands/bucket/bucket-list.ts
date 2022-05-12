@@ -6,6 +6,7 @@ import {
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { odata, validation } from '../../../../utils';
+import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -45,7 +46,7 @@ class PlannerBucketListCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getPlanId(args)
-      .then((planId: string): Promise<PlannerBucket[]> => odata.getAllItems<PlannerBucket>(`${this.resource}/v1.0/planner/plans/${planId}/buckets`, logger))
+      .then((planId: string): Promise<PlannerBucket[]> => odata.getAllItems<PlannerBucket>(`${this.resource}/v1.0/planner/plans/${planId}/buckets`))
       .then((buckets): void => {
         logger.log(buckets);
         cb();
@@ -59,25 +60,15 @@ class PlannerBucketListCommand extends GraphCommand {
 
     return this
       .getGroupId(args)
-      .then((groupId: string) => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/plans?$filter=(owner eq '${groupId}')`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-
-        return request.get<{ value: { id: string; title: string; }[] }>(requestOptions);
-      })
+      .then((groupId: string) => planner.getPlansByGroupId(groupId))
       .then(response => {
-        const plan: { id: string; title: string; } | undefined = response.value.find(val => val.title === args.options.planName);
+        const plan = response.find(val => val.title === args.options.planName);
 
         if (!plan) {
           return Promise.reject(`The specified plan does not exist`);
         }
 
-        return Promise.resolve(plan.id);
+        return Promise.resolve(plan.id!);
       });
   }
 

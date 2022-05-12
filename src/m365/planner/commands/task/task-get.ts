@@ -4,6 +4,7 @@ import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
+import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -126,20 +127,10 @@ class PlannerTaskGetCommand extends GraphCommand {
 
     return this
       .getGroupId(options)
-      .then((groupId: string) => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/plans?$filter=owner eq '${groupId}'&$select=id,title`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-
-        return request.get<{ value: PlannerPlan[] }>(requestOptions);
-      })
-      .then((response) => {
+      .then(groupId => planner.getPlansByGroupId(groupId))
+      .then(response => {
         const planName = options.planName as string;
-        const plans: PlannerPlan[] | undefined = response.value.filter(val => val.title?.toLocaleLowerCase() === planName.toLocaleLowerCase());
+        const plans: PlannerPlan[] | undefined = response.filter(val => val.title?.toLocaleLowerCase() === planName.toLocaleLowerCase());
         
         if (!plans.length) {
           return Promise.reject(`The specified plan ${options.planName} does not exist`);

@@ -14,11 +14,34 @@ const singlePlanResponse = {
   owner: validOwnerGroupId
 };
 
+const multiplePlanResponse = {
+  value: [
+    {
+      id: validPlanId,
+      title: validPlanName,
+      owner: validOwnerGroupId
+    }
+  ]
+};
+
 describe('utils/planner', () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get
     ]);
+  });
+
+  it('correctly get all plans related to a specific group.', async () => {
+    sinon.stub(request, 'get').callsFake(async opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return multiplePlanResponse;
+      }
+
+      return 'Invalid Request';
+    });
+
+    const actual = await planner.getPlansByGroupId(validOwnerGroupId);
+    assert.strictEqual(actual, multiplePlanResponse.value);
   });
 
   it('correctly get a single plan by id.', async () => {

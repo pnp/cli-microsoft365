@@ -24,7 +24,7 @@ class AadGroupSettingTemplateListCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     odata
-      .getAllItems<GroupSettingTemplate>(`${this.resource}/v1.0/groupSettingTemplates`, logger)
+      .getAllItems<GroupSettingTemplate>(`${this.resource}/v1.0/groupSettingTemplates`)
       .then((templates): void => {
         logger.log(templates);
         cb();

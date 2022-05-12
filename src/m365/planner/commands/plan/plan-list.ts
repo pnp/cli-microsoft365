@@ -5,6 +5,7 @@ import {
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
+import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -40,20 +41,10 @@ class PlannerPlanListCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getGroupId(args)
-      .then((groupId: string): Promise<any> => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/groups/${groupId}/planner/plans`,
-          headers: {
-            'accept': 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-
-        return request.get(requestOptions);
-      })
-      .then((res: any): void => {
-        if (res.value && res.value.length > 0) {
-          logger.log(res.value);
+      .then((groupId: string) => planner.getPlansByGroupId(groupId))
+      .then((res): void => {
+        if (res && res.length > 0) {
+          logger.log(res);
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));

@@ -5,7 +5,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { odata, validation } from '../../../../utils';
+import { validation } from '../../../../utils';
 import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -55,7 +55,7 @@ class PlannerPlanGetCommand extends GraphCommand {
     else {
       this
         .getGroupId(args)
-        .then((groupId: string): Promise<PlannerPlan[]> => odata.getAllItems<PlannerPlan>(`${this.resource}/v1.0/groups/${groupId}/planner/plans`, logger, 'minimal'))
+        .then((groupId: string): Promise<PlannerPlan[]> => planner.getPlansByGroupId(groupId))
         .then((plans): void => {
           const filteredPlan = plans.filter((plan: any) => plan.title === args.options.title);
           if (filteredPlan && filteredPlan.length > 0) {

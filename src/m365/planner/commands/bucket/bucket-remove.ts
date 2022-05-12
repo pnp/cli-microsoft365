@@ -1,4 +1,4 @@
-import { Group, PlannerBucket, PlannerPlan } from '@microsoft/microsoft-graph-types';
+import { Group, PlannerBucket } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
 import { Cli, Logger } from '../../../../cli';
 import {
@@ -9,6 +9,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { planner } from '../../../../utils/planner';
 
 interface CommandArgs {
   options: Options;
@@ -134,19 +135,9 @@ class PlannerBucketRemoveCommand extends GraphCommand {
 
     return this
       .getGroupId(args)
-      .then(groupId => {
-        const requestOptions: AxiosRequestConfig = {
-          url: `${this.resource}/v1.0/planner/plans?$filter=owner eq '${groupId}'`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-
-        return request.get<{ value: PlannerPlan[] }>(requestOptions);
-      })
+      .then(groupId => planner.getPlansByGroupId(groupId))
       .then(plans => {
-        const filteredPlans = plans.value.filter(p => p.title!.toLowerCase() === planName!.toLowerCase());
+        const filteredPlans = plans.filter(p => p.title!.toLowerCase() === planName!.toLowerCase());
 
         if (!filteredPlans.length) {
           return Promise.reject(`The specified plan ${planName} does not exist`);

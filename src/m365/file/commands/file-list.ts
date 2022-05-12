@@ -193,7 +193,7 @@ class FileListCommand extends GraphCommand {
       .all(folderIds.map((folderId: string): Promise<DriveItem[]> =>
         // get items from folder. Because we can't filter out folders here
         // we need to get all items from the folder and filter them out later
-        odata.getAllItems<DriveItem>(`${this.resource}/v1.0/drives/${driveId}/items/${folderId}/children`, logger)))
+        odata.getAllItems<DriveItem>(`${this.resource}/v1.0/drives/${driveId}/items/${folderId}/children`)))
       .then(res => {
         // flatten data from all promises
         files = files.concat(...res);
