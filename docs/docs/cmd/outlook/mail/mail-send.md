@@ -50,7 +50,7 @@ m365 outlook mail send --to "chris@contoso.com,brian@contoso.com" --subject "DG2
 Send an HTML e-mail to the specified e-mail address loading e-mail contents from a file on disk
 
 ```sh
-m365 outlook mail send --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContents @email.html --bodyContentType HTML
+m365 outlook mail send --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContents `@email.html --bodyContentType HTML
 ```
 
 Send a text e-mail to the specified e-mail address. Don't store the e-mail in sent items

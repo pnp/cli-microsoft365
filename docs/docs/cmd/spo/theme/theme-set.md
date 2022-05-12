@@ -69,13 +69,13 @@ If any of these checks fails you are presented with a `The specified theme is no
 Add or update a theme from a theme JSON file
 
 ```sh
-m365 spo theme set --name Contoso-Blue --theme @/Users/rjesh/themes/contoso-blue.json
+m365 spo theme set --name Contoso-Blue --theme `@/Users/rjesh/themes/contoso-blue.json
 ```
 
 Add or update an inverted theme from a theme JSON file
 
 ```sh
-m365 spo theme set --name Contoso-Blue --theme @/Users/rjesh/themes/contoso-blue.json --isInverted
+m365 spo theme set --name Contoso-Blue --theme `@/Users/rjesh/themes/contoso-blue.json --isInverted
 ```
 
 ## More information

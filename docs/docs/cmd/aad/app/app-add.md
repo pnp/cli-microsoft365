@@ -96,7 +96,7 @@ m365 aad app add --name 'My AAD app'
 Create new Azure AD app registration from the manifest retrieved from the Azure Portal stored in a local file named _manifest.json_
 
 ```sh
-m365 aad app add --manifest @manifest.json
+m365 aad app add --manifest `@manifest.json
 ```
 
 Create new multitenant Azure AD app registration

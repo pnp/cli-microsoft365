@@ -41,13 +41,13 @@ m365 teams team add --name "Architecture" --description "Architecture Discussion
 Add a new Microsoft Teams team using a template from a file
 
 ```sh
-m365 teams team add --name "Architecture" --description "Architecture Discussion" --template @template.json
+m365 teams team add --name "Architecture" --description "Architecture Discussion" --template `@template.json
 ```
 
 Add a new Microsoft Teams team using a template and wait for the team to be provisioned
 
 ```sh
-m365 teams team add --name "Architecture" --description "Architecture Discussion" --template @template.json --wait
+m365 teams team add --name "Architecture" --description "Architecture Discussion" --template `@template.json --wait
 ```
 
 ## More information

@@ -54,5 +54,5 @@ m365 spfx package generate
 Generate a web part that shows the weather for Amsterdam. Load web part contents from a local file. Allow the web part to be deployed to all sites. Expose the web part in Teams as a personal tab.
 
 ```sh
-m365 spfx package generate --webPartTitle "Amsterdam weather" --webPartDescription "Shows weather in Amsterdam" --packageName amsterdam-weather --html @amsterdam-weather.html --allowTenantWideDeployment --enableForTeams all
+m365 spfx package generate --webPartTitle "Amsterdam weather" --webPartDescription "Shows weather in Amsterdam" --packageName amsterdam-weather --html `@amsterdam-weather.html --allowTenantWideDeployment --enableForTeams all
 ```
