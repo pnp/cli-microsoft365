@@ -54,19 +54,6 @@ describe(commands.TASK_GET, () => {
     ]
   };
 
-  const multiplePlanResponse = {
-    "value": [
-      {
-        "id": validPlanId,
-        "title": validPlanName
-      },
-      {
-        "id": validPlanId,
-        "title": validPlanName
-      }
-    ]
-  };
-
   const singleBucketByNameResponse = {
     "value": [
       {

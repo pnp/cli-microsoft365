@@ -1,4 +1,4 @@
-import { Group, PlannerBucket, PlannerPlan, PlannerTask } from '@microsoft/microsoft-graph-types';
+import { Group, PlannerBucket, PlannerTask } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';

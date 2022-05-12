@@ -1,4 +1,3 @@
-import { PlannerPlan } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
