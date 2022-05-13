@@ -13,6 +13,7 @@
 - [spo field list](../cmd/spo/field/field-list.md) - retrieves columns for the specified list or site [#2695](https://github.com/pnp/cli-microsoft365/issues/2695)
 - [spo list roleinheritance break](../cmd/spo/list/list-roleinheritance-break.md) - breaks role inheritance on list or library [#3198](https://github.com/pnp/cli-microsoft365/issues/3198)
 - [spo list roleinheritance reset](../cmd/spo/list/list-roleinheritance-reset.md) - restores role inheritance on list or library [#3220](https://github.com/pnp/cli-microsoft365/issues/3220)
+- [spo roledefinition list](../cmd/spo/roledefinition/roledefinition-list.md) - gets list of role definitions for the specified site [#3237](https://github.com/pnp/cli-microsoft365/issues/3237)
 
 **Tenant:**
 
