@@ -60,8 +60,9 @@ class TeamsCacheRemoveCommand extends GraphCommand {
       await this.killRunningProcess(logger);
       await this.removeCachingFiles(logger);      
     } 
-    catch (err: any) {
-      cb(err.message);
+    catch {
+      logger.logToStderr('Teams cache not found');
+      cb();
       return;
     }
 
@@ -90,7 +91,18 @@ class TeamsCacheRemoveCommand extends GraphCommand {
       logger.logToStderr(cmd);
     }
 
-    await this.exec(cmd);
+    try {
+      await this.exec(cmd);
+
+      if (this.verbose) {
+        logger.logToStderr('Teams client closed');
+      }
+    }
+    catch { 
+      if (this.verbose) {
+        logger.logToStderr('Teams client isn\'t running');
+      }
+    }
   }
 
   private async removeCachingFiles(logger: Logger): Promise<void> {
@@ -103,7 +115,7 @@ class TeamsCacheRemoveCommand extends GraphCommand {
 
     switch (platform) {
       case 'win32': 
-        cmd = 'cd %userprofile% && rmdir /s /q AppData\\Roaming\\Microsoft\\Teamss'; 
+        cmd = 'cd %userprofile% && rmdir /s /q AppData\\Roaming\\Microsoft\\Teams'; 
         break;
       case 'darwin': 
         cmd = 'rm -r ~/Library/Application\ Support/Microsoft/Teams'; 

@@ -13,7 +13,6 @@ describe(commands.CACHE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
-
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -135,10 +134,11 @@ describe(commands.CACHE_REMOVE, () => {
     const exec = sinon.stub(command, 'exec' as any).throws(error);
 
     command.action(logger, { options: {
-      confirm: true
-    }}, (err?: any) => {
+      confirm: true,
+      verbose: true
+    }}, () => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify("some fake error"));
+        assert(true);
         exec.restore();
         done();
       }
