@@ -1,4 +1,4 @@
-import { Channel } from '../../Channel';
+import { Channel } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import { validation } from '../../../../utils';
@@ -140,7 +140,7 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
           return Promise.reject(`The specified channel is not a private channel`);
         }
 
-        return Promise.resolve(channelItem.id);
+        return Promise.resolve(channelItem.id!);
       });
   }
 
