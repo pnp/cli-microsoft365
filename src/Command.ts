@@ -172,6 +172,12 @@ export default abstract class Command {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public validate(args: any): boolean | string {
+    const outputOption: CommandOption = this.options()
+      .find(val => val.option.indexOf(`--output`) > -1) as CommandOption;
+    const outputValues: string[] = outputOption.autocomplete as string[];
+    if (args.options?.output && !(outputValues.includes(args.options.output))) {
+      return `Use one of the values for --output: ${outputValues}`;
+    }
     return true;
   }
 

@@ -105,6 +105,11 @@ class TeamsAppInstallCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
+    const baseValidate = super.validate(args);
+    if (baseValidate !== true) {
+      return baseValidate;
+    }
+
     if (!validation.isValidGuid(args.options.appId)) {
       return `${args.options.appId} is not a valid GUID`;
     }

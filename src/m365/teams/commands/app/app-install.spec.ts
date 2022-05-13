@@ -38,7 +38,8 @@ describe(commands.APP_INSTALL, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post
+      request.post,
+      Command.prototype.validate
     ]);
   });
 
@@ -158,6 +159,13 @@ describe(commands.APP_INSTALL, () => {
       }
     });
     assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if parent validation fails', () => {
+    sinon.stub(Command.prototype, "validate").callsFake(() => `Here goes prototype validation error`);
+    const actual = command.validate({});
+    assert.strictEqual(typeof actual, 'string');
+    assert.strictEqual((actual as string).indexOf('Here goes prototype validation error') > -1, true);
   });
 
   it('adds app from the catalog to a Microsoft Team', (done) => {

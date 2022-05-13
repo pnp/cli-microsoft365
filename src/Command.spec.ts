@@ -359,4 +359,11 @@ describe('Command', () => {
     command.addUnknownOptionsToPayloadPublic(actual, { Prop2: false });
     assert.strictEqual(JSON.stringify(actual), expected);
   });
+
+  it('returns an error for invalid output option', () => {
+    const cmd = new MockCommand2();
+    const validationError = cmd.validate({ options: { output: 'somethingIncorrect' } });
+    assert.strictEqual(typeof validationError, 'string');
+    assert.strictEqual((validationError as string).indexOf('Use one of the values for --output: ') > -1, true);
+  });
 });

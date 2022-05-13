@@ -572,6 +572,20 @@ describe('Cli', () => {
       });
   });
 
+  it('correctly handles output validation error', (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', '-x', '123', '-o', 'somethingInvalid'])
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
+        try {
+          assert.strictEqual(cliErrorStub.lastCall.args[0].indexOf('Error: Use one of the values for --output:') > -1, true);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
   it(`executes command when validation passed`, (done) => {
     cli
       .execute(rootFolder, ['cli', 'mock', '-x', '123'])
