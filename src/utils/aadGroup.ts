@@ -40,7 +40,8 @@ export const aadGroup = {
   /**
    * Get a single group by its display name.
    * @param displayName Group display name.
-   * @throws Error when group is not found or multiple groups were found.
+   * @throws Error when group was not found.
+   * @throws Error when multiple groups with the same name were found.
    */
   async getGroupByDisplayName(displayName: string): Promise<Group> {
     const groups = await this.getGroupsByDisplayName(displayName);

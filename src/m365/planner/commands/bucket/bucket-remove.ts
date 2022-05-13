@@ -1,4 +1,4 @@
-import { Group, PlannerBucket, PlannerPlan } from '@microsoft/microsoft-graph-types';
+import { PlannerBucket, PlannerPlan } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
 import { Cli, Logger } from '../../../../cli';
 import {
@@ -9,6 +9,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { aadGroup } from '../../../../utils/aadGroup';
 
 interface CommandArgs {
   options: Options;
@@ -167,27 +168,9 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       return Promise.resolve(ownerGroupId);
     }
 
-    const requestOptions: AxiosRequestConfig = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(ownerGroupName!)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: Group[] }>(requestOptions)
-      .then(response => {
-        if (!response.value.length) {
-          return Promise.reject(`The specified owner group ${ownerGroupName} does not exist`);
-        }
-
-        if (response.value.length > 1) {
-          return Promise.reject(`Multiple owner groups with name ${ownerGroupName} found: ${response.value.map(x => x.id)}`);
-        }
-
-        return Promise.resolve(response.value[0].id!);
-      });
+    return aadGroup
+      .getGroupByDisplayName(ownerGroupName!)
+      .then(group => group.id!);
   }
 
   public options(): CommandOption[] {

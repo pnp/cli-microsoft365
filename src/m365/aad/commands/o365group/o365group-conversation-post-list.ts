@@ -7,7 +7,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { odata, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import request from '../../../../request';
+import { aadGroup } from '../../../../utils/aadGroup';
 
 interface CommandArgs {
   options: Options;
@@ -54,25 +54,10 @@ class AadO365GroupConversationPostListCommand extends GraphCommand {
     if (args.options.groupId) {
       return Promise.resolve(encodeURIComponent(args.options.groupId));
     }
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.groupDisplayName as string)}'&$select=id`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: { id: string; }[] }>(requestOptions)
-      .then(res => {
-        if (res.value.length === 1) {
-          return Promise.resolve(res.value[0].id);
-        }
-        if (res.value.length === 0) {
-          return Promise.reject(`The specified group does not exist`);
-        }
-        return Promise.reject(`Multiple groups found with name ${args.options.groupDisplayName} found. Please choose between the following IDs: ${res.value.map(a => a.id).join(', ')}`);
-      });
+    
+    return aadGroup
+      .getGroupByDisplayName(args.options.groupDisplayName!)
+      .then(group => group.id!);
   }
 
   public options(): CommandOption[] {

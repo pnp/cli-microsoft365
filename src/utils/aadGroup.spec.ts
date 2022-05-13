@@ -61,10 +61,10 @@ describe('utils/aadGroup', () => {
 
     try {
       await aadGroup.getGroupByDisplayName(validGroupName);
-      assert.fail('Error expected, but was not thrown.')
+      assert.fail('Error expected, but was not thrown.');
     }
     catch (ex) {
-      assert.deepStrictEqual(ex, Error(`The specified group '${validGroupName}' does not exist.`))
+      assert.deepStrictEqual(ex, Error(`The specified group '${validGroupName}' does not exist.`));
     }
   });
 
@@ -84,10 +84,10 @@ describe('utils/aadGroup', () => {
 
     try {
       await aadGroup.getGroupByDisplayName(validGroupName);
-      assert.fail('Error expected, but was not thrown.')
+      assert.fail('Error expected, but was not thrown.');
     }
     catch (ex) {
-      assert.deepStrictEqual(ex, Error(`Multiple groups with name '${validGroupName}' found: ${[validGroupId, validGroupId]}.`))
+      assert.deepStrictEqual(ex, Error(`Multiple groups with name '${validGroupName}' found: ${[validGroupId, validGroupId]}.`));
     }
   });
 
