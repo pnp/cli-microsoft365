@@ -89,8 +89,8 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
-    assert(actual);
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: '4' } });
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if the listId option is not a valid GUID', () => {
@@ -99,8 +99,18 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
   });
 
   it('passes validation if the listId option is a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
-    assert(actual);
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: '4' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if the specified list item id is not a number', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listItemId: 'a' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if the specified list item id is a number', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listItemId: '4' } });
+    assert.strictEqual(actual, true);
   });
 
   it('break role inheritance of list item with id 1 on list by title', (done) => {
@@ -117,7 +127,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
-        id: 1
+        listItemId: 1
       }
     }, (err: any) => {
       try {
@@ -144,7 +154,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
-        id: 1,
+        listItemId: 1,
         clearExistingPermissions: true
       }
     }, (err: any) => {
@@ -171,7 +181,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        id: 1,
+        listItemId: 1,
         listId: '202b8199-b9de-43fd-9737-7f213f51c991'
       }
     }, (err: any) => {
@@ -199,7 +209,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '202b8199-b9de-43fd-9737-7f213f51c991',
-        id: 1,
+        listItemId: 1,
         clearExistingPermissions: true
       }
     }, (err: any) => {
@@ -227,7 +237,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        id: 1,
+        listItemId: 1,
         listTitle: 'test'
       }
     }, (error?: any) => {

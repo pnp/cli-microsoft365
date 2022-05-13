@@ -1,6 +1,6 @@
 # spo listitem roleinheritance break
 
-Break inheritance of list item. Keeping existing permissions is the default behavior.
+Break inheritance of list item.
 
 ## Usage
 
@@ -13,7 +13,7 @@ m365 spo listitem roleinheritance break [options]
 `-u, --webUrl <webUrl>`
 : URL of the site from which the item should be retrieved
 
-`-i, --id <id>`
+`--listItemId <listItemId>`
 : ID of the item to retrieve
 
 `-l, --listId [listId]`
@@ -26,6 +26,10 @@ Title of the list. Specify listId or listTitle but not both
 : Flag if used clears all roles from the listitem
 
 --8<-- "docs/cmd/_global.md"
+
+## Remarks
+
+By default, when breaking permissions inheritance, the list item will retain existing permissions. To remove existing permissions, use the `--clearExistingPermissions` option.
 
 ## Examples
 

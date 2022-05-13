@@ -12,13 +12,13 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  id: number;
+  listItemId: number;
   listId?: string;
   listTitle?: string;
   clearExistingPermissions?: boolean;
 }
 
-class SpoListItemRoleInHeritanceBreakCommand extends SpoCommand {
+class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
   public get name(): string {
     return commands.LISTITEM_ROLEINHERITANCE_BREAK;
   }
@@ -53,7 +53,7 @@ class SpoListItemRoleInHeritanceBreakCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${requestUrl}/items(${args.options.id})/breakroleinheritance(${keepExistingPermissions})`,
+      url: `${requestUrl}/items(${args.options.listItemId})/breakroleinheritance(${keepExistingPermissions})`,
       method: 'POST',
       headers: {
         'accept': 'application/json;odata=nometadata',
@@ -73,7 +73,7 @@ class SpoListItemRoleInHeritanceBreakCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id <id>'
+        option: '--listItemId <listItemId>'
       },
       {
         option: '-l, --listId [listId]'
@@ -100,8 +100,12 @@ class SpoListItemRoleInHeritanceBreakCommand extends SpoCommand {
       return `${args.options.listId} is not a valid GUID`;
     }
 
+    if (isNaN(args.options.listItemId)) {
+      return `${args.options.listItemId} is not a number`;
+    }
+
     return true;
   }
 }
 
-module.exports = new SpoListItemRoleInHeritanceBreakCommand();
+module.exports = new SpoListItemRoleInheritanceBreakCommand();
