@@ -6,6 +6,7 @@
 
 **Planner:**
 
+- [planner bucket get](../cmd/planner/bucket/bucket-get.md) - retrieves a planner bucket [#3226](https://github.com/pnp/cli-microsoft365/issues/3226)
 - [planner bucket remove](../cmd/planner/bucket/bucket-remove.md) - removes a Microsoft Planner bucket from a plan [#2742](https://github.com/pnp/cli-microsoft365/issues/2742)
 
 **SharePoint Online:**
@@ -28,6 +29,9 @@
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
 ### New commands
+
+**Apps:**
+- [app open](../cmd/planner/bucket/bucket-get.md) - returns deep link of the current AD app to open the Azure portal on the Azure AD app registration management page [#2940](https://github.com/pnp/cli-microsoft365/issues/2940)
 
 **Azure Active Directory:**
 
@@ -75,6 +79,7 @@
 - removed react check from 'spfx doctor' command [#3162](https://github.com/pnp/cli-microsoft365/issues/3162)
 - added support for upgrading SPFx projects to 1.15.0-beta.6 [#3243](https://github.com/pnp/cli-microsoft365/issues/3243)
 - fixed options descriptions for `planner task set` [#3245](https://github.com/pnp/cli-microsoft365/issues/3245)
+- extends 'sp approleassignment' with more properties [#3262](https://github.com/pnp/cli-microsoft365/issues/3262)
 
 ## [v5.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.1.0)
 
