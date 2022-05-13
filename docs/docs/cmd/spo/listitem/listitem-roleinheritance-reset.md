@@ -13,7 +13,7 @@ m365 spo listitem roleinheritance reset [options]
 `-u, --webUrl <webUrl>`
 : URL of the site from which the item role inheritance should be reset
 
-`--id <id>`
+`--listItemId <listItemId>`
 : ID of the item to retrieve
 
 `--listId [listId]`
@@ -29,11 +29,11 @@ m365 spo listitem roleinheritance reset [options]
 Restore role inheritance of list item with id 8 from list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo listitem roleinheritance reset --webUrl https://contoso.sharepoint.com/sites/project-x --id 8 --listId 0cd891ef-afce-4e55-b836-fce03286cccf
+m365 spo listitem roleinheritance reset --webUrl https://contoso.sharepoint.com/sites/project-x --listItemId 8 --listId 0cd891ef-afce-4e55-b836-fce03286cccf
 ```
 
 Restore role inheritance of list item with id 8 from list with title _test_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo listitem roleinheritance reset --webUrl https://contoso.sharepoint.com/sites/project-x --id 8 --listTitle test
+m365 spo listitem roleinheritance reset --webUrl https://contoso.sharepoint.com/sites/project-x --listItemId 8 --listTitle test
 ```

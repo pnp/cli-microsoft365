@@ -12,7 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  id: number;
+  listItemId: number;
   listId?: string;
   listTitle?: string;
 }
@@ -44,7 +44,7 @@ class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${requestUrl}/items(${args.options.id})/resetroleinheritance`,
+      url: `${requestUrl}/items(${args.options.listItemId})/resetroleinheritance`,
       method: 'POST',
       headers: {
         'accept': 'application/json;odata=nometadata',
@@ -70,7 +70,7 @@ class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--id <id>'
+        option: '--listItemId <listItemId>'
       },
       {
         option: '--listId [listId]'
@@ -94,8 +94,8 @@ class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
       return `${args.options.listId} is not a valid GUID`;
     }
 
-    if (isNaN(args.options.id)) {
-      return `${args.options.id} is not a number`;
+    if (isNaN(args.options.listItemId)) {
+      return `${args.options.listItemId} is not a number`;
     }
 
     return true;

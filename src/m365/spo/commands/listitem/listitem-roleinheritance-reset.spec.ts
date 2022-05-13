@@ -84,32 +84,32 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'foo', id: 8, listTitle: 'Demo List' } });
+    const actual = command.validate({ options: { webUrl: 'foo', listItemId: 8, listTitle: 'Demo List' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 8, listId: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: 8, listId: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if the listId option is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 8, listId: 'foo' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: 8, listId: 'foo' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the listId option is a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 8, listId: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: 8, listId: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the specified id is not a number', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', id: 'a' } });
+  it('fails validation if the specified list item id is not a number', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listItemId: 'a' } });
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the specified id is a number', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', id: '4' } });
+  it('passes validation if the specified list item id is a number', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listItemId: '4' } });
     assert.strictEqual(actual, true);
   });
 
@@ -126,7 +126,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        id: 8,
+        listItemId: 8,
         listTitle: 'test'
       }
     }, (err: any) => {
@@ -153,7 +153,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        id: 8,
+        listItemId: 8,
         listId: '0cd891ef-afce-4e55-b836-fce03286cccf'
       }
     }, (err: any) => {
@@ -181,7 +181,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        id: 8,
+        listItemId: 8,
         listTitle: 'test'
       }
     }, (error?: any) => {
