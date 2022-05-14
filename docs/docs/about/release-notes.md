@@ -4,6 +4,9 @@
 
 ### New commands
 
+**Apps:**
+- [app open](../cmd/planner/bucket/bucket-get.md) - returns deep link of the current AD app to open the Azure portal on the Azure AD app registration management page [#2940](https://github.com/pnp/cli-microsoft365/issues/2940)
+
 **Planner:**
 
 - [planner bucket get](../cmd/planner/bucket/bucket-get.md) - retrieves a planner bucket [#3226](https://github.com/pnp/cli-microsoft365/issues/3226)
@@ -25,13 +28,12 @@
 - added 'add multiple tasks in Planner' sample [#2245](https://github.com/pnp/cli-microsoft365/issues/2245)
 - removed testing on Node@12 [#3212](https://github.com/pnp/cli-microsoft365/issues/3212)
 - extended 'planner task get' [#3229](https://github.com/pnp/cli-microsoft365/issues/3229)
+- extends 'sp approleassignment' with more properties [#2462](https://github.com/pnp/cli-microsoft365/issues/2462)
+- Fixes invalid channel ID in docs. Closes [#3278](https://github.com/pnp/cli-microsoft365/issues/3278)
 
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
 ### New commands
-
-**Apps:**
-- [app open](../cmd/planner/bucket/bucket-get.md) - returns deep link of the current AD app to open the Azure portal on the Azure AD app registration management page [#2940](https://github.com/pnp/cli-microsoft365/issues/2940)
 
 **Azure Active Directory:**
 
@@ -50,7 +52,7 @@
 
 - [teams channel member remove](../cmd/teams/channel/channel-member-remove.md) - remove the specified member from the specified Microsoft Teams private team channel [#3175](https://github.com/pnp/cli-microsoft365/issues/3175)
 - [teams channel member set](../cmd/teams/channel/channel-member-set.md) - updates the role of the specified member in the specified Microsoft Teams private team channel [#3177](https://github.com/pnp/cli-microsoft365/issues/3177)
-- teams channel membership list - lists users for the specified Microsoft Teams channel [#3176](https://github.com/pnp/cli-microsoft365/issues/3176)
+- [teams channel membership list](../cmd/teams/channel/channel-member-list.md) - lists users for the specified Microsoft Teams channel [#3176](https://github.com/pnp/cli-microsoft365/issues/3176)
 - [teams chat get](../cmd/teams/chat/chat-get.md) - gets a Microsoft Teams chat conversation by id, participants or chat name [#3017](https://github.com/pnp/cli-microsoft365/issues/3017)
 
 ### Changes
@@ -79,8 +81,6 @@
 - removed react check from 'spfx doctor' command [#3162](https://github.com/pnp/cli-microsoft365/issues/3162)
 - added support for upgrading SPFx projects to 1.15.0-beta.6 [#3243](https://github.com/pnp/cli-microsoft365/issues/3243)
 - fixed options descriptions for `planner task set` [#3245](https://github.com/pnp/cli-microsoft365/issues/3245)
-- extends 'sp approleassignment' with more properties [#2462](https://github.com/pnp/cli-microsoft365/issues/2462)
-- Fixes invalid channel ID in docs. Closes [#3278](https://github.com/pnp/cli-microsoft365/issues/3278)
 
 ## [v5.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.1.0)
 
