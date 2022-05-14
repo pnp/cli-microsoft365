@@ -47,11 +47,11 @@ export const planner = {
     const filteredPlans = plans.filter(p => p.title && p.title.toLowerCase() === name.toLowerCase());
 
     if (!filteredPlans.length) {
-      throw new Error(`The specified plan '${name}' does not exist.`);
+      throw Error(`The specified plan '${name}' does not exist.`);
     }
 
     if (filteredPlans.length > 1) {
-      throw new Error(`Multiple plans with name '${name}' found: ${filteredPlans.map(x => x.id)}.`);
+      throw Error(`Multiple plans with name '${name}' found: ${filteredPlans.map(x => x.id)}.`);
     }
 
     return filteredPlans[0];
