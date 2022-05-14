@@ -6,9 +6,10 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils';
+import { accessToken, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import Auth from '../../../../Auth';
 
 interface CommandArgs {
   options: Options;
@@ -44,6 +45,11 @@ class PlannerBucketGetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+      this.handleError('This command does not support application permissions.', logger, cb);
+      return;
+    }
+    
     this
       .getBucketId(args)
       .then((bucketId: string) => this.getBucketById(bucketId))
