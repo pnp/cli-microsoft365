@@ -42,33 +42,15 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let sp: ServicePrincipal;
+    let spAppRoleAssignments: AppRoleAssignment[];
 
-    // get the service principal associated with the appId
-    let spMatchQuery: string = '';
-    if (args.options.appId) {
-      spMatchQuery = `appId eq '${encodeURIComponent(args.options.appId)}'`;
-    }
-    else if (args.options.objectId) {
-      spMatchQuery = `id eq '${encodeURIComponent(args.options.objectId)}'`;
-    }
-    else {
-      spMatchQuery = `displayName eq '${encodeURIComponent(args.options.displayName as string)}'`;
-    }
-
-    this
-      .getServicePrincipalForApp(spMatchQuery)
-      .then((resp: { value: ServicePrincipal[] }): Promise<ServicePrincipal[]> => {
-        if (!resp.value.length) {
-          return Promise.reject('app registration not found');
-        }
-
-        sp = resp.value[0];
-
+    this.getAppRoleAssignments(args.options)
+      .then((appRoleAssignments: AppRoleAssignment[]) => {
+        spAppRoleAssignments = appRoleAssignments;
         // the role assignment has an appRoleId but no name. To get the name,
         // we need to get all the roles from the resource. the resource is
         // a service principal. Multiple roles may have same resource id.
-        const resourceIds = sp.appRoleAssignments.map((item: AppRoleAssignment) => item.resourceId);
+        const resourceIds = appRoleAssignments.map((item: AppRoleAssignment) => item.resourceId);
 
         const tasks: Promise<ServicePrincipal>[] = [];
         for (let i: number = 0; i < resourceIds.length; i++) {
@@ -81,7 +63,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
         // loop through all appRoleAssignments for the servicePrincipal
         // and lookup the appRole.Id in the resources[resourceId].appRoles array...
         const results: any[] = [];
-        sp.appRoleAssignments.map((appRoleAssignment: AppRoleAssignment) => {
+        spAppRoleAssignments.map((appRoleAssignment: AppRoleAssignment) => {
           const resource: ServicePrincipal | undefined = resources.find((r: any) => r.id === appRoleAssignment.resourceId);
 
           if (resource) {
@@ -93,7 +75,9 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
                 resourceDisplayName: appRoleAssignment.resourceDisplayName,
                 resourceId: appRoleAssignment.resourceId,
                 roleId: appRole.id,
-                roleName: appRole.value
+                roleName: appRole.value,
+                created: appRoleAssignment.createdDateTime,
+                deleted: appRoleAssignment.deletedDateTime
               });
             }
           }
@@ -102,6 +86,58 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
         logger.log(results);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  }
+
+  private getAppRoleAssignments(argOptions: Options): Promise<AppRoleAssignment[]> {
+    return new Promise<AppRoleAssignment[]>((resolve: (approleAssignments: AppRoleAssignment[]) => void, reject: (err: any) => void) => {
+      if (argOptions.objectId) {
+        this.getSPAppRoleAssignments(argOptions.objectId)
+          .then(( spAppRoleAssignments: { value: AppRoleAssignment[] }) => {
+            if (!spAppRoleAssignments.value.length) {
+              reject('no app role assignments found');
+            }
+
+            resolve(spAppRoleAssignments.value);
+          })
+          .catch((err: any) => {
+            reject(err);
+          });
+      }
+      else {
+        // Use existing way to get service principal object
+        let spMatchQuery: string = '';
+        if (argOptions.appId) {
+          spMatchQuery = `appId eq '${encodeURIComponent(argOptions.appId)}'`;
+        }
+        else {
+          spMatchQuery = `displayName eq '${encodeURIComponent(argOptions.displayName as string)}'`;
+        } 
+  
+        this.getServicePrincipalForApp(spMatchQuery)
+          .then((resp: { value: ServicePrincipal[] }) => {
+            if (!resp.value.length) {
+              reject('app registration not found');
+            }
+  
+            resolve(resp.value[0].appRoleAssignments);
+          })
+          .catch((err: any) => {
+            reject(err);
+          });
+      }
+    });
+  }
+
+  private getSPAppRoleAssignments(spId: string): Promise<{ value: AppRoleAssignment[] }> {
+    const spRequestOptions: any = {
+      url: `${this.resource}/v1.0/servicePrincipals/${spId}/appRoleAssignments`,
+      headers: {
+        accept: 'application/json'
+      },
+      responseType: 'json'
+    };
+
+    return request.get<{ value: AppRoleAssignment[] }>(spRequestOptions);
   }
 
   private getServicePrincipalForApp(filterParam: string): Promise<{ value: ServicePrincipal[] }> {
@@ -116,7 +152,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
     return request.get<{ value: ServicePrincipal[] }>(spRequestOptions);
   }
 
-  private  getServicePrincipal(spId: string): Promise<ServicePrincipal> {
+  private getServicePrincipal(spId: string): Promise<ServicePrincipal> {
     const spRequestOptions: any = {
       url: `${this.resource}/v1.0/servicePrincipals/${spId}`,
       headers: {

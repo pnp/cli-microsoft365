@@ -1,15 +1,14 @@
-import { PlannerBucket, PlannerPlan } from '@microsoft/microsoft-graph-types';
+import { PlannerBucket, PlannerPlan, Group } from '@microsoft/microsoft-graph-types';
+import { Logger } from '../../../../cli';
 import { AxiosRequestConfig } from 'axios';
-import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
 } from '../../../../Command';
-import { accessToken, validation } from '../../../../utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { accessToken, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { aadGroup } from '../../../../utils/aadGroup';
 import Auth from '../../../../Auth';
 
 interface CommandArgs {
@@ -23,16 +22,15 @@ interface Options extends GlobalOptions {
   planName?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
-  confirm?: boolean;
 }
 
-class PlannerBucketRemoveCommand extends GraphCommand {
+class PlannerBucketGetCommand extends GraphCommand {
   public get name(): string {
-    return commands.BUCKET_REMOVE;
+    return commands.BUCKET_GET;
   }
 
   public get description(): string {
-    return 'Removes the Microsoft Planner bucket from a plan';
+    return 'Gets the Microsoft Planner bucket in a plan';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -43,7 +41,6 @@ class PlannerBucketRemoveCommand extends GraphCommand {
     telemetryProps.planName = typeof args.options.planName !== 'undefined';
     telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
     telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
-    telemetryProps.confirm = args.options.confirm || false;
     return telemetryProps;
   }
 
@@ -53,64 +50,28 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       return;
     }
     
-    const removeBucket: () => void = (): void => {
-      this
-        .getBucket(args)
-        .then(bucket => {
-          const requestOptions: AxiosRequestConfig = {
-            url: `${this.resource}/v1.0/planner/buckets/${bucket.id}`,
-            headers: {
-              accept: 'application/json;odata.metadata=none',
-              'if-match': (bucket as any)['@odata.etag']
-            },
-            responseType: 'json'
-          };
-    
-          return request.delete(requestOptions);
-        })
-        .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-    };
-
-    if (args.options.confirm) {
-      removeBucket();
-    }
-    else {
-      Cli.prompt({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to remove the bucket ${args.options.id || args.options.name}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeBucket();
-        }
-      });
-    }
+    this
+      .getBucketId(args)
+      .then((bucketId: string) => this.getBucketById(bucketId))
+      .then((bucket: PlannerBucket) => {
+        logger.log(bucket);
+        cb();
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getBucket(args: CommandArgs): Promise<PlannerBucket> {
-    if (args.options.id) {
-      const requestOptions: AxiosRequestConfig = {
-        url: `${this.resource}/v1.0/planner/buckets/${args.options.id}`,
-        headers: {
-          accept: 'application/json'
-        },
-        responseType: 'json'
-      };
-      
-      return request.get<PlannerBucket>(requestOptions);
+  private getBucketId (args: CommandArgs): Promise<string> {
+    const { id, name } = args.options;
+    if (id) {
+      return Promise.resolve(id);
     }
 
     return this
       .getPlanId(args)
-      .then(planId => {
-        const requestOptions: AxiosRequestConfig = {
+      .then((planId: string) => {
+        const requestOptions: any = {
           url: `${this.resource}/v1.0/planner/plans/${planId}/buckets`,
           headers: {
-            accept: 'application/json'
+            accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json'
         };
@@ -118,18 +79,18 @@ class PlannerBucketRemoveCommand extends GraphCommand {
         return request.get<{ value:PlannerBucket[] }>(requestOptions);
       })
       .then(buckets => {
-        const filteredBuckets = buckets.value.filter(b => args.options.name!.toLowerCase() === b.name!.toLowerCase());
+        const filteredBuckets = buckets.value.filter(b => name!.toLowerCase() === b.name!.toLowerCase());
 
         if (!filteredBuckets.length) {
-          return Promise.reject(`The specified bucket ${args.options.name} does not exist`);
+          return Promise.reject(`The specified bucket ${name} does not exist`);
         }
-
+        
         if (filteredBuckets.length > 1) {
-          return Promise.reject(`Multiple buckets with name ${args.options.name} found: ${filteredBuckets.map(x => x.id)}`);
+          return Promise.reject(`Multiple buckets with name ${name} found: ${filteredBuckets.map(x => x.id)}`);
         }
 
-        return Promise.resolve(filteredBuckets[0]);
-      });
+        return Promise.resolve(filteredBuckets[0].id!.toString());
+      });     
   }
 
   private getPlanId(args: CommandArgs): Promise<string> {
@@ -155,7 +116,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       .then(plans => {
         const filteredPlans = plans.value.filter(p => p.title!.toLowerCase() === planName!.toLowerCase());
 
-        if (!filteredPlans.length) {
+        if (filteredPlans.length === 0) {
           return Promise.reject(`The specified plan ${planName} does not exist`);
         }
 
@@ -167,6 +128,18 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       });
   }
 
+  private async getBucketById(id: string): Promise<PlannerBucket> {
+    const requestOptions: AxiosRequestConfig = {
+      url: `${this.resource}/v1.0/planner/buckets/${id}`,
+      headers: {
+        accept: 'application/json'
+      },
+      responseType: 'json'
+    };
+
+    return request.get<PlannerBucket>(requestOptions);    
+  }
+
   private getGroupId(args: CommandArgs): Promise<string> {
     const { ownerGroupId, ownerGroupName } = args.options;
 
@@ -174,15 +147,33 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       return Promise.resolve(ownerGroupId);
     }
 
-    return aadGroup
-      .getGroupByDisplayName(ownerGroupName!)
-      .then(group => group.id!);
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(ownerGroupName as string)}'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    return request
+      .get<{ value: Group[] }>(requestOptions)
+      .then(response => {
+        if (!response.value.length) {
+          return Promise.reject(`The specified owner group ${ownerGroupName} does not exist`);
+        }
+
+        if (response.value.length > 1) {
+          return Promise.reject(`Multiple owner groups with name ${ownerGroupName} found: ${response.value.map(x => x.id)}`);
+        }
+
+        return Promise.resolve(response.value[0].id!);
+      });
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--id [id]'
+        option: '-i, --id [id]'
       },
       {
         option: '--name [name]'
@@ -198,9 +189,6 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       },
       {
         option: '--ownerGroupName [ownerGroupName]'
-      },
-      {
-        option: '--confirm'
       }
     ];
 
@@ -208,25 +196,23 @@ class PlannerBucketRemoveCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public optionSets(): string[][] | undefined {
-    return [
-      ['id', 'name']
-    ];
-  }
-
   public validate(args: CommandArgs): boolean | string {
     if (args.options.id) {
       if (args.options.planId || args.options.planName || args.options.ownerGroupId || args.options.ownerGroupName) {
         return 'Don\'t specify planId, planName, ownerGroupId or ownerGroupName when using id';
       }
+      if (args.options.name) {
+        return 'Specify either id or name';
+      }
     }
-    else {
+
+    if (args.options.name) {
       if (!args.options.planId && !args.options.planName) {
         return 'Specify either planId or planName when using name';
       }
 
       if (args.options.planId && args.options.planName) {
-        return 'Specify either planId or planName when using name but not both';  
+        return 'Specify either planId or planName when using name but not both';
       }
 
       if (args.options.planName) {
@@ -242,15 +228,20 @@ class PlannerBucketRemoveCommand extends GraphCommand {
           return `${args.options.ownerGroupId} is not a valid GUID`;
         }
       }
-      else {
+      
+      if (args.options.planId) {
         if (args.options.ownerGroupId || args.options.ownerGroupName) {
           return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
         }
       }
     }
 
+    if (!args.options.id && !args.options.name) {
+      return 'Please specify id or name';
+    }
+
     return true;
   }
 }
 
-module.exports = new PlannerBucketRemoveCommand();
+module.exports = new PlannerBucketGetCommand();

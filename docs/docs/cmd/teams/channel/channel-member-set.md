@@ -38,10 +38,10 @@ m365 teams channel member set [options]
 
 ## Examples
   
-Updates the role of the user _johndoe@example.com_ to owner in the Microsoft Teams team with id 00000000-0000-0000-0000-000000000000 and channel id 00:00000000000000000000000000000000@thread.skype
+Updates the role of the user _johndoe@example.com_ to owner in the Microsoft Teams team with id 00000000-0000-0000-0000-000000000000 and channel id 19:00000000000000000000000000000000@thread.skype
 
 ```sh
-m365 teams channel member set --teamId 00000000-0000-0000-0000-000000000000 --channelId 00:00000000000000000000000000000000@thread.skype --userName "johndoe@example.com" --role owner
+m365 teams channel member set --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --userName "johndoe@example.com" --role owner
 ```
 
 Updates the role of the user with id 00000000-0000-0000-0000-000000000000 to member in the Microsoft Teams team with name _Team Name_ and channel with name _Channel Name_

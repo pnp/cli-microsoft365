@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { sinonUtil } from '../../../../utils';
+import { accessToken, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./plan-add');
 
@@ -15,6 +15,7 @@ describe(commands.PLAN_ADD, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
@@ -40,7 +41,8 @@ describe(commands.PLAN_ADD, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post
+      request.post,
+      accessToken.isAppOnlyAccessToken
     ]);
   });
 
@@ -117,6 +119,26 @@ describe(commands.PLAN_ADD, () => {
     });
     assert.strictEqual(actual, true);
     done();
+  });
+
+  it('fails validation when using app only access token', (done) => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    command.action(logger, {
+      options: {
+        title: 'My Planner Plan',
+        ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('correctly adds planner plan with given title with available ownerGroupId', (done) => {

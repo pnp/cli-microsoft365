@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { sinonUtil } from '../../../../utils';
+import { accessToken, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./bucket-remove');
 
@@ -86,6 +86,7 @@ describe(commands.BUCKET_REMOVE, () => {
   let promptOptions: any;
 
   before(() => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
@@ -115,6 +116,7 @@ describe(commands.BUCKET_REMOVE, () => {
     sinonUtil.restore([
       request.get,
       request.delete,
+      accessToken.isAppOnlyAccessToken,
       Cli.prompt
     ]);
   });
@@ -275,6 +277,26 @@ describe(commands.BUCKET_REMOVE, () => {
     }, () => {
       try {
         assert(postSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when using app only access token', (done) => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    command.action(logger, {
+      options: {
+        name: 'My Planner Bucket',
+        planId: validPlanId
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
         done();
       }
       catch (e) {
