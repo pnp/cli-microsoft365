@@ -29,11 +29,12 @@ nav:
       - app:
         - app add: 'cmd/aad/app/app-add.md'
         - app get: 'cmd/aad/app/app-get.md'
-        - app remove: 'cmd/aad/app/app-remove.md'
-        - app set: 'cmd/aad/app/app-set.md'
+        - app open: 'cmd/aad/app/app-open.md'
+        - app remove: 'cmd/aad/app/app-remove.md'        
         - app role add: 'cmd/aad/app/app-role-add.md'
         - app role list: 'cmd/aad/app/app-role-list.md'
         - app role remove: 'cmd/aad/app/app-role-remove.md'
+        - app set: 'cmd/aad/app/app-set.md'
       - approleassignment:
         - approleassignment add: 'cmd/aad/approleassignment/approleassignment-add.md'
         - approleassignment list: 'cmd/aad/approleassignment/approleassignment-list.md'
@@ -183,6 +184,7 @@ nav:
     - Planner (planner):
       - bucket:
         - bucket add: 'cmd/planner/bucket/bucket-add.md'
+        - bucket get: 'cmd/planner/bucket/bucket-get.md'
         - bucket list: 'cmd/planner/bucket/bucket-list.md'
         - bucket set: 'cmd/planner/bucket/bucket-set.md'
         - bucket remove: 'cmd/planner/bucket/bucket-remove.md'
@@ -362,6 +364,8 @@ nav:
         - list get: 'cmd/spo/list/list-get.md'
         - list list: 'cmd/spo/list/list-list.md'
         - list remove: 'cmd/spo/list/list-remove.md'
+        - list roleinheritance break: 'cmd/spo/list/list-roleinheritance-break.md'
+        - list roleinheritance reset: 'cmd/spo/list/list-roleinheritance-reset.md'
         - list set: 'cmd/spo/list/list-set.md'
         - list contenttype add: 'cmd/spo/list/list-contenttype-add.md'
         - list contenttype list: 'cmd/spo/list/list-contenttype-list.md'
@@ -440,6 +444,8 @@ nav:
         - report siteusagepages: 'cmd/spo/report/report-siteusagepages.md'
         - report siteusagesitecounts: 'cmd/spo/report/report-siteusagesitecounts.md'
         - report siteusagestorage: 'cmd/spo/report/report-siteusagestorage.md'
+      - roledefinition:
+        - roledefinition list: 'cmd/spo/roledefinition/roledefinition-list.md'
       - serviceprincipal:
         - serviceprincipal grant add: 'cmd/spo/serviceprincipal/serviceprincipal-grant-add.md'
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'

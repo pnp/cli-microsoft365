@@ -44,10 +44,10 @@ m365 teams conversationmember remove [options]
 
 ## Examples
   
-Remove the user _johndoe@example.com_ from the Microsoft Teams team with id 00000000-0000-0000-0000-000000000000 and channel id 00:00000000000000000000000000000000@thread.skype
+Remove the user _johndoe@example.com_ from the Microsoft Teams team with id 00000000-0000-0000-0000-000000000000 and channel id 19:00000000000000000000000000000000@thread.skype
 
 ```sh
-m365 teams channel member remove --teamId 00000000-0000-0000-0000-000000000000 --channelId 00:00000000000000000000000000000000@thread.skype --userName "johndoe@example.com"
+m365 teams channel member remove --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --userName "johndoe@example.com"
 ```
 
 Remove the user with id 00000000-0000-0000-0000-000000000000 from the Microsoft Teams team with name _Team Name_ and channel with name _Channel Name_

@@ -29,6 +29,7 @@ const dictionary = [
   'home',
   'hub',
   'in',
+  'inheritance',
   'init',
   'install',
   'installed',
