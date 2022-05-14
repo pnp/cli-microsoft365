@@ -433,6 +433,38 @@ describe(commands.BUCKET_GET, () => {
     });
   });
 
+  it('Correctly gets bucket by plan name and owner group ID', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return Promise.resolve(singlePlanResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+        return Promise.resolve(singleBucketByNameResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
+        return Promise.resolve(singleBucketByIdResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+    
+    command.action(logger, {
+      options: {
+        name: validBucketName,
+        planName: validPlanName,
+        ownerGroupId: validOwnerGroupId
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', err?.message);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('supports debug mode', () => {
     const options = command.options();
     let containsOption = false;
