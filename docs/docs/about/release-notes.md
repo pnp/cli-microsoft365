@@ -79,7 +79,8 @@
 - removed react check from 'spfx doctor' command [#3162](https://github.com/pnp/cli-microsoft365/issues/3162)
 - added support for upgrading SPFx projects to 1.15.0-beta.6 [#3243](https://github.com/pnp/cli-microsoft365/issues/3243)
 - fixed options descriptions for `planner task set` [#3245](https://github.com/pnp/cli-microsoft365/issues/3245)
-- extends 'sp approleassignment' with more properties [#3262](https://github.com/pnp/cli-microsoft365/issues/3262)
+- extends 'sp approleassignment' with more properties [#2462](https://github.com/pnp/cli-microsoft365/issues/2462)
+- Fixes invalid channel ID in docs. Closes [#3278](https://github.com/pnp/cli-microsoft365/issues/3278)
 
 ## [v5.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.1.0)
 
