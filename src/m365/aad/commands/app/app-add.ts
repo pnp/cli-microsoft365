@@ -167,18 +167,16 @@ class AadAppAddCommand extends GraphCommand {
     }
     
     if(args.options.certificateFile || args.options.certificateBase64Encoded) {
-      const certificateBase64Encoded = await this.getCertificateBase64Encoded(args, logger);
+      const certificateBase64Encoded = this.getCertificateBase64Encoded(args, logger);
+    
+      const newKeyCredential = {
+        type: "AsymmetricX509Cert",
+        usage: "Verify",
+        displayName: args.options.certificateDisplayName,
+        key: certificateBase64Encoded
+      } as any;
       
-      if (certificateBase64Encoded) {
-        const newKeyCredential = {
-          type: "AsymmetricX509Cert",          
-          usage: "Verify",
-          displayName: args.options.certificateDisplayName,
-          key: certificateBase64Encoded
-        } as any;
-        
-        applicationInfo.keyCredentials = [newKeyCredential];
-      }
+      applicationInfo.keyCredentials = [newKeyCredential];
     }
 
     if (this.verbose) {
@@ -589,9 +587,9 @@ class AadAppAddCommand extends GraphCommand {
       }));
   }
   
-  private getCertificateBase64Encoded(args: CommandArgs, logger: Logger): Promise<string | undefined> {
+  private getCertificateBase64Encoded(args: CommandArgs, logger: Logger): string {
     if (args.options.certificateBase64Encoded) {
-      return Promise.resolve(args.options.certificateBase64Encoded);
+      return args.options.certificateBase64Encoded;
     }
     
     if (this.debug) {
@@ -599,12 +597,11 @@ class AadAppAddCommand extends GraphCommand {
     }
 
     try {
-      const fileContents = fs.readFileSync(args.options.certificateFile as string, {encoding: 'base64'});
-      return Promise.resolve(fileContents);
+      return fs.readFileSync(args.options.certificateFile as string, {encoding: 'base64'});
     }
     catch (e) {
-      return Promise.reject(`Error reading certificate file: ${e}. Please add the certificate using base64 option '--certificateBase64Encoded'.`);
-    }  
+      throw new Error(`Error reading certificate file: ${e}. Please add the certificate using base64 option '--certificateBase64Encoded'.`);
+    }
   }
 
   private saveAppInfo(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
