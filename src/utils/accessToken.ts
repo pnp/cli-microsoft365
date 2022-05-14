@@ -1,4 +1,27 @@
 export const accessToken = {
+  isAppOnlyAccessToken(accessToken: string): boolean {
+    let isAppOnlyAccessToken: boolean = false;
+
+    if (!accessToken || accessToken.length === 0) {
+      return isAppOnlyAccessToken;
+    }
+
+    const chunks = accessToken.split('.');
+    if (chunks.length !== 3) {
+      return isAppOnlyAccessToken;
+    }
+
+    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
+    try {
+      const token: any = JSON.parse(tokenString);
+      isAppOnlyAccessToken = token.idtyp === 'app';
+    }
+    catch {
+    }
+
+    return isAppOnlyAccessToken;
+  },
+
   getTenantIdFromAccessToken(accessToken: string): string {
     let tenantId: string = '';
 

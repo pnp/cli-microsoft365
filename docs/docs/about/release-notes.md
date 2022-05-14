@@ -29,7 +29,8 @@
 - removed testing on Node@12 [#3212](https://github.com/pnp/cli-microsoft365/issues/3212)
 - extended 'planner task get' [#3229](https://github.com/pnp/cli-microsoft365/issues/3229)
 - extends 'sp approleassignment' with more properties [#2462](https://github.com/pnp/cli-microsoft365/issues/2462)
-- Fixes invalid channel ID in docs. Closes [#3278](https://github.com/pnp/cli-microsoft365/issues/3278)
+- Fixes invalid channel ID in docs [#3278](https://github.com/pnp/cli-microsoft365/issues/3278)
+- Adds app only token check to planner commands [#3265](https://github.com/pnp/cli-microsoft365/issues/3265)
 
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
