@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli';
 import request from '../../../../request';
 import PowerBICommand from '../../../base/PowerBICommand';
 import commands from '../../commands';
+import { Gateway } from '../../Gateway';
 
 class PpGatewayListCommand extends PowerBICommand {
   public get name(): string {
@@ -21,8 +22,6 @@ class PpGatewayListCommand extends PowerBICommand {
       logger.logToStderr(`Retrieving list of gateways for which the user is an admin...`);
     }
 
-    console.log(`${this.resource}/v1.0/myorg/gateways`);
-
     const requestOptions: any = {
       url: `${this.resource}/v1.0/myorg/gateways`,
       headers: {
@@ -32,8 +31,8 @@ class PpGatewayListCommand extends PowerBICommand {
     };
 
     request
-      .get<{ value: [{ id: string, gatewayId: string, name: string, type: string, publicKey: { exponent: string, modulus: string }, gatewayAnnotation: string }] }>(requestOptions)
-      .then((res: { value: [{ id: string, gatewayId: string, name: string, type: string, publicKey: { exponent: string, modulus: string }, gatewayAnnotation: string }] }): void => {
+      .get<{ value: Gateway[] }>(requestOptions)
+      .then((res: { value: Gateway[] }): void => {
         logger.log(res.value);
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
