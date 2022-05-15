@@ -35,7 +35,7 @@ class TeamsMessageReplyListCommand extends GraphCommand  {
     const endpoint: string = `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${args.options.channelId}/messages/${args.options.messageId}/replies`;
 
     odata
-      .getAllItems<Reply>(endpoint, logger)
+      .getAllItems<Reply>(endpoint)
       .then((items): void => {
         if (args.options.output !== 'json') {
           items.forEach(i => {

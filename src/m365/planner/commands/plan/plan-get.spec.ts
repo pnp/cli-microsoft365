@@ -245,7 +245,7 @@ describe(commands.PLAN_GET, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith([{
+        assert(loggerLogSpy.calledWith({
           "@odata.etag": "W/\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\"",
           "createdDateTime": "2021-03-10T17:39:43.1045549Z",
           "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
@@ -261,7 +261,7 @@ describe(commands.PLAN_GET, () => {
               "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
             }
           }
-        }]));
+        }));
         done();
       }
       catch (e) {
@@ -384,7 +384,7 @@ describe(commands.PLAN_GET, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith([{
+        assert(loggerLogSpy.calledWith({
           "@odata.etag": "W/\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\"",
           "createdDateTime": "2021-03-10T17:39:43.1045549Z",
           "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
@@ -400,7 +400,7 @@ describe(commands.PLAN_GET, () => {
               "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
             }
           }
-        }]));
+        }));
         done();
       }
       catch (e) {

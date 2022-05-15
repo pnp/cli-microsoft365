@@ -34,7 +34,7 @@ export const aadGroup = {
    * @param displayName Group display name.
    */
   getGroupsByDisplayName(displayName: string): Promise<Group[]> {
-    return odata.getAllItems<Group>(`${graphResource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(displayName)}'`, undefined as any);
+    return odata.getAllItems<Group>(`${graphResource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(displayName)}'`);
   },
 
   /**

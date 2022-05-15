@@ -39,7 +39,7 @@ class TeamsTeamListCommand extends GraphCommand {
       endpoint = `${this.resource}/v1.0/me/joinedTeams`;
     }
     odata
-      .getAllItems<Group>(endpoint, logger)
+      .getAllItems<Group>(endpoint)
       .then((items): Promise<Group[] | Team[]> => {
         if (args.options.joined) {
           return Promise.resolve(items);

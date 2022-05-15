@@ -31,7 +31,7 @@ class AadO365GroupConversationListCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     odata
-      .getAllItems<Conversation>(`${this.resource}/v1.0/groups/${args.options.groupId}/conversations`, logger)
+      .getAllItems<Conversation>(`${this.resource}/v1.0/groups/${args.options.groupId}/conversations`)
       .then((conversations): void => {
         logger.log(conversations);
         cb();

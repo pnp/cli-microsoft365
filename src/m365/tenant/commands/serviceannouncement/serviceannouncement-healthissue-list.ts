@@ -35,7 +35,7 @@ class TenantServiceAnnouncementHealthIssueListCommand extends GraphCommand {
     }
 
     odata
-      .getAllItems<ServiceHealthIssue>(endpoint, logger)
+      .getAllItems<ServiceHealthIssue>(endpoint)
       .then((items): void => {
         logger.log(items);
         cb();

@@ -46,7 +46,7 @@ class AadUserListCommand extends GraphCommand {
     const url: string = `${this.resource}/v1.0/${endpoint}?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
 
     odata
-      .getAllItems<User>(url, logger)
+      .getAllItems<User>(url)
       .then((users): void => {
         logger.log(users);
         cb();

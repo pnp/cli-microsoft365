@@ -42,7 +42,7 @@ class AadO365GroupConversationPostListCommand extends GraphCommand {
     this
       .getGroupId(args)
       .then((retrievedgroupId: string): Promise<Post[]> => {
-        return odata.getAllItems<Post>(`${this.resource}/v1.0/groups/${retrievedgroupId}/threads/${args.options.threadId}/posts`, logger);
+        return odata.getAllItems<Post>(`${this.resource}/v1.0/groups/${retrievedgroupId}/threads/${args.options.threadId}/posts`);
       })
       .then((posts): void => {
         logger.log(posts);
