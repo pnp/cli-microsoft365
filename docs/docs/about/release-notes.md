@@ -34,6 +34,7 @@
 - extends 'sp approleassignment' with more properties [#2462](https://github.com/pnp/cli-microsoft365/issues/2462)
 - fixed invalid channel ID in docs [#3278](https://github.com/pnp/cli-microsoft365/issues/3278)
 - added app only token check to planner commands [#3265](https://github.com/pnp/cli-microsoft365/issues/3265)
+- Added Planner utilities class [#3268](https://github.com/pnp/cli-microsoft365/issues/3268)
 
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
