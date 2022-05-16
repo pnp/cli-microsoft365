@@ -2,6 +2,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -39,7 +40,7 @@ class PlannerTaskReferenceAddCommand extends GraphCommand {
           responseType: 'json',
           data: {
             references: {
-              [this.customURIEncoder(args.options.url)]: {
+              [formatting.openTypesEncoder(args.options.url)]: {
                 '@odata.type': 'microsoft.graph.plannerExternalReference',
                 previewPriority: ' !',
                 ...(args.options.alias && {alias: args.options.alias}),
@@ -77,15 +78,6 @@ class PlannerTaskReferenceAddCommand extends GraphCommand {
 
         return Promise.resolve(etag);
       });
-  }
-
-  private customURIEncoder(value: string): string {
-    return value
-      .replace(/\%/g, '%25')
-      .replace(/\./g, '%2E')
-      .replace(/:/g, '%3A')
-      .replace(/@/g, '%40')
-      .replace(/#/g, '%23');
   }
 
   public options(): CommandOption[] {
