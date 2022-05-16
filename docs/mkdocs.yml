@@ -443,6 +443,7 @@ nav:
         - report siteusagesitecounts: 'cmd/spo/report/report-siteusagesitecounts.md'
         - report siteusagestorage: 'cmd/spo/report/report-siteusagestorage.md'
       - roledefinition:
+        - roledefinition get: 'cmd/spo/roledefinition/roledefinition-get.md'
         - roledefinition list: 'cmd/spo/roledefinition/roledefinition-list.md'
       - serviceprincipal:
         - serviceprincipal grant add: 'cmd/spo/serviceprincipal/serviceprincipal-grant-add.md'
