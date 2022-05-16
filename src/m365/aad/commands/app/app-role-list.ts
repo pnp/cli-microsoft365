@@ -43,7 +43,7 @@ class AadAppRoleListCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getAppObjectId(args, logger)
-      .then(objectId => odata.getAllItems<AppRole>(`${this.resource}/v1.0/myorganization/applications/${objectId}/appRoles`, logger))
+      .then(objectId => odata.getAllItems<AppRole>(`${this.resource}/v1.0/myorganization/applications/${objectId}/appRoles`))
       .then(appRoles => {
         logger.log(appRoles);
         cb();

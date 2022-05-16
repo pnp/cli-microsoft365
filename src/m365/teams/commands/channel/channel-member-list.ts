@@ -60,7 +60,7 @@ class TeamsChannelMemberListCommand extends GraphCommand {
       })
       .then((channelId: string): Promise<ConversationMember[]> => {
         const endpoint = `${this.resource}/v1.0/teams/${this.teamId}/channels/${channelId}/members`;
-        return odata.getAllItems<ConversationMember>(endpoint, logger);
+        return odata.getAllItems<ConversationMember>(endpoint);
       })
       .then((memberships): void => {
         if (args.options.role) {

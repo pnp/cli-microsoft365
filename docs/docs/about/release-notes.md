@@ -4,8 +4,13 @@
 
 ### New commands
 
+**Apps:**
+
+- [app open](../cmd/planner/bucket/bucket-get.md) - returns deep link of the current AD app to open the Azure portal on the Azure AD app registration management page [#2940](https://github.com/pnp/cli-microsoft365/issues/2940)
+
 **Planner:**
 
+- [planner bucket get](../cmd/planner/bucket/bucket-get.md) - retrieves a planner bucket [#3226](https://github.com/pnp/cli-microsoft365/issues/3226)
 - [planner bucket remove](../cmd/planner/bucket/bucket-remove.md) - removes a Microsoft Planner bucket from a plan [#2742](https://github.com/pnp/cli-microsoft365/issues/2742)
 
 **SharePoint Online:**
@@ -13,6 +18,9 @@
 - [spo field list](../cmd/spo/field/field-list.md) - retrieves columns for the specified list or site [#2695](https://github.com/pnp/cli-microsoft365/issues/2695)
 - [spo list roleinheritance break](../cmd/spo/list/list-roleinheritance-break.md) - breaks role inheritance on list or library [#3198](https://github.com/pnp/cli-microsoft365/issues/3198)
 - [spo list roleinheritance reset](../cmd/spo/list/list-roleinheritance-reset.md) - restores role inheritance on list or library [#3220](https://github.com/pnp/cli-microsoft365/issues/3220)
+- [spo listitem roleinheritance break](../cmd/spo/listitem/listitem-roleinheritance-break.md) - breaks inheritance of list item [#3199](https://github.com/pnp/cli-microsoft365/issues/3199)
+- [spo listitem roleinheritance reset](../cmd/spo/listitem/listitem-roleinheritance-reset.md) - restores the role inheritance of list item, file, or folder [#3238](https://github.com/pnp/cli-microsoft365/issues/3238)
+- [spo roledefinition list](../cmd/spo/roledefinition/roledefinition-list.md) - gets list of role definitions for the specified site [#3237](https://github.com/pnp/cli-microsoft365/issues/3237)
 
 **Tenant:**
 
@@ -23,6 +31,10 @@
 - added 'add multiple tasks in Planner' sample [#2245](https://github.com/pnp/cli-microsoft365/issues/2245)
 - removed testing on Node@12 [#3212](https://github.com/pnp/cli-microsoft365/issues/3212)
 - extended 'planner task get' [#3229](https://github.com/pnp/cli-microsoft365/issues/3229)
+- extends 'sp approleassignment' with more properties [#2462](https://github.com/pnp/cli-microsoft365/issues/2462)
+- fixed invalid channel ID in docs [#3278](https://github.com/pnp/cli-microsoft365/issues/3278)
+- added app only token check to planner commands [#3265](https://github.com/pnp/cli-microsoft365/issues/3265)
+- Added Planner utilities class [#3268](https://github.com/pnp/cli-microsoft365/issues/3268)
 
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
@@ -45,7 +57,7 @@
 
 - [teams channel member remove](../cmd/teams/channel/channel-member-remove.md) - remove the specified member from the specified Microsoft Teams private team channel [#3175](https://github.com/pnp/cli-microsoft365/issues/3175)
 - [teams channel member set](../cmd/teams/channel/channel-member-set.md) - updates the role of the specified member in the specified Microsoft Teams private team channel [#3177](https://github.com/pnp/cli-microsoft365/issues/3177)
-- teams channel membership list - lists users for the specified Microsoft Teams channel [#3176](https://github.com/pnp/cli-microsoft365/issues/3176)
+- [teams channel membership list](../cmd/teams/channel/channel-member-list.md) - lists users for the specified Microsoft Teams channel [#3176](https://github.com/pnp/cli-microsoft365/issues/3176)
 - [teams chat get](../cmd/teams/chat/chat-get.md) - gets a Microsoft Teams chat conversation by id, participants or chat name [#3017](https://github.com/pnp/cli-microsoft365/issues/3017)
 
 ### Changes

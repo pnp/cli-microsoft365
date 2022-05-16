@@ -35,7 +35,7 @@ class TenantServiceAnnouncementMessageListCommand extends GraphCommand {
     }
 
     odata
-      .getAllItems<ServiceUpdateMessage>(endpoint, logger)
+      .getAllItems<ServiceUpdateMessage>(endpoint)
       .then((items): void => {
         logger.log(items);
         cb();

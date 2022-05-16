@@ -5,6 +5,7 @@ export default {
   BUCKET_LIST: `${prefix} bucket list`,
   BUCKET_SET: `${prefix} bucket set`,
   BUCKET_REMOVE: `${prefix} bucket remove`,
+  BUCKET_GET: `${prefix} bucket get`,
   PLAN_ADD: `${prefix} plan add`,
   PLAN_GET: `${prefix} plan get`,
   PLAN_DETAILS_GET: `${prefix} plan details get`,

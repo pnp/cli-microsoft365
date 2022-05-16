@@ -41,7 +41,7 @@ class AadGroupListCommand extends GraphCommand   {
     const endpoint: string = args.options.deleted ? 'directory/deletedItems/microsoft.graph.group' : 'groups';
 
     odata
-      .getAllItems<Group>(`${this.resource}/v1.0/${endpoint}`, logger)
+      .getAllItems<Group>(`${this.resource}/v1.0/${endpoint}`)
       .then((groups): void => {
         if (args.options.output === 'text') {
           groups.forEach((group: ExtendedGroup) => {

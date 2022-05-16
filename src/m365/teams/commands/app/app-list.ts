@@ -110,7 +110,7 @@ class TeamsAppListCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     this
       .getEndpointUrl(args)
-      .then(endpoint => odata.getAllItems<TeamsApp>(endpoint, logger))
+      .then(endpoint => odata.getAllItems<TeamsApp>(endpoint))
       .then((items): void => {
         if (args.options.teamId || args.options.teamName) {
           items.forEach(t => {

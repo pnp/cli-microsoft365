@@ -43,7 +43,7 @@ class OutlookRoomListCommand extends GraphCommand {
     }
 
     odata
-      .getAllItems<Room>(endpoint, logger)
+      .getAllItems<Room>(endpoint)
       .then((rooms): void => {
         logger.log(rooms);
         cb();
