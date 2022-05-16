@@ -1,4 +1,4 @@
-# spo userprofile set
+# spo userprofile get
 
 Get SharePoint user profile properties for the specified user
 
