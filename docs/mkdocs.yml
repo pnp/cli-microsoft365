@@ -197,6 +197,7 @@ nav:
         - task add: 'cmd/planner/task/task-add.md'
         - task get: 'cmd/planner/task/task-get.md'
         - task list: 'cmd/planner/task/task-list.md'
+        - task reference list: 'cmd/planner/task/task-reference-list.md'
         - task set: 'cmd/planner/task/task-set.md'
         - task details get: 'cmd/planner/task/task-details-get.md'
     - Power Apps (pa):
