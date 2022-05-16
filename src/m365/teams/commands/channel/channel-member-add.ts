@@ -205,7 +205,7 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
         }
 
         return Promise.resolve(channelItem.id!);
-      }, err => { return Promise.reject(err); });
+      });
   }
 
   private getUserId(args: CommandArgs): Promise<string[]> {
