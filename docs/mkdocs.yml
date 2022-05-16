@@ -466,6 +466,7 @@ nav:
         - report siteusagesitecounts: 'cmd/spo/report/report-siteusagesitecounts.md'
         - report siteusagestorage: 'cmd/spo/report/report-siteusagestorage.md'
       - roledefinition:
+        - roledefinition get: 'cmd/spo/roledefinition/roledefinition-get.md'
         - roledefinition list: 'cmd/spo/roledefinition/roledefinition-list.md'
         - roledefinition remove: 'cmd/spo/roledefinition/roledefinition-remove.md'
       - serviceprincipal:
