@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  url: string;
+  url?: string;
   alias?: string;
   taskId: string;
   confirm?: boolean;
@@ -82,7 +82,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
       },
       responseType: 'json'
     };
-    let url: string = options.url;
+    let url: string = options.url!;
 
     return request
       .get(requestOptions)
@@ -138,17 +138,11 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
   }
-  
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.url && !args.options.alias) {
-      return 'Specify either url or alias';
-    }
 
-    if (args.options.url && args.options.alias) {
-      return 'Specify either url or alias but not both';
-    }
-
-    return true;
+  public optionSets(): string[][] | undefined {
+    return [
+      ['url', 'alias']
+    ];
   }
 }
 
