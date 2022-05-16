@@ -37,6 +37,11 @@ describe(commands.TASK_REFERENCE_LIST, () => {
     }
   };
   
+  const references = {
+    references: [
+      referenceListResponse
+    ]
+  };
   
   let log: string[];
   let logger: Logger;
@@ -88,8 +93,8 @@ describe(commands.TASK_REFERENCE_LIST, () => {
 
   it('successfully handles item found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/uBk5fK_MHkeyuPYlCo4OFpcAMowf/details?$select=references`) {
-        return Promise.resolve(referenceListResponse);
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent("uBk5fK_MHkeyuPYlCo4OFpcAMowf")}/details?$select=references`) {
+        return Promise.resolve(references);
       }
 
       return Promise.reject('Invalid request');
@@ -101,7 +106,7 @@ describe(commands.TASK_REFERENCE_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith(referenceListResponse));
+        assert(loggerLogSpy.calledWith(references.references));
         done();
       }
       catch (e) {
