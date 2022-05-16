@@ -108,6 +108,16 @@ describe(commands.TASK_GET, () => {
     "id": validTaskId
   };
 
+  const taskDetailsResponse = {
+    "description": "Test",
+    "references": { }
+  };
+
+  const outputResponse = {
+    ...taskResponse,
+    ...taskDetailsResponse
+  };
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -153,6 +163,11 @@ describe(commands.TASK_GET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
   });
 
   it('fails validation when title is used without bucket id', () => {
@@ -446,6 +461,9 @@ describe(commands.TASK_GET, () => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/${encodeURIComponent(validTaskId)}`) {
         return Promise.resolve(taskResponse);
       }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+        return Promise.resolve(taskDetailsResponse);
+      }
 
       return Promise.reject('Invalid Request');
     });
@@ -459,7 +477,7 @@ describe(commands.TASK_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith(taskResponse));
+        assert(loggerLogSpy.calledWith(outputResponse));
         done();
       }
       catch (e) {
@@ -482,6 +500,9 @@ describe(commands.TASK_GET, () => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/${encodeURIComponent(validTaskId)}`) {
         return Promise.resolve(taskResponse);
       }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+        return Promise.resolve(taskDetailsResponse);
+      }
 
       return Promise.reject('Invalid Request');
     });
@@ -495,7 +516,7 @@ describe(commands.TASK_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith(taskResponse));
+        assert(loggerLogSpy.calledWith(outputResponse));
         done();
       }
       catch (e) {
@@ -504,77 +525,53 @@ describe(commands.TASK_GET, () => {
     });
   });
 
-  it('successfully handles item found', (done) => {
+  it('Correctly gets task by task ID', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/01gzSlKkIUSUl6DF_EilrmQAKDhh`) {
-        return Promise.resolve({
-          "createdBy": {
-            "user": {
-              "id": "6463a5ce-2119-4198-9f2a-628761df4a62"
-            }
-          },
-          "planId": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
-          "bucketId": "gcrYAaAkgU2EQUvpkNNXLGQAGTtu",
-          "title": "title-value",
-          "orderHint": "9223370609546166567W",
-          "assigneePriority": "90057581\"",
-          "createdDateTime": "2015-03-25T18:36:49.2407981Z",
-          "assignments": {
-            "fbab97d0-4932-4511-b675-204639209557": {
-              "@odata.type": "#microsoft.graph.plannerAssignment",
-              "assignedBy": {
-                "user": {
-                  "id": "1e9955d2-6acd-45bf-86d3-b546fdc795eb"
-                }
-              },
-              "assignedDateTime": "2015-03-25T18:38:21.956Z",
-              "orderHint": "RWk1"
-            }
-          },
-          "priority": 5,
-          "id": "01gzSlKkIUSUl6DF_EilrmQAKDhh"
-        });
+      if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/${encodeURIComponent(validTaskId)}`) {
+        return Promise.resolve(taskResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+        return Promise.resolve(taskDetailsResponse);
       }
 
-      return Promise.reject('Invalid request');
+      return Promise.reject('Invalid Request');
     });
 
     command.action(logger, {
       options: {
-        id: '01gzSlKkIUSUl6DF_EilrmQAKDhh', debug: true
+        id: validTaskId
       }
     }, () => {
       try {
-        const actual = JSON.stringify(log[log.length - 1]);
-        const expected = JSON.stringify({
-          "createdBy": {
-            "user": {
-              "id": "6463a5ce-2119-4198-9f2a-628761df4a62"
-            }
-          },
-          "planId": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
-          "bucketId": "gcrYAaAkgU2EQUvpkNNXLGQAGTtu",
-          "title": "title-value",
-          "orderHint": "9223370609546166567W",
-          "assigneePriority": "90057581\"",
-          "createdDateTime": "2015-03-25T18:36:49.2407981Z",
-          "assignments": {
-            "fbab97d0-4932-4511-b675-204639209557": {
-              "@odata.type": "#microsoft.graph.plannerAssignment",
-              "assignedBy": {
-                "user": {
-                  "id": "1e9955d2-6acd-45bf-86d3-b546fdc795eb"
-                }
-              },
-              "assignedDateTime": "2015-03-25T18:38:21.956Z",
-              "orderHint": "RWk1"
-            }
-          },
-          "priority": 5,
-          "id": "01gzSlKkIUSUl6DF_EilrmQAKDhh"
-        });
-        assert.strictEqual(actual, expected);
+        assert(loggerLogSpy.calledWith(outputResponse));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
 
+  // This test has been added to support task details get alias. Needs to be removed when deprecation is removed. 
+  it('Correctly gets task by task ID from task details get', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/${encodeURIComponent(validTaskId)}`) {
+        return Promise.resolve(taskResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+        return Promise.resolve(taskDetailsResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        taskId: validTaskId
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(outputResponse));
         done();
       }
       catch (e) {

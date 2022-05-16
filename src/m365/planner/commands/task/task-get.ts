@@ -1,4 +1,4 @@
-import { Group, PlannerBucket, PlannerTask } from '@microsoft/microsoft-graph-types';
+import { Group, PlannerBucket, PlannerTask, PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import { accessToken } from '../../../../utils';
@@ -15,6 +15,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  taskId?: string; // This option has been added to support task details get alias. Needs to be removed when deprecation is removed. 
   id?: string;
   title?: string;
   bucketId?: string;
@@ -30,14 +31,25 @@ class PlannerTaskGetCommand extends GraphCommand {
     return commands.TASK_GET;
   }
 
+  public alias(): string[] | undefined {
+    return [commands.TASK_DETAILS_GET];
+  }
+
   public get description(): string {
     return 'Retrieve the the specified planner task';
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    this.showDeprecationWarning(logger, commands.TASK_DETAILS_GET, commands.TASK_GET);
+
     if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
+    }
+
+    // This check has been added to support task details get alias. Needs to be removed when deprecation is removed. 
+    if (args.options.taskId) {
+      args.options.id = args.options.taskId;
     }
     
     this
@@ -51,12 +63,30 @@ class PlannerTaskGetCommand extends GraphCommand {
           responseType: 'json'
         }; 
 
-        return request.get<{ value: PlannerTask }>(requestOptions);
+        return request.get<PlannerTask>(requestOptions);
       })
+      .then(task => this.getTaskDetails(task))
       .then((res: any): void => {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  }
+
+  private getTaskDetails(task: PlannerTask): Promise<PlannerTask & PlannerTaskDetails> {
+    const requestOptionsTaskDetails: any = {
+      url: `${this.resource}/v1.0/planner/tasks/${task.id}/details`,
+      headers: {
+        'accept': 'application/json;odata.metadata=none',
+        'Prefer': 'return=representation'
+      },
+      responseType: 'json'
+    };
+
+    return request
+      .get(requestOptionsTaskDetails)
+      .then(taskDetails => {
+        return { ...task, ...taskDetails as PlannerTaskDetails };
+      });
   }
 
   private getTaskId(options: Options): Promise<string> {
@@ -170,6 +200,7 @@ class PlannerTaskGetCommand extends GraphCommand {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
+      { option: '--taskId [taskId]' }, // This option has been added to support task details get alias. Needs to be removed when deprecation is removed. 
       { option: '-i, --id [id]' },
       { option: '-t, --title [title]' },
       { option: '--bucketId [bucketId]' },

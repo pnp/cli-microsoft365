@@ -49,6 +49,7 @@ describe('Lazy loading commands', () => {
       'flow connector export',
       'flow connector list',
       'outlook sendmail',
+      'planner task details get',
       'spo site classic remove',
       'spo sp grant add',
       'spo sp grant list',
