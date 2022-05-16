@@ -14,5 +14,6 @@ export default {
   TASK_DETAILS_GET: `${prefix} task details get`,
   TASK_GET: `${prefix} task get`,
   TASK_LIST: `${prefix} task list`,
+  TASK_REMOVE: `${prefix} task remove`,
   TASK_SET: `${prefix} task set`
 };

@@ -198,6 +198,7 @@ nav:
         - task list: 'cmd/planner/task/task-list.md'
         - task set: 'cmd/planner/task/task-set.md'
         - task details get: 'cmd/planner/task/task-details-get.md'
+        - task remove: 'cmd/planner/task/task-remove.md'
     - Power Apps (pa):
       - app:
         - app get: 'cmd/pa/app/app-get.md'
