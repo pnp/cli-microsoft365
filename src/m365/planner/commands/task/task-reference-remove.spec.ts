@@ -100,26 +100,9 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if url or alias is not specified.', (done) => {
-    const actual = command.validate({
-      options: {
-        taskId: validTaskId
-      }
-    });
-    assert.notStrictEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if url and alias are both specified.', (done) => {
-    const actual = command.validate({
-      options: {
-        taskId: validTaskId,
-        url: validUrl,
-        alias: validAlias
-      }
-    });
-    assert.notStrictEqual(actual, true);
-    done();
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets();
+    assert.deepStrictEqual(optionSets, [['url', 'alias']]);
   });
 
   it('prompts before removal when confirm option not passed', (done) => {

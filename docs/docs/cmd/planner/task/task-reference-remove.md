@@ -11,10 +11,10 @@ m365 planner task reference remove [options]
 ## Options
 
 `-u, --url [url]`
-: URL location of the reference.  Specify either `alias` or `url` but not both.
+: URL location of the reference. Specify either `alias` or `url` but not both.
 
 `--alias [alias]`
-: The alias of the reference.  Specify either `alias` or `url` but not both.
+: The alias of the reference. Specify either `alias` or `url` but not both.
 
 `-i, --taskId <taskId>`
 : ID of the task.
