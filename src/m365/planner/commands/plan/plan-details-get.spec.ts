@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { sinonUtil } from '../../../../utils';
+import { accessToken, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./plan-details-get');
 
@@ -21,6 +21,7 @@ describe(commands.PLAN_DETAILS_GET, () => {
   });
 
   beforeEach(() => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     log = [];
     logger = {
       log: (msg: string) => {
@@ -39,7 +40,8 @@ describe(commands.PLAN_DETAILS_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      accessToken.isAppOnlyAccessToken
     ]);
   });
 
@@ -190,6 +192,25 @@ describe(commands.PLAN_DETAILS_GET, () => {
             "category6": "Needs equipment"
           }
         }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when using app only access token', (done) => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    command.action(logger, {
+      options: {
+        id: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
         done();
       }
       catch (e) {
@@ -484,71 +505,6 @@ describe(commands.PLAN_DETAILS_GET, () => {
             "category6": "Needs equipment"
           }
         }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('failed validation when multiple planner plans are found with same name and ownerGroupId', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/planner/plans`) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.plannerPlan)",
-          "@odata.count": 1,
-          "value": [
-            {
-              "@odata.etag": "W/\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\"",
-              "createdDateTime": "2021-03-10T17:39:43.1045549Z",
-              "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
-              "title": "My Planner Plan",
-              "id": "opb7bchfZUiFbVWEPL7jPGUABW7f",
-              "createdBy": {
-                "user": {
-                  "displayName": null,
-                  "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
-                },
-                "application": {
-                  "displayName": null,
-                  "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
-                }
-              }
-            },
-            {
-              "@odata.etag": "W/\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\"",
-              "createdDateTime": "2021-03-10T17:39:43.1045549Z",
-              "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
-              "title": "My Planner Plan",
-              "id": "KEBXwYWi8025K93fSZKwOZgAGULL",
-              "createdBy": {
-                "user": {
-                  "displayName": null,
-                  "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
-                },
-                "application": {
-                  "displayName": null,
-                  "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
-                }
-              }
-            }
-          ]
-        });
-      }
-
-      return Promise.reject(`Invalid request ${opts.url}`);
-    });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        planTitle: 'My Planner Plan',
-        ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple plans with name My Planner Plan found: opb7bchfZUiFbVWEPL7jPGUABW7f,KEBXwYWi8025K93fSZKwOZgAGULL`)));
         done();
       }
       catch (e) {

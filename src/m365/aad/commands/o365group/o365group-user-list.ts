@@ -62,7 +62,7 @@ class AadO365GroupUserListCommand extends GraphCommand {
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`;
 
     return odata
-      .getAllItems<User>(endpoint, logger)
+      .getAllItems<User>(endpoint)
       .then(users => {
         // Currently there is a bug in the Microsoft Graph that returns Owners as
         // userType 'member'. We therefore update all returned user as owner
@@ -76,7 +76,7 @@ class AadO365GroupUserListCommand extends GraphCommand {
 
   private getMembersAndGuests(logger: Logger, groupId: string): Promise<User[]> {
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
-    return odata.getAllItems<User>(endpoint, logger);
+    return odata.getAllItems<User>(endpoint);
   }
 
   public options(): CommandOption[] {

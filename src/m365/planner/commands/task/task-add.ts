@@ -1,9 +1,11 @@
-import { Group, PlannerBucket, PlannerPlan, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
+import { Group, PlannerBucket, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
+import Auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { formatting, validation } from '../../../../utils';
+import { planner } from '../../../../utils/planner';
+import { accessToken, formatting, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -59,6 +61,11 @@ class PlannerTaskAddCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+      this.handleError('This command does not support application permissions.', logger, cb);
+      return;
+    }
+    
     this
       .getPlanId(args)
       .then(planId => {
@@ -201,25 +208,8 @@ class PlannerTaskAddCommand extends GraphCommand {
 
     return this
       .getGroupId(args)
-      .then((groupId: string) => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/plans?$filter=(owner eq '${groupId}')`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-
-        return request.get<{ value: PlannerPlan[] }>(requestOptions);
-      }).then((response) => {
-        const plan: PlannerPlan | undefined = response.value.find(val => val.title === args.options.planName);
-
-        if (!plan) {
-          return Promise.reject(`The specified plan does not exist`);
-        }
-
-        return Promise.resolve(plan.id as string);
-      });
+      .then((groupId: string) => planner.getPlanByName(args.options.planName!, groupId))
+      .then(plan => plan.id!);
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {

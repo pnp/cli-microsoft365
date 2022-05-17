@@ -29,11 +29,12 @@ nav:
       - app:
         - app add: 'cmd/aad/app/app-add.md'
         - app get: 'cmd/aad/app/app-get.md'
-        - app remove: 'cmd/aad/app/app-remove.md'
-        - app set: 'cmd/aad/app/app-set.md'
+        - app open: 'cmd/aad/app/app-open.md'
+        - app remove: 'cmd/aad/app/app-remove.md'        
         - app role add: 'cmd/aad/app/app-role-add.md'
         - app role list: 'cmd/aad/app/app-role-list.md'
         - app role remove: 'cmd/aad/app/app-role-remove.md'
+        - app set: 'cmd/aad/app/app-set.md'
       - approleassignment:
         - approleassignment add: 'cmd/aad/approleassignment/approleassignment-add.md'
         - approleassignment list: 'cmd/aad/approleassignment/approleassignment-list.md'
@@ -393,6 +394,8 @@ nav:
         - listitem isrecord: 'cmd/spo/listitem/listitem-isrecord.md'
         - listitem list: 'cmd/spo/listitem/listitem-list.md'
         - listitem remove: 'cmd/spo/listitem/listitem-remove.md'
+        - listitem roleinheritance break: 'cmd/spo/listitem/listitem-roleinheritance-break.md'
+        - listitem roleinheritance reset: 'cmd/spo/listitem/listitem-roleinheritance-reset.md'
         - listitem set: 'cmd/spo/listitem/listitem-set.md'
         - listitem record declare: 'cmd/spo/listitem/listitem-record-declare.md'
         - listitem record undeclare: 'cmd/spo/listitem/listitem-record-undeclare.md'
@@ -444,6 +447,8 @@ nav:
         - report siteusagepages: 'cmd/spo/report/report-siteusagepages.md'
         - report siteusagesitecounts: 'cmd/spo/report/report-siteusagesitecounts.md'
         - report siteusagestorage: 'cmd/spo/report/report-siteusagestorage.md'
+      - roledefinition:
+        - roledefinition list: 'cmd/spo/roledefinition/roledefinition-list.md'
       - serviceprincipal:
         - serviceprincipal grant add: 'cmd/spo/serviceprincipal/serviceprincipal-grant-add.md'
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'

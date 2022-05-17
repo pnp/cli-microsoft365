@@ -33,7 +33,7 @@ class AadGroupSettingTemplateGetCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     odata
-      .getAllItems<GroupSettingTemplate>(`${this.resource}/v1.0/groupSettingTemplates`, logger)
+      .getAllItems<GroupSettingTemplate>(`${this.resource}/v1.0/groupSettingTemplates`)
       .then((templates): void => {
         const groupSettingTemplate: GroupSettingTemplate[] = templates.filter(t => args.options.id ? t.id === args.options.id : t.displayName === args.options.displayName);
 

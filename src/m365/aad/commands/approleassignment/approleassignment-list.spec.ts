@@ -9,35 +9,44 @@ import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./approleassignment-list');
 
+class ServicePrincipalAppRoleAssignments {
+  private static AppRoleAssignments: any = {
+    value: [
+      {
+        "id": "im2nOkVB0UCJyrFb25Q7_eZg4Yr51ZhDlErpioz6f8k",
+        "deletedDateTime": null,
+        "createdDateTime": "2020-02-11T16:42:20.2272849Z",
+        "appRoleId": "df021288-bdef-4463-88db-98f22de89214",
+        "principalDisplayName": "Product Catalog daemon",
+        "principalId": "3aa76d8a-4145-40d1-89ca-b15bdb943bfd",
+        "principalType": "ServicePrincipal",
+        "resourceDisplayName": "Microsoft Graph",
+        "resourceId": "b1ce2d04-5502-4142-ba53-819327b74b5b"
+      },
+      {
+        "id": "im2nOkVB0UCJyrFb25Q7_c9ubVNI2s9PkLasaAPuNQM",
+        "deletedDateTime": null,
+        "createdDateTime": "2020-02-11T01:27:47.395556Z",
+        "appRoleId": "9116d0c7-0632-4203-889f-a24a08442b3d",
+        "principalDisplayName": "Product Catalog daemon",
+        "principalId": "3aa76d8a-4145-40d1-89ca-b15bdb943bfd",
+        "principalType": "ServicePrincipal",
+        "resourceDisplayName": "Contoso Product Catalog service",
+        "resourceId": "b3598f45-9d8c-41c9-b5f0-81eb7ea8551f"
+      }
+    ]
+  };
+
+  static NoAppRoleAssignments: any = { value: [] };
+  static WithAppRoleAssignments: any = ServicePrincipalAppRoleAssignments.AppRoleAssignments;
+}
+
 class ServicePrincipalCollections {
 
   private static oneServicePrincipalWithAppRoleAssignments: any = {
     value: [
       {
-        "appRoleAssignments": [
-          {
-            "id": "im2nOkVB0UCJyrFb25Q7_eZg4Yr51ZhDlErpioz6f8k",
-            "deletedDateTime": null,
-            "createdDateTime": "2020-02-11T16:42:20.2272849Z",
-            "appRoleId": "df021288-bdef-4463-88db-98f22de89214",
-            "principalDisplayName": "Product Catalog daemon",
-            "principalId": "3aa76d8a-4145-40d1-89ca-b15bdb943bfd",
-            "principalType": "ServicePrincipal",
-            "resourceDisplayName": "Microsoft Graph",
-            "resourceId": "b1ce2d04-5502-4142-ba53-819327b74b5b"
-          },
-          {
-            "id": "im2nOkVB0UCJyrFb25Q7_c9ubVNI2s9PkLasaAPuNQM",
-            "deletedDateTime": null,
-            "createdDateTime": "2020-02-11T01:27:47.395556Z",
-            "appRoleId": "9116d0c7-0632-4203-889f-a24a08442b3d",
-            "principalDisplayName": "Product Catalog daemon",
-            "principalId": "3aa76d8a-4145-40d1-89ca-b15bdb943bfd",
-            "principalType": "ServicePrincipal",
-            "resourceDisplayName": "Contoso Product Catalog service",
-            "resourceId": "b3598f45-9d8c-41c9-b5f0-81eb7ea8551f"
-          }
-        ],
+        "appRoleAssignments": ServicePrincipalAppRoleAssignments.WithAppRoleAssignments.value,
         "id": "3aa76d8a-4145-40d1-89ca-b15bdb943bfd",
         "deletedDateTime": null,
         "accountEnabled": true,
@@ -338,6 +347,7 @@ class CommandActionParameters {
   static appNameWithRoleAssignments: string = "Product Catalog daemon";
   static appIdWithNoRoleAssignments: string = "1c21749e-df7a-4fed-b3ab-921dce3bb124";
   static objectIdWithRoleAssignments: string = "3aa76d8a-4145-40d1-89ca-b15bdb943bfd";
+  static objectIdNoRoleAssignments: string = "021d971f-779d-439b-8006-9f084423f344";
   static invalidAppId: string = "12345678-abcd-9876-fedc-0123456789ab";
 }
 
@@ -349,6 +359,7 @@ class InternalRequestStub {
 class RequestStub {
   static retrieveAppRoles = ((opts: any) => {
     // we need to fake three calls:
+    // 1. query the service principal endpoint based on input parameters
     // 2. get the service principal for the assigned resource(s)
     // 3. get the app roles of the resource
 
@@ -356,10 +367,6 @@ class RequestStub {
     if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$expand=appRoleAssignments&$filter=`) > -1) {
       // by app id
       if ((opts.url as string).indexOf(`appId eq '${CommandActionParameters.appIdWithRoleAssignments}'`) > -1) {
-        return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByAppId);
-      }
-      // by object id
-      if ((opts.url as string).indexOf(`id eq '${CommandActionParameters.objectIdWithRoleAssignments}'`) > -1) {
         return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByAppId);
       }
       // by display name
@@ -384,6 +391,16 @@ class RequestStub {
       return Promise.resolve(ServicePrincipalObject.servicePrincipalMicrosoftGraphWithAppRole);
     }
 
+    // get service principal app role assignments : roles found
+    if ((opts.url as string).indexOf(`/v1.0/servicePrincipals/${CommandActionParameters.objectIdWithRoleAssignments}/appRoleAssignments`) > -1) {
+      return Promise.resolve(ServicePrincipalAppRoleAssignments.WithAppRoleAssignments);
+    }
+
+    // get service principal app role assignments : no roles found
+    if ((opts.url as string).indexOf(`/v1.0/servicePrincipals/${CommandActionParameters.objectIdNoRoleAssignments}/appRoleAssignments`) > -1) {
+      return Promise.resolve(ServicePrincipalAppRoleAssignments.NoAppRoleAssignments);
+    }
+
     return Promise.reject('Invalid request');
   });
 }
@@ -400,14 +417,18 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
       "resourceDisplayName": "Microsoft Graph",
       "resourceId": "b1ce2d04-5502-4142-ba53-819327b74b5b",
       "roleId": "df021288-bdef-4463-88db-98f22de89214",
-      "roleName": "User.Read.All"
+      "roleName": "User.Read.All",
+      "created": "2020-02-11T16:42:20.2272849Z",
+      "deleted": null
     },
     {
       "appRoleId": "9116d0c7-0632-4203-889f-a24a08442b3d",
       "resourceDisplayName": "Contoso Product Catalog service",
       "resourceId": "b3598f45-9d8c-41c9-b5f0-81eb7ea8551f",
       "roleId": "9116d0c7-0632-4203-889f-a24a08442b3d",
-      "roleName": "access_as_application"
+      "roleName": "access_as_application",
+      "created": "2020-02-11T01:27:47.395556Z",
+      "deleted": null
     }
   ];
 
@@ -530,6 +551,20 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
     });
   });
 
+  it('correctly handles a service principal that does not have any app role assignments', (done) => {
+    sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
+
+    command.action(logger, { options: { objectId: CommandActionParameters.objectIdNoRoleAssignments } } as any, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('no app role assignments found')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles no app role assignments for the specified app', (done) => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
@@ -558,7 +593,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, appId: '36e3a540-6f25-4483-9542-9f5fa00bb633' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, objectId: '021d971f-779d-439b-8006-9f084423f344' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
         done();

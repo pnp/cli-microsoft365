@@ -2,6 +2,36 @@ import * as assert from 'assert';
 import { accessToken } from '../utils';
 
 describe('accessToken/accessToken', () => {
+  it('isAppOnlyAccessToken returns false when access token is undefined', () => {
+    const actual = accessToken.isAppOnlyAccessToken(undefined as any);
+    assert.strictEqual(actual, false);
+  });
+  
+  it('isAppOnlyAccessToken returns false when access token is empty', () => {
+    const actual = accessToken.isAppOnlyAccessToken('');
+    assert.strictEqual(actual, false);
+  });
+
+  it('isAppOnlyAccessToken returns false when access token is invalid', () => {
+    const actual = accessToken.isAppOnlyAccessToken('abc.def');
+    assert.strictEqual(actual, false);
+  });
+
+  it('isAppOnlyAccessToken returns false when non base64 access token passed', () => {
+    const actual = accessToken.isAppOnlyAccessToken('abc.def.ghi');
+    assert.strictEqual(actual, false);
+  });
+
+  it('isAppOnlyAccessToken returns true when access token is valid', () => {
+    const jwt = JSON.stringify({
+      idtyp: 'app'
+    });
+    const jwt64 = Buffer.from(jwt).toString('base64');
+    const token = `abc.${jwt64}.def`;
+    const actual = accessToken.isAppOnlyAccessToken(token);
+    assert.strictEqual(actual, true);
+  });
+
   it('shows app display name as connected-as for app-only auth', () => {
     const jwt = JSON.stringify({
       app_displayname: 'CLI for Microsoft 365 Contoso'

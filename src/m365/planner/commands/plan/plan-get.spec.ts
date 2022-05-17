@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { sinonUtil } from '../../../../utils';
+import { accessToken, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./plan-get');
 
@@ -21,6 +21,7 @@ describe(commands.PLAN_GET, () => {
   });
 
   beforeEach(() => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     log = [];
     logger = {
       log: (msg: string) => {
@@ -39,7 +40,8 @@ describe(commands.PLAN_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      accessToken.isAppOnlyAccessToken
     ]);
   });
 
@@ -243,7 +245,7 @@ describe(commands.PLAN_GET, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith([{
+        assert(loggerLogSpy.calledWith({
           "@odata.etag": "W/\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\"",
           "createdDateTime": "2021-03-10T17:39:43.1045549Z",
           "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
@@ -259,7 +261,26 @@ describe(commands.PLAN_GET, () => {
               "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
             }
           }
-        }]));
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when using app only access token', (done) => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    command.action(logger, {
+      options: {
+        id: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
         done();
       }
       catch (e) {
@@ -363,7 +384,7 @@ describe(commands.PLAN_GET, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith([{
+        assert(loggerLogSpy.calledWith({
           "@odata.etag": "W/\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\"",
           "createdDateTime": "2021-03-10T17:39:43.1045549Z",
           "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
@@ -379,7 +400,7 @@ describe(commands.PLAN_GET, () => {
               "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
             }
           }
-        }]));
+        }));
         done();
       }
       catch (e) {

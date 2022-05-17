@@ -60,7 +60,7 @@ class AadO365GroupListCommand extends GraphCommand {
     let groups: GroupExtended[] = [];
 
     odata
-      .getAllItems<GroupExtended>(endpoint, logger)
+      .getAllItems<GroupExtended>(endpoint)
       .then((_groups): Promise<any> => {
         groups = _groups;
 

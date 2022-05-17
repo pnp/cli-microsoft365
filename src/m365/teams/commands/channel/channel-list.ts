@@ -77,7 +77,7 @@ class TeamsChannelListCommand extends GraphCommand{
           endpoint += `?$filter=membershipType eq '${args.options.type}'`;
         }
 
-        return odata.getAllItems<Channel>(endpoint, logger);
+        return odata.getAllItems<Channel>(endpoint);
       })
       .then((items): void => {
         logger.log(items);
