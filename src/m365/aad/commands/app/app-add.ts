@@ -672,6 +672,11 @@ class AadAppAddCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
+    const baseValidate = super.validate(args);
+    if (baseValidate !== true) {
+      return baseValidate;
+    }
+
     if (!args.options.manifest && !args.options.name) {
       return 'Specify either the name of the app to create or the manifest';
     }

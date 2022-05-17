@@ -60,7 +60,8 @@ describe(commands.APP_ADD, () => {
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      Command.prototype.validate
     ]);
     auth.service.connected = false;
   });
@@ -5460,6 +5461,13 @@ describe(commands.APP_ADD, () => {
     const manifest = '{}';
     const actual = command.validate({ options: { manifest: manifest, name: 'My app' } });
     assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if parent validation fails', () => {
+    sinon.stub(Command.prototype, "validate").callsFake(() => `Here goes prototype validation error`);
+    const actual = command.validate({});
+    assert.strictEqual(typeof actual, 'string');
+    assert.strictEqual((actual as string).indexOf('Here goes prototype validation error') > -1, true);
   });
 
   it('supports debug mode', () => {
