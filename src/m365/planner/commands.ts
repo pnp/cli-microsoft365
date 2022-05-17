@@ -12,6 +12,7 @@ export default {
   PLAN_LIST: `${prefix} plan list`,
   TASK_ADD: `${prefix} task add`,
   TASK_CHECKLISTITEM_ADD: `${prefix} task checklistitem add`,
+  TASK_CHECKLISTITEM_LIST: `${prefix} task checklistitem list`,
   TASK_DETAILS_GET: `${prefix} task details get`,
   TASK_GET: `${prefix} task get`,
   TASK_LIST: `${prefix} task list`,
