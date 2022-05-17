@@ -38,15 +38,15 @@ describe(commands.APP_INSTALL, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.post,
-      Command.prototype.validate
+      request.post
     ]);
   });
 
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      Command.prototype.validate
     ]);
     auth.service.connected = false;
   });
