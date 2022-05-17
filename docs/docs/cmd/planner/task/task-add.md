@@ -49,8 +49,17 @@ m365 planner task add [options]
 `--assignedToUserNames [assignedToUserNames]`
 : The comma-separated UPNs of the assignees the task is assigned to. Specify either `assignedToUserIds` or `assignedToUserNames` but not both.
 
+`--assigneePriority [assigneePriority]`
+: Hint used to order items of this type in a list view
+
 `--description [description]`
 : Description of the task
+
+`--appliedCategories [appliedCategories]`
+: Comma-separated categories that should be added to the task
+
+`--previewType [previewType]`
+: This sets the type of preview that shows up on the task. The possible values are: `automatic`, `noPreview`, `checklist`, `description`, `reference`. When set to automatic the displayed preview is chosen by the app viewing the task.
 
 `--orderHint [orderHint]`
 : Hint used to order items of this type in a list view. The format is defined as outlined [here](https://docs.microsoft.com/en-us/graph/api/resources/planner-order-hint-format?view=graph-rest-1.0).
@@ -75,4 +84,10 @@ Adds a Microsoft Planner task with the name _My Planner Task_ for plan with the 
 
 ```sh
 m365 planner task add --title "My Planner Task" --planId "8QZEH7b3wkSbGQobscsM5gADCBa" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna" --assignedToUserNames "Allan.Carroll@contoso.com,Ida.Stevens@contoso.com" --dueDateTime "2021-12-16"
+```
+
+Adds a Microsoft Planner task with the name _My Planner Task_ for plan with the ID _8QZEH7b3wkbGQobscsM5gADCBa_ and for the bucket with the ID _IK8tuFTwQEa5vTonM7ZMRZgAKdna_. The new task will receive the categories _category1,category3_ and get a preview with the type _noPreview_
+
+```sh
+m365 planner task add --title "My Planner Task" --planId "8QZEH7b3wkSbGQobscsM5gADCBa" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna" --appliedCategories "category1,category3" --previewType "noPreview"
 ```

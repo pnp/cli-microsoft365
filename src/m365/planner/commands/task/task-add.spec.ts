@@ -422,6 +422,32 @@ describe(commands.TASK_ADD, () => {
     done();
   });
 
+  it('fails validation if incorrect appliedCategory is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        appliedCategories: "category1,category9"
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if incorrect previewType is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        previewType: "test"
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
   it('correctly adds planner task with title, planId, and bucketId', (done) => {
     const options: any = {
       title: 'My Planner Task',
@@ -601,7 +627,7 @@ describe(commands.TASK_ADD, () => {
     });
   });
 
-  it('correctly adds planner task with title, bucketId, planId, and assignedToUserNames', (done) => {
+  it('correctly adds planner task with title, bucketId, planId, assignedToUserNames, and appliedCategories', (done) => {
     sinonUtil.restore(request.get);
     sinonUtil.restore(request.post);
 
@@ -609,7 +635,8 @@ describe(commands.TASK_ADD, () => {
       title: 'My Planner Task',
       planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
       bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-      assignedToUserNames: 'user@contoso.onmicrosoft.com'
+      assignedToUserNames: 'user@contoso.onmicrosoft.com',
+      appliedCategories: "category1,category3"
     };
 
     sinon.stub(request, 'get').callsFake((opts) => {
