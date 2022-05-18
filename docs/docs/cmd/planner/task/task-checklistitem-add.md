@@ -14,7 +14,7 @@ m365 planner task checklistitem add [options]
 : ID of the task.
 
 `-t, --title <title>`
-: Title of the task to add.
+: Title of the checklist item.
 
 `--isChecked`
 : Mark the checklist item as checked.
