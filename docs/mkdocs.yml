@@ -195,6 +195,7 @@ nav:
         - plan list: 'cmd/planner/plan/plan-list.md'
       - task:
         - task add: 'cmd/planner/task/task-add.md'
+        - task checklistitem add: 'cmd/planner/task/task-checklistitem-add.md'
         - task details get: 'cmd/planner/task/task-details-get.md'
         - task get: 'cmd/planner/task/task-get.md'
         - task list: 'cmd/planner/task/task-list.md'
