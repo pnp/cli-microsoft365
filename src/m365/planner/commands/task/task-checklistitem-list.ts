@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   taskId: string;
 }
 
-class PlannerTaskChecklistItemListCommand extends GraphCommand {
+class PlannerTaskChecklistitemListCommand extends GraphCommand {
   public get name(): string {
     return commands.TASK_CHECKLISTITEM_LIST;
   }
@@ -75,4 +75,4 @@ class PlannerTaskChecklistItemListCommand extends GraphCommand {
   }
 }
 
-module.exports = new PlannerTaskChecklistItemListCommand();
+module.exports = new PlannerTaskChecklistitemListCommand();
