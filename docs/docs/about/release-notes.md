@@ -31,10 +31,11 @@
 - added 'add multiple tasks in Planner' sample [#2245](https://github.com/pnp/cli-microsoft365/issues/2245)
 - removed testing on Node@12 [#3212](https://github.com/pnp/cli-microsoft365/issues/3212)
 - extended 'planner task get' [#3229](https://github.com/pnp/cli-microsoft365/issues/3229)
-- extends 'sp approleassignment' with more properties [#2462](https://github.com/pnp/cli-microsoft365/issues/2462)
+- extended 'sp approleassignment' with more properties [#2462](https://github.com/pnp/cli-microsoft365/issues/2462)
 - fixed invalid channel ID in docs [#3278](https://github.com/pnp/cli-microsoft365/issues/3278)
 - added app only token check to planner commands [#3265](https://github.com/pnp/cli-microsoft365/issues/3265)
-- Added Planner utilities class [#3268](https://github.com/pnp/cli-microsoft365/issues/3268)
+- added Planner utilities class [#3268](https://github.com/pnp/cli-microsoft365/issues/3268)
+- extended 'aad app add' and 'aad app set' with certificates [#3115](https://github.com/pnp/cli-microsoft365/issues/3115), [#3116](https://github.com/pnp/cli-microsoft365/issues/3116)
 
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
