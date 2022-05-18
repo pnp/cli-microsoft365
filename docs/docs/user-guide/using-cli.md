@@ -75,9 +75,16 @@ To check if CLI detected the SPO URL previously, use the `m365 spo get` command.
 
 ## Passing complex content into CLI options
 
-When passing complex content into CLI options, such as JSON strings, you will need to properly escape nested quotes. The exact way to do it, depends on the shell that you're using. Alternatively, you can choose to pass complex content by storing the complex content in a file and passing the path to the file prefixed with an `` `@`` that needs to be escaped in PowerShell, for example:
+When passing complex content into CLI options, such as JSON strings, you will need to properly escape nested quotes. The exact way to do it, depends on the shell that you're using. Alternatively, you can choose to pass complex content by storing the complex content in a file and passing the path to the file prefixed with an `@`, for example:
 
 ```sh
+m365 spo sitescript add --title "Contoso" --description "Contoso theme script" --content @themeScript.json
+```
+
+
+`@` works in any shell and when used it PowerShell it needs to be escaped as `` `@``, for example:
+
+```powershell
 m365 spo sitescript add --title "Contoso" --description "Contoso theme script" --content `@themeScript.json
 ```
 
