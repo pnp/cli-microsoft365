@@ -28,8 +28,7 @@ nav:
     - Azure Active Directory (aad):
       - app:
         - app add: 'cmd/aad/app/app-add.md'
-        - app get: 'cmd/aad/app/app-get.md'
-        - app open: 'cmd/aad/app/app-open.md'
+        - app get: 'cmd/aad/app/app-get.md'        
         - app remove: 'cmd/aad/app/app-remove.md'        
         - app role add: 'cmd/aad/app/app-role-add.md'
         - app role list: 'cmd/aad/app/app-role-list.md'
@@ -119,6 +118,7 @@ nav:
       - list: 'cmd/file/file-list.md'
     - Microsoft 365 apps (app):
       - get: 'cmd/app/app-get.md'
+      - open: 'cmd/app/app-open.md'
       - permission:
         - permission list: 'cmd/app/permission/permission-list.md'
     - Microsoft 365 tenant (tenant):
