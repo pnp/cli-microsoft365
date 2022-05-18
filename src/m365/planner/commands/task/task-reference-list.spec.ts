@@ -3,9 +3,9 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { sinonUtil } from '../../../../utils';
+import { accessToken, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./task-reference-list');
 
@@ -47,6 +47,7 @@ describe(commands.TASK_REFERENCE_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   before(() => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
@@ -71,7 +72,8 @@ describe(commands.TASK_REFERENCE_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      accessToken.isAppOnlyAccessToken
     ]);
   });
 
@@ -91,6 +93,25 @@ describe(commands.TASK_REFERENCE_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation when using app only access token', (done) => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
+
+    command.action(logger, {
+      options: {
+        taskId: "uBk5fK_MHkeyuPYlCo4OFpcAMowf"
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('successfully handles item found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent("uBk5fK_MHkeyuPYlCo4OFpcAMowf")}/details?$select=references`) {
@@ -102,7 +123,7 @@ describe(commands.TASK_REFERENCE_LIST, () => {
 
     command.action(logger, {
       options: {
-        taskId: 'uBk5fK_MHkeyuPYlCo4OFpcAMowf', debug: true
+        taskId: 'uBk5fK_MHkeyuPYlCo4OFpcAMowf'
       }
     }, () => {
       try {
