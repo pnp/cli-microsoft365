@@ -24,7 +24,7 @@ interface Options extends GlobalOptions {
   isChecked?: boolean;
 }
 
-class PlannerChecklistItemAddCommand extends GraphCommand {
+class PlannerTaskChecklistItemAddCommand extends GraphCommand {
   public get name(): string {
     return commands.TASK_CHECKLISTITEM_ADD;
   }
@@ -104,4 +104,4 @@ class PlannerChecklistItemAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new PlannerChecklistItemAddCommand();
+module.exports = new PlannerTaskChecklistItemAddCommand();
