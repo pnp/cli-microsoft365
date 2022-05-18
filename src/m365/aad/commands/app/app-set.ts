@@ -1,5 +1,6 @@
-import { Application, PublicClientApplication, SpaApplication, WebApplication } from '@microsoft/microsoft-graph-types';
+import { Application, KeyCredential, PublicClientApplication, SpaApplication, WebApplication } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
+import * as fs from 'fs';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -21,6 +22,9 @@ interface Options extends GlobalOptions {
   redirectUris?: string;
   redirectUrisToRemove?: string;
   uri?: string;
+  certificateFile?: string;
+  certificateBase64Encoded?: string;
+  certificateDisplayName?: string;
 }
 
 class AadAppSetCommand extends GraphCommand {
@@ -43,6 +47,9 @@ class AadAppSetCommand extends GraphCommand {
     telemetryProps.redirectUris = typeof args.options.redirectUris !== 'undefined';
     telemetryProps.redirectUrisToRemove = typeof args.options.redirectUrisToRemove !== 'undefined';
     telemetryProps.uri = typeof args.options.uri !== 'undefined';
+    telemetryProps.certificateFile = typeof args.options.certificateFile !== 'undefined';
+    telemetryProps.certificateBase64Encoded = typeof args.options.certificateBase64Encoded !== 'undefined';
+    telemetryProps.certificateDisplayName = typeof args.options.certificateDisplayName !== 'undefined';
     return telemetryProps;
   }
 
@@ -51,6 +58,7 @@ class AadAppSetCommand extends GraphCommand {
       .getAppObjectId(args, logger)
       .then(objectId => this.configureUri(args, objectId, logger))
       .then(objectId => this.configureRedirectUris(args, objectId, logger))
+      .then(objectId => this.configureCertificate(args, objectId, logger))
       .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
@@ -206,6 +214,97 @@ class AadAppSetCommand extends GraphCommand {
       .then(_ => Promise.resolve(objectId));
   }
 
+  private configureCertificate(args: CommandArgs, objectId: string, logger: Logger): Promise<void> {
+    if (!args.options.certificateFile && !args.options.certificateBase64Encoded) {
+      return Promise.resolve();
+    }
+
+    if (this.verbose) {
+      logger.logToStderr(`Setting certificate for Azure AD app...`);
+    }
+
+    const certificateBase64Encoded = this.getCertificateBase64Encoded(args, logger);
+
+    return this
+      .getCurrentKeyCredentialsList(args, objectId, certificateBase64Encoded, logger)
+      .then(currentKeyCredentials => {
+        if (this.verbose) {
+          logger.logToStderr(`Adding new keyCredential to list`);
+        }
+
+        // The KeyCredential graph type defines the 'key' property as 'NullableOption<number>'
+        // while it is a base64 encoded string. This is why a cast to any is used here.
+        const keyCredentials = currentKeyCredentials.filter(existingCredential => existingCredential.key !== certificateBase64Encoded as any);
+
+        const newKeyCredential = {
+          type: "AsymmetricX509Cert",
+          usage: "Verify",
+          displayName: args.options.certificateDisplayName,
+          key: certificateBase64Encoded
+        } as any;
+
+        keyCredentials.push(newKeyCredential);
+
+        return Promise.resolve(keyCredentials);
+      })
+      .then(keyCredentials => this.updateKeyCredentials(objectId, keyCredentials, logger));
+  }
+
+  private getCertificateBase64Encoded(args: CommandArgs, logger: Logger): string {
+    if (args.options.certificateBase64Encoded) {
+      return args.options.certificateBase64Encoded;
+    }
+
+    if (this.debug) {
+      logger.logToStderr(`Reading existing ${args.options.certificateFile}...`);
+    }
+
+    try {
+      return fs.readFileSync(args.options.certificateFile as string, { encoding: 'base64' });
+    }
+    catch (e) {
+      throw new Error(`Error reading certificate file: ${e}. Please add the certificate using base64 option '--certificateBase64Encoded'.`);
+    }
+  }
+
+  // We first retrieve existing certificates because we need to specify the full list of certificates when updating the app.
+  private getCurrentKeyCredentialsList(args: CommandArgs, objectId: string, certificateBase64Encoded: string, logger: Logger): Promise<KeyCredential[]> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving current keyCredentials list for app`);
+    }
+
+    const getAppRequestOptions: AxiosRequestConfig = {
+      url: `${this.resource}/v1.0/myorganization/applications/${objectId}?$select=keyCredentials`,
+      headers: {
+        'content-type': 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    return request.get<Application>(getAppRequestOptions).then((application) => {
+      return Promise.resolve(application.keyCredentials || []);
+    });
+  }
+
+  private updateKeyCredentials(objectId: string, keyCredentials: KeyCredential[], logger: Logger): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Updating keyCredentials in AAD app`);
+    }
+
+    const requestOptions: AxiosRequestConfig = {
+      url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
+      headers: {
+        'content-type': 'application/json;odata.metadata=none'
+      },
+      responseType: 'json',
+      data: {
+        keyCredentials: keyCredentials
+      }
+    };
+
+    return request.patch(requestOptions);
+  }
+
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       { option: '--appId [appId]' },
@@ -213,6 +312,9 @@ class AadAppSetCommand extends GraphCommand {
       { option: '-n, --name [name]' },
       { option: '-u, --uri [uri]' },
       { option: '-r, --redirectUris [redirectUris]' },
+      { option: '--certificateFile [certificateFile]' },
+      { option: '--certificateBase64Encoded [certificateBase64Encoded]' },
+      { option: '--certificateDisplayName [certificateDisplayName]' },
       {
         option: '--platform [platform]',
         autocomplete: AadAppSetCommand.aadApplicationPlatform
@@ -235,6 +337,18 @@ class AadAppSetCommand extends GraphCommand {
       (args.options.appId && args.options.name) ||
       (args.options.objectId && args.options.name)) {
       return 'Specify either appId, objectId or name but not both';
+    }
+
+    if (args.options.certificateFile && args.options.certificateBase64Encoded) {
+      return 'Specify either certificateFile or certificateBase64Encoded but not both';
+    }
+
+    if (args.options.certificateDisplayName && !args.options.certificateFile && !args.options.certificateBase64Encoded) {
+      return 'When you specify certificateDisplayName you also need to specify certificateFile or certificateBase64Encoded';
+    }
+
+    if (args.options.certificateFile && !fs.existsSync(args.options.certificateFile as string)) {
+      return 'Certificate file not found';
     }
 
     if (args.options.redirectUris && !args.options.platform) {
