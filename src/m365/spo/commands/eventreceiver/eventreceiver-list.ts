@@ -17,6 +17,7 @@ interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   listUrl?: string;
+  scope?: string;
 }
 
 class SpoEventReceiverListCommand extends SpoCommand {
