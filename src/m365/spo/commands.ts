@@ -34,6 +34,7 @@ export default {
   CUSTOMACTION_SET: `${prefix} customaction set`,
   CUSTOMACTION_LIST: `${prefix} customaction list`,
   CUSTOMACTION_REMOVE: `${prefix} customaction remove`,
+  EVENTRECEIVER_GET: `${prefix} eventreceiver get`,
   EXTERNALUSER_LIST: `${prefix} externaluser list`,
   FEATURE_DISABLE: `${prefix} feature disable`,
   FEATURE_ENABLE: `${prefix} feature enable`,

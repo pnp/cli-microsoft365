@@ -304,6 +304,8 @@ nav:
         - customaction list: 'cmd/spo/customaction/customaction-list.md'
         - customaction remove: 'cmd/spo/customaction/customaction-remove.md'
         - customaction set: 'cmd/spo/customaction/customaction-set.md'
+      - eventreceiver:
+        - eventreceiver get: 'cmd/spo/eventreceiver/eventreceiver-get.md'
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
       - feature:
