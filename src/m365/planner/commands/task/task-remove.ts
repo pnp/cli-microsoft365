@@ -25,7 +25,7 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class PlannerTaskGetCommand extends GraphCommand {
+class PlannerTaskRemoveCommand extends GraphCommand {
   public get name(): string {
     return commands.TASK_REMOVE;
   }
@@ -253,4 +253,4 @@ class PlannerTaskGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new PlannerTaskGetCommand();
+module.exports = new PlannerTaskRemoveCommand();
