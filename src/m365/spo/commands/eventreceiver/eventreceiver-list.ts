@@ -53,10 +53,10 @@ class SpoEventReceiverListCommand extends SpoCommand {
       listUrl = `GetList('${encodeURIComponent(listServerRelativeUrl)}')/`;
     }
 
-    if (args.options.scope == null || args.options.scope == "web"){
+    if (args.options.scope == null || args.options.scope == 'web'){
       requestUrl += `web/${listUrl}eventreceivers`
     } else {
-      requestUrl += "site/eventreceivers"
+      requestUrl += 'site/eventreceivers'
     }
 
     const requestOptions: any = {
@@ -70,7 +70,6 @@ class SpoEventReceiverListCommand extends SpoCommand {
     request
       .get<{ value: any[] }>(requestOptions)
       .then((res: any): void => {
-        logger.log(res);
         logger.log(res.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
@@ -119,7 +118,7 @@ class SpoEventReceiverListCommand extends SpoCommand {
       return `${args.options.scope} is not a valid type value. Allowed values web|site.`;
     }
 
-    if (args.options.scope && args.options.scope == "site" && (args.options.listId || args.options.listUrl || args.options.listTitle)) {
+    if (args.options.scope && args.options.scope == 'site' && (args.options.listId || args.options.listUrl || args.options.listTitle)) {
       return 'Scope cannot be set to site when retrieving list event receivers.';
     }
 
