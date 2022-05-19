@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
   scope?: string;
 }
 
-class SpoEventReceiverGetCommand extends SpoCommand {
+class SpoEventreceiverGetCommand extends SpoCommand {
   public get name(): string {
     return commands.EVENTRECEIVER_GET;
   }
@@ -58,10 +58,10 @@ class SpoEventReceiverGetCommand extends SpoCommand {
       listUrl = `GetList('${encodeURIComponent(listServerRelativeUrl)}')/`;
     }
 
-    if (args.options.scope == null || args.options.scope == 'web') {
-      requestUrl += `web/${listUrl}eventreceivers`
+    if (args.options.scope === null || args.options.scope === 'web') {
+      requestUrl += `web/${listUrl}eventreceivers`;
     } else {
-      requestUrl += 'site/eventreceivers'
+      requestUrl += 'site/eventreceivers';
     }
 
     if (args.options.id) {
@@ -89,22 +89,22 @@ class SpoEventReceiverGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--listTitle [listTitle]',
+        option: '--listTitle [listTitle]'
       },
       {
-        option: '--listId  [listId]',
+        option: '--listId  [listId]'
       },
       {
-        option: '--listUrl [listUrl]',
+        option: '--listUrl [listUrl]'
       },
       {
-        option: '-n, --name [name]',
+        option: '-n, --name [name]'
       },
       {
-        option: '-i, --id [id]',
+        option: '-i, --id [id]'
       },
       {
         option: '-s, --scope [scope]',
@@ -122,12 +122,12 @@ class SpoEventReceiverGetCommand extends SpoCommand {
       return isValidSharePointUrl;
     }
 
-    const erOptions: any[] = [args.options.name, args.options.id]
-    if (erOptions.filter(item => item !== undefined).length == 0) {
+    const erOptions: any[] = [args.options.name, args.options.id];
+    if (erOptions.filter(item => item !== undefined).length === 0) {
       return `Specify atleast the name or the id of the event receiver to retrieve`;
     }
 
-    if (erOptions.filter(item => item !== undefined).length == 2) {
+    if (erOptions.filter(item => item !== undefined).length === 2) {
       return `Specify either the name or the id of the event receiver to retrieve, but not both`;
     }
 
@@ -144,7 +144,7 @@ class SpoEventReceiverGetCommand extends SpoCommand {
       return `${args.options.scope} is not a valid type value. Allowed values web|site.`;
     }
 
-    if (args.options.scope && args.options.scope == 'site' && (args.options.listId || args.options.listUrl || args.options.listTitle)) {
+    if (args.options.scope && args.options.scope === 'site' && (args.options.listId || args.options.listUrl || args.options.listTitle)) {
       return 'Scope cannot be set to site when retrieving list event receivers.';
     }
 
@@ -152,4 +152,4 @@ class SpoEventReceiverGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoEventReceiverGetCommand(); 
+module.exports = new SpoEventreceiverGetCommand(); 
