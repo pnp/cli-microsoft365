@@ -44,9 +44,7 @@ class PlannerTaskChecklistitemListCommand extends GraphCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(
-        args.options.taskId
-      )}/details`,
+      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(args.options.taskId)}/details?$select=checklist`,
       headers: {
         accept: "application/json;odata.metadata=none"
       },
