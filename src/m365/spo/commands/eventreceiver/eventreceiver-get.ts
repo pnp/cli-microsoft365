@@ -58,15 +58,17 @@ class SpoEventreceiverGetCommand extends SpoCommand {
       listUrl = `GetList('${encodeURIComponent(listServerRelativeUrl)}')/`;
     }
 
-    if (args.options.scope === null || args.options.scope === 'web') {
+    if (!args.options.scope || args.options.scope === 'web') {
       requestUrl += `web/${listUrl}eventreceivers`;
-    } else {
+    } 
+    else {
       requestUrl += 'site/eventreceivers';
     }
 
     if (args.options.id) {
       filter += `receiverid eq (guid'${args.options.id}')`;
-    } else {
+    } 
+    else {
       filter += `receivername eq '${args.options.name}'`; 
     }
 

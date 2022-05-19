@@ -233,7 +233,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
     });
   });
 
-  it('retrieves all list event receivers queried by url using name as option', (done) => {
+  it('retrieves list event receivers queried by url using name as option', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/GetList('%2Fsites%2Fportal%2FShared%20Documents')/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) > -1) {
         return Promise.resolve(eventReceiverValue);
@@ -252,7 +252,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
     });
   });
 
-  it('retrieves all list event receivers queried by list id using name as option', (done) => {
+  it('retrieves list event receivers queried by list id using name as option', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists(guid'b17bd74f-d1b1-42bf-a21d-f865a903acc3')/eventreceivers?$filter=receivername eq 'PnP Test Receiver'`) > -1) {
         return Promise.resolve(eventReceiverValue);
@@ -330,7 +330,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
     });
   });
 
-  it('retrieves all list event receivers queried by url using id as option', (done) => {
+  it('retrieves list event receivers queried by url using id as option', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/GetList('%2Fsites%2Fportal%2FShared%20Documents')/eventreceivers?$filter=receiverid eq (guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
         return Promise.resolve(eventReceiverValue);
@@ -349,7 +349,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
     });
   });
 
-  it('retrieves all list event receivers queried by list id using id as option', (done) => {
+  it('retrieves list event receivers queried by list id using id as option', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists(guid'b17bd74f-d1b1-42bf-a21d-f865a903acc3')/eventreceivers?$filter=receiverid eq (guid'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec')`) > -1) {
         return Promise.resolve(eventReceiverValue);
