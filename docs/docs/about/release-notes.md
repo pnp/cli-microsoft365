@@ -13,6 +13,10 @@
 - [planner bucket get](../cmd/planner/bucket/bucket-get.md) - retrieves a planner bucket [#3226](https://github.com/pnp/cli-microsoft365/issues/3226)
 - [planner bucket remove](../cmd/planner/bucket/bucket-remove.md) - removes a Microsoft Planner bucket from a plan [#2742](https://github.com/pnp/cli-microsoft365/issues/2742)
 
+**Power Platform:**
+
+- [pp gateway list](../cmd/pp/gateway/gateway-list.md) - returns a list of gateways for which the user is an admin [#3276](https://github.com/pnp/cli-microsoft365/issues/3276)
+
 **SharePoint Online:**
 
 - [spo field list](../cmd/spo/field/field-list.md) - retrieves columns for the specified list or site [#2695](https://github.com/pnp/cli-microsoft365/issues/2695)
@@ -36,6 +40,8 @@
 - added app only token check to planner commands [#3265](https://github.com/pnp/cli-microsoft365/issues/3265)
 - added Planner utilities class [#3268](https://github.com/pnp/cli-microsoft365/issues/3268)
 - extended 'aad app add' and 'aad app set' with certificates [#3115](https://github.com/pnp/cli-microsoft365/issues/3115), [#3116](https://github.com/pnp/cli-microsoft365/issues/3116)
+- fixes documentation app open in wrong place [#3316](https://github.com/pnp/cli-microsoft365/issues/3316)
+- extended teams channel member with check for private channel [#3254](https://github.com/pnp/cli-microsoft365/issues/3254)
 
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
