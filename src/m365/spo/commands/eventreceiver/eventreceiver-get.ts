@@ -28,7 +28,7 @@ class SpoEventReceiverGetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Gets a specific event receiver attached to the web, site or list (if any of the list options are filled in)';
+    return 'Gets a specific event receiver attached to the web, site or list (if any of the list options are filled in) by receiver name of id';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -37,6 +37,8 @@ class SpoEventReceiverGetCommand extends SpoCommand {
     telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
     telemetryProps.listUrl = typeof args.options.listUrl !== 'undefined';
     telemetryProps.scope = typeof args.options.scope !== 'undefined';
+    telemetryProps.id = typeof args.options.id !== 'undefined';
+    telemetryProps.name = typeof args.options.name !== 'undefined';
     return telemetryProps;
   }
 
@@ -64,6 +66,8 @@ class SpoEventReceiverGetCommand extends SpoCommand {
 
     if (args.options.id) {
       filter += `receiverid eq (guid'${args.options.id}')`;
+    } else {
+      filter += `receivername eq '${args.options.name}'`; 
     }
 
     const requestOptions: any = {
@@ -77,7 +81,6 @@ class SpoEventReceiverGetCommand extends SpoCommand {
     request
       .get<{ value: any[] }>(requestOptions)
       .then((res: any): void => {
-        logger.log(res);
         logger.log(res.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
