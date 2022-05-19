@@ -14,23 +14,6 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   const jsonOutput = {
-    "description": "Description",
-    "previewType": "checklist",
-    "id": "vzCcZoOv-U27PwydxHB8opcADJo-",
-    "references": {
-      "https%3A//www%2Econtoso%2Ecom": {
-        "alias": "Contoso.com",
-        "type": "Other",
-        "previewPriority": "8585576049615477185P<",
-        "lastModifiedDateTime": "2022-02-04T19:13:03.9611197Z",
-        "lastModifiedBy": {
-          "user": {
-            "displayName": null,
-            "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e"
-          }
-        }
-      }
-    },
     "checklist": {
       "33224": {
         "isChecked": false,
@@ -127,7 +110,7 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
 
   it('successfully handles item found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/vzCcZoOv-U27PwydxHB8opcADJo-/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/vzCcZoOv-U27PwydxHB8opcADJo-/details?$select=checklist`) {
         return Promise.resolve(jsonOutput
         );
       }
