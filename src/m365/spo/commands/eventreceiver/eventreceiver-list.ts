@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
   scope?: string;
 }
 
-class SpoEventReceiverListCommand extends SpoCommand {
+class SpoEventreceiverListCommand extends SpoCommand {
   public get name(): string {
     return commands.EVENTRECEIVER_LIST;
   }
@@ -53,10 +53,10 @@ class SpoEventReceiverListCommand extends SpoCommand {
       listUrl = `GetList('${encodeURIComponent(listServerRelativeUrl)}')/`;
     }
 
-    if (args.options.scope == null || args.options.scope == 'web'){
-      requestUrl += `web/${listUrl}eventreceivers`
+    if (args.options.scope === null || args.options.scope === 'web'){
+      requestUrl += `web/${listUrl}eventreceivers`;
     } else {
-      requestUrl += 'site/eventreceivers'
+      requestUrl += 'site/eventreceivers';
     }
 
     const requestOptions: any = {
@@ -78,16 +78,16 @@ class SpoEventReceiverListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--listTitle [listTitle]',
+        option: '--listTitle [listTitle]'
       },
       {
-        option: '--listId  [listId]',
+        option: '--listId  [listId]'
       },
       {
-        option: '--listUrl [listUrl]',
+        option: '--listUrl [listUrl]'
       },
       {
         option: '-s, --scope [scope]',
@@ -118,7 +118,7 @@ class SpoEventReceiverListCommand extends SpoCommand {
       return `${args.options.scope} is not a valid type value. Allowed values web|site.`;
     }
 
-    if (args.options.scope && args.options.scope == 'site' && (args.options.listId || args.options.listUrl || args.options.listTitle)) {
+    if (args.options.scope && args.options.scope === 'site' && (args.options.listId || args.options.listUrl || args.options.listTitle)) {
       return 'Scope cannot be set to site when retrieving list event receivers.';
     }
 
@@ -126,4 +126,4 @@ class SpoEventReceiverListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoEventReceiverListCommand();
+module.exports = new SpoEventreceiverListCommand();
