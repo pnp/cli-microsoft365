@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -10,6 +11,11 @@ import commands from '../../commands';
 const command: Command = require('./app-set');
 
 describe(commands.APP_SET, () => {
+
+  //#region Mocked Responses  
+  const appDetailsResponse: any = { "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity", "id": "95cfe30d-ed44-4f9d-b73d-c66560f72e83", "deletedDateTime": null, "appId": "ff254847-12c7-44cf-921e-8883dbd622a7", "applicationTemplateId": null, "disabledByMicrosoftStatus": null, "createdDateTime": "2022-02-07T08:51:18Z", "displayName": "Angular Teams app", "description": null, "groupMembershipClaims": null, "identifierUris": ["api://244e-2001-1c00-80c-d00-e5da-977c-7c52-5193.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"], "isDeviceOnlyAuthSupported": null, "isFallbackPublicClient": null, "notes": null, "publisherDomain": "contoso.onmicrosoft.com", "serviceManagementReference": null, "signInAudience": "AzureADMyOrg", "tags": [], "tokenEncryptionKeyId": null, "defaultRedirectUri": null, "certification": null, "optionalClaims": null, "addIns": [], "api": { "acceptMappedClaims": null, "knownClientApplications": [], "requestedAccessTokenVersion": null, "oauth2PermissionScopes": [{ "adminConsentDescription": "Access as a user", "adminConsentDisplayName": "Access as a user", "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5", "isEnabled": true, "type": "User", "userConsentDescription": null, "userConsentDisplayName": null, "value": "access_as_user" }], "preAuthorizedApplications": [{ "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346", "delegatedPermissionIds": ["cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"] }, { "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264", "delegatedPermissionIds": ["cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"] }] }, "appRoles": [], "info": { "logoUrl": null, "marketingUrl": null, "privacyStatementUrl": null, "supportUrl": null, "termsOfServiceUrl": null }, "keyCredentials": [], "parentalControlSettings": { "countriesBlockedForMinors": [], "legalAgeGroupRule": "Allow" }, "passwordCredentials": [], "publicClient": { "redirectUris": [] }, "requiredResourceAccess": [{ "resourceAppId": "00000003-0000-0000-c000-000000000000", "resourceAccess": [{ "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d", "type": "Scope" }] }], "verifiedPublisher": { "displayName": null, "verifiedPublisherId": null, "addedDateTime": null }, "web": { "homePageUrl": null, "logoutUrl": null, "redirectUris": [], "implicitGrantSettings": { "enableAccessTokenIssuance": false, "enableIdTokenIssuance": false } }, "spa": { "redirectUris": [] } };
+  //#endregion
+
   let log: string[];
   let logger: Logger;
 
@@ -37,7 +43,9 @@ describe(commands.APP_SET, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get,
-      request.patch
+      request.patch,
+      fs.existsSync,
+      fs.readFileSync
     ]);
   });
 
@@ -797,6 +805,182 @@ describe(commands.APP_SET, () => {
     });
   });
 
+  it('adds new certificate using base64 string', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
+        return Promise.resolve(appDetailsResponse);
+      }
+      else if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83?$select=keyCredentials`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",
+          "keyCredentials": []
+        });
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+    sinon.stub(request, 'patch').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "keyCredentials": [{
+            "type": "AsymmetricX509Cert",
+            "usage": "Verify",
+            "displayName": "some certificate",
+            "key": "somecertificatebase64string"
+          }]
+        })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83',
+        certificateDisplayName: 'some certificate',
+        certificateBase64Encoded: 'somecertificatebase64string'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', err?.message);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('adds new certificate using base64 string (with null keyCredentials)', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
+        return Promise.resolve(appDetailsResponse);
+      }
+      else if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83?$select=keyCredentials`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",
+          "keyCredentials": null
+        });
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+    sinon.stub(request, 'patch').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "keyCredentials": [{
+            "type": "AsymmetricX509Cert",
+            "usage": "Verify",
+            "displayName": "some certificate",
+            "key": "somecertificatebase64string"
+          }]
+        })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83',
+        certificateDisplayName: 'some certificate',
+        certificateBase64Encoded: 'somecertificatebase64string'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', err?.message);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('adds new certificate using certificate file', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
+        return Promise.resolve(appDetailsResponse);
+      }
+      else if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83?$select=keyCredentials`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",
+          "keyCredentials": []
+        });
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+    sinon.stub(request, 'patch').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "keyCredentials": [{
+            "type": "AsymmetricX509Cert",
+            "usage": "Verify",
+            "displayName": "some certificate",
+            "key": "somecertificatebase64string"
+          }]
+        })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => "somecertificatebase64string");
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83',
+        certificateDisplayName: 'some certificate',
+        certificateFile: 'C:\\temp\\some-certificate.cer'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', err?.message);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('handles error when certificate file cannot be read', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/95cfe30d-ed44-4f9d-b73d-c66560f72e83`) {
+        return Promise.resolve(appDetailsResponse);
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error("An error has occurred"); });
+
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83',
+        certificateDisplayName: 'some certificate',
+        certificateFile: 'C:\\temp\\some-certificate.cer'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(err.message, `Error reading certificate file: Error: An error has occurred. Please add the certificate using base64 option '--certificateBase64Encoded'.`);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('handles error when the app specified with objectId not found', (done) => {
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject(`Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`));
 
@@ -972,6 +1156,30 @@ describe(commands.APP_SET, () => {
 
   it('fails validation if invalid platform specified', () => {
     const actual = command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', redirectUris: 'https://foo.com', platform: 'invalid' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if certificateDisplayName is specified without certificate', () => {
+    const actual = command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', certificateDisplayName: 'Some certificate' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both certificateBase64Encoded and certificateFile are specified', () => {
+    const actual = command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', certificateFile: 'c:\\temp\\some-certificate.cer', certificateBase64Encoded: 'somebase64string' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if certificateFile specified with certificateDisplayName', () => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+
+    const actual = command.validate({ options: { name: 'My AAD app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation when certificate file is not found', () => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+
+    const actual = command.validate({ options: { debug: true, objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83', certificateDisplayName: 'some certificate', certificateFile: 'C:\\temp\\some-certificate.cer' } });
     assert.notStrictEqual(actual, true);
   });
 
