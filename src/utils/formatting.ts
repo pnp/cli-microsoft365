@@ -33,8 +33,9 @@ export const formatting = {
   },
 
   filterObject(obj: any, propertiesToInclude: string[]): any {
-    return Object.keys(obj)
-      .filter(key => propertiesToInclude.includes(key))
+    const objKeys = Object.keys(obj);
+    return propertiesToInclude
+      .filter(prop => objKeys.includes(prop))
       .reduce((filtered: any, key: string) => {
         filtered[key] = obj[key];
         return filtered;
