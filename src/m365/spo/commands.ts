@@ -99,6 +99,7 @@ export default {
   LIST_ROLEINHERITANCE_RESET: `${prefix} list roleinheritance reset`,
   LIST_SET: `${prefix} list set`,
   LIST_SITESCRIPT_GET: `${prefix} list sitescript get`,
+  LIST_VIEW_ADD: `${prefix} list view add`,
   LIST_VIEW_GET: `${prefix} list view get`,
   LIST_VIEW_LIST: `${prefix} list view list`,
   LIST_VIEW_REMOVE: `${prefix} list view remove`,
