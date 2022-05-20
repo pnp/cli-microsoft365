@@ -6,7 +6,6 @@ import Auth from "../../../../Auth";
 import request from "../../../../request";
 import GraphCommand from "../../../base/GraphCommand";
 import commands from "../../commands";
-import { PlannerChecklistItems } from "@microsoft/microsoft-graph-types";
 
 interface CommandArgs {
   options: Options;
@@ -25,21 +24,9 @@ class PlannerTaskChecklistitemListCommand extends GraphCommand {
     return "Lists the checklist items of a Planner task.";
   }
 
-  public commandAction(
-    logger: Logger,
-    args: CommandArgs,
-    cb: () => void
-  ): void {
-    if (
-      accessToken.isAppOnlyAccessToken(
-        Auth.service.accessTokens[this.resource].accessToken
-      )
-    ) {
-      this.handleError(
-        "This command does not support application permissions.",
-        logger,
-        cb
-      );
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+      this.handleError('This command does not support application permissions.', logger, cb);
       return;
     }
 
@@ -53,8 +40,7 @@ class PlannerTaskChecklistitemListCommand extends GraphCommand {
 
     request.get(requestOptions).then(
       (res: any): void => {
-        const checklistitem: PlannerChecklistItems = res.checklist;
-        logger.log(checklistitem);
+        logger.log(res.checklist);
         cb();
       },
       (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb)
