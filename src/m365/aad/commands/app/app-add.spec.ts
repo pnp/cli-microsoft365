@@ -1843,6 +1843,220 @@ describe(commands.APP_ADD, () => {
     });
   });
 
+  it('creates AAD app reg with a certificate using certificate file', (done) => {
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg",
+          "keyCredentials": [{
+            "type": "AsymmetricX509Cert",
+            "usage": "Verify",
+            "displayName": "some certificate",
+            "key": "somecertificatebase64string"
+          }]
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => "somecertificatebase64string");
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        certificateDisplayName: 'some certificate',
+        certificateFile: 'C:\\temp\\some-certificate.cer'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+          objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('creates AAD app reg with a certificate using base64 string', (done) => {
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg",
+          "keyCredentials": [{
+            "type": "AsymmetricX509Cert",
+            "usage": "Verify",
+            "displayName": "some certificate",
+            "key": "somecertificatebase64string"
+          }]
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        certificateDisplayName: 'some certificate',
+        certificateBase64Encoded: 'somecertificatebase64string'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+          objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('returns error when retrieving information about service principals failed', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject({
       error: {
@@ -2401,6 +2615,28 @@ describe(commands.APP_ADD, () => {
     }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns error when certificate file cannot be read', (done) => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error("An error has occurred"); });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        name: 'My AAD app',
+        certificateDisplayName: 'some certificate',
+        certificateFile: 'C:\\temp\\some-certificate.cer'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(err.message, `Error reading certificate file: Error: An error has occurred. Please add the certificate using base64 option '--certificateBase64Encoded'.`);
         done();
       }
       catch (e) {
@@ -5448,6 +5684,35 @@ describe(commands.APP_ADD, () => {
     const manifest = '{}';
     const actual = command.validate({ options: { manifest: manifest } });
     assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if certificateDisplayName is specified without certificate', () => {
+    const actual = command.validate({ options: { name: 'My AAD app', certificateDisplayName: 'Some certificate' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both certificateBase64Encoded and certificateFile are specified', () => {
+    const actual = command.validate({ options: { name: 'My AAD app', certificateFile: 'c:\\temp\\some-certificate.cer', certificateBase64Encoded: 'somebase64string' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if certificateFile specified with certificateDisplayName', () => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+
+    const actual = command.validate({ options: { name: 'My AAD app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation when certificate file is not found', () => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+
+    const actual = command.validate({ options: { debug: true, name: 'My AAD app', certificateDisplayName: 'some certificate', certificateFile: 'C:\\temp\\some-certificate.cer' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if certificateBase64Encoded specified with certificateDisplayName', () => {
+    const actual = command.validate({ options: { name: 'My AAD app', certificateDisplayName: 'Some certificate', certificateBase64Encoded: 'somebase64string' } });
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if manifest is valid JSON with name and name not specified', () => {

@@ -9,7 +9,7 @@ import request from '../../../../request';
 import { validation } from '../../../../utils';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
-import { Channel } from '../../Channel';
+import { Channel } from '@microsoft/microsoft-graph-types';
 import commands from '../../commands';
 
 interface ExtendedGroup extends Group {
@@ -191,8 +191,12 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
           return Promise.reject(`The specified channel '${args.options.channelName}' does not exist in the Microsoft Teams team with ID '${teamId}'`);
         }
 
-        return Promise.resolve(channelItem.id);
-      }, err => { return Promise.reject(err); });
+        if (channelItem.membershipType !== "private") {
+          return Promise.reject(`The specified channel is not a private channel`);
+        }
+
+        return Promise.resolve(channelItem.id!);
+      });
   }
 
   private getUserId(args: CommandArgs): Promise<string[]> {

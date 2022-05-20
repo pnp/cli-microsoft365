@@ -5,4 +5,5 @@ export interface Channel {
   isFavoriteByDefault: boolean | null;
   email: string | null;
   webUrl: string | null;
+  membershipType: string | null;
 }

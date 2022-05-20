@@ -6,7 +6,7 @@ import request from '../../../../request';
 import { validation } from '../../../../utils';
 import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
-import { Channel } from '../../Channel';
+import { Channel } from '@microsoft/microsoft-graph-types';
 import commands from '../../commands';
 import { ConversationMember } from '../../ConversationMember';
 
@@ -162,7 +162,11 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
           return Promise.reject(`The specified channel does not exist in the Microsoft Teams team`);
         }
 
-        return Promise.resolve(channelItem.id);
+        if (channelItem.membershipType !== "private") {
+          return Promise.reject(`The specified channel is not a private channel`);
+        }
+
+        return Promise.resolve(channelItem.id!);
       });
   }
 
