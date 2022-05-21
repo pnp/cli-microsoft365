@@ -76,18 +76,13 @@ describe(commands.EVENTRECEIVER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets();
+    assert.deepStrictEqual(optionSets, [['name', 'id']]);
+  });
+
   it('fails validation if the specified site URL is not a valid SharePoint URL', () => {
     const actual = command.validate({ options: { webUrl: 'site.com' } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if no event receiver id or name is filled in', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales' } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both event receiver id and name is filled in', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', id: 'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec' } });
     assert.notStrictEqual(actual, true);
   });
 

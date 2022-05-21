@@ -118,19 +118,16 @@ class SpoEventreceiverGetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
+  public optionSets(): string[][] | undefined {
+    return [
+      ['name', 'id']
+    ];
+  }
+
   public validate(args: CommandArgs): boolean | string {
     const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
-    }
-
-    const erOptions: any[] = [args.options.name, args.options.id];
-    if (erOptions.filter(item => item !== undefined).length === 0) {
-      return `Specify atleast the name or the id of the event receiver to retrieve`;
-    }
-
-    if (erOptions.filter(item => item !== undefined).length === 2) {
-      return `Specify either the name or the id of the event receiver to retrieve, but not both`;
     }
 
     const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
