@@ -10,6 +10,8 @@
 
 **Planner:**
 
+- [planner task reference add](../cmd/planner/task/task-reference-add.md) - adds a new reference to a Planner task [#3283](https://github.com/pnp/cli-microsoft365/issues/3283)
+- [planner task reference list](../cmd/planner/task/task-reference-list.md) - retrieve the references associated to a Planner task [#3284](https://github.com/pnp/cli-microsoft365/issues/3284)
 - [planner bucket get](../cmd/planner/bucket/bucket-get.md) - retrieves a planner bucket [#3226](https://github.com/pnp/cli-microsoft365/issues/3226)
 - [planner bucket remove](../cmd/planner/bucket/bucket-remove.md) - removes a Microsoft Planner bucket from a plan [#2742](https://github.com/pnp/cli-microsoft365/issues/2742)
 
@@ -42,6 +44,8 @@
 - extended 'aad app add' and 'aad app set' with certificates [#3115](https://github.com/pnp/cli-microsoft365/issues/3115), [#3116](https://github.com/pnp/cli-microsoft365/issues/3116)
 - fixes documentation app open in wrong place [#3316](https://github.com/pnp/cli-microsoft365/issues/3316)
 - extended teams channel member with check for private channel [#3254](https://github.com/pnp/cli-microsoft365/issues/3254)
+- updates documentation titles [#3310](https://github.com/pnp/cli-microsoft365/issues/3310)
+- follow the order of properties as defined in defaultProperties [#2008](https://github.com/pnp/cli-microsoft365/issues/2008)
 
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
