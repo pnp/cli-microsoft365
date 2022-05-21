@@ -10,10 +10,6 @@ import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import request from '../../../../request';
 
-interface ExtendedPlannerTaskDetails extends PlannerTaskDetails {
-  '@odata.etag': string;
-}
-
 interface CommandArgs {
   options: Options;
 }
@@ -46,10 +42,8 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
     }
 
     this
-      .getTaskDetails(args.options.taskId)
-      .then(details => {
-        const etag: string = details['@odata.etag'];
-
+      .getTaskDetailsEtag(args.options.taskId)
+      .then(etag => {
         const body: PlannerTaskDetails = {
           checklist: {
             // Generate new GUID for new task checklist item
@@ -80,7 +74,7 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getTaskDetails(taskId: string): Promise<ExtendedPlannerTaskDetails> {
+  private getTaskDetailsEtag(taskId: string): Promise<string> {
     const requestOptions: AxiosRequestConfig = {
       url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}/details`,
       headers: {
@@ -89,7 +83,9 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request.get(requestOptions);
+    return request
+      .get(requestOptions)
+      .then((task: any) => task['@odata.etag']);
   }
 
   public options(): CommandOption[] {

@@ -89,7 +89,7 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
 
       return Promise.reject('Invalid Request');
     });
-    sinon.stub(request,  'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsWithChecklistResponse);
       }
@@ -105,6 +105,38 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
     }, () => {
       try {
         assert(loggerLogSpy.calledWith(taskDetailsWithChecklistResponse.checklist));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails when unexpected API error was thrown', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+        return Promise.resolve(taskDetailsResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+        return Promise.reject('Something went wrong.');
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        taskId: validTaskId,
+        title: validTitle
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Something went wrong.')));
         done();
       }
       catch (e) {
