@@ -28,8 +28,7 @@ nav:
     - Azure Active Directory (aad):
       - app:
         - app add: 'cmd/aad/app/app-add.md'
-        - app get: 'cmd/aad/app/app-get.md'
-        - app open: 'cmd/aad/app/app-open.md'
+        - app get: 'cmd/aad/app/app-get.md'        
         - app remove: 'cmd/aad/app/app-remove.md'        
         - app role add: 'cmd/aad/app/app-role-add.md'
         - app role list: 'cmd/aad/app/app-role-list.md'
@@ -119,6 +118,7 @@ nav:
       - list: 'cmd/file/file-list.md'
     - Microsoft 365 apps (app):
       - get: 'cmd/app/app-get.md'
+      - open: 'cmd/app/app-open.md'
       - permission:
         - permission list: 'cmd/app/permission/permission-list.md'
     - Microsoft 365 tenant (tenant):
@@ -190,16 +190,18 @@ nav:
         - bucket remove: 'cmd/planner/bucket/bucket-remove.md'
       - plan:
         - plan add: 'cmd/planner/plan/plan-add.md'
-        - plan get: 'cmd/planner/plan/plan-get.md'
         - plan details get: 'cmd/planner/plan/plan-details-get.md'
+        - plan get: 'cmd/planner/plan/plan-get.md'
         - plan list: 'cmd/planner/plan/plan-list.md'
       - task:
         - task add: 'cmd/planner/task/task-add.md'
         - task checklistitem add: 'cmd/planner/task/task-checklistitem-add.md'
+        - task details get: 'cmd/planner/task/task-details-get.md'
         - task get: 'cmd/planner/task/task-get.md'
         - task list: 'cmd/planner/task/task-list.md'
+        - task reference add: 'cmd/planner/task/task-reference-add.md'
+        - task reference list: 'cmd/planner/task/task-reference-list.md'
         - task set: 'cmd/planner/task/task-set.md'
-        - task details get: 'cmd/planner/task/task-details-get.md'
     - Power Apps (pa):
       - app:
         - app get: 'cmd/pa/app/app-get.md'
@@ -236,7 +238,9 @@ nav:
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Power Platform (pp):
       - environment:
-        - environment list: 'cmd/pp/environment/environment-list.md' 
+        - environment list: 'cmd/pp/environment/environment-list.md'
+      - gateway:
+        - gateway list: 'cmd/pp/gateway/gateway-list.md' 
       - managementapp:
         - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
         - managementapp list: 'cmd/pp/managementapp/managementapp-list.md'
