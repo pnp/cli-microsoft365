@@ -461,13 +461,51 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     });
   });
 
+  it('fails to get channel when channel does is not private', (done) => {
+    sinonUtil.restore(request.get);
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('00000000-0000-0000-0000-000000000000')}/channels?$filter=displayName eq '${encodeURIComponent('Other Channel')}'`) {
+        return Promise.resolve({
+          "value": [
+            {
+              "name": "Other Channel",
+              "membershipType": "standard"
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelName: 'Other Channel',
+        id: '00000',
+        role: 'owner'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(
+          JSON.stringify(err),
+          JSON.stringify(new CommandError(`The specified channel is not a private channel`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly get channel id by channel name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/teams/00000000-0000-0000-0000-000000000000/channels?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
           value: [
             {
-              "id": "19:00000000000000000000000000000000@thread.skype"
+              "id": "19:00000000000000000000000000000000@thread.skype",
+              "membershipType": "private"
             }
           ]
         });

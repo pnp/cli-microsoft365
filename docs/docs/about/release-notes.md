@@ -10,17 +10,29 @@
 
 **Planner:**
 
+- [planner task reference add](../cmd/planner/task/task-reference-add.md) - adds a new reference to a Planner task [#3283](https://github.com/pnp/cli-microsoft365/issues/3283)
+- [planner task reference list](../cmd/planner/task/task-reference-list.md) - retrieve the references associated to a Planner task [#3284](https://github.com/pnp/cli-microsoft365/issues/3284)
 - [planner bucket get](../cmd/planner/bucket/bucket-get.md) - retrieves a planner bucket [#3226](https://github.com/pnp/cli-microsoft365/issues/3226)
 - [planner bucket remove](../cmd/planner/bucket/bucket-remove.md) - removes a Microsoft Planner bucket from a plan [#2742](https://github.com/pnp/cli-microsoft365/issues/2742)
 
+**Power Platform:**
+
+- [pp gateway list](../cmd/pp/gateway/gateway-list.md) - returns a list of gateways for which the user is an admin [#3276](https://github.com/pnp/cli-microsoft365/issues/3276)
+
 **SharePoint Online:**
 
+- [spo eventreceiver get](../cmd/spo/eventreceiver/eventreceiver-get.md) - retrieves specific event receiver for a web, site or list [#3308](https://github.com/pnp/cli-microsoft365/issues/3308)
 - [spo field list](../cmd/spo/field/field-list.md) - retrieves columns for the specified list or site [#2695](https://github.com/pnp/cli-microsoft365/issues/2695)
 - [spo list roleinheritance break](../cmd/spo/list/list-roleinheritance-break.md) - breaks role inheritance on list or library [#3198](https://github.com/pnp/cli-microsoft365/issues/3198)
 - [spo list roleinheritance reset](../cmd/spo/list/list-roleinheritance-reset.md) - restores role inheritance on list or library [#3220](https://github.com/pnp/cli-microsoft365/issues/3220)
+- [spo list view add](../cmd/spo/list/list-view-add.md) - adds a new view to a SharePoint list [#1834](https://github.com/pnp/cli-microsoft365/issues/1834)
 - [spo listitem roleinheritance break](../cmd/spo/listitem/listitem-roleinheritance-break.md) - breaks inheritance of list item [#3199](https://github.com/pnp/cli-microsoft365/issues/3199)
 - [spo listitem roleinheritance reset](../cmd/spo/listitem/listitem-roleinheritance-reset.md) - restores the role inheritance of list item, file, or folder [#3238](https://github.com/pnp/cli-microsoft365/issues/3238)
 - [spo roledefinition list](../cmd/spo/roledefinition/roledefinition-list.md) - gets list of role definitions for the specified site [#3237](https://github.com/pnp/cli-microsoft365/issues/3237)
+
+**Search:**
+
+- [search externalConnections list](../cmd/search/externalconnection/externalconnection-list.md) - lists external connections defined in Microsoft Search [#2790](https://github.com/pnp/cli-microsoft365/issues/2790)
 
 **Tenant:**
 
@@ -36,6 +48,10 @@
 - added app only token check to planner commands [#3265](https://github.com/pnp/cli-microsoft365/issues/3265)
 - added Planner utilities class [#3268](https://github.com/pnp/cli-microsoft365/issues/3268)
 - extended 'aad app add' and 'aad app set' with certificates [#3115](https://github.com/pnp/cli-microsoft365/issues/3115), [#3116](https://github.com/pnp/cli-microsoft365/issues/3116)
+- fixes documentation app open in wrong place [#3316](https://github.com/pnp/cli-microsoft365/issues/3316)
+- extended teams channel member with check for private channel [#3254](https://github.com/pnp/cli-microsoft365/issues/3254)
+- updates documentation titles [#3310](https://github.com/pnp/cli-microsoft365/issues/3310)
+- follow the order of properties as defined in defaultProperties [#2008](https://github.com/pnp/cli-microsoft365/issues/2008)
 
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
