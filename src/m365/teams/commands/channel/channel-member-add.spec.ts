@@ -669,6 +669,45 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     });
   });
 
+  it('fails to get channel when channel does is not private', (done) => {
+    sinonUtil.restore(request.get);
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
+        return Promise.resolve(singleTeamResponse);
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels?$filter=displayName eq '${encodeURIComponent('Other Channel')}'`) {
+        return Promise.resolve({
+          "value": [
+            {
+              "name": "Other Channel",
+              "membershipType": "standard"
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
+        channelName: "Other Channel"
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(
+          JSON.stringify(err),
+          JSON.stringify(new CommandError(`The specified channel is not a private channel`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('fails adding conversation members with multiple teamName', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
