@@ -21,12 +21,18 @@
 
 **SharePoint Online:**
 
+- [spo eventreceiver get](../cmd/spo/eventreceiver/eventreceiver-get.md) - retrieves specific event receiver for a web, site or list [#3308](https://github.com/pnp/cli-microsoft365/issues/3308)
 - [spo field list](../cmd/spo/field/field-list.md) - retrieves columns for the specified list or site [#2695](https://github.com/pnp/cli-microsoft365/issues/2695)
 - [spo list roleinheritance break](../cmd/spo/list/list-roleinheritance-break.md) - breaks role inheritance on list or library [#3198](https://github.com/pnp/cli-microsoft365/issues/3198)
 - [spo list roleinheritance reset](../cmd/spo/list/list-roleinheritance-reset.md) - restores role inheritance on list or library [#3220](https://github.com/pnp/cli-microsoft365/issues/3220)
+- [spo list view add](../cmd/spo/list/list-view-add.md) - adds a new view to a SharePoint list [#1834](https://github.com/pnp/cli-microsoft365/issues/1834)
 - [spo listitem roleinheritance break](../cmd/spo/listitem/listitem-roleinheritance-break.md) - breaks inheritance of list item [#3199](https://github.com/pnp/cli-microsoft365/issues/3199)
 - [spo listitem roleinheritance reset](../cmd/spo/listitem/listitem-roleinheritance-reset.md) - restores the role inheritance of list item, file, or folder [#3238](https://github.com/pnp/cli-microsoft365/issues/3238)
 - [spo roledefinition list](../cmd/spo/roledefinition/roledefinition-list.md) - gets list of role definitions for the specified site [#3237](https://github.com/pnp/cli-microsoft365/issues/3237)
+
+**Search:**
+
+- [search externalConnections list](../cmd/search/externalconnection/externalconnection-list.md) - lists external connections defined in Microsoft Search [#2790](https://github.com/pnp/cli-microsoft365/issues/2790)
 
 **Tenant:**
 
