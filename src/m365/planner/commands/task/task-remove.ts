@@ -1,3 +1,4 @@
+import * as os from 'os';
 import { Group, PlannerBucket, PlannerTask } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
 import { Cli, Logger } from '../../../../cli';
@@ -90,28 +91,27 @@ class PlannerTaskRemoveCommand extends GraphCommand {
       .getBucketId(options)
       .then(bucketId => {
         const requestOptions: AxiosRequestConfig = {
-          url: `${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`,
+          url: `${this.resource}/v1.0/planner/buckets/${bucketId}/tasks?$select=title,id`,
           headers: {
-            accept: 'application/json;odata.metadata=none'
+            accept: 'application/json;'
           },
           responseType: 'json'
         };
 
         return request.get<{ value: PlannerTask[] }>(requestOptions);
       })
-      .then(tasks => {
-        const filteredTasks = tasks.value.filter(b => title!.toLocaleLowerCase() === b.title!.toLocaleLowerCase());
+      .then(tasks => {      
+        const filteredtasks = tasks.value.filter(b => title!.toLocaleLowerCase() === b.title!.toLocaleLowerCase());
 
-        
-        if (!filteredTasks.length) {
+        if (!filteredtasks.length) {
           return Promise.reject(`The specified task ${title} does not exist`);
         }
 
-        if (filteredTasks.length > 1) {
-          return Promise.reject(`Multiple tasks with title ${title} found: ${filteredTasks.map(x => x.id)}`);
+        if (filteredtasks.length > 1) {
+          return Promise.reject(`Multiple tasks with title ${title} found: Please disambiguate: ${os.EOL}${filteredtasks.map(f => `- ${f.id}`).join(os.EOL)}`);
         }
 
-        return Promise.resolve(filteredTasks[0]);
+        return Promise.resolve(filteredtasks[0]);
       });
   }
 
@@ -126,7 +126,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
       .getPlanId(options)
       .then(planId => {
         const requestOptions: AxiosRequestConfig = {
-          url: `${this.resource}/v1.0/planner/plans/${planId}/buckets`,
+          url: `${this.resource}/v1.0/planner/plans/${planId}/buckets?$select=id,name`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
@@ -143,7 +143,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
         }
 
         if (filteredBuckets.length > 1) {
-          return Promise.reject(`Multiple buckets with name ${bucketName} found: ${filteredBuckets.map(x => x.id)}`);
+          return Promise.reject(`Multiple buckets with name ${bucketName} found: Please disambiguate:${os.EOL}${filteredBuckets.map(f => `- ${f.id}`).join(os.EOL)}`);
         }
 
         return Promise.resolve(filteredBuckets[0].id!);

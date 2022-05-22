@@ -1,3 +1,4 @@
+import * as os from 'os';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
@@ -334,7 +335,7 @@ describe(commands.TASK_REMOVE, () => {
 
   it('fails validation when no buckets found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
         return Promise.resolve({"value": []});
       }
 
@@ -361,7 +362,7 @@ describe(commands.TASK_REMOVE, () => {
 
   it('fails validation when multiple buckets found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
         return Promise.resolve(multipleBucketByNameResponse);
       }
 
@@ -377,7 +378,7 @@ describe(commands.TASK_REMOVE, () => {
       }
     }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple buckets with name ${validBucketName} found: ${multipleBucketByNameResponse.value.map(x => x.id)}`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple buckets with name ${validBucketName} found: Please disambiguate:${os.EOL}${multipleBucketByNameResponse.value.map(f => `- ${f.id}`).join(os.EOL)}`)));
         done();
       }
       catch (e) {
@@ -387,7 +388,7 @@ describe(commands.TASK_REMOVE, () => {
   });
   it('fails validation when no tasks found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=title,id`) {
         return Promise.resolve({"value": []});
       }
 
@@ -413,7 +414,7 @@ describe(commands.TASK_REMOVE, () => {
 
   it('fails validation when multiple tasks found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=title,id`) {
         return Promise.resolve(multipleTasksByTitleResponse);
       }
 
@@ -428,7 +429,7 @@ describe(commands.TASK_REMOVE, () => {
       }
     }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple tasks with title ${validTaskTitle} found: ${multipleTasksByTitleResponse.value.map(x => x.id)}`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple tasks with title ${validTaskTitle} found: Please disambiguate: ${os.EOL}${multipleTasksByTitleResponse.value.map(f => `- ${f.id}`).join(os.EOL)}`)));
         done();
       }
       catch (e) {
@@ -508,15 +509,15 @@ describe(commands.TASK_REMOVE, () => {
     });
   });
 
-  it('Correctly deletes task by name with group id', (done) => {
+  it('Correctly deletes task by title with group id', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return Promise.resolve(singlePlanResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
         return Promise.resolve(singleBucketByNameResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=title,id`) {
         return Promise.resolve(singleTaskByTitleResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
@@ -553,7 +554,7 @@ describe(commands.TASK_REMOVE, () => {
       }
     });
   });
-  it('Correctly deletes task by name', (done) => {
+  it('Correctly deletes task by title', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
         return Promise.resolve(singleGroupResponse);
@@ -561,10 +562,10 @@ describe(commands.TASK_REMOVE, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return Promise.resolve(singlePlanResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
         return Promise.resolve(singleBucketByNameResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=title,id`) {
         return Promise.resolve(singleTaskByTitleResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${validTaskId}`) {
