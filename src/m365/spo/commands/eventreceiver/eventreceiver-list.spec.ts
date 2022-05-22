@@ -86,6 +86,10 @@ describe(commands.EVENTRECEIVER_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['receiverId', 'receiverName', 'receiverAssembly', 'receiverClass', 'sequenceNumber', 'synchronization', 'eventType', 'receiverUrl']);
+  });
+
   it('fails validation if the specified site URL is not a valid SharePoint URL', () => {
     const actual = command.validate({ options: { webUrl: 'site.com' } });
     assert.notStrictEqual(actual, true);

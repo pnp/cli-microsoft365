@@ -29,6 +29,10 @@ class SpoEventreceiverListCommand extends SpoCommand {
     return 'Lists all the event receivers attached to the web, site or list (if any of the list options are filled in)';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['receiverId', 'receiverName', 'receiverAssembly', 'receiverClass', 'sequenceNumber', 'synchronization', 'eventType', 'receiverUrl'];
+  } 
+
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.listId = typeof args.options.listId !== 'undefined';
