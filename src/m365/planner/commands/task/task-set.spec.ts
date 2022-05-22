@@ -406,7 +406,7 @@ describe(commands.TASK_SET, () => {
     });
   });
 
-  it('correctly updates planner task  to bucket with bucketName, planName, and ownerGroupName', (done) => {
+  it('correctly updates planner task to bucket with bucketName, planName, and ownerGroupName', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
@@ -447,7 +447,7 @@ describe(commands.TASK_SET, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
         return Promise.resolve(groupByDisplayNameResponse);
       }
 
@@ -832,33 +832,6 @@ describe(commands.TASK_SET, () => {
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(err.message, "Cannot proceed with planner task update. The following users provided are invalid : user2@contoso.onmicrosoft.com");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails validation when ownerGroupName not found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
-        return Promise.resolve({ value: [] });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: false,
-        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-        bucketName: 'My Planner Bucket',
-        planName: 'My Planner Plan',
-        ownerGroupName: 'foo'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified owner group does not exist`)));
         done();
       }
       catch (e) {

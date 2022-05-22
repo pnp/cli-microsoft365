@@ -32,19 +32,6 @@ describe(commands.TASK_GET, () => {
     ]
   };
 
-  const multipleGroupResponse = {
-    "value": [
-      {
-        "id": validOwnerGroupId,
-        "displayName": validOwnerGroupName
-      },
-      {
-        "id": validOwnerGroupId,
-        "displayName": validOwnerGroupName
-      }
-    ]
-  };
-
   const singlePlanResponse = {
     "value": [
       {
@@ -278,60 +265,6 @@ describe(commands.TASK_GET, () => {
     });
   });
 
-  it('fails validation when no groups found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'&$select=id`) {
-        return Promise.resolve({ "value": [] });
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    command.action(logger, {
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planName: validPlanName,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified ownerGroup ${validOwnerGroupName} does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails validation when multiple groups found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'&$select=id`) {
-        return Promise.resolve(multipleGroupResponse);
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    command.action(logger, {
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planName: validPlanName,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple ownerGroups with name ${validOwnerGroupName} found: ${multipleGroupResponse.value.map(x => x.id)}`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('fails validation when no buckets found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
@@ -436,7 +369,7 @@ describe(commands.TASK_GET, () => {
 
   it('Correctly gets task by name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
         return Promise.resolve(singleGroupResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
