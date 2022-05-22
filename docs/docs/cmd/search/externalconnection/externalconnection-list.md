@@ -1,6 +1,6 @@
 # search externalconnection list
 
-Lists external connections defined in the Microsoft Search
+Lists external connections defined in Microsoft Search
 
 ## Usage
 
@@ -14,7 +14,7 @@ m365 search externalconnection list [options]
 
 ## Examples
 
-List external connections defined in the Microsoft Search
+List external connections defined in Microsoft Search
 
 ```sh
 m365 search externalconnection list
