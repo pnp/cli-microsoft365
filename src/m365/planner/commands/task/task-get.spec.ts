@@ -198,6 +198,7 @@ describe(commands.TASK_GET, () => {
   it('fails validation when bucket name is used with both plan name and plan id', () => {
     const actual = command.validate({
       options: {
+        title: validTaskTitle,
         name: validBucketName,
         bucketName: validBucketName,
         planId: validPlanId,
