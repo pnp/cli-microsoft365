@@ -765,33 +765,6 @@ describe(commands.TASK_ADD, () => {
     });
   });
 
-  it('fails validation when ownerGroupName not found', (done) => {
-    sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
-        return Promise.resolve({ value: [] });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: false,
-        name: 'My Planner Bucket',
-        planName: 'My Planner Plan',
-        ownerGroupName: 'foo'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified owner group does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('fails validation when task details endpoint fails', (done) => {
     sinonUtil.restore(request.get);
 

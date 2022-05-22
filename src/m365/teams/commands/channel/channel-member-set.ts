@@ -1,4 +1,4 @@
-import { Channel } from '@microsoft/microsoft-graph-types';
+import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import { validation } from '../../../../utils';
@@ -7,6 +7,11 @@ import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import request from '../../../../request';
 import { ConversationMember } from '../../ConversationMember';
+import { aadGroup } from '../../../../utils/aadGroup';
+
+interface ExtendedGroup extends Group {
+  resourceProvisioningOptions: string[];
+}
 
 interface CommandArgs {
   options: Options;
@@ -85,32 +90,14 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
       return Promise.resolve(args.options.teamId);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: [{ id: string, resourceProvisioningOptions: string[] }] }>(requestOptions)
-      .then(response => {
-        const groupItem: { id: string, resourceProvisioningOptions: string[] } | undefined = response.value[0];
-
-        if (!groupItem) {
+    return aadGroup
+      .getGroupByDisplayName(args.options.teamName!)
+      .then(group => {
+        if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
           return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
         }
 
-        if (groupItem.resourceProvisioningOptions.indexOf('Team') === -1) {
-          return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
-        }
-
-        if (response.value.length > 1) {
-          return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${response.value.map(x => x.id)}`);
-        }
-
-        return Promise.resolve(groupItem.id);
+        return group.id!;
       });
   }
 

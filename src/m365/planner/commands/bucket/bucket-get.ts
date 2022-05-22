@@ -1,4 +1,4 @@
-import { PlannerBucket, Group } from '@microsoft/microsoft-graph-types';
+import { PlannerBucket } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { AxiosRequestConfig } from 'axios';
 import {
@@ -11,6 +11,7 @@ import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import Auth from '../../../../Auth';
 import { planner } from '../../../../utils/planner';
+import { aadGroup } from '../../../../utils/aadGroup';
 
 interface CommandArgs {
   options: Options;
@@ -116,7 +117,7 @@ class PlannerBucketGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request.get<PlannerBucket>(requestOptions);    
+    return request.get<PlannerBucket>(requestOptions);
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {
@@ -126,27 +127,9 @@ class PlannerBucketGetCommand extends GraphCommand {
       return Promise.resolve(ownerGroupId);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(ownerGroupName as string)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: Group[] }>(requestOptions)
-      .then(response => {
-        if (!response.value.length) {
-          return Promise.reject(`The specified owner group ${ownerGroupName} does not exist`);
-        }
-
-        if (response.value.length > 1) {
-          return Promise.reject(`Multiple owner groups with name ${ownerGroupName} found: ${response.value.map(x => x.id)}`);
-        }
-
-        return Promise.resolve(response.value[0].id!);
-      });
+    return aadGroup
+      .getGroupByDisplayName(ownerGroupName!)
+      .then(group => group.id!);
   }
 
   public options(): CommandOption[] {

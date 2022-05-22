@@ -7,8 +7,13 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
-import { Channel } from '@microsoft/microsoft-graph-types';
+import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import commands from '../../commands';
+import { aadGroup } from '../../../../utils/aadGroup';
+
+interface ExtendedGroup extends Group {
+  resourceProvisioningOptions: string[];
+}
 
 interface CommandArgs {
   options: Options;
@@ -152,29 +157,14 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
       return Promise.resolve(args.options.teamId);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: [{ id: string, resourceProvisioningOptions: string[] }] }>(requestOptions)
-      .then(response => {
-        const filteredResponseByTeam: { id: string, resourceProvisioningOptions: string[] }[] = response.value.filter(t => t.resourceProvisioningOptions.includes('Team'));
-        const groupItem: { id: string } | undefined = filteredResponseByTeam[0];
-
-        if (!groupItem) {
-          return Promise.reject(`The specified team '${args.options.teamName}' does not exist in Microsoft Teams`);
+    return aadGroup
+      .getGroupByDisplayName(args.options.teamName!)
+      .then(group => {
+        if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
+          return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
         }
 
-        if (filteredResponseByTeam.length > 1) {
-          return Promise.reject(`Multiple Microsoft Teams with name '${args.options.teamName}' found. Please disambiguate:${os.EOL}${response.value.map(x => `- ${x.id}`).join(os.EOL)}`);
-        }
-
-        return Promise.resolve(groupItem.id);
+        return group.id!;
       });
   }
 
