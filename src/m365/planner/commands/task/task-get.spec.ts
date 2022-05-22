@@ -22,7 +22,7 @@ describe(commands.TASK_GET, () => {
   const validOwnerGroupName = 'Group name';
   const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
   const invalidOwnerGroupId = 'Invalid GUID';
-  
+
   const singleGroupResponse = {
     "value": [
       {
@@ -155,6 +155,16 @@ describe(commands.TASK_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation if neither id nor title specified', () => {
+    const actual = command.validate({ options: {} });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if both id and title specified', () => {
+    const actual = command.validate({ options: { id: 'vzCcZoOv-U27PwydxHB8opcADJo-', title: 'My Planner Task' } });
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation when title is used without bucket id', () => {
     const actual = command.validate({
       options: {
@@ -276,7 +286,7 @@ describe(commands.TASK_GET, () => {
   it('fails validation when no groups found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'&$select=id`) {
-        return Promise.resolve({"value": []});
+        return Promise.resolve({ "value": [] });
       }
 
       return Promise.reject('Invalid Request');
@@ -299,7 +309,7 @@ describe(commands.TASK_GET, () => {
       }
     });
   });
-  
+
   it('fails validation when multiple groups found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'&$select=id`) {
@@ -330,7 +340,7 @@ describe(commands.TASK_GET, () => {
   it('fails validation when no buckets found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
-        return Promise.resolve({"value": [ { "id": "" } ]});
+        return Promise.resolve({ "value": [{ "id": "" }] });
       }
 
       return Promise.reject('Invalid Request');
@@ -382,7 +392,7 @@ describe(commands.TASK_GET, () => {
   it('fails validation when no tasks found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
-        return Promise.resolve({"value": [ { "id": "" } ]});
+        return Promise.resolve({ "value": [{ "id": "" }] });
       }
 
       return Promise.reject('Invalid Request');
@@ -429,6 +439,10 @@ describe(commands.TASK_GET, () => {
     });
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'priority']);
+  });
+
   it('Correctly gets task by name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'&$select=id`) {
@@ -443,7 +457,7 @@ describe(commands.TASK_GET, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
         return Promise.resolve(singleTaskByTitleResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/${encodeURIComponent(validTaskId)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}`) {
         return Promise.resolve(taskResponse);
       }
 
@@ -479,7 +493,7 @@ describe(commands.TASK_GET, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
         return Promise.resolve(singleTaskByTitleResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/${encodeURIComponent(validTaskId)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}`) {
         return Promise.resolve(taskResponse);
       }
 
@@ -506,7 +520,7 @@ describe(commands.TASK_GET, () => {
 
   it('successfully handles item found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/01gzSlKkIUSUl6DF_EilrmQAKDhh`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/01gzSlKkIUSUl6DF_EilrmQAKDhh`) {
         return Promise.resolve({
           "createdBy": {
             "user": {
