@@ -185,6 +185,15 @@ class PlannerTaskGetCommand extends GraphCommand {
       });
   }
 
+  public optionSets(): string[][] | undefined {
+    return [
+      ['id', 'title'],
+      ['title', 'bucketId', 'bucketName'],
+      ['bucketName', 'planId', 'planName'],
+      ['planName', 'ownerGroupId', 'ownerGroupName']
+    ];
+  }
+
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       { option: '-i, --id [id]' },
@@ -202,38 +211,6 @@ class PlannerTaskGetCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!args.options.id && !args.options.title) {
-      return 'Specify either id or title';
-    }
-
-    if (args.options.id && args.options.title) {
-      return 'Specify either id or title but not both';
-    }
-
-    if (args.options.title && !args.options.bucketId && !args.options.bucketName) {
-      return 'Specify either bucketId or bucketName when using title';
-    }
-
-    if (args.options.title && args.options.bucketId && args.options.bucketName) {
-      return 'Specify either bucketId or bucketName when using title but not both';
-    }
-
-    if (args.options.bucketName && !args.options.planId && !args.options.planName) {
-      return 'Specify either planId or planName when using bucketName';
-    }
-
-    if (args.options.bucketName && args.options.planId && args.options.planName) {
-      return 'Specify either planId or planName when using bucketName but not both';
-    }
-
-    if (args.options.planName && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName';
-    }
-
-    if (args.options.planName && args.options.ownerGroupId && args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
-    }
-
     if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
       return `${args.options.ownerGroupId} is not a valid GUID`;
     }
