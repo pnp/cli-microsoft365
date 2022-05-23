@@ -32,24 +32,6 @@ describe('utils/aadGroup', () => {
     assert.strictEqual(actual, singleGroupResponse);
   });
 
-  it('throws error message when group is not found.', async () => {
-    sinon.stub(request, 'get').callsFake(async opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validGroupId}`) {
-        throw Error('Group not found.');
-      }
-
-      return 'Invalid Request';
-    });
-
-    try {
-      await aadGroup.getGroupById(validGroupId);
-      assert.fail('No error message thrown.');
-    }
-    catch (ex) {
-      assert.deepStrictEqual(ex, Error(`Group with ID ${validGroupId} was not found.`));
-    }
-  });
-
   it('throws error message when no group was found using getGroupByDisplayName', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validGroupName)}'`) {

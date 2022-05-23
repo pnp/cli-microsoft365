@@ -1,3 +1,4 @@
+export * from './aadGroup';
 export * from './accessToken';
 export * from './formatting';
 export * from './fsUtil';
