@@ -203,6 +203,7 @@ nav:
         - task list: 'cmd/planner/task/task-list.md'
         - task reference add: 'cmd/planner/task/task-reference-add.md'
         - task reference list: 'cmd/planner/task/task-reference-list.md'
+        - task reference remove: 'cmd/planner/task/task-reference-remove.md'
         - task remove: 'cmd/planner/task/task-remove.md'
         - task set: 'cmd/planner/task/task-set.md'
       - tenant:
