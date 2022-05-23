@@ -85,7 +85,8 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
 
     return request
       .get(requestOptions)
-      .then((task: any) => task['@odata.etag']);
+      .then((task: any) => task['@odata.etag']
+        , () => Promise.reject('Planner task was not found.'));
   }
 
   public options(): CommandOption[] {
