@@ -1,3 +1,4 @@
+import { chatUtil } from './../../../teams/commands/chat/chatUtil';
 import { Group, PlannerBucket, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
 import Auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
@@ -144,14 +145,14 @@ class PlannerTaskAddCommand extends GraphCommand {
     }
 
     const categories: AppliedCategories = {};
-    options.appliedCategories.toLocaleLowerCase().split(',').forEach(x => categories[x] = true);
+    chatUtil.convertParticipantStringToArray(options.appliedCategories.toLocaleLowerCase()).forEach(x => categories[x] = true);
     return categories;
   }
 
   private updateTaskDetails(options: Options, newTask: PlannerTask): Promise<PlannerTask & PlannerTaskDetails> {
     const taskId = newTask.id as string;
 
-    if (!options.description) {
+    if (!options.description && !options.previewType) {
       return Promise.resolve(newTask);
     }
 
