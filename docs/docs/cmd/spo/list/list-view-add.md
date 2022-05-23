@@ -26,7 +26,10 @@ m365 spo list view add [options]
 : Title of the view to be created for the list.
 
 `--fields <fields>`
-: Comma-separated list of **case-sensitive** internal names of the fields to add to the view. 
+: Comma-separated list of **case-sensitive** internal names of the fields to add to the view.
+
+`--viewQuery [viewQuery]`
+: XML representation of the list query for the underlying view.
 
 `--personal`
 : View will be created as personal view, if specified.
@@ -64,4 +67,10 @@ Add a personal view called _All events_ to a list with a specific ID.
 
 ```sh
 spo list view add --webUrl https://contoso.sharepoint.com/sites/project-x --listId 00000000-0000-0000-0000-000000000000 --title "All events" --fields "FieldName1,Created" --paged --personal
+```
+
+Add a view called _All events_ with defined filter and sorting.
+
+```sh
+spo list view add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "My List" --title "All events" --fields "FieldName1,Created" --viewQuery "<OrderBy><FieldRef Name='Created' Ascending='FALSE' /></OrderBy><Where><Eq><FieldRef Name='TextFieldName' /><Value Type='Text'>Field value</Value></Eq></Where>" --paged
 ```

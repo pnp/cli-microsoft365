@@ -18,6 +18,7 @@ interface Options extends GlobalOptions {
   listUrl?: string;
   title: string;
   fields: string;
+  viewQuery?: string;
   personal?: boolean;
   default?: boolean;
   paged?: boolean;
@@ -39,6 +40,7 @@ class SpoListViewAddCommand extends SpoCommand {
     telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
     telemetryProps.listUrl = typeof args.options.listUrl !== 'undefined';
     telemetryProps.title = typeof args.options.title !== 'undefined';
+    telemetryProps.viewQuery = typeof args.options.viewQuery !== 'undefined';
     telemetryProps.personal = !!args.options.personal;
     telemetryProps.default = !!args.options.default;
     telemetryProps.orderedView = !!args.options.orderedView;
@@ -61,6 +63,7 @@ class SpoListViewAddCommand extends SpoCommand {
           ViewFields: {
             results: args.options.fields.split(',')
           },
+          Query: args.options.viewQuery,
           PersonalView: !!args.options.personal,
           SetAsDefaultView: !!args.options.default,
           Paged: !!args.options.paged,
@@ -107,6 +110,7 @@ class SpoListViewAddCommand extends SpoCommand {
       { option: '--listUrl [listUrl]' },
       { option: '--title <title>' },
       { option: '--fields <fields>' },
+      { option: '--viewQuery [viewQuery]' },
       { option: '--personal' },
       { option: '--default' },
       { option: '--paged' },
