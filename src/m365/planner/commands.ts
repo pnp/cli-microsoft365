@@ -16,5 +16,6 @@ export default {
   TASK_LIST: `${prefix} task list`,
   TASK_REFERENCE_ADD: `${prefix} task reference add`,
   TASK_REFERENCE_LIST: `${prefix} task reference list`,
+  TASK_REFERENCE_REMOVE: `${prefix} task reference remove`,
   TASK_SET: `${prefix} task set`
 };
