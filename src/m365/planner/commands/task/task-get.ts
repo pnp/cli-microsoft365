@@ -54,22 +54,24 @@ class PlannerTaskGetCommand extends GraphCommand {
     
     this
       .getTaskId(args.options)
-      .then(taskId => {
-        const requestOptions: any = {
-          url: `${this.resource}/beta/planner/tasks/${encodeURIComponent(taskId)}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        }; 
-
-        return request.get<PlannerTask>(requestOptions);
-      })
+      .then(taskId => this.getTask(taskId))
       .then(task => this.getTaskDetails(task))
       .then((res: any): void => {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  }
+
+  private getTask(taskId: string): Promise<PlannerTask> {
+    const requestOptions: any = {
+      url: `${this.resource}/beta/planner/tasks/${encodeURIComponent(taskId)}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    }; 
+
+    return request.get<PlannerTask>(requestOptions);
   }
 
   private getTaskDetails(task: PlannerTask): Promise<PlannerTask & PlannerTaskDetails> {
