@@ -17,7 +17,7 @@ m365 planner task checklistitem list [options]
 
 ## Examples
 
-Lists the checklist items of a Planner task
+Lists the checklist items of a Planner task.
 
 ```sh
 m365 planner task checklistitem list --taskId 'vzCcZoOv-U27PwydxHB8opcADJo-'
