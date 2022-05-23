@@ -3,6 +3,7 @@ import { Cli, Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -61,7 +62,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
           responseType: 'json',
           data: {
             references: {
-              [this.customURIEncoder(url)]: null
+              [formatting.openTypesEncoder(url)]: null
             }
           }
         };
@@ -116,15 +117,6 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
 
         return Promise.resolve({etag, url});
       });
-  }
-
-  private customURIEncoder(value: string): string {
-    return value
-      .replace(/\%/g, '%25')
-      .replace(/\./g, '%2E')
-      .replace(/:/g, '%3A')
-      .replace(/@/g, '%40')
-      .replace(/#/g, '%23');
   }
 
   public options(): CommandOption[] {
