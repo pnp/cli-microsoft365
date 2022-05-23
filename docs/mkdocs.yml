@@ -28,8 +28,8 @@ nav:
     - Azure Active Directory (aad):
       - app:
         - app add: 'cmd/aad/app/app-add.md'
-        - app get: 'cmd/aad/app/app-get.md'        
-        - app remove: 'cmd/aad/app/app-remove.md'        
+        - app get: 'cmd/aad/app/app-get.md'
+        - app remove: 'cmd/aad/app/app-remove.md'
         - app role add: 'cmd/aad/app/app-role-add.md'
         - app role list: 'cmd/aad/app/app-role-list.md'
         - app role remove: 'cmd/aad/app/app-role-remove.md'
@@ -239,7 +239,7 @@ nav:
       - environment:
         - environment list: 'cmd/pp/environment/environment-list.md'
       - gateway:
-        - gateway list: 'cmd/pp/gateway/gateway-list.md' 
+        - gateway list: 'cmd/pp/gateway/gateway-list.md'
       - managementapp:
         - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
         - managementapp list: 'cmd/pp/managementapp/managementapp-list.md'
@@ -688,6 +688,7 @@ nav:
       - 'Authenticate with and call the Microsoft Graph' : 'sample-scripts/graph/call-graph.md'
     - Planner:
       - 'Add multiple tasks': sample-scripts/planner/add-multiple-tasks.md
+      - 'Planner migration to SharePoint list': 'sample-scripts/spo/planner-migrate-sharepoint-list.md'
     - Power Automate:
       - 'Cancel all running flow runs for a flow in an environment': 'sample-scripts/flow/cancel-all-running-flow-runs.md'
       - 'Export a single Flow to a Logic App' : 'sample-scripts/flow/export-flow-logicapp.md'
