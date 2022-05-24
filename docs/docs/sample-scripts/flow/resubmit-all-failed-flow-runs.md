@@ -1,3 +1,8 @@
+---
+tags:  
+  - Miscelaneous
+---
+
 # Resubmit all failed flow runs for a flow in an environment
 
 Author: [Mohamed Ashiq Faleel](https://ashiqf.com/2021/05/09/resubmit-your-failed-power-automate-flow-runs-automatically-using-m365-cli-and-rest-api/)

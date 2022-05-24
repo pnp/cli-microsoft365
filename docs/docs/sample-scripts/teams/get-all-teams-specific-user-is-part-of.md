@@ -1,3 +1,8 @@
+---
+tags:
+  - Users
+---
+
 # Get all the Teams a specific user is part of
 
 Author: [Veronique Lengelle](https://twitter.com/veronicageek)

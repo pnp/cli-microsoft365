@@ -1,3 +1,9 @@
+---
+tags:
+  - Users
+  - Permission management
+---
+
 # Change group membership of all SharePoint Online sites
 
 Author: [Arjun Menon](https://twitter.com/arjunumenon), Inspired by [Patrick Lamber](https://www.nubo.eu/Change-The-Group-Memberships-Of-All-SharePoint-Online-Sites/)

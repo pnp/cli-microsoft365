@@ -1,3 +1,8 @@
+---
+tags:
+  - Usage
+---
+
 # List app usage in Microsoft Teams
 
 Inspired by: [Thomy Goelles](https://thomy.tech/list-teams-app-usage/)

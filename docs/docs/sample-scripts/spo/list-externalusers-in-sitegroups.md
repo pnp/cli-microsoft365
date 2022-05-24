@@ -1,3 +1,9 @@
+---
+tags:
+  - Guests  
+  - Users
+---
+
 # List all external users in site groups across all site collections
 
 Author: [Martin Lingstuyl](https://www.blimped.nl)

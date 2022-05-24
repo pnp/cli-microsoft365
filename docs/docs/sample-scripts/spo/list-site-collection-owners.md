@@ -1,3 +1,10 @@
+---
+tags:
+  - Analytics
+  - Users
+  - Permission management
+---
+
 # List site collection owners
 
 Author: [Patrick Lamber](https://www.nubo.eu/Retrieve-All-Site-Collection-Owners-Using-The-CLI-For-Microsoft-365/)

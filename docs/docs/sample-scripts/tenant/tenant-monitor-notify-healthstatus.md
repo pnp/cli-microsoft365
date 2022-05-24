@@ -1,3 +1,9 @@
+---
+tags:
+  - Usage
+  - Analytics
+---
+
 # Monitor and notify Microsoft 365 health status
 
 Author: [Arjun Menon](https://arjunumenon.com/tenant-status-solution-m365cli/)

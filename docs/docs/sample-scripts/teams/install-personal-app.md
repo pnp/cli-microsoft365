@@ -1,3 +1,8 @@
+---
+tags:
+  - Provisioning
+---
+
 # Deploy Microsoft Teams personal app and add it to users
 
 Author: [Sébastien Levert](https://github.com/sebastienlevert)

@@ -1,3 +1,8 @@
+---
+tags:
+  - Files
+---
+
 # Copy files to another SharePoint Library in another site
 
 Author: [Garry Trinder](https://github.com/garrytrinder), [Adam](https://github.com/Adam-it), Inspired by Veronique Lengelle

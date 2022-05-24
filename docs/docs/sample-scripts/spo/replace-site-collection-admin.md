@@ -1,3 +1,9 @@
+---
+tags:
+  - Permission management
+  - Users  
+---
+
 # Replace site collection admin with another user
 
 Author: [Patrick Lamber](https://www.nubo.eu/Replace-Site-Collection-Admin-Using-CLI/)

@@ -1,3 +1,8 @@
+---
+tags:  
+  - Miscelaneous
+---
+
 # Authenticate with and call the Microsoft Graph 
 
 Author: [Garry Trinder](https://github.com/garrytrinder)

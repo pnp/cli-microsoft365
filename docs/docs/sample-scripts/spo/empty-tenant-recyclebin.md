@@ -1,3 +1,8 @@
+---
+tags:
+  - Cleanup
+---
+
 # Empty the tenant recycle bin
 
 Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powershell-scripts-for-keeping-your-development-environment-tidy-and-spotless/#empty-the-tenant-recycle-bin)

@@ -1,3 +1,8 @@
+---
+tags:
+  - Analytics
+---
+
 # List all tabs in Microsoft Teams teams in the tenant
 
 Inspired by: [Patrick Lamber](https://www.nubo.eu/List-all-tabs-in-Microsoft-Teams-teams-in-the-tenant-using-CLI-for-Microsoft-365/) and [Veronique Lengelle](https://veronicageek.com/powershell/powershell-for-m365/get-teams-channels-tabs-and-privacy-settings-using-teams-pnp-powershell/2020/07/)

@@ -1,3 +1,9 @@
+---
+tags:
+  - Files  
+  - Analytics
+---
+
 # Lists number of files in all lists and folders for the given site
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/lists-file-count-cli-microsoft-365/)

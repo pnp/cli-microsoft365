@@ -1,3 +1,9 @@
+---
+tags:
+  - Provisioning
+  - Cleanup
+---
+
 # Delete custom color themes from SharePoint
 
 Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powershell-scripts-for-keeping-your-development-environment-tidy-and-spotless/#delete-all-custom-color-themes-from-sharepoint)

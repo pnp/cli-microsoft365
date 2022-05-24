@@ -1,3 +1,9 @@
+---
+tags:
+  - Cleanup
+  - Tasks
+---
+
 # Cleanup completed Microsoft To Do tasks
 
 Author: [Garry Trinder](https://garrytrinder.github.io/2021/04/cleanup-completed-microsoft-to-do-tasks-using-cli-for-microsoft365)

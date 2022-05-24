@@ -1,3 +1,8 @@
+---
+tags:
+  - Governance
+---
+
 # Export Configurations of Tenant Wide Extensions
 
 Author: [Joseph Velliah](https://sprider.blog/export-configs-tenant-wide-extensions)

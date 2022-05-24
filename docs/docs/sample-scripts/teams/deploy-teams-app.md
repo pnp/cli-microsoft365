@@ -1,3 +1,8 @@
+---
+tags:
+  - Provisioning
+---
+
 # Deploy Microsoft Teams app from Azure DevOps
 
 Author: [Garry Trinder](https://github.com/garrytrinder)

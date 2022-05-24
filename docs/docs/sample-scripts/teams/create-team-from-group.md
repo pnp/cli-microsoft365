@@ -1,3 +1,8 @@
+---
+tags:
+  - Provisioning
+---
+
 # Create a Microsoft Team with channels from a Microsoft 365 Group
 
 Inspired by: [Patrick Lamber](https://www.nubo.eu/Provision-A-Team-With-CLI-For-Microsoft-365/)

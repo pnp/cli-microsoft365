@@ -1,3 +1,9 @@
+---
+tags:
+  - Users
+  - Social
+---
+
 # Share social champions to Teams
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/recognize-contributions-clim365) Inspired by: [Emily Mancini](https://docs.microsoft.com/en-us/microsoft-365/community/identifying-your-sharepoint-champions)

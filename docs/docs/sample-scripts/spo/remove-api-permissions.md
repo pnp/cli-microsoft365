@@ -1,3 +1,8 @@
+---
+tags:
+  - Permission management
+---
+
 # Remove SharePoint API permissions
 
 Author: [Waldek Mastykarz](https://blog.mastykarz.nl/sample-script-quickly-remove-sharepoint-api-permissions/)

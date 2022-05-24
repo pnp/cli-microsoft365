@@ -1,3 +1,10 @@
+---
+tags:
+  - Permission management
+  - Users
+  - Guests
+---
+
 # List all external users in all site collections
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/migration-report-external-users/)

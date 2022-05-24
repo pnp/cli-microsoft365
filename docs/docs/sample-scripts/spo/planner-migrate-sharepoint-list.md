@@ -1,3 +1,10 @@
+---
+tags:
+  - Migration
+  - Lists
+  - Tasks
+---
+
 # Planner migration to SharePoint list
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/migrate-planner-plan-list-climicrosoft365/)

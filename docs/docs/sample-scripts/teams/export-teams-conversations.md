@@ -1,3 +1,8 @@
+---
+tags:
+  - Migration
+---
+
 # Export conversations from Microsoft Teams Channels
 
 Author: [Joseph Velliah](https://sprider.blog/export-conversations-from-microsoft-teams)

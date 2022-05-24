@@ -1,3 +1,8 @@
+---
+tags:
+  - Governance
+---
+
 # Govern orphaned Microsoft Teams
 
 Author: [Matti Paukkonen](https://mattipaukkonen.com/2019/10/09/govern-orphaned-teams-with-powershell/)

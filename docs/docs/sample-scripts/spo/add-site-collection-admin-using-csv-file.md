@@ -1,3 +1,9 @@
+---
+tags:
+  - Users
+  - Security
+---
+
 # Add a Site Collection Admin using a csv file
 
 !!! warning

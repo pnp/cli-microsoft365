@@ -1,3 +1,9 @@
+---
+tags:
+  - Provisioning
+  - Pages
+---
+
 # Add custom client-side web part to modern page
 
 Author: [Yannick Plenevaux](https://ypcode.wordpress.com)

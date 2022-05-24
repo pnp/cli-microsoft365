@@ -1,3 +1,8 @@
+---
+tags:
+  - Lists
+---
+
 # Copy list items between SharePoint lists
 
 Author: [SekThang](https://github.com/SekThang), Inspired by [Ruud](https://lazyadmin.nl/it/copy-sharepoint-list-items-to-another-list-with-powershell-and-pnp/)

@@ -1,3 +1,9 @@
+---
+tags:
+  - Users
+  - Permission management
+---
+
 # Add users to the Associated SharePoint Groups of a site from a CSV File
 
 Author: [Arjun Menon](https://arjunumenon.com/add-multiple-users-sharepoint-groups-site/)

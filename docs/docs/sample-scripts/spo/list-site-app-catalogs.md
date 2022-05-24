@@ -1,3 +1,8 @@
+---
+tags:
+  - Analytics
+---
+
 # Lists active SharePoint site collection application catalogs
 
 Inspired by: [David Ramalho](http://sharepoint-tricks.com/check-all-sharepoint-sites-collection-with-app-catalog-active/)

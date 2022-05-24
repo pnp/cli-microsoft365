@@ -1,3 +1,8 @@
+---
+tags:
+  - Files    
+---
+
 # Upload local files and folders to SharePoint Online
 
 Author: [Patrick Lamber](https://github.com/plamber), [Adam](https://github.com/Adam-it)

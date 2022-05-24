@@ -1,3 +1,8 @@
+---
+tags:  
+  - Usage
+---
+
 # Inventory Flows By Creator  
 
 Author: [Pete Skelly](https://peteskelly.com/lightweight-reports-using-the-office-365-cli-and-jq/)

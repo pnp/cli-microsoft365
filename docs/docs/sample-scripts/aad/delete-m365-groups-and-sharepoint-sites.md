@@ -1,3 +1,8 @@
+---
+tags:  
+  - Cleanup
+---
+
 # Delete all Microsoft 365 groups and SharePoint sites
 
 Author: [Patrick Lamber](https://www.nubo.eu/Delete-All-SPO-Sites-And-M365-Groups/)

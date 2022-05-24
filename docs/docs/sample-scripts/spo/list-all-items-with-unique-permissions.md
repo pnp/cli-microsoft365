@@ -1,3 +1,9 @@
+---
+tags:
+  - Permission management
+  - Lists
+---
+
 # List all items with unique permissions
 
 Author: [Veronique Lengelle](https://twitter.com/veronicageek), Inspired by [Salaudeen Rajack](https://www.sharepointdiary.com/2017/03/sharepoint-online-get-all-list-items-with-unique-permissions-using-powershell.html)

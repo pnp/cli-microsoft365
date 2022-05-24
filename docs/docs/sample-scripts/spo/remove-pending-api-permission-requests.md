@@ -1,3 +1,8 @@
+---
+tags:
+  - Cleanup
+---
+
 # Remove pending SharePoint API permission requests
 
 Author: [Waldek Mastykarz](https://blog.mastykarz.nl/sample-script-quickly-remove-pending-sharepoint-api-permission-requests/)

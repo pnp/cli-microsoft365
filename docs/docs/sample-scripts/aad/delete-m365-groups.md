@@ -1,3 +1,8 @@
+---
+tags:  
+  - Cleanup
+---
+
 # Delete all Microsoft 365 groups
 
 Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powershell-scripts-for-keeping-your-development-environment-tidy-and-spotless/#delete-all-office-365-groups)

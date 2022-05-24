@@ -1,3 +1,8 @@
+---
+tags:  
+  - Usage
+---
+
 # Flow runs day summary report
 
 Author: [Adam](https://github.com/Adam-it)

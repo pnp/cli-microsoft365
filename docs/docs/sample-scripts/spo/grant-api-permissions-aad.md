@@ -1,3 +1,8 @@
+---
+tags:
+  - Permission management
+---
+
 # Grant API permissions to SharePoint Azure AD Application
 
 Author: [Michaël Maillot](https://michaelmaillot.github.io)

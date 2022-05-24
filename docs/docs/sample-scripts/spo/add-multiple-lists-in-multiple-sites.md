@@ -1,3 +1,9 @@
+---
+tags:
+  - Provisioning
+  - Lists
+---
+
 # Add multiple lists in multiple sites
 
 Author: [Sudharsan Kesavanarayanan](https://twitter.com/sudharsank)

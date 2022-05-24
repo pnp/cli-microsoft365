@@ -1,3 +1,8 @@
+---
+tags:
+  - Files
+---
+
 # List all checked out files in SharePoint
 
 Author: [Veronique Lengelle](https://veronicageek.com/2020/find-checked-out-files-across-multiple-site-collections/)

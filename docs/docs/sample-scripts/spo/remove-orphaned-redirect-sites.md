@@ -1,3 +1,8 @@
+---
+tags:
+  - Cleanup
+---
+
 # Remove orphaned redirect sites
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/remove-orphaned-redirectsites/)

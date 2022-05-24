@@ -1,3 +1,8 @@
+---
+tags:
+  - Users
+---
+
 # Bulk add members to Microsoft Teams team from CSV file
 
 Inspired by: [Rakesh Pandey](https://www.flexmind.co/blog/how-to-add-bulk-users-from-csv-file-to-ms-teams-using-powershell/)

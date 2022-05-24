@@ -1,3 +1,9 @@
+---
+tags:
+  - Usage
+  - Analytics
+---
+
 # List Microsoft Teams teams, channels, and tabs in the tenant
 
 Inspired by: [Veronique Lengelle](https://veronicageek.com/powershell/powershell-for-m365/get-teams-channels-tabs-and-privacy-settings-using-teams-pnp-powershell/2020/07/)

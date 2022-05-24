@@ -1,3 +1,9 @@
+---
+tags:
+  - Provisioning
+  - Sites
+---
+
 # Setup example site
 
 Author: [Adam](https://github.com/Adam-it)

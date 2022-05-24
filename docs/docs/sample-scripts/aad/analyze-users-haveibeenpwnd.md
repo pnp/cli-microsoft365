@@ -1,3 +1,10 @@
+---
+tags:  
+  - Privacy
+  - Miscelaneous
+  - Users
+---
+
 # Analyze users for known data breaches with have i been pwned
 
 Inspired by: [Albert-Jan Schot](https://www.cloudappie.nl/cli-microsoft-haveibeenpwned-status/)

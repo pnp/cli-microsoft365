@@ -1,3 +1,8 @@
+---
+tags:
+  - Files
+---
+
 # Add multiple folders in libraries using a csv file
 
 Author: [Veronique Lengelle](https://twitter.com/veronicageek)

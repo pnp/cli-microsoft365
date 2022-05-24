@@ -1,3 +1,9 @@
+---
+tags:
+  - Files
+  - Analytics
+---
+
 # List all large files within a SharePoint Site
 
 Author: [Veronique Lengelle](https://veronicageek.com/2019/get-files-bigger-50mb/)

@@ -1,3 +1,9 @@
+---
+tags:  
+  - Users
+  - AI
+---
+
 # Analyze User Profile Photos using Azure Computer Vision API
 
 Author: [Joseph Velliah](https://sprider.blog/analyze-microsoft-365-user-profile-photos-using-azure-computer-vision-api)

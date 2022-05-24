@@ -1,3 +1,9 @@
+---
+tags:
+  - Permission management
+  - Users
+---
+
 # Bulk add/remove users to Microsoft Teams and Microsoft 365 Groups
 
 Author: [Joseph Velliah](https://sprider.blog/add-remove-bulk-users-to-from-microsoft-teams-microsoft-365-group-office-365-cli-commands)

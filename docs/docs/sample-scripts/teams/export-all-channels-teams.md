@@ -1,3 +1,8 @@
+---
+tags:
+  - Migration
+---
+
 # Export all channels in Microsoft Teams teams in the tenant
 
 Author: [Sudharsan Kesavanarayanan](https://twitter.com/sudharsank)

@@ -1,3 +1,8 @@
+---
+tags:
+  - Lists
+---
+
 # Hide SharePoint list from Site Contents
 
 Author: [David Ramalho](https://sharepoint-tricks.com/hide-sharepoint-list-from-site-contents/)

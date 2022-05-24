@@ -1,3 +1,8 @@
+---
+tags:
+  - Users
+---
+
 # List all Microsoft Teams team's Owners and Members
 
 Author: [Patrick Lamber](https://www.nubo.eu/List-All-Microsoft-Teams-Owners-And-Members/)

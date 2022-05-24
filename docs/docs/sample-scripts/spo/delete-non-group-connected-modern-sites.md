@@ -1,3 +1,8 @@
+---
+tags:
+  - Cleanup
+---
+
 # Delete all (non-group connected) modern SharePoint sites
 
 Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powershell-scripts-for-keeping-your-development-environment-tidy-and-spotless/#delete-all-non-group-connected-modern-sharepoint-sites)

@@ -1,3 +1,8 @@
+---
+tags:
+  - Analytics
+---
+
 # List all failed site design for all sites
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/failed-sitedesigns-clim365/)

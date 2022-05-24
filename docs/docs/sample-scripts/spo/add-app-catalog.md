@@ -1,3 +1,8 @@
+---
+tags:
+  - Provisioning
+---
+
 # Add App Catalog to SharePoint site
 
 Author: [David Ramalho](https://sharepoint-tricks.com/tenant-app-catalog-vs-site-collection-app-catalog/)

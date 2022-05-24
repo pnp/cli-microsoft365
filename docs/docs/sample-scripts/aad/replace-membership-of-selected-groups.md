@@ -1,3 +1,9 @@
+---
+tags:  
+  - Cleanup
+  - Users
+---
+
 # Replace a user's membership in selected Microsoft 365 Groups or Teams
 
 Inspired by: [Alan Eardley](https://blog.eardley.org.uk/2021/04/managing-teams-movers-and-leavers/), [Patrick Lamber](https://www.nubo.eu/Replace-Membership-In-A-Microsoft-Group-Or-Team/)

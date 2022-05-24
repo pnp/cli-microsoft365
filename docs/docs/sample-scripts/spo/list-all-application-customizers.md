@@ -1,3 +1,9 @@
+---
+tags:
+  - Provisioning
+  - Customizations
+---
+
 # List all application customizers in a tenant
 
 Author: [Rabia Williams](https://twitter.com/williamsrabia)

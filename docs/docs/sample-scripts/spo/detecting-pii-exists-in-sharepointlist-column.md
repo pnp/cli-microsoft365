@@ -1,3 +1,8 @@
+---
+tags:
+  - Privacy
+---
+
 # Detecting PII exists in SharePoint List using AWS Comprehend
 
 Author: [Joseph Velliah](https://blog.josephvelliah.com/detecting-pii-exist-in-sharepoint-list-using-aws-comprehend)

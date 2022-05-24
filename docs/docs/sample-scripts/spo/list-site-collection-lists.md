@@ -1,3 +1,8 @@
+---
+tags:
+  - Analytics
+---
+
 # List site collections and their lists
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/migration-report-climicrosoft365)

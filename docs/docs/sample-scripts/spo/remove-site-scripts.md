@@ -1,3 +1,8 @@
+---
+tags:
+  - Cleanup    
+---
+
 # Delete custom SharePoint site scripts
 
 Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powershell-scripts-for-keeping-your-development-environment-tidy-and-spotless/#delete-all-sharepoint-site-designs-and-site-scripts)

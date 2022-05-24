@@ -1,3 +1,8 @@
+---
+tags:
+  - Analytics
+---
+
 # List all tenant-wide extensions
 
 Author: [Shantha Kumar T](https://www.ktskumar.com/2020/04/manage-tenant-wide-extensions-using-office-365-cli/)

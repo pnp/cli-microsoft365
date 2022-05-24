@@ -1,3 +1,8 @@
+---
+tags:
+  - Cleanup
+---
+
 # Removes Microsoft Teams personal app from users and Microsoft Teams app catalog
 
 Author: [Sébastien Levert](https://github.com/sebastienlevert)

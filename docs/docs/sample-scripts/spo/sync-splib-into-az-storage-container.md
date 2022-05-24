@@ -1,3 +1,9 @@
+---
+tags:
+  - Files
+  - Migration
+---
+
 # Sync SharePoint Document Library Documents with Azure Storage Container
 
 Author: [Joseph Velliah](https://sprider.blog/sync-sp-library-with-az-storage-container)
