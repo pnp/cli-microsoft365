@@ -118,7 +118,7 @@ class SpoFileRenameCommand extends SpoCommand {
           resolve();
         })
         .catch((err: any): any => {
-          if (err.message === "Request failed with status code 404") {
+          if (err.message === 'Request failed with status code 404') {
             // file does not exist so can proceed
             return resolve();
           }

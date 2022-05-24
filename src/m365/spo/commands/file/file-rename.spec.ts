@@ -16,12 +16,12 @@ describe(commands.FILE_RENAME, () => {
 
   const renameResponseJson = [
     {
-      "ErrorCode": 0,
-      "ErrorMessage": null,
-      "FieldName": "FileLeafRef",
-      "FieldValue": "test 2.docx",
-      "HasException": false,
-      "ItemId": 642
+      'ErrorCode': 0,
+      'ErrorMessage': null,
+      'FieldName': 'FileLeafRef',
+      'FieldValue': 'test 2.docx',
+      'HasException': false,
+      'ItemId': 642
     }
   ];
 
