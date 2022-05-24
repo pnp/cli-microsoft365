@@ -157,7 +157,73 @@ describe(commands.TASK_GET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets();
-    assert.deepStrictEqual(optionSets, [['id', 'title'], ['title', 'bucketId', 'bucketName'], ['bucketName', 'planId', 'planName'], ['planName', 'ownerGroupId', 'ownerGroupName']]);
+    assert.deepStrictEqual(optionSets, [['id', 'title']]);
+  });
+
+  it('fails validation when title is used without bucket id', () => {
+    const actual = command.validate({
+      options: {
+        title: validTaskTitle
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when title is used with both bucket id and bucketname', () => {
+    const actual = command.validate({
+      options: {
+        title: validTaskTitle,
+        bucketId: validBucketId,
+        bucketName: validBucketName
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when bucket name is used without plan name or plan id', () => {
+    const actual = command.validate({
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when bucket name is used with both plan name and plan id', () => {
+    const actual = command.validate({
+      options: {
+        name: validBucketName,
+        bucketName: validBucketName,
+        planId: validPlanId,
+        planName: validPlanName
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when plan name is used without owner group name or owner group id', () => {
+    const actual = command.validate({
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planName: validPlanName
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when plan name is used with both owner group name and owner group id', () => {
+    const actual = command.validate({
+      options: {
+        title: validTaskTitle,
+        bucketName: validBucketName,
+        planName: validPlanName,
+        ownerGroupName: validOwnerGroupName,
+        ownerGroupId: validOwnerGroupId
+      }
+    });
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when owner group id is not a guid', () => {
