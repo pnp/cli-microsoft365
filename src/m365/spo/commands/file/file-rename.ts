@@ -1,4 +1,3 @@
-import * as url from 'url';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -17,7 +16,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   sourceUrl: string;
   targetFileName: string;
-  force: boolean;
+  force?: boolean;
 }
 
 class SpoFileRenameCommand extends SpoCommand {
@@ -31,32 +30,23 @@ class SpoFileRenameCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.webUrl = typeof args.options.webUrl !== 'undefined';
-    telemetryProps.sourceUrl = typeof args.options.sourceUrl !== 'undefined';
-    telemetryProps.targetFileName = typeof args.options.targetFileName !== 'undefined';
-    telemetryProps.force = typeof args.options.force !== 'undefined';
+    telemetryProps.force = !!args.options.force;
     return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const webUrl = args.options.webUrl;
-    const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
-    const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
-    const webServerRelativeUrl: string = webUrl.replace(tenantUrl, '');
-    const originalFileServerRelativeUrl: string = `${webServerRelativeUrl}${args.options.sourceUrl}`;
-    
+    const originalFileServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.sourceUrl);
     // Check if the source file exists.
-    // Called on purpose, we explicitly check if user specified file
-    // in the sourceUrl option.
+    // Called on purpose, we explicitly check if user specified file exists, otherwise, the rename can't happen and we will throw an error
     this
-      .fileExists(originalFileServerRelativeUrl, args.options.webUrl)
+      .fileExists(originalFileServerRelativeUrl, webUrl)
       .then((): Promise<void> => {
-        const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.sourceUrl.substring(0, args.options.sourceUrl.lastIndexOf('/'))) + '/' + args.options.targetFileName;
-
-        // Check if file already exists with the new name, if so: delete
+        // Check if file already exists with the new name, if so: the file will be removed to the recycle bin
         if (args.options.force) {
           // delete the target file if force is set
-          return this.recycleFile(args.options.webUrl, serverRelativeUrl, logger); 
+          const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(webUrl, args.options.sourceUrl.substring(0, args.options.sourceUrl.lastIndexOf('/')))}/${args.options.targetFileName}`;
+          return this.recycleFile(webUrl, targetFileServerRelativeUrl, logger); 
         }
 
         return Promise.resolve();
