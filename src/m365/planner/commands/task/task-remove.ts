@@ -71,7 +71,9 @@ class PlannerTaskRemoveCommand extends GraphCommand {
       });
     }   
   }
-
+  /**
+  * $filter is not working on the buckets/{bucketId}/tasks endpoint, hence it is not being used.  
+  * */
   private getTask(options: Options): Promise<PlannerTask> {
     const { id, title } = options;
 
@@ -210,14 +212,17 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
   
+  public optionSets(): string[][] | undefined {
+    return [
+      ['id', 'title']
+    ];
+  }
+
   public validate(args: CommandArgs): boolean | string {
     if (args.options.id) {
       if (args.options.bucketId || args.options.bucketName || args.options.planId || args.options.planName || args.options.ownerGroupId || args.options.ownerGroupName) {
         return 'Don\'t specify bucketId,bucketName, planId, planName, ownerGroupId or ownerGroupName when using id';
-      }
-      if (args.options.title) {
-        return 'Specify either id or title';
-      } 
+      }  
     }
     if (args.options.title) {
       if (!args.options.bucketId && !args.options.bucketName) {
