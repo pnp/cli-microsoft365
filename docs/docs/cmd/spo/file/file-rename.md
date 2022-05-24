@@ -20,13 +20,13 @@ m365 spo file rename [options]
 : New file name of the file
 
 `--force`
-: If a file already exists with target file name, it will be moved to the recycle bin. If omitted, the rename operation will be canceled if a file already exists the new file name
+: If a file already exists with target file name, it will be moved to the recycle bin. If omitted, the rename operation will be canceled if a file already exists with the specified file name
 
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
-If you try to rename a file without the _--force_ flag and a file with this name already exists, the operation will be cancelled.
+If you try to rename a file without the `--force` flag and a file with this name already exists, the operation will be cancelled.
 
 ## Examples
 
