@@ -1,3 +1,10 @@
+---
+tags:
+  - reports
+  - security
+  - users
+---
+
 # List site collection owners
 
 Author: [Patrick Lamber](https://www.nubo.eu/Retrieve-All-Site-Collection-Owners-Using-The-CLI-For-Microsoft-365/)
@@ -43,8 +50,3 @@ This script helps you to list and export all site collection owners in your Shar
     $results | Export-Csv -Path $fileExportPath -NoTypeInformation
     Write-Host "Completed."
     ```
-
-Keywords:
-
-- SharePoint Online
-- Governance

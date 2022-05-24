@@ -1,3 +1,9 @@
+---
+tags:
+  - adoption
+  - users
+---
+
 # Share social champions to Teams
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/recognize-contributions-clim365) Inspired by: [Emily Mancini](https://docs.microsoft.com/en-us/microsoft-365/community/identifying-your-sharepoint-champions)
@@ -37,10 +43,3 @@ Retrieves activities for SharePoint Online, Teams and Yammer and shares the top 
     $card = '{ \"type\": \"AdaptiveCard\", \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\", \"version\": \"1.2\", \"body\": [  {  \"type\": \"TextBlock\",  \"text\": \"'+$($title)+'\",  \"wrap\": true,  \"size\": \"Medium\",  \"weight\": \"Bolder\",  \"color\": \"Attention\"  },  {  \"type\": \"TextBlock\",  \"wrap\": true,  \"text\": \"Week '+$(get-date -UFormat %V)+'\",  \"fontType\": \"Default\",  \"size\": \"Small\",  \"weight\": \"Lighter\",  \"isSubtle\": true  },  {  \"type\": \"FactSet\",  \"facts\": [   {   \"title\": \"First place\",   \"value\": \"'+$($activityUsers[0])+'\"   },   {   \"title\": \"Second place\",   \"value\": \"'+$($activityUsers[1])+'\"   },   {   \"title\": \"Third place\",   \"value\": \"'+$($activityUsers[2])+'\"   }  ]  } ] }'
     m365 adaptivecard send --url $webhookUrl --card $card
     ```
-
-Keywords:
-
-- Microsoft Teams
-- SharePoint Online
-- Yammer
-- Adoption

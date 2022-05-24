@@ -1,3 +1,9 @@
+---
+tags:
+  - cleanup
+  - sites
+---
+
 # Delete all (non-group connected) modern SharePoint sites
 
 Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powershell-scripts-for-keeping-your-development-environment-tidy-and-spotless/#delete-all-non-group-connected-modern-sharepoint-sites)
@@ -66,8 +72,3 @@ When you delete Microsoft 365 groups, the modern group-connected team sites get 
       m365 spo site classic remove --url $siteUrl
     done
     ```
-
-Keywords:
-
-- SharePoint Online
-- Microsoft 365 groups

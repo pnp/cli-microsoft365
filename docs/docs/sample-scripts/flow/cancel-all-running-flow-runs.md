@@ -1,3 +1,9 @@
+---
+tags:  
+  - cleanup
+  - flows
+---
+
 # Cancel all running flow runs for a flow in an environment
 
 Author: [Mohamed Ashiq Faleel](https://ashiqf.com/2021/05/16/cancel-all-your-running-power-automate-flow-runs-using-m365-cli-and-rest-api/)

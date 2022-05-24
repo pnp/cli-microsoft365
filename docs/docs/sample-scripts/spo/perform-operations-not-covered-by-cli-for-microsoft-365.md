@@ -1,3 +1,9 @@
+---
+tags:
+  - files
+  - listitems
+---
+
 # How to perform operations if a command is not covered by the CLI for Microsoft 365
 
 Author: [Joseph Velliah](https://blog.josephvelliah.com/spol-download-attachments-from-list-items-using-cli-for-microsoft-365)
@@ -107,8 +113,3 @@ Prerequisites:
     #Call the function to download list items attachments
     Download-ListAttachments -TenantName $TenantName -SiteURL $SiteURL -ListTitle $ListTitle -DownloadDirectory $DownloadDirectory
     ```
-
-Keywords:
-
-- CLI for Microsoft 365
-- SharePoint Online

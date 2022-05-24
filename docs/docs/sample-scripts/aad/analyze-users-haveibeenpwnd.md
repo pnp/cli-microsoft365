@@ -1,3 +1,9 @@
+---
+tags:  
+  - security
+  - users
+---
+
 # Analyze users for known data breaches with have i been pwned
 
 Inspired by: [Albert-Jan Schot](https://www.cloudappie.nl/cli-microsoft-haveibeenpwned-status/)
@@ -32,10 +38,3 @@ Validate all your users against known breaches with the have i been pwned api. T
       Start-Sleep -Milliseconds 1500
     }
     ```
-
-Keywords:
-
-- Azure
-- Microsoft 365
-- PowerShell
-- Security

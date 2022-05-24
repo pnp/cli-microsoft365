@@ -1,3 +1,9 @@
+---
+tags:
+  - customizations
+  - reports
+---
+
 # List all application customizers in a tenant
 
 Author: [Rabia Williams](https://twitter.com/williamsrabia)
@@ -35,8 +41,3 @@ List all the application customizers in a tenant. Scope is default `All`. Here w
       m365 spo customaction list --url $siteUrl
     done
     ```
-
-Keywords:
-
-- SharePoint Online
-- Governance

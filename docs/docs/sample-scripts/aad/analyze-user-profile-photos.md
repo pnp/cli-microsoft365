@@ -1,3 +1,10 @@
+---
+tags:  
+  - ai
+  - azure
+  - users
+---
+
 # Analyze User Profile Photos using Azure Computer Vision API
 
 Author: [Joseph Velliah](https://sprider.blog/analyze-microsoft-365-user-profile-photos-using-azure-computer-vision-api)
@@ -242,10 +249,3 @@ Prerequisites
     $global:analysisOutcomes | Export-Csv -Path "$outputFilePath" -NoTypeInformation
     Write-Host "Open $outputFilePath to review analysis outcomes report."
     ```
-
-Keywords:
-
-- Azure
-- Computer Vision API
-- Microsoft 365
-- PowerShell

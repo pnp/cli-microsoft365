@@ -1,3 +1,9 @@
+---
+tags:
+  - provisioning
+  - sites
+---
+
 # Add App Catalog to SharePoint site
 
 Author: [David Ramalho](https://sharepoint-tricks.com/tenant-app-catalog-vs-site-collection-app-catalog/)
@@ -24,8 +30,3 @@ When you just want to deploy certain SharePoint solution to a specific site, it'
     m365 spo site appcatalog add --url $site
     echo "App Catalog Created on $site"
     ```
-
-Keywords:
-
-- SharePoint Online
-- Create App Catalog for site

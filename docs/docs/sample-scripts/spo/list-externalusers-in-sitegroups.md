@@ -1,3 +1,12 @@
+---
+tags:
+  - guests  
+  - groups
+  - reports
+  - sites
+  - users
+---
+
 # List all external users in site groups across all site collections
 
 Author: [Martin Lingstuyl](https://www.blimped.nl)
@@ -47,9 +56,4 @@ This script shows how you can check if external users are added to site groups. 
     Write-Host "Exporting list..." -ForegroundColor Green
     $results | Export-Csv -Path "./cli-external-users-in-sitegroups.csv" -NoTypeInformation
     ```
-
-Keywords:
-
-- SharePoint Online
-- Governance
-- External Users
+    
