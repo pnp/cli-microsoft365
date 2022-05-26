@@ -50,19 +50,19 @@ m365 planner task add [options]
 : The comma-separated UPNs of the assignees the task is assigned to. Specify either `assignedToUserIds` or `assignedToUserNames` but not both.
 
 `--assigneePriority [assigneePriority]`
-: Hint used to order items of this type in a list view. The format is defined as outlined [here](https://docs.microsoft.com/en-us/graph/api/resources/planner-order-hint-format?view=graph-rest-1.0).
+: Hint used to order items of this type in a list view. The format is defined as outlined [here](https://docs.microsoft.com/graph/api/resources/planner-order-hint-format?view=graph-rest-1.0).
 
 `--description [description]`
 : Description of the task
 
 `--appliedCategories [appliedCategories]`
-: Comma-separated categories that should be added to the task
+: Comma-separated categories that should be added to the task. The possible options are: `category1`, `category2`, `category3`, `category4`, `category5` and/or `category6`. Additional info defined [here](https://docs.microsoft.com/graph/api/resources/plannerappliedcategories?view=graph-rest-1.0).
 
 `--previewType [previewType]`
 : This sets the type of preview that shows up on the task. The possible values are: `automatic`, `noPreview`, `checklist`, `description`, `reference`. When set to automatic the displayed preview is chosen by the app viewing the task. Default `automatic`.
 
 `--orderHint [orderHint]`
-: Hint used to order items of this type in a list view. The format is defined as outlined [here](https://docs.microsoft.com/en-us/graph/api/resources/planner-order-hint-format?view=graph-rest-1.0).
+: Hint used to order items of this type in a list view. The format is defined as outlined [here](https://docs.microsoft.com/graph/api/resources/planner-order-hint-format?view=graph-rest-1.0).
 
 --8<-- "docs/cmd/_global.md"
 

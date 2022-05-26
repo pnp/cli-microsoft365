@@ -672,6 +672,51 @@ describe(commands.TASK_ADD, () => {
     });
   });
 
+  it('correctly adds planner task with title, bucketId, planId, assignedToUserNames, and appliedCategories split with space', (done) => {
+    sinonUtil.restore(request.get);
+    sinonUtil.restore(request.post);
+
+    const options: any = {
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      assignedToUserNames: 'user@contoso.onmicrosoft.com',
+      appliedCategories: "category1 category2"
+    };
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent('user@contoso.onmicrosoft.com')}'&$select=id,userPrincipalName`) {
+        return Promise.resolve({
+          value: [
+            {
+              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
+              userPrincipalName: 'user@contoso.onmicrosoft.com'
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks`) {
+        return Promise.resolve(taskAddResponseWithAssignments);
+      }
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert(loggerLogSpy.calledWith(taskAddResponseWithAssignments));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly adds planner task with title, bucketId, planId, and description', (done) => {
     sinonUtil.restore(request.get);
     sinonUtil.restore(request.patch);
