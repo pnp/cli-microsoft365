@@ -178,10 +178,10 @@ class PlannerBucketRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--id [id]'
+        option: '-i, --id [id]'
       },
       {
-        option: '--name [name]'
+        option: '-n, --name [name]'
       },
       {
         option: '--planId [planId]'

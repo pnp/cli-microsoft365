@@ -169,7 +169,7 @@ class PlannerBucketSetCommand extends GraphCommand {
         option: '-i, --id [id]'
       },
       {
-        option: '--name [name]'
+        option: '-n, --name [name]'
       },
       {
         option: '--planId [planId]'
