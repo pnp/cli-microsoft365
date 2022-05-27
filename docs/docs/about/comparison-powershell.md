@@ -192,27 +192,6 @@ Update-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
 Update-UserType|Microsoft.Online.SharePoint.PowerShell|
 Upgrade-SPOSite|Microsoft.Online.SharePoint.PowerShell|
 Verify-SPOTenantOrgRelation|Microsoft.Online.SharePoint.PowerShell|
-Add-PnPPlannerBucket|PnP.PowerShell|[planner bucket add](../cmd/planner/bucket/bucket-add.md)
-Add-PnPPlannerTask|PnP.PowerShell|[planner task add](../cmd/planner/task/task-add.md)
-Add-PnPTeamsChannelUser|PnP.PowerShell|[teams channel member add](../cmd/teams/channel/channel-member-add.md)
-Add-PnPView|PnP.PowerShell|[spo list view add](../cmd/spo/list/list-view-add.md)
-Get-PnPEventReceiver|PnP.PowerShell|[spo eventreceiver get](../cmd/spo/eventreceiver/eventreceiver-get.md)
-Get-PnPFlowRun|PnP.PowerShell|[flow run get](../cmd/flow/run/run-get.md), [flow run list](../cmd/flow/run/run-list.md)
-Get-PnPPlannerBucket|PnP.PowerShell|[planner bucket get](../cmd/planner/bucket/bucket-get.md), [planner bucket list](../cmd/planner/bucket/bucket-list.md)
-Get-PnPPlannerTask|PnP.PowerShell|[planner task get](../cmd/planner/task/task-get.md), [planner task list](../cmd/planner/task/task-list.md)
-Get-PnPTeamsChannelMessageReply|PnP.PowerShell|[teams message reply list](../cmd/teams/message/message-reply-list.md)
-Get-PnPTeamsChannelUser|PnP.PowerShell|[teams channel member list](../cmd/teams/channel/channel-member-list.md)
-New-PnPPlannerPlan|PnP.PowerShell|[planner plan add](../cmd/planner/plan/plan-add.md)
-Remove-PnPPlannerBucket|PnP.PowerShell|[planner bucket remove](../cmd/planner/bucket/bucket-remove.md)
-Remove-PnPPlannerPlan|PnP.PowerShell|
-Remove-PnPPlannerTask|PnP.PowerShell|
-Remove-PnPTeamsChannelUser|PnP.PowerShell|[teams channel member remove](../cmd/teams/channel/channel-member-remove.md)
-Set-PnPPlannerBucket|PnP.PowerShell|[planner bucket set](../cmd/planner/bucket/bucket-set.md)
-Set-PnPPlannerPlan|PnP.PowerShell|
-Set-PnPPlannerTask|PnP.PowerShell|[planner task set](../cmd/planner/task/task-set.md)
-Set-PnPTeamsChannelUser|PnP.PowerShell|[teams channel member set](../cmd/teams/channel/channel-member-set.md)
-Set-PnPTheme|PnP.PowerShell|[spo theme apply](../cmd/spo/theme/theme-apply.md)
-Stop-PnPFlowRun|PnP.PowerShell|[flow run cancel](../cmd/flow/run/run-cancel.md)
 Add-PnPAlert|PnP.PowerShell|
 Add-PnPApp|PnP.PowerShell|[spo app add](../cmd/spo/app/app-add.md)
 Add-PnPApplicationCustomizer
@@ -248,6 +227,8 @@ Add-PnPNavigationNode|PnP.PowerShell|[spo navigation node add](../cmd/spo/naviga
 Add-PnPOffice365GroupToSite|PnP.PowerShell|
 Add-PnPOrgAssetsLibrary|PnP.PowerShell|[spo orgassetslibrary add](../cmd/spo/orgassetslibrary/orgassetslibrary-add.md)
 Add-PnPOrgNewsSite|PnP.PowerShell|[spo orgnewssite set](../cmd/spo/orgnewssite/orgnewssite-set.md)
+Add-PnPPlannerBucket|PnP.PowerShell|[planner bucket add](../cmd/planner/bucket/bucket-add.md)
+Add-PnPPlannerTask|PnP.PowerShell|[planner task add](../cmd/planner/task/task-add.md)
 Add-PnPProvisioningSequence|PnP.PowerShell|
 Add-PnPProvisioningSite|PnP.PowerShell|
 Add-PnPProvisioningTemplate|PnP.PowerShell|
@@ -264,6 +245,7 @@ Add-PnPSiteScript|PnP.PowerShell|[spo sitescript add](../cmd/spo/sitescript/site
 Add-PnPStoredCredential|PnP.PowerShell|
 Add-PnPTaxonomyField|PnP.PowerShell|
 Add-PnPTeamsChannel|PnP.PowerShell|[teams channel add](../cmd/teams/channel/channel-add.md)
+Add-PnPTeamsChannelUser|PnP.PowerShell|[teams channel member add](../cmd/teams/channel/channel-member-add.md)
 Add-PnPTeamsTab|PnP.PowerShell|[teams tab add](../cmd/teams/tab/tab-add.md)
 Add-PnPTeamsTeam|PnP.PowerShell|[teams team add](../cmd/teams/team/team-add.md)
 Add-PnPTeamsUser|PnP.PowerShell|[teams user add](../cmd/aad/o365group/o365group-user-add.md)
@@ -276,6 +258,7 @@ Add-PnPUnifiedGroupMember|PnP.PowerShell|[aad o365group user add](../cmd/aad/o36
 Add-PnPUnifiedGroupOwner|PnP.PowerShell|[aad o365group user add](../cmd/aad/o365group/o365group-user-add.md)
 Add-PnPUserToGroup|PnP.PowerShell|
 Add-PnPView|PnP.PowerShell|
+Add-PnPView|PnP.PowerShell|[spo list view add](../cmd/spo/list/list-view-add.md)
 Add-PnPWebhookSubscription|PnP.PowerShell|[spo list webhook add](../cmd/spo/list/list-webhook-add.md)
 Add-PnPWebPartToWebPartPage|PnP.PowerShell|
 Add-PnPWebPartToWikiPage|PnP.PowerShell|
@@ -297,8 +280,8 @@ Clear-PnPTenantRecycleBinItem|PnP.PowerShell|[spo tenant recyclebinitem remove](
 Clear-PnPUnifiedGroupOwner|PnP.PowerShell|
 Connect-PnPHubSite|PnP.PowerShell|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md)
 Connect-PnPMicrosoftGraph|PnP.PowerShell|[login](../cmd/login.md)
-Convert-PnPFolderToProvisioningTemplate|PnP.PowerShell|
 Connect-PnPOnline|PnP.PowerShell|[login](../cmd/login.md)
+Convert-PnPFolderToProvisioningTemplate|PnP.PowerShell|
 Convert-PnPProvisioningTemplate|PnP.PowerShell|
 ConvertTo-PnPClientSidePage|PnP.PowerShell|
 Copy-PnPFile|PnP.PowerShell|[spo file copy](../cmd/spo/file/file-copy.md), [spo folder copy](../cmd/spo/folder/folder-copy.md)
@@ -353,11 +336,13 @@ Get-PnPDeletedMicrosoft365Group|PnP.PowerShell|[aad o365group list](../cmd/aad/o
 Get-PnPDeletedUnifiedGroup|PnP.PowerShell|[aad o365group list](../cmd/aad/o365group/o365group-list.md)
 Get-PnPDocumentSetTemplate|PnP.PowerShell|
 Get-PnPEventReceiver|PnP.PowerShell|
+Get-PnPEventReceiver|PnP.PowerShell|[spo eventreceiver get](../cmd/spo/eventreceiver/eventreceiver-get.md)
 Get-PnPException|PnP.PowerShell|
 Get-PnPFeature|PnP.PowerShell|[spo feature list](../cmd/spo/feature/feature-list.md)
 Get-PnPField|PnP.PowerShell|[spo field get](../cmd/spo/field/field-get.md)
 Get-PnPFile|PnP.PowerShell|[spo file get](../cmd/spo/file/file-get.md), [spo file list](../cmd/spo/file/file-list.md)
 Get-PnPFileVersion|PnP.PowerShell|
+Get-PnPFlowRun|PnP.PowerShell|[flow run get](../cmd/flow/run/run-get.md), [flow run list](../cmd/flow/run/run-list.md)
 Get-PnPFolder|PnP.PowerShell|[spo folder get](../cmd/spo/folder/folder-get.md), [spo folder list](../cmd/spo/folder/folder-list.md)
 Get-PnPFolderItem|PnP.PowerShell|
 Get-PnPFooter|PnP.PowerShell|
@@ -395,6 +380,8 @@ Get-PnPOffice365Services|PnP.PowerShell|
 Get-PnPOfficeManagementApiAccessToken|PnP.PowerShell|[util accesstoken get](../cmd/util/accesstoken/accesstoken-get.md)
 Get-PnPOrgAssetsLibrary|PnP.PowerShell|[spo orgassetslibrary list](../cmd/spo/orgassetslibrary/orgassetslibrary-list.md)
 Get-PnPOrgNewsSite|PnP.PowerShell|[spo orgnewssite list](../cmd/spo/orgnewssite/orgnewssite-list.md)
+Get-PnPPlannerBucket|PnP.PowerShell|[planner bucket get](../cmd/planner/bucket/bucket-get.md), [planner bucket list](../cmd/planner/bucket/bucket-list.md)
+Get-PnPPlannerTask|PnP.PowerShell|[planner task get](../cmd/planner/task/task-get.md), [planner task list](../cmd/planner/task/task-list.md)
 Get-PnPPowerShellTelemetryEnabled|PnP.PowerShell|
 Get-PnPProperty|PnP.PowerShell|
 Get-PnPPropertyBag|PnP.PowerShell|[spo propertybag get](../cmd/spo/propertybag/propertybag-get.md), [spo propertybag list](../cmd/spo/propertybag/propertybag-list.md)
@@ -432,6 +419,8 @@ Get-PnPTaxonomySession|PnP.PowerShell|
 Get-PnPTeamsApp|PnP.PowerShell|[teams app list](../cmd/teams/app/app-list.md)
 Get-PnPTeamsChannel|PnP.PowerShell|[teams channel get](../cmd/teams/channel/channel-get.md), [teams channel list](../cmd/teams/channel/channel-list.md)
 Get-PnPTeamsChannelMessage|PnP.PowerShell|[teams message get](../cmd/teams/message/message-get.md), [teams message list](../cmd/teams/message/message-list.md)
+Get-PnPTeamsChannelMessageReply|PnP.PowerShell|[teams message reply list](../cmd/teams/message/message-reply-list.md)
+Get-PnPTeamsChannelUser|PnP.PowerShell|[teams channel member list](../cmd/teams/channel/channel-member-list.md)
 Get-PnPTeamsTab|PnP.PowerShell|[teams tab list](../cmd/teams/tab/tab-list.md)
 Get-PnPTeamsTeam|PnP.PowerShell|[teams team list](../cmd/teams/team/team-list.md)
 Get-PnPTeamsUser|PnP.PowerShell|[teams user list](../cmd/teams/user/user-list.md)
@@ -444,9 +433,9 @@ Get-PnPTenantId|PnP.PowerShell|[tenant id get](../cmd/tenant/id/id-get.md)
 Get-PnPTenantRecycleBinItem|PnP.PowerShell|[spo tenant recyclebinitem list](../cmd/spo/tenant/tenant-recyclebinitem-list.md)
 Get-PnPTenantSequence|PnP.PowerShell|
 Get-PnPTenantSequenceSite|PnP.PowerShell|
+Get-PnPTenantServicePrincipal|PnP.PowerShell|
 Get-PnPTenantServicePrincipalPermissionGrants|PnP.PowerShell|[spo serviceprincipal grant list](../cmd/spo/serviceprincipal/serviceprincipal-grant-list.md)
 Get-PnPTenantServicePrincipalPermissionRequests|PnP.PowerShell|[spo serviceprincipal permissionrequest list](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-list.md)
-Get-PnPTenantServicePrincipal|PnP.PowerShell|
 Get-PnPTenantSite|PnP.PowerShell|[spo site get](../cmd/spo/site/site-get.md), [spo site classic list](../cmd/spo/site/site-classic-list.md)
 Get-PnPTenantSyncClientRestriction|PnP.PowerShell|
 Get-PnPTenantTemplate|PnP.PowerShell|
@@ -505,6 +494,7 @@ New-PnPGroup|PnP.PowerShell|
 New-PnPList|PnP.PowerShell|[spo list add](../cmd/spo/list/list-add.md)
 New-PnPMicrosoft365Group|PnP.PowerShell|[aad o365group add](../cmd/aad/o365group/o365group-add.md)
 New-PnPPersonalSite|PnP.PowerShell|
+New-PnPPlannerPlan|PnP.PowerShell|[planner plan add](../cmd/planner/plan/plan-add.md)
 New-PnPProvisioningCommunicationSite|PnP.PowerShell|
 New-PnPProvisioningHierarchy|PnP.PowerShell|
 New-PnPProvisioningSequence|PnP.PowerShell|
@@ -570,6 +560,9 @@ Remove-PnPMicrosoft365GroupOwner|PnP.PowerShell|[aad o365group user remove](../c
 Remove-PnPNavigationNode|PnP.PowerShell|[spo navigation node remove](../cmd/spo/navigation/navigation-node-remove.md)
 Remove-PnPOrgAssetsLibrary|PnP.PowerShell|[spo orgassetslibrary remove](../cmd/spo/orgassetslibrary/orgassetslibrary-remove.md)
 Remove-PnPOrgNewsSite|PnP.PowerShell|[spo orgnewssite remove](../cmd/spo/orgnewssite/orgnewssite-remove.md)
+Remove-PnPPlannerBucket|PnP.PowerShell|[planner bucket remove](../cmd/planner/bucket/bucket-remove.md)
+Remove-PnPPlannerPlan|PnP.PowerShell|
+Remove-PnPPlannerTask|PnP.PowerShell|
 Remove-PnPPropertyBagValue|PnP.PowerShell|[spo propertybag remove](../cmd/spo/propertybag/propertybag-remove.md)
 Remove-PnPPublishingImageRendition|PnP.PowerShell|
 Remove-PnPRoleDefinition|PnP.PowerShell|
@@ -585,6 +578,7 @@ Remove-PnPStoredCredential|PnP.PowerShell|
 Remove-PnPTaxonomyItem|PnP.PowerShell|
 Remove-PnPTeamsApp|PnP.PowerShell|[teams app remove](../cmd/teams/app/app-remove.md)
 Remove-PnPTeamsChannel|PnP.PowerShell|[teams channel remove](../cmd/teams/channel/channel-remove.md)
+Remove-PnPTeamsChannelUser|PnP.PowerShell|[teams channel member remove](../cmd/teams/channel/channel-member-remove.md)
 Remove-PnPTeamsTab|PnP.PowerShell|[teams tab remove](../cmd/teams/tab/tab-remove.md)
 Remove-PnPTeamsTeam|PnP.PowerShell|[teams team remove](../cmd/teams/team/team-remove.md)
 Remove-PnPTeamsUser|PnP.PowerShell|[teams user remove](../cmd/aad/o365group/o365group-user-remove.md)
@@ -609,17 +603,17 @@ Rename-PnPFolder|PnP.PowerShell|[spo folder rename](../cmd/spo/folder/folder-ren
 Request-PnPAccessToken|PnP.PowerShell|[util accesstoken get](../cmd/util/accesstoken/accesstoken-get.md)
 Request-PnPReIndexList|PnP.PowerShell|
 Request-PnPReIndexWeb|PnP.PowerShell|[spo web reindex](../cmd/spo/web/web-reindex.md)
-Reset-PnPLabel|PnP.PowerShell|
 Reset-PnPFileVersion|PnP.PowerShell|
+Reset-PnPLabel|PnP.PowerShell|
 Reset-PnPMicrosoft365GroupExpiration|PnP.PowerShell|[aad o365group renew](../cmd/aad/o365group/o365group-renew.md)
 Reset-PnPUnifiedGroupExpiration|PnP.PowerShell|[aad o365group renew](../cmd/aad/o365group/o365group-renew.md)
 Reset-PnPUserOneDriveQuotaToDefault|PnP.PowerShell|
+Resolve-PnPFolder|PnP.PowerShell|
 Restore-PnPDeletedMicrosoft365Group|PnP.PowerShell|[aad o365group restore](../cmd/aad/o365group/o365group-recyclebinitem-restore.md)
 Restore-PnPDeletedUnifiedGroup|PnP.PowerShell|[aad o365group restore](../cmd/aad/o365group/o365group-recyclebinitem-restore.md)
 Restore-PnPFileVersion|PnP.PowerShell|
 Restore-PnPRecycleBinItem|PnP.PowerShell|
 Restore-PnPTenantRecycleBinItem|PnP.PowerShell|[spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.md)
-Resolve-PnPFolder|PnP.PowerShell|
 Resume-PnPWorkflowInstance|PnP.PowerShell|
 Revoke-PnPHubSiteRights|PnP.PowerShell|[spo hubsite rights revoke](../cmd/spo/hubsite/hubsite-rights-revoke.md)
 Revoke-PnPSiteDesignRights|PnP.PowerShell|[spo sitedesign rights revoke](../cmd/spo/sitedesign/sitedesign-rights-revoke.md)
@@ -649,9 +643,9 @@ Set-PnPFooter|PnP.PowerShell|
 Set-PnPGraphSubscription|PnP.PowerShell|
 Set-PnPGroup|PnP.PowerShell|
 Set-PnPGroupPermissions|PnP.PowerShell|
-Set-PnPHomeSite|PnP.PowerShell|[spo homesite set](../cmd/spo/homesite/homesite-set.md)
 Set-PnPHideDefaultThemes|PnP.PowerShell|[spo hidedefaultthemes set](../cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md)
 Set-PnPHomePage|PnP.PowerShell|[spo web set](../cmd/spo/web/web-set.md)
+Set-PnPHomeSite|PnP.PowerShell|[spo homesite set](../cmd/spo/homesite/homesite-set.md)
 Set-PnPHubSite|PnP.PowerShell|[spo hubsite set](../cmd/spo/hubsite/hubsite-set.md)
 Set-PnPIndexedProperties|PnP.PowerShell|
 Set-PnPInPlaceRecordsManagement|PnP.PowerShell|[spo site inplacerecordsmanagement set](../cmd/spo/site/site-inplacerecordsmanagement-set.md)
@@ -667,6 +661,9 @@ Set-PnPListRecordDeclaration|PnP.PowerShell|
 Set-PnPMasterPage|PnP.PowerShell|
 Set-PnPMicrosoft365Group|PnP.PowerShell|[aad o365group set](../cmd/aad/o365group/o365group-set.md)
 Set-PnPMinimalDownloadStrategy|PnP.PowerShell|
+Set-PnPPlannerBucket|PnP.PowerShell|[planner bucket set](../cmd/planner/bucket/bucket-set.md)
+Set-PnPPlannerPlan|PnP.PowerShell|
+Set-PnPPlannerTask|PnP.PowerShell|[planner task set](../cmd/planner/task/task-set.md)
 Set-PnPPropertyBagValue|PnP.PowerShell|[spo propertybag set](../cmd/spo/propertybag/propertybag-set.md)
 Set-PnPProvisioningTemplateMetadata|PnP.PowerShell|
 Set-PnPRequestAccessEmails|PnP.PowerShell|
@@ -680,6 +677,7 @@ Set-PnPSiteScript|PnP.PowerShell|[spo sitescript set](../cmd/spo/sitescript/site
 Set-PnPStorageEntity|PnP.PowerShell|[spo storageentity set](../cmd/spo/storageentity/storageentity-set.md)
 Set-PnPTaxonomyFieldValue|PnP.PowerShell|
 Set-PnPTeamsChannel|PnP.PowerShell|[teams channel set](../cmd/teams/channel/channel-set.md)
+Set-PnPTeamsChannelUser|PnP.PowerShell|[teams channel member set](../cmd/teams/channel/channel-member-set.md)
 Set-PnPTeamsTab|PnP.PowerShell|
 Set-PnPTeamsTeam|PnP.PowerShell|[teams team set](../cmd/teams/team/team-set.md)
 Set-PnPTeamsTeamArchivedState|PnP.PowerShell|[teams team archive](../cmd/teams/team/team-archive.md), [teams team unarchive](../cmd/teams/team/team-unarchive.md)
@@ -691,6 +689,7 @@ Set-PnPTenantCdnPolicy|PnP.PowerShell|[spo cdn policy set](../cmd/spo/cdn/cdn-po
 Set-PnPTenantSite|PnP.PowerShell|[spo site classic set](../cmd/spo/site/site-classic-set.md)
 Set-PnPTenantSyncClientRestriction|PnP.PowerShell|
 Set-PnPTheme|PnP.PowerShell|
+Set-PnPTheme|PnP.PowerShell|[spo theme apply](../cmd/spo/theme/theme-apply.md)
 Set-PnPTraceLog|PnP.PowerShell|
 Set-PnPUnifiedGroup|PnP.PowerShell|[aad o365group set](../cmd/aad/o365group/o365group-set.md)
 Set-PnPUserOneDriveQuota|PnP.PowerShell|
@@ -703,6 +702,7 @@ Set-PnPWebPermission|PnP.PowerShell|
 Set-PnPWebTheme|PnP.PowerShell|
 Set-PnPWikiPageContent|PnP.PowerShell|
 Start-PnPWorkflowInstance|PnP.PowerShell|
+Stop-PnPFlowRun|PnP.PowerShell|[flow run cancel](../cmd/flow/run/run-cancel.md)
 Stop-PnPWorkflowInstance|PnP.PowerShell|
 Submit-PnPSearchQuery|PnP.PowerShell|[spo search](../cmd/spo/spo-search.md)
 Submit-PnPTeamsChannelMessage|PnP.PowerShell|
