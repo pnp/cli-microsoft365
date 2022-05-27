@@ -17,10 +17,10 @@ m365 planner task list [options]
 : Name of the bucket to list the tasks of. To retrieve tasks from a bucket, specify `bucketId` or `bucketName`, but not both.
 
 `--planId [planId]`
-: ID of the plan to list the tasks of. Specify `planId` or `planName` when using `bucketName`.
+: ID of a plan to list the tasks of. To retrieve all tasks from a plan, specify either `planId` or `planName` but not both. Use in combination with `bucketName` to retrieve tasks from a specific bucket.
 
 `--planName [planName]`
-: Name of the plan to list the tasks of. Specify `planId` or `planName` when using `bucketName`.
+: Name of a plan to list the tasks of. To retrieve all tasks from a plan, specify either `planId` or `planName` but not both. Always use in combination with either `ownerGroupId` or `ownerGroupName`. Use in combination with `bucketName` to retrieve tasks from a specific bucket.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
