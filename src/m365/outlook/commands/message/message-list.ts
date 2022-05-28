@@ -46,7 +46,7 @@ class OutlookMessageListCommand extends GraphCommand {
       .then((folderId: string): Promise<Message[]> => {
         const url: string = folderId ? `me/mailFolders/${folderId}/messages` : 'me/messages';
 
-        return odata.getAllItems<Message>(`${this.resource}/v1.0/${url}?$top=50`, logger);
+        return odata.getAllItems<Message>(`${this.resource}/v1.0/${url}?$top=50`);
       })
       .then((messages): void => {
         logger.log(messages);

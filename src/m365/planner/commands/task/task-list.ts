@@ -1,9 +1,11 @@
 import { PlannerTask } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
+import { accessToken, odata, validation } from '../../../../utils';
+import Auth from '../../../../Auth';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { odata, validation } from '../../../../utils';
+import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -49,6 +51,11 @@ class PlannerTaskListCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+      this.handleError('This command does not support application permissions.', logger, cb);
+      return;
+    }
+    
     const bucketName: string | undefined = args.options.bucketName;
     let bucketId: string | undefined = args.options.bucketId;
     const planName: string | undefined = args.options.planName;
@@ -60,11 +67,11 @@ class PlannerTaskListCommand extends GraphCommand {
         .getBucketId(args)
         .then((retrievedBucketId: string): Promise<PlannerTask[]> => {
           bucketId = retrievedBucketId;
-          return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`, logger);
+          return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`);
         })
         .then((tasks): Promise<BetaPlannerTask[]> => {
           taskItems = tasks;
-          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/planner/buckets/${bucketId}/tasks`, logger);
+          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/planner/buckets/${bucketId}/tasks`);
         })
         .then((betaTasks): void => {
           logger.log(this.mergeTaskPriority(taskItems, betaTasks));
@@ -76,11 +83,11 @@ class PlannerTaskListCommand extends GraphCommand {
         .getPlanId(args)
         .then((retrievedPlanId: string): Promise<PlannerTask[]> => {
           planId = retrievedPlanId;
-          return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/plans/${planId}/tasks`, logger);
+          return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/plans/${planId}/tasks`);
         })
         .then((tasks): Promise<BetaPlannerTask[]> => {
           taskItems = tasks;
-          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/planner/plans/${planId}/tasks`, logger);
+          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/planner/plans/${planId}/tasks`);
         })
         .then((betaTasks): void => {
           logger.log(this.mergeTaskPriority(taskItems, betaTasks));
@@ -89,10 +96,10 @@ class PlannerTaskListCommand extends GraphCommand {
     }
     else {
       odata
-        .getAllItems<PlannerTask>(`${this.resource}/v1.0/me/planner/tasks`, logger)
+        .getAllItems<PlannerTask>(`${this.resource}/v1.0/me/planner/tasks`)
         .then((tasks): Promise<BetaPlannerTask[]> => {
           taskItems = tasks;
-          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/me/planner/tasks`, logger);
+          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/me/planner/tasks`);
         })
         .then((betaTasks): void => {
           logger.log(this.mergeTaskPriority(taskItems, betaTasks));
@@ -137,26 +144,8 @@ class PlannerTaskListCommand extends GraphCommand {
 
     return this
       .getGroupId(args)
-      .then((groupId: string) => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/plans?$filter=(owner eq '${groupId}')`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-
-        return request.get<{ value: { id: string; title: string; }[] }>(requestOptions);
-      })
-      .then(response => {
-        const plan: { id: string; title: string; } | undefined = response.value.find(val => val.title === args.options.planName);
-
-        if (!plan) {
-          return Promise.reject(`The specified plan does not exist`);
-        }
-
-        return Promise.resolve(plan.id);
-      });
+      .then((groupId: string) => planner.getPlanByName(args.options.planName!, groupId))
+      .then(plan => plan.id!);
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {

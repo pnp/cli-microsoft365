@@ -1,4 +1,4 @@
-import { Channel } from '../../Channel';
+import { Channel } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import { validation } from '../../../../utils';
@@ -136,7 +136,11 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
           return Promise.reject(`The specified channel does not exist in the Microsoft Teams team`);
         }
 
-        return Promise.resolve(channelItem.id);
+        if (channelItem.membershipType !== "private") {
+          return Promise.reject(`The specified channel is not a private channel`);
+        }
+
+        return Promise.resolve(channelItem.id!);
       });
   }
 

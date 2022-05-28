@@ -31,6 +31,15 @@ m365 aad app set [options]
 `--redirectUrisToRemove [redirectUrisToRemove]`
 : Comma-separated list of existing redirect URIs to remove. Specify, when you want to replace existing redirect URIs with another
 
+`--certificateFile [certificateFile]`
+: Path to the file with certificate public key. Specify either `certificateFile` or `certificateBase64Encoded`
+
+`--certificateBase64Encoded [certificateBase64Encoded]`
+: Base64-encoded string with certificate public key. Specify either `certificateFile` or `certificateBase64Encoded`
+
+`--certificateDisplayName [certificateDisplayName]`
+: Display name for the certificate. If not given, the displayName will be set to the certificate subject. When specified, also specify either `certificateFile` or `certificateBase64Encoded`
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -38,6 +47,8 @@ m365 aad app set [options]
 For best performance use the `objectId` option to reference the Azure AD application registration to update. If you use `appId` or `name`, this command will first need to find the corresponding object ID for that application.
 
 If the command finds multiple Azure AD application registrations with the specified app name, it will prompt you to disambiguate which app it should use, listing the discovered object IDs.
+
+When a certificate is specified it will be added to the list of certificates of the app without changing existing certificates.
 
 ## Examples
 
@@ -69,4 +80,10 @@ Replace one redirect URI with another for SPA authentication
 
 ```sh
 m365 aad app set --objectId 95cfe30d-ed44-4f9d-b73d-c66560f72e83 --redirectUris https://contoso.com/auth --platform spa --redirectUrisToRemove https://contoso.com/old-auth
+```
+
+Add a certificate to the app
+
+```sh
+m365 aad app set --certificateDisplayName "Some certificate name" --certificateFile c:\temp\some-certificate.cer
 ```

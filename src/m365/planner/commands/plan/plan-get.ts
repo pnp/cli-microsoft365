@@ -1,13 +1,12 @@
-import { PlannerPlan } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
+import { CommandOption } from '../../../../Command';
+import { accessToken, validation } from '../../../../utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { odata, validation } from '../../../../utils';
+import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import Auth from '../../../../Auth';
 
 interface CommandArgs {
   options: Options;
@@ -43,9 +42,14 @@ class PlannerPlanGetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+      this.handleError('This command does not support application permissions.', logger, cb);
+      return;
+    }
+    
     if (args.options.id) {
-      this
-        .getPlan(args)
+      planner
+        .getPlanById(args.options.id)
         .then((res: any): void => {
           logger.log(res);
           cb();
@@ -54,11 +58,10 @@ class PlannerPlanGetCommand extends GraphCommand {
     else {
       this
         .getGroupId(args)
-        .then((groupId: string): Promise<PlannerPlan[]> => odata.getAllItems<PlannerPlan>(`${this.resource}/v1.0/groups/${groupId}/planner/plans`, logger, 'minimal'))
-        .then((plans): void => {
-          const filteredPlan = plans.filter((plan: any) => plan.title === args.options.title);
-          if (filteredPlan && filteredPlan.length > 0) {
-            logger.log(filteredPlan);
+        .then(groupId => planner.getPlanByName(args.options.title!, groupId))
+        .then((plan): void => {
+          if (plan) {
+            logger.log(plan);
           }
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
@@ -89,18 +92,6 @@ class PlannerPlanGetCommand extends GraphCommand {
 
         return Promise.resolve(group.id);
       });
-  }
-
-  private getPlan(args: CommandArgs): Promise<any> {
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/plans/${args.options.id}`,
-      headers: {
-        'accept': 'application/json'
-      },
-      responseType: 'json'
-    };
-
-    return request.get(requestOptions);
   }
 
   public options(): CommandOption[] {

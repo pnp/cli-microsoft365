@@ -5,7 +5,7 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { sinonUtil } from '../../../../utils';
+import { accessToken, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./bucket-list');
 
@@ -124,6 +124,7 @@ describe(commands.BUCKET_LIST, () => {
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
@@ -134,7 +135,7 @@ describe(commands.BUCKET_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
         return Promise.resolve(groupByDisplayNameResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
         return Promise.resolve(plansInOwnerGroup);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets`) {
@@ -160,7 +161,8 @@ describe(commands.BUCKET_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      accessToken.isAppOnlyAccessToken
     ]);
   });
 
@@ -349,30 +351,17 @@ describe(commands.BUCKET_LIST, () => {
     });
   });
 
-  it('fails validation when planName not found', (done) => {
-    sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
-        return Promise.resolve(groupByDisplayNameResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '${encodeURIComponent('0d0402ee-970f-4951-90b5-2f24519d2e40')}')`) {
-        return Promise.resolve({ value: [] });
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/iVPMIgdku0uFlou-KLNg6MkAE1O2/buckets`) {
-        return Promise.resolve(bucketListResponse);
-      }
-      return Promise.reject('Invalid Request');
-    });
+  it('fails validation when using app only access token', (done) => {
+    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
     command.action(logger, {
       options: {
-        debug: false,
-        planName: 'foo',
-        ownerGroupName: 'My Planner Group'
+        planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
       }
     }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified plan does not exist`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
         done();
       }
       catch (e) {

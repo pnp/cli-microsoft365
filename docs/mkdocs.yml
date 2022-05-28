@@ -28,12 +28,12 @@ nav:
     - Azure Active Directory (aad):
       - app:
         - app add: 'cmd/aad/app/app-add.md'
-        - app get: 'cmd/aad/app/app-get.md'
-        - app remove: 'cmd/aad/app/app-remove.md'
-        - app set: 'cmd/aad/app/app-set.md'
+        - app get: 'cmd/aad/app/app-get.md'        
+        - app remove: 'cmd/aad/app/app-remove.md'        
         - app role add: 'cmd/aad/app/app-role-add.md'
         - app role list: 'cmd/aad/app/app-role-list.md'
         - app role remove: 'cmd/aad/app/app-role-remove.md'
+        - app set: 'cmd/aad/app/app-set.md'
       - approleassignment:
         - approleassignment add: 'cmd/aad/approleassignment/approleassignment-add.md'
         - approleassignment list: 'cmd/aad/approleassignment/approleassignment-list.md'
@@ -118,6 +118,7 @@ nav:
       - list: 'cmd/file/file-list.md'
     - Microsoft 365 apps (app):
       - get: 'cmd/app/app-get.md'
+      - open: 'cmd/app/app-open.md'
       - permission:
         - permission list: 'cmd/app/permission/permission-list.md'
     - Microsoft 365 tenant (tenant):
@@ -183,20 +184,23 @@ nav:
     - Planner (planner):
       - bucket:
         - bucket add: 'cmd/planner/bucket/bucket-add.md'
+        - bucket get: 'cmd/planner/bucket/bucket-get.md'
         - bucket list: 'cmd/planner/bucket/bucket-list.md'
         - bucket set: 'cmd/planner/bucket/bucket-set.md'
         - bucket remove: 'cmd/planner/bucket/bucket-remove.md'
       - plan:
         - plan add: 'cmd/planner/plan/plan-add.md'
-        - plan get: 'cmd/planner/plan/plan-get.md'
         - plan details get: 'cmd/planner/plan/plan-details-get.md'
+        - plan get: 'cmd/planner/plan/plan-get.md'
         - plan list: 'cmd/planner/plan/plan-list.md'
       - task:
         - task add: 'cmd/planner/task/task-add.md'
+        - task details get: 'cmd/planner/task/task-details-get.md'
         - task get: 'cmd/planner/task/task-get.md'
         - task list: 'cmd/planner/task/task-list.md'
+        - task reference add: 'cmd/planner/task/task-reference-add.md'
+        - task reference list: 'cmd/planner/task/task-reference-list.md'
         - task set: 'cmd/planner/task/task-set.md'
-        - task details get: 'cmd/planner/task/task-details-get.md'
     - Power Apps (pa):
       - app:
         - app get: 'cmd/pa/app/app-get.md'
@@ -233,13 +237,16 @@ nav:
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Power Platform (pp):
       - environment:
-        - environment list: 'cmd/pp/environment/environment-list.md' 
+        - environment list: 'cmd/pp/environment/environment-list.md'
+      - gateway:
+        - gateway list: 'cmd/pp/gateway/gateway-list.md' 
       - managementapp:
         - managementapp add: 'cmd/pp/managementapp/managementapp-add.md'
         - managementapp list: 'cmd/pp/managementapp/managementapp-list.md'
     - Search (search):
       - externalconnection:
         - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
+        - externalconnection list: 'cmd/search/externalconnection/externalconnection-list.md'
     - Skype (skype):
       - report:
         - report activitycounts: 'cmd/skype/report/report-activitycounts.md'
@@ -297,6 +304,8 @@ nav:
         - customaction list: 'cmd/spo/customaction/customaction-list.md'
         - customaction remove: 'cmd/spo/customaction/customaction-remove.md'
         - customaction set: 'cmd/spo/customaction/customaction-set.md'
+      - eventreceiver:
+        - eventreceiver get: 'cmd/spo/eventreceiver/eventreceiver-get.md'
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
       - feature:
@@ -372,6 +381,7 @@ nav:
         - list label get: 'cmd/spo/list/list-label-get.md'
         - list label set: 'cmd/spo/list/list-label-set.md'
         - list sitescript get: 'cmd/spo/list/list-sitescript-get.md'
+        - list view add: 'cmd/spo/list/list-view-add.md'
         - list view get: 'cmd/spo/list/list-view-get.md'
         - list view list: 'cmd/spo/list/list-view-list.md'
         - list view remove: 'cmd/spo/list/list-view-remove.md'
@@ -391,6 +401,8 @@ nav:
         - listitem isrecord: 'cmd/spo/listitem/listitem-isrecord.md'
         - listitem list: 'cmd/spo/listitem/listitem-list.md'
         - listitem remove: 'cmd/spo/listitem/listitem-remove.md'
+        - listitem roleinheritance break: 'cmd/spo/listitem/listitem-roleinheritance-break.md'
+        - listitem roleinheritance reset: 'cmd/spo/listitem/listitem-roleinheritance-reset.md'
         - listitem set: 'cmd/spo/listitem/listitem-set.md'
         - listitem record declare: 'cmd/spo/listitem/listitem-record-declare.md'
         - listitem record undeclare: 'cmd/spo/listitem/listitem-record-undeclare.md'

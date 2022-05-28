@@ -35,10 +35,10 @@ m365 teams conversationmember list [options]
 
 ## Examples
   
-List the members of a specified Microsoft Teams team with id 00000000-0000-0000-0000-000000000000 and channel id 00:00000000000000000000000000000000@thread.skype
+List the members of a specified Microsoft Teams team with id 00000000-0000-0000-0000-000000000000 and channel id 19:00000000000000000000000000000000@thread.skype
 
 ```sh
-m365 teams channel member list --teamId 00000000-0000-0000-0000-000000000000 --channelId 00:00000000000000000000000000000000@thread.skype
+m365 teams channel member list --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype
 ```
 
 List the members of a specified Microsoft Teams team with name _Team Name_ and channel with name _Channel Name_
@@ -47,8 +47,8 @@ List the members of a specified Microsoft Teams team with name _Team Name_ and c
 m365 teams channel member list --teamName "Team Name" --channelName "Channel Name"
 ```
 
-List all owners of the specified Microsoft Teams team with id 00000000-0000-0000-0000-000000000000 and channel id 00:00000000000000000000000000000000@thread.skype
+List all owners of the specified Microsoft Teams team with id 00000000-0000-0000-0000-000000000000 and channel id 19:00000000000000000000000000000000@thread.skype
 
 ```sh
-m365 teams channel member list --teamId 00000000-0000-0000-0000-000000000000 --channelId 00:00000000000000000000000000000000@thread.skype --role owner
+m365 teams channel member list --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --role owner
 ```
