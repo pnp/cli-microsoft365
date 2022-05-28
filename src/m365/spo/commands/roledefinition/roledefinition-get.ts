@@ -4,7 +4,9 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
+import { BasePermissions } from '../../base-permissions';
 import commands from '../../commands';
+import { RoleType } from './roleType';
 
 interface CommandArgs {
   options: Options;
@@ -12,7 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  is: number;
+  id: number;
 }
 
 class SpoRoleDefinitionGetCommand extends SpoCommand {
@@ -38,9 +40,17 @@ class SpoRoleDefinitionGetCommand extends SpoCommand {
     };
 
     request
-      .get<{ value: any[] }>(requestOptions)
-      .then((response: { value: any[] }): void => {
-        logger.log(response.value);
+      .get<any>(requestOptions)
+      .then((response: any): void => {
+
+        const permissions: BasePermissions = new BasePermissions();
+        permissions.high = response.BasePermissions.High as number;
+        permissions.low = response.BasePermissions.Low as number;
+        response["BasePermissionsValue"] = permissions.parse();
+
+        response["RoleTypeKindValue"] = RoleType[response["RoleTypeKind"]];
+
+        logger.log(response);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -65,7 +75,7 @@ class SpoRoleDefinitionGetCommand extends SpoCommand {
       return isValidSharePointUrl;
     }
 
-    if (isNaN(parseInt(args.options.id))) {
+    if (isNaN(args.options.id)) {
       return `${args.options.id} is not a number`;
     }
 
