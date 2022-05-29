@@ -17,16 +17,16 @@ m365 planner task list [options]
 : Name of the bucket to list the tasks of. To retrieve tasks from a bucket, specify `bucketId` or `bucketName`, but not both.
 
 `--planId [planId]`
-: ID of the plan to list the tasks of. Specify `planId` or `planName` when using `bucketName`.
+: ID of the plan to list the tasks of. Specify `planId` or `planTitle` when using `bucketName`.
 
-`--planName [planName]`
-: Name of the plan to list the tasks of. Specify `planId` or `planName` when using `bucketName`.
+`--planTitle [planTitle]`
+: Name of the plan to list the tasks of. Specify `planId` or `planTitle` when using `bucketName`.
 
 `--ownerGroupId [ownerGroupId]`
-: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--ownerGroupName [ownerGroupName]`
-: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -52,7 +52,7 @@ m365 planner task list --planId "iVPMIgdku0uFlou-KLNg6MkAE1O2"`
 List the Microsoft Planner tasks in the plan _My Plan_ in group _My Group_
 
 ```sh
-m365 planner task list --planName "My Plan" --ownerGroupName "My Group"
+m365 planner task list --planTitle "My Plan" --ownerGroupName "My Group"
 ```
 
 List the Microsoft Planner tasks in the bucket _FtzysDykv0-9s9toWiZhdskAD67z_
@@ -70,5 +70,5 @@ m365 planner task list --bucketName "My Bucket" --planId "iVPMIgdku0uFlou-KLNg6M
 List the Microsoft Planner tasks in the bucket _My Bucket_ belonging to plan _My Plan_ in group _My Group_
 
 ```sh
-m365 planner task list --bucketName "My Bucket" --planName "My Plan" --ownerGroupName "My Group"
+m365 planner task list --bucketName "My Bucket" --planTitle "My Plan" --ownerGroupName "My Group"
 ```

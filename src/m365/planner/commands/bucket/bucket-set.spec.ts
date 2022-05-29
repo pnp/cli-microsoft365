@@ -15,7 +15,7 @@ describe(commands.BUCKET_SET, () => {
   const validBucketName = 'Bucket name';
   const validOrderHint = '8585513699476931356P;';
   const validPlanId = 'oUHpnKBFekqfGE_PS6GGUZcAFY7b';
-  const validPlanName = 'Plan name';
+  const validPlanTitle = 'Plan title';
   const validOwnerGroupName = 'Group name';
   const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
   const invalidOwnerGroupId = 'Invalid GUID';
@@ -46,7 +46,7 @@ describe(commands.BUCKET_SET, () => {
     "value": [
       {
         "id": validPlanId,
-        "title": validPlanName
+        "title": validPlanTitle
       }
     ]
   };
@@ -146,7 +146,7 @@ describe(commands.BUCKET_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when name is used without plan id or planname', () => {
+  it('fails validation when name is used without plan id or planTitle', () => {
     const actual = command.validate({
       options: {
         name: validBucketName
@@ -155,12 +155,12 @@ describe(commands.BUCKET_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when name is used with both plan id and planname', () => {
+  it('fails validation when name is used with both plan id and planTitle', () => {
     const actual = command.validate({
       options: {
         name: validBucketName,
         planId: validPlanId,
-        planName: validPlanName
+        planTitle: validPlanTitle
       }
     });
     assert.notStrictEqual(actual, true);
@@ -170,7 +170,7 @@ describe(commands.BUCKET_SET, () => {
     const actual = command.validate({
       options: {
         name: validBucketName,
-        planName: validPlanName
+        planTitle: validPlanTitle
       }
     });
     assert.notStrictEqual(actual, true);
@@ -180,7 +180,7 @@ describe(commands.BUCKET_SET, () => {
     const actual = command.validate({
       options: {
         name: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
         ownerGroupId: validOwnerGroupId
       }
@@ -192,7 +192,7 @@ describe(commands.BUCKET_SET, () => {
     const actual = command.validate({
       options: {
         name: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupId: invalidOwnerGroupId
       }
     });
@@ -244,7 +244,7 @@ describe(commands.BUCKET_SET, () => {
     const actual = command.validate({
       options: {
         name: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
         newName: 'New name'
       }
@@ -285,7 +285,7 @@ describe(commands.BUCKET_SET, () => {
     command.action(logger, {
       options: {
         name: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
       }
     }, (err?: any) => {
@@ -311,7 +311,7 @@ describe(commands.BUCKET_SET, () => {
     command.action(logger, {
       options: {
         name: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
       }
     }, (err?: any) => {
@@ -432,7 +432,7 @@ describe(commands.BUCKET_SET, () => {
     command.action(logger, {
       options: {
         name: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
         newName: 'New bucket name',
         orderHint: validOrderHint
@@ -470,10 +470,49 @@ describe(commands.BUCKET_SET, () => {
     command.action(logger, {
       options: {
         name: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupId: validOwnerGroupId,
         newName: 'New bucket name',
         orderHint: validOrderHint
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', err?.message);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Correctly updates bucket by name with deprecated planName', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return Promise.resolve(singlePlanResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+        return Promise.resolve(singleBucketByNameResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        name: validBucketName,
+        planName: validPlanTitle,
+        ownerGroupId: validOwnerGroupId,
+        newName: 'New bucket name',
+        orderHint: validOrderHint,
+        verbose: true
       }
     }, (err?: any) => {
       try {

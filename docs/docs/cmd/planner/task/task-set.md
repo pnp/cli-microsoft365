@@ -23,16 +23,16 @@ m365 planner task set [options]
 : Name of the bucket to move the task to. The bucket needs to exist in the selected plan. Specify either `bucketId` or `bucketName` but not both.
 
 `--planId [planId]`
-: ID of the plan to which the bucket belongs to. Specify either `planId` or `planName` when using `bucketName`.
+: ID of the plan to which the bucket belongs to. Specify either `planId` or `planTitle` when using `bucketName`.
 
-`--planName [planName]`
-: Name of the plan to which the bucket belongs to. Specify either `planId` or `planName` when using `bucketName`.
+`--planTitle [planTitle]`
+: Name of the plan to which the bucket belongs to. Specify either `planId` or `planTitle` when using `bucketName`.
 
 `--ownerGroupId [ownerGroupId]`
-: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--ownerGroupName [ownerGroupName]`
-: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--startDateTime [startDateTime]`
 : The date and time when the task started. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
@@ -84,7 +84,7 @@ m365 planner task set --id "Z-RLQGfppU6H3663DBzfs5gAMD3o" --title "My Planner Ta
 Moves a Microsoft Planner task with the ID _Z-RLQGfppU6H3663DBzfs5gAMD3o_ to the bucket named _My Planner Bucket_. Based on the plan with the name _My Planner Plan_ owned by the group _My Planner Group_
 
 ```sh
-m365 planner task set  --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --bucketName "My Planner Bucket" --planName "My Planner Plan" --ownerGroupName "My Planner Group"
+m365 planner task set  --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --bucketName "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
 ```
 
 Marks a Microsoft Planner task with the ID _Z-RLQGfppU6H3663DBzfs5gAMD3o_ as 50% complete and assigned to categories 1 and 3.

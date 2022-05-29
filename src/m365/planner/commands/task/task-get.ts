@@ -21,6 +21,7 @@ interface Options extends GlobalOptions {
   bucketName?: string;
   planId?: string;
   planName?: string;
+  planTitle?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
 }
@@ -35,6 +36,14 @@ class PlannerTaskGetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (args.options.planName) {
+      args.options.planTitle = args.options.planName;
+
+      if (this.verbose) {
+        this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
+      }
+    }
+
     if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
@@ -134,7 +143,7 @@ class PlannerTaskGetCommand extends GraphCommand {
 
     return this
       .getGroupId(options)
-      .then(groupId => planner.getPlanByName(options.planName!, groupId))
+      .then(groupId => planner.getPlanByTitle(options.planTitle!, groupId))
       .then(plan => plan.id!);
   }
 
@@ -176,6 +185,7 @@ class PlannerTaskGetCommand extends GraphCommand {
       { option: '--bucketName [bucketName]' },
       { option: '--planId [planId]' },
       { option: '--planName [planName]' },
+      { option: '--planTitle [planTitle]' },
       { option: '--ownerGroupId [ownerGroupId]' },
       { option: '--ownerGroupName [ownerGroupName]' }
     ];
@@ -193,20 +203,20 @@ class PlannerTaskGetCommand extends GraphCommand {
       return 'Specify either bucketId or bucketName when using title but not both';
     }
 
-    if (args.options.bucketName && !args.options.planId && !args.options.planName) {
-      return 'Specify either planId or planName when using bucketName';
+    if (args.options.bucketName && !args.options.planId && !args.options.planName && !args.options.planTitle) {
+      return 'Specify either planId or planTitle when using bucketName';
     }
 
-    if (args.options.bucketName && args.options.planId && args.options.planName) {
-      return 'Specify either planId or planName when using bucketName but not both';
+    if (args.options.bucketName && args.options.planId && (args.options.planName || args.options.planTitle)) {
+      return 'Specify either planId or planTitle when using bucketName but not both';
     }
 
-    if (args.options.planName && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName';
+    if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
     }
 
-    if (args.options.planName && args.options.ownerGroupId && args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
+    if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
     }
 
     if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {

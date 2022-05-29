@@ -102,7 +102,7 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
     }
 
     return planner
-      .getPlanByName(args.options.planTitle!, this.groupId)
+      .getPlanByTitle(args.options.planTitle!, this.groupId)
       .then(plan => plan.id!);
   }
 

@@ -58,7 +58,7 @@ class PlannerPlanGetCommand extends GraphCommand {
     else {
       this
         .getGroupId(args)
-        .then(groupId => planner.getPlanByName(args.options.title!, groupId))
+        .then(groupId => planner.getPlanByTitle(args.options.title!, groupId))
         .then((plan): void => {
           if (plan) {
             logger.log(plan);
