@@ -20,7 +20,7 @@ m365 planner bucket set [options]
 : ID of the plan to update the bucket of. Specify either `planId` or `planName` when using `name`.
 
 `--planName [planName]`
-: Name of the plan to update the bucket of. Specify either `planId` or `planName` when using `name`.
+: Name of the plan to update the bucket of. Specify either `planId` or `planName` when using `name`. Always use in combination with either `ownerGroupId` or `ownerGroupName`. 
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
