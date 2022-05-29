@@ -16,6 +16,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id?: string;
+  listId?: string;
+  listTitle?: string;
   fields?: string;
   filter?: string;
   pageNumber?: string;
@@ -37,6 +39,8 @@ class SpoListItemListCommand extends SpoCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.id = typeof args.options.id !== 'undefined';
+    telemetryProps.listId = typeof args.options.listId !== 'undefined';
+    telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
     telemetryProps.title = typeof args.options.title !== 'undefined';
     telemetryProps.fields = typeof args.options.fields !== 'undefined';
     telemetryProps.filter = typeof args.options.filter !== 'undefined';
@@ -47,17 +51,24 @@ class SpoListItemListCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const listIdArgument = args.options.id || '';
-    const listTitleArgument = args.options.title || '';
+    if (args.options.id) {
+      this.warn(logger, `Option 'id' is deprecated. Please use 'listId' instead.`);
+    }
+    if (args.options.title) {
+      this.warn(logger, `Option 'title' is deprecated. Please use 'listTitle' instead.`);
+    }
+
+    const listIdArgument = args.options.listId || args.options.id || '';
+    const listTitleArgument = args.options.listTitle || args.options.title || '';
 
     let formDigestValue: string = '';
 
     const fieldsArray: string[] = args.options.fields ? args.options.fields.split(",")
       : (!args.options.output || args.options.output === "text") ? ["Title", "Id"] : [];
 
-    const listRestUrl: string = (args.options.id ?
+    const listRestUrl: string = listIdArgument ?
       `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listIdArgument)}')`
-      : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitleArgument)}')`);
+      : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitleArgument)}')`;
 
     ((): Promise<any> => {
       if (args.options.camlQuery) {
@@ -135,10 +146,16 @@ class SpoListItemListCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id [listId]'
+        option: '--id [id]'
       },
       {
-        option: '-t, --title [listTitle]'
+        option: '--title [title]'
+      },
+      {
+        option: '-i, --listId [listId]'
+      },
+      {
+        option: '-t, --listTitle [listTitle]'
       },
       {
         option: '-s, --pageSize [pageSize]'
@@ -182,12 +199,17 @@ class SpoListItemListCommand extends SpoCommand {
       return isValidSharePointUrl;
     }
 
-    if (!args.options.id && !args.options.title) {
-      return `Specify list id or title`;
+    if (!args.options.id && !args.options.title && !args.options.listId && !args.options.listTitle) {
+      return `Specify listId or listTitle`;
     }
 
     if (args.options.id && args.options.title) {
       return `Specify list id or title but not both`;
+    }
+
+    // Check if only one of the 4 options is specified
+    if ([args.options.id, args.options.title, args.options.listId, args.options.listTitle].filter(o => o).length > 1) {
+      return 'Specify listId or listTitle but not both';
     }
 
     if (args.options.camlQuery && args.options.fields) {
@@ -214,8 +236,11 @@ class SpoListItemListCommand extends SpoCommand {
       return `pageNumber must be numeric`;
     }
 
-    if (args.options.id &&
-      !validation.isValidGuid(args.options.id)) {
+    if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
+      return `${args.options.listId} is not a valid GUID`;
+    }
+
+    if (args.options.id && !validation.isValidGuid(args.options.id)) {
       return `${args.options.id} in option id is not a valid GUID`;
     }
 
