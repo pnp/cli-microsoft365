@@ -18,6 +18,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   planId?: string;
   planName?: string;
+  planTitle?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
 }
@@ -35,6 +36,7 @@ class PlannerBucketListCommand extends GraphCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.planId = typeof args.options.planId !== 'undefined';
     telemetryProps.planName = typeof args.options.planName !== 'undefined';
+    telemetryProps.planTitle = typeof args.options.planTitle !== 'undefined';
     telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
     telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
     return telemetryProps;
@@ -45,6 +47,12 @@ class PlannerBucketListCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (args.options.planName) {
+      args.options.planTitle = args.options.planName;
+
+      this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
+    }
+
     if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
@@ -66,7 +74,7 @@ class PlannerBucketListCommand extends GraphCommand {
 
     return this
       .getGroupId(args)
-      .then(groupId => planner.getPlanByName(args.options.planName!, groupId))
+      .then(groupId => planner.getPlanByTitle(args.options.planTitle!, groupId))
       .then(plan => plan.id!);
   }
 
@@ -89,6 +97,9 @@ class PlannerBucketListCommand extends GraphCommand {
         option: '--planName [planName]'
       },
       {
+        option: "--planTitle [planTitle]"
+      },
+      {
         option: '--ownerGroupId [ownerGroupId]'
       },
       {
@@ -101,20 +112,20 @@ class PlannerBucketListCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!args.options.planId && !args.options.planName) {
-      return 'Specify either planId or planName';
+    if (!args.options.planId && !args.options.planName && !args.options.planTitle) {
+      return 'Specify either planId or planTitle';
     }
 
-    if (args.options.planId && args.options.planName) {
-      return 'Specify either planId or planName but not both';
+    if (args.options.planId && (args.options.planName || args.options.planTitle)) {
+      return 'Specify either planId or planTitle but not both';
     }
 
-    if (args.options.planName && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName';
+    if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
     }
 
-    if (args.options.planName && args.options.ownerGroupId && args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
+    if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
     }
 
     if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {

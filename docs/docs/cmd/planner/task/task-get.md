@@ -20,22 +20,25 @@ m365 planner task get [options]
 : (deprecated. Use `id` instead) ID of the task.
 
 `--bucketId [bucketId]`
-: Bucket ID to which the task belongs. Specify `bucketId` or `bucketName` when using `title`.
+: ID of the bucket to which the task belongs. Specify `bucketId` or `bucketName` when using `title`.
 
 `--bucketName [bucketName]`
-: Bucket Name to which the task belongs. Specify `bucketId` or `bucketName` when using `title`.
+: Name of the bucket to which the task belongs. Specify `bucketId` or `bucketName` when using `title`.
 
 `--planId [planId]`
-: Plan ID to which the task belongs. Specify `planId` or `planName` when using `bucketName`.
+: ID of the plan to which the task belongs. Specify `planId` or `planTitle` when using `bucketName`.
+
+`--planTitle [planTitle]`
+: Title of the plan to which the task belongs. Specify `planId` or `planTitle` when using `bucketName`.
 
 `--planName [planName]`
-: Plan Name to which the task belongs. Specify `planId` or `planName` when using `bucketName`.
+: (deprecated. Use `planTitle` instead) Title of the plan to which the bucket belongs.
 
 `--ownerGroupId [ownerGroupId]`
-: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--ownerGroupName [ownerGroupName]`
-: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -47,8 +50,8 @@ Retrieve the specified planner task by id
 m365 planner task get --id "vzCcZoOv-U27PwydxHB8opcADJo-"
 ```
 
-Retrieve the specified planner task with the title _My Planner Task_ from the bucket named _My Planner Bucket_ based on the plan with the name _My Planner Plan_ owned by the group _My Planner Group_
+Retrieve the specified planner task with the title _My Planner Task_ from the bucket named _My Planner Bucket_. Based on the plan with the title _My Planner Plan_ owned by the group _My Planner Group_.
 
 ```sh
-m365 planner task get --title "My Planner Task" --bucketName "My Planner Bucket" --planName "My Planner Plan" --ownerGroupName "My Planner Group"
+m365 planner task get --title "My Planner Task" --bucketName "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
 ```

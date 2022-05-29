@@ -6,12 +6,12 @@ import { planner } from './planner';
 import { sinonUtil } from "./sinonUtil";
 
 const validPlanId = 'oUHpnKBFekqfGE_PS6GGUZcAFY7b';
-const validPlanName = 'Plan name';
+const validPlanTitle = 'Plan title';
 const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
 
 const singlePlanResponse: PlannerPlan = {
   id: validPlanId,
-  title: validPlanName,
+  title: validPlanTitle,
   owner: validOwnerGroupId
 };
 
@@ -72,7 +72,7 @@ describe('utils/planner', () => {
     }
   });
 
-  it('correctly get plan by name.', async () => {
+  it('correctly get plan by title.', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return multiplePlanResponse;
@@ -81,7 +81,7 @@ describe('utils/planner', () => {
       return 'Invalid Request';
     });
 
-    const actual = await planner.getPlanByName(validPlanName, validOwnerGroupId);
+    const actual = await planner.getPlanByTitle(validPlanTitle, validOwnerGroupId);
     assert.strictEqual(actual, singlePlanResponse);
   });
 
@@ -97,21 +97,21 @@ describe('utils/planner', () => {
     });
 
     try {
-      await planner.getPlanByName(validPlanName, validOwnerGroupId);
+      await planner.getPlanByTitle(validPlanTitle, validOwnerGroupId);
       assert.fail('No error message thrown.');
     }
     catch (ex) {
-      assert.deepStrictEqual(ex, Error(`The specified plan '${validPlanName}' does not exist.`));
+      assert.deepStrictEqual(ex, Error(`The specified plan '${validPlanTitle}' does not exist.`));
     }
   });
 
-  it('fails to get plan when multiple plans have the same name', async () => {
+  it('fails to get plan when multiple plans have the same title', async () => {
     sinon.stub(request, 'get').callsFake(async opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return {
           value: [
-            { title: validPlanName, id: validPlanId },
-            { title: validPlanName, id: validPlanId }
+            { title: validPlanTitle, id: validPlanId },
+            { title: validPlanTitle, id: validPlanId }
           ]
         };
       }
@@ -120,11 +120,11 @@ describe('utils/planner', () => {
     });
 
     try {
-      await planner.getPlanByName(validPlanName, validOwnerGroupId);
+      await planner.getPlanByTitle(validPlanTitle, validOwnerGroupId);
       assert.fail('No error message thrown.');
     }
     catch (ex) {
-      assert.deepStrictEqual(ex, Error(`Multiple plans with name '${validPlanName}' found: ${[validPlanId, validPlanId]}.`));
+      assert.deepStrictEqual(ex, Error(`Multiple plans with title '${validPlanTitle}' found: ${[validPlanId, validPlanId]}.`));
     }
   });
 });

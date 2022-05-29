@@ -17,16 +17,19 @@ m365 planner bucket set [options]
 : Name of the bucket. Specify either `id` or `name` but not both.
 
 `--planId [planId]`
-: ID of the plan to update the bucket of. Specify either `planId` or `planName` when using `name`.
+: ID of the plan to update the bucket of. Specify either `planId` or `planTitle` when using `name`.
+
+`--planTitle [planTitle]`
+: Title of the plan to update the bucket of. Specify either `planId` or `planTitle` when using `name`. Always use in combination with either `ownerGroupId` or `ownerGroupName`. 
 
 `--planName [planName]`
-: Name of the plan to update the bucket of. Specify either `planId` or `planName` when using `name`. Always use in combination with either `ownerGroupId` or `ownerGroupName`. 
+: (deprecated. Use `planTitle` instead) Title of the plan to which the bucket belongs.
 
 `--ownerGroupId [ownerGroupId]`
-: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--ownerGroupName [ownerGroupName]`
-: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--newName [newName]`
 : New name of the bucket.
@@ -47,11 +50,11 @@ m365 planner bucket set --id "vncYUXCRBke28qMLB-d4xJcACtNz" --newName "New bucke
 Updates the Microsoft Planner bucket named _My Bucket_ in the Plan _My Plan_ owned by group _My Group_
 
 ```sh
-m365 planner bucket set --name "My Bucket" --planName "My Plan" --ownerGroupName "My Group" --newName "New bucket name"
+m365 planner bucket set --name "My Bucket" --planTitle "My Plan" --ownerGroupName "My Group" --newName "New bucket name"
 ```
 
 Updates the Microsoft Planner bucket named _My Bucket_ in the Plan _My Plan_ owned by group with ID _00000000-0000-0000-0000-000000000000_
 
 ```sh
-m365 planner bucket set --name "My Bucket" --planName "My Plan" --ownerGroupId 00000000-0000-0000-0000-000000000000 --newName "New bucket name"
+m365 planner bucket set --name "My Bucket" --planTitle "My Plan" --ownerGroupId 00000000-0000-0000-0000-000000000000 --newName "New bucket name"
 ```

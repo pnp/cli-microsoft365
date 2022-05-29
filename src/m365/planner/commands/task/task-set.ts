@@ -21,6 +21,7 @@ interface Options extends GlobalOptions {
   title?: string;
   planId?: string;
   planName?: string;
+  planTitle?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
   bucketId?: string;
@@ -56,6 +57,7 @@ class PlannerTaskSetCommand extends GraphCommand {
     telemetryProps.title = typeof args.options.title !== 'undefined';
     telemetryProps.planId = typeof args.options.planId !== 'undefined';
     telemetryProps.planName = typeof args.options.planName !== 'undefined';
+    telemetryProps.planTitle = typeof args.options.planTitle !== 'undefined';
     telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
     telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
     telemetryProps.bucketId = typeof args.options.bucketId !== 'undefined';
@@ -74,6 +76,12 @@ class PlannerTaskSetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (args.options.planName) {
+      args.options.planTitle = args.options.planName;
+
+      this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
+    }
+
     if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
@@ -283,7 +291,7 @@ class PlannerTaskSetCommand extends GraphCommand {
 
     return this
       .getGroupId(options)
-      .then((groupId: string) => planner.getPlanByName(options.planName!, groupId))
+      .then((groupId: string) => planner.getPlanByTitle(options.planTitle!, groupId))
       .then(plan => plan.id!);
   }
 
@@ -349,6 +357,7 @@ class PlannerTaskSetCommand extends GraphCommand {
       { option: '-t, --title [title]' },
       { option: '--planId [planId]' },
       { option: '--planName [planName]' },
+      { option: '--planTitle [planTitle]' },
       { option: '--ownerGroupId [ownerGroupId]' },
       { option: '--ownerGroupName [ownerGroupName]' },
       { option: '--bucketId [bucketId]' },
@@ -374,20 +383,20 @@ class PlannerTaskSetCommand extends GraphCommand {
       return 'Specify either bucketId or bucketName but not both';
     }
 
-    if (args.options.bucketName && !args.options.planId && !args.options.planName) {
-      return 'Specify either planId or planName when using bucketName';
+    if (args.options.bucketName && !args.options.planId && !args.options.planName && !args.options.planTitle) {
+      return 'Specify either planId or planTitle when using bucketName';
     }
 
-    if (args.options.bucketName && args.options.planId && args.options.planName) {
-      return 'Specify either planId or planName when using bucketName but not both';
+    if (args.options.bucketName && args.options.planId && (args.options.planName || args.options.planTitle)) {
+      return 'Specify either planId or planTitle when using bucketName but not both';
     }
 
-    if (args.options.planName && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName';
+    if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
     }
 
-    if (args.options.planName && args.options.ownerGroupId && args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
+    if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
     }
 
     if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
@@ -417,6 +426,7 @@ class PlannerTaskSetCommand extends GraphCommand {
     if (args.options.assignedToUserIds && args.options.assignedToUserNames) {
       return 'Specify either assignedToUserIds or assignedToUserNames but not both';
     }
+    
     if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => this.allowedAppliedCategories.indexOf(category.toLocaleLowerCase()) < 0).length !== 0) {
       return 'The appliedCategories contains invalid value. Specify either category1, category2, category3, category4, category5 and/or category6 as properties';
     }

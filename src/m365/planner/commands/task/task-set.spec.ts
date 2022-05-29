@@ -196,7 +196,7 @@ describe(commands.TASK_SET, () => {
     done();
   });
 
-  it('fails validation when bucketName is specified but not planId or planName', (done) => {
+  it('fails validation when bucketName is specified but not planId or planTitle', (done) => {
     const actual = command.validate({
       options: {
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
@@ -207,37 +207,37 @@ describe(commands.TASK_SET, () => {
     done();
   });
 
-  it('fails validation when bucketName is specified but both planId and planName are specified', (done) => {
+  it('fails validation when bucketName is specified but both planId and planTitle are specified', (done) => {
     const actual = command.validate({
       options: {
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
         bucketName: 'My Bucket',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        planName: 'My Planner'
+        planTitle: 'My Planner'
       }
     });
     assert.notStrictEqual(actual, true);
     done();
   });
 
-  it('fails validation when planName is specified without ownerGroupId or ownerGroupName', (done) => {
+  it('fails validation when planTitle is specified without ownerGroupId or ownerGroupName', (done) => {
     const actual = command.validate({
       options: {
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
         bucketName: 'My Bucket',
-        planName: 'My Planner Plan'
+        planTitle: 'My Planner Plan'
       }
     });
     assert.notStrictEqual(actual, true);
     done();
   });
 
-  it('fails validation when planName is specified with both ownerGroupId and ownerGroupName', (done) => {
+  it('fails validation when planTitle is specified with both ownerGroupId and ownerGroupName', (done) => {
     const actual = command.validate({
       options: {
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
         bucketName: 'My Bucket',
-        planName: 'My Planner Plan',
+        planTitle: 'My Planner Plan',
         ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
         ownerGroupName: 'My Planner Group'
       }
@@ -251,7 +251,7 @@ describe(commands.TASK_SET, () => {
       options: {
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
         bucketName: 'My Bucket',
-        planName: 'My Planner Plan',
+        planTitle: 'My Planner Plan',
         ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
@@ -570,7 +570,7 @@ describe(commands.TASK_SET, () => {
     });
   });
 
-  it('correctly updates planner task to bucket with bucketName, planName, and ownerGroupName', (done) => {
+  it('correctly updates planner task to bucket with bucketName, planTitle, and ownerGroupName', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
@@ -621,7 +621,7 @@ describe(commands.TASK_SET, () => {
     const options: any = {
       id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
       bucketName: 'My Planner Bucket',
-      planName: 'My Planner Plan',
+      planTitle: 'My Planner Plan',
       ownerGroupName: 'My Planner Group'
     };
 
@@ -636,7 +636,69 @@ describe(commands.TASK_SET, () => {
     });
   });
 
-  it('correctly updates planner task  to bucket with bucketName, planName, and ownerGroupId', (done) => {
+  it('correctly updates planner task  to bucket with bucketName, planTitle, and ownerGroupId', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+        return Promise.resolve(taskResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${encodeURIComponent('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
+        return Promise.resolve({
+          value: [
+            {
+              "name": "My Planner Bucket",
+              "id": "IK8tuFTwQEa5vTonM7ZMRZgAKdno"
+            }
+          ]
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
+        JSON.stringify(opts.headers) === JSON.stringify({
+          'accept': 'application/json'
+        })) {
+        return Promise.resolve({
+          "@odata.etag": "TestEtag"
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
+        return Promise.resolve({
+          value: [
+            {
+              "title": "My Planner Plan",
+              "id": "8QZEH7b3wkS_bGQobscsM5gADCBb"
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const options: any = {
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      bucketName: 'My Planner Bucket',
+      planTitle: 'My Planner Plan',
+      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert(loggerLogSpy.calledWith(taskResponse));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly updates planner task  to bucket with bucketName, deprecated planName, and ownerGroupId', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
@@ -684,7 +746,8 @@ describe(commands.TASK_SET, () => {
       id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
       bucketName: 'My Planner Bucket',
       planName: 'My Planner Plan',
-      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
+      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
+      verbose: true
     };
 
     command.action(logger, { options: options } as any, () => {
@@ -997,6 +1060,117 @@ describe(commands.TASK_SET, () => {
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(err.message, "Cannot proceed with planner task update. The following users provided are invalid : user2@contoso.onmicrosoft.com");
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when ownerGroupName not found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
+        return Promise.resolve({ value: [] });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+        bucketName: 'My Planner Bucket',
+        planTitle: 'My Planner Plan',
+        ownerGroupName: 'foo'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified group 'foo' does not exist.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when task endpoint fails', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+        return Promise.resolve(taskResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}/details`) {
+        return Promise.reject('Error fetching task');
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
+        JSON.stringify(opts.headers) === JSON.stringify({
+          'accept': 'application/json'
+        })) {
+        return Promise.reject('Error fetching task');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+
+    command.action(logger, {
+      options: {
+        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+        title: 'My Planner Task'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Error fetching task`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when task details endpoint fails', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+        return Promise.resolve(taskResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}/details`) {
+        return Promise.reject('Error fetching task details');
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
+        JSON.stringify(opts.headers) === JSON.stringify({
+          'accept': 'application/json'
+        })) {
+        return Promise.resolve({
+          "@odata.etag": "TestEtag"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+
+    command.action(logger, {
+      options: {
+        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+        description: 'My Task Description'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Error fetching task details`)));
         done();
       }
       catch (e) {
