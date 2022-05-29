@@ -83,7 +83,7 @@ class TeamsCacheRemoveCommand extends GraphCommand {
         cmd = 'taskkill /IM "Teams.exe" /F'; 
         break;
       case 'darwin': 
-        cmd = 'kill -9 \`pidof Teams.exe\`'; 
+        cmd = `ps ax | grep MacOS/Teams -m 1 | grep -v grep | awk '{ print $1 }'`; 
         break;
     }
 
@@ -92,7 +92,11 @@ class TeamsCacheRemoveCommand extends GraphCommand {
     }
 
     try {
-      await this.exec(cmd);
+      const cmdOutput = await this.exec(cmd);
+
+      if (cmdOutput.stdout !== '' && platform === 'darwin') {
+        await this.exec(`process.kill(${cmdOutput.stdout})`);
+      }
 
       if (this.verbose) {
         logger.logToStderr('Teams client closed');

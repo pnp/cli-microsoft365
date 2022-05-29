@@ -148,6 +148,26 @@ describe(commands.CACHE_REMOVE, () => {
     });
   });
 
+  it('removes Teams cache from macOs platform without prompting.', (done) => {
+    sinon.stub(process, 'platform').value('darwin');
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    const exec = sinon.stub(command, 'exec' as any).returns({stdout: 'pid'});
+
+    command.action(logger, { options: {
+      confirm: true,
+      verbose: true
+    }}, () => {
+      try {
+        assert(true);
+        exec.restore();
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('removes Teams cache from win32 platform without prompting.', (done) => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
