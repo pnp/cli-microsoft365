@@ -20,7 +20,7 @@ describe(commands.TASK_REMOVE, () => {
   const validBucketId = 'vncYUXCRBke28qMLB-d4xJcACtNz';
   const validBucketName = 'Bucket name';
   const validPlanId = 'oUHpnKBFekqfGE_PS6GGUZcAFY7b';
-  const validPlanName = 'Plan name';
+  const validPlanTitle = 'Plan name';
   const validOwnerGroupName = 'Group name';
   const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
   const invalidOwnerGroupId = 'Invalid GUID';
@@ -51,7 +51,7 @@ describe(commands.TASK_REMOVE, () => {
     "value": [
       {
         "id": validPlanId,
-        "title": validPlanName
+        "title": validPlanTitle
       }
     ]
   };
@@ -209,7 +209,7 @@ describe(commands.TASK_REMOVE, () => {
         title: validTaskTitle,
         bucketName: validBucketName,
         planId: validPlanId,
-        planName: validPlanName
+        planTitle: validPlanTitle
       }
     });
     assert.notStrictEqual(actual, true);
@@ -220,7 +220,7 @@ describe(commands.TASK_REMOVE, () => {
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
-        planName: validPlanName
+        planTitle: validPlanTitle
       }
     });
     assert.notStrictEqual(actual, true);
@@ -231,7 +231,7 @@ describe(commands.TASK_REMOVE, () => {
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
         ownerGroupId: validOwnerGroupId
       }
@@ -244,7 +244,7 @@ describe(commands.TASK_REMOVE, () => {
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupId: invalidOwnerGroupId
       }
     });
@@ -275,7 +275,7 @@ describe(commands.TASK_REMOVE, () => {
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
       }
     });
@@ -295,7 +295,7 @@ describe(commands.TASK_REMOVE, () => {
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
         confirm: true
       }
@@ -323,7 +323,7 @@ describe(commands.TASK_REMOVE, () => {
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
         confirm: true
       }
@@ -546,7 +546,7 @@ describe(commands.TASK_REMOVE, () => {
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupId: validOwnerGroupId
       }
     }, (err?: any) => {
@@ -594,7 +594,7 @@ describe(commands.TASK_REMOVE, () => {
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
       }
     }, (err?: any) => {

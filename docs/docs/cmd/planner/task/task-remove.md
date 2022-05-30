@@ -23,16 +23,16 @@ m365 planner task remove [options]
 : Name of the bucket to which the task to remove belongs. Specify either `bucketId` or `bucketName` but not both.
 
 `--planId [planId]`
-: ID of the plan to which the task to remove belongs. Specify either `planId` or `planName` when using `name`.
+: ID of the plan to which the task to remove belongs. Specify either `planId` or `planTitle` when using `name`.
 
-`--planName [planName]`
-: Name of the plan to which the task to remove belongs. Specify either `planId` or `planName` when using `name`.
+`--planTitle [planTitle]`
+: Name of the plan to which the task to remove belongs. Specify either `planId` or `planTitle` when using `name`.
 
 `--ownerGroupId [ownerGroupId]`
-: ID of the group to which the plan belongs. Specify either `ownerGroupId` or `ownerGroupName` when using `planName`.
+: ID of the group to which the plan belongs. Specify either `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--ownerGroupName [ownerGroupName]`
-: Name of the group to which the plan belongs. Specify either `ownerGroupId` or `ownerGroupName` when using `planName`.
+: Name of the group to which the plan belongs. Specify either `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--confirm`
 : Don't prompt for confirmation
@@ -68,11 +68,11 @@ m365 planner task remove --title "My Task" --bucketName "My Bucket" --planId "oU
 Removes the Microsoft Planner task with title _My Task_ in the bucket with name _My Bucket_ in the Plan _My Plan_ owned by group _My Group_
 
 ```sh
-m365 planner task remove --title "My Task" --bucketName "My Bucket" --planName "My Plan" --ownerGroupName "My Group"
+m365 planner task remove --title "My Task" --bucketName "My Bucket" --planTitle "My Plan" --ownerGroupName "My Group"
 ```
 
 Removes the Microsoft Planner task with title _My Task_ in the bucket with name _My Bucket_ in the Plan _My Plan_ owned by group with ID _00000000-0000-0000-0000-000000000000_
 
 ```sh
-m365 planner task remove --title "My Task" --bucketName "My Bucket" --planName "My Plan" --ownerGroupId "00000000-0000-0000-0000-000000000000"
+m365 planner task remove --title "My Task" --bucketName "My Bucket" --planTitle "My Plan" --ownerGroupId "00000000-0000-0000-0000-000000000000"
 ```
