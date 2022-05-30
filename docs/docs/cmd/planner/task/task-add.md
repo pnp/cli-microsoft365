@@ -65,7 +65,7 @@ Adds a Microsoft Planner task with the name _My Planner Task_ for plan with the 
 m365 planner task add --title "My Planner Task" --planId "8QZEH7b3wkSbGQobscsM5gADCBa" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna"
 ```
 
-Adds a Completed Microsoft Planner task with the name _My Planner Task_ for plan with the name _My Planner Plan_ owned by group _My Planner Group_ and for the bucket with the ID _IK8tuFTwQEa5vTonM7ZMRZgAKdna_
+Adds a Completed Microsoft Planner task with the name _My Planner Task_ for plan with the title _My Planner Plan_ owned by group _My Planner Group_ and for the bucket with the ID _IK8tuFTwQEa5vTonM7ZMRZgAKdna_
 
 ```sh
 m365 planner task add --title "My Planner task" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna" --percentComplete 100

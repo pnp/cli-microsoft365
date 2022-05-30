@@ -49,7 +49,7 @@ Retrieve the the specified planner task by id.
 m365 planner task get --id 'vzCcZoOv-U27PwydxHB8opcADJo-'
 ```
 
-Retrieve the the specified planner task with the title _My Planner Task_ from the bucket named _My Planner Bucket_. Based on the plan with the name _My Planner Plan_ owned by the group _My Planner Group_.
+Retrieve the the specified planner task with the title _My Planner Task_ from the bucket named _My Planner Bucket_. Based on the plan with the title _My Planner Plan_ owned by the group _My Planner Group_.
 
 ```sh
 m365 planner task get --title "My Planner Task" --bucketName "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"

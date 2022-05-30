@@ -38,7 +38,7 @@ Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with 
 m365 planner bucket add --name "My Planner Bucket" --planId "xqQg5FS2LkCp935s-FIFm2QAFkHM" --orderHint " !"
 ```
 
-Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with the name _My Planner Plan_ owned by group _My Planner Group_
+Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with the title _My Planner Plan_ owned by group _My Planner Group_
 
 ```sh
 m365 planner bucket add --name "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
