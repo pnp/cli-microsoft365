@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
   bucketId?: string;
   bucketName?: string;
   planId?: string;
-  planTitle?: string;
+  planName?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
   confirm?: boolean;
@@ -153,7 +153,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
   }
 
   private getPlanId(options: Options): Promise<string> {
-    const { planId, planTitle } = options;
+    const { planId, planName } = options;
 
     if (planId) {
       return Promise.resolve(planId);
@@ -161,7 +161,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
 
     return this
       .getGroupId(options)
-      .then(groupId => planner.getPlanByName(planTitle!, groupId))
+      .then(groupId => planner.getPlanByName(planName!, groupId))
       .then(plan => plan.id!);
   }
 
@@ -202,7 +202,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
       { option: '--bucketId [bucketId]' },
       { option: '--bucketName [bucketName]' },
       { option: '--planId [planId]' },
-      { option: '--planTitle [planTitle]' },
+      { option: '--planName [planName]' },
       { option: '--ownerGroupId [ownerGroupId]' },
       { option: '--ownerGroupName [ownerGroupName]' },
       { option: '--confirm' }
@@ -220,8 +220,8 @@ class PlannerTaskRemoveCommand extends GraphCommand {
 
   public validate(args: CommandArgs): boolean | string {
     if (args.options.id) {
-      if (args.options.bucketId || args.options.bucketName || args.options.planId || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName) {
-        return 'Don\'t specify bucketId,bucketName, planId, planTitle, ownerGroupId or ownerGroupName when using id';
+      if (args.options.bucketId || args.options.bucketName || args.options.planId || args.options.planName || args.options.ownerGroupId || args.options.ownerGroupName) {
+        return 'Don\'t specify bucketId,bucketName, planId, planName, ownerGroupId or ownerGroupName when using id';
       }  
     }
     if (args.options.title) {
@@ -234,20 +234,20 @@ class PlannerTaskRemoveCommand extends GraphCommand {
       }
 
       if (args.options.bucketName) {
-        if (!args.options.planId && !args.options.planTitle) {
-          return 'Specify either planId or planTitle when using bucketName';
+        if (!args.options.planId && !args.options.planName) {
+          return 'Specify either planId or planName when using bucketName';
         }
 
-        if (args.options.planId && args.options.planTitle) {
-          return 'Specify either planId or planTitle when using bucketName but not both';
+        if (args.options.planId && args.options.planName) {
+          return 'Specify either planId or planName when using bucketName but not both';
         }
       }
-      if (args.options.planTitle) {
+      if (args.options.planName) {
         if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
-          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
+          return 'Specify either ownerGroupId or ownerGroupName when using planName';
         }
         if (args.options.ownerGroupId && args.options.ownerGroupName) {
-          return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
+          return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
         }
       }
       if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
