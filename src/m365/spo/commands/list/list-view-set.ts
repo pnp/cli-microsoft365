@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ContextInfo, spo, validation } from '../../../../utils';
+import { ContextInfo, formatting, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -45,9 +45,9 @@ class SpoListViewSetCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const baseRestUrl: string = `${args.options.webUrl}/_api/web/lists`;
     const listRestUrl: string = args.options.listId ?
-      `(guid'${encodeURIComponent(args.options.listId)}')`
-      : `/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
-    const viewRestUrl: string = `/views/${(args.options.viewId ? `getById('${encodeURIComponent(args.options.viewId)}')` : `getByTitle('${encodeURIComponent(args.options.viewTitle as string)}')`)}`;
+      `(guid'${formatting.encodeQueryParameter(args.options.listId)}')`
+      : `/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+    const viewRestUrl: string = `/views/${(args.options.viewId ? `getById('${formatting.encodeQueryParameter(args.options.viewId)}')` : `getByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`)}`;
 
     spo
       .getRequestDigest(args.options.webUrl)

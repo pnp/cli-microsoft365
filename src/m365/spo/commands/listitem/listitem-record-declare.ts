@@ -5,7 +5,7 @@ import {
 import config from "../../../../config";
 import GlobalOptions from "../../../../GlobalOptions";
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, IdentityResponse, spo, validation } from "../../../../utils";
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, IdentityResponse, spo, validation } from "../../../../utils";
 import SpoCommand from "../../../base/SpoCommand";
 import commands from "../../commands";
 
@@ -44,8 +44,8 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
     let listId: string = '';
 
     const listRestUrl: string = args.options.listId
-      ? `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')`
-      : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
+      ? `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`
+      : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
 
     spo
       .getRequestDigest(args.options.webUrl)

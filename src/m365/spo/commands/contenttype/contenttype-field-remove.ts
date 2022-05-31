@@ -95,7 +95,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           }
           // Request for the ListId
           const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/lists/GetByTitle('${encodeURIComponent(args.options.listTitle)}')?$select=Id`,
+            url: `${args.options.webUrl}/_api/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')?$select=Id`,
             headers: {
               accept: 'application/json;odata=nometadata'
             },
