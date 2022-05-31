@@ -43,29 +43,19 @@ class PlannerTaskChecklistitemListCommand extends GraphCommand {
 
     request.get(requestOptions).then(
       (res: any): void => {
-        let checklistitems = res.checklist;
-        if (args.options.output === 'text') {
-          checklistitems = this.ModifyToJsonArray(res.checklist);
+        if (!args.options.output || args.options.output === 'json') {
+          logger.log(res.checklist);
         }
-        logger.log(checklistitems);
+        else {
+          //converted to text friendly output
+          const output = Object.getOwnPropertyNames(res.checklist).map(prop => ({ id: prop, ...(res.checklist as any)[prop] }));
+          logger.log(output);
+        }
         cb();
       },
       (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb)
     );
   }
-  private ModifyToJsonArray(checklist: any): any[] {
-    const checklistitems = [];
-    for (const item in checklist) {
-      const checklistitem: any = {};
-      checklistitem["id"] = item;
-      for (const obj in checklist[item]) {
-        checklistitem[obj] = checklist[item][obj];
-      }
-      checklistitems.push(checklistitem);
-    }
-    return checklistitems;
-  }
-
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
