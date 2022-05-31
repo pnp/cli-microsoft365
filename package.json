@@ -1,6 +1,6 @@
 {
   "name": "@pnp/cli-microsoft365",
-  "version": "5.3.0",
+  "version": "5.4.0",
   "description": "Manage Microsoft 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/api.js",
