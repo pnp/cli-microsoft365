@@ -16,5 +16,6 @@ export default {
   TASK_LIST: `${prefix} task list`,
   TASK_REFERENCE_ADD: `${prefix} task reference add`,
   TASK_REFERENCE_LIST: `${prefix} task reference list`,
-  TASK_SET: `${prefix} task set`
+  TASK_SET: `${prefix} task set`,
+  TENANT_SETTINGS_LIST: `${prefix} tenant settings list`
 };
