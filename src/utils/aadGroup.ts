@@ -44,7 +44,7 @@ export const aadGroup = {
     }
 
     if (groups.length > 1) {
-      throw Error(`Multiple groups with name '${displayName}' found: ${groups.map(x => x.id)}.`);
+      throw Error(`Multiple groups with name '${displayName}' found: ${groups.map(x => x.id).join(',')}.`);
     }
 
     return groups[0];
