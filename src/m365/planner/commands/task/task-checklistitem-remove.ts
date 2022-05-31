@@ -23,6 +23,9 @@ class PlannerTaskChecklistitemRemoveCommand extends GraphCommand {
   public get description(): string {
     return 'Removes the Checklistitem from the Planner task';
   }
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'title', 'isChecked'];
+  }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (args.options.confirm) {
@@ -67,7 +70,14 @@ class PlannerTaskChecklistitemRemoveCommand extends GraphCommand {
         return request.patch(requestOptionsTaskDetails);
       })
       .then((res: any): void => {
-        logger.log(res.checklist);
+        if (!args.options.output || args.options.output === 'json') {
+          logger.log(res.checklist);
+        }
+        else {
+          //converted to text friendly output
+          const output = Object.getOwnPropertyNames(res.checklist).map(prop => ({ id: prop, ...(res.checklist as any)[prop] }));
+          logger.log(output);
+        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
