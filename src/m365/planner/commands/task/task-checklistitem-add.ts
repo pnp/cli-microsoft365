@@ -35,6 +35,10 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'title', 'isChecked'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
@@ -68,8 +72,15 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
         
         return request.patch<PlannerTaskDetails>(requestOptions);
       })
-      .then((res): void => {
-        logger.log(res.checklist);
+      .then((result): void => {
+        if (args.options.output === 'json') {
+          logger.log(result.checklist);
+        }
+        else {
+          // Transform checklist item object to text friendly format
+          const output = Object.getOwnPropertyNames(result.checklist).map(prop => ({ id: prop, ...(result.checklist as any)[prop]}));
+          logger.log(output);
+        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -85,8 +96,8 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
 
     return request
       .get(requestOptions)
-      .then((task: any) => task['@odata.etag']
-        , () => Promise.reject('Planner task was not found.'));
+      .then((task: any) => task['@odata.etag'],
+        () => Promise.reject('Planner task was not found.'));
   }
 
   public options(): CommandOption[] {

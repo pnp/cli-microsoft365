@@ -10,7 +10,6 @@ import commands from '../../commands';
 const command: Command = require('./task-checklistitem-add');
 
 describe(commands.TASK_CHECKLISTITEM_ADD, () => {
-  
   const validTaskId = 'BC3L9DGJ5UG2UQn4MlEbcZcALpqb';
   const validTitle = 'Checklist item title';
 
@@ -81,6 +80,10 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'isChecked']);
+  });
+
   it('correctly adds checklist item', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
@@ -100,11 +103,45 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
     command.action(logger, {
       options: {
         taskId: validTaskId,
-        title: validTitle
+        title: validTitle,
+        output: 'json'
       }
     }, () => {
       try {
         assert(loggerLogSpy.calledWith(taskDetailsWithChecklistResponse.checklist));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly adds checklist item with text output', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+        return Promise.resolve(taskDetailsResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+        return Promise.resolve(taskDetailsWithChecklistResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        taskId: validTaskId,
+        title: validTitle,
+        output: 'text'
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith([{id: '00000000-0000-0000-0000-000000000000', title: validTitle, isChecked: false}]));
         done();
       }
       catch (e) {
