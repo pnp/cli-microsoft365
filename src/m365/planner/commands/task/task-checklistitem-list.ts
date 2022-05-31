@@ -23,6 +23,9 @@ class PlannerTaskChecklistitemListCommand extends GraphCommand {
   public get description(): string {
     return "Lists the checklist items of a Planner task.";
   }
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'title', 'isChecked'];
+  }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
@@ -40,11 +43,27 @@ class PlannerTaskChecklistitemListCommand extends GraphCommand {
 
     request.get(requestOptions).then(
       (res: any): void => {
-        logger.log(res.checklist);
+        let checklistitems = res.checklist;
+        if (args.options.output === 'text') {
+          checklistitems = this.ModifyToJsonArray(res.checklist);
+        }
+        logger.log(checklistitems);
         cb();
       },
       (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb)
     );
+  }
+  private ModifyToJsonArray(checklist: any): any[] {
+    const checklistitems = [];
+    for (const item in checklist) {
+      const checklistitem: any = {};
+      checklistitem["id"] = item;
+      for (const obj in checklist[item]) {
+        checklistitem[obj] = checklist[item][obj];
+      }
+      checklistitems.push(checklistitem);
+    }
+    return checklistitems;
   }
 
   public options(): CommandOption[] {

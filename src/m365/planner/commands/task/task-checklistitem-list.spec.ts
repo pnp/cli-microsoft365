@@ -41,6 +41,35 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
       }
     }
   };
+  const textOutput = {
+    "checklist": [{
+      "id": "33224",
+      "isChecked": false,
+      "title": "Some checklist",
+      "orderHint": "8585576049720396756P(",
+      "lastModifiedDateTime": "2022-02-04T19:12:53.4692149Z",
+      "lastModifiedBy": {
+        "user": {
+          "displayName": null,
+          "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e"
+        }
+      }
+    },
+    {
+      "id": "69115",
+      "isChecked": false,
+      "title": "Some checklist more",
+      "orderHint": "85855760494@",
+      "lastModifiedDateTime": "2022-02-04T19:12:55.4735671Z",
+      "lastModifiedBy": {
+        "user": {
+          "displayName": null,
+          "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e"
+        }
+      }
+    }
+    ]
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -89,6 +118,10 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'isChecked']);
+  });
+
   it('fails validation when using app only access token', (done) => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
@@ -108,7 +141,7 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
     });
   });
 
-  it('successfully handles item found', (done) => {
+  it('successfully handles item found(JSON)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/vzCcZoOv-U27PwydxHB8opcADJo-/details?$select=checklist`) {
         return Promise.resolve(jsonOutput
@@ -126,6 +159,32 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
       try {
         assert(loggerLogSpy.calledWith(
           jsonOutput.checklist
+        ));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+  it('successfully handles item found(TEXT)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/vzCcZoOv-U27PwydxHB8opcADJo-/details?$select=checklist`) {
+        return Promise.resolve(jsonOutput
+        );
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        taskId: 'vzCcZoOv-U27PwydxHB8opcADJo-', debug: true, output: 'text'
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(
+          textOutput.checklist
         ));
         done();
       }
