@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { urlUtil, validation } from '../../../../utils';
+import { formatting, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -60,10 +60,10 @@ class SpoFieldRemoveCommand extends SpoCommand {
 
       let fieldRestUrl: string = '';
       if (fieldId) {
-        fieldRestUrl = `/getbyid('${encodeURIComponent(fieldId)}')`;
+        fieldRestUrl = `/getbyid('${formatting.encodeQueryParameter(fieldId)}')`;
       }
       else {
-        fieldRestUrl = `/getbyinternalnameortitle('${encodeURIComponent(fieldTitle as string)}')`;
+        fieldRestUrl = `/getbyinternalnameortitle('${formatting.encodeQueryParameter(fieldTitle as string)}')`;
       }
 
       const requestOptions: any = {
@@ -84,14 +84,14 @@ class SpoFieldRemoveCommand extends SpoCommand {
       let listRestUrl: string = '';
 
       if (args.options.listId) {
-        listRestUrl = `lists(guid'${encodeURIComponent(args.options.listId)}')/`;
+        listRestUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
       }
       else if (args.options.listTitle) {
-        listRestUrl = `lists/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')/`;
+        listRestUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/`;
       }
       else if (args.options.listUrl) {
         const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-        listRestUrl = `GetList('${encodeURIComponent(listServerRelativeUrl)}')/`;
+        listRestUrl = `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
       }
 
       if (args.options.group) {
