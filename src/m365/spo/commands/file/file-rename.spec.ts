@@ -2,12 +2,13 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./file-rename');
+const fileRemoveCommand: Command = require('./file-remove');
 
 describe(commands.FILE_RENAME, () => {
   let log: any[];
@@ -55,7 +56,8 @@ describe(commands.FILE_RENAME, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.get, 
-      request.post
+      request.post,
+      Cli.executeCommand
     ]);
   });
 
@@ -87,11 +89,19 @@ describe(commands.FILE_RENAME, () => {
 
 
   it('should command complete successfully', (done) => {
+    sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
+      if (command === fileRemoveCommand) {
+        if (args.options.webUrl === 'https://contoso.sharepoint.com/sites/portal') {
+          return Promise.resolve();
+        }
+
+        return Promise.reject(new CommandError('Invalid URL'));
+      }
+
+      return Promise.reject(new CommandError('Unknown case'));
+    });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('Recycle()') > -1) {
-        return Promise.resolve();
-      }
       if ((opts.url as string).indexOf('ValidateUpdateListItem()') > -1) {
         return Promise.resolve(renameValue);
       }
@@ -123,10 +133,19 @@ describe(commands.FILE_RENAME, () => {
   });
 
   it('should command complete successfully with all options', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('Recycle()') > -1) {
-        return Promise.resolve();
+    sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
+      if (command === fileRemoveCommand) {
+        if (args.options.webUrl === 'https://contoso.sharepoint.com/sites/portal') {
+          return Promise.resolve();
+        }
+
+        return Promise.reject(new CommandError('Invalid URL'));
       }
+
+      return Promise.reject(new CommandError('Unknown case'));
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('ValidateUpdateListItem()') > -1) {
         return Promise.resolve(renameValue);
       }
@@ -194,12 +213,17 @@ describe(commands.FILE_RENAME, () => {
 
 
   it('should continue if file not found when recycling', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('Recycle()') > -1) {
-        return Promise.reject({
-          message: 'Request failed with status code 404'
-        });
+    sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
+      if (command === fileRemoveCommand) {
+        if (args.options.webUrl === 'https://contoso.sharepoint.com/sites/portal') {
+          return Promise.resolve();
+        }
+        return Promise.reject(new CommandError('Invalid URL'));
       }
+      return Promise.reject(new CommandError('Unknown case'));
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('ValidateUpdateListItem()') > -1) {
         return Promise.resolve(renameValue);
       }
@@ -224,45 +248,6 @@ describe(commands.FILE_RENAME, () => {
     }, () => {
       try {
         assert(loggerLogSpy.calledWith(renameResponseJson));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('should throw error on recycling', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('Recycle()') > -1) {
-        return Promise.reject('recycleFile error');
-      }
-
-      if ((opts.url as string).indexOf('ValidateUpdateListItem()') > -1) {
-        return Promise.resolve(renameValue);
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl`) > -1) {
-        return Promise.resolve();
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options:
-      {
-        webUrl: 'https://contoso.sharepoint.com/sites/portal',
-        sourceUrl: 'Shared Documents/abc.pdf',
-        force: true,
-        targetFileName: 'def.pdf',
-        debug: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('recycleFile error')));
         done();
       }
       catch (e) {
