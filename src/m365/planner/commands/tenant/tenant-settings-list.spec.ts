@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -86,5 +86,36 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
         done(e);
       }
     });
+  });
+
+  it('correctly handles random API error', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://tasks.office.com/taskAPI/tenantAdminSettings/Settings') {
+        return Promise.reject('An error has occurred');
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, { options: {} } as any, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('supports debug mode', () => {
+    const options = command.options();
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option === '--debug') {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
   });
 });
