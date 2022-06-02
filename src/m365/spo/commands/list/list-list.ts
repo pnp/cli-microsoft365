@@ -36,7 +36,7 @@ class SpoListListCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/lists?$expand=RootFolder`,
+      url: `${args.options.webUrl}/_api/web/lists?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl,*`,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
