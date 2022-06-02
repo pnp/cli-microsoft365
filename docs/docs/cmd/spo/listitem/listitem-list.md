@@ -17,7 +17,7 @@ m365 spo listitem list [options]
 : ID of the list to retrieve items from. Specify `listId` or `listTitle` but not both
 
 `-t, --listTitle [listTitle]`
-: Title of the list from which to retrieve the item. Specify `listId` or `listTitle` but not both
+: Title of the list to retrieve items from. Specify `listId` or `listTitle` but not both
 
 `-q, --camlQuery [camlQuery]`
 : CAML query to use to query the list of items with
@@ -33,6 +33,13 @@ m365 spo listitem list [options]
 
 `-n, --pageNumber [pageNumber]`
 : Page number to return if `pageSize` is specified (first page is indexed as value of 0)
+
+`--id [id]`
+: (deprecated. Use `listId` instead) ID of the list to retrieve items from. Specify `id` or `title` but not both
+
+`--title [title]`
+: (deprecated. Use `listTitle` instead) Title of the list to retrieve items from. Specify `id` or `title` but not both
+
 
 --8<-- "docs/cmd/_global.md"
 
