@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { Cli, Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -25,6 +24,14 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
 
   public get description(): string {
     return 'Removes the reference from the Planner task';
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.url = typeof args.options.url !== 'undefined';
+    telemetryProps.alias = typeof args.options.alias !== 'undefined';
+    telemetryProps.confirm = (!(!args.options.confirm)).toString();
+    return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -69,8 +76,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
 
         return request.patch(requestOptionsTaskDetails);
       })
-      .then((res: any): void => {
-        logger.log(res.references);
+      .then((): void => {
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -98,9 +104,9 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
           const alias = options.alias as string;
           const urls: string[] = [];
 
-          _.each(response.references, (ref, key) => {
-            if (ref.alias?.toLocaleLowerCase() === alias.toLocaleLowerCase()) {
-              urls.push(decodeURIComponent(key));
+          Object.entries(response.references).forEach((ref: any) => {
+            if (ref[1].alias?.toLocaleLowerCase() === alias.toLocaleLowerCase()) {
+              urls.push(decodeURIComponent(ref[0]));
             }
           });
 
@@ -109,7 +115,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
           }
   
           if (urls.length > 1) {
-            return Promise.reject(`Multiple references with alias ${options.alias} found: ${urls}`);
+            return Promise.reject(`Multiple references with alias ${options.alias} found. Pass one of the following urls within the "--url" option : ${urls}`);
           }
 
           url = urls[0];
@@ -135,6 +141,14 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
     return [
       ['url', 'alias']
     ];
+  }
+
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.url && args.options.url.indexOf('https://') !== 0 && args.options.url.indexOf('http://') !== 0)  {
+      return 'url is not a valid url. url should contain http(s)://';
+    }
+
+    return true;
   }
 }
 

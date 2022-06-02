@@ -100,6 +100,39 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation if url does not contain http or https', (done) => {
+    const actual = command.validate({
+      options: {
+        taskId: validTaskId,
+        url: 'www.microsoft.com'
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('passes validation when valid url with http specified', (done) => {
+    const actual = command.validate({
+      options: {
+        taskId: validTaskId,
+        url: 'http://www.microsoft.com'
+      }
+    });
+    assert.strictEqual(actual, true);
+    done();
+  });
+
+  it('passes validation when valid url with https specified', (done) => {
+    const actual = command.validate({
+      options: {
+        taskId: validTaskId,
+        url: 'https://www.microsoft.com'
+      }
+    });
+    assert.strictEqual(actual, true);
+    done();
+  });
+
   it('defines correct option sets', () => {
     const optionSets = command.optionSets();
     assert.deepStrictEqual(optionSets, [['url', 'alias']]);
