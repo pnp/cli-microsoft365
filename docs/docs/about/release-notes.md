@@ -1,5 +1,12 @@
 # Release notes
 
+## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
+
+### Changes
+
+- fixed 'planner task get' [#3324](https://github.com/pnp/cli-microsoft365/issues/3324)
+- extended spo list view add command with viewQuery option [#1862](https://github.com/pnp/cli-microsoft365/issues/1862)
+
 ## [v5.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.3.0)
 
 ### New commands
