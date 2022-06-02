@@ -50,6 +50,30 @@ body:
     validations:
       required: true
   - type: textarea
+    id: examples
+    attributes:
+      label: Examples
+      description: |
+        Provide some useful examples of how the new command can be used. Try to provide at least 2 examples (if possible).
+
+        Always start with a short description followed by the example.
+
+        Use markdown code blocks like the example below to improve readability.
+      value: |
+        Add channel to the specified Microsoft Teams team with name _Team Name_
+
+        ```sh
+        m365 teams channel add --teamName "Team Name" --name climicrosoft365 --description development
+        ```
+
+        Add private channel to the specified Microsoft Teams team with owner UPN
+
+        ```sh
+        m365 teams channel add --teamName "Team Name" --name climicrosoft365 --type private --owner john.doe@contoso.com
+        ```
+    validations:
+      required: true
+  - type: textarea
     id: info
     attributes:
       label: Additional Info

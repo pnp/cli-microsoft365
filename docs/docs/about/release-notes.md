@@ -1,5 +1,12 @@
 # Release notes
 
+## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
+
+### Changes
+
+- fixed 'planner task get' [#3324](https://github.com/pnp/cli-microsoft365/issues/3324)
+- extended spo list view add command with viewQuery option [#1862](https://github.com/pnp/cli-microsoft365/issues/1862)
+
 ## [v5.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.3.0)
 
 ### New commands
@@ -50,8 +57,10 @@
 - extended 'aad app add' and 'aad app set' with certificates [#3115](https://github.com/pnp/cli-microsoft365/issues/3115), [#3116](https://github.com/pnp/cli-microsoft365/issues/3116)
 - fixes documentation app open in wrong place [#3316](https://github.com/pnp/cli-microsoft365/issues/3316)
 - extended teams channel member with check for private channel [#3254](https://github.com/pnp/cli-microsoft365/issues/3254)
-- updates documentation titles [#3310](https://github.com/pnp/cli-microsoft365/issues/3310)
+- updated documentation titles [#3310](https://github.com/pnp/cli-microsoft365/issues/3310)
 - follow the order of properties as defined in defaultProperties [#2008](https://github.com/pnp/cli-microsoft365/issues/2008)
+- added Examples section for New Command template [#3105](https://github.com/pnp/cli-microsoft365/issues/3105)
+- fixed 'documentation about using the @ token in PowerShell' [#3239](https://github.com/pnp/cli-microsoft365/issues/3239)
 
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
