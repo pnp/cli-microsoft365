@@ -13,6 +13,10 @@ class PlannerTenantSettingsListCommand extends PlannerCommand {
     return 'Lists the Microsoft Planner configuration of the tenant';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['isPlannerAllowed', 'allowCalendarSharing', 'allowTenantMoveWithDataLoss', 'allowTenantMoveWithDataMigration', 'allowRosterCreation', 'allowPlannerMobilePushNotifications'];
+  }
+
   public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     const requestOptions: AxiosRequestConfig = {
       url: `${this.resource}/taskAPI/tenantAdminSettings/Settings`,
