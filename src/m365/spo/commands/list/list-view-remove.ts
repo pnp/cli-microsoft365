@@ -43,7 +43,7 @@ class SpoListViewRemoveCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeViewFromList: () => void = (): void => {
       if (this.verbose) {
-        const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
+        const list: string = args.options.listId ? formatting.encodeQueryParameter(args.options.listId as string) : formatting.encodeQueryParameter(args.options.listTitle as string);
         logger.logToStderr(`Removing view ${args.options.viewId || args.options.viewTitle} from list ${list} in site at ${args.options.webUrl}...`);
       }
 

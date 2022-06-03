@@ -40,7 +40,7 @@ class SpoListViewListCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
+      const list: string = args.options.listId ? formatting.encodeQueryParameter(args.options.listId as string) : formatting.encodeQueryParameter(args.options.listTitle as string);
       logger.logToStderr(`Retrieving views information for list ${list} in site at ${args.options.webUrl}...`);
     }
 

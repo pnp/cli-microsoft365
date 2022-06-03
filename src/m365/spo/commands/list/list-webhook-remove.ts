@@ -39,10 +39,9 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
-
     const removeWebhook: () => void = (): void => {
       if (this.verbose) {
+        const list: string = args.options.listId ? formatting.encodeQueryParameter(args.options.listId as string) : formatting.encodeQueryParameter(args.options.listTitle as string);
         logger.logToStderr(`Webhook ${args.options.id} is about to be removed from list ${list} located at site ${args.options.webUrl}...`);
       }
 
@@ -82,7 +81,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove webhook ${args.options.id} from list ${list} located at site ${args.options.webUrl}?`
+        message: `Are you sure you want to remove webhook ${args.options.id} from list ${args.options.listTitle || args.options.listId} located at site ${args.options.webUrl}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

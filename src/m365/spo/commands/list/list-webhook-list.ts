@@ -53,7 +53,7 @@ class SpoListWebhookListCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      const list: string = args.options.id ? encodeURIComponent(args.options.id as string) : (args.options.listId ? encodeURIComponent(args.options.listId as string) : (args.options.title ? encodeURIComponent(args.options.title as string) : encodeURIComponent(args.options.listTitle as string)));
+      const list: string = args.options.id ? formatting.encodeQueryParameter(args.options.id as string) : (args.options.listId ? formatting.encodeQueryParameter(args.options.listId as string) : (args.options.title ? formatting.encodeQueryParameter(args.options.title as string) : formatting.encodeQueryParameter(args.options.listTitle as string)));
       logger.logToStderr(`Retrieving webhook information for list ${list} in site at ${args.options.webUrl}...`);
     }
 

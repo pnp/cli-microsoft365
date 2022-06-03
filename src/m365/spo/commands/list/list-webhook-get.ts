@@ -38,7 +38,7 @@ class SpoListWebhookGetCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
+      const list: string = args.options.listId ? formatting.encodeQueryParameter(args.options.listId as string) : formatting.encodeQueryParameter(args.options.listTitle as string);
       logger.logToStderr(`Retrieving information for webhook ${args.options.id} belonging to list ${list} in site at ${args.options.webUrl}...`);
     }
 
