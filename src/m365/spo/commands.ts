@@ -166,6 +166,7 @@ export default {
   REPORT_SITEUSAGESITECOUNTS: `${prefix} report siteusagesitecounts`,
   REPORT_SITEUSAGESTORAGE: `${prefix} report siteusagestorage`,
   ROLEDEFINITION_LIST: `${prefix} roledefinition list`,
+  ROLEDEFINITION_REMOVE: `${prefix} roledefinition remove`,
   SEARCH: `${prefix} search`,
   SERVICEPRINCIPAL_GRANT_ADD: `${prefix} serviceprincipal grant add`,
   SERVICEPRINCIPAL_GRANT_LIST: `${prefix} serviceprincipal grant list`,

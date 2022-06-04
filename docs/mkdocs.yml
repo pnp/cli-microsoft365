@@ -458,6 +458,7 @@ nav:
         - report siteusagestorage: 'cmd/spo/report/report-siteusagestorage.md'
       - roledefinition:
         - roledefinition list: 'cmd/spo/roledefinition/roledefinition-list.md'
+        - roledefinition remove: 'cmd/spo/roledefinition/roledefinition-remove.md'
       - serviceprincipal:
         - serviceprincipal grant add: 'cmd/spo/serviceprincipal/serviceprincipal-grant-add.md'
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'
