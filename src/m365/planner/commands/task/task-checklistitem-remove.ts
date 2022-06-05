@@ -21,10 +21,17 @@ class PlannerTaskChecklistitemRemoveCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Removes the Checklistitem from the Planner task';
+    return 'Removes the checklist item from the planner task';
   }
+
   public defaultProperties(): string[] | undefined {
     return ['id', 'title', 'isChecked'];
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.confirm = (!(!args.options.confirm)).toString();
+    return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -36,7 +43,7 @@ class PlannerTaskChecklistitemRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the Checklist item from the Planner task?`
+        message: `Are you sure you want to remove the checklist item with id ${args.options.id} from the planner task?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -101,6 +108,7 @@ class PlannerTaskChecklistitemRemoveCommand extends GraphCommand {
         return Promise.resolve(etag);
       });
   }
+
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       { option: '-i, --id <id>' },
@@ -111,7 +119,6 @@ class PlannerTaskChecklistitemRemoveCommand extends GraphCommand {
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
   }
-
 }
 
 module.exports = new PlannerTaskChecklistitemRemoveCommand();
