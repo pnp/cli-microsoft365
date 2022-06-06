@@ -87,7 +87,6 @@ describe(commands.FILE_RENAME, () => {
     assert.strictEqual(actual, true);
   });
 
-
   it('should command complete successfully', (done) => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args) : Promise<any> => {
       if (command === fileRemoveCommand) {

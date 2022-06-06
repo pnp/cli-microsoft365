@@ -108,7 +108,6 @@ class SpoFileRenameCommand extends SpoCommand {
         }
         return Promise.reject(err);
       });
-
   }
 
   public options(): CommandOption[] {
