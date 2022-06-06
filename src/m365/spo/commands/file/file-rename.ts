@@ -42,23 +42,13 @@ class SpoFileRenameCommand extends SpoCommand {
     
     this
       .fileExists(originalFileServerRelativeUrl, webUrl)
-      .then((): Promise<void> => {
+      .then(_ => {
         if (args.options.force) {
-          const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(webUrl, args.options.sourceUrl.substring(0, args.options.sourceUrl.lastIndexOf('/')))}/${args.options.targetFileName}`;
-
-          const options: SpoFileRemoveOptions = {
-            webUrl: args.options.webUrl,
-            url: targetFileServerRelativeUrl,
-            recycle: true,
-            confirm: true
-          };
-
-          return Cli.executeCommand(removeCommand as Command, { options: { ...options, _: [] } });
-        }
-
+          return this.deleteTargetItem(webUrl, args.options.sourceUrl, args.options.targetFileName);
+        } 
         return Promise.resolve();
       })
-      .then((): Promise<void> => {
+      .then(_ => {
         const requestBody: any = {
           formValues : [{
             FieldName: 'FileLeafRef',
@@ -97,6 +87,28 @@ class SpoFileRenameCommand extends SpoCommand {
       responseType: 'json'
     };
     return request.get(requestOptions);
+  }
+
+  private deleteTargetItem(webUrl: string, sourceUrl: string, targetFileName: string): Promise<void> {
+    const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(webUrl,sourceUrl.substring(0, sourceUrl.lastIndexOf('/')))}/${targetFileName}`;
+
+    const options: SpoFileRemoveOptions = {
+      webUrl: webUrl,
+      url: targetFileServerRelativeUrl,
+      recycle: true,
+      confirm: true
+    };
+
+    return Cli.executeCommandWithOutput(removeCommand as Command, { options: { ...options, _: [] } })
+      .then(_ => {
+        return Promise.resolve();
+      }, (err: any) => {
+        if (err.error !== null && err.error.message !== null && err.error.message.includes('does not exist')) {
+          return Promise.resolve();
+        }
+        return Promise.reject(err);
+      });
+
   }
 
   public options(): CommandOption[] {

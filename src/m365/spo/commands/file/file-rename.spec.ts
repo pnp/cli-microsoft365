@@ -57,7 +57,7 @@ describe(commands.FILE_RENAME, () => {
     sinonUtil.restore([
       request.get, 
       request.post,
-      Cli.executeCommand
+      Cli.executeCommandWithOutput
     ]);
   });
 
@@ -89,7 +89,7 @@ describe(commands.FILE_RENAME, () => {
 
 
   it('should command complete successfully', (done) => {
-    sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args) : Promise<any> => {
       if (command === fileRemoveCommand) {
         if (args.options.webUrl === 'https://contoso.sharepoint.com/sites/portal') {
           return Promise.resolve();
@@ -133,7 +133,7 @@ describe(commands.FILE_RENAME, () => {
   });
 
   it('should command complete successfully with all options', (done) => {
-    sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args) : Promise<any> => {
       if (command === fileRemoveCommand) {
         if (args.options.webUrl === 'https://contoso.sharepoint.com/sites/portal') {
           return Promise.resolve();
@@ -211,12 +211,15 @@ describe(commands.FILE_RENAME, () => {
     });
   });
 
-
-  it('should continue if file not found when recycling', (done) => {
-    sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
+  it('should continue if file cannot be recycled because it does not exist', (done) => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
       if (command === fileRemoveCommand) {
         if (args.options.webUrl === 'https://contoso.sharepoint.com/sites/portal') {
-          return Promise.resolve();
+          return Promise.reject({
+            error: {
+              message: 'File does not exist'
+            }
+          });
         }
         return Promise.reject(new CommandError('Invalid URL'));
       }
@@ -248,6 +251,47 @@ describe(commands.FILE_RENAME, () => {
     }, () => {
       try {
         assert(loggerLogSpy.calledWith(renameResponseJson));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('should throw error if file cannot be recycled', (done) => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+      if (command === fileRemoveCommand) {
+        if (args.options.webUrl === 'https://contoso.sharepoint.com/sites/portal') {
+          return Promise.reject({
+            error: {
+              message: 'Locked for use'
+            }
+          });
+        }
+        return Promise.reject(new CommandError('Invalid URL'));
+      }
+      return Promise.reject(new CommandError('Unknown case'));
+    });
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`GetFileByServerRelativeUrl`) > -1) {
+        return Promise.resolve();
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options:
+      {
+        webUrl: 'https://contoso.sharepoint.com/sites/portal',
+        sourceUrl: 'Shared Documents/abc.pdf',
+        force: true,
+        targetFileName: 'def.pdf'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Locked for use')));
         done();
       }
       catch (e) {
