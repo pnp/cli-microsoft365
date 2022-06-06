@@ -28,6 +28,7 @@ interface Options extends GlobalOptions {
   assignedToUserNames?: string;
   description?: string;
   orderHint?: string;
+  priority?: number;
 }
 
 class PlannerTaskAddCommand extends GraphCommand {
@@ -57,6 +58,7 @@ class PlannerTaskAddCommand extends GraphCommand {
     telemetryProps.assignedToUserNames = typeof args.options.assignedToUserNames !== 'undefined';
     telemetryProps.description = typeof args.options.description !== 'undefined';
     telemetryProps.orderHint = typeof args.options.orderHint !== 'undefined';
+    telemetryProps.priority = typeof args.options.priority !== 'undefined';
     return telemetryProps;
   }
 
@@ -91,7 +93,8 @@ class PlannerTaskAddCommand extends GraphCommand {
             dueDateTime: args.options.dueDateTime,
             percentComplete: args.options.percentComplete,
             assignments: assignments,
-            orderHint: args.options.orderHint
+            orderHint: args.options.orderHint,
+            priority: args.options.priority
           }
         };
 
@@ -294,7 +297,8 @@ class PlannerTaskAddCommand extends GraphCommand {
       { option: '--assignedToUserIds [assignedToUserIds]' },
       { option: '--assignedToUserNames [assignedToUserNames]' },
       { option: '--description [description]' },
-      { option: '--orderHint [orderHint]' }
+      { option: '--orderHint [orderHint]' },
+      { option: '--priority [priority]' }
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -343,7 +347,7 @@ class PlannerTaskAddCommand extends GraphCommand {
     }
 
     if (args.options.percentComplete && (args.options.percentComplete < 0 || args.options.percentComplete > 100)) {
-      return `percentComplete should be between 0 and 100 `;
+      return `percentComplete should be between 0 and 100`;
     }
 
     if (args.options.assignedToUserIds && !validation.isValidGuidArray(args.options.assignedToUserIds.split(','))) {
@@ -352,6 +356,10 @@ class PlannerTaskAddCommand extends GraphCommand {
 
     if (args.options.assignedToUserIds && args.options.assignedToUserNames) {
       return 'Specify either assignedToUserIds or assignedToUserNames but not both';
+    }
+
+    if (args.options.priority && (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10)) {
+      return 'priority should be a number between 0 and 10';
     }
 
     return true;

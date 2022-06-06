@@ -337,6 +337,28 @@ describe(commands.TASK_SET, () => {
     done();
   });
 
+  it('fails validation if priority lower than 0 is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+        priority: -1
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if priority higher than 10 is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+        priority: 11
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
   it('passes validation when valid options specified', (done) => {
     const actual = command.validate({
       options: {
@@ -730,7 +752,7 @@ describe(commands.TASK_SET, () => {
     });
   });
 
-  it('correctly updates planner task with appliedCategories, bucketId, startDateTime, dueDateTime, percentComplete, assigneePriority, and orderHint', (done) => {
+  it('correctly updates planner task with appliedCategories, bucketId, startDateTime, dueDateTime, percentComplete, assigneePriority, orderHint and priority', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
@@ -760,7 +782,8 @@ describe(commands.TASK_SET, () => {
       dueDateTime: '2023-01-01T00:00:00Z',
       percentComplete: '50',
       assigneePriority: ' !',
-      orderHint: ' !'
+      orderHint: ' !',
+      priority: 3
     };
 
     command.action(logger, { options: options } as any, () => {

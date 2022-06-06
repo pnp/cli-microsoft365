@@ -422,6 +422,32 @@ describe(commands.TASK_ADD, () => {
     done();
   });
 
+  it('fails validation if priority lower than 0 is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        priority: -1
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if priority higher than 10 is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        priority: 11
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
   it('correctly adds planner task with title, planId, and bucketId', (done) => {
     const options: any = {
       title: 'My Planner Task',
