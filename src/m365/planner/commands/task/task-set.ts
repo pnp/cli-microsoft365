@@ -366,7 +366,7 @@ class PlannerTaskSetCommand extends GraphCommand {
       requestBody.orderHint = options.orderHint;
     }
 
-    if (options.priority != undefined) {
+    if (options.priority !== undefined) {
       requestBody.priority = options.priority;
     }
 
