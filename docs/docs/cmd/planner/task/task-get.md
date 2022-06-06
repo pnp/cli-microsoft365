@@ -1,6 +1,6 @@
 # planner task get
 
-Retrieve the the specified planner task
+Retrieve the specified planner task
 
 ## Usage
 
@@ -36,20 +36,15 @@ m365 planner task get [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Remarks
-
-!!! attention
-    This command uses an API that is currently in preview to enrich the results with the `priority` field. Keep in mind that this preview API is subject to change once the API reached general availability.
-
 ## Examples
 
-Retrieve the the specified planner task by id.
+Retrieve the specified planner task by id
 
 ```sh
-m365 planner task get --id 'vzCcZoOv-U27PwydxHB8opcADJo-'
+m365 planner task get --id "vzCcZoOv-U27PwydxHB8opcADJo-"
 ```
 
-Retrieve the the specified planner task with the title _My Planner Task_ from the bucket named _My Planner Bucket_. Based on the plan with the name _My Planner Plan_ owned by the group _My Planner Group_.
+Retrieve the specified planner task with the title _My Planner Task_ from the bucket named _My Planner Bucket_ based on the plan with the name _My Planner Plan_ owned by the group _My Planner Group_
 
 ```sh
 m365 planner task get --title "My Planner Task" --bucketName "My Planner Bucket" --planName "My Planner Plan" --ownerGroupName "My Planner Group"
