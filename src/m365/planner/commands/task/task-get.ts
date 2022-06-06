@@ -1,14 +1,13 @@
 import { Group, PlannerBucket, PlannerTask } from '@microsoft/microsoft-graph-types';
+import Auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
-import { accessToken } from '../../../../utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils';
+import { accessToken, validation } from '../../../../utils';
 import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import Auth from '../../../../Auth';
 
 interface CommandArgs {
   options: Options;
@@ -31,7 +30,20 @@ class PlannerTaskGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Retrieve the the specified planner task';
+    return 'Retrieve the specified planner task';
+  }
+
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.id = typeof args.options.id !== 'undefined';
+    telemetryProps.title = typeof args.options.title !== 'undefined';
+    telemetryProps.bucketId = typeof args.options.bucketId !== 'undefined';
+    telemetryProps.bucketName = typeof args.options.bucketName !== 'undefined';
+    telemetryProps.planId = typeof args.options.planId !== 'undefined';
+    telemetryProps.planName = typeof args.options.planName !== 'undefined';
+    telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
+    telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
+    return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -39,17 +51,17 @@ class PlannerTaskGetCommand extends GraphCommand {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
     }
-    
+
     this
       .getTaskId(args.options)
       .then(taskId => {
         const requestOptions: any = {
-          url: `${this.resource}/beta/planner/tasks/${encodeURIComponent(taskId)}`,
+          url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json'
-        }; 
+        };
 
         return request.get<{ value: PlannerTask }>(requestOptions);
       })
@@ -80,7 +92,7 @@ class PlannerTaskGetCommand extends GraphCommand {
       .then((response) => {
         const title = options.title as string;
         const tasks: PlannerTask[] | undefined = response.value.filter(val => val.title?.toLocaleLowerCase() === title.toLocaleLowerCase());
-        
+
         if (!tasks.length) {
           return Promise.reject(`The specified task ${options.title} does not exist`);
         }
@@ -114,7 +126,7 @@ class PlannerTaskGetCommand extends GraphCommand {
       .then((response) => {
         const bucketName = options.bucketName as string;
         const buckets: PlannerBucket[] | undefined = response.value.filter(val => val.name?.toLocaleLowerCase() === bucketName.toLocaleLowerCase());
-        
+
         if (!buckets.length) {
           return Promise.reject(`The specified bucket ${options.bucketName} does not exist`);
         }
@@ -155,7 +167,7 @@ class PlannerTaskGetCommand extends GraphCommand {
       .get<{ value: Group[] }>(requestOptions)
       .then(response => {
         const groups: Group[] | undefined = response.value;
-        
+
         if (!groups.length) {
           return Promise.reject(`The specified ownerGroup ${options.ownerGroupName} does not exist`);
         }
@@ -166,6 +178,12 @@ class PlannerTaskGetCommand extends GraphCommand {
 
         return Promise.resolve(groups[0].id as string);
       });
+  }
+
+  public optionSets(): string[][] | undefined {
+    return [
+      ['id', 'title']
+    ];
   }
 
   public options(): CommandOption[] {
@@ -183,7 +201,7 @@ class PlannerTaskGetCommand extends GraphCommand {
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
   }
-  
+
   public validate(args: CommandArgs): boolean | string {
     if (args.options.title && !args.options.bucketId && !args.options.bucketName) {
       return 'Specify either bucketId or bucketName when using title';
