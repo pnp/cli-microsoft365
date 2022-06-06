@@ -337,6 +337,50 @@ describe(commands.TASK_SET, () => {
     done();
   });
 
+  it('fails validation if priority lower than 0 is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+        priority: -1
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if priority higher than 10 is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+        priority: 11
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if priority is specified which is a number with decimals.', (done) => {
+    const actual = command.validate({
+      options: {
+        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+        priority: 5.6
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if unknown priority label is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+        priority: 'invalid'
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
   it('passes validation when valid options specified', (done) => {
     const actual = command.validate({
       options: {
@@ -398,6 +442,126 @@ describe(commands.TASK_SET, () => {
     }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct value for urgent priority', (done) => {
+    const requestPatchStub = sinon.stub(request, 'patch');
+    requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+        return Promise.resolve({
+          "@odata.etag": "TestEtag"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const options: any = {
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      priority: 'Urgent'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct value for important priority', (done) => {
+    const requestPatchStub = sinon.stub(request, 'patch');
+    requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+        return Promise.resolve({
+          "@odata.etag": "TestEtag"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const options: any = {
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      priority: 'Important'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 3);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct value for medium priority', (done) => {
+    const requestPatchStub = sinon.stub(request, 'patch');
+    requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+        return Promise.resolve({
+          "@odata.etag": "TestEtag"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const options: any = {
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      priority: 'Medium'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 5);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct value for low priority', (done) => {
+    const requestPatchStub = sinon.stub(request, 'patch');
+    requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
+        return Promise.resolve({
+          "@odata.etag": "TestEtag"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const options: any = {
+      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+      priority: 'Low'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 9);
         done();
       }
       catch (e) {
@@ -730,7 +894,7 @@ describe(commands.TASK_SET, () => {
     });
   });
 
-  it('correctly updates planner task with appliedCategories, bucketId, startDateTime, dueDateTime, percentComplete, assigneePriority, and orderHint', (done) => {
+  it('correctly updates planner task with appliedCategories, bucketId, startDateTime, dueDateTime, percentComplete, assigneePriority, orderHint and priority', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
@@ -760,7 +924,8 @@ describe(commands.TASK_SET, () => {
       dueDateTime: '2023-01-01T00:00:00Z',
       percentComplete: '50',
       assigneePriority: ' !',
-      orderHint: ' !'
+      orderHint: ' !',
+      priority: 3
     };
 
     command.action(logger, { options: options } as any, () => {

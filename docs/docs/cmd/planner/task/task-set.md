@@ -61,15 +61,25 @@ m365 planner task set [options]
 `--appliedCategories [appliedCategories]`
 : Comma-separated categories that should be added to the task
 
+`--priority [priority]`
+: Priority of the task: Urgent, Important, Medium, Low. Or an integer between 0 and 10 (check remarks section for more info).
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
-When you specify the value for `percentageComplete`, consider the following:
+When you specify the value for `percentComplete`, consider the following:
 
 - when set to 0, the task is considered _Not started_
 - when set between 1 and 99, the task is considered _In progress_
 - when set to 100, the task is considered _Completed_
+
+When you specify an integer value for `priority`, consider the following:
+
+- values 0 and 1 are interpreted as _Urgent_
+- values 2, 3 and 4 are interpreted as _Important_
+- values 5, 6 and 7 are interpreted as _Medium_
+- values 8, 9 and 10 are interpreted as _Low_
 
 You can add up to 6 categories to the task. An example to add _category1_ and _category3_ would be `category1,category3`.
 

@@ -10,6 +10,7 @@ import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import { AppliedCategories } from '../../AppliedCategories';
 import commands from '../../commands';
+import { taskPriority } from '../../taskPriority';
 
 interface CommandArgs {
   options: Options;
@@ -33,6 +34,7 @@ interface Options extends GlobalOptions {
   appliedCategories?: string;
   previewType?: string;
   orderHint?: string;
+  priority?: number | string;
 }
 
 class PlannerTaskAddCommand extends GraphCommand {
@@ -67,6 +69,7 @@ class PlannerTaskAddCommand extends GraphCommand {
     telemetryProps.appliedCategories = typeof args.options.appliedCategories !== 'undefined';
     telemetryProps.previewType = typeof args.options.previewType !== 'undefined';
     telemetryProps.orderHint = typeof args.options.orderHint !== 'undefined';
+    telemetryProps.priority = typeof args.options.priority !== 'undefined';
     return telemetryProps;
   }
 
@@ -92,7 +95,7 @@ class PlannerTaskAddCommand extends GraphCommand {
         const requestOptions: any = {
           url: `${this.resource}/v1.0/planner/tasks`,
           headers: {
-            'accept': 'application/json;odata.metadata=none'
+            accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json',
           data: {
@@ -105,7 +108,8 @@ class PlannerTaskAddCommand extends GraphCommand {
             assignments: assignments,
             orderHint: args.options.orderHint,
             assigneePriority: args.options.assigneePriority,
-            appliedCategories: appliedCategories
+            appliedCategories: appliedCategories,
+            priority: taskPriority.getPriorityValue(args.options.priority)
           }
         };
 
@@ -312,7 +316,8 @@ class PlannerTaskAddCommand extends GraphCommand {
         option: '--previewType [previewType]',
         autocomplete: this.allowedPreviewTypes
       },
-      { option: '--orderHint [orderHint]' }
+      { option: '--orderHint [orderHint]' },
+      { option: '--priority [priority]', autocomplete: taskPriority.priorityValues }
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -361,7 +366,7 @@ class PlannerTaskAddCommand extends GraphCommand {
     }
 
     if (args.options.percentComplete && (args.options.percentComplete < 0 || args.options.percentComplete > 100)) {
-      return `percentComplete should be between 0 and 100 `;
+      return `percentComplete should be between 0 and 100`;
     }
 
     if (args.options.assignedToUserIds && !validation.isValidGuidArray(args.options.assignedToUserIds.split(','))) {
@@ -377,7 +382,18 @@ class PlannerTaskAddCommand extends GraphCommand {
     }
 
     if (args.options.previewType && this.allowedPreviewTypes.indexOf(args.options.previewType.toLocaleLowerCase()) === -1) {
-      return `${args.options.previewType} is not a valid preview type value. Allowed values ${this.allowedPreviewTypes.join(', ')}`;
+      return `${args.options.previewType} is not a valid preview type value. Allowed values are ${this.allowedPreviewTypes.join(', ')}`;
+    }
+
+    if (args.options.priority !== undefined) {
+      if (typeof args.options.priority === "number") {
+        if (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10 || !Number.isInteger(args.options.priority)) {
+          return 'priority should be an integer between 0 and 10.';
+        }
+      }
+      else if (taskPriority.priorityValues.map(l => l.toLowerCase()).indexOf(args.options.priority.toString().toLowerCase()) === -1) {
+        return `${args.options.priority} is not a valid priority value. Allowed values are ${taskPriority.priorityValues.join('|')}.`;
+      }
     }
 
     return true;

@@ -435,6 +435,19 @@ describe(commands.TASK_ADD, () => {
     done();
   });
 
+  it('fails validation if priority lower than 0 is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        priority: -1
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
   it('fails validation if incorrect previewType is specified.', (done) => {
     const actual = command.validate({
       options: {
@@ -442,6 +455,45 @@ describe(commands.TASK_ADD, () => {
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
         previewType: "test"
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if priority higher than 10 is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        priority: 11
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if priority is specified which is a number with decimals.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        priority: 5.6
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if unknown priority label is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        priority: 'invalid'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -759,6 +811,98 @@ describe(commands.TASK_ADD, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         assert(loggerLogSpy.calledWith(taskAddResponseWithDetails));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct value for urgent priority', (done) => {
+    sinonUtil.restore(request.post);
+    const requestPostStub = sinon.stub(request, 'post');
+    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
+
+    const options: any = {
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: 'Urgent'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct value for important priority', (done) => {
+    sinonUtil.restore(request.post);
+    const requestPostStub = sinon.stub(request, 'post');
+    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
+
+    const options: any = {
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: 'Important'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 3);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct value for medium priority', (done) => {
+    sinonUtil.restore(request.post);
+    const requestPostStub = sinon.stub(request, 'post');
+    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
+
+    const options: any = {
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: 'Medium'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 5);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct value for low priority', (done) => {
+    sinonUtil.restore(request.post);
+    const requestPostStub = sinon.stub(request, 'post');
+    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
+
+    const options: any = {
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: 'Low'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 9);
         done();
       }
       catch (e) {

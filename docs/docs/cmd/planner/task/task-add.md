@@ -39,9 +39,6 @@ m365 planner task add [options]
 
 `--percentComplete [percentComplete]`
 : Percentage of task completion. Number between 0 and 100.
-  - When set to 0, the task is considered _Not started_. 
-  - When set between 1 and 99, the task is considered _In progress_.
-  - When set to 100, the task is considered _Completed_.
 
 `--assignedToUserIds [assignedToUserIds]`
 : The comma-separated IDs of the assignees the task is assigned to. Specify either `assignedToUserIds` or `assignedToUserNames` but not both.
@@ -64,7 +61,25 @@ m365 planner task add [options]
 `--orderHint [orderHint]`
 : Hint used to order items of this type in a list view. The format is defined as outlined [here](https://docs.microsoft.com/graph/api/resources/planner-order-hint-format?view=graph-rest-1.0).
 
+`--priority [priority]`
+: Priority of the task: Urgent, Important, Medium, Low. Or an integer between 0 and 10 (check remarks section for more info). Default value is Medium.
+
 --8<-- "docs/cmd/_global.md"
+
+## Remarks
+
+When you specify the value for `percentComplete`, consider the following:
+
+- when set to 0, the task is considered _Not started_
+- when set between 1 and 99, the task is considered _In progress_
+- when set to 100, the task is considered _Completed_
+
+When you specify an integer value for `priority`, consider the following:
+
+- values 0 and 1 are interpreted as _Urgent_
+- values 2, 3 and 4 are interpreted as _Important_
+- values 5, 6 and 7 are interpreted as _Medium_
+- values 8, 9 and 10 are interpreted as _Low_
 
 ## Examples
 
