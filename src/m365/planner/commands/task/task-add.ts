@@ -38,6 +38,7 @@ class PlannerTaskAddCommand extends GraphCommand {
   private planId: string | undefined;
   private bucketId: string | undefined;
   private allowedAppliedCategories: string[] = ['category1', 'category2', 'category3', 'category4', 'category5', 'category6'];
+  private allowedPreviewTypes: string[] = ['automatic', 'nopreview', 'checklist', 'description', 'reference'];
 
   public get name(): string {
     return commands.TASK_ADD;
@@ -331,8 +332,14 @@ class PlannerTaskAddCommand extends GraphCommand {
       { option: '--assignedToUserNames [assignedToUserNames]' },
       { option: '--assigneePriority [assigneePriority]' },
       { option: '--description [description]' },
-      { option: '--appliedCategories [appliedCategories]' },
-      { option: '--previewType [previewType]' },
+      { 
+        option: '--appliedCategories [appliedCategories]', 
+        autocomplete: this.allowedAppliedCategories 
+      },
+      { 
+        option: '--previewType [previewType]', 
+        autocomplete: this.allowedPreviewTypes 
+      },
       { option: '--orderHint [orderHint]' }
     ];
 
@@ -394,11 +401,11 @@ class PlannerTaskAddCommand extends GraphCommand {
     }
 
     if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => this.allowedAppliedCategories.indexOf(category.toLocaleLowerCase()) < 0).length !== 0) {
-      return 'The appliedCategories contains invalid value. Specify either category1, category2, category3, category4, category5 and/or category6 as properties';
+      return `The appliedCategories contains invalid value. Specify either ${this.allowedAppliedCategories.join(', ')} as properties`;
     }
 
-    if (args.options.previewType && ['automatic', 'nopreview', 'checklist', 'description', 'reference'].indexOf(args.options.previewType.toLocaleLowerCase()) === -1) {
-      return `${args.options.previewType} is not a valid preview type value. Allowed values automatic|noPreview|checklist|description|reference`;
+    if (args.options.previewType && this.allowedPreviewTypes.indexOf(args.options.previewType.toLocaleLowerCase()) === -1) {
+      return `${args.options.previewType} is not a valid preview type value. Allowed values ${this.allowedPreviewTypes.join(', ')}`;
     } 
 
     return true;
