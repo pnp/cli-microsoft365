@@ -22,10 +22,6 @@ interface Options extends GlobalOptions {
   ownerGroupName?: string;
 }
 
-interface BetaPlannerTask extends PlannerTask {
-  priority?: number;
-}
-
 class PlannerTaskListCommand extends GraphCommand {
   public get name(): string {
     return commands.TASK_LIST;
@@ -69,9 +65,9 @@ class PlannerTaskListCommand extends GraphCommand {
           bucketId = retrievedBucketId;
           return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`);
         })
-        .then((tasks): Promise<BetaPlannerTask[]> => {
+        .then((tasks): Promise<PlannerTask[]> => {
           taskItems = tasks;
-          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/planner/buckets/${bucketId}/tasks`);
+          return odata.getAllItems<PlannerTask>(`${this.resource}/beta/planner/buckets/${bucketId}/tasks`);
         })
         .then((betaTasks): void => {
           logger.log(this.mergeTaskPriority(taskItems, betaTasks));
@@ -85,9 +81,9 @@ class PlannerTaskListCommand extends GraphCommand {
           planId = retrievedPlanId;
           return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/plans/${planId}/tasks`);
         })
-        .then((tasks): Promise<BetaPlannerTask[]> => {
+        .then((tasks): Promise<PlannerTask[]> => {
           taskItems = tasks;
-          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/planner/plans/${planId}/tasks`);
+          return odata.getAllItems<PlannerTask>(`${this.resource}/beta/planner/plans/${planId}/tasks`);
         })
         .then((betaTasks): void => {
           logger.log(this.mergeTaskPriority(taskItems, betaTasks));
@@ -97,9 +93,9 @@ class PlannerTaskListCommand extends GraphCommand {
     else {
       odata
         .getAllItems<PlannerTask>(`${this.resource}/v1.0/me/planner/tasks`)
-        .then((tasks): Promise<BetaPlannerTask[]> => {
+        .then((tasks): Promise<PlannerTask[]> => {
           taskItems = tasks;
-          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/me/planner/tasks`);
+          return odata.getAllItems<PlannerTask>(`${this.resource}/beta/me/planner/tasks`);
         })
         .then((betaTasks): void => {
           logger.log(this.mergeTaskPriority(taskItems, betaTasks));
@@ -173,7 +169,7 @@ class PlannerTaskListCommand extends GraphCommand {
       });
   }
 
-  private mergeTaskPriority(taskItems: PlannerTask[], betaTaskItems: BetaPlannerTask[]): BetaPlannerTask[] {
+  private mergeTaskPriority(taskItems: PlannerTask[], betaTaskItems: PlannerTask[]): PlannerTask[] {
     const findBetaTask = (id: string) => betaTaskItems.find(task => task.id === id);
 
     taskItems.forEach(task => {
