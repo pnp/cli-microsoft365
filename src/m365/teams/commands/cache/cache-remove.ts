@@ -58,10 +58,10 @@ class TeamsCacheRemoveCommand extends GraphCommand {
   private async clearTeamsCache(logger: Logger, cb: (err?: any) => void): Promise<void> {
     try {
       await this.killRunningProcess(logger);
-      await this.removeCachingFiles(logger);      
+      await this.removeCacheFiles(logger);      
     } 
-    catch {
-      logger.logToStderr('Teams cache not found');
+    catch (e: any) {
+      logger.logToStderr(e.message as string);
       cb();
       return;
     }
@@ -95,21 +95,28 @@ class TeamsCacheRemoveCommand extends GraphCommand {
       const cmdOutput = await this.exec(cmd);
 
       if (cmdOutput.stdout !== '' && platform === 'darwin') {
-        await this.exec(`process.kill(${cmdOutput.stdout})`);
+        process.kill(cmdOutput.stdout);
       }
 
       if (this.verbose) {
         logger.logToStderr('Teams client closed');
       }
     }
-    catch { 
-      if (this.verbose) {
-        logger.logToStderr('Teams client isn\'t running');
+    catch (e: any) { 
+      const errorMessage = e.message as string;
+
+      if (errorMessage.includes('ERROR: The process "Teams.exe" not found.')) {
+        if (this.verbose) {
+          logger.logToStderr('Teams client isn\'t running');
+        }
+      } 
+      else {
+        throw new Error(errorMessage);
       }
     }
   }
 
-  private async removeCachingFiles(logger: Logger): Promise<void> {
+  private async removeCacheFiles(logger: Logger): Promise<void> {
     if (this.verbose) {
       logger.logToStderr('Clear Teams cached files');
     }
@@ -122,7 +129,7 @@ class TeamsCacheRemoveCommand extends GraphCommand {
         cmd = 'cd %userprofile% && rmdir /s /q AppData\\Roaming\\Microsoft\\Teams'; 
         break;
       case 'darwin': 
-        cmd = 'rm -r ~/Library/Application\ Support/Microsoft/Teams'; 
+        cmd = 'rm -r ~/Library/Application\\ Support/Microsoft/Teams'; 
         break;
     }
 
@@ -130,7 +137,12 @@ class TeamsCacheRemoveCommand extends GraphCommand {
       logger.logToStderr(cmd);
     }
 
-    await this.exec(cmd);
+    try {
+      await this.exec(cmd);
+    }
+    catch (e: any) { 
+      throw new Error(e.message as string);
+    }
   }
 
   private exec = util.promisify(require('child_process').exec);

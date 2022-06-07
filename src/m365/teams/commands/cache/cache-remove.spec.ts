@@ -130,7 +130,7 @@ describe(commands.CACHE_REMOVE, () => {
   it('fails to remove teams cache when exec fails', (done) => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
-    const error = new Error("some fake error");
+    const error = new Error('ERROR: The process "Teams.exe" not found.');
     const exec = sinon.stub(command, 'exec' as any).throws(error);
 
     command.action(logger, { options: {
@@ -148,14 +148,14 @@ describe(commands.CACHE_REMOVE, () => {
     });
   });
 
-  it('removes Teams cache from macOs platform without prompting.', (done) => {
-    sinon.stub(process, 'platform').value('darwin');
+  it('fails to remove teams cache when exec fails randomly', (done) => {
+    sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
-    const exec = sinon.stub(command, 'exec' as any).returns({stdout: 'pid'});
+    const error = new Error('random error');
+    const exec = sinon.stub(command, 'exec' as any).throws(error);
 
     command.action(logger, { options: {
-      confirm: true,
-      verbose: true
+      confirm: true
     }}, () => {
       try {
         assert(true);
@@ -168,10 +168,33 @@ describe(commands.CACHE_REMOVE, () => {
     });
   });
 
+  it('removes Teams cache from macOs platform without prompting.', (done) => {
+    sinon.stub(process, 'platform').value('darwin');
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    const exec = sinon.stub(command, 'exec' as any).returns({stdout: 'pid'});
+    const kill = sinon.stub(process, 'kill' as any).returns(null);
+
+
+    command.action(logger, { options: {
+      confirm: true,
+      verbose: true
+    }}, () => {
+      try {
+        assert(true);
+        exec.restore();
+        kill.restore();
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('removes Teams cache from win32 platform without prompting.', (done) => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
-    const exec = sinon.stub(command, 'exec' as any).returns(null);
+    const exec = sinon.stub(command, 'exec' as any).returns({stdout: ''});
 
     command.action(logger, { options: {
       confirm: true,
@@ -191,7 +214,8 @@ describe(commands.CACHE_REMOVE, () => {
   it('removes Teams cache from darwin platform with prompting.', (done) => {
     sinon.stub(process, 'platform').value('darwin');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
-    const exec = sinon.stub(command, 'exec' as any).returns(null);
+    const exec = sinon.stub(command, 'exec' as any).returns({stdout: 'pid'});
+    const kill = sinon.stub(process, 'kill' as any).returns(null);
 
     command.action(logger, { options: { 
       debug: true
@@ -199,6 +223,7 @@ describe(commands.CACHE_REMOVE, () => {
       try {
         assert(true);
         exec.restore();
+        kill.restore();
         done();
       }
       catch (e) {
