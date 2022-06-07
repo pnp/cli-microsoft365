@@ -1,4 +1,4 @@
-# aad approleassignment add
+# aad approleassignment remove
 
 Deletes an app role assignment for the specified Azure AD Application Registration
 

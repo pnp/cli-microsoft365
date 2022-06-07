@@ -63,6 +63,9 @@ interface Options extends GlobalOptions {
   scopeName?: string;
   uri?: string;
   withSecret: boolean;
+  certificateFile?: string;
+  certificateBase64Encoded?: string;
+  certificateDisplayName?: string;
 }
 
 class AadAppAddCommand extends GraphCommand {
@@ -92,6 +95,9 @@ class AadAppAddCommand extends GraphCommand {
     telemetryProps.scopeName = typeof args.options.scopeName !== 'undefined';
     telemetryProps.uri = typeof args.options.uri !== 'undefined';
     telemetryProps.withSecret = args.options.withSecret;
+    telemetryProps.certificateFile = typeof args.options.certificateFile !== 'undefined';
+    telemetryProps.certificateBase64Encoded = typeof args.options.certificateBase64Encoded !== 'undefined';
+    telemetryProps.certificateDisplayName = typeof args.options.certificateDisplayName !== 'undefined';
     return telemetryProps;
   }
 
@@ -129,7 +135,7 @@ class AadAppAddCommand extends GraphCommand {
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
-  private createAppRegistration(args: CommandArgs, apis: RequiredResourceAccess[], logger: Logger): Promise<AppInfo> {
+  private async createAppRegistration(args: CommandArgs, apis: RequiredResourceAccess[], logger: Logger): Promise<AppInfo> {
     const applicationInfo: any = {
       displayName: args.options.name,
       signInAudience: args.options.multitenant ? 'AzureADMultipleOrgs' : 'AzureADMyOrg'
@@ -158,6 +164,19 @@ class AadAppAddCommand extends GraphCommand {
         enableAccessTokenIssuance: true,
         enableIdTokenIssuance: true
       };
+    }
+
+    if (args.options.certificateFile || args.options.certificateBase64Encoded) {
+      const certificateBase64Encoded = this.getCertificateBase64Encoded(args, logger);
+
+      const newKeyCredential = {
+        type: "AsymmetricX509Cert",
+        usage: "Verify",
+        displayName: args.options.certificateDisplayName,
+        key: certificateBase64Encoded
+      } as any;
+
+      applicationInfo.keyCredentials = [newKeyCredential];
     }
 
     if (this.verbose) {
@@ -568,6 +587,23 @@ class AadAppAddCommand extends GraphCommand {
       }));
   }
 
+  private getCertificateBase64Encoded(args: CommandArgs, logger: Logger): string {
+    if (args.options.certificateBase64Encoded) {
+      return args.options.certificateBase64Encoded;
+    }
+
+    if (this.debug) {
+      logger.logToStderr(`Reading existing ${args.options.certificateFile}...`);
+    }
+
+    try {
+      return fs.readFileSync(args.options.certificateFile as string, { encoding: 'base64' });
+    }
+    catch (e) {
+      throw new Error(`Error reading certificate file: ${e}. Please add the certificate using base64 option '--certificateBase64Encoded'.`);
+    }
+  }
+
   private saveAppInfo(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
     if (!args.options.save) {
       return Promise.resolve(appInfo);
@@ -660,6 +696,15 @@ class AadAppAddCommand extends GraphCommand {
         option: '--scopeAdminConsentDescription [scopeAdminConsentDescription]'
       },
       {
+        option: '--certificateFile [certificateFile]'
+      },
+      {
+        option: '--certificateBase64Encoded [certificateBase64Encoded]'
+      },
+      {
+        option: '--certificateDisplayName [certificateDisplayName]'
+      },
+      {
         option: '--manifest [manifest]'
       },
       {
@@ -683,6 +728,18 @@ class AadAppAddCommand extends GraphCommand {
 
     if (args.options.redirectUris && !args.options.platform) {
       return `When you specify redirectUris you also need to specify platform`;
+    }
+
+    if (args.options.certificateFile && args.options.certificateBase64Encoded) {
+      return 'Specify either certificateFile or certificateBase64Encoded but not both';
+    }
+
+    if (args.options.certificateDisplayName && !args.options.certificateFile && !args.options.certificateBase64Encoded) {
+      return 'When you specify certificateDisplayName you also need to specify certificateFile or certificateBase64Encoded';
+    }
+
+    if (args.options.certificateFile && !fs.existsSync(args.options.certificateFile as string)) {
+      return 'Certificate file not found';
     }
 
     if (args.options.scopeName) {
