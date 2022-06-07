@@ -6,6 +6,11 @@
 
 - fixed 'planner task get' [#3324](https://github.com/pnp/cli-microsoft365/issues/3324)
 - extended spo list view add command with viewQuery option [#1862](https://github.com/pnp/cli-microsoft365/issues/1862)
+- updated planner task list options docs [#3347](https://github.com/pnp/cli-microsoft365/issues/3347)
+- updated PowerShell comparison docs [#3332](https://github.com/pnp/cli-microsoft365/issues/3332)
+- added short options to planner bucket commands [#3343](https://github.com/pnp/cli-microsoft365/issues/3343)
+- fixed spo listitem roleinheritance break docs option description formatting [#3358](https://github.com/pnp/cli-microsoft365/issues/3358)
+- added support for upgrading SPFx projects to v1.15.0-rc.0 [#3376](https://github.com/pnp/cli-microsoft365/issues/3376)
 
 ## [v5.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.3.0)
 
