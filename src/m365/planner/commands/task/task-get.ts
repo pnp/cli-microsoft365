@@ -76,7 +76,7 @@ class PlannerTaskGetCommand extends GraphCommand {
 
   private getTask(taskId: string): Promise<PlannerTask> {
     const requestOptions: any = {
-      url: `${this.resource}/beta/planner/tasks/${encodeURIComponent(taskId)}`,
+      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
