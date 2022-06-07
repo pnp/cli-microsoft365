@@ -444,7 +444,7 @@ describe(commands.TASK_GET, () => {
     });
   });
 
-  it('Correctly gets task by name', (done) => {
+  it('correctly gets task by name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'&$select=id`) {
         return Promise.resolve(singleGroupResponse);
@@ -486,7 +486,7 @@ describe(commands.TASK_GET, () => {
     });
   });
 
-  it('Correctly gets task by name with group ID', (done) => {
+  it('correctly gets task by name with group ID', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return Promise.resolve(singlePlanResponse);
@@ -525,7 +525,7 @@ describe(commands.TASK_GET, () => {
     });
   });
 
-  it('Correctly gets task by task ID', (done) => {
+  it('correctly gets task by task ID', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/${encodeURIComponent(validTaskId)}`) {
         return Promise.resolve(taskResponse);
@@ -553,7 +553,7 @@ describe(commands.TASK_GET, () => {
   });
 
   // This test has been added to support task details get alias. Needs to be removed when deprecation is removed. 
-  it('Correctly gets task by task ID from task details get', (done) => {
+  it('correctly gets task by task ID from task details get', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/${encodeURIComponent(validTaskId)}`) {
         return Promise.resolve(taskResponse);
