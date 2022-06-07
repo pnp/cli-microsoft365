@@ -532,7 +532,7 @@ describe(commands.TASK_GET, () => {
 
   it('correctly gets task by task ID', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/${encodeURIComponent(validTaskId)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}`) {
         return Promise.resolve(taskResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
@@ -560,7 +560,7 @@ describe(commands.TASK_GET, () => {
   // This test has been added to support task details get alias. Needs to be removed when deprecation is removed. 
   it('correctly gets task by task ID from task details get', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/${encodeURIComponent(validTaskId)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}`) {
         return Promise.resolve(taskResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
