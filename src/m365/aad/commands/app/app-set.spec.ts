@@ -104,6 +104,46 @@ describe(commands.APP_SET, () => {
     });
   });
 
+  it('updates multiple URIs for the specified appId', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq 'bc724b77-da87-43a9-b385-6ebaaf969db8'&$select=id`) {
+        return Promise.resolve({
+          value: [{
+            id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
+          }]
+        });
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+    sinon.stub(request, 'patch').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
+        opts.data &&
+        opts.data.identifierUris[0] === 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' &&
+        opts.data.identifierUris[1] === 'api://testapi') {
+        return Promise.resolve();
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+        uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8,api://testapi'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', err?.message);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('updates uri for the specified objectId', (done) => {
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
@@ -120,6 +160,35 @@ describe(commands.APP_SET, () => {
         debug: false,
         objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
         uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', err?.message);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('updates multiple URIs for the specified objectId', (done) => {
+    sinon.stub(request, 'patch').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
+        opts.data &&
+        opts.data.identifierUris[0] === 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' &&
+        opts.data.identifierUris[1] === 'api://testapi') {
+        return Promise.resolve();
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+        uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8,api://testapi'
       }
     }, (err?: any) => {
       try {
@@ -159,6 +228,46 @@ describe(commands.APP_SET, () => {
         debug: true,
         name: 'My app',
         uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', err?.message);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('updates multiple URIs for the specified name', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
+        return Promise.resolve({
+          value: [{
+            id: '5b31c38c-2584-42f0-aa47-657fb3a84230'
+          }]
+        });
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+    sinon.stub(request, 'patch').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230' &&
+        opts.data &&
+        opts.data.identifierUris[0] === 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' &&
+        opts.data.identifierUris[1] === 'api://testapi') {
+        return Promise.resolve();
+      }
+
+      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        name: 'My app',
+        uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8,api://testapi'
       }
     }, (err?: any) => {
       try {
