@@ -32,5 +32,5 @@ m365 spo file checkout --webUrl https://contoso.sharepoint.com/sites/project-x -
 Checks out file with server-relative url _/sites/project-x/documents/Test1.docx_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo file checkout --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx'
+m365 spo file checkout --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx'
 ```
