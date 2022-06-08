@@ -2,10 +2,10 @@ const prefix: string = 'planner';
 
 export default {
   BUCKET_ADD: `${prefix} bucket add`,
+  BUCKET_GET: `${prefix} bucket get`,
   BUCKET_LIST: `${prefix} bucket list`,
   BUCKET_SET: `${prefix} bucket set`,
   BUCKET_REMOVE: `${prefix} bucket remove`,
-  BUCKET_GET: `${prefix} bucket get`,
   PLAN_ADD: `${prefix} plan add`,
   PLAN_DETAILS_GET: `${prefix} plan details get`,
   PLAN_GET: `${prefix} plan get`,
@@ -16,5 +16,6 @@ export default {
   TASK_LIST: `${prefix} task list`,
   TASK_REFERENCE_ADD: `${prefix} task reference add`,
   TASK_REFERENCE_LIST: `${prefix} task reference list`,
+  TASK_REMOVE: `${prefix} task remove`,
   TASK_SET: `${prefix} task set`
 };
