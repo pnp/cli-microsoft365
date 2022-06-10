@@ -6,7 +6,12 @@
 
 **Planner:**
 
+- [planner task checklistitem add](../cmd/planner/task/task-checklistitem-add.md) - adds a new checklist item to a Planner task [#3280](https://github.com/pnp/cli-microsoft365/issues/3280)
 - [planner task remove](../cmd/planner/task/task-remove.md) - removes a Microsoft Planner task [#3227](https://github.com/pnp/cli-microsoft365/issues/3227)
+
+**SharePoint Online:**
+
+- [spo roledefinition remove](../cmd/spo/roledefinition/roledefinition-remove.md) - removes the role definition from the specified site [#3272](https://github.com/pnp/cli-microsoft365/issues/3272)
 
 ### Changes
 
@@ -22,6 +27,8 @@
 - fixed invalid ISO date pattern with 7 milliseconds digits [#3372](https://github.com/pnp/cli-microsoft365/issues/3372)
 - fixed documentation for spo file checkout [#3388](https://github.com/pnp/cli-microsoft365/pull/3388)
 - fixed issue with mkdocs serve because of pygments version [#3389](https://github.com/pnp/cli-microsoft365/issues/3389)
+- fixed spo listitem list options [#3361](https://github.com/pnp/cli-microsoft365/issues/3361)
+- added aadGroup utils class [#3267](https://github.com/pnp/cli-microsoft365/issues/3267)
 
 ## [v5.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.3.0)
 
