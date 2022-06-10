@@ -46,6 +46,7 @@ export interface ListInstance {
   ParentWebPath: any;
   ParentWebUrl: string;
   ParserDisabled: boolean;
+  RoleAssignments: RoleAssignment[];
   ServerTemplateCanCreateFolders: boolean;
   TemplateFeatureId: string;
   Title: string;
@@ -55,4 +56,13 @@ export interface ListInstance {
 
 export interface RootFolder {
   ServerRelativeUrl: string;
+}
+
+export interface RoleAssignment {
+  Member: Member;
+}
+
+export interface Member {
+  PrincipalType: number;
+  PrincipalTypeString: string;
 }
