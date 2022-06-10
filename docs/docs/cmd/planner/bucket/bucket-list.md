@@ -14,7 +14,10 @@ m365 planner bucket list [options]
 : ID of the plan to list the buckets of. Specify either `planId` or `planTitle` but not both.
 
 `--planTitle [planTitle]`
-: Name of the plan to list the buckets of. Specify either `planId` or `planTitle` but not both.
+: Title of the plan to list the buckets of. Specify either `planId` or `planTitle` but not both.
+
+`--planName [planName]`
+: (deprecated. Use `planTitle` instead) Plan Title to which the bucket belongs.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.

@@ -17,7 +17,10 @@ m365 planner bucket add [options]
 : Plan ID to which the bucket belongs. Specify either `planId` or `planTitle` but not both.
 
 `--planTitle [planTitle]`
-: Plan Name to which the bucket belongs. Specify either `planId` or `planTitle` but not both.
+: Plan Title to which the bucket belongs. Specify either `planId` or `planTitle` but not both.
+
+`--planName [planName]`
+: (deprecated. Use `planTitle` instead) Plan Title to which the bucket belongs.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.

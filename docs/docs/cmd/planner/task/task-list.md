@@ -20,7 +20,10 @@ m365 planner task list [options]
 : ID of the plan to list the tasks of. Specify `planId` or `planTitle` when using `bucketName`.
 
 `--planTitle [planTitle]`
-: Name of the plan to list the tasks of. Specify `planId` or `planTitle` when using `bucketName`.
+: Title of the plan to list the tasks of. Specify `planId` or `planTitle` when using `bucketName`.
+
+`--planName [planName]`
+: (deprecated. Use `planTitle` instead) Plan Title to which the bucket belongs.
 
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
