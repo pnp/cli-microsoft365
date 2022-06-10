@@ -1,4 +1,5 @@
 export interface ListInstance {
+  RoleAssignments: RoleAssignment[];
   AllowContentTypes: boolean;
   BaseTemplate: number;
   BaseType: number;
@@ -55,4 +56,13 @@ export interface ListInstance {
 
 export interface RootFolder {
   ServerRelativeUrl: string;
+}
+
+export interface RoleAssignment {
+  Member: Member;
+}
+
+export interface Member {
+  PrincipalType: number;
+  PrincipalTypeString: string;
 }

@@ -8,6 +8,7 @@ import { formatting, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { ListInstance } from "./ListInstance";
+import { ListPrincipalType } from './ListPrincipalType';
 
 interface CommandArgs {
   options: Options;
@@ -67,6 +68,13 @@ class SpoListGetCommand extends SpoCommand {
     request
       .get<ListInstance>(requestOptions)
       .then((listInstance: ListInstance): void => {
+        if (args.options.withPermissions) {
+          // Add custom property "PrincipalTypeString"
+          listInstance.RoleAssignments.forEach(r => {
+            r.Member.PrincipalTypeString = ListPrincipalType[r.Member.PrincipalType];
+          });
+        }
+
         logger.log(listInstance);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
