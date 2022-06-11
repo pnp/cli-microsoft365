@@ -45,7 +45,7 @@ class TeamsTeamGetCommand extends GraphCommand {
     }
 
     return aadGroup
-      .getGroupByDisplayName(args.options.teamName!)
+      .getGroupByDisplayName(args.options.name!)
       .then(group => {
         if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
           return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
