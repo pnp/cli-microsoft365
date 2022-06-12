@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { urlUtil, validation } from '../../../../utils';
+import { formatting, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -42,15 +42,15 @@ class SpoFieldListCommand extends SpoCommand {
     let listUrl: string = '';
 
     if (args.options.listId) {
-      listUrl = `lists(guid'${encodeURIComponent(args.options.listId)}')/`;
+      listUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
     }
     else if (args.options.listTitle) {
-      listUrl = `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/`;
+      listUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/`;
     }
     else if (args.options.listUrl) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
 
-      listUrl = `GetList('${encodeURIComponent(listServerRelativeUrl)}')/`;
+      listUrl = `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
     }
 
     const requestOptions: any = {

@@ -11,6 +11,7 @@ const dictionary = [
   'assets',
   'bin',
   'catalog',
+  'checklist',
   'client',
   'comm',
   'content',

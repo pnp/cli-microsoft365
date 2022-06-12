@@ -28,19 +28,6 @@ describe(commands.BUCKET_GET, () => {
     ]
   };
 
-  const multipleGroupResponse = {
-    "value": [
-      {
-        "id": validOwnerGroupId,
-        "displayName": validOwnerGroupName
-      },
-      {
-        "id": validOwnerGroupId,
-        "displayName": validOwnerGroupName
-      }
-    ]
-  };
-
   const singlePlanResponse = {
     "value": [
       {
@@ -251,58 +238,6 @@ describe(commands.BUCKET_GET, () => {
       }
     });
     assert.strictEqual(actual, true);
-  });
-
-  it('fails validation when no groups found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
-        return Promise.resolve({"value": []});
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    command.action(logger, {
-      options: {
-        name: validBucketName,
-        planName: validPlanName,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified owner group ${validOwnerGroupName} does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails validation when multiple groups found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
-        return Promise.resolve(multipleGroupResponse);
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    command.action(logger, {
-      options: {
-        name: validBucketName,
-        planName: validPlanName,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple owner groups with name ${validOwnerGroupName} found: ${multipleGroupResponse.value.map(x => x.id)}`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('fails validation when no buckets found', (done) => {
