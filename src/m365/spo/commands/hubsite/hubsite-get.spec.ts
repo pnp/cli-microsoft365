@@ -73,7 +73,7 @@ describe(commands.HUBSITE_GET, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets();
-    assert.deepStrictEqual(optionSets, [['id', 'title', 'siteUrl']]);
+    assert.deepStrictEqual(optionSets, [['id', 'title', 'url']]);
   });
 
   it('gets information about the specified hub site', (done) => {
@@ -295,7 +295,7 @@ describe(commands.HUBSITE_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it(`fails validation if the specified siteUrl is invalid`, () => {
+  it(`fails validation if the specified url is invalid`, () => {
     const actual = command.validate({ options: {
       url: '/'
     } });

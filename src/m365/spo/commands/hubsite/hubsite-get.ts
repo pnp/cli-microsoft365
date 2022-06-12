@@ -95,7 +95,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
 
   public optionSets(): string[][] | undefined {
     return [
-      ['id', 'title', 'siteUrl']
+      ['id', 'title', 'url']
     ];
   }
 
