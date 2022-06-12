@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils';
+import { formatting, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -39,20 +39,19 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
-
     const removeWebhook: () => void = (): void => {
       if (this.verbose) {
+        const list: string = (args.options.listId ? args.options.listId : args.options.listTitle) as string;
         logger.logToStderr(`Webhook ${args.options.id} is about to be removed from list ${list} located at site ${args.options.webUrl}...`);
       }
 
       let requestUrl: string = '';
 
       if (args.options.listId) {
-        requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/Subscriptions('${encodeURIComponent(args.options.id)}')`;
+        requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/Subscriptions('${formatting.encodeQueryParameter(args.options.id)}')`;
       }
       else {
-        requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/Subscriptions('${encodeURIComponent(args.options.id)}')`;
+        requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/Subscriptions('${formatting.encodeQueryParameter(args.options.id)}')`;
       }
 
       const requestOptions: any = {
@@ -82,7 +81,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove webhook ${args.options.id} from list ${list} located at site ${args.options.webUrl}?`
+        message: `Are you sure you want to remove webhook ${args.options.id} from list ${args.options.listTitle || args.options.listId} located at site ${args.options.webUrl}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

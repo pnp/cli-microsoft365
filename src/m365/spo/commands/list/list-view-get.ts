@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { urlUtil, validation } from '../../../../utils';
+import { formatting, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -45,18 +45,18 @@ class SpoListViewGetCommand extends SpoCommand {
     let listRestUrl: string = '';
 
     if (args.options.listId) {
-      listRestUrl = `/lists(guid'${encodeURIComponent(args.options.listId)}')`;
+      listRestUrl = `/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
     }
     else if (args.options.listTitle) {
-      listRestUrl = `/lists/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
+      listRestUrl = `/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
     }
     else if (args.options.listUrl) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
 
-      listRestUrl = `/GetList('${encodeURIComponent(listServerRelativeUrl)}')`;
+      listRestUrl = `/GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')`;
     }
 
-    const viewRestUrl: string = `/views/${(args.options.viewId ? `getById('${encodeURIComponent(args.options.viewId)}')` : `getByTitle('${encodeURIComponent(args.options.viewTitle as string)}')`)}`;
+    const viewRestUrl: string = `/views/${(args.options.viewId ? `getById('${formatting.encodeQueryParameter(args.options.viewId)}')` : `getByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`)}`;
 
     const requestOptions: any = {
       url: `${baseRestUrl}${listRestUrl}${viewRestUrl}`,

@@ -13,7 +13,7 @@ m365 planner bucket set [options]
 `-i, --id [id]`
 : ID of the bucket. Specify either `id` or `name` but not both.
 
-`--name [name]`
+`-n, --name [name]`
 : Name of the bucket. Specify either `id` or `name` but not both.
 
 `--planId [planId]`

@@ -12,108 +12,6 @@ const command: Command = require('./channel-member-add');
 
 describe(commands.CHANNEL_MEMBER_ADD, () => {
   //#region Mocked Responses 
-  const multipleTeamsResponse: any = {
-    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
-    "value": [
-      {
-        "id": "47d6625d-a540-4b59-a4ab-19b787e40593",
-        "deletedDateTime": null,
-        "classification": null,
-        "createdDateTime": "2018-12-28T04:09:33Z",
-        "createdByAppId": null,
-        "description": "Human Resources",
-        "displayName": "Human Resources",
-        "expirationDateTime": null,
-        "groupTypes": [
-          "Unified"
-        ],
-        "infoCatalogs": [],
-        "isAssignableToRole": null,
-        "mail": "hr@contoso.onmicrosoft.com",
-        "mailEnabled": true,
-        "mailNickname": "hr",
-        "membershipRule": null,
-        "membershipRuleProcessingState": null,
-        "onPremisesDomainName": null,
-        "onPremisesLastSyncDateTime": null,
-        "onPremisesNetBiosName": null,
-        "onPremisesSamAccountName": null,
-        "onPremisesSecurityIdentifier": null,
-        "onPremisesSyncEnabled": null,
-        "preferredDataLocation": null,
-        "preferredLanguage": null,
-        "proxyAddresses": [
-          "SPO:SPO_c562a29c-2afd-4b53-ae4d-f94f200de3ef@SPO_d544d1e7-d321-494b-870a-1beac97967a2",
-          "SMTP:hr@sconsoto.onmicrosoft.com"
-        ],
-        "renewedDateTime": "2018-12-28T04:09:33Z",
-        "resourceBehaviorOptions": [],
-        "resourceProvisioningOptions": [
-          "Team"
-        ],
-        "securityEnabled": false,
-        "securityIdentifier": "S-1-12-1-1205232221-1264166208-3071912868-2466636935",
-        "theme": null,
-        "visibility": "Private",
-        "writebackConfiguration": {
-          "isEnabled": null,
-          "onPremisesGroupType": null
-        },
-        "onPremisesProvisioningErrors": []
-      },
-      {
-        "id": "5b1fac18-4ae3-43b4-9ca8-e27c7f44b65f",
-        "deletedDateTime": null,
-        "classification": null,
-        "createdDateTime": "2020-10-28T21:50:12Z",
-        "createdByAppId": "cc15fd57-2c6c-4117-a88c-83b1d56b4bbe",
-        "description": "Human Resources",
-        "displayName": "Human Resources",
-        "expirationDateTime": null,
-        "groupTypes": [
-          "Unified"
-        ],
-        "infoCatalogs": [],
-        "isAssignableToRole": null,
-        "mail": "HumanResources@contoso.onmicrosoft.com",
-        "mailEnabled": true,
-        "mailNickname": "HumanResources",
-        "membershipRule": null,
-        "membershipRuleProcessingState": null,
-        "onPremisesDomainName": null,
-        "onPremisesLastSyncDateTime": null,
-        "onPremisesNetBiosName": null,
-        "onPremisesSamAccountName": null,
-        "onPremisesSecurityIdentifier": null,
-        "onPremisesSyncEnabled": null,
-        "preferredDataLocation": null,
-        "preferredLanguage": null,
-        "proxyAddresses": [
-          "SPO:SPO_4bb60dfd-0d1d-4242-9e50-cfb41c37d022@SPO_d544d1e7-d321-494b-870a-1beac97967a2",
-          "SMTP:HumanResources@contoso.onmicrosoft.com"
-        ],
-        "renewedDateTime": "2020-10-28T21:50:12Z",
-        "resourceBehaviorOptions": [
-          "HideGroupInOutlook",
-          "SubscribeMembersToCalendarEventsDisabled",
-          "WelcomeEmailDisabled"
-        ],
-        "resourceProvisioningOptions": [
-          "Team"
-        ],
-        "securityEnabled": false,
-        "securityIdentifier": "S-1-12-1-1528802328-1135889123-2095229084-1605780607",
-        "theme": null,
-        "visibility": "Public",
-        "writebackConfiguration": {
-          "isEnabled": null,
-          "onPremisesGroupType": null
-        },
-        "onPremisesProvisioningErrors": []
-      }
-    ]
-  };
-
   const singleTeamResponse: any = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
     "value": [
@@ -601,38 +499,6 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     });
   });
 
-  it('fails adding conversation members with invalid teamName', (done) => {
-    sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Other Human Resources')}'`) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
-          "@odata.count": 0,
-          "value": []
-        });
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    command.action(logger, {
-      options: {
-        teamName: "Other Human Resources",
-        channelName: "Other Private Channel"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError(`The specified team 'Other Human Resources' does not exist in Microsoft Teams`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('fails adding conversation members with invalid channelName', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -708,28 +574,33 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     });
   });
 
-  it('fails adding conversation members with multiple teamName', (done) => {
+  it('fails when group has no team', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
-        return Promise.resolve(multipleTeamsResponse);
+      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
+          "@odata.count": 1,
+          "value": [
+            {
+              "id": "00000000-0000-0000-0000-000000000000",
+              "resourceProvisioningOptions": []
+            }
+          ]
+        });
       }
 
-      return Promise.reject('Invalid Request');
+      return Promise.reject('Invalid request');
     });
 
     command.action(logger, {
       options: {
-        teamName: "Human Resources",
-        channelName: "Private Channel"
+        teamName: 'Team Name',
+        channelName: "Other Channel"
       }
     }, (err?: any) => {
       try {
-        assert.strictEqual(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError(`Multiple Microsoft Teams with name 'Human Resources' found. Please disambiguate:${os.EOL}${[
-            '- 47d6625d-a540-4b59-a4ab-19b787e40593',
-            '- 5b1fac18-4ae3-43b4-9ca8-e27c7f44b65f'].join(os.EOL)}`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
         done();
       }
       catch (e) {

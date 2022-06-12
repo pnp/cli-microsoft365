@@ -1,4 +1,4 @@
-import { Group, PlannerPlanDetails } from '@microsoft/microsoft-graph-types';
+import { PlannerPlanDetails } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import { accessToken, validation } from '../../../../utils';
@@ -8,6 +8,7 @@ import request from '../../../../request';
 import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { aadGroup } from '../../../../utils/aadGroup';
 
 interface CommandArgs {
   options: Options;
@@ -71,29 +72,9 @@ class PlannerPlanDetailsGetCommand extends GraphCommand {
       return Promise.resolve(args.options.ownerGroupId);
     }
     
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.ownerGroupName as string)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: Group[] }>(requestOptions)
-      .then(response => {
-        const groupItem: Group | undefined = response.value[0];
-
-        if (!groupItem) {
-          return Promise.reject(`The specified ownerGroup does not exist`);
-        }
-
-        if (response.value.length > 1) {
-          return Promise.reject(`Multiple ownerGroups with name ${args.options.ownerGroupName} found: Please choose between the following IDs ${response.value.map(x => x.id)}`);
-        }
-
-        return Promise.resolve(groupItem.id as string);
-      });
+    return aadGroup
+      .getGroupByDisplayName(args.options.ownerGroupName!)
+      .then(group => group.id!);
   }
 
   private getPlanId(args: CommandArgs): Promise<string> {

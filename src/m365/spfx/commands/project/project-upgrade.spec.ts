@@ -2666,66 +2666,66 @@ describe(commands.PROJECT_UPGRADE, () => {
   //#endregion
 
   //#region 1.14.0
-  it('e2e: shows correct number of findings for upgrading application customizer 1.14.0 project to 1.15.0-beta.6', () => {
+  it('e2e: shows correct number of findings for upgrading application customizer 1.14.0 project to 1.15.0-rc.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1140-applicationcustomizer'));
 
-    command.action(logger, { options: { toVersion: '1.15.0-beta.6', output: 'json', preview: true } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.15.0-rc.0', output: 'json', preview: true } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 13);
+      assert.strictEqual(findings.length, 21);
     });
   });
 
-  it('e2e: shows correct number of findings for upgrading field customizer react 1.14.0 project to 1.15.0-beta.6', () => {
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.14.0 project to 1.15.0-rc.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1140-fieldcustomizer-react'));
 
-    command.action(logger, { options: { toVersion: '1.15.0-beta.6', output: 'json', preview: true } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.15.0-rc.0', output: 'json', preview: true } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 13);
+      assert.strictEqual(findings.length, 22);
     });
   });
 
-  it('e2e: shows correct number of findings for upgrading list view command set 1.14.0 project to 1.15.0-beta.6', () => {
+  it('e2e: shows correct number of findings for upgrading list view command set 1.14.0 project to 1.15.0-rc.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1140-listviewcommandset'));
 
-    command.action(logger, { options: { toVersion: '1.15.0-beta.6', output: 'json', preview: true } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.15.0-rc.0', output: 'json', preview: true } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 13);
+      assert.strictEqual(findings.length, 21);
     });
   });
 
-  it('e2e: shows correct number of findings for upgrading no framework web part 1.14.0 project to 1.15.0-beta.6', () => {
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.14.0 project to 1.15.0-rc.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1140-webpart-nolib'));
 
-    command.action(logger, { options: { toVersion: '1.15.0-beta.6', output: 'json', preview: true } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.15.0-rc.0', output: 'json', preview: true } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 14);
+      assert.strictEqual(findings.length, 22);
     });
   });
 
-  it('e2e: shows correct number of findings for upgrading react web part 1.14.0 project to 1.15.0-beta.6', () => {
+  it('e2e: shows correct number of findings for upgrading react web part 1.14.0 project to 1.15.0-rc.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1140-webpart-react'));
 
-    command.action(logger, { options: { toVersion: '1.15.0-beta.6', output: 'json', preview: true } } as any, () => {
-      const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 15);
-    });
-  });
-
-  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.14.0 project to 1.15.0-beta.6', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1140-webpart-optionaldeps'));
-
-    command.action(logger, { options: { toVersion: '1.15.0-beta.6', output: 'json', preview: true } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.15.0-rc.0', output: 'json', preview: true } } as any, () => {
       const findings: FindingToReport[] = log[0];
       assert.strictEqual(findings.length, 24);
     });
   });
 
-  it('e2e: shows correct number of findings for upgrading ace 1.14.0 project to 1.15.0-beta.6', () => {
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.14.0 project to 1.15.0-rc.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1140-webpart-optionaldeps'));
+
+    command.action(logger, { options: { toVersion: '1.15.0-rc.0', output: 'json', preview: true } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 32);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading ace 1.14.0 project to 1.15.0-rc.0', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1140-ace'));
 
-    command.action(logger, { options: { toVersion: '1.15.0-beta.6', output: 'json', preview: true } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.15.0-rc.0', output: 'json', preview: true } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 11);
+      assert.strictEqual(findings.length, 19);
     });
   });
   //#endregion
@@ -2780,7 +2780,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-nolib'));
 
     command.action(logger, { options: { output: 'text', preview: true } } as any, () => {
-      assert(log[0].indexOf('1.15.0-beta.6') > -1);
+      assert(log[0].indexOf('1.15.0-rc.0') > -1);
     });
   });
 

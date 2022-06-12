@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils';
+import { formatting, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { FileSharingPrincipalType } from './FileSharingPrincipalType';
@@ -81,7 +81,7 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/lists/getbytitle('${fileInformation.libraryName}')/items(${fileInformation.fileItemId})/GetSharingInformation?$select=permissionsInformation&$Expand=permissionsInformation`,
+          url: `${args.options.webUrl}/_api/web/lists/getbytitle('${formatting.encodeQueryParameter(fileInformation.libraryName)}')/items(${fileInformation.fileItemId})/GetSharingInformation?$select=permissionsInformation&$Expand=permissionsInformation`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },

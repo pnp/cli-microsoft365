@@ -1,7 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
-import { urlUtil, validation } from '../../../../utils';
+import { formatting, urlUtil, validation } from '../../../../utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
@@ -18,6 +18,7 @@ interface Options extends GlobalOptions {
   listUrl?: string;
   title: string;
   fields: string;
+  viewQuery?: string;
   personal?: boolean;
   default?: boolean;
   paged?: boolean;
@@ -39,6 +40,7 @@ class SpoListViewAddCommand extends SpoCommand {
     telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
     telemetryProps.listUrl = typeof args.options.listUrl !== 'undefined';
     telemetryProps.title = typeof args.options.title !== 'undefined';
+    telemetryProps.viewQuery = typeof args.options.viewQuery !== 'undefined';
     telemetryProps.personal = !!args.options.personal;
     telemetryProps.default = !!args.options.default;
     telemetryProps.orderedView = !!args.options.orderedView;
@@ -61,6 +63,7 @@ class SpoListViewAddCommand extends SpoCommand {
           ViewFields: {
             results: args.options.fields.split(',')
           },
+          Query: args.options.viewQuery,
           PersonalView: !!args.options.personal,
           SetAsDefaultView: !!args.options.default,
           Paged: !!args.options.paged,
@@ -80,13 +83,13 @@ class SpoListViewAddCommand extends SpoCommand {
   private getRestUrl(options: Options): string {
     let result: string = `${options.webUrl}/_api/web/`;
     if (options.listId) {
-      result += `lists(guid'${encodeURIComponent(options.listId)}')`;
+      result += `lists(guid'${formatting.encodeQueryParameter(options.listId)}')`;
     }
     else if (options.listTitle) {
-      result += `lists/getByTitle('${encodeURIComponent(options.listTitle)}')`;
+      result += `lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')`;
     }
     else if (options.listUrl) {
-      result += `GetList('${encodeURIComponent(urlUtil.getServerRelativePath(options.webUrl, options.listUrl))}')`;
+      result += `GetList('${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(options.webUrl, options.listUrl))}')`;
     }
     result += '/views/add';
     
@@ -107,6 +110,7 @@ class SpoListViewAddCommand extends SpoCommand {
       { option: '--listUrl [listUrl]' },
       { option: '--title <title>' },
       { option: '--fields <fields>' },
+      { option: '--viewQuery [viewQuery]' },
       { option: '--personal' },
       { option: '--default' },
       { option: '--paged' },

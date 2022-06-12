@@ -96,8 +96,13 @@ describe('validation/validation', () => {
     assert.strictEqual(result, true);
   });
 
-  it('should validate a valid date with milliseconds-precision time is passed', () => {
+  it('should validate a valid date with milliseconds-precision time is passed (short)', () => {
     const result = validation.isValidISODateTime("2019-01-01T01:01:01.123Z");
+    assert.strictEqual(result, true);
+  });
+
+  it('should validate a valid date with milliseconds-precision time is passed (long)', () => {
+    const result = validation.isValidISODateTime("2019-01-01T01:01:01.1234567Z");
     assert.strictEqual(result, true);
   });
 

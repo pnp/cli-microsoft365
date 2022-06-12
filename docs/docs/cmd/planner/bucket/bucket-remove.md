@@ -10,10 +10,10 @@ m365 planner bucket remove [options]
 
 ## Options
 
-`--id [id]`
+`-i, --id [id]`
 : ID of the bucket to remove. Specify either `id` or `name` but not both.
 
-`--name [name]`
+`-n, --name [name]`
 : Name of the bucket to remove. Specify either `id` or `name` but not both.
 
 `--planId [planId]`

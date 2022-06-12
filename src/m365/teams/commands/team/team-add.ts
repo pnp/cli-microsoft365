@@ -5,6 +5,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -126,18 +127,12 @@ class TeamsTeamAddCommand extends GraphCommand {
             });
         });
       })
-      .then((teamsAsyncOperation: TeamsAsyncOperation) => {
+      .then((teamsAsyncOperation: TeamsAsyncOperation): any => {
         if (teamsAsyncOperation.status !== TeamsAsyncOperationStatus.Succeeded) {
           return Promise.resolve(teamsAsyncOperation);
         }
 
-        return request.get({
-          url: `${this.resource}/v1.0/groups/${teamsAsyncOperation.targetResourceId}`,
-          headers: {
-            accept: 'application/json;odata.metadata=minimal'
-          },
-          responseType: 'json'
-        });
+        return aadGroup.getGroupById(teamsAsyncOperation.targetResourceId);
       })
       .then((output: any) => {
         logger.log(output);

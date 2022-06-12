@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { urlUtil, validation } from '../../../../utils';
+import { formatting, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { ListInstance } from './ListInstance';
@@ -54,10 +54,10 @@ class SpoListLabelSetCommand extends SpoCommand {
         return Promise.resolve(listServerRelativeUrl);
       }
       else if (args.options.listId) {
-        listRestUrl = `lists(guid'${encodeURIComponent(args.options.listId)}')/`;
+        listRestUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
       }
       else {
-        listRestUrl = `lists/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')/`;
+        listRestUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/`;
       }
 
       const requestOptions: any = {
