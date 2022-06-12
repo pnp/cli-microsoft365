@@ -736,7 +736,8 @@ describe(commands.TASK_ADD, () => {
 
   it('uses correct value for urgent priority', (done) => {
     sinonUtil.restore(request.post);
-    const requestPostSpy = sinon.spy(request, 'post');
+    const requestPostStub = sinon.stub(request, 'post');
+    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
 
     const options: any = {
       title: 'My Planner Task',
@@ -747,7 +748,7 @@ describe(commands.TASK_ADD, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(requestPostSpy.lastCall.args[0].data.priority, 1);
+        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 1);
         done();
       }
       catch (e) {
@@ -758,7 +759,8 @@ describe(commands.TASK_ADD, () => {
 
   it('uses correct value for important priority', (done) => {
     sinonUtil.restore(request.post);
-    const requestPostSpy = sinon.spy(request, 'post');
+    const requestPostStub = sinon.stub(request, 'post');
+    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
 
     const options: any = {
       title: 'My Planner Task',
@@ -769,7 +771,7 @@ describe(commands.TASK_ADD, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(requestPostSpy.lastCall.args[0].data.priority, 3);
+        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 3);
         done();
       }
       catch (e) {
@@ -780,7 +782,8 @@ describe(commands.TASK_ADD, () => {
 
   it('uses correct value for medium priority', (done) => {
     sinonUtil.restore(request.post);
-    const requestPostSpy = sinon.spy(request, 'post');
+    const requestPostStub = sinon.stub(request, 'post');
+    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
 
     const options: any = {
       title: 'My Planner Task',
@@ -791,7 +794,7 @@ describe(commands.TASK_ADD, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(requestPostSpy.lastCall.args[0].data.priority, 5);
+        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 5);
         done();
       }
       catch (e) {
@@ -802,7 +805,8 @@ describe(commands.TASK_ADD, () => {
 
   it('uses correct value for low priority', (done) => {
     sinonUtil.restore(request.post);
-    const requestPostSpy = sinon.spy(request, 'post');
+    const requestPostStub = sinon.stub(request, 'post');
+    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
 
     const options: any = {
       title: 'My Planner Task',
@@ -813,7 +817,7 @@ describe(commands.TASK_ADD, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(requestPostSpy.lastCall.args[0].data.priority, 9);
+        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 9);
         done();
       }
       catch (e) {

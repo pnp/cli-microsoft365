@@ -440,8 +440,9 @@ describe(commands.TASK_SET, () => {
   });
 
   it('uses correct value for urgent priority', (done) => {
-    sinonUtil.restore(request.patch);
-    const requestPatchSpy = sinon.spy(request, 'patch');
+    const requestPatchStub = sinon.stub(request, 'patch');
+    requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
+
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve({
@@ -459,7 +460,7 @@ describe(commands.TASK_SET, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(requestPatchSpy.lastCall.args[0].data.priority, 1);
+        assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 1);
         done();
       }
       catch (e) {
@@ -469,8 +470,9 @@ describe(commands.TASK_SET, () => {
   });
 
   it('uses correct value for important priority', (done) => {
-    sinonUtil.restore(request.patch);
-    const requestPatchSpy = sinon.spy(request, 'patch');
+    const requestPatchStub = sinon.stub(request, 'patch');
+    requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
+
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve({
@@ -488,7 +490,7 @@ describe(commands.TASK_SET, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(requestPatchSpy.lastCall.args[0].data.priority, 3);
+        assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 3);
         done();
       }
       catch (e) {
@@ -498,8 +500,9 @@ describe(commands.TASK_SET, () => {
   });
 
   it('uses correct value for medium priority', (done) => {
-    sinonUtil.restore(request.patch);
-    const requestPatchSpy = sinon.spy(request, 'patch');
+    const requestPatchStub = sinon.stub(request, 'patch');
+    requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
+
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve({
@@ -517,7 +520,7 @@ describe(commands.TASK_SET, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(requestPatchSpy.lastCall.args[0].data.priority, 5);
+        assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 5);
         done();
       }
       catch (e) {
@@ -527,8 +530,9 @@ describe(commands.TASK_SET, () => {
   });
 
   it('uses correct value for low priority', (done) => {
-    sinonUtil.restore(request.patch);
-    const requestPatchSpy = sinon.spy(request, 'patch');
+    const requestPatchStub = sinon.stub(request, 'patch');
+    requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
+
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve({
@@ -546,7 +550,7 @@ describe(commands.TASK_SET, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(requestPatchSpy.lastCall.args[0].data.priority, 9);
+        assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 9);
         done();
       }
       catch (e) {
