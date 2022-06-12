@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { urlUtil, validation } from '../../../../utils';
+import { formatting, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -44,23 +44,23 @@ class SpoFieldGetCommand extends SpoCommand {
     let listRestUrl: string = '';
 
     if (args.options.listId) {
-      listRestUrl = `lists(guid'${encodeURIComponent(args.options.listId)}')/`;
+      listRestUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
     }
     else if (args.options.listTitle) {
-      listRestUrl = `lists/getByTitle('${encodeURIComponent(args.options.listTitle as string)}')/`;
+      listRestUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/`;
     }
     else if (args.options.listUrl) {
       const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
 
-      listRestUrl = `GetList('${encodeURIComponent(listServerRelativeUrl)}')/`;
+      listRestUrl = `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
     }
 
     let fieldRestUrl: string = '';
     if (args.options.id) {
-      fieldRestUrl = `/getbyid('${encodeURIComponent(args.options.id)}')`;
+      fieldRestUrl = `/getbyid('${formatting.encodeQueryParameter(args.options.id)}')`;
     }
     else {
-      fieldRestUrl = `/getbyinternalnameortitle('${encodeURIComponent(args.options.fieldTitle as string)}')`;
+      fieldRestUrl = `/getbyinternalnameortitle('${formatting.encodeQueryParameter(args.options.fieldTitle as string)}')`;
     }
 
     const requestOptions: any = {

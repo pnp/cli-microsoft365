@@ -1,4 +1,3 @@
-import { Group } from '@microsoft/microsoft-graph-types';
 import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
@@ -6,6 +5,7 @@ import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { ClientSvcResponse, ClientSvcResponseContents, formatting, FormDigestInfo, spo, SpoOperation, validation } from '../../../../utils';
+import { aadGroup } from '../../../../utils/aadGroup';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -68,8 +68,8 @@ class SpoSiteRemoveCommand extends SpoCommand {
                 logger.logToStderr(`Site attached to group ${groupId}. Initiating group delete operation via Graph API`);
               }
 
-              return this
-                .getSiteGroup(groupId)
+              return aadGroup
+                .getGroupById(groupId)
                 .then((group) => {
                   if (args.options.skipRecycleBin || args.options.wait) {
                     logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameters 'skipRecycleBin' and 'wait' will not be applicable.`));
@@ -77,36 +77,31 @@ class SpoSiteRemoveCommand extends SpoCommand {
 
                   return this.deleteGroup(group.id, logger);
                 })
-                .catch((err: any) => {
-                  if (err.response.status === 404) {
-                    if (this.verbose) {
-                      logger.logToStderr(`Site group doesn't exist. Searching in the Microsoft 365 deleted groups.`);
-                    }
-
-                    return this
-                      .isSiteGroupDeleted(groupId)
-                      .then((deletedGroups: { value: { id: string }[] }): Promise<void> => {
-                        if (deletedGroups.value.length === 0) {
-                          if (this.verbose) {
-                            logger.logToStderr("Site group doesn't exist anymore. Deleting the site.");
-                          }
-
-                          if (args.options.wait) {
-                            logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameter 'wait' will not be applicable.`));
-                          }
-
-                          return Promise.resolve();
-                        }
-                        else {
-                          return Promise.reject(`Site group still exists in the deleted groups. The site won't be removed.`);
-                        }
-                      })
-                      .then(_ => this.deleteOrphanedSite(logger, args.options.url))
-                      .catch((err) => Promise.reject(err));
+                .catch(() => {
+                  if (this.verbose) {
+                    logger.logToStderr(`Site group doesn't exist. Searching in the Microsoft 365 deleted groups.`);
                   }
-                  else {
-                    return Promise.reject(err);
-                  }
+
+                  return this
+                    .isSiteGroupDeleted(groupId)
+                    .then((deletedGroups: { value: { id: string }[] }): Promise<void> => {
+                      if (deletedGroups.value.length === 0) {
+                        if (this.verbose) {
+                          logger.logToStderr("Site group doesn't exist anymore. Deleting the site.");
+                        }
+
+                        if (args.options.wait) {
+                          logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameter 'wait' will not be applicable.`));
+                        }
+
+                        return Promise.resolve();
+                      }
+                      else {
+                        return Promise.reject(`Site group still exists in the deleted groups. The site won't be removed.`);
+                      }
+                    })
+                    .then(_ => this.deleteOrphanedSite(logger, args.options.url))
+                    .catch((err) => Promise.reject(err));
                 })
                 .then(_ => this.deleteSite(args.options.url, args.options.wait, logger));
             }
@@ -133,18 +128,6 @@ class SpoSiteRemoveCommand extends SpoCommand {
         }
       });
     }
-  }
-
-  private getSiteGroup(groupId: string): Promise<Group> {
-    const requestOptions: any = {
-      url: `https://graph.microsoft.com/v1.0/groups/${groupId}`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request.get<Group>(requestOptions);
   }
 
   private isSiteGroupDeleted(groupId: string): Promise<{ value: { id: string }[] }> {
