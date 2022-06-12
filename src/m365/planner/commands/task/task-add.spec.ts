@@ -448,6 +448,19 @@ describe(commands.TASK_ADD, () => {
     done();
   });
 
+  it('fails validation if unknown priority label is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        priority: 'invalid'
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
   it('correctly adds planner task with title, planId, and bucketId', (done) => {
     const options: any = {
       title: 'My Planner Task',
@@ -713,6 +726,94 @@ describe(commands.TASK_ADD, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         assert(loggerLogSpy.calledWith(taskAddResponseWithDetails));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct value for urgent priority', (done) => {
+    sinonUtil.restore(request.post);
+    const requestPostSpy = sinon.spy(request, 'post');
+
+    const options: any = {
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: 'Urgent'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPostSpy.lastCall.args[0].data.priority, 1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct value for important priority', (done) => {
+    sinonUtil.restore(request.post);
+    const requestPostSpy = sinon.spy(request, 'post');
+
+    const options: any = {
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: 'Important'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPostSpy.lastCall.args[0].data.priority, 3);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct value for medium priority', (done) => {
+    sinonUtil.restore(request.post);
+    const requestPostSpy = sinon.spy(request, 'post');
+
+    const options: any = {
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: 'Medium'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPostSpy.lastCall.args[0].data.priority, 5);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct value for low priority', (done) => {
+    sinonUtil.restore(request.post);
+    const requestPostSpy = sinon.spy(request, 'post');
+
+    const options: any = {
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: 'Low'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPostSpy.lastCall.args[0].data.priority, 9);
         done();
       }
       catch (e) {

@@ -33,7 +33,7 @@ interface Options extends GlobalOptions {
   description?: string;
   appliedCategories?: string;
   orderHint?: string;
-  priority?: number;
+  priority?: number | string;
 }
 
 class PlannerTaskSetCommand extends GraphCommand {
@@ -367,10 +367,29 @@ class PlannerTaskSetCommand extends GraphCommand {
     }
 
     if (options.priority !== undefined) {
-      requestBody.priority = options.priority;
+      requestBody.priority = this.getPriorityValue(options);
     }
 
     return requestBody;
+  }
+
+  private getPriorityValue(options: Options): number | undefined {
+    const priority = options.priority;
+    
+    if (typeof priority === "string") {
+      switch (priority.toLowerCase()) {
+        case "urgent":
+          return 1;
+        case "important":
+          return 3;
+        case "medium":
+          return 5;
+        case "low":
+          return 9;
+      }
+    }
+    
+    return priority as number | undefined;
   }
 
   public options(): CommandOption[] {
@@ -392,7 +411,7 @@ class PlannerTaskSetCommand extends GraphCommand {
       { option: '--description [description]' },
       { option: '--appliedCategories [appliedCategories]' },
       { option: '--orderHint [orderHint]' },
-      { option: '--priority [priority]' }
+      { option: '--priority [priority]', autocomplete: ["Urgent", "Important", "Medium", "Low"] }
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -451,8 +470,17 @@ class PlannerTaskSetCommand extends GraphCommand {
       return 'The appliedCategories contains invalid value. Specify either category1, category2, category3, category4, category5 and/or category6 as properties';
     }
 
-    if (args.options.priority && (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10)) {
-      return 'priority should be a number between 0 and 10';
+    if (args.options.priority !== undefined) {
+      if (typeof args.options.priority === "number") {
+        // Number validation
+        if (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10) {
+          return 'priority should be a number between 0 and 10.';
+        }
+      }
+      // String validation
+      else if (["urgent", "important", "medium", "low"].indexOf(args.options.priority.toString().toLowerCase()) === -1) {
+        return `${args.options.priority} is not a valid priority value. Allowed values Urgent|Important|Medium|Low.`;
+      }
     }
 
     return true;

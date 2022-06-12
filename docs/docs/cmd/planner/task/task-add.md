@@ -53,7 +53,7 @@ m365 planner task add [options]
 : Hint used to order items of this type in a list view. The format is defined as outlined [here](https://docs.microsoft.com/en-us/graph/api/resources/planner-order-hint-format?view=graph-rest-1.0).
 
 `--priority [priority]`
-: Priority of the task. Number between 0 and 10.
+: Priority of the task: Urgent, Important, Medium, Low. Or a number between 0 and 10 (check remarks section for more info). Default value is Medium.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -65,7 +65,7 @@ When you specify the value for `percentComplete`, consider the following:
 - when set between 1 and 99, the task is considered _In progress_
 - when set to 100, the task is considered _Completed_
 
-When you specify the value for `priority`, consider the following:
+When you specify a number value for `priority`, consider the following:
 
 - values 0 and 1 are interpreted as _Urgent_
 - values 2, 3 and 4 are interpreted as _Important_

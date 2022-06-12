@@ -28,7 +28,7 @@ interface Options extends GlobalOptions {
   assignedToUserNames?: string;
   description?: string;
   orderHint?: string;
-  priority?: number;
+  priority?: number | string;
 }
 
 class PlannerTaskAddCommand extends GraphCommand {
@@ -82,7 +82,7 @@ class PlannerTaskAddCommand extends GraphCommand {
         const requestOptions: any = {
           url: `${this.resource}/v1.0/planner/tasks`,
           headers: {
-            'accept': 'application/json;odata.metadata=none'
+            accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json',
           data: {
@@ -94,7 +94,7 @@ class PlannerTaskAddCommand extends GraphCommand {
             percentComplete: args.options.percentComplete,
             assignments: assignments,
             orderHint: args.options.orderHint,
-            priority: args.options.priority
+            priority: this.getPriorityValue(args.options)
           }
         };
 
@@ -105,6 +105,25 @@ class PlannerTaskAddCommand extends GraphCommand {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  }
+
+  private getPriorityValue(options: Options): number | undefined {
+    const priority = options.priority;
+    
+    if (typeof priority === "string") {
+      switch (priority.toLowerCase()) {
+        case "urgent":
+          return 1;
+        case "important":
+          return 3;
+        case "medium":
+          return 5;
+        case "low":
+          return 9;
+      }
+    }
+    
+    return priority as number | undefined;
   }
 
   private getTaskDetailsEtag(taskId: string): Promise<string> {
@@ -298,7 +317,7 @@ class PlannerTaskAddCommand extends GraphCommand {
       { option: '--assignedToUserNames [assignedToUserNames]' },
       { option: '--description [description]' },
       { option: '--orderHint [orderHint]' },
-      { option: '--priority [priority]' }
+      { option: '--priority [priority]', autocomplete: ["Urgent", "Important", "Medium", "Low"] }
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -358,8 +377,17 @@ class PlannerTaskAddCommand extends GraphCommand {
       return 'Specify either assignedToUserIds or assignedToUserNames but not both';
     }
 
-    if (args.options.priority && (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10)) {
-      return 'priority should be a number between 0 and 10';
+    if (args.options.priority !== undefined) {
+      if (typeof args.options.priority === "number") {
+        // Number validation
+        if (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10) {
+          return 'priority should be a number between 0 and 10.';
+        }
+      }
+      // String validation
+      else if (["urgent", "important", "medium", "low"].indexOf(args.options.priority.toString().toLowerCase()) === -1) {
+        return `${args.options.priority} is not a valid priority value. Allowed values Urgent|Important|Medium|Low.`;
+      }
     }
 
     return true;
