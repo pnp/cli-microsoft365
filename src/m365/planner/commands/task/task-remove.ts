@@ -154,7 +154,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
 
     return this
       .getGroupId(options)
-      .then(groupId => planner.getPlanByName(planTitle!, groupId))
+      .then(groupId => planner.getPlanByTitle(planTitle!, groupId))
       .then(plan => plan.id!);
   }
 
