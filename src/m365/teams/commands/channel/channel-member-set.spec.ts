@@ -287,33 +287,6 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     done();
   });
 
-  it('fails to get team when team does not exist', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
-        return Promise.resolve({ value: [] });
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    command.action(logger, {
-      options: {
-        teamName: 'Team Name',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        id: '00000',
-        role: 'owner'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('fails to get team when resourceprovisioning does not exist', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
@@ -323,11 +296,6 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
               "id": "00000000-0000-0000-0000-000000000000",
               "resourceProvisioningOptions": [
               ]
-            },
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "resourceProvisioningOptions": [
-              ]
             }
           ]
         });
@@ -346,48 +314,6 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails when multiple teams with same name exists', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
-        return Promise.resolve({
-          value: [
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "resourceProvisioningOptions": [
-                "Team"
-              ]
-            },
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "resourceProvisioningOptions": [
-                "Team"
-              ]
-            }
-          ]
-        });
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    command.action(logger, {
-      options: {
-        teamName: 'Team Name',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        id: '00000',
-        role: 'owner'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple Microsoft Teams teams with name Team Name found: 00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000`)));
         done();
       }
       catch (e) {

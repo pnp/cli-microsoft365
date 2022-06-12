@@ -51,12 +51,7 @@
       "name": "Waldek Mastykarz",
       "email": "waldek@mastykarz.nl",
       "web": "https://blog.mastykarz.nl"
-    },
-    {
-      "name": "Velin Georgiev",
-      "email": "velin.georgiev@gmail.com",
-      "web": "https://blog.velingeorgiev.com"
-    },
+    },    
     {
       "name": "Garry Trinder",
       "email": "garry.trinder@live.com",
@@ -81,6 +76,16 @@
       "name": "Arjun Menon",
       "email": "arjun.umenon@gmail.com",
       "web": "https://arjunumenon.com/"
+    },
+    {
+      "name": "Adam Wojcik",
+      "email": "adam.wojcik.it@gmail.com",
+      "web": "https://github.com/Adam-it/"
+    },
+    {
+      "name": "Martin Lingstuyl",
+      "email": "mlingstuyl@live.com",
+      "web": "https://www.blimped.nl/"
     }
   ],
   "contributors": [
@@ -128,7 +133,7 @@
     "Laskewitz, Daniel <daniel@laskewitz.nl>",
     "Lengelle, Veronique <25181757+veronicageek@users.noreply.github.com>",
     "Levert, Sebastien <slevert@outlook.com>",
-    "Lingstuyl, Martin <martin@i4-you.com>",
+    "Lingstuyl, Martin <mlingstuyl@live.com>",
     "Maillot, Michaël <battosaimykle@gmail.com>",
     "Mastykarz, Waldek <waldek@mastykarz.nl>",
     "McDonnell, Kevin <kevin@mcd79.com>",

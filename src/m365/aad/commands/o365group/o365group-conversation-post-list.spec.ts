@@ -198,61 +198,7 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
       }
     });
   });
-  it('handles error when the group with the specified the name not found', (done) => {
-    sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'MyGroup'&$select=id`) {
-        return Promise.resolve({ value: [] });
-      }
 
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
-    });
-
-    command.action(logger, {
-      options: {
-        debug: false,
-        groupDisplayName: 'MyGroup',
-        threadId: "AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E="
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `The specified group does not exist`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-  it('handles error when multiple groups with the specified name found', (done) => {
-    sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'MyGroup'&$select=id`) {
-        return Promise.resolve({
-          value: [
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' },
-            { id: '8b1b1e42-794b-4c71-93ac-5ed92488b67g' }
-          ]
-        });
-      }
-
-      return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
-    });
-
-    command.action(logger, {
-      options: {
-        debug: false,
-        groupDisplayName: 'MyGroup',
-        threadId: "AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E="
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `Multiple groups found with name MyGroup found. Please choose between the following IDs: 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 8b1b1e42-794b-4c71-93ac-5ed92488b67g`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
   it('correctly handles error when listing posts', (done) => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
