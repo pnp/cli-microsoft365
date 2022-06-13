@@ -12,9 +12,9 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
-  title: string;
-  url: string;
+  id?: string;
+  title?: string;
+  url?: string;
 }
 
 class SpoHubSiteGetCommand extends SpoCommand {
@@ -61,13 +61,13 @@ class SpoHubSiteGetCommand extends SpoCommand {
         let hubSites = response.value as HubSite[];
 
         if (options.id) {
-          hubSites = hubSites.filter(site => site.ID.toLocaleLowerCase() === options.id.toLocaleLowerCase());
+          hubSites = hubSites.filter(site => site.ID.toLocaleLowerCase() === options.id!.toLocaleLowerCase());
         }
         else if (options.title) {
-          hubSites = hubSites.filter(site => site.Title.toLocaleLowerCase() === options.title.toLocaleLowerCase());
+          hubSites = hubSites.filter(site => site.Title.toLocaleLowerCase() === options.title!.toLocaleLowerCase());
         }
         else if (options.url) {
-          hubSites = hubSites.filter(site => site.SiteUrl.toLocaleLowerCase() === options.url.toLocaleLowerCase());
+          hubSites = hubSites.filter(site => site.SiteUrl.toLocaleLowerCase() === options.url!.toLocaleLowerCase());
         }
 
         if (!hubSites.length) {
