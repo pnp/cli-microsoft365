@@ -19,7 +19,7 @@ export const planner = {
    * @param id Planner ID.
    */
   async getPlanById(id: string): Promise<PlannerPlan> {
-    const requestOptions = getRequestOptions(`${graphResource}/v1.0/planner/plans/${id}`, 'none');
+    const requestOptions = getRequestOptions(`${graphResource}/v1.0/planner/plans/${id}`, 'minimal');
     
     try {
       return await request.get<PlannerPlan>(requestOptions);
@@ -34,7 +34,7 @@ export const planner = {
    * @param groupId Group ID.
    */
   getPlansByGroupId(groupId: string): Promise<PlannerPlan[]> {
-    return odata.getAllItems<PlannerPlan>(`${graphResource}/v1.0/groups/${groupId}/planner/plans`, 'none');
+    return odata.getAllItems<PlannerPlan>(`${graphResource}/v1.0/groups/${groupId}/planner/plans`, 'minimal');
   },
 
   /**
