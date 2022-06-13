@@ -5,7 +5,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils';
+import { formatting, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -53,23 +53,23 @@ class SpoListWebhookListCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      const list: string = args.options.id ? encodeURIComponent(args.options.id as string) : (args.options.listId ? encodeURIComponent(args.options.listId as string) : (args.options.title ? encodeURIComponent(args.options.title as string) : encodeURIComponent(args.options.listTitle as string)));
+      const list: string = args.options.id ? formatting.encodeQueryParameter(args.options.id as string) : (args.options.listId ? formatting.encodeQueryParameter(args.options.listId as string) : (args.options.title ? formatting.encodeQueryParameter(args.options.title as string) : formatting.encodeQueryParameter(args.options.listTitle as string)));
       logger.logToStderr(`Retrieving webhook information for list ${list} in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
 
     if (args.options.id) {
-      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.id)}')/Subscriptions`;
+      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.id)}')/Subscriptions`;
     }
     else if (args.options.listId) {
-      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/Subscriptions`;
+      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/Subscriptions`;
     }
     else if (args.options.listTitle) {
-      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/Subscriptions`;
+      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/Subscriptions`;
     }
     else {
-      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.title as string)}')/Subscriptions`;
+      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')/Subscriptions`;
     }
 
     const requestOptions: any = {

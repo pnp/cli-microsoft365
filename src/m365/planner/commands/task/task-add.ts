@@ -1,4 +1,4 @@
-import { Group, PlannerBucket, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
+import { PlannerBucket, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
 import Auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
@@ -8,6 +8,7 @@ import { planner } from '../../../../utils/planner';
 import { accessToken, formatting, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { aadGroup } from '../../../../utils/aadGroup';
 
 interface CommandArgs {
   options: Options;
@@ -217,25 +218,9 @@ class PlannerTaskAddCommand extends GraphCommand {
       return Promise.resolve(args.options.ownerGroupId);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.ownerGroupName as string)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: Group[] }>(requestOptions)
-      .then(response => {
-        const group: Group | undefined = response.value[0];
-
-        if (!group) {
-          return Promise.reject(`The specified owner group does not exist`);
-        }
-
-        return Promise.resolve(group.id as string);
-      });
+    return aadGroup
+      .getGroupByDisplayName(args.options.ownerGroupName!)
+      .then(group => group.id!);
   }
 
   private getUserIds(options: Options): Promise<string[]> {
