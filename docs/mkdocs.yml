@@ -194,6 +194,7 @@ nav:
         - plan details get: 'cmd/planner/plan/plan-get.md'
         - plan get: 'cmd/planner/plan/plan-get.md'
         - plan list: 'cmd/planner/plan/plan-list.md'
+        - plan remove: 'cmd/planner/plan/plan-remove.md'
       - task:
         - task add: 'cmd/planner/task/task-add.md'
         - task checklistitem add: 'cmd/planner/task/task-checklistitem-add.md'        
