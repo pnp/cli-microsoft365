@@ -16,6 +16,9 @@ m365 planner task get [options]
 `-t, --title [title]`
 : Title of the task. Specify either `id` or `title` but not both.
 
+`--taskId [taskId]`
+: (deprecated. Use `id` instead) ID of the task.
+
 `--bucketId [bucketId]`
 : Bucket ID to which the task belongs. Specify `bucketId` or `bucketName` when using `title`.
 
