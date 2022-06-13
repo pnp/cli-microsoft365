@@ -59,7 +59,7 @@ class PlannerPlanRemoveCommand extends GraphCommand {
             'if-match': (plan as any)['@odata.etag']
           },
           responseType: 'json'
-        }
+        };
 
         await request.delete(requestOptions);
         cb();

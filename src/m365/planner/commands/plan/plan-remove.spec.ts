@@ -38,7 +38,7 @@ describe(commands.PLAN_REMOVE, () => {
         '@odata.etag': 'abcdef',
         id: validPlanId,
         title: validPlanTitle,
-        owner: validOwnerGroupId,
+        owner: validOwnerGroupId
       }
     ]
   };
