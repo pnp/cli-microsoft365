@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { urlUtil, validation } from '../../../../utils';
+import { formatting, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { ListInstance } from './ListInstance';
@@ -37,7 +37,7 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
-      const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
+      const list: string = (args.options.listId ? args.options.listId : args.options.listTitle) as string;
       logger.logToStderr(`Extracting Site Script from list ${list} in site at ${args.options.webUrl}...`);
     }
 
@@ -47,13 +47,13 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
       if (this.debug) {
         logger.logToStderr(`Retrieving List Url from Id '${args.options.listId}'...`);
       }
-      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')?$expand=RootFolder`;
+      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')?$expand=RootFolder`;
     }
     else {
       if (this.debug) {
         logger.logToStderr(`Retrieving List Url from Title '${args.options.listTitle}'...`);
       }
-      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')?$expand=RootFolder`;
+      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')?$expand=RootFolder`;
     }
 
     const requestOptions: any = {

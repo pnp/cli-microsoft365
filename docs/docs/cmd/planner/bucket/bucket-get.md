@@ -13,7 +13,7 @@ m365 planner bucket get [options]
 `-i, --id [id]`
 : ID of the bucket to retrieve details. Specify either `id` or `name` but not both.
 
-`-name, --name [name]`
+`-n, --name [name]`
 : Name of the bucket to retrieve details. Specify either `id` or `name` but not both. 
 
 `--planId [planId]`

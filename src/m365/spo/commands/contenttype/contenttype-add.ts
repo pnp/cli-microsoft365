@@ -150,7 +150,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
           }
 
           const requestOptions: any = {
-            url: `${webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitle)}')?$select=Id`,
+            url: `${webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitle)}')?$select=Id`,
             headers: {
               accept: 'application/json;odata=nometadata'
             },

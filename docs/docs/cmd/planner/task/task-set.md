@@ -17,10 +17,10 @@ m365 planner task set [options]
 : New title of the task.
 
 `--bucketId [bucketId]`
-: ID of the bucket to move the task to. Specify either `bucketId` or `bucketName` but not both.
+: ID of the bucket to move the task to. Specify either `bucketId` or `bucketName` when using `title`.
 
 `--bucketName [bucketName]`
-: Name of the bucket to move the task to. The bucket needs to exist in the selected plan. Specify either `bucketId` or `bucketName` but not both.
+: Name of the bucket to move the task to. The bucket needs to exist in the selected plan. Specify either `bucketId` or `bucketName` when using `title`.
 
 `--planId [planId]`
 : ID of the plan to which the bucket belongs to. Specify either `planId` or `planName` when using `bucketName`.
