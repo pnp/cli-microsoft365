@@ -17,7 +17,7 @@ m365 planner plan remove [options]
 : Title of the plan to remove. Specify either `id` or `title` but not both.
 
 `--ownerGroupId [ownerGroupId]`
-: ID of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` when using title.
+: ID of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` when using `title`.
 
 `--ownerGroupName [ownerGroupName]`
 : Name of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` when using `title`.

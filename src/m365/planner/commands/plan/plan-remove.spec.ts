@@ -91,7 +91,7 @@ describe(commands.PLAN_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.PLAN_REMOVE), true);
+    assert.strictEqual(command.name, commands.PLAN_REMOVE);
   });
 
   it('has a description', () => {
@@ -185,14 +185,14 @@ describe(commands.PLAN_REMOVE, () => {
   });
 
   it('aborts removing the specified plan when confirm option not passed and prompt not confirmed', (done) => {
-    const postSpy = sinon.spy(request, 'delete');
+    const deleteSpy = sinon.spy(request, 'delete');
     command.action(logger, {
       options: {
         id: validPlanId
       }
     }, () => {
       try {
-        assert(postSpy.notCalled);
+        assert(deleteSpy.notCalled);
         done();
       }
       catch (e) {
