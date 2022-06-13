@@ -69,7 +69,6 @@ class SpoListGetCommand extends SpoCommand {
       .get<ListInstance>(requestOptions)
       .then((listInstance: ListInstance): void => {
         if (args.options.withPermissions) {
-          // Add custom property "PrincipalTypeString"
           listInstance.RoleAssignments.forEach(r => {
             r.Member.PrincipalTypeString = ListPrincipalType[r.Member.PrincipalType];
           });
