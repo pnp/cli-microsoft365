@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class PlannerTaskChecklistitemRemoveCommand extends GraphCommand {
+class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
   public get name(): string {
     return commands.TASK_CHECKLISTITEM_REMOVE;
   }
@@ -121,4 +121,4 @@ class PlannerTaskChecklistitemRemoveCommand extends GraphCommand {
   }
 }
 
-module.exports = new PlannerTaskChecklistitemRemoveCommand();
+module.exports = new PlannerTaskChecklistItemRemoveCommand();
