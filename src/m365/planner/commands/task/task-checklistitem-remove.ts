@@ -33,9 +33,6 @@ class PlannerTaskChecklistitemRemoveCommand extends GraphCommand {
     telemetryProps.confirm = (!(!args.options.confirm)).toString();
     return telemetryProps;
   }
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'title', 'isChecked'];
-  }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (args.options.confirm) {
