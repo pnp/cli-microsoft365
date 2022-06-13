@@ -103,7 +103,7 @@ describe(commands.PLAN_REMOVE, () => {
     assert.deepStrictEqual(optionSets, [['id', 'title']]);
   });
 
-  it('fails validation id when id and ownerGroupId is specified', () => {
+  it('fails validation when id and ownerGroupId is specified', () => {
     const actual = command.validate({
       options: {
         id: validPlanId,
@@ -152,7 +152,7 @@ describe(commands.PLAN_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct input with name', () => {
+  it('validates for a correct input with title', () => {
     const actual = command.validate({
       options: {
         title: validPlanTitle,
