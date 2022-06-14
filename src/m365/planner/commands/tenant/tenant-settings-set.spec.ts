@@ -7,9 +7,9 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
-const command: Command = require('./tenant-settings-list');
+const command: Command = require('./tenant-settings-set');
 
-describe(commands.TENANT_SETTINGS_LIST, () => {
+describe(commands.TENANT_SETTINGS_SET, () => {
 
   const successReponse = {
     id: '1',
@@ -50,7 +50,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.patch
     ]);
   });
 
@@ -62,7 +62,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TENANT_SETTINGS_LIST), true);
+    assert.strictEqual(command.name, commands.TENANT_SETTINGS_SET);
   });
 
   it('has a description', () => {
@@ -73,8 +73,38 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['isPlannerAllowed', 'allowCalendarSharing', 'allowTenantMoveWithDataLoss', 'allowTenantMoveWithDataMigration', 'allowRosterCreation', 'allowPlannerMobilePushNotifications']);
   });
 
-  it('successfully lists tenant planner settings', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+  it('fails validation no options are specified', (done) => {
+    const actual = command.validate({
+      options: { }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation when invalid boolean is passed as option', (done) => {
+    const actual = command.validate({
+      options: {
+        isPlannerAllowed: 'invalid'
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('passes validation when valid options specified', (done) => {
+    const actual = command.validate({
+      options: {
+        isPlannerAllowed: 'true',
+        allowCalendarSharing: 'false',
+        allowPlannerMobilePushNotifications: 'false'
+      }
+    });
+    assert.strictEqual(actual, true);
+    done();
+  });
+
+  it('successfully updates tenant planner settings', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://tasks.office.com/taskAPI/tenantAdminSettings/Settings') {
         return Promise.resolve(successReponse);
       }
@@ -82,7 +112,11 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: {} } as any, () => {
+    command.action(logger, {
+      options: {
+        isPlannerAllowed: 'true'
+      }
+    }, () => {
       try {
         assert(loggerLogSpy.calledWith(successReponse));
         done();
@@ -94,7 +128,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://tasks.office.com/taskAPI/tenantAdminSettings/Settings') {
         return Promise.reject('An error has occurred');
       }
@@ -102,7 +136,11 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
+    command.action(logger, {
+      options: {
+        isPlannerAllowed: 'true'
+      }
+    }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
