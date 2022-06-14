@@ -7,7 +7,6 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
 const command: Command = require('./task-checklistitem-remove');
 
 describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
@@ -125,11 +124,6 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
       }
       return Promise.reject('Invalid Request');
     });
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-
     command.action(logger, {
       options: {
         taskId: validTaskId,
@@ -172,25 +166,6 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     });
   });
 
-  it('fails validation when using app only access token', (done) => {
-    sinonUtil.restore(accessToken.isAppOnlyAccessToken);
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
-
-    command.action(logger, {
-      options: {
-        taskId: validTaskId,
-        id: validId
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
   it('supports debug mode', () => {
     const options = command.options();
     let containsOption = false;

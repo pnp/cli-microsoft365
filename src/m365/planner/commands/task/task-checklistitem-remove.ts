@@ -4,8 +4,6 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils/accessToken';
-import Auth from '../../../../Auth';
 
 interface CommandArgs {
   options: Options;
@@ -33,10 +31,6 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.', logger, cb);
-      return;
-    }
     if (args.options.confirm) {
       this.removeChecklistitem(logger, args, cb);
     }
