@@ -8,6 +8,7 @@
 
 - [planner task checklistitem add](../cmd/planner/task/task-checklistitem-add.md) - adds a new checklist item to a Planner task [#3280](https://github.com/pnp/cli-microsoft365/issues/3280)
 - [planner task remove](../cmd/planner/task/task-remove.md) - removes a Microsoft Planner task [#3227](https://github.com/pnp/cli-microsoft365/issues/3227)
+- [planner tenant settings list](../cmd/planner/tenant/tenant-settings-list.md) - lists the Microsoft Planner configuration of the tenant [#3255](https://github.com/pnp/cli-microsoft365/issues/3355)
 
 **SharePoint Online:**
 
@@ -29,6 +30,7 @@
 - fixed issue with mkdocs serve because of pygments version [#3389](https://github.com/pnp/cli-microsoft365/issues/3389)
 - fixed spo listitem list options [#3361](https://github.com/pnp/cli-microsoft365/issues/3361)
 - added aadGroup utils class [#3267](https://github.com/pnp/cli-microsoft365/issues/3267)
+- combines planner task details get with planner task get [#3257](https://github.com/pnp/cli-microsoft365/issues/3257)
 
 ## [v5.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.3.0)
 
@@ -214,7 +216,7 @@
 **Planner:**
 
 - [planner task get](../cmd/planner/task/task-get.md) - retrieves the the specified planner task [#3019](https://github.com/pnp/cli-microsoft365/issues/3019)
-- [planner task details get](../cmd/planner/task/task-details-get.md) - retrieves the details of the specified planner task [#3015](https://github.com/pnp/cli-microsoft365/issues/3015)
+- [planner task details get](../cmd/planner/task/task-get.md) - retrieves the details of the specified planner task [#3015](https://github.com/pnp/cli-microsoft365/issues/3015)
 
 **SharePoint:**
 

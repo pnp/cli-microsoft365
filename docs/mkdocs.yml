@@ -197,13 +197,15 @@ nav:
         - task add: 'cmd/planner/task/task-add.md'
         - task checklistitem add: 'cmd/planner/task/task-checklistitem-add.md'
         - task checklistitem remove: 'cmd/planner/task/task-checklistitem-remove.md'
-        - task details get: 'cmd/planner/task/task-details-get.md'
+        - task details get: 'cmd/planner/task/task-get.md'
         - task get: 'cmd/planner/task/task-get.md'
         - task list: 'cmd/planner/task/task-list.md'
         - task reference add: 'cmd/planner/task/task-reference-add.md'
         - task reference list: 'cmd/planner/task/task-reference-list.md'
         - task remove: 'cmd/planner/task/task-remove.md'
         - task set: 'cmd/planner/task/task-set.md'
+      - tenant:
+        - tenant settings list: 'cmd/planner/tenant/tenant-settings-list.md'
     - Power Apps (pa):
       - app:
         - app get: 'cmd/pa/app/app-get.md'
