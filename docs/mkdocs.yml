@@ -310,6 +310,7 @@ nav:
         - customaction set: 'cmd/spo/customaction/customaction-set.md'
       - eventreceiver:
         - eventreceiver get: 'cmd/spo/eventreceiver/eventreceiver-get.md'
+        - eventreceiver list: 'cmd/spo/eventreceiver/eventreceiver-list.md'
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
       - feature:
