@@ -219,75 +219,6 @@ describe(commands.PLAN_DETAILS_GET, () => {
     });
   });
 
-  it('fails when multiple owner groups with same name exists', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
-          "@odata.count": 2,
-          "value": [
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "createdDateTime": null,
-              "displayName": "Team Name",
-              "description": "Team Description",
-              "internalId": null,
-              "classification": null,
-              "specialization": null,
-              "visibility": null,
-              "webUrl": null,
-              "isArchived": false,
-              "isMembershipLimitedToOwners": null,
-              "memberSettings": null,
-              "guestSettings": null,
-              "messagingSettings": null,
-              "funSettings": null,
-              "discoverySettings": null,
-              "resourceProvisioningOptions": ["Team"]
-            },
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "createdDateTime": null,
-              "displayName": "Team Name",
-              "description": "Team Description",
-              "internalId": null,
-              "classification": null,
-              "specialization": null,
-              "visibility": null,
-              "webUrl": null,
-              "isArchived": false,
-              "isMembershipLimitedToOwners": null,
-              "memberSettings": null,
-              "guestSettings": null,
-              "messagingSettings": null,
-              "funSettings": null,
-              "discoverySettings": null,
-              "resourceProvisioningOptions": ["Team"]
-            }
-          ]
-        }
-        );
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        ownerGroupName: 'Team Name',
-        planTitle: 'Test Plan 2'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple ownerGroups with name Team Name found: Please choose between the following IDs 00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('correctly get planner plan details with given planTitle and ownerGroupId', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/planner/plans`) {
@@ -505,56 +436,6 @@ describe(commands.PLAN_DETAILS_GET, () => {
             "category6": "Needs equipment"
           }
         }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails validation when ownerGroupName not found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
-        return Promise.resolve({ value: [] });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: false,
-        planTitle: 'My Planner Plan',
-        ownerGroupName: 'foo'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified ownerGroup does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails to get owmnerGroup when ownerGroup does not exist', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
-        return Promise.resolve({ value: [] });
-      }
-      return Promise.reject('The specified ownerGroup does not exist');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        planTitle: 'My Planner Plan',
-        ownerGroupName: 'Team Name'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified ownerGroup does not exist`)));
         done();
       }
       catch (e) {

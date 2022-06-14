@@ -5,7 +5,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils';
+import { formatting, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -47,17 +47,17 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeContentTypeFromList: () => void = (): void => {
       if (this.verbose) {
-        const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
+        const list: string = (args.options.listId ? args.options.listId : args.options.listTitle) as string;
         logger.logToStderr(`Removing content type ${args.options.contentTypeId} from list ${list} in site at ${args.options.webUrl}...`);
       }
 
       let requestUrl: string = '';
 
       if (args.options.listId) {
-        requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/ContentTypes('${encodeURIComponent(args.options.contentTypeId)}')`;
+        requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/ContentTypes('${encodeURIComponent(args.options.contentTypeId)}')`;
       }
       else {
-        requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/ContentTypes('${encodeURIComponent(args.options.contentTypeId)}')`;
+        requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/ContentTypes('${encodeURIComponent(args.options.contentTypeId)}')`;
       }
 
       const requestOptions: any = {

@@ -1,11 +1,15 @@
-import { Channel } from '@microsoft/microsoft-graph-types';
+import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import { odata, validation } from '../../../../utils';
+import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+
+interface ExtendedGroup extends Group {
+  resourceProvisioningOptions: string[];
+}
 
 interface CommandArgs {
   options: Options;
@@ -42,29 +46,14 @@ class TeamsChannelListCommand extends GraphCommand{
       return Promise.resolve(args.options.teamId);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: [{ id: string, resourceProvisioningOptions: string[] }] }>(requestOptions)
-      .then(response => {
-        const filteredResponseByTeam: { id: string, resourceProvisioningOptions: string[] }[] = response.value.filter(t => t.resourceProvisioningOptions.includes('Team'));
-        const groupItem: { id: string } | undefined = filteredResponseByTeam[0];
-
-        if (!groupItem) {
+    return aadGroup
+      .getGroupByDisplayName(args.options.teamName!)
+      .then(group => {
+        if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
           return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
         }
 
-        if (filteredResponseByTeam.length > 1) {
-          return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${filteredResponseByTeam.map(x => x.id)}`);
-        }
-
-        return Promise.resolve(groupItem.id);
+        return group.id!;
       });
   }
 

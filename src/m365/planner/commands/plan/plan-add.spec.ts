@@ -363,31 +363,6 @@ describe(commands.PLAN_ADD, () => {
     });
   });
 
-  it('fails validation when ownerGroupName not found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
-        return Promise.resolve({ value: [] });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: false,
-        title: 'My Planner Plan',
-        ownerGroupName: 'foo'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified owner group does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('correctly handles API OData error', (done) => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject("An error has occurred.");
