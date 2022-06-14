@@ -4,6 +4,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { accessToken } from '../../../../utils/accessToken';
+import Auth from '../../../../Auth';
 
 interface CommandArgs {
   options: Options;
@@ -24,10 +26,6 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
     return 'Removes the checklist item from the planner task';
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'title', 'isChecked'];
-  }
-
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.confirm = (!(!args.options.confirm)).toString();
@@ -35,6 +33,10 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+      this.handleError('This command does not support application permissions.', logger, cb);
+      return;
+    }
     if (args.options.confirm) {
       this.removeChecklistitem(logger, args, cb);
     }
@@ -76,37 +78,22 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
 
         return request.patch(requestOptionsTaskDetails);
       })
-      .then((res: any): void => {
-        if (!args.options.output || args.options.output === 'json') {
-          logger.log(res.checklist);
-        }
-        else {
-          //converted to text friendly output
-          const output = Object.getOwnPropertyNames(res.checklist).map(prop => ({ id: prop, ...(res.checklist as any)[prop] }));
-          logger.log(output);
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private getTaskDetailsEtag(taskId: string): Promise<string> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}/details`,
       headers: {
-        accept: 'application/json'
+        accept: 'application/json;odata.metadata=minimal'
       },
       responseType: 'json'
     };
 
     return request
       .get(requestOptions)
-      .then((response: any) => {
-        const etag: string | undefined = response ? response['@odata.etag'] : undefined;
-        if (!etag) {
-          return Promise.reject(`Error fetching task details`);
-        }
-        return Promise.resolve(etag);
-      });
+      .then((task: any) => task['@odata.etag'],
+        () => Promise.reject('Planner task was not found.'));
   }
 
   public options(): CommandOption[] {
