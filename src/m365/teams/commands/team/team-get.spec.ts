@@ -124,7 +124,7 @@ describe(commands.TEAM_GET, () => {
 
   it('fails when team name does not exist', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Finance'`) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
           "@odata.count": 1,
@@ -143,7 +143,7 @@ describe(commands.TEAM_GET, () => {
     command.action(logger, {
       options: {
         debug: true,
-        name: 'Team Name'
+        name: 'Finance'
       }
     }, (err?: any) => {
       try {
@@ -258,7 +258,7 @@ describe(commands.TEAM_GET, () => {
   it('retrieves information about the specified Microsoft Teams team by name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
 
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Finance'`) {
         return Promise.resolve({
           "value": [
             {
