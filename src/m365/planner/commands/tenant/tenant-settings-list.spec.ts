@@ -11,7 +11,7 @@ const command: Command = require('./tenant-settings-list');
 
 describe(commands.TENANT_SETTINGS_LIST, () => {
 
-  const successReponse = {
+  const successResponse = {
     id: '1',
     isPlannerAllowed: true,
     allowCalendarSharing: true,
@@ -76,7 +76,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
   it('successfully lists tenant planner settings', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://tasks.office.com/taskAPI/tenantAdminSettings/Settings') {
-        return Promise.resolve(successReponse);
+        return Promise.resolve(successResponse);
       }
 
       return Promise.reject('Invalid Request');
@@ -84,7 +84,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
 
     command.action(logger, { options: {} } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith(successReponse));
+        assert(loggerLogSpy.calledWith(successResponse));
         done();
       }
       catch (e) {
