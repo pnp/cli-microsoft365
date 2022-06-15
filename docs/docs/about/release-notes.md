@@ -34,6 +34,7 @@
 - combines planner task details get with planner task get [#3257](https://github.com/pnp/cli-microsoft365/issues/3257)
 - fixes the documentation of the m365 file list command [#3368](https://github.com/pnp/cli-microsoft365/issues/3368)
 - fixes error with the teams team get --name command parameter [#3395](https://github.com/pnp/cli-microsoft365/issues/3395)
+- fixes gateway timeout on flow export [#3393](https://github.com/pnp/cli-microsoft365/issues/3393)
 
 ## [v5.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.3.0)
 
