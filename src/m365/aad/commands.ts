@@ -28,6 +28,7 @@ export default {
   O365GROUP_CONVERSATION_POST_LIST: `${prefix} o365group conversation post list`,
   O365GROUP_RECYCLEBINITEM_CLEAR: `${prefix} o365group recyclebinitem clear`,
   O365GROUP_RECYCLEBINITEM_LIST: `${prefix} o365group recyclebinitem list`,
+  O365GROUP_RECYCLEBINITEM_REMOVE: `${prefix} o365group recyclebinitem remove`,
   O365GROUP_RECYCLEBINITEM_RESTORE: `${prefix} o365group recyclebinitem restore`,
   O365GROUP_SET: `${prefix} o365group set`,
   O365GROUP_TEAMIFY: `${prefix} o365group teamify`,
