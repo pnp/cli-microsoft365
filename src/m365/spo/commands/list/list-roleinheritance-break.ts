@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils';
+import { formatting, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -48,10 +48,10 @@ class SpoListRoleInheritanceBreakCommand extends SpoCommand {
     let requestUrl: string = `${args.options.webUrl}/_api/web/lists`;
 
     if (args.options.listId) {
-      requestUrl += `(guid'${encodeURIComponent(args.options.listId)}')`;
+      requestUrl += `(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
     }
     else {
-      requestUrl += `/getbytitle('${encodeURIComponent(args.options.listTitle as string)}')`;
+      requestUrl += `/getbytitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
     }
 
     let keepExistingPermissions: boolean = true;

@@ -4,9 +4,14 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
-import { Channel } from '../../Channel';
+import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import commands from '../../commands';
 import { ConversationMember } from '../../ConversationMember';
+import { aadGroup } from '../../../../utils/aadGroup';
+
+interface ExtendedGroup extends Group {
+  resourceProvisioningOptions: string[];
+}
 
 interface CommandArgs {
   options: Options;
@@ -123,32 +128,14 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
       return Promise.resolve(args.options.teamId);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: [{ id: string, resourceProvisioningOptions: string[] }] }>(requestOptions)
-      .then(response => {
-        const groupItem: { id: string, resourceProvisioningOptions: string[] } | undefined = response.value[0];
-
-        if (!groupItem) {
+    return aadGroup
+      .getGroupByDisplayName(args.options.teamName!)
+      .then(group => {
+        if ((group as ExtendedGroup).resourceProvisioningOptions.indexOf('Team') === -1) {
           return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
         }
 
-        if (groupItem.resourceProvisioningOptions.indexOf('Team') === -1) {
-          return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
-        }
-
-        if (response.value.length > 1) {
-          return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${response.value.map(x => x.id)}`);
-        }
-
-        return Promise.resolve(groupItem.id);
+        return group.id!;
       });
   }
 
@@ -174,7 +161,11 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
           return Promise.reject(`The specified channel does not exist in the Microsoft Teams team`);
         }
 
-        return Promise.resolve(channelItem.id);
+        if (channelItem.membershipType !== "private") {
+          return Promise.reject(`The specified channel is not a private channel`);
+        }
+
+        return Promise.resolve(channelItem.id!);
       });
   }
 

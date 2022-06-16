@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils';
+import { formatting, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -46,16 +46,16 @@ class SpoListWebhookAddCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.logToStderr(`Adding webhook to list ${args.options.listId ? encodeURIComponent(args.options.listId) : encodeURIComponent(args.options.listTitle as string)} located at site ${args.options.webUrl}...`);
+      logger.logToStderr(`Adding webhook to list ${args.options.listId ? args.options.listId : args.options.listTitle} located at site ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
 
     if (args.options.listId) {
-      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')/Subscriptions')`;
+      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/Subscriptions')`;
     }
     else {
-      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')/Subscriptions')`;
+      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/Subscriptions')`;
     }
 
     const requestBody: any = {};

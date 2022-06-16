@@ -33,8 +33,9 @@ export const formatting = {
   },
 
   filterObject(obj: any, propertiesToInclude: string[]): any {
-    return Object.keys(obj)
-      .filter(key => propertiesToInclude.includes(key))
+    const objKeys = Object.keys(obj);
+    return propertiesToInclude
+      .filter(prop => objKeys.includes(prop))
       .reduce((filtered: any, key: string) => {
         filtered[key] = obj[key];
         return filtered;
@@ -74,5 +75,14 @@ export const formatting = {
 
   splitAndTrim(s: string): string[] {
     return s.split(',').map(c => c.trim());
+  },
+
+  openTypesEncoder(value: string): string {
+    return value
+      .replace(/\%/g, '%25')
+      .replace(/\./g, '%2E')
+      .replace(/:/g, '%3A')
+      .replace(/@/g, '%40')
+      .replace(/#/g, '%23');
   }
 };

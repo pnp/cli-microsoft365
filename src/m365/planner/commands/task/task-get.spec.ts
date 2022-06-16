@@ -22,22 +22,9 @@ describe(commands.TASK_GET, () => {
   const validOwnerGroupName = 'Group name';
   const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
   const invalidOwnerGroupId = 'Invalid GUID';
-  
+
   const singleGroupResponse = {
     "value": [
-      {
-        "id": validOwnerGroupId,
-        "displayName": validOwnerGroupName
-      }
-    ]
-  };
-
-  const multipleGroupResponse = {
-    "value": [
-      {
-        "id": validOwnerGroupId,
-        "displayName": validOwnerGroupName
-      },
       {
         "id": validOwnerGroupId,
         "displayName": validOwnerGroupName
@@ -108,6 +95,16 @@ describe(commands.TASK_GET, () => {
     "id": validTaskId
   };
 
+  const taskDetailsResponse = {
+    "description": "Test",
+    "references": { }
+  };
+
+  const outputResponse = {
+    ...taskResponse,
+    ...taskDetailsResponse
+  };
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -153,6 +150,16 @@ describe(commands.TASK_GET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+  
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets();
+    assert.deepStrictEqual(optionSets, [['id', 'title']]);
   });
 
   it('fails validation when title is used without bucket id', () => {
@@ -273,64 +280,10 @@ describe(commands.TASK_GET, () => {
     });
   });
 
-  it('fails validation when no groups found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'&$select=id`) {
-        return Promise.resolve({"value": []});
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    command.action(logger, {
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planName: validPlanName,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified ownerGroup ${validOwnerGroupName} does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-  
-  it('fails validation when multiple groups found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'&$select=id`) {
-        return Promise.resolve(multipleGroupResponse);
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    command.action(logger, {
-      options: {
-        title: validTaskTitle,
-        bucketName: validBucketName,
-        planName: validPlanName,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple ownerGroups with name ${validOwnerGroupName} found: ${multipleGroupResponse.value.map(x => x.id)}`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('fails validation when no buckets found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets?$select=id,name`) {
-        return Promise.resolve({"value": [ { "id": "" } ]});
+        return Promise.resolve({ "value": [{ "id": "" }] });
       }
 
       return Promise.reject('Invalid Request');
@@ -382,7 +335,7 @@ describe(commands.TASK_GET, () => {
   it('fails validation when no tasks found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
-        return Promise.resolve({"value": [ { "id": "" } ]});
+        return Promise.resolve({ "value": [{ "id": "" }] });
       }
 
       return Promise.reject('Invalid Request');
@@ -429,9 +382,9 @@ describe(commands.TASK_GET, () => {
     });
   });
 
-  it('Correctly gets task by name', (done) => {
+  it('correctly gets task by name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
         return Promise.resolve(singleGroupResponse);
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
@@ -443,8 +396,11 @@ describe(commands.TASK_GET, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
         return Promise.resolve(singleTaskByTitleResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/${encodeURIComponent(validTaskId)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}`) {
         return Promise.resolve(taskResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+        return Promise.resolve(taskDetailsResponse);
       }
 
       return Promise.reject('Invalid Request');
@@ -459,7 +415,7 @@ describe(commands.TASK_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith(taskResponse));
+        assert(loggerLogSpy.calledWith(outputResponse));
         done();
       }
       catch (e) {
@@ -468,7 +424,7 @@ describe(commands.TASK_GET, () => {
     });
   });
 
-  it('Correctly gets task by name with group ID', (done) => {
+  it('correctly gets task by name with group ID', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return Promise.resolve(singlePlanResponse);
@@ -479,8 +435,11 @@ describe(commands.TASK_GET, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}/tasks?$select=id,title`) {
         return Promise.resolve(singleTaskByTitleResponse);
       }
-      if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/${encodeURIComponent(validTaskId)}`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}`) {
         return Promise.resolve(taskResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+        return Promise.resolve(taskDetailsResponse);
       }
 
       return Promise.reject('Invalid Request');
@@ -495,7 +454,7 @@ describe(commands.TASK_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith(taskResponse));
+        assert(loggerLogSpy.calledWith(outputResponse));
         done();
       }
       catch (e) {
@@ -504,77 +463,53 @@ describe(commands.TASK_GET, () => {
     });
   });
 
-  it('successfully handles item found', (done) => {
+  it('correctly gets task by task ID', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/planner/tasks/01gzSlKkIUSUl6DF_EilrmQAKDhh`) {
-        return Promise.resolve({
-          "createdBy": {
-            "user": {
-              "id": "6463a5ce-2119-4198-9f2a-628761df4a62"
-            }
-          },
-          "planId": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
-          "bucketId": "gcrYAaAkgU2EQUvpkNNXLGQAGTtu",
-          "title": "title-value",
-          "orderHint": "9223370609546166567W",
-          "assigneePriority": "90057581\"",
-          "createdDateTime": "2015-03-25T18:36:49.2407981Z",
-          "assignments": {
-            "fbab97d0-4932-4511-b675-204639209557": {
-              "@odata.type": "#microsoft.graph.plannerAssignment",
-              "assignedBy": {
-                "user": {
-                  "id": "1e9955d2-6acd-45bf-86d3-b546fdc795eb"
-                }
-              },
-              "assignedDateTime": "2015-03-25T18:38:21.956Z",
-              "orderHint": "RWk1"
-            }
-          },
-          "priority": 5,
-          "id": "01gzSlKkIUSUl6DF_EilrmQAKDhh"
-        });
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}`) {
+        return Promise.resolve(taskResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+        return Promise.resolve(taskDetailsResponse);
       }
 
-      return Promise.reject('Invalid request');
+      return Promise.reject('Invalid Request');
     });
 
     command.action(logger, {
       options: {
-        id: '01gzSlKkIUSUl6DF_EilrmQAKDhh', debug: true
+        id: validTaskId
       }
     }, () => {
       try {
-        const actual = JSON.stringify(log[log.length - 1]);
-        const expected = JSON.stringify({
-          "createdBy": {
-            "user": {
-              "id": "6463a5ce-2119-4198-9f2a-628761df4a62"
-            }
-          },
-          "planId": "xqQg5FS2LkCp935s-FIFm2QAFkHM",
-          "bucketId": "gcrYAaAkgU2EQUvpkNNXLGQAGTtu",
-          "title": "title-value",
-          "orderHint": "9223370609546166567W",
-          "assigneePriority": "90057581\"",
-          "createdDateTime": "2015-03-25T18:36:49.2407981Z",
-          "assignments": {
-            "fbab97d0-4932-4511-b675-204639209557": {
-              "@odata.type": "#microsoft.graph.plannerAssignment",
-              "assignedBy": {
-                "user": {
-                  "id": "1e9955d2-6acd-45bf-86d3-b546fdc795eb"
-                }
-              },
-              "assignedDateTime": "2015-03-25T18:38:21.956Z",
-              "orderHint": "RWk1"
-            }
-          },
-          "priority": 5,
-          "id": "01gzSlKkIUSUl6DF_EilrmQAKDhh"
-        });
-        assert.strictEqual(actual, expected);
+        assert(loggerLogSpy.calledWith(outputResponse));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
 
+  // This test has been added to support task details get alias. Needs to be removed when deprecation is removed. 
+  it('correctly gets task by task ID from task details get', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}`) {
+        return Promise.resolve(taskResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+        return Promise.resolve(taskDetailsResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        taskId: validTaskId
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(outputResponse));
         done();
       }
       catch (e) {

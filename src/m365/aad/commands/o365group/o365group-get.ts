@@ -5,6 +5,7 @@ import {
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
+import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { GroupExtended } from './GroupExtended';
@@ -30,16 +31,8 @@ class AadO365GroupGetCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let group: GroupExtended;
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups/${args.options.id}`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    request
-      .get<GroupExtended>(requestOptions)
+    aadGroup
+      .getGroupById(args.options.id)
       .then((res: GroupExtended): Promise<{ webUrl: string }> => {
         group = res;
 

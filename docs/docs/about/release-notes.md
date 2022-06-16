@@ -1,5 +1,43 @@
 # Release notes
 
+## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
+
+### New commands
+
+**Planner:**
+
+- [planner task checklistitem add](../cmd/planner/task/task-checklistitem-add.md) - adds a new checklist item to a Planner task [#3280](https://github.com/pnp/cli-microsoft365/issues/3280)
+- [planner task remove](../cmd/planner/task/task-remove.md) - removes a Microsoft Planner task [#3227](https://github.com/pnp/cli-microsoft365/issues/3227)
+- [planner tenant settings list](../cmd/planner/tenant/tenant-settings-list.md) - lists the Microsoft Planner configuration of the tenant [#3255](https://github.com/pnp/cli-microsoft365/issues/3355)
+
+**SharePoint Online:**
+
+- [spo eventreceiver list](../cmd/spo/eventreceiver/eventreceiver-list.md) - lists all event receivers attached to the specified site, web or list [#3305](https://github.com/pnp/cli-microsoft365/issues/3305)
+- [spo roledefinition remove](../cmd/spo/roledefinition/roledefinition-remove.md) - removes the role definition from the specified site [#3272](https://github.com/pnp/cli-microsoft365/issues/3272)
+
+### Changes
+
+- fixed 'planner task get' [#3324](https://github.com/pnp/cli-microsoft365/issues/3324)
+- extended spo list view add command with viewQuery option [#1862](https://github.com/pnp/cli-microsoft365/issues/1862)
+- updated planner task list options docs [#3347](https://github.com/pnp/cli-microsoft365/issues/3347)
+- updated PowerShell comparison docs [#3332](https://github.com/pnp/cli-microsoft365/issues/3332)
+- added short options to planner bucket commands [#3343](https://github.com/pnp/cli-microsoft365/issues/3343)
+- fixed spo listitem roleinheritance break docs option description formatting [#3358](https://github.com/pnp/cli-microsoft365/issues/3358)
+- added support for upgrading SPFx projects to v1.15.0-rc.0 [#3376](https://github.com/pnp/cli-microsoft365/issues/3376)
+- fixed listTitle option values with single quote [#3357](https://github.com/pnp/cli-microsoft365/issues/3357)
+- fixed planner documentation inconsistency [#3338](https://github.com/pnp/cli-microsoft365/issues/3338)
+- fixed invalid ISO date pattern with 7 milliseconds digits [#3372](https://github.com/pnp/cli-microsoft365/issues/3372)
+- fixed documentation for spo file checkout [#3388](https://github.com/pnp/cli-microsoft365/pull/3388)
+- fixed issue with mkdocs serve because of pygments version [#3389](https://github.com/pnp/cli-microsoft365/issues/3389)
+- fixed spo listitem list options [#3361](https://github.com/pnp/cli-microsoft365/issues/3361)
+- added aadGroup utils class [#3267](https://github.com/pnp/cli-microsoft365/issues/3267)
+- combined planner task details get with planner task get [#3257](https://github.com/pnp/cli-microsoft365/issues/3257)
+- fixed the documentation of the m365 file list command [#3368](https://github.com/pnp/cli-microsoft365/issues/3368)
+- fixed error with the teams team get --name command parameter [#3395](https://github.com/pnp/cli-microsoft365/issues/3395)
+- fixed gateway timeout on flow export [#3393](https://github.com/pnp/cli-microsoft365/issues/3393)
+- extended 'aad app set' with support for multiple identifier URIs [#3333](https://github.com/pnp/cli-microsoft365/issues/3333)
+- fixed bug with spo list list throwing access denied [#3373](https://github.com/pnp/cli-microsoft365/issues/3373)
+
 ## [v5.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.3.0)
 
 ### New commands
@@ -10,17 +48,29 @@
 
 **Planner:**
 
+- [planner task reference add](../cmd/planner/task/task-reference-add.md) - adds a new reference to a Planner task [#3283](https://github.com/pnp/cli-microsoft365/issues/3283)
+- [planner task reference list](../cmd/planner/task/task-reference-list.md) - retrieve the references associated to a Planner task [#3284](https://github.com/pnp/cli-microsoft365/issues/3284)
 - [planner bucket get](../cmd/planner/bucket/bucket-get.md) - retrieves a planner bucket [#3226](https://github.com/pnp/cli-microsoft365/issues/3226)
 - [planner bucket remove](../cmd/planner/bucket/bucket-remove.md) - removes a Microsoft Planner bucket from a plan [#2742](https://github.com/pnp/cli-microsoft365/issues/2742)
 
+**Power Platform:**
+
+- [pp gateway list](../cmd/pp/gateway/gateway-list.md) - returns a list of gateways for which the user is an admin [#3276](https://github.com/pnp/cli-microsoft365/issues/3276)
+
 **SharePoint Online:**
 
+- [spo eventreceiver get](../cmd/spo/eventreceiver/eventreceiver-get.md) - retrieves specific event receiver for a web, site or list [#3308](https://github.com/pnp/cli-microsoft365/issues/3308)
 - [spo field list](../cmd/spo/field/field-list.md) - retrieves columns for the specified list or site [#2695](https://github.com/pnp/cli-microsoft365/issues/2695)
 - [spo list roleinheritance break](../cmd/spo/list/list-roleinheritance-break.md) - breaks role inheritance on list or library [#3198](https://github.com/pnp/cli-microsoft365/issues/3198)
 - [spo list roleinheritance reset](../cmd/spo/list/list-roleinheritance-reset.md) - restores role inheritance on list or library [#3220](https://github.com/pnp/cli-microsoft365/issues/3220)
+- [spo list view add](../cmd/spo/list/list-view-add.md) - adds a new view to a SharePoint list [#1834](https://github.com/pnp/cli-microsoft365/issues/1834)
 - [spo listitem roleinheritance break](../cmd/spo/listitem/listitem-roleinheritance-break.md) - breaks inheritance of list item [#3199](https://github.com/pnp/cli-microsoft365/issues/3199)
 - [spo listitem roleinheritance reset](../cmd/spo/listitem/listitem-roleinheritance-reset.md) - restores the role inheritance of list item, file, or folder [#3238](https://github.com/pnp/cli-microsoft365/issues/3238)
 - [spo roledefinition list](../cmd/spo/roledefinition/roledefinition-list.md) - gets list of role definitions for the specified site [#3237](https://github.com/pnp/cli-microsoft365/issues/3237)
+
+**Search:**
+
+- [search externalConnections list](../cmd/search/externalconnection/externalconnection-list.md) - lists external connections defined in Microsoft Search [#2790](https://github.com/pnp/cli-microsoft365/issues/2790)
 
 **Tenant:**
 
@@ -31,10 +81,17 @@
 - added 'add multiple tasks in Planner' sample [#2245](https://github.com/pnp/cli-microsoft365/issues/2245)
 - removed testing on Node@12 [#3212](https://github.com/pnp/cli-microsoft365/issues/3212)
 - extended 'planner task get' [#3229](https://github.com/pnp/cli-microsoft365/issues/3229)
-- extends 'sp approleassignment' with more properties [#2462](https://github.com/pnp/cli-microsoft365/issues/2462)
+- extended 'sp approleassignment' with more properties [#2462](https://github.com/pnp/cli-microsoft365/issues/2462)
 - fixed invalid channel ID in docs [#3278](https://github.com/pnp/cli-microsoft365/issues/3278)
 - added app only token check to planner commands [#3265](https://github.com/pnp/cli-microsoft365/issues/3265)
-- Added Planner utilities class [#3268](https://github.com/pnp/cli-microsoft365/issues/3268)
+- added Planner utilities class [#3268](https://github.com/pnp/cli-microsoft365/issues/3268)
+- extended 'aad app add' and 'aad app set' with certificates [#3115](https://github.com/pnp/cli-microsoft365/issues/3115), [#3116](https://github.com/pnp/cli-microsoft365/issues/3116)
+- fixes documentation app open in wrong place [#3316](https://github.com/pnp/cli-microsoft365/issues/3316)
+- extended teams channel member with check for private channel [#3254](https://github.com/pnp/cli-microsoft365/issues/3254)
+- updated documentation titles [#3310](https://github.com/pnp/cli-microsoft365/issues/3310)
+- follow the order of properties as defined in defaultProperties [#2008](https://github.com/pnp/cli-microsoft365/issues/2008)
+- added Examples section for New Command template [#3105](https://github.com/pnp/cli-microsoft365/issues/3105)
+- fixed 'documentation about using the @ token in PowerShell' [#3239](https://github.com/pnp/cli-microsoft365/issues/3239)
 
 ## [v5.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.2.0)
 
@@ -165,7 +222,7 @@
 **Planner:**
 
 - [planner task get](../cmd/planner/task/task-get.md) - retrieves the the specified planner task [#3019](https://github.com/pnp/cli-microsoft365/issues/3019)
-- [planner task details get](../cmd/planner/task/task-details-get.md) - retrieves the details of the specified planner task [#3015](https://github.com/pnp/cli-microsoft365/issues/3015)
+- [planner task details get](../cmd/planner/task/task-get.md) - retrieves the details of the specified planner task [#3015](https://github.com/pnp/cli-microsoft365/issues/3015)
 
 **SharePoint:**
 

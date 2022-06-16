@@ -6,7 +6,7 @@ import {
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo, validation } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { ListItemInstance } from './ListItemInstance';
@@ -50,8 +50,8 @@ class SpoListItemSetCommand extends SpoCommand {
     const listIdArgument = args.options.listId || '';
     const listTitleArgument = args.options.listTitle || '';
     const listRestUrl: string = (args.options.listId ?
-      `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
-      : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
+      `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listIdArgument)}')`
+      : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitleArgument)}')`);
     let contentTypeName: string = '';
 
     let formDigestValue: string = '';

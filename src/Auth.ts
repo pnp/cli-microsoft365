@@ -642,6 +642,12 @@ export class Auth {
       resource = 'https://management.azure.com/';
     }
 
+    if (resource === 'https://api.powerbi.com') {
+      // api.powerbi.com is not a valid resource
+      // we need to use https://analysis.windows.net/powerbi/api instead
+      resource = 'https://analysis.windows.net/powerbi/api';
+    }
+
     return resource;
   }
 
