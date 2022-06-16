@@ -61,8 +61,7 @@ class TeamsCacheRemoveCommand extends GraphCommand {
       await this.removeCacheFiles(logger);      
     } 
     catch (e: any) {
-      logger.logToStderr(e.message as string);
-      cb();
+      cb(e.message as string);
       return;
     }
 

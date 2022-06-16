@@ -136,14 +136,16 @@ describe(commands.CACHE_REMOVE, () => {
     command.action(logger, { options: {
       confirm: true,
       verbose: true
-    }}, () => {
+    }}, (err) => {
       try {
-        assert(true);
-        exec.restore();
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(`ERROR: The process "Teams.exe" not found.`));
         done();
       }
       catch (e) {
         done(e);
+      }
+      finally {
+        exec.restore();
       }
     });
   });
@@ -156,14 +158,16 @@ describe(commands.CACHE_REMOVE, () => {
 
     command.action(logger, { options: {
       confirm: true
-    }}, () => {
+    }}, (err) => {
       try {
-        assert(true);
-        exec.restore();
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(`random error`));
         done();
       }
       catch (e) {
         done(e);
+      }
+      finally {
+        exec.restore();
       }
     });
   });
@@ -174,19 +178,20 @@ describe(commands.CACHE_REMOVE, () => {
     const exec = sinon.stub(command, 'exec' as any).returns({stdout: 'pid'});
     const kill = sinon.stub(process, 'kill' as any).returns(null);
 
-
     command.action(logger, { options: {
       confirm: true,
       verbose: true
     }}, () => {
       try {
         assert(true);
-        exec.restore();
-        kill.restore();
         done();
       }
       catch (e) {
         done(e);
+      }
+      finally {
+        exec.restore();
+        kill.restore();
       }
     });
   });
@@ -202,11 +207,13 @@ describe(commands.CACHE_REMOVE, () => {
     }}, () => {
       try {
         assert(true);
-        exec.restore();
         done();
       }
       catch (e) {
         done(e);
+      }
+      finally {
+        exec.restore();
       }
     });
   });
@@ -222,12 +229,14 @@ describe(commands.CACHE_REMOVE, () => {
     }}, () => {
       try {
         assert(true);
-        exec.restore();
-        kill.restore();
         done();
       }
       catch (e) {
         done(e);
+      }
+      finally {
+        exec.restore();
+        kill.restore();
       }
     });
   });
