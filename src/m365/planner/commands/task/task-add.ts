@@ -145,7 +145,7 @@ class PlannerTaskAddCommand extends GraphCommand {
     }
 
     const categories: AppliedCategories = {};
-    this.splitByCommaOrSpace(options.appliedCategories).forEach(x => categories[x] = true);
+    options.appliedCategories.toLocaleLowerCase().split(',').forEach(x => categories[x] = true);
     return categories;
   }
 
@@ -301,19 +301,6 @@ class PlannerTaskAddCommand extends GraphCommand {
 
         return Promise.resolve(userIds);
       });
-  }
-  
-  /**
-   * Converts a comma or space separated string into an array.
-   * @param value the string to convert
-   */
-  private splitByCommaOrSpace (value: string): string[] {
-    if (value.indexOf(',') === -1) {
-      return value.trim().toLowerCase().split(' ').filter(e => e && e !== '');
-    } 
-    else {
-      return value.trim().toLowerCase().split(',').filter(e => e && e !== '');
-    }
   }
 
   public options(): CommandOption[] {
