@@ -448,6 +448,19 @@ describe(commands.TASK_ADD, () => {
     done();
   });
 
+  it('fails validation if priority is specified which is not an integer.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        priority: 5.6
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
   it('fails validation if unknown priority label is specified.', (done) => {
     const actual = command.validate({
       options: {

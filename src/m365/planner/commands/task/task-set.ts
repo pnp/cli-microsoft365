@@ -10,6 +10,7 @@ import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { aadGroup } from '../../../../utils/aadGroup';
+import { taskPriority } from '../../taskPriority';
 
 interface CommandArgs {
   options: Options;
@@ -352,29 +353,10 @@ class PlannerTaskSetCommand extends GraphCommand {
     }
 
     if (options.priority !== undefined) {
-      requestBody.priority = this.getPriorityValue(options);
+      requestBody.priority = taskPriority.getPriorityValue(options.priority);
     }
 
     return requestBody;
-  }
-
-  private getPriorityValue(options: Options): number | undefined {
-    const priority = options.priority;
-    
-    if (typeof priority === "string") {
-      switch (priority.toLowerCase()) {
-        case "urgent":
-          return 1;
-        case "important":
-          return 3;
-        case "medium":
-          return 5;
-        case "low":
-          return 9;
-      }
-    }
-    
-    return priority as number | undefined;
   }
 
   public options(): CommandOption[] {
@@ -396,7 +378,7 @@ class PlannerTaskSetCommand extends GraphCommand {
       { option: '--description [description]' },
       { option: '--appliedCategories [appliedCategories]' },
       { option: '--orderHint [orderHint]' },
-      { option: '--priority [priority]', autocomplete: ["Urgent", "Important", "Medium", "Low"] }
+      { option: '--priority [priority]', autocomplete: taskPriority.priorityValues }
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -457,14 +439,12 @@ class PlannerTaskSetCommand extends GraphCommand {
 
     if (args.options.priority !== undefined) {
       if (typeof args.options.priority === "number") {
-        // Number validation
-        if (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10) {
-          return 'priority should be a number between 0 and 10.';
+        if (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10 || !Number.isInteger(args.options.priority)) {
+          return 'priority should be an integer between 0 and 10.';
         }
       }
-      // String validation
-      else if (["urgent", "important", "medium", "low"].indexOf(args.options.priority.toString().toLowerCase()) === -1) {
-        return `${args.options.priority} is not a valid priority value. Allowed values Urgent|Important|Medium|Low.`;
+      else if (taskPriority.priorityValues.map(l => l.toLowerCase()).indexOf(args.options.priority.toString().toLowerCase()) === -1) {
+        return `${args.options.priority} is not a valid priority value. Allowed values ${taskPriority.priorityValues.join('|')}.`;
       }
     }
 

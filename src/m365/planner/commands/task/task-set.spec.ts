@@ -359,6 +359,17 @@ describe(commands.TASK_SET, () => {
     done();
   });
 
+  it('fails validation if priority is specified which is not an integer.', (done) => {
+    const actual = command.validate({
+      options: {
+        id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
+        priority: 5.6
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
   it('fails validation if unknown priority label is specified.', (done) => {
     const actual = command.validate({
       options: {
