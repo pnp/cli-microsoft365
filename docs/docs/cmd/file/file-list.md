@@ -27,20 +27,20 @@ This command is an improved version of the `spo file list` command. The main dif
 
 ## Examples
 
-Return all files from folder _Shared Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Return all files from the folder _Shared Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 file list --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents'
+m365 file list --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl 'Shared Documents'
 ```
 
 Return all files from the folder _Shared Documents_ and all the sub-folders of _Shared Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 file list --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --recursive
+m365 file list --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl 'Shared Documents' --recursive
 ```
 
 Return all files from the _Important_ folder in the _Shared Documents_ document library located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 file list --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents/Important'
+m365 file list --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl 'Shared Documents/Important'
 ```

@@ -196,13 +196,15 @@ nav:
       - task:
         - task add: 'cmd/planner/task/task-add.md'
         - task checklistitem add: 'cmd/planner/task/task-checklistitem-add.md'
-        - task details get: 'cmd/planner/task/task-details-get.md'
+        - task details get: 'cmd/planner/task/task-get.md'
         - task get: 'cmd/planner/task/task-get.md'
         - task list: 'cmd/planner/task/task-list.md'
         - task reference add: 'cmd/planner/task/task-reference-add.md'
         - task reference list: 'cmd/planner/task/task-reference-list.md'
         - task remove: 'cmd/planner/task/task-remove.md'
         - task set: 'cmd/planner/task/task-set.md'
+      - tenant:
+        - tenant settings list: 'cmd/planner/tenant/tenant-settings-list.md'
     - Power Apps (pa):
       - app:
         - app get: 'cmd/pa/app/app-get.md'
@@ -308,6 +310,7 @@ nav:
         - customaction set: 'cmd/spo/customaction/customaction-set.md'
       - eventreceiver:
         - eventreceiver get: 'cmd/spo/eventreceiver/eventreceiver-get.md'
+        - eventreceiver list: 'cmd/spo/eventreceiver/eventreceiver-list.md'
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
       - feature:

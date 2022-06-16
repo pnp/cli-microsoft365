@@ -110,8 +110,12 @@ class AadAppSetCommand extends GraphCommand {
       logger.logToStderr(`Configuring Azure AD application ID URI...`);
     }
 
+    const identifierUris: string[] = args.options.uri
+      .split(',')
+      .map(u => u.trim());
+
     const applicationInfo: any = {
-      identifierUris: [args.options.uri]
+      identifierUris: identifierUris
     };
 
     const requestOptions: any = {
