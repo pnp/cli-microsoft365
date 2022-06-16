@@ -22,4 +22,4 @@ export const taskPriority = {
     
     return priority as number | undefined;
   }
-}
+};
