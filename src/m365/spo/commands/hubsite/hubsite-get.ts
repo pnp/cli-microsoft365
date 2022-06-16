@@ -105,10 +105,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
     }
 
     if (args.options.url) {
-      const isValidSiteUrl = validation.isValidSharePointUrl(args.options.url);
-      if (isValidSiteUrl !== true) {
-        return isValidSiteUrl;
-      }
+      return validation.isValidSharePointUrl(args.options.url);
     }
 
     return true;
