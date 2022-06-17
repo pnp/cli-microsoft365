@@ -125,7 +125,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
 
   it('Correctly deletes checklist item', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details?$select=checklist`) {
         return Promise.resolve({
           "@odata.etag": "TestEtag",
           checklist: responseChecklistWithId
@@ -158,7 +158,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
 
   it('fails validation when checklist item does not exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details?$select=checklist` &&
         JSON.stringify(opts.headers) === JSON.stringify({
           'accept': 'application/json'
         })) {

@@ -53,8 +53,13 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
 
   private removeChecklistitem(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     this
-      .getTaskDetailsEtag(args.options)
-      .then(etag => {
+      .getTaskDetails(args.options.taskId)
+      .then(task => {
+        const etag: string = task['@odata.etag'];
+        const checklistItemId = task.checklist[args.options.id];
+        if (!checklistItemId) {
+          return Promise.reject(`The specified checklist item with id ${args.options.id} does not exist`);
+        }
         const requestOptionsTaskDetails: any = {
           url: `${this.resource}/v1.0/planner/tasks/${args.options.taskId}/details`,
           headers: {
@@ -75,9 +80,9 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getTaskDetailsEtag(options: Options): Promise<string> {
+  private getTaskDetails(taskId: string): Promise<any> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(options.taskId)}/details`,
+      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}/details?$select=checklist`,
       headers: {
         accept: 'application/json'
       },
@@ -87,12 +92,7 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
     return request
       .get(requestOptions)
       .then((response: any) => {
-        const etag: string = response['@odata.etag'];
-        const checklistItemId = response.checklist[options.id];
-        if (!checklistItemId) {
-          return Promise.reject(`The specified checklist item with id ${options.id} does not exist`);
-        }
-        return Promise.resolve(etag);
+        return Promise.resolve(response);
       });
   }
 
