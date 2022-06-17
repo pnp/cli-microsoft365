@@ -46,6 +46,8 @@ m365 spo listitem list [options]
 
 `pageNumber` is specified as a 0-based index. A value of `2` returns the third page of items.
 
+If you want to specify a lookup type in the `properties` option, define which columns from the related list should be returned.
+
 ## Examples
 
 Get all items from a list named Demo List
@@ -70,6 +72,12 @@ Get all items from list named _Demo List_. For each item, retrieve the value of 
 
 ```sh
 m365 spo listitem list --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --fields "ID,Title,Modified"
+```
+
+Get all items from list named _Demo List_. For each item, retrieve the value of the _ID_, _Title_, _Modified_ fields, and the value of lookup field _Company_
+
+```sh
+m365 spo listitem list --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --fields "ID,Title,Modified,Company/Title"
 ```
 
 From a list named _Demo List_ get all items with title _Demo list item_ using an OData filter
