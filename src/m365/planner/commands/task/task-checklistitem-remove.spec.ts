@@ -16,6 +16,20 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
   const validTaskId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validId = '71175';
 
+  const responseChecklistWithId = {
+    "71175": {
+      "isChecked": false,
+      "title": "test 2"
+    }
+  };
+  const responseChecklistWithNoId = {
+    "71176": {
+      "isChecked": false,
+      "title": "test 2"
+    }
+  };
+
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -113,7 +127,8 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
         return Promise.resolve({
-          "@odata.etag": "TestEtag"
+          "@odata.etag": "TestEtag",
+          checklist: responseChecklistWithId
         });
       }
       return Promise.reject('Invalid Request');
@@ -141,13 +156,19 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     });
   });
 
-  it('fails when Planner task does not exist', (done) => {
+  it('fails validation when checklist item does not exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
-        return Promise.reject('The request item is not found.');
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details` &&
+        JSON.stringify(opts.headers) === JSON.stringify({
+          'accept': 'application/json'
+        })) {
+        return Promise.resolve({
+          "@odata.etag": "TestEtag",
+          checklist: responseChecklistWithNoId
+        });
       }
 
-      return Promise.reject('Invalid Request');
+      return Promise.reject('Invalid request');
     });
 
     command.action(logger, {
@@ -157,7 +178,22 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
       }
     }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Planner task was not found.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified checklist item with id ${validId} does not exist`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles random API error', (done) => {
+    sinonUtil.restore(request.get);
+    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
+
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {

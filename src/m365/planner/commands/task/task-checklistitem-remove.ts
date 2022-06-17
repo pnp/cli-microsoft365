@@ -53,7 +53,7 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
 
   private removeChecklistitem(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     this
-      .getTaskDetailsEtag(args.options.taskId)
+      .getTaskDetailsEtag(args.options)
       .then(etag => {
         const requestOptionsTaskDetails: any = {
           url: `${this.resource}/v1.0/planner/tasks/${args.options.taskId}/details`,
@@ -75,19 +75,25 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getTaskDetailsEtag(taskId: string): Promise<string> {
+  private getTaskDetailsEtag(options: Options): Promise<string> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}/details`,
+      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(options.taskId)}/details`,
       headers: {
-        accept: 'application/json;odata.metadata=minimal'
+        accept: 'application/json'
       },
       responseType: 'json'
     };
 
     return request
       .get(requestOptions)
-      .then((task: any) => task['@odata.etag'],
-        () => Promise.reject('Planner task was not found.'));
+      .then((response: any) => {
+        const etag: string = response['@odata.etag'];
+        const checklistItemId = response.checklist[options.id];
+        if (!checklistItemId) {
+          return Promise.reject(`The specified checklist item with id ${options.id} does not exist`);
+        }
+        return Promise.resolve(etag);
+      });
   }
 
   public options(): CommandOption[] {
