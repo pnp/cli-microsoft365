@@ -78,8 +78,8 @@ describe(commands.HUBSITE_GET, () => {
 
   it('gets information about the specified hub site', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
-        return Promise.resolve({ value: [hubsiteResponse] });
+      if ((opts.url as string).indexOf(`/_api/hubsites/getbyid('${validId}')`) > -1) {
+        return Promise.resolve(hubsiteResponse);
       }
 
       return Promise.reject('Invalid request');
@@ -98,10 +98,9 @@ describe(commands.HUBSITE_GET, () => {
 
   it('gets information about the specified hub site (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
-        return Promise.resolve({ value: [hubsiteResponse] });
+      if ((opts.url as string).indexOf(`/_api/hubsites/getbyid('${validId}')`) > -1) {
+        return Promise.resolve(hubsiteResponse);
       }
-
 
       return Promise.reject('Invalid request');
     });
@@ -168,7 +167,7 @@ describe(commands.HUBSITE_GET, () => {
 
     command.action(logger, { options: { debug: false, title: validTitle } }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple hubsites with ${validTitle} found: ${validUrl},${validUrl}`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple hub sites with ${validTitle} found: ${validUrl},${validUrl}`)));
         done();
       }
       catch (e) {
@@ -188,7 +187,7 @@ describe(commands.HUBSITE_GET, () => {
 
     command.action(logger, { options: { debug: false, title: validTitle } }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified hubsite ${validTitle} does not exist`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified hub site ${validTitle} does not exist`)));
         done();
       }
       catch (e) {
@@ -208,7 +207,7 @@ describe(commands.HUBSITE_GET, () => {
 
     command.action(logger, { options: { debug: false, url: validUrl } }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple hubsites with ${validUrl} found: ${validUrl},${validUrl}`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple hub sites with ${validUrl} found: ${validUrl},${validUrl}`)));
         done();
       }
       catch (e) {
@@ -228,7 +227,7 @@ describe(commands.HUBSITE_GET, () => {
 
     command.action(logger, { options: { debug: false, url: validUrl } }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified hubsite ${validUrl} does not exist`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified hub site ${validUrl} does not exist`)));
         done();
       }
       catch (e) {
@@ -254,7 +253,7 @@ describe(commands.HUBSITE_GET, () => {
 
     command.action(logger, { options: { debug: false, id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified hub site with id ee8b42c3-3e6f-4822-87c1-c21ad666046b does not exist`)));
         done();
       }
       catch (e) {

@@ -21,11 +21,6 @@ m365 spo hubsite get [options]
 
 --8<-- "docs/cmd/_global.md"
 
-## Remarks
-
-!!! attention
-    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
-
 ## Examples
 
 Get information about the hub site with ID _2c1ba4c4-cd9b-4417-832f-92a34bc34b2a_

@@ -38,12 +38,32 @@ class SpoHubSiteGetCommand extends SpoCommand {
     spo
       .getSpoUrl(logger, this.debug)
       .then((spoUrl: string): Promise<any> => {
-        return this.getHubSite(spoUrl, args.options);
+        if (args.options.id) {
+          return this.getHubSiteById(spoUrl, args.options);
+        }
+        else {
+          return this.getHubSite(spoUrl, args.options);
+        }
       })
       .then((res: any): void => {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  }
+
+  private getHubSiteById(spoUrl: string, options: Options): Promise<HubSite> {
+    const requestOptions: any = {
+      url: `${spoUrl}/_api/hubsites/getbyid('${options.id}')`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+    
+    return request
+      .get(requestOptions)
+      .then((hubsite: any) => hubsite)
+      .catch(() => Promise.reject(`The specified hub site with id ${options.id} does not exist`));
   }
 
   private getHubSite(spoUrl: string, options: Options): Promise<HubSite> {
@@ -60,10 +80,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
       .then((response: any) => {
         let hubSites = response.value as HubSite[];
 
-        if (options.id) {
-          hubSites = hubSites.filter(site => site.ID.toLocaleLowerCase() === options.id!.toLocaleLowerCase());
-        }
-        else if (options.title) {
+        if (options.title) {
           hubSites = hubSites.filter(site => site.Title.toLocaleLowerCase() === options.title!.toLocaleLowerCase());
         }
         else if (options.url) {
@@ -71,11 +88,11 @@ class SpoHubSiteGetCommand extends SpoCommand {
         }
 
         if (!hubSites.length) {
-          return Promise.reject(`The specified hubsite ${options.id || options.title || options.url} does not exist`);
+          return Promise.reject(`The specified hub site ${options.title || options.url} does not exist`);
         }
 
         if (hubSites.length > 1) {
-          return Promise.reject(`Multiple hubsites with ${options.id || options.title || options.url} found: ${hubSites.map(site => site.SiteUrl)}`);
+          return Promise.reject(`Multiple hub sites with ${options.title || options.url} found: ${hubSites.map(site => site.SiteUrl)}`);
         }
 
         return hubSites[0];
