@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,11 +12,13 @@ const command: Command = require('./site-chrome-set');
 describe(commands.SITE_CHROME_SET, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -207,7 +209,7 @@ describe(commands.SITE_CHROME_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -218,7 +220,7 @@ describe(commands.SITE_CHROME_SET, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<url>') > -1) {
@@ -228,18 +230,18 @@ describe(commands.SITE_CHROME_SET, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { url: 'foo' } });
+  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { url: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com' } });
+  it('passes validation if the url option is a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports specifying disable footer', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--disableFooter') > -1) {
@@ -250,7 +252,7 @@ describe(commands.SITE_CHROME_SET, () => {
   });
 
   it('supports specifying disable mega menu', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--disableMegaMenu') > -1) {
@@ -261,7 +263,7 @@ describe(commands.SITE_CHROME_SET, () => {
   });
 
   it('supports specifying hide title in header', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--hideTitleInHeader') > -1) {
@@ -272,7 +274,7 @@ describe(commands.SITE_CHROME_SET, () => {
   });
 
   it('supports specifying footer emphasis', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[footerEmphasis]') > -1) {
@@ -282,18 +284,18 @@ describe(commands.SITE_CHROME_SET, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if the footer emphasis option is not a valid', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', footerEmphasis: "None" } });
+  it('fails validation if the footer emphasis option is not a valid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', footerEmphasis: "None" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the footer emphasis option is a valid', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', footerEmphasis: "Dark" } });
+  it('passes validation if the footer emphasis option is a valid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', footerEmphasis: "Dark" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports specifying footer layout', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[footerLayout]') > -1) {
@@ -303,18 +305,18 @@ describe(commands.SITE_CHROME_SET, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if the footer layout option is not a valid', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', footerLayout: "None" } });
+  it('fails validation if the footer layout option is not a valid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', footerLayout: "None" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the footer layout option is a valid', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', footerLayout: "Simple" } });
+  it('passes validation if the footer layout option is a valid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', footerLayout: "Simple" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports specifying header emphasis', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[headerEmphasis]') > -1) {
@@ -324,18 +326,18 @@ describe(commands.SITE_CHROME_SET, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if the header emphasis option is not a valid', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', headerEmphasis: "None" } });
+  it('fails validation if the header emphasis option is not a valid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', headerEmphasis: "None" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the header emphasis option is a valid', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', headerEmphasis: "Dark" } });
+  it('passes validation if the header emphasis option is a valid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', headerEmphasis: "Dark" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports specifying header layout', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[headerLayout]') > -1) {
@@ -345,18 +347,18 @@ describe(commands.SITE_CHROME_SET, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if the header emphasis layout is not a valid', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', headerLayout: "None" } });
+  it('fails validation if the header emphasis layout is not a valid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', headerLayout: "None" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the header emphasis layout is a valid', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', headerLayout: "Standard" } });
+  it('passes validation if the header emphasis layout is a valid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', headerLayout: "Standard" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports specifying logo alignment', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[logoAlignment]') > -1) {
@@ -366,13 +368,13 @@ describe(commands.SITE_CHROME_SET, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if the header logo alignment is not a valid', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', logoAlignment: "None" } });
+  it('fails validation if the header logo alignment is not a valid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', logoAlignment: "None" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the logo alignment is a valid', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', logoAlignment: "Center" } });
+  it('passes validation if the logo alignment is a valid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', logoAlignment: "Center" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

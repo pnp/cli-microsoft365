@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
-import { CommandError, CommandOption } from '../../../../Command';
+import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Dictionary, Hash, packageManager } from '../../../../utils';
 import commands from '../../commands';
@@ -65,10 +65,6 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
     '1.15.2'
   ];
 
-  public constructor() {
-    super();
-  }
-
   public get name(): string {
     return commands.PROJECT_DOCTOR;
   }
@@ -77,10 +73,48 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
     return 'Validates correctness of a SharePoint Framework project';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.packageManager = args.options.packageManager || 'npm';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        packageManager: args.options.packageManager || 'npm'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.forEach(o => {
+      if (o.option.indexOf('--output') > -1) {
+        o.autocomplete = ['json', 'text', 'md', 'tour'];
+      }
+    });
+    this.options.unshift(
+      {
+        option: '--packageManager [packageManager]',
+        autocomplete: SpfxProjectDoctorCommand.packageManagers
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.packageManager) {
+          if (SpfxProjectDoctorCommand.packageManagers.indexOf(args.options.packageManager) < 0) {
+            return `${args.options.packageManager} is not a supported package manager. Supported package managers are ${SpfxProjectDoctorCommand.packageManagers.join(', ')}`;
+          }
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -386,33 +420,6 @@ ${f.resolution}
       modificationPerFile: modificationPerFile,
       modificationTypePerFile: modificationTypePerFile
     };
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--packageManager [packageManager]',
-        autocomplete: SpfxProjectDoctorCommand.packageManagers
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    parentOptions.forEach(o => {
-      if (o.option.indexOf('--output') > -1) {
-        o.autocomplete = ['json', 'text', 'md', 'tour'];
-      }
-    });
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.packageManager) {
-      if (SpfxProjectDoctorCommand.packageManagers.indexOf(args.options.packageManager) < 0) {
-        return `${args.options.packageManager} is not a supported package manager. Supported package managers are ${SpfxProjectDoctorCommand.packageManagers.join(', ')}`;
-      }
-    }
-
-    return true;
   }
 }
 

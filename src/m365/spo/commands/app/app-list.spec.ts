@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,12 +13,14 @@ describe(commands.APP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -368,7 +370,7 @@ describe(commands.APP_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -378,38 +380,38 @@ describe(commands.APP_LIST, () => {
     assert(containsdebugOption);
   });
 
-  it('fails validation when invalid scope is specified', () => {
-    const actual = command.validate({ options: { scope: 'foo' } });
+  it('fails validation when invalid scope is specified', async () => {
+    const actual = await command.validate({ options: { scope: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when no scope is specified', () => {
-    const actual = command.validate({ options: {} });
+  it('passes validation when no scope is specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the scope is specified with \'tenant\'', () => {
-    const actual = command.validate({ options: { scope: 'tenant' } });
+  it('passes validation when the scope is specified with \'tenant\'', async () => {
+    const actual = await command.validate({ options: { scope: 'tenant' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when appCatalogUrl is not a valid url', () => {
-    const actual = command.validate({ options: { scope: 'sitecollection', appCatalogUrl: 'abc' } });
+  it('fails validation when appCatalogUrl is not a valid url', async () => {
+    const actual = await command.validate({ options: { scope: 'sitecollection', appCatalogUrl: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', () => {
-    const actual = command.validate({ options: { name: 'solution', filePath: 'abc', scope: 'sitecollection' } });
+  it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', async () => {
+    const actual = await command.validate({ options: { scope: 'sitecollection' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('should fail when \'sitecollection\' scope, but  bad appCatalogUrl format specified', () => {
-    const actual = command.validate({ options: { name: 'solution', filePath: 'abc', scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } });
+  it('should fail when \'sitecollection\' scope, but  bad appCatalogUrl format specified', async () => {
+    const actual = await command.validate({ options: { scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the scope is specified with \'sitecollection\' and appCatalogUrl present', () => {
-    const actual = command.validate({ options: { scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } });
+  it('passes validation when the scope is specified with \'sitecollection\' and appCatalogUrl present', async () => {
+    const actual = await command.validate({ options: { scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

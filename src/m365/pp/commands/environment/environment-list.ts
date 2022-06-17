@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import PowerPlatformCommand from '../../../base/PowerPlatformCommand';
@@ -24,6 +23,29 @@ class PpEnvironmentListCommand extends PowerPlatformCommand {
 
   public defaultProperties(): string[] | undefined {
     return ['name', 'displayName'];
+  }
+
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        asAdmin: !!args.options.asAdmin
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-a, --asAdmin [teamId]'
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -59,17 +81,6 @@ class PpEnvironmentListCommand extends PowerPlatformCommand {
 
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-a, --asAdmin [teamId]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

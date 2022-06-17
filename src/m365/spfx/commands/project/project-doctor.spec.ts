@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import { fsUtil, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -13,6 +13,7 @@ const command: Command = require('./project-doctor');
 describe(commands.PROJECT_DOCTOR, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let trackEvent: any;
   let telemetry: any;
   const validProjectPath = 'src/m365/spfx/commands/project/test-projects/spfx-1140-webpart-react';
@@ -22,6 +23,7 @@ describe(commands.PROJECT_DOCTOR, () => {
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -790,7 +792,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -800,28 +802,28 @@ describe(commands.PROJECT_DOCTOR, () => {
     assert(containsOption);
   });
 
-  it('passes validation when package manager not specified', () => {
-    const actual = command.validate({ options: {} });
+  it('passes validation when package manager not specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when unsupported package manager specified', () => {
-    const actual = command.validate({ options: { packageManager: 'abc' } });
+  it('fails validation when unsupported package manager specified', async () => {
+    const actual = await command.validate({ options: { packageManager: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when npm package manager specified', () => {
-    const actual = command.validate({ options: { packageManager: 'npm' } });
+  it('passes validation when npm package manager specified', async () => {
+    const actual = await command.validate({ options: { packageManager: 'npm' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when pnpm package manager specified', () => {
-    const actual = command.validate({ options: { packageManager: 'pnpm' } });
+  it('passes validation when pnpm package manager specified', async () => {
+    const actual = await command.validate({ options: { packageManager: 'pnpm' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when yarn package manager specified', () => {
-    const actual = command.validate({ options: { packageManager: 'yarn' } });
+  it('passes validation when yarn package manager specified', async () => {
+    const actual = await command.validate({ options: { packageManager: 'yarn' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

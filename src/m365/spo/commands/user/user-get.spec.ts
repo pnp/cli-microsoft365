@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.USER_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -234,7 +236,7 @@ describe(commands.USER_GET, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -244,53 +246,53 @@ describe(commands.USER_GET, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'foo', id: 1 } });
+  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'foo', id: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if id or email or loginName options are not passed', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+  it('fails validation if id or email or loginName options are not passed', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if id, email and loginName options are passed (multiple options)', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, email: "jonh.deo@mytenant.com", loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } });
+  it('fails validation if id, email and loginName options are passed (multiple options)', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, email: "jonh.deo@mytenant.com", loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if id and email both are passed (multiple options)', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, email: "jonh.deo@mytenant.com" } });
+  it('fails validation if id and email both are passed (multiple options)', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, email: "jonh.deo@mytenant.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if id and loginName options are passed (multiple options)', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } });
+  it('fails validation if id and loginName options are passed (multiple options)', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if email and loginName options are passed (multiple options)', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', email: "jonh.deo@mytenant.com", loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } });
+  it('fails validation if email and loginName options are passed (multiple options)', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', email: "jonh.deo@mytenant.com", loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if specified id is not a number', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'a' } });
+  it('fails validation if specified id is not a number', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'a' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation url is valid and id is passed', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+  it('passes validation url is valid and id is passed', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if the url is valid and email is passed', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', email: "jonh.deo@mytenant.com" } });
+  it('passes validation if the url is valid and email is passed', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', email: "jonh.deo@mytenant.com" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if the url is valid and loginName is passed', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } });
+  it('passes validation if the url is valid and loginName is passed', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 }); 

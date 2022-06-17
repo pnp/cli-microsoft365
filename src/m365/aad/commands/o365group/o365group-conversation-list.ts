@@ -1,8 +1,5 @@
 import { Conversation } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
@@ -29,6 +26,33 @@ class AadO365GroupConversationListCommand extends GraphCommand {
     return ['topic', 'lastDeliveredDateTime', 'id'];
   }
 
+  constructor() {
+    super();
+  
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --groupId <groupId>'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.groupId as string)) {
+          return `${args.options.groupId} is not a valid GUID`;
+        }
+    
+        return true;
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     odata
       .getAllItems<Conversation>(`${this.resource}/v1.0/groups/${args.options.groupId}/conversations`)
@@ -36,24 +60,6 @@ class AadO365GroupConversationListCommand extends GraphCommand {
         logger.log(conversations);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --groupId <groupId>'
-      }
-    ];
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.groupId as string)) {
-      return `${args.options.groupId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

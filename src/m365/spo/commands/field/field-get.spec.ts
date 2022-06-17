@@ -3,7 +3,7 @@ import chalk = require('chalk');
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -15,11 +15,13 @@ describe(commands.FIELD_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -63,27 +65,27 @@ describe(commands.FIELD_GET, () => {
   });
 
   it('defines correct option sets', () => {
-    const optionSets = command.optionSets();
+    const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [['id', 'title', 'fieldTitle']]);
   });
 
-  it('fails validation if the specified site URL is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { webUrl: 'site.com', id: '03e45e84-1992-4d42-9116-26f756012634' } });
+  it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'site.com', id: '03e45e84-1992-4d42-9116-26f756012634' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the field ID is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: 'abc' } });
+  it('fails validation if the field ID is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the list ID is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '03e45e84-1992-4d42-9116-26f756012634', listId: 'abc' } });
+  it('fails validation if the list ID is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '03e45e84-1992-4d42-9116-26f756012634', listId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when all required parameters are valid', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '03e45e84-1992-4d42-9116-26f756012634' } });
+  it('passes validation when all required parameters are valid', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '03e45e84-1992-4d42-9116-26f756012634' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -478,7 +480,7 @@ describe(commands.FIELD_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

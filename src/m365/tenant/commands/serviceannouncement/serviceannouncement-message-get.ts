@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -22,6 +19,33 @@ class TenantServiceAnnouncementMessageGetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Retrieves a specified service update message for the tenant';
+  }
+
+  constructor() {
+    super();
+
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id <id>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!this.isValidId(args.options.id)) {
+          return `${args.options.id} is not a valid message ID`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -45,27 +69,8 @@ class TenantServiceAnnouncementMessageGetCommand extends GraphCommand {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
   private isValidId(id: string): boolean {
     return (/MC\d{6}/).test(id);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!this.isValidId(args.options.id)) {
-      return `${args.options.id} is not a valid message ID`;
-    }
-
-    return true;
   }
 }
 

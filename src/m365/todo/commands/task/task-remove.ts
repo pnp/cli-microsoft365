@@ -1,7 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -27,12 +24,55 @@ class TodoTaskRemoveCommand extends GraphCommand {
     return 'Removes the specified Microsoft To Do task';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listName = typeof args.options.listName !== 'undefined';
-    telemetryProps.listId = typeof args.options.listId !== 'undefined';
-    telemetryProps.confirm = typeof args.options.confirm !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listName: typeof args.options.listName !== 'undefined',
+        listId: typeof args.options.listId !== 'undefined',
+        confirm: typeof args.options.confirm !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '--listName [listName]'
+      },
+      {
+        option: '--listId [listId]'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.listName && !args.options.listId) {
+          return 'Specify name or id of the To Do list';
+        }
+
+        if (args.options.listName && args.options.listId) {
+          return 'Specify either the name or the id of the To Do list but not both';
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -96,38 +136,6 @@ class TodoTaskRemoveCommand extends GraphCommand {
         }
       );
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '--listName [listName]'
-      },
-      {
-        option: '--listId [listId]'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.listName && !args.options.listId) {
-      return 'Specify name or id of the To Do list';
-    }
-
-    if (args.options.listName && args.options.listId) {
-      return 'Specify either the name or the id of the To Do list but not both';
-    }
-
-    return true;
   }
 }
 

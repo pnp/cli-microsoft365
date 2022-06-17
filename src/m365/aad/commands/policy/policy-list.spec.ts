@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.POLICY_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -360,88 +362,88 @@ describe(commands.POLICY_LIST, () => {
     });
   });
 
-  it('accepts policyType to be activityBasedTimeout', () => {
-    const actual = command.validate({
+  it('accepts policyType to be activityBasedTimeout', async () => {
+    const actual = await command.validate({
       options:
       {
         policyType: "activityBasedTimeout"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policyType to be authorization', () => {
-    const actual = command.validate({
+  it('accepts policyType to be authorization', async () => {
+    const actual = await command.validate({
       options:
       {
         policyType: "authorization"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policyType to be claimsMapping', () => {
-    const actual = command.validate({
+  it('accepts policyType to be claimsMapping', async () => {
+    const actual = await command.validate({
       options:
       {
         policyType: "claimsMapping"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policyType to be homeRealmDiscovery', () => {
-    const actual = command.validate({
+  it('accepts policyType to be homeRealmDiscovery', async () => {
+    const actual = await command.validate({
       options:
       {
         policyType: "homeRealmDiscovery"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policyType to be identitySecurityDefaultsEnforcement', () => {
-    const actual = command.validate({
+  it('accepts policyType to be identitySecurityDefaultsEnforcement', async () => {
+    const actual = await command.validate({
       options:
       {
         policyType: "identitySecurityDefaultsEnforcement"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policyType to be tokenLifetime', () => {
-    const actual = command.validate({
+  it('accepts policyType to be tokenLifetime', async () => {
+    const actual = await command.validate({
       options:
       {
         policyType: "tokenLifetime"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policyType to be tokenIssuance', () => {
-    const actual = command.validate({
+  it('accepts policyType to be tokenIssuance', async () => {
+    const actual = await command.validate({
       options:
       {
         policyType: "tokenIssuance"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('rejects invalid policyType', () => {
+  it('rejects invalid policyType', async () => {
     const policyType = 'foo';
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         policyType: policyType
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

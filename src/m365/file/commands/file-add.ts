@@ -2,9 +2,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as url from 'url';
 import { Logger } from '../../../cli';
-import {
-  CommandOption
-} from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
 import { validation } from '../../../utils';
@@ -28,6 +25,49 @@ class FileAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Uploads file to the specified site';
+  }
+
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        siteUrl: typeof args.options.siteUrl !== 'undefined'
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '-u, --folderUrl <folderUrl>' },
+      { option: '-p, --filePath <filePath>' },
+      { option: '--siteUrl [siteUrl]' }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!fs.existsSync(args.options.filePath)) {
+          return `Specified source file ${args.options.sourceFile} doesn't exist`;
+        }
+    
+        if (args.options.siteUrl) {
+          const isValidSiteUrl = validation.isValidSharePointUrl(args.options.siteUrl);
+          if (isValidSiteUrl !== true) {
+            return isValidSiteUrl;
+          }
+        }
+    
+        return validation.isValidSharePointUrl(args.options.folderUrl);
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (error?: any) => void): void {
@@ -241,32 +281,6 @@ class FileAddCommand extends GraphCommand {
 
         return Promise.resolve(drive.id);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '-u, --folderUrl <folderUrl>' },
-      { option: '-p, --filePath <filePath>' },
-      { option: '--siteUrl [siteUrl]' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!fs.existsSync(args.options.filePath)) {
-      return `Specified source file ${args.options.sourceFile} doesn't exist`;
-    }
-
-    if (args.options.siteUrl) {
-      const isValidSiteUrl = validation.isValidSharePointUrl(args.options.siteUrl);
-      if (isValidSiteUrl !== true) {
-        return isValidSiteUrl;
-      }
-    }
-
-    return validation.isValidSharePointUrl(args.options.folderUrl);
   }
 }
 

@@ -1,5 +1,4 @@
 import { Logger } from '../../../cli';
-import { CommandOption } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
 import YammerCommand from '../../base/YammerCommand';
@@ -90,6 +89,14 @@ class YammerSearchCommand extends YammerCommand {
   private topics: YammerBasicTopicResponse[];
   private users: YammerBasicUserResponse[];
 
+  public get name(): string {
+    return commands.SEARCH;
+  }
+
+  public get description(): string {
+    return 'Returns a list of messages, users, topics and groups that match the specified query.';
+  }
+
   constructor() {
     super();
     this.summary = {
@@ -102,21 +109,64 @@ class YammerSearchCommand extends YammerCommand {
     this.groups = [];
     this.topics = [];
     this.users = [];
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
   }
 
-  public get name(): string {
-    return commands.SEARCH;
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        show: typeof args.options.show !== 'undefined',
+        limit: typeof args.options.limit !== 'undefined'
+      });
+    });
   }
 
-  public get description(): string {
-    return 'Returns a list of messages, users, topics and groups that match the specified query.';
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--queryText <queryText>'
+      },
+      {
+        option: '--show [show]',
+        autocomplete: YammerSearchCommand.showOptions
+      },
+      {
+        option: '--limit [limit]'
+      }
+    );
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.show = typeof args.options.show !== 'undefined';
-    telemetryProps.limit = typeof args.options.limit !== 'undefined';
-    return telemetryProps;
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.queryText && typeof args.options.queryText !== 'string') {
+          return `${args.options.queryText} is not a string`;
+        }
+
+        if (args.options.limit && typeof args.options.limit !== 'number') {
+          return `${args.options.limit} is not a number`;
+        }
+
+        if (args.options.output !== 'json') {
+          if (typeof args.options.show !== 'undefined') {
+            const scope = args.options.show.toString().toLowerCase();
+            if (YammerSearchCommand.showOptions.indexOf(scope) < 0) {
+              return `${scope} is not a valid value for show. Allowed values are ${YammerSearchCommand.showOptions.join(', ')}`;
+            }
+          }
+        }
+        else {
+          if (typeof args.options.show !== 'undefined') {
+            return `${args.options.show} can't be used when --output set to json`;
+          }
+        }
+
+        return true;
+      }
+    );
   }
 
   private getAllItems(logger: Logger, args: CommandArgs, page: number): Promise<void> {
@@ -288,50 +338,6 @@ class YammerSearchCommand extends YammerCommand {
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--queryText <queryText>'
-      },
-      {
-        option: '--show [show]',
-        autocomplete: YammerSearchCommand.showOptions
-      },
-      {
-        option: '--limit [limit]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.queryText && typeof args.options.queryText !== 'string') {
-      return `${args.options.queryText} is not a string`;
-    }
-
-    if (args.options.limit && typeof args.options.limit !== 'number') {
-      return `${args.options.limit} is not a number`;
-    }
-
-    if (args.options.output !== 'json') {
-      if (typeof args.options.show !== 'undefined') {
-        const scope = args.options.show.toString().toLowerCase();
-        if (YammerSearchCommand.showOptions.indexOf(scope) < 0) {
-          return `${scope} is not a valid value for show. Allowed values are ${YammerSearchCommand.showOptions.join(', ')}`;
-        }
-      }
-    }
-    else {
-      if (typeof args.options.show !== 'undefined') {
-        return `${args.options.show} can't be used when --output set to json`;
-      }
-    }
-
-    return true;
   }
 }
 

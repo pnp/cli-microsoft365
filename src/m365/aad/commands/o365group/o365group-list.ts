@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { odata } from '../../../../utils';
@@ -30,14 +27,56 @@ class AadO365GroupListCommand extends GraphCommand {
     return 'Lists Microsoft 365 Groups in the current tenant';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.displayName = typeof args.options.displayName !== 'undefined';
-    telemetryProps.mailNickname = typeof args.options.mailNickname !== 'undefined';
-    telemetryProps.includeSiteUrl = args.options.includeSiteUrl;
-    telemetryProps.deleted = args.options.deleted;
-    telemetryProps.orphaned = args.options.orphaned;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        displayName: typeof args.options.displayName !== 'undefined',
+        mailNickname: typeof args.options.mailNickname !== 'undefined',
+        includeSiteUrl: args.options.includeSiteUrl,
+        deleted: args.options.deleted,
+        orphaned: args.options.orphaned
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-d, --displayName [displayName]'
+      },
+      {
+        option: '-m, --mailNickname [displayName]'
+      },
+      {
+        option: '--includeSiteUrl'
+      },
+      {
+        option: '--deleted'
+      },
+      {
+        option: '--orphaned'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.deleted && args.options.includeSiteUrl) {
+          return 'You can\'t retrieve site URLs of deleted Microsoft 365 Groups';
+        }
+    
+        return true;
+      }
+    );
   }
 
   public defaultProperties(): string[] | undefined {
@@ -123,37 +162,6 @@ class AadO365GroupListCommand extends GraphCommand {
           reject(err);
         });
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-d, --displayName [displayName]'
-      },
-      {
-        option: '-m, --mailNickname [displayName]'
-      },
-      {
-        option: '--includeSiteUrl'
-      },
-      {
-        option: '--deleted'
-      },
-      {
-        option: '--orphaned'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.deleted && args.options.includeSiteUrl) {
-      return 'You can\'t retrieve site URLs of deleted Microsoft 365 Groups';
-    }
-
-    return true;
   }
 }
 

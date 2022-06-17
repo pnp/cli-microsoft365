@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -32,15 +32,83 @@ class SpoFieldSetCommand extends SpoCommand {
     return 'Updates existing list or site column';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.title = typeof args.options.title !== 'undefined';
-    telemetryProps.name = typeof args.options.name !== 'undefined';
-    telemetryProps.listId = typeof args.options.listId !== 'undefined';
-    telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
-    telemetryProps.updateExistingLists = !!args.options.updateExistingLists;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        title: typeof args.options.title !== 'undefined',
+        name: typeof args.options.name !== 'undefined',
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        updateExistingLists: !!args.options.updateExistingLists
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--listId [listId]'
+      },
+      {
+        option: '--listTitle [listTitle]'
+      },
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --name [name]'
+      },
+      {
+        option: '-t, --title [title]'
+      },
+      {
+        option: '--updateExistingLists'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+	    if (isValidSharePointUrl !== true) {
+	      return isValidSharePointUrl;
+	    }
+
+	    if (args.options.listId && args.options.listTitle) {
+	      return `Specify listId or listTitle but not both`;
+	    }
+
+	    if (args.options.listId &&
+	      !validation.isValidGuid(args.options.listId)) {
+	      return `${args.options.listId} in option listId is not a valid GUID`;
+	    }
+
+	    if (args.options.id &&
+	      !validation.isValidGuid(args.options.id)) {
+	      return `${args.options.id} in option id is not a valid GUID`;
+	    }
+
+	    return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+  	this.optionSets.push(['id', 'title', 'name']);
   }
 
   public allowUnknownOptions(): boolean | undefined {
@@ -159,64 +227,6 @@ class SpoFieldSetCommand extends SpoCommand {
     }).join('');
 
     return payload;
-  }
-
-  public optionSets(): string[][] | undefined {
-    return [
-      ['id', 'title', 'name']
-    ];
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--listId [listId]'
-      },
-      {
-        option: '--listTitle [listTitle]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '--updateExistingLists'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.listId && args.options.listTitle) {
-      return `Specify listId or listTitle but not both`;
-    }
-
-    if (args.options.listId &&
-      !validation.isValidGuid(args.options.listId)) {
-      return `${args.options.listId} in option listId is not a valid GUID`;
-    }
-
-    if (args.options.id &&
-      !validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} in option id is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

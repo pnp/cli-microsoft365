@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -32,18 +31,74 @@ class SpoSiteListCommand extends SpoCommand {
     return 'Lists sites of the given type';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.webTemplate = args.options.webTemplate;
-    telemetryProps.filter = (!(!args.options.filter)).toString();
-    telemetryProps.includeOneDriveSites = typeof args.options.includeOneDriveSites !== 'undefined';
-    telemetryProps.deleted = typeof args.options.deleted !== 'undefined';
-    telemetryProps.siteType = args.options.type || 'TeamSite';
-    return telemetryProps;
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['Title', 'Url'];
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+      	webTemplate: args.options.webTemplate,
+        siteType: args.options.type || 'TeamSite',
+        filter: (!(!args.options.filter)).toString(),
+        deleted: args.options.deleted,
+        includeOneDriveSites: typeof args.options.includeOneDriveSites !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-t, --type [type]',
+        // To not introduce a breaking change, 'All' has been added.
+        // You should use all when using '--includeOneDriveSites'
+        autocomplete: ['TeamSite', 'CommunicationSite', 'All']
+      },
+      {
+        option: '--webTemplate [webTemplate]'
+      },
+      {
+        option: '-f, --filter [filter]'
+      },
+      {
+        option: '--includeOneDriveSites'
+      },
+      {
+        option: '--deleted'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.type && args.options.webTemplate) {
+	      return 'Specify either type or webTemplate, but not both';
+	    }
+
+	    const typeValues = ['TeamSite', 'CommunicationSite', 'All'];
+	    if (args.options.type &&
+	      typeValues.indexOf(args.options.type) < 0) {
+	      return `${args.options.type} is not a valid value for the type option. Allowed values are ${typeValues.join('|')}`;
+	    }
+
+	    if (args.options.includeOneDriveSites
+	      && (!args.options.type || args.options.type !== 'All')) {
+	      return 'When using includeOneDriveSites, specify All as value for type';
+	    }
+
+	    return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -143,51 +198,6 @@ class SpoSiteListCommand extends SpoCommand {
       default:
         return '';
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-t, --type [type]',
-        // To not introduce a breaking change, 'All' has been added.
-        // You should use all when using '--includeOneDriveSites'
-        autocomplete: ['TeamSite', 'CommunicationSite', 'All']
-      },
-      {
-        option: '--webTemplate [webTemplate]'
-      },
-      {
-        option: '-f, --filter [filter]'
-      },
-      {
-        option: '--includeOneDriveSites'
-      },
-      {
-        option: '--deleted'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: any): string | boolean {
-    if (args.options.type && args.options.webTemplate) {
-      return 'Specify either type or webTemplate, but not both';
-    }
-
-    const typeValues = ['TeamSite', 'CommunicationSite', 'All'];
-    if (args.options.type &&
-      typeValues.indexOf(args.options.type) < 0) {
-      return `${args.options.type} is not a valid value for the type option. Allowed values are ${typeValues.join('|')}`;
-    }
-
-    if (args.options.includeOneDriveSites
-      && (!args.options.type || args.options.type !== 'All')) {
-      return 'When using includeOneDriveSites, specify All as value for type';
-    }
-
-    return true;
   }
 }
 

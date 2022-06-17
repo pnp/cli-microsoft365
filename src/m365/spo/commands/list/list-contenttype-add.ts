@@ -1,8 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption,
-  CommandTypes
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -29,17 +25,70 @@ class SpoListContentTypeAddCommand extends SpoCommand {
     return 'Adds content type to list';
   }
 
-  public types(): CommandTypes | undefined {
-    return {
-      string: ['contentTypeId', 'c']
-    };
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initTypes();
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listId = typeof args.options.listId !== 'undefined';
-    telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
-    return telemetryProps;
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-l, --listId [listId]'
+      },
+      {
+        option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '-c, --contentTypeId <contentTypeId>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+    
+        if (args.options.listId) {
+          if (!validation.isValidGuid(args.options.listId)) {
+            return `${args.options.listId} is not a valid GUID`;
+          }
+        }
+    
+        if (args.options.listId && args.options.listTitle) {
+          return 'Specify listId or listTitle, but not both';
+        }
+    
+        if (!args.options.listId && !args.options.listTitle) {
+          return 'Specify listId or listTitle, one is required';
+        }
+    
+        return true;
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('contentTypeId', 'c');
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -81,49 +130,6 @@ class SpoListContentTypeAddCommand extends SpoCommand {
     return {
       contentTypeId: options.contentTypeId
     };
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '-c, --contentTypeId <contentTypeId>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.listId) {
-      if (!validation.isValidGuid(args.options.listId)) {
-        return `${args.options.listId} is not a valid GUID`;
-      }
-    }
-
-    if (args.options.listId && args.options.listTitle) {
-      return 'Specify listId or listTitle, but not both';
-    }
-
-    if (!args.options.listId && !args.options.listTitle) {
-      return 'Specify listId or listTitle, one is required';
-    }
-
-    return true;
   }
 }
 

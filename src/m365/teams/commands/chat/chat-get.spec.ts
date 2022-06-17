@@ -3,7 +3,7 @@ import * as os from 'os';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken } from '../../../../utils/accessToken';
@@ -31,6 +31,7 @@ describe(commands.CHAT_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
  
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -43,10 +44,10 @@ describe(commands.CHAT_GET, () => {
         accessToken: 'abc'
       };
     }
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
-    
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats?$filter=chatType eq 'group'&$expand=members&$select=id,topic,createdDateTime,members`
         || opts.url === `https://graph.microsoft.com/v1.0/chats?$filter=chatType eq 'oneOnOne'&$expand=members&$select=id,topic,createdDateTime,members`) {
@@ -113,147 +114,139 @@ describe(commands.CHAT_GET, () => {
     assert.notStrictEqual(command.description, null);
   });  
 
-  it('fails validation if id and name and participants are not specified', () => {
-    const actual = command.validate({
+  it('fails validation if id and name and participants are not specified', async () => {
+    const actual = await command.validate({
       options: {
         debug: false
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the id is not valid', () => {
-    const actual = command.validate({
+  it('fails validation if the id is not valid', async () => {
+    const actual = await command.validate({
       options: {
         id: "8b081ef6"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation for an incorrect id missing leading 19:.', (done) => {
-    const actual = command.validate({
+  it('fails validation for an incorrect id missing leading 19:.', async () => {
+    const actual = await command.validate({
       options: {
         id: '8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation for an incorrect id missing trailing @thread.v2 or @unq.gbl.spaces', (done) => {
-    const actual = command.validate({
+  it('fails validation for an incorrect id missing trailing @thread.v2 or @unq.gbl.spaces', async () => {
+    const actual = await command.validate({
       options: {
         id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
   
-  it('fails validation for an invalid email address (single)', (done) => {
-    const actual = command.validate({
+  it('fails validation for an invalid email address (single)', async () => {
+    const actual = await command.validate({
       options: {
         participants: 'alexwcontoso.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation for invalid email addresses (multiple)', (done) => {
-    const actual = command.validate({
+  it('fails validation for invalid email addresses (multiple)', async () => {
+    const actual = await command.validate({
       options: {
         participants: 'alexw@contoso.com,natecontoso.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if id and name properties are both defined', (done) => {
-    const actual = command.validate({
+  it('fails validation if id and name properties are both defined', async () => {
+    const actual = await command.validate({
       options: {
         id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
         name: 'test'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if id and participants properties are both defined', (done) => {
-    const actual = command.validate({
+  it('fails validation if id and participants properties are both defined', async () => {
+    const actual = await command.validate({
       options: {
         id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
         participants: 'alexw@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
   
-  it('fails validation if name and participants properties are both defined', (done) => {
-    const actual = command.validate({
+  it('fails validation if name and participants properties are both defined', async () => {
+    const actual = await command.validate({
       options: {
         name: 'test',
         participants: 'alexw@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if all three mutually exclusive properties are defined', (done) => {
-    const actual = command.validate({
+  it('fails validation if all three mutually exclusive properties are defined', async () => {
+    const actual = await command.validate({
       options: {
         id: '19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d',
         name: 'test',
         participants: 'alexw@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
   
-  it('validates for a correct id input', () => {
-    const actual = command.validate({
+  it('validates for a correct id input', async () => {
+    const actual = await command.validate({
       options: {
         id: "19:8b081ef6-4792-4def-b2c9-c363a1bf41d5_5031bb31-22c0-4f6f-9f73-91d34ab2b32d@unq.gbl.spaces"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
   
-  it('validates for a correct name input', () => {
-    const actual = command.validate({
+  it('validates for a correct name input', async () => {
+    const actual = await command.validate({
       options: {
         name: 'test'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct participants input', () => {
-    const actual = command.validate({
+  it('validates for a correct participants input', async () => {
+    const actual = await command.validate({
       options: {
         participants: 'alexw@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
   
-  it('validates for a correct participants (array) input', () => {
-    const actual = command.validate({
+  it('validates for a correct participants (array) input', async () => {
+    const actual = await command.validate({
       options: {
         participants: 'alexw@contoso.com,nateg@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

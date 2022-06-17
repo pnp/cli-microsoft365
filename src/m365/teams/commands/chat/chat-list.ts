@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
@@ -12,7 +9,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  type: string;
+  type?: string;
 }
 
 class TeamsChatListCommand extends GraphCommand {
@@ -28,6 +25,45 @@ class TeamsChatListCommand extends GraphCommand {
     return ['id', 'topic', 'chatType'];
   }
 
+  constructor() {
+    super();
+  
+    
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        type: args.options.type
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-t, --type [type]',
+        autocomplete: ['oneOnOne', 'group', 'meeting']
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const supportedTypes = ['oneOnOne', 'group', 'meeting'];
+        if (args.options.type !== undefined && supportedTypes.indexOf(args.options.type) === -1) {
+          return `${args.options.type} is not a valid chatType. Accepted values are ${supportedTypes.join(', ')}`;
+        }
+    
+        return true;
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const filter = args.options.type !== undefined ? `?$filter=chatType eq '${args.options.type}'` : '';
     const endpoint: string = `${this.resource}/v1.0/chats${filter}`;
@@ -38,27 +74,6 @@ class TeamsChatListCommand extends GraphCommand {
         logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-t, --type [chatType]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-
-  public validate(args: CommandArgs): boolean | string {
-    const supportedTypes = ['oneOnOne', 'group', 'meeting'];
-    if (args.options.type !== undefined && supportedTypes.indexOf(args.options.type) === -1) {
-      return `${args.options.type} is not a valid chatType. Accepted values are ${supportedTypes.join(', ')}`;
-    }
-
-    return true;
   }
 }
 

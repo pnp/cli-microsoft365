@@ -1,9 +1,6 @@
 import { PlannerPlan, PlannerPlanDetails, User } from '@microsoft/microsoft-graph-types';
-import Auth from '../../../../Auth';
+import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { aadGroup, accessToken, formatting, validation } from '../../../../utils';
@@ -31,21 +28,79 @@ class PlannerPlanAddCommand extends GraphCommand {
     return 'Adds a new Microsoft Planner plan';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
-    telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
-    telemetryProps.shareWithUserIds = typeof args.options.shareWithUserIds !== 'undefined';
-    telemetryProps.shareWithUserNames = typeof args.options.shareWithUserNames !== 'undefined';
-    return telemetryProps;
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['id', 'title', 'createdDateTime', 'owner'];
   }
 
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
+        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
+        shareWithUserIds: typeof args.options.shareWithUserIds !== 'undefined',
+        shareWithUserNames: typeof args.options.shareWithUserNames !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-t, --title <title>'
+      },
+      {
+        option: "--ownerGroupId [ownerGroupId]"
+      },
+      {
+        option: "--ownerGroupName [ownerGroupName]"
+      },
+      {
+        option: '--shareWithUserIds [shareWithUserIds]'
+      },
+      {
+        option: '--shareWithUserNames [shareWithUserNames]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName';
+        }
+
+        if (args.options.ownerGroupId && args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName but not both';
+        }
+
+        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
+          return `${args.options.ownerGroupId} is not a valid GUID`;
+        }
+
+        if (args.options.shareWithUserIds && args.options.shareWithUserNames) {
+          return 'Specify either shareWithUserIds or shareWithUserNames but not both';
+        }
+
+        if (args.options.shareWithUserIds && !validation.isValidGuidArray(args.options.shareWithUserIds.split(','))) {
+          return 'shareWithUserIds contains invalid GUID';
+        }
+
+        return true;
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
     }
@@ -178,53 +233,6 @@ class PlannerPlanAddCommand extends GraphCommand {
     return aadGroup
       .getGroupByDisplayName(args.options.ownerGroupName!)
       .then(group => group.id!);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '--ownerGroupId [ownerGroupId]'
-      },
-      {
-        option: '--ownerGroupName [ownerGroupName]'
-      },
-      {
-        option: '--shareWithUserIds [shareWithUserIds]'
-      },
-      {
-        option: '--shareWithUserNames [shareWithUserNames]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName';
-    }
-
-    if (args.options.ownerGroupId && args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName but not both';
-    }
-
-    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-      return `${args.options.ownerGroupId} is not a valid GUID`;
-    }
-
-    if (args.options.shareWithUserIds && args.options.shareWithUserNames) {
-      return 'Specify either shareWithUserIds or shareWithUserNames but not both';
-    }
-
-    if (args.options.shareWithUserIds && !validation.isValidGuidArray(args.options.shareWithUserIds.split(','))) {
-      return 'shareWithUserIds contains invalid GUID';
-    }
-
-    return true;
   }
 }
 

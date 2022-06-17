@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -28,10 +25,46 @@ class SpoThemeSetCommand extends SpoCommand {
     return 'Add or update a theme';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.inverted = (!(!args.options.isInverted)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        inverted: (!(!args.options.isInverted)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --name <name>'
+      },
+      {
+        option: '-t, --theme <theme>'
+      },
+      {
+        option: '--isInverted'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidTheme(args.options.theme)) {
+          return 'The specified theme is not valid';
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -75,29 +108,6 @@ class SpoThemeSetCommand extends SpoCommand {
 
       })
       .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [{
-      option: '-n, --name <name>'
-    },
-    {
-      option: '-t, --theme <theme>'
-    },
-    {
-      option: '--isInverted'
-    }];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidTheme(args.options.theme)) {
-      return 'The specified theme is not valid';
-    }
-
-    return true;
   }
 }
 

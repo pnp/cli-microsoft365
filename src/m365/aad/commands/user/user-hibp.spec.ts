@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -11,6 +11,11 @@ describe(commands.USER_HIBP, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+
+  before(() => {
+    commandInfo = Cli.getCommandInfo(command);
+  });
 
   beforeEach(() => {
     log = [];
@@ -43,23 +48,23 @@ describe(commands.USER_HIBP, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if userName and apiKey is not specified', () => {
-    const actual = command.validate({ options: {} });
+  it('fails validation if userName and apiKey is not specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the userName is not a valid UPN', () => {
-    const actual = command.validate({ options: { userName: 'invalid' } });
+  it('fails validation if the userName is not a valid UPN', async () => {
+    const actual = await command.validate({ options: { userName: 'invalid', apiKey: 'key' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if userName and apiKey is specified', () => {
-    const actual = command.validate({ options: { userName: "account-exists@hibp-integration-tests.com", apiKey: "2975xc539c304xf797f665x43f8x557x" } });
+  it('passes validation if userName and apiKey is specified', async () => {
+    const actual = await command.validate({ options: { userName: "account-exists@hibp-integration-tests.com", apiKey: "2975xc539c304xf797f665x43f8x557x" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if domain is specified', () => {
-    const actual = command.validate({ options: { userName: "account-exists@hibp-integration-tests.com", apiKey: "2975xc539c304xf797f665x43f8x557x", domain: "domain.com" } });
+  it('passes validation if domain is specified', async () => {
+    const actual = await command.validate({ options: { userName: "account-exists@hibp-integration-tests.com", apiKey: "2975xc539c304xf797f665x43f8x557x", domain: "domain.com" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -231,17 +236,17 @@ describe(commands.USER_HIBP, () => {
     });
   });
 
-  it('fails validation if the userName is not a valid UPN.', () => {
-    const actual = command.validate({
+  it('fails validation if the userName is not a valid UPN.', async () => {
+    const actual = await command.validate({
       options: {
         userName: "no-an-email"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach((o: { option: string; }) => {
       if (o.option === '--debug') {

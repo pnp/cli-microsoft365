@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import { fsUtil, packageManager, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -14,6 +14,7 @@ const command: Command = require('./project-upgrade');
 describe(commands.PROJECT_UPGRADE, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let trackEvent: any;
   let telemetry: any;
   let packagesDevExact: string[];
@@ -28,6 +29,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       telemetry = t;
     });
     project141webPartNoLib = (command as any).getProject(projectPath);
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -2914,7 +2916,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -2924,53 +2926,53 @@ describe(commands.PROJECT_UPGRADE, () => {
     assert(containsOption);
   });
 
-  it('passes validation when package manager not specified', () => {
-    const actual = command.validate({ options: {} });
+  it('passes validation when package manager not specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when unsupported package manager specified', () => {
-    const actual = command.validate({ options: { packageManager: 'abc' } });
+  it('fails validation when unsupported package manager specified', async () => {
+    const actual = await command.validate({ options: { packageManager: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when npm package manager specified', () => {
-    const actual = command.validate({ options: { packageManager: 'npm' } });
+  it('passes validation when npm package manager specified', async () => {
+    const actual = await command.validate({ options: { packageManager: 'npm' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when pnpm package manager specified', () => {
-    const actual = command.validate({ options: { packageManager: 'pnpm' } });
+  it('passes validation when pnpm package manager specified', async () => {
+    const actual = await command.validate({ options: { packageManager: 'pnpm' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when yarn package manager specified', () => {
-    const actual = command.validate({ options: { packageManager: 'yarn' } });
+  it('passes validation when yarn package manager specified', async () => {
+    const actual = await command.validate({ options: { packageManager: 'yarn' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when shell not specified', () => {
-    const actual = command.validate({ options: {} });
+  it('passes validation when shell not specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when unsupported shell specified', () => {
-    const actual = command.validate({ options: { shell: 'abc' } });
+  it('fails validation when unsupported shell specified', async () => {
+    const actual = await command.validate({ options: { shell: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when bash shell specified', () => {
-    const actual = command.validate({ options: { shell: 'bash' } });
+  it('passes validation when bash shell specified', async () => {
+    const actual = await command.validate({ options: { shell: 'bash' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when powershell shell specified', () => {
-    const actual = command.validate({ options: { shell: 'powershell' } });
+  it('passes validation when powershell shell specified', async () => {
+    const actual = await command.validate({ options: { shell: 'powershell' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when cmd shell specified', () => {
-    const actual = command.validate({ options: { shell: 'cmd' } });
+  it('passes validation when cmd shell specified', async () => {
+    const actual = await command.validate({ options: { shell: 'cmd' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

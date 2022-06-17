@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -41,17 +40,128 @@ class SpoSiteClassicAddCommand extends SpoCommand {
     return 'Creates new classic site';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.lcid = typeof args.options.lcid !== 'undefined';
-    telemetryProps.webTemplate = typeof args.options.webTemplate !== 'undefined';
-    telemetryProps.resourceQuota = typeof args.options.resourceQuota !== 'undefined';
-    telemetryProps.resourceQuotaWarningLevel = typeof args.options.resourceQuotaWarningLevel !== 'undefined';
-    telemetryProps.storageQuota = typeof args.options.storageQuota !== 'undefined';
-    telemetryProps.storageQuotaWarningLevel = typeof args.options.storageQuotaWarningLevel !== 'undefined';
-    telemetryProps.removeDeletedSite = args.options.removeDeletedSite;
-    telemetryProps.wait = args.options.wait;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        lcid: typeof args.options.lcid !== 'undefined',
+        webTemplate: typeof args.options.webTemplate !== 'undefined',
+        resourceQuota: typeof args.options.resourceQuota !== 'undefined',
+        resourceQuotaWarningLevel: typeof args.options.resourceQuotaWarningLevel !== 'undefined',
+        storageQuota: typeof args.options.storageQuota !== 'undefined',
+        storageQuotaWarningLevel: typeof args.options.storageQuotaWarningLevel !== 'undefined',
+        removeDeletedSite: args.options.removeDeletedSite,
+        wait: args.options.wait
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '-t, --title <title>'
+      },
+      {
+        option: '--owner <owner>'
+      },
+      {
+        option: '-z, --timeZone <timeZone>'
+      },
+      {
+        option: '-l, --lcid [lcid]'
+      },
+      {
+        option: '-w, --webTemplate [webTemplate]'
+      },
+      {
+        option: '--resourceQuota [resourceQuota]'
+      },
+      {
+        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
+      },
+      {
+        option: '--storageQuota [storageQuota]'
+      },
+      {
+        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
+      },
+      {
+        option: '--removeDeletedSite'
+      },
+      {
+        option: '--wait'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (typeof args.options.timeZone !== 'number') {
+          return `${args.options.timeZone} is not a number`;
+        }
+
+        if (args.options.lcid &&
+          typeof args.options.lcid !== 'number') {
+          return `${args.options.lcid} is not a number`;
+        }
+
+        if (args.options.resourceQuota &&
+          typeof args.options.resourceQuota !== 'number') {
+          return `${args.options.resourceQuota} is not a number`;
+        }
+
+        if (args.options.resourceQuotaWarningLevel &&
+          typeof args.options.resourceQuotaWarningLevel !== 'number') {
+          return `${args.options.resourceQuotaWarningLevel} is not a number`;
+        }
+
+        if (args.options.resourceQuotaWarningLevel &&
+          !args.options.resourceQuota) {
+          return `You cannot specify resourceQuotaWarningLevel without specifying resourceQuota`;
+        }
+
+        if ((<number>args.options.resourceQuotaWarningLevel) > (<number>args.options.resourceQuota)) {
+          return `resourceQuotaWarningLevel cannot exceed resourceQuota`;
+        }
+
+        if (args.options.storageQuota &&
+          typeof args.options.storageQuota !== 'number') {
+          return `${args.options.storageQuota} is not a number`;
+        }
+
+        if (args.options.storageQuotaWarningLevel &&
+          typeof args.options.storageQuotaWarningLevel !== 'number') {
+          return `${args.options.storageQuotaWarningLevel} is not a number`;
+        }
+
+        if (args.options.storageQuotaWarningLevel &&
+          !args.options.storageQuota) {
+          return `You cannot specify storageQuotaWarningLevel without specifying storageQuota`;
+        }
+
+        if ((<number>args.options.storageQuotaWarningLevel) > (<number>args.options.storageQuota)) {
+          return `storageQuotaWarningLevel cannot exceed storageQuota`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -292,106 +402,6 @@ class SpoSiteClassicAddCommand extends SpoCommand {
           }
         });
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '--owner <owner>'
-      },
-      {
-        option: '-z, --timeZone <timeZone>'
-      },
-      {
-        option: '-l, --lcid [lcid]'
-      },
-      {
-        option: '-w, --webTemplate [webTemplate]'
-      },
-      {
-        option: '--resourceQuota [resourceQuota]'
-      },
-      {
-        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
-      },
-      {
-        option: '--storageQuota [storageQuota]'
-      },
-      {
-        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
-      },
-      {
-        option: '--removeDeletedSite'
-      },
-      {
-        option: '--wait'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (typeof args.options.timeZone !== 'number') {
-      return `${args.options.timeZone} is not a number`;
-    }
-
-    if (args.options.lcid &&
-      typeof args.options.lcid !== 'number') {
-      return `${args.options.lcid} is not a number`;
-    }
-
-    if (args.options.resourceQuota &&
-      typeof args.options.resourceQuota !== 'number') {
-      return `${args.options.resourceQuota} is not a number`;
-    }
-
-    if (args.options.resourceQuotaWarningLevel &&
-      typeof args.options.resourceQuotaWarningLevel !== 'number') {
-      return `${args.options.resourceQuotaWarningLevel} is not a number`;
-    }
-
-    if (args.options.resourceQuotaWarningLevel &&
-      !args.options.resourceQuota) {
-      return `You cannot specify resourceQuotaWarningLevel without specifying resourceQuota`;
-    }
-
-    if ((<number>args.options.resourceQuotaWarningLevel) > (<number>args.options.resourceQuota)) {
-      return `resourceQuotaWarningLevel cannot exceed resourceQuota`;
-    }
-
-    if (args.options.storageQuota &&
-      typeof args.options.storageQuota !== 'number') {
-      return `${args.options.storageQuota} is not a number`;
-    }
-
-    if (args.options.storageQuotaWarningLevel &&
-      typeof args.options.storageQuotaWarningLevel !== 'number') {
-      return `${args.options.storageQuotaWarningLevel} is not a number`;
-    }
-
-    if (args.options.storageQuotaWarningLevel &&
-      !args.options.storageQuota) {
-      return `You cannot specify storageQuotaWarningLevel without specifying storageQuota`;
-    }
-
-    if ((<number>args.options.storageQuotaWarningLevel) > (<number>args.options.storageQuota)) {
-      return `storageQuotaWarningLevel cannot exceed storageQuota`;
-    }
-
-    return true;
   }
 }
 

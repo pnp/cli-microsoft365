@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
-import { Logger } from '../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../cli';
 import Command, { CommandError } from '../../../Command';
 import request from '../../../request';
 import { sinonUtil } from '../../../utils';
@@ -14,6 +14,7 @@ describe(commands.EXPORT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   const actualFilename = `20180916t000000zba9d7134cc81499e9884bf70642afac7_20180916042428.zip`;
@@ -120,6 +121,7 @@ describe(commands.EXPORT, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -386,55 +388,55 @@ describe(commands.EXPORT, () => {
     });
   });
 
-  it('fails validation if the id is not a GUID', () => {
-    const actual = command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: 'abc' } });
+  it('fails validation if the id is not a GUID', async () => {
+    const actual = await command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if format is specified as neither JSON nor ZIP', () => {
-    const actual = command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'text' } });
+  it('fails validation if format is specified as neither JSON nor ZIP', async () => {
+    const actual = await command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'text' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if format is specified as JSON and packageCreatedBy parameter is specified', () => {
-    const actual = command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json', packageCreatedBy: 'abc' } });
+  it('fails validation if format is specified as JSON and packageCreatedBy parameter is specified', async () => {
+    const actual = await command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json', packageCreatedBy: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if format is specified as JSON and packageDescription parameter is specified', () => {
-    const actual = command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json', packageDescription: 'abc' } });
+  it('fails validation if format is specified as JSON and packageDescription parameter is specified', async () => {
+    const actual = await command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json', packageDescription: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if format is specified as JSON and packageDisplayName parameter is specified', () => {
-    const actual = command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json', packageDisplayName: 'abc' } });
+  it('fails validation if format is specified as JSON and packageDisplayName parameter is specified', async () => {
+    const actual = await command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json', packageDisplayName: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if format is specified as JSON and packageSourceEnvironment parameter is specified', () => {
-    const actual = command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json', packageSourceEnvironment: 'abc' } });
+  it('fails validation if format is specified as JSON and packageSourceEnvironment parameter is specified', async () => {
+    const actual = await command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json', packageSourceEnvironment: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if specified path doesn\'t exist', () => {
+  it('fails validation if specified path doesn\'t exist', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, path: '/path/not/found.zip' } });
+    const actual = await command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, path: '/path/not/found.zip' } }, commandInfo);
     sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the id and environment specified', () => {
-    const actual = command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}` } });
+  it('passes validation when the id and environment specified', async () => {
+    const actual = await command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}` } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the id and environment specified and format set to JSON', () => {
-    const actual = command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json' } });
+  it('passes validation when the id and environment specified and format set to JSON', async () => {
+    const actual = await command.validate({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -445,7 +447,7 @@ describe(commands.EXPORT, () => {
   });
 
   it('supports specifying id', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {
@@ -456,7 +458,7 @@ describe(commands.EXPORT, () => {
   });
 
   it('supports specifying environment', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--environment') > -1) {
@@ -467,7 +469,7 @@ describe(commands.EXPORT, () => {
   });
 
   it('supports specifying path', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--path') > -1) {
@@ -478,7 +480,7 @@ describe(commands.EXPORT, () => {
   });
 
   it('supports specifying packageCreatedBy', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--packageCreatedBy') > -1) {
@@ -489,7 +491,7 @@ describe(commands.EXPORT, () => {
   });
 
   it('supports specifying packageDescription', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--packageDescription') > -1) {
@@ -500,7 +502,7 @@ describe(commands.EXPORT, () => {
   });
 
   it('supports specifying packageDisplayName', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--packageDisplayName') > -1) {
@@ -511,7 +513,7 @@ describe(commands.EXPORT, () => {
   });
 
   it('supports specifying packageSourceEnvironment', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--packageSourceEnvironment') > -1) {

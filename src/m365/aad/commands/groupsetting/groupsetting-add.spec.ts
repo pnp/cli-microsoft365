@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.GROUPSETTING_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -522,13 +524,13 @@ describe(commands.GROUPSETTING_ADD, () => {
     });
   });
 
-  it('fails validation if the templateId is not a valid GUID', () => {
-    const actual = command.validate({ options: { templateId: 'invalid' } });
+  it('fails validation if the templateId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { templateId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the templateId is a valid GUID', () => {
-    const actual = command.validate({ options: { templateId: '68be84bf-a585-4776-80b3-30aa5207aa22' } });
+  it('passes validation if the templateId is a valid GUID', async () => {
+    const actual = await command.validate({ options: { templateId: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -538,7 +540,7 @@ describe(commands.GROUPSETTING_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

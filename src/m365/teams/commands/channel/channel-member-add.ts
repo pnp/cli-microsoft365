@@ -1,15 +1,12 @@
+import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import * as os from 'os';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
-import GraphCommand from '../../../base/GraphCommand';
-import { Channel, Group } from '@microsoft/microsoft-graph-types';
-import commands from '../../commands';
 import { aadGroup } from '../../../../utils/aadGroup';
+import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -42,16 +39,77 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
     return [commands.CONVERSATIONMEMBER_ADD];
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
-    telemetryProps.teamName = typeof args.options.teamName !== 'undefined';
-    telemetryProps.channelId = typeof args.options.channelId !== 'undefined';
-    telemetryProps.channelName = typeof args.options.channelName !== 'undefined';
-    telemetryProps.userId = typeof args.options.userId !== 'undefined';
-    telemetryProps.userDisplayName = typeof args.options.userDisplayName !== 'undefined';
-    telemetryProps.owner = args.options.owner;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        teamId: typeof args.options.teamId !== 'undefined',
+        teamName: typeof args.options.teamName !== 'undefined',
+        channelId: typeof args.options.channelId !== 'undefined',
+        channelName: typeof args.options.channelName !== 'undefined',
+        userId: typeof args.options.userId !== 'undefined',
+        userDisplayName: typeof args.options.userDisplayName !== 'undefined',
+        owner: args.options.owner
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --teamId [teamId]'
+      },
+      {
+        option: '--teamName [teamName]'
+      },
+      {
+        option: '-c, --channelId [channelId]'
+      },
+      {
+        option: '--channelName [channelName]'
+      },
+      {
+        option: '--userId [userId]'
+      },
+      {
+        option: '--userDisplayName [userDisplayName]'
+      },
+      {
+        option: '--owner'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
+
+        if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
+          return `${args.options.channelId} is not a valid Teams ChannelId`;
+        }
+
+        return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['teamId', 'teamName'],
+      ['channelId', 'channelName'],
+      ['userId', 'userDisplayName']
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -83,55 +141,6 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
       })
       .then(_ => cb(),
         (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public optionSets(): string[][] | undefined {
-    return [
-      [ 'teamId', 'teamName' ],
-      [ 'channelId', 'channelName' ],
-      [ 'userId', 'userDisplayName' ]
-    ];
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --teamId [teamId]'
-      },
-      {
-        option: '--teamName [teamName]'
-      },
-      {
-        option: '-c, --channelId [channelId]'
-      },
-      {
-        option: '--channelName [channelName]'
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userDisplayName [userDisplayName]'
-      },
-      {
-        option: '--owner'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
-      return `${args.options.channelId} is not a valid Teams ChannelId`;
-    }
-
-    return true;
   }
 
   private addUser(userId: string, endpoint: string, roles: string[]): Promise<void> {

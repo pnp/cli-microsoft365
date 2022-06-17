@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import { sinonUtil, urlUtil } from '../../../../utils';
 import request from '../../../../request';
@@ -40,11 +40,13 @@ describe(commands.LIST_VIEW_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -86,35 +88,35 @@ describe(commands.LIST_VIEW_ADD, () => {
   });
 
   it('has correct option sets', () => {
-    assert.deepStrictEqual(command.optionSets(), [['listId', 'listTitle', 'listUrl']]);
+    assert.deepStrictEqual(command.optionSets, [['listId', 'listTitle', 'listUrl']]);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', () => {
-    const actual = command.validate({ 
+  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ 
       options: { 
         webUrl: 'invalid', 
         listTitle: validListTitle,
         title: validTitle,
         fields: validFieldsInput
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if listId is not a valid GUID', () => {
-    const actual = command.validate({ 
+  it('fails validation if listId is not a valid GUID', async () => {
+    const actual = await command.validate({ 
       options: { 
         webUrl: validWebUrl, 
         listId: 'invalid',
         title: validTitle,
         fields: validFieldsInput
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if rowLimit is not a number', () => {
-    const actual = command.validate({ 
+  it('fails validation if rowLimit is not a number', async () => {
+    const actual = await command.validate({ 
       options: { 
         webUrl: validWebUrl, 
         listId: validListId,
@@ -122,12 +124,12 @@ describe(commands.LIST_VIEW_ADD, () => {
         fields: validFieldsInput,
         rowLimit: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if rowLimit is lower than 1', () => {
-    const actual = command.validate({ 
+  it('fails validation if rowLimit is lower than 1', async () => {
+    const actual = await command.validate({ 
       options: { 
         webUrl: validWebUrl, 
         listId: validListId,
@@ -135,12 +137,12 @@ describe(commands.LIST_VIEW_ADD, () => {
         fields: validFieldsInput,
         rowLimit: 0
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when setting default and personal option', () => {
-    const actual = command.validate({ 
+  it('fails validation when setting default and personal option', async () => {
+    const actual = await command.validate({ 
       options: { 
         webUrl: validWebUrl, 
         listId: validListId,
@@ -149,19 +151,19 @@ describe(commands.LIST_VIEW_ADD, () => {
         personal: true,
         default: true
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('correctly validates options', () => {
-    const actual = command.validate({ 
+  it('correctly validates options', async () => {
+    const actual = await command.validate({ 
       options: { 
         webUrl: validWebUrl, 
         listId: validListId,
         title: validTitle,
         fields: validFieldsInput
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -248,7 +250,7 @@ describe(commands.LIST_VIEW_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

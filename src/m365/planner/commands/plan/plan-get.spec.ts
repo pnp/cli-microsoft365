@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken, sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.PLAN_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   const validId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validTitle = 'Plan name';
   const validOwnerGroupName = 'Group name';
@@ -47,6 +48,11 @@ describe(commands.PLAN_GET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -80,6 +86,7 @@ describe(commands.PLAN_GET, () => {
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -99,141 +106,128 @@ describe(commands.PLAN_GET, () => {
     assert.notStrictEqual(typeof alias, 'undefined');
   });
 
-  it('fails validation if neither id nor title are provided.', (done) => {
-    const actual = command.validate({ options: {} });
+  it('fails validation if neither id nor title are provided.', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both id and title are specified', (done) => {
-    const actual = command.validate({
+  it('fails validation when both id and title are specified', async () => {
+    const actual = await command.validate({
       options: {
         id: validId,
         title: validTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both deprecated planId and planTitle are specified', (done) => {
-    const actual = command.validate({
+  it('fails validation when both deprecated planId and planTitle are specified', async () => {
+    const actual = await command.validate({
       options: {
         planId: validId,
         planTitle: validTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both id and deprecated planTitle are specified', (done) => {
-    const actual = command.validate({
+  it('fails validation when both id and deprecated planTitle are specified', async () => {
+    const actual = await command.validate({
       options: {
         id: validId,
         planTitle: validTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both title and deprecated planId are specified', (done) => {
-    const actual = command.validate({
+  it('fails validation when both title and deprecated planId are specified', async () => {
+    const actual = await command.validate({
       options: {
         planId: validId,
         title: validTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided.', (done) => {
-    const actual = command.validate({
+  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided.', async () => {
+    const actual = await command.validate({
       options: {
         title: validTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both ownerGroupId and ownerGroupName are specified', (done) => {
-    const actual = command.validate({
+  it('fails validation when both ownerGroupId and ownerGroupName are specified', async () => {
+    const actual = await command.validate({
       options: {
         title: validTitle,
         ownerGroupId: validOwnerGroupId,
         ownerGroupName: validOwnerGroupName
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if the ownerGroupId is not a valid guid.', (done) => {
-    const actual = command.validate({
+  it('fails validation if the ownerGroupId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
         title: validTitle,
         ownerGroupId: invalidOwnerGroupId
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided with deprecated planTitle', (done) => {
-    const actual = command.validate({
+  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided with deprecated planTitle', async () => {
+    const actual = await command.validate({
       options: {
         planTitle: validTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both ownerGroupId and ownerGroupName are specified with deprecated planTitle', (done) => {
-    const actual = command.validate({
+  it('fails validation when both ownerGroupId and ownerGroupName are specified with deprecated planTitle', async () => {
+    const actual = await command.validate({
       options: {
         planTitle: validTitle,
         ownerGroupId: validOwnerGroupId,
         ownerGroupName: validOwnerGroupName
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when id specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when id specified', async () => {
+    const actual = await command.validate({
       options: {
         id: validId
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when title and valid ownerGroupId specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when title and valid ownerGroupId specified', async () => {
+    const actual = await command.validate({
       options: {
         title: validTitle,
         ownerGroupId: validOwnerGroupId
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when title and valid ownerGroupName specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when title and valid ownerGroupName specified', async () => {
+    const actual = await command.validate({
       options: {
         title: validTitle,
         ownerGroupName: validOwnerGroupName
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('correctly get planner plan with given id', (done) => {
@@ -462,7 +456,7 @@ describe(commands.PLAN_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

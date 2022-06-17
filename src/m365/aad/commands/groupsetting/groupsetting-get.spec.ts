@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.GROUPSETTING_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -169,18 +171,18 @@ describe(commands.GROUPSETTING_GET, () => {
     });
   });
 
-  it('fails validation if the id is not a valid GUID', () => {
-    const actual = command.validate({ options: { id: '123' } });
+  it('fails validation if the id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the id is a valid GUID', () => {
-    const actual = command.validate({ options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
+  it('passes validation if the id is a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -191,7 +193,7 @@ describe(commands.GROUPSETTING_GET, () => {
   });
 
   it('supports specifying id', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {

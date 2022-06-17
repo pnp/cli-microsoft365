@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -34,35 +31,27 @@ class TeamsTabAddCommand extends GraphCommand {
   public get description(): string {
     return 'Add a tab to the specified channel';
   }
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.entityId = typeof args.options.entityId !== 'undefined';
-    telemetryProps.removeUrl = typeof args.options.removeUrl !== 'undefined';
-    telemetryProps.websiteUrl = typeof args.options.websiteUrl !== 'undefined';
-    return telemetryProps;
-  }
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
 
-    const data: any = this.mapRequestBody(args.options);
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${args.options.channelId}/tabs`,
-      headers: {
-        accept: 'application/json;odata.metadata=none',
-        'content-type': 'application/json;odata=nometadata'
-      },
-      data: data,
-      responseType: 'json'
-    };
-    request
-      .post(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
   }
 
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        entityId: typeof args.options.entityId !== 'undefined',
+        removeUrl: typeof args.options.removeUrl !== 'undefined',
+        websiteUrl: typeof args.options.websiteUrl !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
       {
         option: '-i, --teamId <teamId>'
       },
@@ -87,21 +76,41 @@ class TeamsTabAddCommand extends GraphCommand {
       {
         option: '--websiteUrl [websiteUrl]'
       }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
+    );
   }
 
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.teamId as string)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-    if (!validation.isValidTeamsChannelId(args.options.channelId as string)) {
-      return `${args.options.channelId} is not a valid Teams ChannelId`;
-    }
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.teamId as string)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
+        if (!validation.isValidTeamsChannelId(args.options.channelId as string)) {
+          return `${args.options.channelId} is not a valid Teams ChannelId`;
+        }
 
-    return true;
+        return true;
+      }
+    );
+  }
+
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    const data: any = this.mapRequestBody(args.options);
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${args.options.channelId}/tabs`,
+      headers: {
+        accept: 'application/json;odata.metadata=none',
+        'content-type': 'application/json;odata=nometadata'
+      },
+      data: data,
+      responseType: 'json'
+    };
+    request
+      .post(requestOptions)
+      .then((res: any): void => {
+        logger.log(res);
+        cb();
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private mapRequestBody(options: Options): any {

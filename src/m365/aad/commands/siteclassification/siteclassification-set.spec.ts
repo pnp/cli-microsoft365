@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,11 +12,13 @@ const command: Command = require('./siteclassification-set');
 describe(commands.SITECLASSIFICATION_SET, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -58,7 +60,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -68,30 +70,30 @@ describe(commands.SITECLASSIFICATION_SET, () => {
     assert(containsOption);
   });
 
-  it('fails validation if none of the options are specified', () => {
-    const actual = command.validate({
+  it('fails validation if none of the options are specified', async () => {
+    const actual = await command.validate({
       options: {
         debug: false
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if at least one option is specified', () => {
-    const actual = command.validate({
+  it('passes validation if at least one option is specified', async () => {
+    const actual = await command.validate({
       options: {
         debug: false, classifications: "Confidential"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if all options are passed', () => {
-    const actual = command.validate({
+  it('passes validation if all options are passed', async () => {
+    const actual = await command.validate({
       options: {
         debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "https://aka.ms/pnp", guestUsageGuidelinesUrl: "https://aka.ms/pnp"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

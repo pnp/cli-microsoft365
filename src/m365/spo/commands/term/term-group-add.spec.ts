@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,6 +14,7 @@ describe(commands.TERM_GROUP_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,6 +27,7 @@ describe(commands.TERM_GROUP_ADD, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -604,23 +606,23 @@ describe(commands.TERM_GROUP_ADD, () => {
     });
   });
 
-  it('fails validation if id is not a valid GUID', () => {
-    const actual = command.validate({ options: { name: 'PnPTermSets', id: 'invalid' } });
+  it('fails validation if id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { name: 'PnPTermSets', id: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when id and name specified', () => {
-    const actual = command.validate({ options: { name: 'PnPTermSets', id: '9e54299e-208a-4000-8546-cc4139091b26' } });
+  it('passes validation when id and name specified', async () => {
+    const actual = await command.validate({ options: { name: 'PnPTermSets', id: '9e54299e-208a-4000-8546-cc4139091b26' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when name specified', () => {
-    const actual = command.validate({ options: { name: 'People' } });
+  it('passes validation when name specified', async () => {
+    const actual = await command.validate({ options: { name: 'People' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

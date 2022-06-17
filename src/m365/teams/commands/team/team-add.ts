@@ -1,8 +1,5 @@
 import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { aadGroup } from '../../../../utils/aadGroup';
@@ -52,13 +49,58 @@ class TeamsTeamAddCommand extends GraphCommand {
     return 'Adds a new Microsoft Teams team';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.name = typeof args.options.name !== 'undefined';
-    telemetryProps.description = typeof args.options.description !== 'undefined';
-    telemetryProps.template = typeof args.options.template !== 'undefined';
-    telemetryProps.wait = args.options.wait;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        name: typeof args.options.name !== 'undefined',
+        description: typeof args.options.description !== 'undefined',
+        template: typeof args.options.template !== 'undefined',
+        wait: args.options.wait
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --name [name]'
+      },
+      {
+        option: '-d, --description [description]'
+      },
+      {
+        option: '--template [template]'
+      },
+      {
+        option: '--wait'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.template) {
+          if (!args.options.name) {
+            return `Required parameter name missing`;
+          }
+
+          if (!args.options.description) {
+            return `Required parameter description missing`;
+          }
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -166,40 +208,6 @@ class TeamsTeamAddCommand extends GraphCommand {
           this.waitUntilFinished(requestOptions, resolve, reject, logger, dots);
         }, this.pollingInterval);
       }).catch(err => reject(err));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--template [template]'
-      },
-      {
-        option: '--wait'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.template) {
-      if (!args.options.name) {
-        return `Required parameter name missing`;
-      }
-
-      if (!args.options.description) {
-        return `Required parameter description missing`;
-      }
-    }
-
-    return true;
   }
 }
 

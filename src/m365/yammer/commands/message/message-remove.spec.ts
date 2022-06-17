@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,11 +12,13 @@ const command: Command = require('./message-remove');
 describe(commands.MESSAGE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -58,13 +60,13 @@ describe(commands.MESSAGE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('id must be a number', () => {
-    const actual = command.validate({ options: { id: 'nonumber' } });
+  it('id must be a number', async () => {
+    const actual = await command.validate({ options: { id: 'nonumber' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('id is required', () => {
-    const actual = command.validate({ options: {} });
+  it('id is required', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -152,13 +154,13 @@ describe(commands.MESSAGE_REMOVE, () => {
     });
   });
 
-  it('passes validation with parameters', () => {
-    const actual = command.validate({ options: { id: 10123123 } });
+  it('passes validation with parameters', async () => {
+    const actual = await command.validate({ options: { id: 10123123 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

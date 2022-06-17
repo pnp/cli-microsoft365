@@ -1,5 +1,5 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -26,6 +26,67 @@ class TeamsAppInstallCommand extends GraphCommand {
 
   public get description(): string {
     return 'Installs a Microsoft Teams team app from the catalog in the specified team or for the specified user';
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        teamId: typeof args.options.teamId !== 'undefined',
+        userId: typeof args.options.userId !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '--appId <appId>' },
+      { option: '--teamId [teamId]' },
+      { option: '--userId [userId]' },
+      { option: '--userName [userName]' }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.appId)) {
+          return `${args.options.appId} is not a valid GUID`;
+        }
+
+        if (!args.options.teamId &&
+          !args.options.userId &&
+          !args.options.userName) {
+          return `Specify either teamId, userId or userName`;
+        }
+
+        if ((args.options.teamId && args.options.userId) ||
+          (args.options.teamId && args.options.userName) ||
+          (args.options.userId && args.options.userName)) {
+          return `Specify either teamId, userId or userName but not multiple`;
+        }
+
+        if (args.options.teamId &&
+          !validation.isValidGuid(args.options.teamId)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
+
+        if (args.options.userId &&
+          !validation.isValidGuid(args.options.userId)) {
+          return `${args.options.userId} is not a valid GUID`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -90,48 +151,6 @@ class TeamsAppInstallCommand extends GraphCommand {
 
         return Promise.reject(`User with ID ${args.options.userId} not found. Original error: ${err.error.message}`);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '--appId <appId>' },
-      { option: '--teamId [teamId]' },
-      { option: '--userId [userId]' },
-      { option: '--userName [userName]' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.appId)) {
-      return `${args.options.appId} is not a valid GUID`;
-    }
-
-    if (!args.options.teamId &&
-      !args.options.userId &&
-      !args.options.userName) {
-      return `Specify either teamId, userId or userName`;
-    }
-
-    if ((args.options.teamId && args.options.userId) ||
-      (args.options.teamId && args.options.userName) ||
-      (args.options.userId && args.options.userName)) {
-      return `Specify either teamId, userId or userName but not multiple`;
-    }
-
-    if (args.options.teamId &&
-      !validation.isValidGuid(args.options.teamId)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    if (args.options.userId &&
-      !validation.isValidGuid(args.options.userId)) {
-      return `${args.options.userId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

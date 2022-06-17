@@ -1,7 +1,6 @@
 import { Group } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
 import { Cli, Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -28,13 +27,57 @@ class AadO365GroupRecycleBinItemRemoveCommand extends GraphCommand {
     return 'Permanently deletes a Microsoft 365 Group from the recycle bin in the current tenant';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.displayName = typeof args.options.displayName !== 'undefined';
-    telemetryProps.mailNickname = typeof args.options.mailNickname !== 'undefined';
-    telemetryProps.confirm = !!args.options.confirm;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        displayName: typeof args.options.displayName !== 'undefined',
+        mailNickname: typeof args.options.mailNickname !== 'undefined',
+        confirm: !!args.options.confirm
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-d, --displayName [displayName]'
+      },
+      {
+        option: '-m, --mailNickname [mailNickname]'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+    
+        return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'displayName', 'mailNickname']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -114,38 +157,6 @@ class AadO365GroupRecycleBinItemRemoveCommand extends GraphCommand {
     }
 
     return groups[0].id!;
-  }
-
-  public optionSets(): string[][] | undefined {
-    return [['id', 'displayName', 'mailNickname']];
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-d, --displayName [displayName]'
-      },
-      {
-        option: '-m, --mailNickname [mailNickname]'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): string | boolean {
-    if (args.options.id && !validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

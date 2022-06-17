@@ -4,7 +4,7 @@ import * as path from 'path';
 // uncomment to support upgrading to preview releases
 // import { prerelease } from 'semver';
 import { Logger } from '../../../../cli';
-import { CommandError, CommandOption } from '../../../../Command';
+import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { Dictionary, fsUtil, Hash, packageManager } from '../../../../utils';
 import commands from '../../commands';
@@ -12,8 +12,8 @@ import { BaseProjectCommand } from './base-project-command';
 import { Project } from './project-model';
 import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_npm_dedupe';
 import { Finding, FindingToReport, FindingTour, FindingTourStep } from './report-model';
-import { Rule } from './Rule';
 import { ReportData, ReportDataModification } from './report-model/ReportData';
+import { Rule } from './Rule';
 
 interface CommandArgs {
   options: Options;
@@ -29,10 +29,6 @@ interface Options extends GlobalOptions {
 class SpfxProjectUpgradeCommand extends BaseProjectCommand {
   private static packageManagers: string[] = ['npm', 'pnpm', 'yarn'];
   private static shells: string[] = ['bash', 'powershell', 'cmd'];
-
-  public constructor() {
-    super();
-  }
 
   private projectVersion: string | undefined;
   private toVersion: string = '';
@@ -87,17 +83,72 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     return 'Upgrades SharePoint Framework project to the specified version';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.toVersion = args.options.toVersion || this.supportedVersions[this.supportedVersions.length - 1];
-    // uncomment to support upgrading to preview releases
-    // if (prerelease(telemetryProps.toVersion) && !args.options.preview) {
-    //   telemetryProps.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
-    // }
-    telemetryProps.packageManager = args.options.packageManager || 'npm';
-    telemetryProps.shell = args.options.shell || 'bash';
-    telemetryProps.preview = args.options.preview;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        toVersion: args.options.toVersion || this.supportedVersions[this.supportedVersions.length - 1],
+        packageManager: args.options.packageManager || 'npm',
+        shell: args.options.shell || 'bash',
+        preview: args.options.preview
+      });
+      // uncomment to support upgrading to preview releases
+      // if (prerelease(this.telemetryProperties.toVersion) && !args.options.preview) {
+      //   this.telemetryProperties.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
+      // }
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-v, --toVersion [toVersion]'
+      },
+      {
+        option: '--packageManager [packageManager]',
+        autocomplete: SpfxProjectUpgradeCommand.packageManagers
+      },
+      {
+        option: '--shell [shell]',
+        autocomplete: SpfxProjectUpgradeCommand.shells
+      },
+      {
+        option: '--preview'
+      }
+    );
+
+    this.options.forEach(o => {
+      if (o.option.indexOf('--output') > -1) {
+        o.autocomplete = ['json', 'text', 'md', 'tour'];
+      }
+    });
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.packageManager) {
+          if (SpfxProjectUpgradeCommand.packageManagers.indexOf(args.options.packageManager) < 0) {
+            return `${args.options.packageManager} is not a supported package manager. Supported package managers are ${SpfxProjectUpgradeCommand.packageManagers.join(', ')}`;
+          }
+        }
+    
+        if (args.options.shell) {
+          if (SpfxProjectUpgradeCommand.shells.indexOf(args.options.shell) < 0) {
+            return `${args.options.shell} is not a supported shell. Supported shells are ${SpfxProjectUpgradeCommand.shells.join(', ')}`;
+          }
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -551,49 +602,6 @@ ${f.resolution}
       modificationPerFile: modificationPerFile,
       modificationTypePerFile: modificationTypePerFile
     };
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-v, --toVersion [toVersion]'
-      },
-      {
-        option: '--packageManager [packageManager]',
-        autocomplete: SpfxProjectUpgradeCommand.packageManagers
-      },
-      {
-        option: '--shell [shell]',
-        autocomplete: SpfxProjectUpgradeCommand.shells
-      },
-      {
-        option: '--preview'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    parentOptions.forEach(o => {
-      if (o.option.indexOf('--output') > -1) {
-        o.autocomplete = ['json', 'text', 'md', 'tour'];
-      }
-    });
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.packageManager) {
-      if (SpfxProjectUpgradeCommand.packageManagers.indexOf(args.options.packageManager) < 0) {
-        return `${args.options.packageManager} is not a supported package manager. Supported package managers are ${SpfxProjectUpgradeCommand.packageManagers.join(', ')}`;
-      }
-    }
-
-    if (args.options.shell) {
-      if (SpfxProjectUpgradeCommand.shells.indexOf(args.options.shell) < 0) {
-        return `${args.options.shell} is not a supported shell. Supported shells are ${SpfxProjectUpgradeCommand.shells.join(', ')}`;
-      }
-    }
-
-    return true;
   }
 }
 

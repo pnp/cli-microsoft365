@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo, validation } from '../../../../utils';
@@ -14,7 +11,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  id?: string;
+  title?: string;
 }
 
 class SpoSiteDesignGetCommand extends SpoCommand {
@@ -26,6 +24,54 @@ class SpoSiteDesignGetCommand extends SpoCommand {
 
   public get description(): string {
     return 'Gets information about the specified site design';
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        title: typeof args.options.title !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '--title [title]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.id && args.options.title) {
+          return 'Specify either id or title, but not both.';
+        }
+
+        if (!args.options.id && !args.options.title) {
+          return 'Specify id or title, one is required';
+        }
+
+        if (args.options.id && !validation.isValidGuid(args.options.id as string)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        return true;
+      }
+    );
   }
 
   private getSiteDesignId(args: CommandArgs): Promise<string> {
@@ -82,36 +128,6 @@ class SpoSiteDesignGetCommand extends SpoCommand {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '--title [title]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.id && args.options.title) {
-      return 'Specify either id or title, but not both.';
-    }
-
-    if (!args.options.id && !args.options.title) {
-      return 'Specify id or title, one is required';
-    }
-
-    if (args.options.id && !validation.isValidGuid(args.options.id as string)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

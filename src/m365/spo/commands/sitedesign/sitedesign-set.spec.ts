@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,12 +13,14 @@ describe(commands.SITEDESIGN_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -758,7 +760,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -769,7 +771,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying id', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {
@@ -780,7 +782,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying title', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--title') > -1) {
@@ -791,7 +793,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying webTemplate', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--webTemplate') > -1) {
@@ -802,7 +804,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying siteScripts', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--siteScripts') > -1) {
@@ -813,7 +815,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying description', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--description') > -1) {
@@ -824,7 +826,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying previewImageUrl', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--previewImageUrl') > -1) {
@@ -835,7 +837,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying previewImageAltText', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--previewImageAltText') > -1) {
@@ -846,7 +848,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying thumbnailUrl', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--thumbnailUrl') > -1) {
@@ -857,7 +859,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying version', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--version') > -1) {
@@ -868,7 +870,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying isDefault', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--isDefault') > -1) {
@@ -878,78 +880,78 @@ describe(commands.SITEDESIGN_SET, () => {
     assert(containsOption);
   });
 
-  it('fails validation if id specified', () => {
-    const actual = command.validate({ options: {} });
+  it('fails validation if id specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if id is not a valid GUID', () => {
-    const actual = command.validate({ options: { id: 'abc' } });
+  it('fails validation if id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passed validation if id is a valid GUID', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99' } });
+  it('passed validation if id is a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if specified webTemplate is invalid', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'Invalid' } });
+  it('fails validation if specified webTemplate is invalid', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'Invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if specified webTemplate is CommunicationSite', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'CommunicationSite' } });
+  it('passes validation if specified webTemplate is CommunicationSite', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'CommunicationSite' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if specified webTemplate is TeamSite', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite' } });
+  it('passes validation if specified webTemplate is TeamSite', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if specified siteScripts is not a valid GUID', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: 'abc' } });
+  it('fails validation if specified siteScripts is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the second specified siteScriptId is not a valid GUID', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24,abc" } });
+  it('fails validation if the second specified siteScriptId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24,abc" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if specified siteScriptId is valid', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } });
+  it('passes validation if specified siteScriptId is valid', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if all required parameters are valid (multiple siteScripts)', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24,449c0c6d-5380-4df2-b84b-622e0ac8ec25" } });
+  it('passes validation if all required parameters are valid (multiple siteScripts)', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24,449c0c6d-5380-4df2-b84b-622e0ac8ec25" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if specified version is not a number', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', version: 'a' } });
+  it('fails validation if specified version is not a number', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', version: 'a' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if specified version is a number', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', version: 2 } });
+  it('passes validation if specified version is a number', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', version: 2 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if specified isDefault value is invalid', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', isDefault: 'invalid' } });
+  it('fails validation if specified isDefault value is invalid', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', isDefault: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if specified isDefault value is true', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', isDefault: 'true' } });
+  it('passes validation if specified isDefault value is true', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', isDefault: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if specified isDefault value is false', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', isDefault: 'false' } });
+  it('passes validation if specified isDefault value is false', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', isDefault: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

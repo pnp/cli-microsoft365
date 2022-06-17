@@ -1,8 +1,7 @@
 import type * as ACData from 'adaptivecards-templating';
 import { Logger } from '../../../cli';
 import {
-  CommandError,
-  CommandOption
+  CommandError
 } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
@@ -32,15 +31,81 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
     return 'Sends adaptive card to the specified URL';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.actionUrl = typeof args.options.actionUrl !== 'undefined';
-    telemetryProps.card = typeof args.options.card !== 'undefined';
-    telemetryProps.cardData = typeof args.options.cardData !== 'undefined';
-    telemetryProps.description = typeof args.options.description !== 'undefined';
-    telemetryProps.imageUrl = typeof args.options.imageUrl !== 'undefined';
-    telemetryProps.title = typeof args.options.title !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        actionUrl: typeof args.options.actionUrl !== 'undefined',
+        card: typeof args.options.card !== 'undefined',
+        cardData: typeof args.options.cardData !== 'undefined',
+        description: typeof args.options.description !== 'undefined',
+        imageUrl: typeof args.options.imageUrl !== 'undefined',
+        title: typeof args.options.title !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '-t, --title [title]'
+      },
+      {
+        option: '-d, --description [description]'
+      },
+      {
+        option: '-i, --imageUrl [imageUrl]'
+      },
+      {
+        option: '-a, --actionUrl [actionUrl]'
+      },
+      {
+        option: '--card [card]'
+      },
+      {
+        option: '--cardData [cardData]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.card && !args.options.title) {
+          return 'Specify either the title or the card to send';
+        }
+    
+        if (args.options.card) {
+          try {
+            JSON.parse(args.options.card);
+          }
+          catch (e) {
+            return `Error while parsing the card: ${e}`;
+          }
+        }
+    
+        if (args.options.cardData) {
+          try {
+            JSON.parse(args.options.cardData);
+          }
+          catch (e) {
+            return `Error while parsing card data: ${e}`;
+          }
+        }
+    
+        return true;
+      }
+    );
   }
 
   public allowUnknownOptions(): boolean {
@@ -206,61 +271,6 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
     }
 
     return cardData;
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-i, --imageUrl [imageUrl]'
-      },
-      {
-        option: '-a, --actionUrl [actionUrl]'
-      },
-      {
-        option: '--card [card]'
-      },
-      {
-        option: '--cardData [cardData]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.card && !args.options.title) {
-      return 'Specify either the title or the card to send';
-    }
-
-    if (args.options.card) {
-      try {
-        JSON.parse(args.options.card);
-      }
-      catch (e) {
-        return `Error while parsing the card: ${e}`;
-      }
-    }
-
-    if (args.options.cardData) {
-      try {
-        JSON.parse(args.options.cardData);
-      }
-      catch (e) {
-        return `Error while parsing card data: ${e}`;
-      }
-    }
-
-    return true;
   }
 }
 

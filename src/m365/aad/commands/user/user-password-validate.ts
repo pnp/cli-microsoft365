@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -24,6 +21,20 @@ class AadUserPasswordValidateCommand extends GraphCommand {
     return "Check a user's password against the organization's password validation policy";
   }
 
+  constructor() {
+    super();
+  
+    this.#initOptions();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-p, --password <password>'
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
       url: `${this.resource}/beta/users/validatePassword`,
@@ -43,18 +54,6 @@ class AadUserPasswordValidateCommand extends GraphCommand {
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-p, --password <password>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
 }
 
 module.exports = new AadUserPasswordValidateCommand();

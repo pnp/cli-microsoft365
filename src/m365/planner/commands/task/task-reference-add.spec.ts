@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.TASK_REFERENCE_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   const validTaskId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validUrl = 'https://www.microsoft.com';
   const validAlias = 'Test';
@@ -37,6 +38,11 @@ describe(commands.TASK_REFERENCE_ADD, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -68,6 +74,7 @@ describe(commands.TASK_REFERENCE_ADD, () => {
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -78,27 +85,25 @@ describe(commands.TASK_REFERENCE_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if incorrect type is specified.', (done) => {
-    const actual = command.validate({
+  it('fails validation if incorrect type is specified.', async () => {
+    const actual = await command.validate({
       options: {
         taskId: validTaskId,
         url: validUrl,
         type: "wrong"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid options specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid options specified', async () => {
+    const actual = await command.validate({
       options: {
         taskId: validTaskId,
         url: validUrl
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('correctly adds reference', (done) => {
@@ -199,7 +204,7 @@ describe(commands.TASK_REFERENCE_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

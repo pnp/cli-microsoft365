@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -26,11 +26,13 @@ const ensureUserResponse = {
 describe(commands.GROUP_SET, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -74,65 +76,62 @@ describe(commands.GROUP_SET, () => {
   });
 
   it('defines correct option sets', () => {
-    const optionSets = command.optionSets();
+    const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [['id', 'name']]);
   });
 
-  it('fails validation when group id is not a number', (done) => {
-    const actual = command.validate({
+  it('fails validation when group id is not a number', async () => {
+    const actual = await command.validate({
       options: {
         webUrl: validWebUrl,
         id: 'invalid id'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both ownerEmail and ownerUserName are specified', (done) => {
-    const actual = command.validate({
+  it('fails validation when both ownerEmail and ownerUserName are specified', async () => {
+    const actual = await command.validate({
       options: {
         webUrl: validWebUrl,
+        id: validId,
         ownerEmail: validOwnerEmail,
         ownerUserName: validOwnerUserName
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when invalid boolean is passed as option', (done) => {
-    const actual = command.validate({
+  it('fails validation when invalid boolean is passed as option', async () => {
+    const actual = await command.validate({
       options: {
         webUrl: validWebUrl,
         id: validId,
         autoAcceptRequestToJoinLeave: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when invalid web URL is passed', (done) => {
-    const actual = command.validate({
+  it('fails validation when invalid web URL is passed', async () => {
+    const actual = await command.validate({
       options: {
-        webUrl: 'invalid'
+        webUrl: 'invalid',
+        id: validId
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid options specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid options specified', async () => {
+    const actual = await command.validate({
       options: {
         webUrl: validWebUrl,
         id: validId,
         allowRequestToJoinLeave: 'true'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('successfully updates group settings by id', (done) => {
@@ -296,7 +295,7 @@ describe(commands.GROUP_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -27,10 +24,54 @@ class SpoAppInstallCommand extends SpoCommand {
     return 'Installs an app from the specified app catalog in the site';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.scope = args.options.scope || 'tenant';
-    return telemetryProps;
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        scope: args.options.scope || 'tenant'
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '-s, --siteUrl <siteUrl>'
+      },
+      {
+        option: '--scope [scope]',
+        autocomplete: ['tenant', 'sitecollection']
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.scope) {
+          const testScope: string = args.options.scope.toLowerCase();
+          if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+            return `Scope must be either 'tenant' or 'sitecollection' if specified`;
+          }
+        }
+    
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+    
+        return validation.isValidSharePointUrl(args.options.siteUrl);
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -50,39 +91,6 @@ class SpoAppInstallCommand extends SpoCommand {
     request
       .post(requestOptions)
       .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-s, --siteUrl <siteUrl>'
-      },
-      {
-        option: '--scope [scope]',
-        autocomplete: ['tenant', 'sitecollection']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.scope) {
-      const testScope: string = args.options.scope.toLowerCase();
-      if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-        return `Scope must be either 'tenant' or 'sitecollection' if specified`;
-      }
-    }
-
-    if (!validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    return validation.isValidSharePointUrl(args.options.siteUrl);
   }
 }
 

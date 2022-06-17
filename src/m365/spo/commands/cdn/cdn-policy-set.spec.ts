@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -13,11 +13,12 @@ const command: Command = require('./cdn-policy-set');
 describe(commands.CDN_POLICY_SET, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let requests: any[];
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'abc',
       FormDigestTimeoutSeconds: 1800,
@@ -42,6 +43,7 @@ describe(commands.CDN_POLICY_SET, () => {
 
       return Promise.reject('Invalid request');
     });
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -246,7 +248,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -257,7 +259,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('requires CDN policy name', () => {
-    const options = command.options();
+    const options = command.options;
     let requiresCdnPolicyName = false;
     options.forEach(o => {
       if (o.option.indexOf('<policy>') > -1) {
@@ -268,7 +270,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('requires CDN policy value', () => {
-    const options = command.options();
+    const options = command.options;
     let requiresCdnPolicyValue = false;
     options.forEach(o => {
       if (o.option.indexOf('<value>') > -1) {
@@ -278,47 +280,40 @@ describe(commands.CDN_POLICY_SET, () => {
     assert(requiresCdnPolicyValue);
   });
 
-  it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = command.options();
-    sinonUtil.restore(Command.prototype.options);
-    assert(options.length > 0);
-  });
-
-  it('accepts Public SharePoint Online CDN type', () => {
-    const actual = command.validate({ options: { type: 'Public', policy: 'IncludeFileExtensions' } });
+  it('accepts Public SharePoint Online CDN type', async () => {
+    const actual = await command.validate({ options: { type: 'Public', policy: 'IncludeFileExtensions', value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts Private SharePoint Online CDN type', () => {
-    const actual = command.validate({ options: { type: 'Private', policy: 'IncludeFileExtensions' } });
+  it('accepts Private SharePoint Online CDN type', async () => {
+    const actual = await command.validate({ options: { type: 'Private', policy: 'IncludeFileExtensions', value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('rejects invalid SharePoint Online CDN type', () => {
+  it('rejects invalid SharePoint Online CDN type', async () => {
     const type = 'foo';
-    const actual = command.validate({ options: { type: type, policy: 'IncludeFileExtensions' } });
+    const actual = await command.validate({ options: { type: type, policy: 'IncludeFileExtensions', value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON' } }, commandInfo);
     assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
   });
 
-  it('doesn\'t fail validation if the optional type option not specified', () => {
-    const actual = command.validate({ options: { policy: 'IncludeFileExtensions' } });
+  it('doesn\'t fail validation if the optional type option not specified', async () => {
+    const actual = await command.validate({ options: { policy: 'IncludeFileExtensions', value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts IncludeFileExtensions SharePoint Online CDN policy', () => {
-    const actual = command.validate({ options: { policy: 'IncludeFileExtensions' } });
+  it('accepts IncludeFileExtensions SharePoint Online CDN policy', async () => {
+    const actual = await command.validate({ options: { policy: 'IncludeFileExtensions', value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts ExcludeRestrictedSiteClassifications SharePoint Online CDN policy', () => {
-    const actual = command.validate({ options: { policy: 'ExcludeRestrictedSiteClassifications' } });
+  it('accepts ExcludeRestrictedSiteClassifications SharePoint Online CDN policy', async () => {
+    const actual = await command.validate({ options: { policy: 'ExcludeRestrictedSiteClassifications', value: 'Public' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('rejects invalid SharePoint Online CDN policy', () => {
+  it('rejects invalid SharePoint Online CDN policy', async () => {
     const policy = 'foo';
-    const actual = command.validate({ options: { policy: policy } });
+    const actual = await command.validate({ options: { policy: policy, value: 'bar' } }, commandInfo);
     assert.strictEqual(actual, `${policy} is not a valid CDN policy. Allowed values are IncludeFileExtensions|ExcludeRestrictedSiteClassifications`);
   });
 });

@@ -1,11 +1,11 @@
 import { Cli, Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { spo, ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -27,10 +27,46 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
     return 'Enable or disable the service principal';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.enabled = args.options.enabled === 'true';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        enabled: args.options.enabled === 'true'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-e, --enabled <enabled>',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const enabled: string = args.options.enabled.toLowerCase();
+        if (enabled !== 'true' &&
+          enabled !== 'false') {
+          return `${args.options.enabled} is not a valid boolean value. Allowed values are true|false`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public alias(): string[] | undefined {
@@ -78,7 +114,7 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
 
             logger.log(output);
           }
-          
+
           cb();
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     };
@@ -101,31 +137,6 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
         }
       });
     }
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const enabled: string = args.options.enabled.toLowerCase();
-    if (enabled !== 'true' &&
-      enabled !== 'false') {
-      return `${args.options.enabled} is not a valid boolean value. Allowed values are true|false`;
-    }
-
-    return true;
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-e, --enabled <enabled>',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

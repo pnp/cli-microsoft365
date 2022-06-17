@@ -1,11 +1,10 @@
+import { TeamsAppDefinition, TeamsAppInstallation } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { odata, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { TeamsAppDefinition, TeamsAppInstallation } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
@@ -25,11 +24,56 @@ class TeamsUserAppListCommand extends GraphCommand {
     return 'List the apps installed in the personal scope of the specified user';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.userId = typeof args.options.userId !== 'undefined';
-    telemetryProps.userName = typeof args.options.userName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        userId: typeof args.options.userId !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--userId [userId]'
+      },
+      {
+        option: '--userName [userName]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.userId && !args.options.userName) {
+          return `userId or userName need to be provided`;
+        }
+
+        if (args.options.userId && args.options.userName) {
+          return `Please specify either userId or userName, not both`;
+        }
+
+        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
+          return `${args.options.userId} is not a valid GUID`;
+        }
+
+        if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
+          return `${args.options.userName} is not a valid userName`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -82,40 +126,6 @@ class TeamsUserAppListCommand extends GraphCommand {
     };
 
     return request.get<{ value: string; }>(requestOptions);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--userName [userName]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.userId && !args.options.userName) {
-      return `userId or userName need to be provided`;
-    }
-
-    if (args.options.userId && args.options.userName) {
-      return `Please specify either userId or userName, not both`;
-    }
-
-    if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-      return `${args.options.userId} is not a valid GUID`;
-    }
-
-    if (args.options.userName && !validation.isValidUserPrincipalName(args.options.userName)) {
-      return `${args.options.userName} is not a valid userName`;
-    }
-
-    return true;
   }
 }
 

@@ -1,8 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption,
-
-  CommandTypes
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -30,14 +28,6 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
   private webId: string;
   private fieldLink: FieldLink | null;
 
-  constructor() {
-    super();
-    this.requestDigest = '';
-    this.siteId = '';
-    this.webId = '';
-    this.fieldLink = null;
-  }
-
   public get name(): string {
     return commands.CONTENTTYPE_FIELD_SET;
   }
@@ -46,17 +36,77 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     return 'Adds or updates a site column reference in a site content type';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.hidden = args.options.hidden;
-    telemetryProps.required = args.options.required;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initTypes();
+
+    this.requestDigest = '';
+    this.siteId = '';
+    this.webId = '';
+    this.fieldLink = null;
   }
 
-  public types(): CommandTypes | undefined {
-    return {
-      string: ['contentTypeId', 'c']
-    };
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        hidden: args.options.hidden,
+        required: args.options.required
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-c, --contentTypeId <contentTypeId>'
+      },
+      {
+        option: '-f, --fieldId <fieldId>'
+      },
+      {
+        option: '-r, --required [required]'
+      },
+      {
+        option: '--hidden [hidden]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.fieldId)) {
+          return `${args.options.fieldId} is not a valid GUID`;
+        }
+    
+        if (typeof args.options.required !== 'undefined') {
+          if (args.options.required !== 'true' &&
+            args.options.required !== 'false') {
+            return `${args.options.required} is not a valid boolean value. Allowed values are true|false`;
+          }
+        }
+    
+        if (typeof args.options.hidden !== 'undefined') {
+          if (args.options.hidden !== 'true' &&
+            args.options.hidden !== 'false') {
+            return `${args.options.hidden} is not a valid boolean value. Allowed values are true|false`;
+          }
+        }
+    
+        return validation.isValidSharePointUrl(args.options.webUrl);
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('contentTypeId', 'c');
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -384,51 +434,6 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           reject(error);
         });
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-c, --contentTypeId <contentTypeId>'
-      },
-      {
-        option: '-f, --fieldId <fieldId>'
-      },
-      {
-        option: '-r, --required [required]'
-      },
-      {
-        option: '--hidden [hidden]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.fieldId)) {
-      return `${args.options.fieldId} is not a valid GUID`;
-    }
-
-    if (typeof args.options.required !== 'undefined') {
-      if (args.options.required !== 'true' &&
-        args.options.required !== 'false') {
-        return `${args.options.required} is not a valid boolean value. Allowed values are true|false`;
-      }
-    }
-
-    if (typeof args.options.hidden !== 'undefined') {
-      if (args.options.hidden !== 'true' &&
-        args.options.hidden !== 'false') {
-        return `${args.options.hidden} is not a valid boolean value. Allowed values are true|false`;
-      }
-    }
-
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

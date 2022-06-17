@@ -1,8 +1,5 @@
 import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -31,13 +28,90 @@ class SpoListWebhookSetCommand extends SpoCommand {
     return 'Updates the specified webhook';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listId = (!(!args.options.listId)).toString();
-    telemetryProps.listTitle = (!(!args.options.listTitle)).toString();
-    telemetryProps.notificationUrl = (!(!args.options.notificationUrl)).toString();
-    telemetryProps.expirationDateTime = (!(!args.options.expirationDateTime)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listId: (!(!args.options.listId)).toString(),
+        listTitle: (!(!args.options.listTitle)).toString(),
+        notificationUrl: (!(!args.options.notificationUrl)).toString(),
+        expirationDateTime: (!(!args.options.expirationDateTime)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-l, --listId [listId]'
+      },
+      {
+        option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '-n, --notificationUrl [notificationUrl]'
+      },
+      {
+        option: '-e, --expirationDateTime [expirationDateTime]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.listId) {
+          if (!validation.isValidGuid(args.options.listId)) {
+            return `${args.options.listId} is not a valid GUID`;
+          }
+        }
+
+        if (args.options.listId && args.options.listTitle) {
+          return 'Specify listId or listTitle, but not both';
+        }
+
+        if (!args.options.listId && !args.options.listTitle) {
+          return 'Specify listId or listTitle, one is required';
+        }
+
+        if (!args.options.notificationUrl && !args.options.expirationDateTime) {
+          return 'Specify notificationUrl, expirationDateTime or both, at least one is required';
+        }
+
+        const parsedDateTime = Date.parse(args.options.expirationDateTime as string);
+        if (args.options.expirationDateTime && !(!parsedDateTime) !== true) {
+          return `${args.options.expirationDateTime} is not a valid date format. Provide the date in one of the following formats:
+      ${chalk.grey('YYYY-MM-DD')}
+      ${chalk.grey('YYYY-MM-DDThh:mm')}
+      ${chalk.grey('YYYY-MM-DDThh:mmZ')}
+      ${chalk.grey('YYYY-MM-DDThh:mm±hh:mm')}`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -80,72 +154,6 @@ class SpoListWebhookSetCommand extends SpoCommand {
       }, (err: any): void => {
         this.handleRejectedODataJsonPromise(err, logger, cb);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-n, --notificationUrl [notificationUrl]'
-      },
-      {
-        option: '-e, --expirationDateTime [expirationDateTime]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.listId) {
-      if (!validation.isValidGuid(args.options.listId)) {
-        return `${args.options.listId} is not a valid GUID`;
-      }
-    }
-
-    if (args.options.listId && args.options.listTitle) {
-      return 'Specify listId or listTitle, but not both';
-    }
-
-    if (!args.options.listId && !args.options.listTitle) {
-      return 'Specify listId or listTitle, one is required';
-    }
-
-    if (!args.options.notificationUrl && !args.options.expirationDateTime) {
-      return 'Specify notificationUrl, expirationDateTime or both, at least one is required';
-    }
-
-    const parsedDateTime = Date.parse(args.options.expirationDateTime as string);
-    if (args.options.expirationDateTime && !(!parsedDateTime) !== true) {
-      return `${args.options.expirationDateTime} is not a valid date format. Provide the date in one of the following formats:
-  ${chalk.grey('YYYY-MM-DD')}
-  ${chalk.grey('YYYY-MM-DDThh:mm')}
-  ${chalk.grey('YYYY-MM-DDThh:mmZ')}
-  ${chalk.grey('YYYY-MM-DDThh:mm±hh:mm')}`;
-    }
-
-    return true;
   }
 }
 

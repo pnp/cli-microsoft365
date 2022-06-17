@@ -1,6 +1,5 @@
 import { Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -32,10 +31,64 @@ class TeamsTeamArchiveCommand extends GraphCommand {
     return 'Archives specified Microsoft Teams team';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.shouldSetSpoSiteReadOnlyForMembers = args.options.shouldSetSpoSiteReadOnlyForMembers === true;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+      	id: typeof args.options.id !== 'undefined',
+      	name: typeof args.options.name !== 'undefined',
+        shouldSetSpoSiteReadOnlyForMembers: args.options.shouldSetSpoSiteReadOnlyForMembers === true,
+        teamId: typeof args.options.teamId !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --name [name]'
+      },
+      {
+        option: '--teamId [teamId]'
+      },
+      {
+        option: '--shouldSetSpoSiteReadOnlyForMembers'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.id && !args.options.name && !args.options.teamId) {
+	      return 'Specify either id or name';
+	    }
+
+	    if (args.options.name && (args.options.id || args.options.teamId)) {
+	      return 'Specify either id or name but not both';
+	    }
+
+	    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
+	      return `${args.options.teamId} is not a valid GUID`;
+	    }
+
+	    if (args.options.id && !validation.isValidGuid(args.options.id)) {
+	      return `${args.options.id} is not a valid GUID`;
+	    }
+
+	    return true;
+      }
+    );
   }
 
   private getTeamId(args: CommandArgs): Promise<string> {
@@ -81,46 +134,6 @@ class TeamsTeamArchiveCommand extends GraphCommand {
         return request.post(requestOptions);
       })
       .then(_ => cb(), (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '--teamId [teamId]'
-      },
-      {
-        option: '--shouldSetSpoSiteReadOnlyForMembers'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.id && !args.options.name && !args.options.teamId) {
-      return 'Specify either id or name';
-    }
-
-    if (args.options.name && (args.options.id || args.options.teamId)) {
-      return 'Specify either id or name but not both';
-    }
-
-    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    if (args.options.id && !validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

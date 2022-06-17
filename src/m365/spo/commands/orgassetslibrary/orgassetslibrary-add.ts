@@ -1,11 +1,11 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { spo, ContextInfo, ClientSvcResponse, ClientSvcResponseContents, validation } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -28,11 +28,49 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
     return 'Promotes an existing library to become an organization assets library';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.cdnType = args.options.cdnType || 'Private';
-    telemetryProps.thumbnailUrl = typeof args.options.thumbnailUrl !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        cdnType: args.options.cdnType || 'Private',
+        thumbnailUrl: typeof args.options.thumbnailUrl !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--libraryUrl <libraryUrl>'
+      },
+      {
+        option: '--thumbnailUrl [thumbnailUrl]'
+      },
+      {
+        option: '--cdnType [cdnType]',
+        autocomplete: ['Public', 'Private']
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidThumbnailUrl = validation.isValidSharePointUrl((args.options.thumbnailUrl as string));
+        if (typeof args.options.thumbnailUrl !== 'undefined' && isValidThumbnailUrl !== true) {
+          return isValidThumbnailUrl;
+        }
+
+        return validation.isValidSharePointUrl(args.options.libraryUrl);
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -66,36 +104,9 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        
+
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidThumbnailUrl = validation.isValidSharePointUrl((args.options.thumbnailUrl as string));
-    if (typeof args.options.thumbnailUrl !== 'undefined' && isValidThumbnailUrl !== true) {
-      return isValidThumbnailUrl;
-    }
-
-    return validation.isValidSharePointUrl(args.options.libraryUrl);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--libraryUrl <libraryUrl>'
-      },
-      {
-        option: '--thumbnailUrl [thumbnailUrl]'
-      },
-      {
-        option: '--cdnType [cdnType]',
-        autocomplete: ['Public', 'Private']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

@@ -3,8 +3,8 @@ import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
-import Command, { CommandError, CommandTypes } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -15,6 +15,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerStderrLogSpy: sinon.SinonSpy;
 
   const defaultRequestsSuccessStub = (): sinon.SinonStub => {
@@ -43,6 +44,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso-admin.sharepoint.com';
     auth.service.tenantId = '6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -88,12 +90,12 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   });
 
   it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
+    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
+    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -332,15 +334,15 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     });
   });
 
-  it('validation fails if wrong enum value', () => {
+  it('validation fails if wrong enum value', async () => {
     const options: any = {
       SharingCapability: 'abc'
     };
-    const actual = command.validate({ options: options });
+    const actual = await command.validate({ options: options }, commandInfo);
     assert.strictEqual(actual, 'SharingCapability option has invalid value of abc. Allowed values are ["Disabled","ExternalUserSharingOnly","ExternalUserAndGuestSharing","ExistingExternalUserSharingOnly"]');
   });
 
-  it('validation passes if right enum value', () => {
+  it('validation passes if right enum value', async () => {
     const options: any = {
       debug: true,
       SharingCapability: 'ExternalUserSharingOnly',
@@ -355,46 +357,46 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       LimitedAccessFileType: 'WebPreviewableFiles',
       SpecialCharactersStateInFileFolderNames: 'Allowed'
     };
-    const actual = command.validate({ options: options });
+    const actual = await command.validate({ options: options }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validation fails if wrong enum key', () => {
+  it('validation fails if wrong enum key', async () => {
 
     const actual = (command as any).mapEnumToInt('abc', 'abc');
     assert.strictEqual(actual, -1);
   });
 
-  it('validation passes if right prop value', () => {
+  it('validation passes if right prop value', async () => {
     const options: any = {
       OrgNewsSiteUrl: 'abc'
     };
-    const actual = command.validate({ options: options });
+    const actual = await command.validate({ options: options }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validation false if boolean option has non boolean value', () => {
+  it('validation false if boolean option has non boolean value', async () => {
     const options: any = {
       ShowAllUsersClaim: 'abc'
     };
-    const actual = command.validate({ options: options });
+    const actual = await command.validate({ options: options }, commandInfo);
     assert.strictEqual(actual, 'ShowAllUsersClaim option has invalid value of abc. Allowed values are ["true","false"]');
   });
 
-  it('validation fails if no options specified', () => {
+  it('validation fails if no options specified', async () => {
     const options: any = {
       debug: true,
       verbose: true
     };
-    const actual = command.validate({ options: options });
+    const actual = await command.validate({ options: options }, commandInfo);
     assert.strictEqual(actual, `You must specify at least one option`);
   });
 
-  it('validation passes autocomplete check if has the right value specified', () => {
+  it('validation passes autocomplete check if has the right value specified', async () => {
     const options: any = {
       ShowAllUsersClaim: true
     };
-    const actual = command.validate({ options: options });
+    const actual = await command.validate({ options: options }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

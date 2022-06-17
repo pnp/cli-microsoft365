@@ -1,11 +1,10 @@
-import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import { AxiosRequestConfig } from 'axios';
-import { validation } from '../../../../utils';
+import { Logger } from '../../../../cli';
+import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { validation } from '../../../../utils';
 import PlannerCommand from '../../../base/PlannerCommand';
 import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
 
 interface CommandArgs {
   options: Options;
@@ -29,15 +28,77 @@ class PlannerTenantSettingsSetCommand extends PlannerCommand {
     return 'Sets Microsoft Planner configuration of the tenant';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.isPlannerAllowed = typeof args.options.isPlannerAllowed !== 'undefined';
-    telemetryProps.allowCalendarSharing = typeof args.options.allowCalendarSharing !== 'undefined';
-    telemetryProps.allowTenantMoveWithDataLoss = typeof args.options.allowTenantMoveWithDataLoss !== 'undefined';
-    telemetryProps.allowTenantMoveWithDataMigration = typeof args.options.allowTenantMoveWithDataMigration !== 'undefined';
-    telemetryProps.allowRosterCreation = typeof args.options.allowRosterCreation !== 'undefined';
-    telemetryProps.allowPlannerMobilePushNotifications = typeof args.options.allowPlannerMobilePushNotifications !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        isPlannerAllowed: typeof args.options.isPlannerAllowed !== 'undefined',
+        allowCalendarSharing: typeof args.options.allowCalendarSharing !== 'undefined',
+        allowTenantMoveWithDataLoss: typeof args.options.allowTenantMoveWithDataLoss !== 'undefined',
+        allowTenantMoveWithDataMigration: typeof args.options.allowTenantMoveWithDataMigration !== 'undefined',
+        allowRosterCreation: typeof args.options.allowRosterCreation !== 'undefined',
+        allowPlannerMobilePushNotifications: typeof args.options.allowPlannerMobilePushNotifications !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--isPlannerAllowed [isPlannerAllowed]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--allowCalendarSharing [allowCalendarSharing]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--allowTenantMoveWithDataLoss [allowTenantMoveWithDataLoss]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--allowTenantMoveWithDataMigration [allowTenantMoveWithDataMigration]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--allowRosterCreation [allowRosterCreation]',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '--allowPlannerMobilePushNotifications [allowPlannerMobilePushNotifications]',
+        autocomplete: ['true', 'false']
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const optionsArray = [
+          args.options.isPlannerAllowed, args.options.allowCalendarSharing, args.options.allowTenantMoveWithDataLoss,
+          args.options.allowTenantMoveWithDataMigration, args.options.allowRosterCreation, args.options.allowPlannerMobilePushNotifications
+        ];
+
+        if (optionsArray.every(o => typeof o === 'undefined')) {
+          return 'You must specify at least one option';
+        }
+
+        for (const option of optionsArray) {
+          if (typeof option !== 'undefined' && !validation.isValidBoolean(option as any)) {
+            return `Value '${option}' is not a valid boolean`;
+          }
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -64,57 +125,6 @@ class PlannerTenantSettingsSetCommand extends PlannerCommand {
         logger.log(result);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--isPlannerAllowed [isPlannerAllowed]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowCalendarSharing [allowCalendarSharing]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowTenantMoveWithDataLoss [allowTenantMoveWithDataLoss]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowTenantMoveWithDataMigration [allowTenantMoveWithDataMigration]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowRosterCreation [allowRosterCreation]',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '--allowPlannerMobilePushNotifications [allowPlannerMobilePushNotifications]',
-        autocomplete: ['true', 'false']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const optionsArray = [
-      args.options.isPlannerAllowed, args.options.allowCalendarSharing, args.options.allowTenantMoveWithDataLoss,
-      args.options.allowTenantMoveWithDataMigration, args.options.allowRosterCreation, args.options.allowPlannerMobilePushNotifications
-    ];
-
-    if (optionsArray.every(o => typeof o === 'undefined')) {
-      return 'You must specify at least one option';
-    }
-
-    for (const option of optionsArray) {
-      if (typeof option !== 'undefined' && !validation.isValidBoolean(option as any)) {
-        return `Value '${option}' is not a valid boolean`;
-      }
-    }
-
-    return true;
   }
 }
 

@@ -2,9 +2,6 @@ import { Group } from '@microsoft/microsoft-graph-types';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -34,6 +31,110 @@ class AadO365GroupSetCommand extends GraphCommand {
 
   public get description(): string {
     return 'Updates Microsoft 365 Group properties';
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        displayName: typeof args.options.displayName !== 'undefined',
+        description: typeof args.options.description !== 'undefined',
+        owners: typeof args.options.owners !== 'undefined',
+        members: typeof args.options.members !== 'undefined',
+        isPrivate: typeof args.options.isPrivate !== 'undefined',
+        logoPath: typeof args.options.logoPath !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '-n, --displayName [displayName]'
+      },
+      {
+        option: '-d, --description [description]'
+      },
+      {
+        option: '--owners [owners]'
+      },
+      {
+        option: '--members [members]'
+      },
+      {
+        option: '--isPrivate [isPrivate]'
+      },
+      {
+        option: '-l, --logoPath [logoPath]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.displayName &&
+          !args.options.description &&
+          !args.options.members &&
+          !args.options.owners &&
+          typeof args.options.isPrivate === 'undefined' &&
+          !args.options.logoPath) {
+          return 'Specify at least one property to update';
+        }
+    
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+    
+        if (args.options.owners) {
+          const owners: string[] = args.options.owners.split(',').map(o => o.trim());
+          for (let i = 0; i < owners.length; i++) {
+            if (owners[i].indexOf('@') < 0) {
+              return `${owners[i]} is not a valid userPrincipalName`;
+            }
+          }
+        }
+    
+        if (args.options.members) {
+          const members: string[] = args.options.members.split(',').map(m => m.trim());
+          for (let i = 0; i < members.length; i++) {
+            if (members[i].indexOf('@') < 0) {
+              return `${members[i]} is not a valid userPrincipalName`;
+            }
+          }
+        }
+    
+        if (typeof args.options.isPrivate !== 'undefined' &&
+          args.options.isPrivate !== 'true' &&
+          args.options.isPrivate !== 'false') {
+          return `${args.options.isPrivate} is not a valid boolean value`;
+        }
+    
+        if (args.options.logoPath) {
+          const fullPath: string = path.resolve(args.options.logoPath);
+    
+          if (!fs.existsSync(fullPath)) {
+            return `File '${fullPath}' not found`;
+          }
+    
+          if (fs.lstatSync(fullPath).isDirectory()) {
+            return `Path '${fullPath}' points to a directory`;
+          }
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -215,88 +316,6 @@ class AadO365GroupSetCommand extends GraphCommand {
       default:
         return 'image/jpeg';
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-n, --displayName [displayName]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--owners [owners]'
-      },
-      {
-        option: '--members [members]'
-      },
-      {
-        option: '--isPrivate [isPrivate]'
-      },
-      {
-        option: '-l, --logoPath [logoPath]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.displayName &&
-      !args.options.description &&
-      !args.options.members &&
-      !args.options.owners &&
-      typeof args.options.isPrivate === 'undefined' &&
-      !args.options.logoPath) {
-      return 'Specify at least one property to update';
-    }
-
-    if (!validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    if (args.options.owners) {
-      const owners: string[] = args.options.owners.split(',').map(o => o.trim());
-      for (let i = 0; i < owners.length; i++) {
-        if (owners[i].indexOf('@') < 0) {
-          return `${owners[i]} is not a valid userPrincipalName`;
-        }
-      }
-    }
-
-    if (args.options.members) {
-      const members: string[] = args.options.members.split(',').map(m => m.trim());
-      for (let i = 0; i < members.length; i++) {
-        if (members[i].indexOf('@') < 0) {
-          return `${members[i]} is not a valid userPrincipalName`;
-        }
-      }
-    }
-
-    if (typeof args.options.isPrivate !== 'undefined' &&
-      args.options.isPrivate !== 'true' &&
-      args.options.isPrivate !== 'false') {
-      return `${args.options.isPrivate} is not a valid boolean value`;
-    }
-
-    if (args.options.logoPath) {
-      const fullPath: string = path.resolve(args.options.logoPath);
-
-      if (!fs.existsSync(fullPath)) {
-        return `File '${fullPath}' not found`;
-      }
-
-      if (fs.lstatSync(fullPath).isDirectory()) {
-        return `Path '${fullPath}' points to a directory`;
-      }
-    }
-
-    return true;
   }
 }
 

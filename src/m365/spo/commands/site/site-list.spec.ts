@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,6 +14,7 @@ describe(commands.SITE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,6 +22,7 @@ describe(commands.SITE_LIST, () => {
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: new Date(), WebFullUrl: 'https://contoso.sharepoint.com' }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -67,33 +69,33 @@ describe(commands.SITE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Title', 'Url']);
   });
 
-  it('passes validation if type TeamSite specified', () => {
-    const actual = command.validate({ options: { type: 'TeamSite' } });
+  it('passes validation if type TeamSite specified', async () => {
+    const actual = await command.validate({ options: { type: 'TeamSite' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if type CommunicationSite specified', () => {
-    const actual = command.validate({ options: { type: 'CommunicationSite' } });
+  it('passes validation if type CommunicationSite specified', async () => {
+    const actual = await command.validate({ options: { type: 'CommunicationSite' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if type All specified', () => {
-    const actual = command.validate({ options: { type: 'CommunicationSite' } });
+  it('passes validation if type All specified', async () => {
+    const actual = await command.validate({ options: { type: 'CommunicationSite' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if non existing type specified', () => {
-    const actual = command.validate({ options: { type: 'invalid' } });
+  it('fails validation if non existing type specified', async () => {
+    const actual = await command.validate({ options: { type: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if type and webTemplate are both specified', () => {
-    const actual = command.validate({ options: { type: 'TeamSite', webTemplate: 'STS#3' } });
+  it('fails validation if type and webTemplate are both specified', async () => {
+    const actual = await command.validate({ options: { type: 'TeamSite', webTemplate: 'STS#3' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if includeOneDriveSites is not specified together with type All', () => {
-    const actual = command.validate({ options: { type: 'TeamSite', includeOneDriveSites: '1' } });
+  it('fails validation if includeOneDriveSites is not specified together with type All', async () => {
+    const actual = await command.validate({ options: { type: 'TeamSite', includeOneDriveSites: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -736,7 +738,7 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

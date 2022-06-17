@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo, validation } from '../../../../utils';
@@ -26,15 +23,62 @@ class SpoAppListCommand extends SpoAppBaseCommand {
     return 'Lists apps from the specified app catalog';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.appCatalogUrl = (!(!args.options.appCatalogUrl)).toString();
-    telemetryProps.scope = args.options.scope || 'tenant';
-    return telemetryProps;
-  }
-
   public defaultProperties(): string[] | undefined {
     return [`Title`, `ID`, `Deployed`, `AppCatalogVersion`];
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        appCatalogUrl: (!(!args.options.appCatalogUrl)).toString(),
+        scope: args.options.scope || 'tenant'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-s, --scope [scope]',
+        autocomplete: ['tenant', 'sitecollection']
+      },
+      {
+        option: '-u, --appCatalogUrl [appCatalogUrl]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        // verify either 'tenant' or 'sitecollection' specified if scope provided
+        if (args.options.scope) {
+          const testScope: string = args.options.scope.toLowerCase();
+
+          if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+            return `Scope must be either 'tenant' or 'sitecollection'`;
+          }
+
+          if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
+            return `You must specify appCatalogUrl when the scope is sitecollection`;
+          }
+
+          if (args.options.appCatalogUrl) {
+            return validation.isValidSharePointUrl(args.options.appCatalogUrl);
+          }
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -76,42 +120,6 @@ class SpoAppListCommand extends SpoAppBaseCommand {
         }
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: ['tenant', 'sitecollection']
-      },
-      {
-        option: '-u, --appCatalogUrl [appCatalogUrl]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    // verify either 'tenant' or 'sitecollection' specified if scope provided
-    if (args.options.scope) {
-      const testScope: string = args.options.scope.toLowerCase();
-
-      if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-        return `Scope must be either 'tenant' or 'sitecollection'`;
-      }
-
-      if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-        return `You must specify appCatalogUrl when the scope is sitecollection`;
-      }
-
-      if (args.options.appCatalogUrl) {
-        return validation.isValidSharePointUrl(args.options.appCatalogUrl);
-      }
-    }
-
-    return true;
   }
 }
 

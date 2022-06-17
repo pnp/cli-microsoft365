@@ -1,6 +1,6 @@
 import { Cli, Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -28,10 +28,40 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
     return 'Removes tenant property stored on the specified SharePoint Online app catalog';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --appCatalogUrl <appCatalogUrl>'
+      },
+      {
+        option: '-k, --key <key>'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.appCatalogUrl)
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -88,33 +118,6 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
           removeTenantProperty();
         }
       });
-    }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --appCatalogUrl <appCatalogUrl>'
-      },
-      {
-        option: '-k, --key <key>'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const result: boolean | string = validation.isValidSharePointUrl(args.options.appCatalogUrl);
-    if (result === false) {
-      return 'Missing required option appCatalogUrl';
-    }
-    else {
-      return result;
     }
   }
 }

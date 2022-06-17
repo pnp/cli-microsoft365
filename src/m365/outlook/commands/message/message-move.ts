@@ -1,8 +1,5 @@
 import * as os from 'os';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -30,13 +27,75 @@ class OutlookMessageMoveCommand extends GraphCommand {
     return 'Moves message to the specified folder';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.sourceFolderId = typeof args.options.sourceFolderId !== 'undefined';
-    telemetryProps.sourceFolderName = typeof args.options.sourceFolderName !== 'undefined';
-    telemetryProps.targetFolderId = typeof args.options.targetFolderId !== 'undefined';
-    telemetryProps.targetFolderName = typeof args.options.targetFolderName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        sourceFolderId: typeof args.options.sourceFolderId !== 'undefined',
+        sourceFolderName: typeof args.options.sourceFolderName !== 'undefined',
+        targetFolderId: typeof args.options.targetFolderId !== 'undefined',
+        targetFolderName: typeof args.options.targetFolderName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--messageId <messageId>'
+      },
+      {
+        option: '--sourceFolderName [sourceFolderName]',
+        autocomplete: Outlook.wellKnownFolderNames
+      },
+      {
+        option: '--sourceFolderId [sourceFolderId]',
+        autocomplete: Outlook.wellKnownFolderNames
+      },
+      {
+        option: '--targetFolderName [targetFolderName]',
+        autocomplete: Outlook.wellKnownFolderNames
+      },
+      {
+        option: '--targetFolderId [targetFolderId]',
+        autocomplete: Outlook.wellKnownFolderNames
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.sourceFolderId &&
+          !args.options.sourceFolderName) {
+          return 'Specify sourceFolderId or sourceFolderName';
+        }
+    
+        if (args.options.sourceFolderId &&
+          args.options.sourceFolderName) {
+          return 'Specify either sourceFolderId or sourceFolderName but not both';
+        }
+    
+        if (!args.options.targetFolderId &&
+          !args.options.targetFolderName) {
+          return 'Specify targetFolderId or targetFolderName';
+        }
+    
+        if (args.options.targetFolderId &&
+          args.options.targetFolderName) {
+          return 'Specify either targetFolderId or targetFolderName but not both';
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -105,57 +164,6 @@ class OutlookMessageMoveCommand extends GraphCommand {
           }
         }, err => reject(err));
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--messageId <messageId>'
-      },
-      {
-        option: '--sourceFolderName [sourceFolderName]',
-        autocomplete: Outlook.wellKnownFolderNames
-      },
-      {
-        option: '--sourceFolderId [sourceFolderId]',
-        autocomplete: Outlook.wellKnownFolderNames
-      },
-      {
-        option: '--targetFolderName [targetFolderName]',
-        autocomplete: Outlook.wellKnownFolderNames
-      },
-      {
-        option: '--targetFolderId [targetFolderId]',
-        autocomplete: Outlook.wellKnownFolderNames
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.sourceFolderId &&
-      !args.options.sourceFolderName) {
-      return 'Specify sourceFolderId or sourceFolderName';
-    }
-
-    if (args.options.sourceFolderId &&
-      args.options.sourceFolderName) {
-      return 'Specify either sourceFolderId or sourceFolderName but not both';
-    }
-
-    if (!args.options.targetFolderId &&
-      !args.options.targetFolderName) {
-      return 'Specify targetFolderId or targetFolderName';
-    }
-
-    if (args.options.targetFolderId &&
-      args.options.targetFolderName) {
-      return 'Specify either targetFolderId or targetFolderName but not both';
-    }
-
-    return true;
   }
 }
 

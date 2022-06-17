@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.HUBSITE_REGISTER, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,6 +25,7 @@ describe(commands.HUBSITE_REGISTER, () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     }));
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -168,7 +170,7 @@ describe(commands.HUBSITE_REGISTER, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -179,7 +181,7 @@ describe(commands.HUBSITE_REGISTER, () => {
   });
 
   it('supports specifying site collection URL', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--url') > -1) {
@@ -189,13 +191,13 @@ describe(commands.HUBSITE_REGISTER, () => {
     assert(containsOption);
   });
 
-  it('fails validation if the specified site collection URL is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { url: 'site.com' } });
+  it('fails validation if the specified site collection URL is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { url: 'site.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when all required parameters are valid', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales' } });
+  it('passes validation when all required parameters are valid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

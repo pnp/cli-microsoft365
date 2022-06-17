@@ -1,8 +1,5 @@
 import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -28,11 +25,56 @@ class SpoCustomActionClearCommand extends SpoCommand {
     return 'Deletes all custom actions in the collection';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.scope = args.options.scope || 'All';
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        scope: args.options.scope || 'All',
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '-s, --scope [scope]',
+        autocomplete: ['Site', 'Web', 'All']
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
+        if (typeof isValidUrl === 'string') {
+          return isValidUrl;
+        }
+    
+        if (args.options.scope &&
+          args.options.scope !== 'Site' &&
+          args.options.scope !== 'Web' &&
+          args.options.scope !== 'All') {
+          return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -99,44 +141,6 @@ class SpoCustomActionClearCommand extends SpoCommand {
           reject(err);
         });
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: ['Site', 'Web', 'All']
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.url) {
-      return 'Missing required option url';
-    }
-
-    const isValidUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-    if (typeof isValidUrl === 'string') {
-      return isValidUrl;
-    }
-
-    if (args.options.scope &&
-      args.options.scope !== 'Site' &&
-      args.options.scope !== 'Web' &&
-      args.options.scope !== 'All') {
-      return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
-    }
-
-    return true;
   }
 }
 

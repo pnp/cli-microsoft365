@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,6 +14,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let promptOptions: any;
   const stubAllPostRequests = (
     requestObjectIdentityResp: any = null,
@@ -93,6 +94,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     }));
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -562,7 +564,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsVerboseOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -573,7 +575,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   });
 
   it('supports specifying folder', () => {
-    const options = command.options();
+    const options = command.options;
     let containsScopeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[folder]') > -1) {
@@ -583,66 +585,59 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     assert(containsScopeOption);
   });
 
-  it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = command.options();
-    sinonUtil.restore(Command.prototype.options);
-    assert(options.length > 0);
-  });
-
-  it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({
+  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({
       options:
       {
         webUrl: 'foo',
         key: 'key1'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the key option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({
+  it('fails validation if the key option is not specified', async () => {
+    const actual = await command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the url option specified', () => {
-    const actual = command.validate({
+  it('passes validation when the url option specified', async () => {
+    const actual = await command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
         key: 'key1'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the url and folder options specified', () => {
-    const actual = command.validate({
+  it('passes validation when the url and folder options specified', async () => {
+    const actual = await command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
         key: 'key1',
         folder: '/'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('doesn\'t fail validation if the optional folder option not specified', () => {
-    const actual = command.validate(
+  it('doesn\'t fail validation if the optional folder option not specified', async () => {
+    const actual = await command.validate(
       {
         options:
         {
           webUrl: 'https://contoso.sharepoint.com',
           key: 'key1'
         }
-      });
+      }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

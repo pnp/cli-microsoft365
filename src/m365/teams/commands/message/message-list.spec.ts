@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.MESSAGE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -62,73 +64,71 @@ describe(commands.MESSAGE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'summary', 'body']);
   });
 
-  it('fails validation if teamId and channelId are not specified', () => {
-    const actual = command.validate({
+  it('fails validation if teamId and channelId are not specified', async () => {
+    const actual = await command.validate({
       options: {
         debug: false
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the teamId is not a valid guid', () => {
-    const actual = command.validate({
+  it('fails validation if the teamId is not a valid guid', async () => {
+    const actual = await command.validate({
       options: {
         teamId: "fce9e580-8bba-",
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validatation for a incorrect channelId missing leading 19:.', (done) => {
-    const actual = command.validate({
+  it('fails validation for a incorrect channelId missing leading 19:.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation for a incorrect channelId missing trailing @thread.skpye.', (done) => {
-    const actual = command.validate({
+  it('fails validation for a incorrect channelId missing trailing @thread.skype.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation for since date wrong format', () => {
-    const actual = command.validate({
+  it('fails validation for since date wrong format', async () => {
+    const actual = await command.validate({
       options: {
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
         since: "2019.12.31"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation for since date too far in the past (> 8 months)', () => {
+  it('fails validation for since date too far in the past (> 8 months)', async () => {
     const d: Date = new Date();
     d.setMonth(d.getMonth() - 9);
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
         since: d.toISOString()
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -138,26 +138,26 @@ describe(commands.MESSAGE_LIST, () => {
     assert(containsOption);
   });
 
-  it('validates for a correct input', () => {
-    const actual = command.validate({
+  it('validates for a correct input', async () => {
+    const actual = await command.validate({
       options: {
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct input (with optional --since param)', () => {
+  it('validates for a correct input (with optional --since param)', async () => {
     const d: Date = new Date();
     d.setMonth(d.getMonth() - 7);
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
         since: d.toISOString()
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

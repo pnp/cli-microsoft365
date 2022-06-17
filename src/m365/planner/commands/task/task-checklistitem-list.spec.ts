@@ -13,6 +13,7 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  
   const jsonOutput = {
     "checklist": {
       "33224": {
@@ -75,6 +76,10 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
   });
 
   beforeEach(() => {
@@ -108,6 +113,7 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
       auth.restoreAuth
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -225,7 +231,7 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

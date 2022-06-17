@@ -1,7 +1,6 @@
 import { isNumber } from 'util';
 import { v4 } from 'uuid';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -39,16 +38,114 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     return 'Adds a client-side web part to a modern page';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.standardWebPart = args.options.standardWebPart;
-    telemetryProps.webPartData = typeof args.options.webPartData !== 'undefined';
-    telemetryProps.webPartId = typeof args.options.webPartId !== 'undefined';
-    telemetryProps.webPartProperties = typeof args.options.webPartProperties !== 'undefined';
-    telemetryProps.section = typeof args.options.section !== 'undefined';
-    telemetryProps.column = typeof args.options.column !== 'undefined';
-    telemetryProps.order = typeof args.options.order !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        standardWebPart: args.options.standardWebPart,
+        webPartData: typeof args.options.webPartData !== 'undefined',
+        webPartId: typeof args.options.webPartId !== 'undefined',
+        webPartProperties: typeof args.options.webPartProperties !== 'undefined',
+        section: typeof args.options.section !== 'undefined',
+        column: typeof args.options.column !== 'undefined',
+        order: typeof args.options.order !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-n, --pageName <pageName>'
+      },
+      {
+        option: '--standardWebPart [standardWebPart]'
+      },
+      {
+        option: '--webPartId [webPartId]'
+      },
+      {
+        option: '--webPartProperties [webPartProperties]'
+      },
+      {
+        option: '--webPartData [webPartData]'
+      },
+      {
+        option: '--section [section]'
+      },
+      {
+        option: '--column [column]'
+      },
+      {
+        option: '--order [order]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.standardWebPart && !args.options.webPartId) {
+          return 'Specify either the standardWebPart or the webPartId option';
+        }
+
+        if (args.options.standardWebPart && args.options.webPartId) {
+          return 'Specify either the standardWebPart or the webPartId option but not both';
+        }
+
+        if (args.options.webPartId && !validation.isValidGuid(args.options.webPartId)) {
+          return `The webPartId '${args.options.webPartId}' is not a valid GUID`;
+        }
+
+        if (args.options.standardWebPart && !StandardWebPartUtils.isValidStandardWebPartType(args.options.standardWebPart)) {
+          return `${args.options.standardWebPart} is not a valid standard web part type`;
+        }
+
+        if (args.options.webPartProperties && args.options.webPartData) {
+          return 'Specify webPartProperties or webPartData but not both';
+        }
+
+        if (args.options.webPartProperties) {
+          try {
+            JSON.parse(args.options.webPartProperties);
+          }
+          catch (e) {
+            return `Specified webPartProperties is not a valid JSON string. Input: ${args.options
+              .webPartProperties}. Error: ${e}`;
+          }
+        }
+
+        if (args.options.webPartData) {
+          try {
+            JSON.parse(args.options.webPartData);
+          }
+          catch (e) {
+            return `Specified webPartData is not a valid JSON string. Input: ${args.options
+              .webPartData}. Error: ${e}`;
+          }
+        }
+
+        if (args.options.section && (!isNumber(args.options.section) || args.options.section < 1)) {
+          return 'The value of parameter section must be 1 or higher';
+        }
+
+        if (args.options.column && (!isNumber(args.options.column) || args.options.column < 1)) {
+          return 'The value of parameter column must be 1 or higher';
+        }
+
+        return validation.isValidSharePointUrl(args.options.webUrl);
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -384,93 +481,6 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         t[v] = source[v];
         return t;
       }, target);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-n, --pageName <pageName>'
-      },
-      {
-        option: '--standardWebPart [standardWebPart]'
-      },
-      {
-        option: '--webPartId [webPartId]'
-      },
-      {
-        option: '--webPartProperties [webPartProperties]'
-      },
-      {
-        option: '--webPartData [webPartData]'
-      },
-      {
-        option: '--section [section]'
-      },
-      {
-        option: '--column [column]'
-      },
-      {
-        option: '--order [order]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.standardWebPart && !args.options.webPartId) {
-      return 'Specify either the standardWebPart or the webPartId option';
-    }
-
-    if (args.options.standardWebPart && args.options.webPartId) {
-      return 'Specify either the standardWebPart or the webPartId option but not both';
-    }
-
-    if (args.options.webPartId && !validation.isValidGuid(args.options.webPartId)) {
-      return `The webPartId '${args.options.webPartId}' is not a valid GUID`;
-    }
-
-    if (args.options.standardWebPart && !StandardWebPartUtils.isValidStandardWebPartType(args.options.standardWebPart)) {
-      return `${args.options.standardWebPart} is not a valid standard web part type`;
-    }
-
-    if (args.options.webPartProperties && args.options.webPartData) {
-      return 'Specify webPartProperties or webPartData but not both';
-    }
-
-    if (args.options.webPartProperties) {
-      try {
-        JSON.parse(args.options.webPartProperties);
-      }
-      catch (e) {
-        return `Specified webPartProperties is not a valid JSON string. Input: ${args.options
-          .webPartProperties}. Error: ${e}`;
-      }
-    }
-
-    if (args.options.webPartData) {
-      try {
-        JSON.parse(args.options.webPartData);
-      }
-      catch (e) {
-        return `Specified webPartData is not a valid JSON string. Input: ${args.options
-          .webPartData}. Error: ${e}`;
-      }
-    }
-
-    if (args.options.section && (!isNumber(args.options.section) || args.options.section < 1)) {
-      return 'The value of parameter section must be 1 or higher';
-    }
-
-    if (args.options.column && (!isNumber(args.options.column) || args.options.column < 1)) {
-      return 'The value of parameter column must be 1 or higher';
-    }
-
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

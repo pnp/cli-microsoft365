@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,6 +12,7 @@ const command: Command = require('./task-checklistitem-remove');
 describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let promptOptions: any;
   const validTaskId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validId = '71175';
@@ -34,7 +35,12 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
     sinon.stub(Cli.getInstance().config, 'all').value({});
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -73,6 +79,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
       Cli.getInstance().config.all
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -112,15 +119,14 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     });
   });
 
-  it('passes validation when valid options specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid options specified', async () => {
+    const actual = await command.validate({
       options: {
         taskId: validTaskId,
         id: validId
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('correctly deletes checklist item', (done) => {
@@ -200,7 +206,7 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

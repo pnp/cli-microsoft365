@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -28,11 +25,54 @@ class TeamsChannelSetCommand extends GraphCommand {
     return 'Updates properties of the specified channel in the given Microsoft Teams team';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.newChannelName = typeof args.options.newChannelName !== 'undefined';
-    telemetryProps.description = typeof args.options.description !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        newChannelName: typeof args.options.newChannelName !== 'undefined',
+        description: typeof args.options.description !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --teamId <teamId>'
+      },
+      {
+        option: '--channelName <channelName>'
+      },
+      {
+        option: '--newChannelName [newChannelName]'
+      },
+      {
+        option: '--description [description]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.teamId)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
+
+        if (args.options.channelName.toLowerCase() === "general") {
+          return 'General channel cannot be updated';
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -67,38 +107,6 @@ class TeamsChannelSetCommand extends GraphCommand {
         return request.patch(requestOptions);
       })
       .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --teamId <teamId>'
-      },
-      {
-        option: '--channelName <channelName>'
-      },
-      {
-        option: '--newChannelName [newChannelName]'
-      },
-      {
-        option: '--description [description]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.teamId)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    if (args.options.channelName.toLowerCase() === "general") {
-      return 'General channel cannot be updated';
-    }
-
-    return true;
   }
 
   private mapRequestBody(options: Options): any {
