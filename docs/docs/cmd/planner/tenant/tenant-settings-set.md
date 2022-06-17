@@ -10,7 +10,7 @@ m365 planner tenant settings set [options]
 
 ## Options
 
-`--isPlannerAllowed [isPlannerAllowed`
+`--isPlannerAllowed [isPlannerAllowed]`
 : Configure whether Planner should be enabled on the tenant.
 
 `--allowCalendarSharing [allowCalendarSharing]`
