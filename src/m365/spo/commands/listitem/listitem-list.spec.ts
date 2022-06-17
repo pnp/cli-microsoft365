@@ -394,6 +394,76 @@ describe(commands.LISTITEM_LIST, () => {
     });
   });
 
+  it('returns array of listItemInstance objects when a list of items is requested with no output type specified, a list of fields with lookup field specified', (done) => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(opts => {
+      if ((opts.url as string).indexOf('&$expand=') > -1) {
+        returnArrayLength = 2;
+        return Promise.resolve({
+          value:
+            [{
+              "Attachments": false,
+              "AuthorId": 3,
+              "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+              "Created": "2018-08-15T13:43:12Z",
+              "EditorId": 3,
+              "GUID": "2b6bd9e0-3c43-4420-891e-20053e3c4664",
+              "ID": 1,
+              "Modified": "2018-08-15T13:43:12Z",
+              "Title": "Example item 1",
+              "Company": `{ "Title": "Contoso" }`
+            },
+            {
+              "Attachments": false,
+              "AuthorId": 3,
+              "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+              "Created": "2018-08-15T13:44:10Z",
+              "EditorId": 3,
+              "GUID": "47c5fc61-afb7-4081-aa32-f4386b8a86ea",
+              "Id": 2,
+              "ID": 2,
+              "Modified": "2018-08-15T13:44:10Z",
+              "Title": "Example item 2",
+              "Company": `{ "Title": "Fabrikam" }`
+            }]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const options: any = {
+      debug: false,
+      listTitle: 'Demo List',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      fields: "Title,ID,Company/ID"
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert([
+          {
+            "Company": {
+              "Title": "Contoso"
+            },
+            "Id": 1,
+            "Title": "Example item 1"
+          },
+          {
+            "Company": {
+              "Title": "Fabrikam"
+            },
+            "Id": 2,
+            "Title": "Example item 2"
+          }]);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('returns array of listItemInstance objects when a list of items is requested with an output type of text, and no fields specified', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);

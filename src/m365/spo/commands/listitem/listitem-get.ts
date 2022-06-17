@@ -49,16 +49,17 @@ class SpoListItemGetCommand extends SpoCommand {
       `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitleArgument)}')`);
 
-    const propertiesSelect: string = args.options.properties ?
-      `?$select=${encodeURIComponent(args.options.properties)}` :
-      (
-        (!args.options.output || args.options.output === 'text') ?
-          `?$select=Id,Title` :
-          ``
-      );
+    const propertiesSelect: string[] = args.options.properties ? args.options.properties.split(",")
+      : (!args.options.output || args.options.output === "text") ? ["Title", "Id"] : [];
+
+    // Calculate the properties to expand (i.e., which includes '/' in properties)
+    const propertiesWithSlash: string[] = propertiesSelect.filter(item => item.includes("/"));
+    const propertiesToExpand = propertiesWithSlash.map(e => e.split('/')[0]);
+    const expandPropertiesArray: string[] = propertiesToExpand.filter((item, pos) => propertiesToExpand.indexOf(item) === pos);
+    const fieldExpand: string = expandPropertiesArray.length > 0 ? `&$expand=${expandPropertiesArray.join(",")}` : ``;
 
     const requestOptions: any = {
-      url: `${listRestUrl}/items(${args.options.id})${propertiesSelect}`,
+      url: `${listRestUrl}/items(${args.options.id})?$select=${encodeURIComponent(propertiesSelect.join(","))}${fieldExpand}`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
