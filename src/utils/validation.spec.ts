@@ -116,6 +116,21 @@ describe('validation/validation', () => {
     assert(result === false);
   });
 
+  it('isValidGuid returns true with @meid token', () => {
+    const result = validation.isValidGuid('@meid');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidGuid returns true with @meid token and spaces', () => {
+    const result = validation.isValidGuid('@meid ');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidGuid returns true with @meId (case sensitive)', () => {
+    const result = validation.isValidGuid('@meId ');
+    assert.strictEqual(result, true);
+  });
+
   it('isValidTeamsChannelId returns true if valid channelId (all numbers)', () => {
     const result = validation.isValidTeamsChannelId('19:0000000000000000000000000000000@thread.skype');
     assert.strictEqual(result, true);
