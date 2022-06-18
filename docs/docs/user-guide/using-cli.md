@@ -85,6 +85,20 @@ CLI for Microsoft 365 will load the contents from the specified file and use it 
 
 You can use the `@` token in any command, with any option that accepts a value.
 
+## @meId and @meUsername tokens
+
+The @meId token is replaced with the currently logged in user's id and the @meUsername token with the currently logged in user's username. 
+
+```sh
+m365 aad user get --id "@meId"
+```
+
+```sh
+m365 aad user get --userName "@meUsername"
+```
+
+You can use the `@` token in any command, with any option that accepts a value.
+
 ## Verbose and debug mode
 
 By default, commands output only the information returned by the corresponding Microsoft 365 API, whether the command result or error. You can choose for a more user-friendly output by using the `--verbose` option or setting the `CLIMICROSOFT365_VERBOSE` environment variable to `1`. For example: by default, when checking status of the Microsoft 365 Public CDN, you would see:

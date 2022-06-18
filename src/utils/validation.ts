@@ -5,10 +5,15 @@ export const validation = {
     return guids.every(guid => this.isValidGuid(guid));
   },
 
-  isValidGuid(guid: string): boolean {
-    const guidRegEx: RegExp = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+  isValidGuid(guid?: string): boolean {
+    if (!guid) {
+      return false;
+    }
 
-    return guidRegEx.test(guid);
+    const guidRegEx: RegExp = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+    
+    // verify if the guid is a valid guid. @meid will be replaced in a later stage with the actual user id of the logged in user
+    return guidRegEx.test(guid) || guid.toLocaleLowerCase().trim() === "@meid";
   },
 
   isValidTeamsChannelId(guid: string): boolean {
