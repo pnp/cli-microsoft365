@@ -345,7 +345,7 @@ describe('Command', () => {
     });
     command.trackUnknownOptionsPublic(actual, { Prop2: false });
     assert.strictEqual(JSON.stringify(actual), expected);
-  });
+  });  
 
   it('adds unknown options to payload', () => {
     const command = new MockCommand1();
