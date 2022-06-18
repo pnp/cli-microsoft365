@@ -164,7 +164,6 @@ describe('BasePermissions', () => {
   });
 
   it('parse returns correct list of permissions kind', () => {
-    
     basePermissions.high = 432;
     basePermissions.low = 1012866047;
 

@@ -6,7 +6,8 @@ import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import { BasePermissions } from '../../base-permissions';
 import commands from '../../commands';
-import { RoleType } from './roleType';
+import { RoleDefinition } from './RoleDefinition';
+import { RoleType } from './RoleType';
 
 interface CommandArgs {
   options: Options;
@@ -40,15 +41,13 @@ class SpoRoleDefinitionGetCommand extends SpoCommand {
     };
 
     request
-      .get<any>(requestOptions)
-      .then((response: any): void => {
-
+      .get<RoleDefinition>(requestOptions)
+      .then((response: RoleDefinition): void => {
         const permissions: BasePermissions = new BasePermissions();
         permissions.high = response.BasePermissions.High as number;
         permissions.low = response.BasePermissions.Low as number;
-        response["BasePermissionsValue"] = permissions.parse();
-
-        response["RoleTypeKindValue"] = RoleType[response["RoleTypeKind"]];
+        response.BasePermissionsValue = permissions.parse();
+        response.RoleTypeKindValue = RoleType[response.RoleTypeKind];
 
         logger.log(response);
         cb();
@@ -70,16 +69,11 @@ class SpoRoleDefinitionGetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
     if (isNaN(args.options.id)) {
       return `${args.options.id} is not a number`;
     }
 
-    return true;
+    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

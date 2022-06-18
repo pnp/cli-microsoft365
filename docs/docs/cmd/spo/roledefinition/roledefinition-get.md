@@ -14,7 +14,7 @@ m365 spo roledefinition get [options]
 : URL of the site for which to retrieve role definition
 
 `-i, --id <id>`
-: role definition id
+: Role definition id
 
 --8<-- "docs/cmd/_global.md"
 
