@@ -777,7 +777,7 @@ nav:
       - 'Remove Wiki tab in a Microsoft Teams channel': 'sample-scripts/teams/remove-wikitab-teams.md'
       - 'Share social champions to Teams': 'sample-scripts/teams/share-socialchampions.md'
     - Microsoft To Do:
-      - 'Cleanup completed Microsoft To Do tasks': 'sample-scripts/todo/cleanup-completed-todos.md'
+      - 'Cleanup completed Microsoft To Do tasks': 'sample-scripts/todo/cleanup-completed-todos/index.md'
     - Microsoft 365 tenant:
       - 'Monitor and notify Microsoft 365 health status': 'sample-scripts/tenant/tenant-monitor-notify-healthstatus.md'
   - About:
