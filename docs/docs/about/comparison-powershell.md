@@ -192,13 +192,16 @@ Update-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
 Update-UserType|Microsoft.Online.SharePoint.PowerShell|
 Upgrade-SPOSite|Microsoft.Online.SharePoint.PowerShell|
 Verify-SPOTenantOrgRelation|Microsoft.Online.SharePoint.PowerShell|
+>> Start change here 
 Add-PnPAlert|PnP.PowerShell|
 Add-PnPApp|PnP.PowerShell|[spo app add](../cmd/spo/app/app-add.md)
-Add-PnPApplicationCustomizer
-Add-PnPClientSidePage|PnP.PowerShell|[spo page add](../cmd/spo/page/page-add.md)
-Add-PnPClientSidePageSection|PnP.PowerShell|[spo page section add](../cmd/spo/page/page-section-add.md)
-Add-PnPClientSideText|PnP.PowerShell|
-Add-PnPClientSideWebPart|PnP.PowerShell|[spo page clientsidewebpart add](../cmd/spo/page/page-clientsidewebpart-add.md)
+Add-PnPApplicationCustomizer|[spo customaction add](../cmd/spo/customaction/customaction-add.md)
+Add-PnPAzureADGroupMember
+Add-PnPAzureADGroupOwnerst
+    Add-PnPClientSidePage|PnP.PowerShell|[spo page add](../cmd/spo/page/page-add.md)
+    Add-PnPClientSidePageSection|PnP.PowerShell|[spo page section add](../cmd/spo/page/page-section-add.md)
+    Add-PnPClientSideText|PnP.PowerShell|
+    Add-PnPClientSideWebPart|PnP.PowerShell|[spo page clientsidewebpart add](../cmd/spo/page/page-clientsidewebpart-add.md)
 Add-PnPContentType|PnP.PowerShell|[spo contenttype add](../cmd/spo/contenttype/contenttype-add.md)
 Add-PnPContentTypeToDocumentSet|PnP.PowerShell|
 Add-PnPContentTypeToList|PnP.PowerShell|[spo list contenttype add](../cmd/spo/list/list-contenttype-add.md)
@@ -719,6 +722,7 @@ Unregister-PnPHubSite|PnP.PowerShell|[spo hubsite unregister](../cmd/spo/hubsite
 Update-PnPApp|PnP.PowerShell|[spo app upgrade](../cmd/spo/app/app-upgrade.md)
 Update-PnPSiteClassification|PnP.PowerShell|[aad siteclassification set](../cmd/aad/siteclassification/siteclassification-set.md)
 Update-PnPTeamsApp|PnP.PowerShell|[teams app update](../cmd/teams/app/app-update.md)
+>> end here
 Approve-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
 Deny-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
 Disable-Flow|Microsoft.PowerApps.PowerShell|[flow disable](../cmd/flow/flow-disable.md)
