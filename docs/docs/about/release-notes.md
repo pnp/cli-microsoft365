@@ -8,6 +8,8 @@
 
 - [planner task checklistitem add](../cmd/planner/task/task-checklistitem-add.md) - adds a new checklist item to a Planner task [#3280](https://github.com/pnp/cli-microsoft365/issues/3280)
 - [planner task checklistitem list](../cmd/planner/task/task-checklistitem-list.md) - lists the checklist items of a Planner task [#3280](https://github.com/pnp/cli-microsoft365/issues/3281)
+- [planner task checklistitem remove](../cmd/planner/task/task-checklistitem-remove.md) - removes a checklist item from a Planner task [#3282](https://github.com/pnp/cli-microsoft365/issues/3282)
+- [planner task reference remove](../cmd/planner/task/task-reference-remove.md) - removes a reference from a Microsoft Planner task [#3285](https://github.com/pnp/cli-microsoft365/issues/3285)
 - [planner task remove](../cmd/planner/task/task-remove.md) - removes a Microsoft Planner task [#3227](https://github.com/pnp/cli-microsoft365/issues/3227)
 - [planner tenant settings list](../cmd/planner/tenant/tenant-settings-list.md) - lists the Microsoft Planner configuration of the tenant [#3255](https://github.com/pnp/cli-microsoft365/issues/3355)
 
