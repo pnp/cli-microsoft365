@@ -71,29 +71,29 @@ m365 planner task add [options]
 Adds a Microsoft Planner task with the name _My Planner Task_ for plan with the ID _8QZEH7b3wkSbGQobscsM5gADCBa_ and for the bucket with the ID _IK8tuFTwQEa5vTonM7ZMRZgAKdna_
 
 ```sh
-m365 planner task add --title "My Planner Task" --planId "8QZEH7b3wkSbGQobscsM5gADCBa" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna"
+m365 planner task add --title 'My Planner Task' --planId '8QZEH7b3wkSbGQobscsM5gADCBa' --bucketId 'IK8tuFTwQEa5vTonM7ZMRZgAKdna'
 ```
 
 Adds a Completed Microsoft Planner task with the name _My Planner Task_ for plan with the name _My Planner Plan_ owned by group _My Planner Group_ and for the bucket with the ID _IK8tuFTwQEa5vTonM7ZMRZgAKdna_
 
 ```sh
-m365 planner task add --title "My Planner task" --planName "My Planner Plan" --ownerGroupName "My Planner Group" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna" --percentComplete 100
+m365 planner task add --title 'My Planner task' --planName 'My Planner Plan' --ownerGroupName 'My Planner Group' --bucketId 'IK8tuFTwQEa5vTonM7ZMRZgAKdna' --percentComplete 100
 ```
 
 Adds a Microsoft Planner task with the name _My Planner Task_ for plan with the ID _8QZEH7b3wkbGQobscsM5gADCBa_ and for the bucket with the ID _IK8tuFTwQEa5vTonM7ZMRZgAKdna_. The new task will be assigned to the users _Allan.Carroll@contoso.com_ and _Ida.Stevens@contoso.com_ and receive a due date for _2021-12-16_
 
 ```sh
-m365 planner task add --title "My Planner Task" --planId "8QZEH7b3wkSbGQobscsM5gADCBa" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna" --assignedToUserNames "Allan.Carroll@contoso.com,Ida.Stevens@contoso.com" --dueDateTime "2021-12-16"
+m365 planner task add --title 'My Planner Task' --planId '8QZEH7b3wkSbGQobscsM5gADCBa' --bucketId 'IK8tuFTwQEa5vTonM7ZMRZgAKdna' --assignedToUserNames 'Allan.Carroll@contoso.com,Ida.Stevens@contoso.com' --dueDateTime '2021-12-16'
 ```
 
 Adds a Microsoft Planner task with the name _My Planner Task_ for plan with the ID _8QZEH7b3wkbGQobscsM5gADCBa_ and for the bucket with the ID _IK8tuFTwQEa5vTonM7ZMRZgAKdna_. The new task will be assigned to the users _Allan.Carroll@contoso.com_ and _Ida.Stevens@contoso.com_ who will appear first with the asssignee priority _ !!_ 
 
 ```sh
-m365 planner task add --title "My Planner Task" --planId "8QZEH7b3wkSbGQobscsM5gADCBa" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna" --assignedToUserNames "Allan.Carroll@contoso.com,Ida.Stevens@contoso.com" --asssigneePriority " !!"
+m365 planner task add --title 'My Planner Task' --planId '8QZEH7b3wkSbGQobscsM5gADCBa' --bucketId 'IK8tuFTwQEa5vTonM7ZMRZgAKdna' --assignedToUserNames 'Allan.Carroll@contoso.com,Ida.Stevens@contoso.com' --asssigneePriority ' !!'
 ```
 
 Adds a Microsoft Planner task with the name _My Planner Task_ for plan with the ID _8QZEH7b3wkbGQobscsM5gADCBa_ and for the bucket with the ID _IK8tuFTwQEa5vTonM7ZMRZgAKdna_. The new task will receive the categories _category1,category3_ and get a preview with the type _noPreview_
 
 ```sh
-m365 planner task add --title "My Planner Task" --planId "8QZEH7b3wkSbGQobscsM5gADCBa" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna" --appliedCategories "category1,category3" --previewType "noPreview"
+m365 planner task add --title 'My Planner Task' --planId '8QZEH7b3wkSbGQobscsM5gADCBa' --bucketId 'IK8tuFTwQEa5vTonM7ZMRZgAKdna' --appliedCategories 'category1,category3' --previewType 'noPreview'
 ```
