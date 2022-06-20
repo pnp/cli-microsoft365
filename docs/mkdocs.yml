@@ -797,8 +797,20 @@ nav:
     - License: 'about/license.md'
 theme:
     name: 'material'
-    palette:
-        primary: 'red'
+    palette:        
+        - media: "(prefers-color-scheme: light)"
+          scheme: default
+          primary: 'red'
+          accent: 'indigo'
+          toggle:
+            icon: material/weather-sunny
+            name: Switch to dark mode
+        - media: "(prefers-color-scheme: dark)"
+          scheme: slate 
+          primary: 'red'
+          toggle:
+            icon: material/weather-night
+            name: Switch to light mode
     logo: 'images/pnp-cli-microsoft365-white.svg'
     features:
         - navigation.tabs
@@ -809,12 +821,18 @@ extra_css:
     - 'css/styles2.css'
 markdown_extensions:
     - admonition
+    - meta
     - toc:
           permalink: true
     - pymdownx.highlight
     - pymdownx.snippets
     - pymdownx.superfences
+    - pymdownx.tabbed:
+        alternate_style: true 
     - pymdownx.tabbed
+    - pymdownx.emoji:
+          emoji_index: !!python/name:materialx.emoji.twemoji
+          emoji_generator: !!python/name:materialx.emoji.to_svg
     - def_list
 extra:
     social:
@@ -828,3 +846,7 @@ extra:
           link: 'https://aka.ms/sppnp'
 repo_url: http://github.com/pnp/cli-microsoft365
 edit_uri: blob/main/docs/docs
+plugins:
+    - search
+    - tags:
+        tags_file: doc-tags.md
