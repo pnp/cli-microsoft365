@@ -191,7 +191,7 @@ nav:
         - bucket remove: 'cmd/planner/bucket/bucket-remove.md'
       - plan:
         - plan add: 'cmd/planner/plan/plan-add.md'
-        - plan details get: 'cmd/planner/plan/plan-details-get.md'
+        - plan details get: 'cmd/planner/plan/plan-get.md'
         - plan get: 'cmd/planner/plan/plan-get.md'
         - plan list: 'cmd/planner/plan/plan-list.md'
       - task:

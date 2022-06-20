@@ -8,6 +8,12 @@ Retrieve information about the specified plan
 m365 planner plan get [options]
 ```
 
+## Alias
+
+```sh
+m365 planner plan details get [options]
+```
+
 ## Options
 
 `-i, --id [id]`
@@ -16,11 +22,17 @@ m365 planner plan get [options]
 `-t, --title [title]`
 : Title of the plan. Specify either `id` or `title` but not both.
 
+`--planId [planId]`
+: (deprecated. Use `id` instead) ID of the plan. Specify either `planId` or `planTitle` but not both.
+
+`---planTitle [planTitle]`
+: (deprecated. Use `title` instead) Title of the plan. Specify either `planId` or `planTitle` but not both.
+
 `--ownerGroupId [ownerGroupId]`
-: ID of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` when using `title`.
+: ID of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` when using `title` or the deprecated `planTitle`.
 
 `--ownerGroupName [ownerGroupName]`
-: Name of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` when using `title`.
+: Name of the Group that owns the plan. Specify either `ownerGroupId` or `ownerGroupName` when using `title` or the deprecated `planTitle`.
 
 --8<-- "docs/cmd/_global.md"
 
