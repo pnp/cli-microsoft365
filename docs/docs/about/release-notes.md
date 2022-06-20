@@ -4,6 +4,10 @@
 
 ### New commands
 
+**Azure Active Directory:**
+
+- [aad o365group recyclebinitem remove](../cmd/aad/o365group/o365group-recyclebinitem-remove.md) - permanently deletes a Microsoft 365 Group from the recycle bin in the current tenant [#1982](https://github.com/pnp/cli-microsoft365/issues/1982)
+
 **Planner:**
 
 - [planner task checklistitem add](../cmd/planner/task/task-checklistitem-add.md) - adds a new checklist item to a Planner task [#3280](https://github.com/pnp/cli-microsoft365/issues/3280)
@@ -40,6 +44,8 @@
 - fixed gateway timeout on flow export [#3393](https://github.com/pnp/cli-microsoft365/issues/3393)
 - extended 'aad app set' with support for multiple identifier URIs [#3333](https://github.com/pnp/cli-microsoft365/issues/3333)
 - fixed bug with spo list list throwing access denied [#3373](https://github.com/pnp/cli-microsoft365/issues/3373)
+- fixed --includeAssociatedSites doesn't include associated sites in the result [#3400](https://github.com/pnp/cli-microsoft365/issues/3400)
+- extended 'spo list get' with PrincipalTypeString [#3379](https://github.com/pnp/cli-microsoft365/issues/3379)
 
 ## [v5.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.3.0)
 
