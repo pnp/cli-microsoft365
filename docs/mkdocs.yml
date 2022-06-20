@@ -256,6 +256,7 @@ nav:
     - Search (search):
       - externalconnection:
         - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
+        - externalconnection get: 'cmd/search/externalconnection/externalconnection-get.md'
         - externalconnection list: 'cmd/search/externalconnection/externalconnection-list.md'
     - Skype (skype):
       - report:
