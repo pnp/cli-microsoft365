@@ -1,6 +1,7 @@
 {
   "name": "CLI for Microsoft 365",
   "dockerFile": "Dockerfile",
+  "context": "..",
   "settings": {
     "terminal.integrated.profiles.linux": {
       "zsh": {

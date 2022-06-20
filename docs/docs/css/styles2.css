@@ -1,3 +1,26 @@
+/*
+    colorcodes:
+    https://github.com/squidfunk/mkdocs-material/blob/master/src/assets/stylesheets/main/_colors.scss
+*/
+
+:root {
+
+}
+
+[data-md-color-scheme="default"] {
+    --md-primary-fg-color: #ef5552;
+    --md-accent-fg-color: #526cfe;
+    --md-accent-bg-color: #e53734;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #ef5552;
+  --md-accent-fg-color: #526cfe;
+  --md-accent-bg-color: #e53734;
+  --md-default-bg-color: #272626;
+  --md-code-bg-color: #3d3e3e;
+}
+
 .md-logo {
   height: 32px;
   width: 150px;
