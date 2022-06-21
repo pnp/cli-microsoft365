@@ -156,15 +156,7 @@ class PlannerTaskSetCommand extends GraphCommand {
 
     return request
       .get(requestOptions)
-      .then((response: any) => {
-        const etag: string | undefined = response ? response['@odata.etag'] : undefined;
-
-        if (!etag) {
-          return Promise.reject(`Error fetching task details`);
-        }
-
-        return Promise.resolve(etag);
-      });
+      .then((response: any) => response['@odata.etag']);
   }
 
   private getTaskEtag(taskId: string): Promise<string> {
@@ -178,15 +170,7 @@ class PlannerTaskSetCommand extends GraphCommand {
 
     return request
       .get(requestOptions)
-      .then((response: any) => {
-        const etag: string | undefined = response ? response['@odata.etag'] : undefined;
-
-        if (!etag) {
-          return Promise.reject(`Error fetching task`);
-        }
-
-        return Promise.resolve(etag);
-      });
+      .then((response: any) => response['@odata.etag']);
   }
 
   private generateAppliedCategories(options: Options): AppliedCategories {

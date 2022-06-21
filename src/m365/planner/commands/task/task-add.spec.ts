@@ -981,36 +981,6 @@ describe(commands.TASK_ADD, () => {
     });
   });
 
-  it('fails validation when task details endpoint fails', (done) => {
-    sinonUtil.restore(request.get);
-
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details`) {
-        return Promise.resolve(undefined);
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-
-    command.action(logger, {
-      options: {
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        description: 'My Task Description'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Error fetching task details`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('correctly handles random API error', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
