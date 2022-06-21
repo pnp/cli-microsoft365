@@ -29,7 +29,7 @@ m365 aad o365group restore [options]
 
 ## Examples
 
-Restores the Microsoft 365 Group with specific id
+Restores the Microsoft 365 Group with specific ID
 
 ```sh
 m365 aad o365group recyclebinitem restore --id 28beab62-7540-4db1-a23f-29a6018a3848
