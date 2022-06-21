@@ -116,15 +116,7 @@ class PlannerTaskAddCommand extends GraphCommand {
 
     return request
       .get(requestOptions)
-      .then((response: any) => {
-        const etag: string | undefined = response ? response['@odata.etag'] : undefined;
-
-        if (!etag) {
-          return Promise.reject(`Error fetching task details`);
-        }
-
-        return Promise.resolve(etag);
-      });
+      .then((response: any) => response['@odata.etag']);
   }
 
   private updateTaskDetails(options: Options, newTask: PlannerTask): Promise<PlannerTask & PlannerTaskDetails> {
