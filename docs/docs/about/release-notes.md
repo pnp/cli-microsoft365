@@ -46,6 +46,8 @@
 - fixed bug with spo list list throwing access denied [#3373](https://github.com/pnp/cli-microsoft365/issues/3373)
 - fixed --includeAssociatedSites doesn't include associated sites in the result [#3400](https://github.com/pnp/cli-microsoft365/issues/3400)
 - extended 'spo list get' with PrincipalTypeString [#3379](https://github.com/pnp/cli-microsoft365/issues/3379)
+- added more options to planner task add. [#3315](https://github.com/pnp/cli-microsoft365/issues/3315)
+- added priority option to planner task add and set. [#3383](https://github.com/pnp/cli-microsoft365/issues/3383)
 
 ## [v5.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.3.0)
 
