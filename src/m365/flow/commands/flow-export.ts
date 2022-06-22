@@ -129,6 +129,9 @@ class FlowExportCommand extends AzmgmtCommand {
         const downloadFileUrl: string = formatArgument === 'json' ? '' : res.packageLink.value;
         const filenameRegEx: RegExp = /([^\/]+\.zip)/i;
         filenameFromApi = formatArgument === 'json' ? `${res.properties.displayName}.json` : (filenameRegEx.exec(downloadFileUrl) || ['output.zip'])[0];
+        // Replace all illegal characters from the file name
+        const illegalCharsRegEx = /[\\\/:*?"<>|]/g;
+        filenameFromApi = filenameFromApi.replace(illegalCharsRegEx, '_');
 
         if (this.debug) {
           logger.logToStderr(`Filename from PowerApps API: ${filenameFromApi}`);
