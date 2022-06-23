@@ -45,7 +45,6 @@ Adds a Microsoft Planner plan with the name _My Planner Plan_ for Group _My Plan
 m365 planner plan add --title 'My Planner Plan' --ownerGroupName 'My Planner Group'
 ```
 
-
 Adds a Microsoft Planner plan with the name _My Planner Plan_ for Group _My Planner Group_ and share it with the users _Allan.Carroll@contoso.com_ and _Ida.Stevens@contoso.com_
 
 ```sh
