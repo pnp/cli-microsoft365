@@ -182,6 +182,28 @@ describe(commands.PLAN_GET, () => {
     done();
   });
 
+  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided with deprecated planTitle', (done) => {
+    const actual = command.validate({
+      options: {
+        planTitle: validTitle
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation when both ownerGroupId and ownerGroupName are specified with deprecated planTitle', (done) => {
+    const actual = command.validate({
+      options: {
+        planTitle: validTitle,
+        ownerGroupId: validOwnerGroupId,
+        ownerGroupName: validOwnerGroupName
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
   it('passes validation when id specified', (done) => {
     const actual = command.validate({
       options: {

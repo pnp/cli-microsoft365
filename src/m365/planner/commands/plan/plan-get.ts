@@ -144,11 +144,7 @@ class PlannerPlanGetCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-
-    if (!args.options.planId && !args.options.planTitle && !args.options.id && !args.options.title) {
-      return 'Specify either id or title';
-    }
-
+  
     if (args.options.planId && args.options.planTitle || 
       args.options.id && args.options.title || 
       args.options.planId && args.options.title || 
@@ -156,16 +152,22 @@ class PlannerPlanGetCommand extends GraphCommand {
       return 'Specify either id or title but not both';
     }
 
-    if ((args.options.title || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName';
-    }
-
-    if ((args.options.title || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName but not both';
-    }
-
-    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-      return `${args.options.ownerGroupId} is not a valid GUID`;
+    if (!args.options.planId && !args.options.id) {
+      if (!args.options.planTitle && !args.options.title) {
+        return 'Specify either id or title';
+      }
+  
+      if ((args.options.title || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+        return 'Specify either ownerGroupId or ownerGroupName';
+      }
+  
+      if ((args.options.title || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
+        return 'Specify either ownerGroupId or ownerGroupName but not both';
+      }
+  
+      if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
+        return `${args.options.ownerGroupId} is not a valid GUID`;
+      }
     }
 
     return true;
