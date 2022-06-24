@@ -46,6 +46,8 @@ m365 spo listitem list [options]
 
 `pageNumber` is specified as a 0-based index. A value of `2` returns the third page of items.
 
+If you want to specify a lookup type in the `properties` option, define which columns from the related list should be returned.
+
 ## Examples
 
 Get all items from a list named Demo List

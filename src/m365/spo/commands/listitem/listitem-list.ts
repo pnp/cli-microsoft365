@@ -66,9 +66,8 @@ class SpoListItemListCommand extends SpoCommand {
     const fieldsArray: string[] = args.options.fields ? args.options.fields.split(",")
       : (!args.options.output || args.options.output === "text") ? ["Title", "Id"] : [];
 
-    // Calculate the fields to expand (i.e., which includes '/' in fields)
     const fieldsWithSlash: string[] = fieldsArray.filter(item => item.includes("/"));
-    const fieldsToExpand = fieldsWithSlash.map(e => e.split('/')[0]);
+    const fieldsToExpand: string[] = fieldsWithSlash.map(e => e.split('/')[0]);
     const expandFieldsArray: string[] = fieldsToExpand.filter((item, pos) => fieldsToExpand.indexOf(item) === pos);
 
     const listRestUrl: string = listIdArgument ?

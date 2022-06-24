@@ -27,6 +27,9 @@ m365 spo listitem get [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+If you want to specify a lookup type in the `properties` option, define which columns from the related list should be returned.
+
 ## Examples
 
 Get an item with ID _147_ from list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_
