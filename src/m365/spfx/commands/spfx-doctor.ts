@@ -408,6 +408,21 @@ class SpfxDoctorCommand extends AnonymousCommand {
         range: '^4',
         fix: 'npm i -g yo@4'
       }
+    },
+    '1.15.0': {
+      gulp: {
+        range: '^4',
+        fix: 'npm i -g gulp@4'
+      },
+      node: {
+        range: '^12.13 || ^14.15 || ^16.13',
+        fix: 'Install Node.js v12.13, v14.15, v16.13 or higher'
+      },
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^4',
+        fix: 'npm i -g yo@4'
+      }
     }
   };
 
