@@ -31,12 +31,12 @@ class SearchExternalConnectionGetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let url: string = '';
+    let url: string = `${this.resource}/v1.0/external/connections`;
     if (args.options.id) {
-      url = `${this.resource}/v1.0/external/connections/${encodeURIComponent(args.options.id as string)}`;
+      url += `/${encodeURIComponent(args.options.id as string)}`;
     }
     else {
-      url = `${this.resource}/v1.0/external/connections?$filter=name eq '${encodeURIComponent(args.options.name as string)}'`;
+      url += `?$filter=name eq '${encodeURIComponent(args.options.name as string)}'`;
     }
 
     const requestOptions: any = {
