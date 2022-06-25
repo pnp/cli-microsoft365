@@ -1,5 +1,12 @@
 # Release notes
 
+## [v5.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.5.0)
+
+### Changes
+
+- fixed login issue [#3431](https://github.com/pnp/cli-microsoft365/issues/3431)
+- fixed issue with wrong _global.md reference breaking the docs and cli help [#3425](https://github.com/pnp/cli-microsoft365/issues/3425)
+
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
 ### New commands
