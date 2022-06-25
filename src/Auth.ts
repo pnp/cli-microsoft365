@@ -394,7 +394,7 @@ export class Auth {
 
     return (this.clientApplication as Msal.PublicClientApplication).acquireTokenByUsernamePassword({
       username: this.service.userName as string,
-      password: encodeURIComponent(this.service.password as string),
+      password: this.service.password as string,
       scopes: [`${resource}/.default`]
     });
   }
