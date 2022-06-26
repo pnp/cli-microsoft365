@@ -69,10 +69,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['isPlannerAllowed', 'allowCalendarSharing', 'allowTenantMoveWithDataLoss', 'allowTenantMoveWithDataMigration', 'allowRosterCreation', 'allowPlannerMobilePushNotifications']);
-  });
-
   it('fails validation no options are specified', (done) => {
     const actual = command.validate({
       options: { }
