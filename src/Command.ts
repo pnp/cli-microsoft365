@@ -367,11 +367,12 @@ export default abstract class Command {
       if (!value || typeof value !== 'string') {
         return;  
       }
-
-      if (value.toLowerCase().includes('@meid')) {
+      
+      const lowerCaseValue = value.toLowerCase();
+      if (lowerCaseValue.includes('@meid')) {
         args.options[option] = accessToken.getUserIdFromAccessToken(token);
       }
-      if (value.toLowerCase().includes('@meusername')) {
+      if (lowerCaseValue.includes('@meusername')) {
         args.options[option] = accessToken.getUserNameFromAccessToken(token);
       }
     });

@@ -152,7 +152,7 @@ describe(commands.USER_GET, () => {
     });
   });
 
-  it('retrieves user using @username token', (done) => {
+  it('retrieves user using @meusername token', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent(userName)}'`) > -1) {
         return Promise.resolve({ value: [resultValue] });
