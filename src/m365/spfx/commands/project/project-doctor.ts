@@ -60,7 +60,8 @@ class SpfxProjectDoctorCommand extends BaseProjectCommand {
     '1.12.1',
     '1.13.0',
     '1.13.1',
-    '1.14.0'
+    '1.14.0',
+    '1.15.0'
   ];
 
   public constructor() {

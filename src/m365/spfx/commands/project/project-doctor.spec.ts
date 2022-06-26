@@ -15,8 +15,10 @@ describe(commands.PROJECT_DOCTOR, () => {
   let logger: Logger;
   let trackEvent: any;
   let telemetry: any;
-  const validProjectPath = 'src/m365/spfx/commands/project/test-projects/spfx-1140-webpart-react';
-  const invalidProjectPath = 'src/m365/spfx/commands/project/test-projects/spfx-1140-webpart-react-invalidconfig';
+  const validV1140ProjectPath = 'src/m365/spfx/commands/project/test-projects/spfx-1140-webpart-react';
+  const invalidV1140ProjectPath = 'src/m365/spfx/commands/project/test-projects/spfx-1140-webpart-react-invalidconfig';
+  const validV1150ProjectPath = 'src/m365/spfx/commands/project/test-projects/spfx-1150-webpart-react';
+  const invalidV1150ProjectPath = 'src/m365/spfx/commands/project/test-projects/spfx-1150-webpart-react-invalidconfig';
 
   before(() => {
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
@@ -70,7 +72,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('calls telemetry', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidV1140ProjectPath));
 
     command.action(logger, { options: {} }, () => {
       try {
@@ -84,7 +86,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidV1140ProjectPath));
 
     command.action(logger, { options: {} }, () => {
       try {
@@ -112,7 +114,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('shows error if the project version couldn\'t be determined', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidV1140ProjectPath));
     sinon.stub(command as any, 'getProjectVersion').callsFake(_ => undefined);
 
     command.action(logger, { options: {} } as any, (err?: any) => {
@@ -127,7 +129,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('shows error if the project version is not supported', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidV1140ProjectPath));
     sinon.stub(command as any, 'getProjectVersion').callsFake(_ => '0.0.1');
 
     command.action(logger, { options: {} } as any, (err?: any) => {
@@ -142,7 +144,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('shows error when loading doctor rules failed', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidV1140ProjectPath));
     sinon.stub(command as any, 'getProjectVersion').callsFake(_ => '0');
 
     (command as any).supportedVersions.splice(1, 0, '0');
@@ -160,7 +162,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('returns markdown report with output format md', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidV1140ProjectPath));
 
     command.action(logger, { options: { output: 'md' } } as any, () => {
       try {
@@ -174,7 +176,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('returns text report with output format text', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidV1140ProjectPath));
 
     command.action(logger, { options: { output: 'text' } } as any, () => {
       try {
@@ -188,7 +190,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('returns json report with output format default', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidV1140ProjectPath));
 
     command.action(logger, { options: {} } as any, () => {
       try {
@@ -202,7 +204,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('writes CodeTour doctor report to .tours folder when in tour output mode. Creates the folder when it does not exist', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidV1140ProjectPath));
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     const existsSyncOriginal = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake(path => {
@@ -216,8 +218,8 @@ describe(commands.PROJECT_DOCTOR, () => {
 
     command.action(logger, { options: { output: 'tour' } } as any, () => {
       try {
-        assert(writeFileSyncStub.calledWith(path.join(process.cwd(), invalidProjectPath, '/.tours/validation.tour')), 'Tour file not created');
-        assert(mkDirSyncStub.calledWith(path.join(process.cwd(), invalidProjectPath, '/.tours')), '.tours folder not created');
+        assert(writeFileSyncStub.calledWith(path.join(process.cwd(), invalidV1140ProjectPath, '/.tours/validation.tour')), 'Tour file not created');
+        assert(mkDirSyncStub.calledWith(path.join(process.cwd(), invalidV1140ProjectPath, '/.tours')), '.tours folder not created');
         done();
       }
       catch (e) {
@@ -227,7 +229,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('writes CodeTour upgrade report to .tours folder when in tour output mode. Does not create the folder when it already exists', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidV1140ProjectPath));
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     const existsSyncOriginal = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake(path => {
@@ -241,7 +243,7 @@ describe(commands.PROJECT_DOCTOR, () => {
 
     command.action(logger, { options: { output: 'tour' } } as any, () => {
       try {
-        assert(writeFileSyncStub.calledWith(path.join(process.cwd(), invalidProjectPath, '/.tours/validation.tour')), 'Tour file not created');
+        assert(writeFileSyncStub.calledWith(path.join(process.cwd(), invalidV1140ProjectPath, '/.tours/validation.tour')), 'Tour file not created');
         assert(mkDirSyncStub.notCalled, '.tours folder created');
         done();
       }
@@ -657,7 +659,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('e2e: shows correct number of findings for a valid 1.14.0 project (json)', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), validProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), validV1140ProjectPath));
 
     command.action(logger, { options: { output: 'json' } } as any, () => {
       try {
@@ -672,7 +674,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('e2e: shows correct message a valid 1.14.0 project (text)', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), validProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), validV1140ProjectPath));
 
     command.action(logger, { options: { output: 'text' } } as any, () => {
       try {
@@ -686,7 +688,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('e2e: shows correct message for a valid 1.14.0 project (md)', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), validProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), validV1140ProjectPath));
 
     command.action(logger, { options: { output: 'md' } } as any, () => {
       try {
@@ -700,7 +702,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('e2e: shows yarn commands for yarn package manager', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidV1140ProjectPath));
 
     command.action(logger, { options: { output: 'json', packageManager: 'yarn' } } as any, () => {
       try {
@@ -715,7 +717,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('e2e: shows yarn commands for pnpm package manager', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidV1140ProjectPath));
 
     command.action(logger, { options: { output: 'json', packageManager: 'pnpm' } } as any, () => {
       try {
@@ -730,7 +732,7 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('e2e: shows correct number of findings for an invalid 1.14.0 project', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidV1140ProjectPath));
 
     command.action(logger, { options: { output: 'json' } } as any, () => {
       try {
@@ -745,12 +747,70 @@ describe(commands.PROJECT_DOCTOR, () => {
   });
 
   it('e2e: shows correct number of findings for an invalid 1.14.0 project (debug)', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidProjectPath));
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidV1140ProjectPath));
 
     command.action(logger, { options: { output: 'json', debug: true } } as any, () => {
       try {
         const findings: FindingToReport[] = log.pop();
         assert.strictEqual(findings.length, 28);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('e2e: shows correct number of findings for a valid 1.15.0 project (json)', (done) => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), validV1150ProjectPath));
+
+    command.action(logger, { options: { output: 'json' } } as any, () => {
+      try {
+        const findings: FindingToReport[] = log[0];
+        assert.strictEqual(findings.length, 0);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('e2e: shows correct message a valid 1.15.0 project (text)', (done) => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), validV1150ProjectPath));
+
+    command.action(logger, { options: { output: 'text' } } as any, () => {
+      try {
+        assert.strictEqual(log[0], '✅ CLI for Microsoft 365 has found no issues in your project');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('e2e: shows correct message for a valid 1.15.0 project (md)', (done) => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), validV1150ProjectPath));
+
+    command.action(logger, { options: { output: 'md' } } as any, () => {
+      try {
+        assert(log[0].indexOf('✅ CLI for Microsoft 365 has found no issues in your project') > -1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('e2e: shows correct number of findings for an invalid 1.15.0 project', (done) => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), invalidV1150ProjectPath));
+
+    command.action(logger, { options: { output: 'json' } } as any, () => {
+      try {
+        const findings: FindingToReport[] = log[0];
+        assert.strictEqual(findings.length, 14);
         done();
       }
       catch (e) {
