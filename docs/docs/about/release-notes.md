@@ -2,10 +2,15 @@
 
 ## [v5.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.5.0)
 
+**Planner:**
+
+- [planner tenant settings set](../cmd/planner/tenant/tenant-settings-set.md) - adds planner tenant settings set command (https://github.com/pnp/cli-microsoft365/issues/3356)
+
 ### Changes
 
 - fixed login issue [#3431](https://github.com/pnp/cli-microsoft365/issues/3431)
 - fixed issue with wrong _global.md reference breaking the docs and cli help [#3425](https://github.com/pnp/cli-microsoft365/issues/3425)
+- Combines planner plan get with planner plan details get (https://github.com/pnp/cli-microsoft365/issues/3344)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
