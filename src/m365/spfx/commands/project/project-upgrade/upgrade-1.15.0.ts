@@ -25,6 +25,7 @@ import { FN002007_DEVDEP_ajv } from "./rules/FN002007_DEVDEP_ajv";
 import { FN002009_DEVDEP_microsoft_sp_tslint_rules } from "./rules/FN002009_DEVDEP_microsoft_sp_tslint_rules";
 import { FN002013_DEVDEP_types_webpack_env } from "./rules/FN002013_DEVDEP_types_webpack_env";
 import { FN002018_DEVDEP_microsoft_rush_stack_compiler_3_9 } from "./rules/FN002018_DEVDEP_microsoft_rush_stack_compiler_3_9";
+import { FN002019_DEVDEP_spfx_fast_serve_helpers } from "./rules/FN002019_DEVDEP_spfx_fast_serve_helpers";
 import { FN002020_DEVDEP_microsoft_rush_stack_compiler_4_5 } from "./rules/FN002020_DEVDEP_microsoft_rush_stack_compiler_4_5";
 import { FN002021_DEVDEP_rushstack_eslint_config } from "./rules/FN002021_DEVDEP_rushstack_eslint_config";
 import { FN002022_DEVDEP_microsoft_eslint_plugin_spfx } from "./rules/FN002022_DEVDEP_microsoft_eslint_plugin_spfx";
@@ -66,6 +67,7 @@ module.exports = [
   new FN002009_DEVDEP_microsoft_sp_tslint_rules('', false),
   new FN002013_DEVDEP_types_webpack_env('1.15.2'),
   new FN002018_DEVDEP_microsoft_rush_stack_compiler_3_9('', false),
+  new FN002019_DEVDEP_spfx_fast_serve_helpers('1.15.2'),
   new FN002020_DEVDEP_microsoft_rush_stack_compiler_4_5('0.2.2'),
   new FN002021_DEVDEP_rushstack_eslint_config('2.5.1'),
   new FN002022_DEVDEP_microsoft_eslint_plugin_spfx('1.15.0'),
