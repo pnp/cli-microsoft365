@@ -59,6 +59,8 @@ class SpoSiteClassicSetCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    this.showDeprecationWarning(logger, commands.SITE_CLASSIC_SET, commands.SITE_SET);
+
     this.dots = '';
 
     spo
