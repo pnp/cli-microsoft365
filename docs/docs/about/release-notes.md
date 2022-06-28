@@ -2,15 +2,24 @@
 
 ## [v5.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.5.0)
 
+### New commands
+
 **Planner:**
 
-- [planner tenant settings set](../cmd/planner/tenant/tenant-settings-set.md) - adds planner tenant settings set command (https://github.com/pnp/cli-microsoft365/issues/3356)
+- [planner plan remove](../cmd/planner/plan/plan-remove.md) - removes the Microsoft Planner plan [#3336](https://github.com/pnp/cli-microsoft365/issues/3336)
+- [planner tenant settings set](../cmd/planner/tenant/tenant-settings-set.md) - sets Microsoft Planner configuration of the tenant [#3356](https://github.com/pnp/cli-microsoft365/issues/3356)
+
+**Teams:**
+
+- [teams cache remove](../cmd/teams/cache/cache-remove.md) - removes the Microsoft Teams client cache [#3205](https://github.com/pnp/cli-microsoft365/issues/3205)
 
 ### Changes
 
 - fixed login issue [#3431](https://github.com/pnp/cli-microsoft365/issues/3431)
 - fixed issue with wrong _global.md reference breaking the docs and cli help [#3425](https://github.com/pnp/cli-microsoft365/issues/3425)
-- Combines planner plan get with planner plan details get (https://github.com/pnp/cli-microsoft365/issues/3344)
+- combined `planner plan get` with `planner plan details get` [#3344](https://github.com/pnp/cli-microsoft365/issues/3344)
+- extended `spfx doctor command` with support for SPFx v1.15.0 [#3432](https://github.com/pnp/cli-microsoft365/issues/3432)
+- extended `spfx project doctor` command with support for SPFx v1.15.0 [#3440](https://github.com/pnp/cli-microsoft365/issues/3440)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
