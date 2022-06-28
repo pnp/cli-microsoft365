@@ -1,12 +1,40 @@
 # Release notes
 
-## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
+## [v5.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.5.0)
 
 ### New commands
 
 **Planner:**
 
+- [planner plan remove](../cmd/planner/plan/plan-remove.md) - removes the Microsoft Planner plan [#3336](https://github.com/pnp/cli-microsoft365/issues/3336)
+- [planner tenant settings set](../cmd/planner/tenant/tenant-settings-set.md) - sets Microsoft Planner configuration of the tenant [#3356](https://github.com/pnp/cli-microsoft365/issues/3356)
+
+**Teams:**
+
+- [teams cache remove](../cmd/teams/cache/cache-remove.md) - removes the Microsoft Teams client cache [#3205](https://github.com/pnp/cli-microsoft365/issues/3205)
+
+### Changes
+
+- fixed login issue [#3431](https://github.com/pnp/cli-microsoft365/issues/3431)
+- fixed issue with wrong _global.md reference breaking the docs and cli help [#3425](https://github.com/pnp/cli-microsoft365/issues/3425)
+- combined `planner plan get` with `planner plan details get` [#3344](https://github.com/pnp/cli-microsoft365/issues/3344)
+- extended `spfx doctor command` with support for SPFx v1.15.0 [#3432](https://github.com/pnp/cli-microsoft365/issues/3432)
+- extended `spfx project doctor` command with support for SPFx v1.15.0 [#3440](https://github.com/pnp/cli-microsoft365/issues/3440)
+
+## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad o365group recyclebinitem remove](../cmd/aad/o365group/o365group-recyclebinitem-remove.md) - permanently deletes a Microsoft 365 Group from the recycle bin in the current tenant [#1982](https://github.com/pnp/cli-microsoft365/issues/1982)
+
+**Planner:**
+
 - [planner task checklistitem add](../cmd/planner/task/task-checklistitem-add.md) - adds a new checklist item to a Planner task [#3280](https://github.com/pnp/cli-microsoft365/issues/3280)
+- [planner task checklistitem list](../cmd/planner/task/task-checklistitem-list.md) - lists the checklist items of a Planner task [#3280](https://github.com/pnp/cli-microsoft365/issues/3281)
+- [planner task checklistitem remove](../cmd/planner/task/task-checklistitem-remove.md) - removes a checklist item from a Planner task [#3282](https://github.com/pnp/cli-microsoft365/issues/3282)
+- [planner task reference remove](../cmd/planner/task/task-reference-remove.md) - removes a reference from a Microsoft Planner task [#3285](https://github.com/pnp/cli-microsoft365/issues/3285)
 - [planner task remove](../cmd/planner/task/task-remove.md) - removes a Microsoft Planner task [#3227](https://github.com/pnp/cli-microsoft365/issues/3227)
 - [planner tenant settings list](../cmd/planner/tenant/tenant-settings-list.md) - lists the Microsoft Planner configuration of the tenant [#3255](https://github.com/pnp/cli-microsoft365/issues/3355)
 
@@ -37,6 +65,11 @@
 - fixed gateway timeout on flow export [#3393](https://github.com/pnp/cli-microsoft365/issues/3393)
 - extended 'aad app set' with support for multiple identifier URIs [#3333](https://github.com/pnp/cli-microsoft365/issues/3333)
 - fixed bug with spo list list throwing access denied [#3373](https://github.com/pnp/cli-microsoft365/issues/3373)
+- fixed --includeAssociatedSites doesn't include associated sites in the result [#3400](https://github.com/pnp/cli-microsoft365/issues/3400)
+- extended 'spo list get' with PrincipalTypeString [#3379](https://github.com/pnp/cli-microsoft365/issues/3379)
+- added more options to planner task add [#3315](https://github.com/pnp/cli-microsoft365/issues/3315)
+- added priority option to planner task add and set [#3383](https://github.com/pnp/cli-microsoft365/issues/3383)
+- added support for upgrading SPFx projects to v1.15.0 [#3427](https://github.com/pnp/cli-microsoft365/issues/3427)
 
 ## [v5.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.3.0)
 

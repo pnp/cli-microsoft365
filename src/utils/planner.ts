@@ -17,9 +17,10 @@ export const planner = {
   /**
    * Get Planner plan by ID.
    * @param id Planner ID.
+   * @param metadata OData metadata level. Default is none
    */
-  async getPlanById(id: string): Promise<PlannerPlan> {
-    const requestOptions = getRequestOptions(`${graphResource}/v1.0/planner/plans/${id}`, 'none');
+  async getPlanById(id: string, metadata: 'none' | 'minimal' | 'full' = 'none'): Promise<PlannerPlan> {
+    const requestOptions = getRequestOptions(`${graphResource}/v1.0/planner/plans/${id}`, metadata);
     
     try {
       return await request.get<PlannerPlan>(requestOptions);
