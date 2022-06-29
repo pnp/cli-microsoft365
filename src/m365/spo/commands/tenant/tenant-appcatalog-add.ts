@@ -4,7 +4,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import * as spoSiteClassicAddCommand from '../site/site-classic-add';
+import * as spoSiteAddCommand from '../site/site-add';
 import * as spoSiteGetCommand from '../site/site-get';
 import * as spoSiteRemoveCommand from '../site/site-remove';
 import * as spoTenantAppCatalogUrlGetCommand from './tenant-appcatalogurl-get';
@@ -36,7 +36,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
     }
 
     Cli
-      .executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { _: [] } })
+      .executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { output: 'text', _: [] } })
       .then((spoTenantAppCatalogUrlGetCommandOutput: CommandOutput): Promise<void> => {
         const appCatalogUrl: string | undefined = spoTenantAppCatalogUrlGetCommandOutput.stdout;
         if (!appCatalogUrl) {
@@ -51,6 +51,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
           logger.logToStderr(`Found app catalog URL ${appCatalogUrl}`);
         }
 
+        //Using JSON.parse
         return this.ensureNoExistingSite(appCatalogUrl, args.options.force, logger);
       })
       .then(() => this.ensureNoExistingSite(args.options.url, args.options.force, logger))
@@ -118,17 +119,19 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
       logger.logToStderr(`Creating app catalog at ${options.url}...`);
     }
 
-    const siteClassicAddOptions = {
+    const siteAddOptions = {
       webTemplate: 'APPCATALOG#0',
       title: 'App catalog',
+      type: 'ClassicSite',
       url: options.url,
       timeZone: options.timeZone,
-      owner: options.owner,
+      owners: options.owner,
       wait: options.wait,
       verbose: this.verbose,
-      debug: this.debug
-    };
-    return Cli.executeCommand(spoSiteClassicAddCommand as Command, { options: { ...siteClassicAddOptions, _: [] } });
+      debug: this.debug,
+      removeDeletedSite: false
+    } as spoSiteAddCommand.Options;
+    return Cli.executeCommand(spoSiteAddCommand as Command, { options: { ...siteAddOptions, _: [] } });
   }
 
   public options(): CommandOption[] {
