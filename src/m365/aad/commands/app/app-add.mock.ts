@@ -13,6 +13,7 @@ export const microsoftGraphSp = {
     "https://dod-graph.microsoft.us/"
   ],
   "appId": "00000003-0000-0000-c000-000000000000",
+  "id": "f75121cb-5156-42f0-916e-341ea2ecaa22",
   "oauth2PermissionScopes": [
     {
       "adminConsentDescription": "Allows the application to create print jobs on behalf of the signed-in user and upload document content to print jobs that the signed-in user created.",
@@ -4925,6 +4926,7 @@ export const aadSp = {
     "0000000c-0000-0000-c000-000000000000"
   ],
   "appId": "0000000c-0000-0000-c000-000000000000",
+  "id": "c28f2eec-18b1-4ed9-b998-71d694a56642",
   "oauth2PermissionScopes": [],
   "appRoles": []
 };
@@ -4959,6 +4961,7 @@ export const mockCrmSp = {
     "https://siteapi.crm2.crmlivetie.com/"
   ],
   "appId": "00000007-0000-0000-c000-000000000000",
+  "id": "eb6eaf14-312e-4fad-87db-7e64d04d7c4c",
   "oauth2PermissionScopes": [
     {
       "adminConsentDescription": "Allows the application to access Common Data Service acting as users in the organization.",
