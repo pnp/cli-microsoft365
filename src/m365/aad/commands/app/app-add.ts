@@ -12,6 +12,7 @@ import commands from '../../commands';
 interface ServicePrincipalInfo {
   appId: string;
   appRoles: { id: string; value: string; }[];
+  id: string;
   oauth2PermissionScopes: { id: string; value: string; }[];
   servicePrincipalNames: string[];
 }
@@ -47,6 +48,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   apisApplication?: string;
   apisDelegated?: string;
+  grantAdminConsent?: boolean;
   implicitFlow: boolean;
   manifest?: string;
   multitenant: boolean;
@@ -65,11 +67,18 @@ interface Options extends GlobalOptions {
   certificateDisplayName?: string;
 }
 
+interface AppPermissions {
+  ResourceId: string;
+  resourceAccess: ResourceAccess[];
+  Scope: string[];
+}
+
 class AadAppAddCommand extends GraphCommand {
   private static aadApplicationPlatform: string[] = ['spa', 'web', 'publicClient'];
   private static aadAppScopeConsentBy: string[] = ['admins', 'adminsAndUsers'];
   private manifest: any;
   private appName: string = '';
+  private appPermissions: AppPermissions[] = [];
 
   public get name(): string {
     return commands.APP_ADD;
@@ -103,7 +112,8 @@ class AadAppAddCommand extends GraphCommand {
         withSecret: args.options.withSecret,
         certificateFile: typeof args.options.certificateFile !== 'undefined',
         certificateBase64Encoded: typeof args.options.certificateBase64Encoded !== 'undefined',
-        certificateDisplayName: typeof args.options.certificateDisplayName !== 'undefined'
+        certificateDisplayName: typeof args.options.certificateDisplayName !== 'undefined',
+        grantAdminConsent: typeof args.options.grantAdminConsent !== 'undefined'
       });
     });
   }
@@ -165,6 +175,9 @@ class AadAppAddCommand extends GraphCommand {
       },
       {
         option: '--save'
+      },
+      {
+        option: '--grantAdminConsent'
       }
     );
   }
@@ -236,7 +249,16 @@ class AadAppAddCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .resolveApis(args, logger)
-      .then(apis => this.createAppRegistration(args, apis, logger))
+      .then(apis => {
+        return this.createAppRegistration(args, apis, logger)
+          .then(appInfo => {
+            if (args.options.grantAdminConsent && apis.length > 0) {
+              return this.grantAdminConsent(appInfo, logger);
+            }
+
+            return Promise.resolve(appInfo);
+          });
+      })
       .then(appInfo => {
         // based on the assumption that we're adding AAD app to the current
         // directory. If we in the future extend the command with allowing
@@ -325,6 +347,94 @@ class AadAppAddCommand extends GraphCommand {
     };
 
     return request.post<AppInfo>(createApplicationRequestOptions);
+  }
+
+  private grantAdminConsent(appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
+    return this.createServicePrincipal(appInfo.appId)
+      .then((sp: ServicePrincipalInfo) => {
+        if (this.debug) {
+          logger.logToStderr("Service principal created, returned object id: " + sp.id);
+        }
+
+        const tasks: Promise<void>[] = [];
+
+        // Parse resolved permissions
+        this.appPermissions.forEach(permission => {
+          if (permission.Scope.length > 0) {
+            // Send delegated permissions requests
+            tasks.push(this.grantOAuth2Permission(sp.id, permission.ResourceId, permission.Scope.join(' ')));
+            
+            if (this.debug) {
+              logger.logToStderr(`Admin consent for following resource ${permission.ResourceId}, with delegated permissions: ${permission.Scope.join(',')}`);
+            }
+          }
+
+          permission.resourceAccess.filter(access => access.type === "Role").forEach((access: ResourceAccess) => {
+            // Send application permissions requests
+            tasks.push(this.addRoleToServicePrincipal(sp.id, permission.ResourceId, access.id));
+
+            if (this.debug) {
+              logger.logToStderr(`Admin consent for following resource ${permission.ResourceId}, with application permission: ${access.id}`);
+            }
+          });
+        });
+    
+        return Promise.all(tasks)
+          .then(_ => {
+            return appInfo;
+          });
+      });
+  }
+
+  private addRoleToServicePrincipal(objectId: string, resourceId: string, appRoleId: string): Promise<void> {
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/myorganization/servicePrincipals/${objectId}/appRoleAssignments`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      responseType: 'json',
+      data: {
+        appRoleId: appRoleId,
+        principalId: objectId,
+        resourceId: resourceId
+      }
+    };
+
+    return request.post<void>(requestOptions);
+  }
+
+  private grantOAuth2Permission(appId: string, resourceId: string, scopeName: string): Promise<void> {
+    const grantAdminConsentApplicationRequestOptions: any = {
+      url: `${this.resource}/v1.0/myorganization/oauth2PermissionGrants`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json',
+      data: {
+        clientId: appId,
+        consentType: "AllPrincipals",
+        principalId: null,
+        resourceId: resourceId,
+        scope: scopeName
+      }
+    };
+
+    return request.post<void>(grantAdminConsentApplicationRequestOptions);
+  }
+
+  private createServicePrincipal(appId: string): Promise<ServicePrincipalInfo> {
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/myorganization/servicePrincipals`,
+      headers: {
+        'content-type': 'application/json'
+      },
+      data: {
+        appId: appId
+      },
+      responseType: 'json'
+    };
+
+    return request.post<ServicePrincipalInfo>(requestOptions);
   }
 
   private updateAppFromManifest(args: CommandArgs, appInfo: AppInfo): Promise<AppInfo> {
@@ -590,7 +700,7 @@ class AadAppAddCommand extends GraphCommand {
     }
 
     return odata
-      .getAllItems<ServicePrincipalInfo>(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles`)
+      .getAllItems<ServicePrincipalInfo>(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames`)
       .then(servicePrincipals => {
         try {
           const resolvedApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisDelegated, 'Scope', logger);
@@ -612,8 +722,10 @@ class AadAppAddCommand extends GraphCommand {
             }
           });
 
-          if (this.debug) {
+          if (this.verbose) {
             logger.logToStderr(`Merged delegated and application permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
+            logger.logToStderr(`App role assignments: ${JSON.stringify(this.appPermissions.flatMap(permission => permission.resourceAccess.filter(access => access.type === "Role")), null, 2)}`);
+            logger.logToStderr(`OAuth2 permissions: ${JSON.stringify(this.appPermissions.flatMap(permission => permission.Scope), null, 2)}`);
           }
 
           return Promise.resolve(resolvedApis);
@@ -662,10 +774,31 @@ class AadAppAddCommand extends GraphCommand {
         resolvedApis.push(resolvedApi);
       }
 
-      resolvedApi.resourceAccess.push({
+      const resourceAccessPermission = {
         id: permission.id,
         type: scopeType
-      });
+      };
+
+      resolvedApi.resourceAccess.push(resourceAccessPermission);
+
+      // During API resolution, we store globally both app role assignments and oauth2permissions
+      // So that we'll be able to parse them during the admin consent process
+      let existingPermission = this.appPermissions.find(oauth => oauth.ResourceId === servicePrincipal.id);
+      if (!existingPermission) {
+        existingPermission = {
+          ResourceId: servicePrincipal.id,
+          resourceAccess: [],
+          Scope: []
+        };
+
+        this.appPermissions.push(existingPermission);
+      }
+
+      if (scopeType === 'Scope') {
+        existingPermission.Scope.push(permission.value);
+      }
+
+      existingPermission.resourceAccess.push(resourceAccessPermission);
     });
 
     return resolvedApis;
