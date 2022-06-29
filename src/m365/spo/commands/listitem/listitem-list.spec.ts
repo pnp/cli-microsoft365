@@ -443,18 +443,26 @@ describe(commands.LISTITEM_LIST, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
-            "Company": {
-              "Title": "Contoso"
-            },
-            "Id": 1,
-            "Title": "Example item 1"
+            Attachments: false,
+            AuthorId: 3,
+            ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
+            Created: '2018-08-15T13:43:12Z',
+            EditorId: 3,
+            GUID: '2b6bd9e0-3c43-4420-891e-20053e3c4664',
+            Modified: '2018-08-15T13:43:12Z',
+            Title: 'Example item 1',
+            Company: '{ "Title": "Contoso" }'
           },
           {
-            "Company": {
-              "Title": "Fabrikam"
-            },
-            "Id": 2,
-            "Title": "Example item 2"
+            Attachments: false,
+            AuthorId: 3,
+            ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
+            Created: '2018-08-15T13:44:10Z',
+            EditorId: 3,
+            GUID: '47c5fc61-afb7-4081-aa32-f4386b8a86ea',
+            Modified: '2018-08-15T13:44:10Z',
+            Title: 'Example item 2',
+            Company: '{ "Title": "Fabrikam" }'
           }]));
         done();
       }
