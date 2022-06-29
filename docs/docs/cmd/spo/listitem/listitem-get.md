@@ -28,6 +28,7 @@ m365 spo listitem get [options]
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
+
 If you want to specify a lookup type in the `properties` option, define which columns from the related list should be returned.
 
 ## Examples

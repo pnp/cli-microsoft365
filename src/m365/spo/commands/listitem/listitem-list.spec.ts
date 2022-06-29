@@ -441,7 +441,7 @@ describe(commands.LISTITEM_LIST, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert([
+        assert(loggerLogSpy.calledWith([
           {
             "Company": {
               "Title": "Contoso"
@@ -455,7 +455,7 @@ describe(commands.LISTITEM_LIST, () => {
             },
             "Id": 2,
             "Title": "Example item 2"
-          }]);
+          }]));
         done();
       }
       catch (e) {

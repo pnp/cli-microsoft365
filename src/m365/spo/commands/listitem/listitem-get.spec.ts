@@ -12,6 +12,7 @@ const command: Command = require('./listitem-get');
 describe(commands.LISTITEM_GET, () => {
   let log: any[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
 
   const expectedTitle = `List Item 1`;
   const expectedId = 147;
@@ -57,6 +58,7 @@ describe(commands.LISTITEM_GET, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -227,13 +229,13 @@ describe(commands.LISTITEM_GET, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert({
+        assert(loggerLogSpy.calledWith({
           "Company": {
             "Title": "Contoso"
           },
           "ID": expectedTitle,
           "Modified": "2018-03-15T10:43:10Z"
-        });
+        }));
         done();
       }
       catch (e) {
