@@ -67,7 +67,7 @@ module.exports = [
   new FN002009_DEVDEP_microsoft_sp_tslint_rules('', false),
   new FN002013_DEVDEP_types_webpack_env('1.15.2'),
   new FN002018_DEVDEP_microsoft_rush_stack_compiler_3_9('', false),
-  new FN002019_DEVDEP_spfx_fast_serve_helpers('1.15.0'),
+  new FN002019_DEVDEP_spfx_fast_serve_helpers('1.15.2'),
   new FN002020_DEVDEP_microsoft_rush_stack_compiler_4_5('0.2.2'),
   new FN002021_DEVDEP_rushstack_eslint_config('2.5.1'),
   new FN002022_DEVDEP_microsoft_eslint_plugin_spfx('1.15.0'),
