@@ -1,11 +1,14 @@
-import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
+import { Cli, CommandOutput, Logger } from '../../../../cli';
+import Command, { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { HubSite } from './HubSite';
+import { AssociatedSite } from './AssociatedSite';
+import { Options as SpoListItemListCommandOptions } from '../listitem/listitem-list';
+import * as SpoListItemListCommand from '../listitem/listitem-list';
 
 interface CommandArgs {
   options: Options;
@@ -15,6 +18,7 @@ interface Options extends GlobalOptions {
   id?: string;
   title?: string;
   url?: string;
+  includeAssociatedSites?: boolean;
 }
 
 class SpoHubSiteGetCommand extends SpoCommand {
@@ -31,10 +35,28 @@ class SpoHubSiteGetCommand extends SpoCommand {
     telemetryProps.id = typeof args.options.id !== 'undefined';
     telemetryProps.title = typeof args.options.title !== 'undefined';
     telemetryProps.url = typeof args.options.url !== 'undefined';
+    telemetryProps.includeAssociatedSites = args.options.includeAssociatedSites === true;
     return telemetryProps;
   }
 
+  private getAssociatedSites(spoAdminUrl: string, hubSiteId: string, logger: Logger, args: CommandArgs): Promise<CommandOutput> {
+    const options: SpoListItemListCommandOptions = {
+      output: 'json',
+      debug: args.options.debug,
+      verbose: args.options.verbose,
+      listTitle: 'DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS',
+      webUrl: spoAdminUrl,
+      filter: `HubSiteId eq '${hubSiteId}'`,
+      fields: 'Title,SiteUrl,SiteId'
+    };
+
+    return Cli
+      .executeCommandWithOutput(SpoListItemListCommand as Command, { options: { ...options, _: [] } });
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    let hubSite: HubSite;
+
     spo
       .getSpoUrl(logger, this.debug)
       .then((spoUrl: string): Promise<any> => {
@@ -45,8 +67,30 @@ class SpoHubSiteGetCommand extends SpoCommand {
           return this.getHubSite(spoUrl, args.options);
         }
       })
-      .then((res: any): void => {
-        logger.log(res);
+      .then((res: HubSite): Promise<CommandOutput | void> => {
+        hubSite = res;
+
+        if (args.options.includeAssociatedSites && (args.options.output && args.options.output !== 'json')) {
+          throw Error('includeAssociatedSites option is only allowed with json output mode');
+        }
+
+        if (args.options.includeAssociatedSites !== true || args.options.output && args.options.output !== 'json') {
+          return Promise.resolve();
+        }
+
+        return spo
+          .getSpoAdminUrl(logger, this.debug)
+          .then((spoAdminUrl: string): Promise<CommandOutput> => {
+            return this.getAssociatedSites(spoAdminUrl, hubSite.SiteId, logger, args);
+          });
+      })
+      .then((associatedSitesCommandOutput: CommandOutput | void): void => {
+        if (args.options.includeAssociatedSites) {
+          const associatedSites: AssociatedSite[] = JSON.parse((associatedSitesCommandOutput as CommandOutput).stdout) as AssociatedSite[];
+          hubSite.AssociatedSites = associatedSites.filter(s => s.SiteId !== hubSite.SiteId);
+        }
+
+        logger.log(hubSite);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -59,7 +103,6 @@ class SpoHubSiteGetCommand extends SpoCommand {
       },
       responseType: 'json'
     };
-    
     return request.get(requestOptions);
   }
 
@@ -100,7 +143,8 @@ class SpoHubSiteGetCommand extends SpoCommand {
     const options: CommandOption[] = [
       { option: '-i, --id [id]' },
       { option: '-t, --title [title]' },
-      { option: '-u, --url [url]' }
+      { option: '-u, --url [url]' },
+      { option: '--includeAssociatedSites' }
     ];
 
     const parentOptions: CommandOption[] = super.options();
