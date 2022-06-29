@@ -20,6 +20,8 @@
 - combined `planner plan get` with `planner plan details get` [#3344](https://github.com/pnp/cli-microsoft365/issues/3344)
 - extended `spfx doctor command` with support for SPFx v1.15.0 [#3432](https://github.com/pnp/cli-microsoft365/issues/3432)
 - extended `spfx project doctor` command with support for SPFx v1.15.0 [#3440](https://github.com/pnp/cli-microsoft365/issues/3440)
+- solved 'spo listitem set' issues with Number and Single Line of Text [#3405](https://github.com/pnp/cli-microsoft365/issues/3405)
+- fixed flow export command with support for illegal file characters [#3404](https://github.com/pnp/cli-microsoft365/issues/3404)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
