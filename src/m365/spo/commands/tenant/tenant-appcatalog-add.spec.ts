@@ -6,7 +6,7 @@ import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError, CommandErrorWithOutput } from '../../../../Command';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
-import * as spoSiteClassicAddCommand from '../site/site-classic-add';
+import * as spoSiteAddCommand from '../site/site-add';
 import * as spoSiteGetCommand from '../site/site-get';
 import * as spoSiteRemoveCommand from '../site/site-remove';
 import * as spoTenantAppCatalogUrlGetCommand from './tenant-appcatalogurl-get';
@@ -71,7 +71,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
         return Promise.reject(new CommandError('Invalid URL'));
       }
 
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.resolve();
         }
@@ -120,7 +120,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
         return Promise.reject(new CommandError('Invalid URL'));
       }
 
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.resolve();
         }
@@ -171,7 +171,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
         return Promise.reject(new CommandError('Invalid URL'));
       }
 
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.reject(new CommandError('An error has occurred'));
         }
@@ -222,7 +222,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
         return Promise.reject(new CommandError('Invalid URL'));
       }
 
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         return Promise.reject('Should not be called');
       }
 
@@ -266,7 +266,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
         return Promise.reject(new CommandError('Invalid URL'));
       }
 
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.resolve();
         }
@@ -316,7 +316,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
         return Promise.reject(new CommandError('Invalid URL'));
       }
 
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.resolve();
         }
@@ -366,7 +366,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
         return Promise.reject(new CommandError('Invalid URL'));
       }
 
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.reject(new CommandError('An error has occurred'));
         }
@@ -529,7 +529,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
         return Promise.reject(new CommandError('Invalid URL'));
       }
 
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.resolve();
         }
@@ -579,7 +579,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
         return Promise.reject(new CommandError('Invalid URL'));
       }
 
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.reject(new CommandError('An error has occurred'));
         }
@@ -697,7 +697,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
   it(`creates app catalog when app catalog and site with different URL don't exist`, (done) => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.resolve();
         }
@@ -737,7 +737,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
   it(`handles error when creating app catalog fails, when app catalog when app catalog does and site with different URL don't exist`, (done) => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.reject(new CommandError('An error has occurred'));
         }
@@ -818,7 +818,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
         return Promise.reject(new CommandError('Invalid URL'));
       }
 
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.resolve();
         }
@@ -865,7 +865,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
         return Promise.reject(new CommandError('Invalid URL'));
       }
 
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.resolve();
         }
@@ -912,7 +912,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
         return Promise.reject(new CommandError('Invalid URL'));
       }
 
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.reject(new CommandError('An error has occurred'));
         }
@@ -1018,7 +1018,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
   it(`creates app catalog when app catalog not registered and site with different URL doesn't exist`, (done) => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.resolve();
         }
@@ -1057,7 +1057,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
   it(`handles error when creating app catalog when app catalog not registered and site with different URL doesn't exist`, (done) => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
-      if (command === spoSiteClassicAddCommand) {
+      if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.reject(new CommandError('An error has occurred'));
         }
