@@ -230,11 +230,15 @@ describe(commands.LISTITEM_GET, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         assert(loggerLogSpy.calledWith({
-          "Company": {
-            "Title": "Contoso"
-          },
-          "ID": expectedTitle,
-          "Modified": "2018-03-15T10:43:10Z"
+          Attachments: false,
+          AuthorId: 3,
+          ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
+          Created: '2018-03-15T10:43:10Z',
+          EditorId: 3,
+          GUID: 'ea093c7b-8ae6-4400-8b75-e2d01154dffc',
+          Modified: '2018-03-15T10:43:10Z',
+          Title: 'List Item 1',
+          Company: '{ "Title": "Contoso" }'
         }));
         done();
       }
