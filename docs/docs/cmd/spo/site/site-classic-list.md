@@ -24,6 +24,9 @@ m365 spo site classic list [options]
 !!! important
     To use this command you have to have permissions to access the tenant admin site.
 
+!!! important
+    This command is deprecated. Please use [spo site list](./site-list.md) instead.
+
 ## Remarks
 
 Using the `-t, --webTemplate` option you can specify which sites you want to retrieve. For example, to get sites with the `STS#0` as their web template, use `--webTemplate STS#0` as the option.
