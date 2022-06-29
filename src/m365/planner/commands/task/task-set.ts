@@ -10,6 +10,7 @@ import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { aadGroup } from '../../../../utils/aadGroup';
+import { taskPriority } from '../../taskPriority';
 
 interface CommandArgs {
   options: Options;
@@ -34,6 +35,7 @@ interface Options extends GlobalOptions {
   description?: string;
   appliedCategories?: string;
   orderHint?: string;
+  priority?: number | string;
 }
 
 class PlannerTaskSetCommand extends GraphCommand {
@@ -67,6 +69,7 @@ class PlannerTaskSetCommand extends GraphCommand {
     telemetryProps.description = typeof args.options.description !== 'undefined';
     telemetryProps.appliedCategories = typeof args.options.appliedCategories !== 'undefined';
     telemetryProps.orderHint = typeof args.options.orderHint !== 'undefined';
+    telemetryProps.priority = typeof args.options.priority !== 'undefined';
     return telemetryProps;
   }
 
@@ -349,6 +352,10 @@ class PlannerTaskSetCommand extends GraphCommand {
       requestBody.orderHint = options.orderHint;
     }
 
+    if (options.priority !== undefined) {
+      requestBody.priority = taskPriority.getPriorityValue(options.priority);
+    }
+
     return requestBody;
   }
 
@@ -370,7 +377,8 @@ class PlannerTaskSetCommand extends GraphCommand {
       { option: '--assigneePriority [assigneePriority]' },
       { option: '--description [description]' },
       { option: '--appliedCategories [appliedCategories]' },
-      { option: '--orderHint [orderHint]' }
+      { option: '--orderHint [orderHint]' },
+      { option: '--priority [priority]', autocomplete: taskPriority.priorityValues }
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -427,6 +435,17 @@ class PlannerTaskSetCommand extends GraphCommand {
     }
     if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => this.allowedAppliedCategories.indexOf(category.toLocaleLowerCase()) < 0).length !== 0) {
       return 'The appliedCategories contains invalid value. Specify either category1, category2, category3, category4, category5 and/or category6 as properties';
+    }
+
+    if (args.options.priority !== undefined) {
+      if (typeof args.options.priority === "number") {
+        if (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10 || !Number.isInteger(args.options.priority)) {
+          return 'priority should be an integer between 0 and 10.';
+        }
+      }
+      else if (taskPriority.priorityValues.map(l => l.toLowerCase()).indexOf(args.options.priority.toString().toLowerCase()) === -1) {
+        return `${args.options.priority} is not a valid priority value. Allowed values are ${taskPriority.priorityValues.join('|')}.`;
+      }
     }
 
     return true;

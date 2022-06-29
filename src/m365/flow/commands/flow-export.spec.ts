@@ -227,6 +227,35 @@ describe(commands.EXPORT, () => {
     });
   });
 
+  it('exports the specified flow in json format with illegal characters', (done) => {
+    sinon.stub(request, 'get').callsFake((opts: any) => {
+      if (opts.url.match(/\/flows\/[^\?]+\?api-version\=2016-11-01/i)) {
+        return Promise.resolve(
+          {
+            id: `/providers/Microsoft.ProcessSimple/environments/Default-${foundEnvironmentId}/flows/${foundFlowId}`,
+            name: `${foundFlowId}`,
+            properties: { apiId: "/providers/Microsoft.PowerApps/apis/shared_logicflows", displayName: '\\Flow "<name> | with: Illegal * characters/?' },
+            type: "Microsoft.ProcessSimple/environments/flows"
+          }
+        );
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(request, 'post').callsFake(postFakes);
+    sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
+
+    command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'json' } }, () => {
+      try {
+        assert(loggerLogSpy.calledWith('./_Flow __name_ _ with_ Illegal _ characters__.json'));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('exports the specified flow in json format (debug)', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
