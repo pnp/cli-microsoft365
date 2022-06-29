@@ -13,6 +13,9 @@ m365 spo hubsite get [options]
 `-i, --id <id>`
 : Hub site ID
 
+`--includeAssociatedSites`
+: Include the associated sites in the result (only in JSON output)
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -29,6 +32,11 @@ Get information about the hub site with ID _2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
 ```sh
 m365 spo hubsite get --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
 ```
+
+Get information about the hub site with ID _2c1ba4c4-cd9b-4417-832f-92a34bc34b2a_, including its associated sites. Associated site info is only shown in JSON output.
+
+```sh
+m365 spo hubsite get --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --includeAssociatedSites --output json
 
 ## More information
 
