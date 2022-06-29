@@ -16,7 +16,7 @@ describe(commands.HUBSITE_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -127,6 +127,86 @@ describe(commands.HUBSITE_GET, () => {
           "Targets": null,
           "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
           "Title": "Sales"
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('retrieves the associated sites of the specified hub site', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/hubsites/getbyid('ee8b42c3-3e6f-4822-87c1-c21ad666046b')`) > -1) {
+        return Promise.resolve({
+          "Description": null,
+          "ID": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
+          "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+          "SiteId": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
+          "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
+          "Targets": null,
+          "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+          "Title": "Sales"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')`) > -1) {
+        return Promise.resolve([
+          {
+            "Title": "Lucky Charms",
+            "SiteId": "c08c7be1-4b97-4caa-b88f-ec91100d7774",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/LuckyCharms"
+          },
+          {
+            "Title": "Great Mates",
+            "SiteId": "7c371590-d9dd-4eb1-beb3-20f3613fdd9a",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/GreatMates"
+          },
+          {
+            "Title": "Life and Music",
+            "SiteId": "dd007944-c7f9-4742-8c21-de8a7718696f",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/LifeAndMusic"
+          },
+          {
+            "Title": "Leadership Connection",
+            "SiteId": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/leadership-connection"
+          }
+        ]);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b', includeAssociatedSites: true, output: 'json' } }, () => {
+      try {
+        assert(loggerLogSpy.calledWith({
+          "Description": null,
+          "ID": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
+          "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+          "SiteId": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
+          "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
+          "Targets": null,
+          "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+          "Title": "Sales",
+          "AssociatedSites": [
+            {
+              "Title": "Lucky Charms",
+              "SiteId": "c08c7be1-4b97-4caa-b88f-ec91100d7774",
+              "SiteUrl": "https://contoso.sharepoint.com/sites/LuckyCharms"
+            },
+            {
+              "Title": "Great Mates",
+              "SiteId": "7c371590-d9dd-4eb1-beb3-20f3613fdd9a",
+              "SiteUrl": "https://contoso.sharepoint.com/sites/GreatMates"
+            },
+            {
+              "Title": "Life and Music",
+              "SiteId": "dd007944-c7f9-4742-8c21-de8a7718696f",
+              "SiteUrl": "https://contoso.sharepoint.com/sites/LifeAndMusic"
+            }
+          ]
         }));
         done();
       }

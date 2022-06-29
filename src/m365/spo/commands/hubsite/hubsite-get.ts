@@ -1,12 +1,14 @@
-import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { HubSite } from './HubSite';
+import { AssociatedSite } from './AssociatedSite';
+import { Options as SpoListItemListCommandOptions } from '../listitem/listitem-list';
+import * as SpoListItemListCommand from '../listitem/listitem-list';
 
 interface CommandArgs {
   options: Options;
@@ -14,6 +16,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id: string;
+  includeAssociatedSites?: boolean;
 }
 
 class SpoHubSiteGetCommand extends SpoCommand {
@@ -25,10 +28,36 @@ class SpoHubSiteGetCommand extends SpoCommand {
     return 'Gets information about the specified hub site';
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.id = (!(!args.options.id)).toString();
+    telemetryProps.includeAssociatedSites = args.options.includeAssociatedSites === true;
+    return telemetryProps;
+  }
+
+  private async getAssociatedSites(spoAdminUrl: string, logger: Logger, args: CommandArgs): Promise<AssociatedSite[]> {
+    const options: SpoListItemListCommandOptions = {
+      output: 'json',
+      debug: args.options.debug,
+      verbose: args.options.verbose,
+      listTitle: 'DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS',
+      webUrl: spoAdminUrl,
+      filter: `HubSiteId eq '${args.options.id}'`,
+      fields: 'Title,SiteUrl,SiteId'
+    };
+
+    const output = await Cli
+      .executeCommandWithOutput(SpoListItemListCommand as Command, { options: { ...options, _: [] } });
+
+    return JSON.parse(output.stdout) as AssociatedSite[];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    let hubSite: HubSite;
+
     spo
       .getSpoUrl(logger, this.debug)
-      .then((spoUrl: string): Promise<any> => {
+      .then((spoUrl: string): Promise<HubSite> => {
         const requestOptions: any = {
           url: `${spoUrl}/_api/hubsites/getbyid('${encodeURIComponent(args.options.id)}')`,
           headers: {
@@ -39,8 +68,25 @@ class SpoHubSiteGetCommand extends SpoCommand {
 
         return request.get(requestOptions);
       })
-      .then((res: any): void => {
-        logger.log(res);
+      .then((res: HubSite): Promise<AssociatedSite[] | void> => {
+        hubSite = res;
+
+        if (args.options.includeAssociatedSites !== true || args.options.output && args.options.output !== 'json') {
+          return Promise.resolve();
+        }
+
+        return spo
+          .getSpoAdminUrl(logger, this.debug)
+          .then((spoAdminUrl: string): Promise<AssociatedSite[] | void> => {
+            return this.getAssociatedSites(spoAdminUrl, logger, args);
+          });
+      })
+      .then((associatedSites: AssociatedSite[] | void): void => {
+        if (associatedSites) {
+          hubSite.AssociatedSites = associatedSites.filter(s => s.SiteId !== args.options.id);
+        }
+
+        logger.log(hubSite);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -49,6 +95,9 @@ class SpoHubSiteGetCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-i, --id <id>'
+      },
+      {
+        option: '--includeAssociatedSites'
       }
     ];
 
