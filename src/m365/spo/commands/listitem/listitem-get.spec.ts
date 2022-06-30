@@ -199,12 +199,6 @@ describe(commands.LISTITEM_GET, () => {
         actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
         return Promise.resolve(
           {
-            "Attachments": false,
-            "AuthorId": 3,
-            "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
-            "Created": "2018-03-15T10:43:10Z",
-            "EditorId": 3,
-            "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
             "ID": actualId,
             "Modified": "2018-03-15T10:43:10Z",
             "Title": expectedTitle,
@@ -224,21 +218,15 @@ describe(commands.LISTITEM_GET, () => {
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       id: expectedId,
       output: "json",
-      properties: "ID,Modified,Company/Title"
+      properties: "Title,Modified,Company/Title"
     };
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith({
-          Attachments: false,
-          AuthorId: 3,
-          ContentTypeId: '0x0100B21BD271A810EE488B570BE49963EA34',
-          Created: '2018-03-15T10:43:10Z',
-          EditorId: 3,
-          GUID: 'ea093c7b-8ae6-4400-8b75-e2d01154dffc',
-          Modified: '2018-03-15T10:43:10Z',
-          Title: 'List Item 1',
-          Company: '{ "Title": "Contoso" }'
+        assert.deepStrictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify({
+          "Modified": "2018-03-15T10:43:10Z",
+          "Title": expectedTitle,
+          "Company": `{ "Title": "Contoso" }`
         }));
         done();
       }
