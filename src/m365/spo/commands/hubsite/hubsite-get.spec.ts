@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -39,7 +39,8 @@ describe(commands.HUBSITE_GET, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.get
+      request.get,
+      Cli.executeCommandWithOutput
     ]);
   });
 
@@ -151,8 +152,8 @@ describe(commands.HUBSITE_GET, () => {
         });
       }
 
-      if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')`) > -1) {
-        return Promise.resolve([
+      sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
+        stdout: JSON.stringify([
           {
             "Title": "Lucky Charms",
             "SiteId": "c08c7be1-4b97-4caa-b88f-ec91100d7774",
@@ -173,8 +174,9 @@ describe(commands.HUBSITE_GET, () => {
             "SiteId": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
             "SiteUrl": "https://contoso.sharepoint.com/sites/leadership-connection"
           }
-        ]);
-      }
+        ]),
+        stderr: ''
+      }));
 
       return Promise.reject('Invalid request');
     });

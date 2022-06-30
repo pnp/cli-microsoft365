@@ -1,4 +1,4 @@
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command, { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -35,7 +35,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  private async getAssociatedSites(spoAdminUrl: string, logger: Logger, args: CommandArgs): Promise<AssociatedSite[]> {
+  private getAssociatedSites(spoAdminUrl: string, logger: Logger, args: CommandArgs): Promise<CommandOutput> {
     const options: SpoListItemListCommandOptions = {
       output: 'json',
       debug: args.options.debug,
@@ -46,10 +46,8 @@ class SpoHubSiteGetCommand extends SpoCommand {
       fields: 'Title,SiteUrl,SiteId'
     };
 
-    const output = await Cli
+    return Cli
       .executeCommandWithOutput(SpoListItemListCommand as Command, { options: { ...options, _: [] } });
-
-    return JSON.parse(output.stdout) as AssociatedSite[];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -68,7 +66,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
 
         return request.get(requestOptions);
       })
-      .then((res: HubSite): Promise<AssociatedSite[] | void> => {
+      .then((res: HubSite): Promise<CommandOutput | void> => {
         hubSite = res;
 
         if (args.options.includeAssociatedSites !== true || args.options.output && args.options.output !== 'json') {
@@ -77,12 +75,13 @@ class SpoHubSiteGetCommand extends SpoCommand {
 
         return spo
           .getSpoAdminUrl(logger, this.debug)
-          .then((spoAdminUrl: string): Promise<AssociatedSite[] | void> => {
+          .then((spoAdminUrl: string): Promise<CommandOutput> => {
             return this.getAssociatedSites(spoAdminUrl, logger, args);
           });
       })
-      .then((associatedSites: AssociatedSite[] | void): void => {
-        if (associatedSites) {
+      .then((associatedSitesCommandOutput: CommandOutput | void): void => {
+        if (associatedSitesCommandOutput) {
+          const associatedSites = JSON.parse((associatedSitesCommandOutput as CommandOutput).stdout) as AssociatedSite[];
           hubSite.AssociatedSites = associatedSites.filter(s => s.SiteId !== args.options.id);
         }
 
