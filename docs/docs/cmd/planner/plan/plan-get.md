@@ -8,12 +8,6 @@ Retrieve information about the specified plan
 m365 planner plan get [options]
 ```
 
-## Alias
-
-```sh
-m365 planner plan details get [options]
-```
-
 ## Options
 
 `-i, --id [id]`
