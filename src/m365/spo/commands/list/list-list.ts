@@ -12,7 +12,6 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  executeWithLimitedPermissions?: boolean;
 }
 
 class SpoListListCommand extends SpoCommand {
@@ -31,26 +30,14 @@ class SpoListListCommand extends SpoCommand {
   constructor() {
     super();
 
-    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
-  }
-
-  #initTelemetry(): void {
-    this.telemetry.push((args: CommandArgs) => {
-      Object.assign(this.telemetryProperties, {
-        executeWithLimitedPermissions: !!args.options.executeWithLimitedPermissions
-      });
-    });
   }
 
   #initOptions(): void {
     this.options.unshift(
       {
         option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--executeWithLimitedPermissions'
       }
     );
   }
@@ -66,10 +53,8 @@ class SpoListListCommand extends SpoCommand {
       logger.logToStderr(`Retrieving all lists in site at ${args.options.webUrl}...`);
     }
 
-    const suffix = args.options.executeWithLimitedPermissions ? '&$select=RootFolder/ServerRelativeUrl,*' : '';
-
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/lists?$expand=RootFolder${suffix}`,
+      url: `${args.options.webUrl}/_api/web/lists?$expand=RootFolder&$select=RootFolder/ServerRelativeUrl,*`,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
