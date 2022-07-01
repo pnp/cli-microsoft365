@@ -15,7 +15,6 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  taskId?: string; // This option has been added to support task details get alias. Needs to be removed when deprecation is removed. 
   id?: string;
   title?: string;
   bucketId?: string;
@@ -30,10 +29,6 @@ interface Options extends GlobalOptions {
 class PlannerTaskGetCommand extends GraphCommand {
   public get name(): string {
     return commands.TASK_GET;
-  }
-
-  public alias(): string[] | undefined {
-    return [commands.TASK_DETAILS_GET];
   }
 
   public get description(): string {
@@ -54,8 +49,6 @@ class PlannerTaskGetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this.showDeprecationWarning(logger, commands.TASK_DETAILS_GET, commands.TASK_GET);
-    
     if (args.options.planName) {
       args.options.planTitle = args.options.planName;
 
@@ -67,11 +60,6 @@ class PlannerTaskGetCommand extends GraphCommand {
       return;
     }
 
-    // This check has been added to support task details get alias. Needs to be removed when deprecation is removed. 
-    if (args.options.taskId) {
-      args.options.id = args.options.taskId;
-    }
-    
     this
       .getTaskId(args.options)
       .then(taskId => this.getTask(taskId))
@@ -208,7 +196,6 @@ class PlannerTaskGetCommand extends GraphCommand {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
-      { option: '--taskId [taskId]' }, // This option has been added to support task details get alias. Needs to be removed when deprecation is removed. 
       { option: '-i, --id [id]' },
       { option: '-t, --title [title]' },
       { option: '--bucketId [bucketId]' },
