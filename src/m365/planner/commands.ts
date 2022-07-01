@@ -15,7 +15,6 @@ export default {
   TASK_CHECKLISTITEM_ADD: `${prefix} task checklistitem add`,
   TASK_CHECKLISTITEM_LIST: `${prefix} task checklistitem list`,
   TASK_CHECKLISTITEM_REMOVE: `${prefix} task checklistitem remove`,
-  TASK_DETAILS_GET: `${prefix} task details get`,
   TASK_GET: `${prefix} task get`,
   TASK_LIST: `${prefix} task list`,
   TASK_REFERENCE_ADD: `${prefix} task reference add`,

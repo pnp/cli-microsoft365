@@ -15,7 +15,6 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  taskId?: string; // This option has been added to support task details get alias. Needs to be removed when deprecation is removed. 
   id?: string;
   title?: string;
   bucketId?: string;
@@ -30,10 +29,6 @@ interface Options extends GlobalOptions {
 class PlannerTaskGetCommand extends GraphCommand {
   public get name(): string {
     return commands.TASK_GET;
-  }
-
-  public alias(): string[] | undefined {
-    return [commands.TASK_DETAILS_GET];
   }
 
   public get description(): string {
@@ -66,7 +61,6 @@ class PlannerTaskGetCommand extends GraphCommand {
 
   #initOptions(): void {
     this.options.unshift(
-      { option: '--taskId [taskId]' }, // This option has been added to support task details get alias. Needs to be removed when deprecation is removed. 
       { option: '-i, --id [id]' },
       { option: '-t, --title [title]' },
       { option: '--bucketId [bucketId]' },
@@ -130,8 +124,6 @@ class PlannerTaskGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, commands.TASK_DETAILS_GET, commands.TASK_GET);
-    
     if (args.options.planName) {
       args.options.planTitle = args.options.planName;
 
@@ -141,11 +133,6 @@ class PlannerTaskGetCommand extends GraphCommand {
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.');
       return;
-    }
-
-    // This check has been added to support task details get alias. Needs to be removed when deprecation is removed. 
-    if (args.options.taskId) {
-      args.options.id = args.options.taskId;
     }
 
     try {
