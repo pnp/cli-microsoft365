@@ -94,11 +94,6 @@ describe(commands.PLAN_GET, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'createdDateTime', 'owner', '@odata.etag']);
   });
   
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
   it('fails validation if neither id nor title are provided.', (done) => {
     const actual = command.validate({ options: {} });
     assert.notStrictEqual(actual, true);
