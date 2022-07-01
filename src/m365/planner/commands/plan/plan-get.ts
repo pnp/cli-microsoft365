@@ -28,10 +28,6 @@ class PlannerPlanGetCommand extends GraphCommand {
     return commands.PLAN_GET;
   }
 
-  public alias(): string[] | undefined {
-    return [commands.PLAN_DETAILS_GET];
-  }
-
   public get description(): string {
     return 'Get a Microsoft Planner plan';
   }
@@ -118,8 +114,6 @@ class PlannerPlanGetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.showDeprecationWarning(logger, commands.PLAN_DETAILS_GET, commands.PLAN_GET);
-
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.');
       return;
