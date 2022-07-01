@@ -7,6 +7,7 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
+import * as SpoListItemListCommand from '../listitem/listitem-list';
 const command: Command = require('./hubsite-get');
 
 describe(commands.HUBSITE_GET, () => {
@@ -152,32 +153,37 @@ describe(commands.HUBSITE_GET, () => {
         });
       }
 
-      sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
-        stdout: JSON.stringify([
-          {
-            "Title": "Lucky Charms",
-            "SiteId": "c08c7be1-4b97-4caa-b88f-ec91100d7774",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/LuckyCharms"
-          },
-          {
-            "Title": "Great Mates",
-            "SiteId": "7c371590-d9dd-4eb1-beb3-20f3613fdd9a",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/GreatMates"
-          },
-          {
-            "Title": "Life and Music",
-            "SiteId": "dd007944-c7f9-4742-8c21-de8a7718696f",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/LifeAndMusic"
-          },
-          {
-            "Title": "Leadership Connection",
-            "SiteId": "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/leadership-connection"
-          }
-        ]),
-        stderr: ''
-      }));
+      return Promise.reject('Invalid request');
+    });
 
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+      if (command === SpoListItemListCommand) {
+        return Promise.resolve({
+          stdout: JSON.stringify([
+            {
+              Title: "Lucky Charms",
+              SiteId: "c08c7be1-4b97-4caa-b88f-ec91100d7774",
+              SiteUrl: "https://contoso.sharepoint.com/sites/LuckyCharms"
+            },
+            {
+              Title: "Great Mates",
+              SiteId: "7c371590-d9dd-4eb1-beb3-20f3613fdd9a",
+              SiteUrl: "https://contoso.sharepoint.com/sites/GreatMates"
+            },
+            {
+              Title: "Life and Music",
+              SiteId: "dd007944-c7f9-4742-8c21-de8a7718696f",
+              SiteUrl: "https://contoso.sharepoint.com/sites/LifeAndMusic"
+            },
+            {
+              Title: "Leadership Connection",
+              SiteId: "ee8b42c3-3e6f-4822-87c1-c21ad666046b",
+              SiteUrl: "https://contoso.sharepoint.com/sites/leadership-connection"
+            }
+          ]
+          )
+        });
+      }
       return Promise.reject('Invalid request');
     });
 

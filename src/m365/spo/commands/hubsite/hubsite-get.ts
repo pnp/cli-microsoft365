@@ -80,8 +80,8 @@ class SpoHubSiteGetCommand extends SpoCommand {
           });
       })
       .then((associatedSitesCommandOutput: CommandOutput | void): void => {
-        if (associatedSitesCommandOutput) {
-          const associatedSites = JSON.parse((associatedSitesCommandOutput as CommandOutput).stdout) as AssociatedSite[];
+        if (args.options.includeAssociatedSites) {
+          const associatedSites: AssociatedSite[] = JSON.parse((associatedSitesCommandOutput as CommandOutput).stdout) as AssociatedSite[];
           hubSite.AssociatedSites = associatedSites.filter(s => s.SiteId !== args.options.id);
         }
 
