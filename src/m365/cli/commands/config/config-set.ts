@@ -78,7 +78,6 @@ class CliConfigSetCommand extends AnonymousCommand {
     let value: any = undefined;
 
     switch (args.options.key) {
-      case settingsNames.autoOpenBrowserOnLogin:
       case settingsNames.autoOpenLinksInBrowser:
       case settingsNames.copyDeviceCodeToClipboard:
       case settingsNames.csvHeader:

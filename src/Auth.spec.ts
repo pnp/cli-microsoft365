@@ -432,16 +432,10 @@ describe('Auth', () => {
     });
   });
 
-  it('opens the browser with the login (using autoOpenBrowserOnLogin)', () => {
-    (auth as any).processDeviceCodeCallback(response, logger, false);
-    assert(openStub.called);
-  });
-
   it('opens the browser with the login (using autoOpenLinksInBrowser)', () => {
     getSettingWithDefaultValueStub.restore();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake(((settingName, defaultValue) => {
-      if (settingName === "autoOpenBrowserOnLogin") { return false; }
-      else if (settingName === "autoOpenLinksInBrowser") { return true; }
+      if (settingName === "autoOpenLinksInBrowser") { return true; }
       else {
         return defaultValue;
       }
