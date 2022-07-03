@@ -197,8 +197,8 @@ Add-PnPAlert|PnP.PowerShell|
 Add-PnPApp|PnP.PowerShell|[spo app add](../cmd/spo/app/app-add.md)
 Add-PnPApplicationCustomizer|PnP.PowerShell|[spo customaction add](../cmd/spo/customaction/customaction-add.md)
 Add-PnPAzureADGroupMember|PnP.PowerShell|
-Add-PnPAzureADGroupOwner
-Add-PnPContentType
+Add-PnPAzureADGroupOwner|PnP.PowerShell|
+Add-PnPContentType|PnP.PowerShell|[spo contenttype add](../cmd/spo/contenttype/contenttype-add.md)
 Add-PnPContentTypesFromContentTypeHub
 Add-PnPContentTypeToDocumentSet
 Add-PnPContentTypeToList
