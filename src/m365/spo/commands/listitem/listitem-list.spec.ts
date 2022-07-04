@@ -7,14 +7,12 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
-import chalk = require('chalk');
 const command: Command = require('./listitem-list');
 
 describe(commands.LISTITEM_LIST, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   const expectedArrayLength = 2;
@@ -116,7 +114,6 @@ describe(commands.LISTITEM_LIST, () => {
     };
 
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -180,8 +177,8 @@ describe(commands.LISTITEM_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if title and id are specified together', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', id: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } }, commandInfo);
+  it('fails validation if listTitle and listId are specified together', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -200,8 +197,8 @@ describe(commands.LISTITEM_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'foo' } }, commandInfo);
+  it('fails validation if the listId option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -238,46 +235,6 @@ describe(commands.LISTITEM_LIST, () => {
   it('fails validation if the specific pageNumber is not a number', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', pageSize: 3, pageNumber: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('logs deprecation warning when option id is specified', (done) => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    const options: any = {
-      id: '935c13a0-cc53-4103-8b48-c1d0828eaa7f',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x'
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'id' is deprecated. Please use 'listId' instead.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('logs deprecation warning when option title is specified', (done) => {
-    sinon.stub(request, 'get').callsFake(getFakes);
-    sinon.stub(request, 'post').callsFake(postFakes);
-
-    const options: any = {
-      title: 'Demo List',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x'
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'title' is deprecated. Please use 'listTitle' instead.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('returns array of listItemInstance objects when a list of items is requested, and debug mode enabled', (done) => {
