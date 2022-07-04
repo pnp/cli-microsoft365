@@ -13,7 +13,6 @@ interface CommandArgs {
 }
 
 export interface Options extends GlobalOptions {
-  id?: string;
   listId?: string;
   listTitle?: string;
   fields?: string;
@@ -21,7 +20,6 @@ export interface Options extends GlobalOptions {
   pageNumber?: string;
   pageSize?: string;
   camlQuery?: string;
-  title?: string;
   webUrl: string;
 }
 
@@ -46,10 +44,8 @@ class SpoListItemListCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        id: typeof args.options.id !== 'undefined',
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
-        title: typeof args.options.title !== 'undefined',
         fields: typeof args.options.fields !== 'undefined',
         filter: typeof args.options.filter !== 'undefined',
         pageNumber: typeof args.options.pageNumber !== 'undefined',
@@ -63,12 +59,6 @@ class SpoListItemListCommand extends SpoCommand {
     this.options.unshift(
       {
         option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--id [id]'
-      },
-      {
-        option: '--title [title]'
       },
       {
         option: '-i, --listId [listId]'
@@ -98,56 +88,47 @@ class SpoListItemListCommand extends SpoCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
+	    if (isValidSharePointUrl !== true) {
+	      return isValidSharePointUrl;
+	    }
 
-        if (!args.options.id && !args.options.title && !args.options.listId && !args.options.listTitle) {
-          return `Specify listId or listTitle`;
-        }
+	    if (!args.options.listId && !args.options.listTitle) {
+	      return `Specify listId or listTitle`;
+	    }
 
-        if (args.options.id && args.options.title) {
-          return `Specify list id or title but not both`;
-        }
+	    if (args.options.listId && args.options.listTitle) {
+	      return 'Specify listId or listTitle but not both';
+	    }
 
-        // Check if only one of the 4 options is specified
-        if ([args.options.id, args.options.title, args.options.listId, args.options.listTitle].filter(o => o).length > 1) {
-          return 'Specify listId or listTitle but not both';
-        }
+	    if (args.options.camlQuery && args.options.fields) {
+	      return `Specify camlQuery or fields but not both`;
+	    }
 
-        if (args.options.camlQuery && args.options.fields) {
-          return `Specify camlQuery or fields but not both`;
-        }
+	    if (args.options.camlQuery && args.options.pageSize) {
+	      return `Specify camlQuery or pageSize but not both`;
+	    }
 
-        if (args.options.camlQuery && args.options.pageSize) {
-          return `Specify camlQuery or pageSize but not both`;
-        }
+	    if (args.options.camlQuery && args.options.pageNumber) {
+	      return `Specify camlQuery or pageNumber but not both`;
+	    }
 
-        if (args.options.camlQuery && args.options.pageNumber) {
-          return `Specify camlQuery or pageNumber but not both`;
-        }
+	    if (args.options.pageSize && isNaN(Number(args.options.pageSize))) {
+	      return `pageSize must be numeric`;
+	    }
 
-        if (args.options.pageSize && isNaN(Number(args.options.pageSize))) {
-          return `pageSize must be numeric`;
-        }
+	    if (args.options.pageNumber && !args.options.pageSize) {
+	      return `pageSize must be specified if pageNumber is specified`;
+	    }
 
-        if (args.options.pageNumber && !args.options.pageSize) {
-          return `pageSize must be specified if pageNumber is specified`;
-        }
+	    if (args.options.pageNumber && isNaN(Number(args.options.pageNumber))) {
+	      return `pageNumber must be numeric`;
+	    }
 
-        if (args.options.pageNumber && isNaN(Number(args.options.pageNumber))) {
-          return `pageNumber must be numeric`;
-        }
+	    if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
+	      return `${args.options.listId} is not a valid GUID`;
+	    }
 
-        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} is not a valid GUID`;
-        }
-
-        if (args.options.id && !validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} in option id is not a valid GUID`;
-        }
-
-        return true;
+	    return true;
       }
     );
   }
@@ -155,8 +136,6 @@ class SpoListItemListCommand extends SpoCommand {
   #initTypes(): void {
     this.types.string.push(
       'webUrl',
-      'id',
-      'title',
       'camlQuery',
       'pageSize',
       'pageNumber',
@@ -166,15 +145,8 @@ class SpoListItemListCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.id) {
-      this.warn(logger, `Option 'id' is deprecated. Please use 'listId' instead.`);
-    }
-    if (args.options.title) {
-      this.warn(logger, `Option 'title' is deprecated. Please use 'listTitle' instead.`);
-    }
-
-    const listIdArgument = args.options.listId || args.options.id || '';
-    const listTitleArgument = args.options.listTitle || args.options.title || '';
+    const listIdArgument = args.options.listId || '';
+    const listTitleArgument = args.options.listTitle || '';
 
     let formDigestValue: string = '';
 
