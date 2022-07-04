@@ -20,17 +20,12 @@ interface Options extends GlobalOptions {
 }
 
 class AadAppRoleRemoveCommand extends GraphCommand {
-
   public get name(): string {
     return commands.APP_ROLE_REMOVE;
   }
 
   public get description(): string {
     return 'Removes role from the specified Azure AD app registration';
-  }
-
-  public alias(): string[] | undefined {
-    return [commands.APP_ROLE_DELETE];
   }
 
   constructor() {
@@ -107,8 +102,6 @@ class AadAppRoleRemoveCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this.showDeprecationWarning(logger, commands.APP_ROLE_DELETE, commands.APP_ROLE_REMOVE);
-
     const deleteAppRole: () => void = (): void => {
       this
         .processAppRoleDelete(logger, args)
