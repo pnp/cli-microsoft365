@@ -77,9 +77,9 @@ module.exports = [
   new FN012017_TSC_extends('./node_modules/@microsoft/rush-stack-compiler-4.5/includes/tsconfig-web.json'),
   new FN015003_FILE_tslint_json(false, ''),
   new FN015008_FILE_eslintrc_js(true, `require('@rushstack/eslint-config/patch/modern-module-resolution');
-  module.exports = {
-    extends: ['@microsoft/eslint-config-spfx/lib/profiles/react'],
-    parserOptions: { tsconfigRootDir: __dirname }
-  };`),
+module.exports = {
+  extends: ['@microsoft/eslint-config-spfx/lib/profiles/default'],
+  parserOptions: { tsconfigRootDir: __dirname }
+};`),
   new FN023002_GITIGNORE_heft()
 ];
