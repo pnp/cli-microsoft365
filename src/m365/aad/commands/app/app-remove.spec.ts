@@ -91,16 +91,6 @@ describe(commands.APP_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.strictEqual((alias && alias.indexOf(commands.APP_DELETE) > -1), true);
-  });
-
   it('fails validation if appId and objectId specified', () => {
     const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8' } });
     assert.notStrictEqual(actual, true);
