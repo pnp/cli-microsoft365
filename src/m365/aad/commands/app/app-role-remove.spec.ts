@@ -64,16 +64,6 @@ describe(commands.APP_ROLE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.strictEqual((alias && alias.indexOf(commands.APP_ROLE_DELETE) > -1), true);
-  });
-
   it('deletes an app role when the role is in enabled state and valid appObjectId, role claim and --confirm option specified', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230?$select=id,appRoles') {

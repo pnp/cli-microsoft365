@@ -32,10 +32,6 @@ class AadAppRoleRemoveCommand extends GraphCommand {
     return 'Removes role from the specified Azure AD app registration';
   }
 
-  public alias(): string[] | undefined {
-    return [commands.APP_ROLE_DELETE];
-  }
-
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.appId = typeof args.options.appId !== 'undefined';
@@ -48,8 +44,6 @@ class AadAppRoleRemoveCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this.showDeprecationWarning(logger, commands.APP_ROLE_DELETE, commands.APP_ROLE_REMOVE);
-
     const deleteAppRole: () => void = (): void => {
       this
         .processAppRoleDelete(logger, args)
