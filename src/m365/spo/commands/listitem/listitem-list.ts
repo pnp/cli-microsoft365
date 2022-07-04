@@ -15,7 +15,6 @@ interface CommandArgs {
 }
 
 export interface Options extends GlobalOptions {
-  id?: string;
   listId?: string;
   listTitle?: string;
   fields?: string;
@@ -23,7 +22,6 @@ export interface Options extends GlobalOptions {
   pageNumber?: string;
   pageSize?: string;
   camlQuery?: string;
-  title?: string;
   webUrl: string;
 }
 
@@ -38,10 +36,8 @@ class SpoListItemListCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id !== 'undefined';
     telemetryProps.listId = typeof args.options.listId !== 'undefined';
     telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
-    telemetryProps.title = typeof args.options.title !== 'undefined';
     telemetryProps.fields = typeof args.options.fields !== 'undefined';
     telemetryProps.filter = typeof args.options.filter !== 'undefined';
     telemetryProps.pageNumber = typeof args.options.pageNumber !== 'undefined';
@@ -51,15 +47,8 @@ class SpoListItemListCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (args.options.id) {
-      this.warn(logger, `Option 'id' is deprecated. Please use 'listId' instead.`);
-    }
-    if (args.options.title) {
-      this.warn(logger, `Option 'title' is deprecated. Please use 'listTitle' instead.`);
-    }
-
-    const listIdArgument = args.options.listId || args.options.id || '';
-    const listTitleArgument = args.options.listTitle || args.options.title || '';
+    const listIdArgument = args.options.listId || '';
+    const listTitleArgument = args.options.listTitle || '';
 
     let formDigestValue: string = '';
 
@@ -151,12 +140,6 @@ class SpoListItemListCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--id [id]'
-      },
-      {
-        option: '--title [title]'
-      },
-      {
         option: '-i, --listId [listId]'
       },
       {
@@ -204,16 +187,11 @@ class SpoListItemListCommand extends SpoCommand {
       return isValidSharePointUrl;
     }
 
-    if (!args.options.id && !args.options.title && !args.options.listId && !args.options.listTitle) {
+    if (!args.options.listId && !args.options.listTitle) {
       return `Specify listId or listTitle`;
     }
 
-    if (args.options.id && args.options.title) {
-      return `Specify list id or title but not both`;
-    }
-
-    // Check if only one of the 4 options is specified
-    if ([args.options.id, args.options.title, args.options.listId, args.options.listTitle].filter(o => o).length > 1) {
+    if (args.options.listId && args.options.listTitle) {
       return 'Specify listId or listTitle but not both';
     }
 
@@ -243,10 +221,6 @@ class SpoListItemListCommand extends SpoCommand {
 
     if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
       return `${args.options.listId} is not a valid GUID`;
-    }
-
-    if (args.options.id && !validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} in option id is not a valid GUID`;
     }
 
     return true;
