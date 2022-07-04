@@ -67,6 +67,11 @@ describe(commands.FIELD_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets();
+    assert.deepStrictEqual(optionSets, [['id', 'fieldTitle', 'name']]);
+  });
+
   it('updates site column specified by fieldTitle', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
@@ -759,16 +764,6 @@ describe(commands.FIELD_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if neither id nor name are specified', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if both id and name are specified', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '330f29c5-5c4c-465f-9f4b-7903020ae1ce', fieldTitle: 'MyColumn' } });
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if id is specified and is not a valid GUID', () => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'invalid' } });
     assert.notStrictEqual(actual, true);
@@ -781,11 +776,6 @@ describe(commands.FIELD_SET, () => {
 
   it('fails validation if listId is specified and is not a valid GUID', () => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'invalid', fieldTitle: 'MyColumn' } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation both name and fieldTitle are specified', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'MyColumn', fieldTitle: 'MyColumn' } });
     assert.notStrictEqual(actual, true);
   });
 

@@ -161,6 +161,12 @@ class SpoFieldSetCommand extends SpoCommand {
     return payload;
   }
 
+  public optionSets(): string[][] | undefined {
+    return [
+      ['id', 'fieldTitle', 'name']
+    ];
+  }
+
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
@@ -203,18 +209,6 @@ class SpoFieldSetCommand extends SpoCommand {
     if (args.options.listId &&
       !validation.isValidGuid(args.options.listId)) {
       return `${args.options.listId} in option listId is not a valid GUID`;
-    }
-
-    if (!args.options.id && !args.options.fieldTitle && !args.options.name) {
-      return `Specify id or fieldTitle`;
-    }
-
-    if (args.options.name && args.options.fieldTitle) {
-      return `Specify only fieldTitle. Option name is deprecated.`;
-    }
-
-    if (args.options.id && (args.options.fieldTitle || args.options.name)) {
-      return `Specify id or fieldTitle but not both`;
     }
 
     if (args.options.id &&
