@@ -42,8 +42,6 @@ describe('Lazy loading commands', () => {
       yammerCommands.default
     ];
     const aliases: string[] = [
-      'aad app delete',
-      'aad app role delete',
       'aad o365group restore',
       'consent',
       'flow connector export',
