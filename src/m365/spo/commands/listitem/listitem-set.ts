@@ -341,11 +341,11 @@ class SpoListItemSetCommand extends SpoCommand {
           requestBody.push(`
             <Parameters>
               <Parameter Type="String">${key}</Parameter>
-              <Parameter Type="String">${(<any>options)[key]}</Parameter>
+              <Parameter Type="String">${(<any>options)[key].toString()}</Parameter>
             </Parameters>`);
         }
         else {
-          requestBody.push({ FieldName: key, FieldValue: (<any>options)[key] });
+          requestBody.push({ FieldName: key, FieldValue: (<any>options)[key].toString() });
         }
       }
     });

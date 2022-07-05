@@ -2716,7 +2716,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     command.action(logger, { options: { toVersion: '1.15.0', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 32);
+      assert.strictEqual(findings.length, 33);
     });
   });
 
