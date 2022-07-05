@@ -167,7 +167,7 @@ describe(commands.HUBSITE_GET, () => {
 
     command.action(logger, { options: { debug: false, title: validTitle } }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple hub sites with ${validTitle} found: ${validUrl},${validUrl}`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple hub sites with ${validTitle} found. Please disambiguate: ${validUrl}, ${validUrl}`)));
         done();
       }
       catch (e) {
@@ -207,7 +207,7 @@ describe(commands.HUBSITE_GET, () => {
 
     command.action(logger, { options: { debug: false, url: validUrl } }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple hub sites with ${validUrl} found: ${validUrl},${validUrl}`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple hub sites with ${validUrl} found. Please disambiguate: ${validUrl}, ${validUrl}`)));
         done();
       }
       catch (e) {
@@ -244,7 +244,7 @@ describe(commands.HUBSITE_GET, () => {
             "code": "-1, Microsoft.SharePoint.Client.ResourceNotFoundException",
             "message": {
               "lang": "en-US",
-              "value": "Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."
+              "value": "The specified hub site with id ee8b42c3-3e6f-4822-87c1-c21ad666046b does not exist"
             }
           }
         }

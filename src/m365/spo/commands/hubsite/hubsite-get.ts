@@ -63,7 +63,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
     return request
       .get(requestOptions)
       .then((hubsite: any) => hubsite)
-      .catch(() => Promise.reject(`The specified hub site with id ${options.id} does not exist`));
+      .catch((err: any) => Promise.reject(err));
   }
 
   private getHubSite(spoUrl: string, options: Options): Promise<HubSite> {
@@ -87,12 +87,12 @@ class SpoHubSiteGetCommand extends SpoCommand {
           hubSites = hubSites.filter(site => site.SiteUrl.toLocaleLowerCase() === options.url!.toLocaleLowerCase());
         }
 
-        if (!hubSites.length) {
+        if (hubSites.length === 0) {
           return Promise.reject(`The specified hub site ${options.title || options.url} does not exist`);
         }
 
         if (hubSites.length > 1) {
-          return Promise.reject(`Multiple hub sites with ${options.title || options.url} found: ${hubSites.map(site => site.SiteUrl)}`);
+          return Promise.reject(`Multiple hub sites with ${options.title || options.url} found. Please disambiguate: ${hubSites.map(site => site.SiteUrl).join(', ')}`);
         }
 
         return hubSites[0];
