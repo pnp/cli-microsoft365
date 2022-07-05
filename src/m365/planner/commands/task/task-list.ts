@@ -53,9 +53,7 @@ class PlannerTaskListCommand extends GraphCommand {
     if (args.options.planName) {
       args.options.planTitle = args.options.planName;
 
-      if (this.verbose) {
-        this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
-      }
+      this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
     }
 
     if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {

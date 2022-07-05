@@ -723,7 +723,6 @@ describe(commands.TASK_LIST, () => {
     });
   });
 
-
   it('correctly handles random API error', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));

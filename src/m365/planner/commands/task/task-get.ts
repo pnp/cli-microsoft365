@@ -57,9 +57,7 @@ class PlannerTaskGetCommand extends GraphCommand {
     if (args.options.planName) {
       args.options.planTitle = args.options.planName;
 
-      if (this.verbose) {
-        this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
-      }
+      this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
     }
     
     this.showDeprecationWarning(logger, commands.TASK_DETAILS_GET, commands.TASK_GET);
