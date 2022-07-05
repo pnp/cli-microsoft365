@@ -9,6 +9,14 @@
 - [planner plan remove](../cmd/planner/plan/plan-remove.md) - removes the Microsoft Planner plan [#3336](https://github.com/pnp/cli-microsoft365/issues/3336)
 - [planner tenant settings set](../cmd/planner/tenant/tenant-settings-set.md) - sets Microsoft Planner configuration of the tenant [#3356](https://github.com/pnp/cli-microsoft365/issues/3356)
 
+**Search:**
+
+- [search externalconnection get](../cmd/search/externalconnection/externalconnection-get.md) - adds search externalconnection get command. [#3169](https://github.com/pnp/cli-microsoft365/issues/3169)
+
+**SharePoint:**
+
+- [spo roledefinition get](../cmd/spo/roledefinition/roledefinition-get.md) - adds spo roledefinition get command. [#3270](https://github.com/pnp/cli-microsoft365/issues/3270)
+
 **Teams:**
 
 - [teams cache remove](../cmd/teams/cache/cache-remove.md) - removes the Microsoft Teams client cache [#3205](https://github.com/pnp/cli-microsoft365/issues/3205)
@@ -28,6 +36,8 @@
 - upgraded SPFx fast serve helper to v1.15 [#3446](https://github.com/pnp/cli-microsoft365/issues/3446)
 - removed unnecessary undefined checks from several commands [#3420](https://github.com/pnp/cli-microsoft365/issues/3420)
 - added `@meId` and `@meUserName` tokens [#3056](https://github.com/pnp/cli-microsoft365/issues/3056)
+- extended spo hubsite get options. [#3378](https://github.com/pnp/cli-microsoft365/issues/3378)
+- fixed planTitle inconsistency in planner commands. [#3342](https://github.com/pnp/cli-microsoft365/issues/3342)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
@@ -75,7 +85,7 @@
 - fixed bug with spo list list throwing access denied [#3373](https://github.com/pnp/cli-microsoft365/issues/3373)
 - fixed --includeAssociatedSites doesn't include associated sites in the result [#3400](https://github.com/pnp/cli-microsoft365/issues/3400)
 - extended 'spo list get' with PrincipalTypeString [#3379](https://github.com/pnp/cli-microsoft365/issues/3379)
-- added more options to planner task add [#3315](https://github.com/pnp/cli-microsoft365/issues/3315)
+- added more options to planner task add [#3246](https://github.com/pnp/cli-microsoft365/issues/3246)
 - added priority option to planner task add and set [#3383](https://github.com/pnp/cli-microsoft365/issues/3383)
 - added support for upgrading SPFx projects to v1.15.0 [#3427](https://github.com/pnp/cli-microsoft365/issues/3427)
 
@@ -199,7 +209,7 @@
 
 **Planner:**
 
-- [planner plan details get](../cmd/planner/plan/plan-details-get.md) - retrieve the planner details about the specified plan [#3051](https://github.com/pnp/cli-microsoft365/issues/3051)
+- [planner plan details get](../cmd/planner/plan/plan-get.md) - retrieve the planner details about the specified plan [#3051](https://github.com/pnp/cli-microsoft365/issues/3051)
 
 **Power Platform:**
 
