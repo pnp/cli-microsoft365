@@ -22,6 +22,12 @@
 - extended `spfx project doctor` command with support for SPFx v1.15.0 [#3440](https://github.com/pnp/cli-microsoft365/issues/3440)
 - solved 'spo listitem set' issues with Number and Single Line of Text [#3405](https://github.com/pnp/cli-microsoft365/issues/3405)
 - fixed flow export command with support for illegal file characters [#3404](https://github.com/pnp/cli-microsoft365/issues/3404)
+- fixed `planner plan remove` docs [#3473](https://github.com/pnp/cli-microsoft365/issues/3473)
+- fixed upgrading non-React SPFx projects to v1.15.0 [#3475](https://github.com/pnp/cli-microsoft365/issues/3475)
+- fixed sample script referencing deprecated task details get [#3467](https://github.com/pnp/cli-microsoft365/issues/3467)
+- upgraded SPFx fast serve helper to v1.15 [#3446](https://github.com/pnp/cli-microsoft365/issues/3446)
+- removed unnecessary undefined checks from several commands [#3420](https://github.com/pnp/cli-microsoft365/issues/3420)
+- added `@meId` and `@meUserName` tokens [#3056](https://github.com/pnp/cli-microsoft365/issues/3056)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
