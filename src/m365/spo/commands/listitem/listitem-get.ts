@@ -49,9 +49,7 @@ class SpoListItemGetCommand extends SpoCommand {
       `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitleArgument)}')`);
 
-    const propertiesSelect: string[] = args.options.properties ? args.options.properties.split(',')
-      : (!args.options.output || args.options.output === "text") ? ["Title", "Id"] : [];
-
+    const propertiesSelect: string[] = args.options.properties ? args.options.properties.split(',') : [];
     const propertiesWithSlash: string[] = propertiesSelect.filter(item => item.includes("/"));
     const propertiesToExpand: string[] = propertiesWithSlash.map(e => e.split('/')[0]);
     const expandPropertiesArray: string[] = propertiesToExpand.filter((item, pos) => propertiesToExpand.indexOf(item) === pos);
