@@ -62,6 +62,7 @@ export default {
   FOLDER_REMOVE: `${prefix} folder remove`,
   FOLDER_RENAME: `${prefix} folder rename`,
   GET: `${prefix} get`,
+  GROUP_ADD: `${prefix} group add`,
   GROUP_GET: `${prefix} group get`,
   GROUP_LIST: `${prefix} group list`,
   GROUP_REMOVE: `${prefix} group remove`,

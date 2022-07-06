@@ -349,6 +349,7 @@ nav:
         - folder remove: 'cmd/spo/folder/folder-remove.md'
         - folder rename: 'cmd/spo/folder/folder-rename.md'
       - group:
+        - group add: 'cmd/spo/group/group-add.md'
         - group get: 'cmd/spo/group/group-get.md'
         - group list: 'cmd/spo/group/group-list.md'
         - group remove: 'cmd/spo/group/group-remove.md'
