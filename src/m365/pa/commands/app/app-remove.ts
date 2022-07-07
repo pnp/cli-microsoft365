@@ -5,7 +5,7 @@ import {
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
-import AzmgmtCommand from '../../../base/AzmgmtCommand';
+import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
 interface CommandArgs {
   options: Options;
@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class PaAppRemoveCommand extends AzmgmtCommand {
+class PaAppRemoveCommand extends PowerAppsCommand {
   public get name(): string {
     return commands.APP_REMOVE;
   }
@@ -38,7 +38,7 @@ class PaAppRemoveCommand extends AzmgmtCommand {
 
     const removePaApp: () => void = (): void => {
       const requestOptions: any = {
-        url: `${this.resource}providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2017-08-01`,
+        url: `${this.resource}/providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2017-08-01`,
         resolveWithFullResponse: true,
         headers: {
           accept: 'application/json'
