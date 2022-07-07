@@ -42,33 +42,35 @@ class SpoGroupAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs, cb: () => void): Promise<void> {
-    try {
-      const requestOptions: AxiosRequestConfig = {
-        url: `${args.options.webUrl}/_api/web/sitegroups`,
-        headers: {
-          accept: 'application/json;odata=nometadata'
-        },
-        responseType: 'json',
-        data: {
-          Title: args.options.name,
-          Description: args.options.description,
-          AllowMembersEditMembership: args.options.allowMembersEditMembership,
-          OnlyAllowMembersViewMembership: args.options.onlyAllowMembersViewMembership,
-          AllowRequestToJoinLeave: args.options.allowRequestToJoinLeave,
-          AutoAcceptRequestToJoinLeave: args.options.autoAcceptRequestToJoinLeave,
-          RequestToJoinLeaveEmailSetting: args.options.requestToJoinLeaveEmailSetting
-        }
-      };
-
-      const response = await request.post(requestOptions);
-
-      logger.log(response);
-      cb();
-    }
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err, logger, cb);
-    }
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    (async () => {
+      try {
+        const requestOptions: AxiosRequestConfig = {
+          url: `${args.options.webUrl}/_api/web/sitegroups`,
+          headers: {
+            accept: 'application/json;odata=nometadata'
+          },
+          responseType: 'json',
+          data: {
+            Title: args.options.name,
+            Description: args.options.description,
+            AllowMembersEditMembership: args.options.allowMembersEditMembership,
+            OnlyAllowMembersViewMembership: args.options.onlyAllowMembersViewMembership,
+            AllowRequestToJoinLeave: args.options.allowRequestToJoinLeave,
+            AutoAcceptRequestToJoinLeave: args.options.autoAcceptRequestToJoinLeave,
+            RequestToJoinLeaveEmailSetting: args.options.requestToJoinLeaveEmailSetting
+          }
+        };
+  
+        const response = await request.post(requestOptions);
+  
+        logger.log(response);
+        cb();
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err, logger, cb);
+      }
+    })();
   }
 
   public options(): CommandOption[] {
