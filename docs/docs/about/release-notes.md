@@ -38,6 +38,9 @@
 - added `@meId` and `@meUserName` tokens [#3056](https://github.com/pnp/cli-microsoft365/issues/3056)
 - extended spo hubsite get options. [#3378](https://github.com/pnp/cli-microsoft365/issues/3378)
 - fixed planTitle inconsistency in planner commands. [#3342](https://github.com/pnp/cli-microsoft365/issues/3342)
+- fixed API issue for broken Power Apps commands [#3207](https://github.com/pnp/cli-microsoft365/issues/3207)
+- fixed 'spo listitem list' and 'spo listitem get' commands [#3391](https://github.com/pnp/cli-microsoft365/issues/3391)
+- extended `planner plan add` with more options [#3345](https://github.com/pnp/cli-microsoft365/issues/3345)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
