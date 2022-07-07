@@ -33,29 +33,39 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
     return [commands.O365GROUP_RESTORE];
   }
 
-  public async commandAction(logger: Logger, args: CommandArgs, cb: () => void): Promise<void> {
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.id = typeof args.options.id !== 'undefined';
+    telemetryProps.displayName = typeof args.options.displayName !== 'undefined';
+    telemetryProps.mailNickname = typeof args.options.mailNickname !== 'undefined';
+    return telemetryProps;
+  }
+
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
       logger.logToStderr(`Restoring Microsoft 365 Group: ${args.options.id || args.options.displayName || args.options.mailNickname}...`);
     }
 
-    try {
-      const groupId = await this.getGroupId(args.options);
-
-      const requestOptions: AxiosRequestConfig = {
-        url: `${this.resource}/v1.0/directory/deleteditems/${groupId}/restore`,
-        headers: {
-          accept: 'application/json;odata.metadata=none',
-          'content-type': 'application/json'
-        },
-        responseType: 'json'
-      };
-
-      await request.post(requestOptions);
-      cb();
-    }
-    catch(err: any) {
-      this.handleRejectedODataJsonPromise(err, logger, cb);
-    }
+    (async () => {
+      try {
+        const groupId = await this.getGroupId(args.options);
+  
+        const requestOptions: AxiosRequestConfig = {
+          url: `${this.resource}/v1.0/directory/deleteditems/${groupId}/restore`,
+          headers: {
+            accept: 'application/json;odata.metadata=none',
+            'content-type': 'application/json'
+          },
+          responseType: 'json'
+        };
+  
+        await request.post(requestOptions);
+        cb();
+      }
+      catch(err: any) {
+        this.handleRejectedODataJsonPromise(err, logger, cb);
+      }
+    })();
   }
 
   private async getGroupId(options: Options): Promise<string> {
