@@ -352,6 +352,7 @@ nav:
         - group get: 'cmd/spo/group/group-get.md'
         - group list: 'cmd/spo/group/group-list.md'
         - group remove: 'cmd/spo/group/group-remove.md'
+        - group set: 'cmd/spo/group/group-set.md'
         - group user add: 'cmd/spo/group/group-user-add.md'
         - group user list: 'cmd/spo/group/group-user-list.md'
         - group user remove: 'cmd/spo/group/group-user-remove.md'
