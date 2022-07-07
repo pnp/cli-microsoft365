@@ -1,7 +1,8 @@
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { AzmgmtItemsListCommand } from '../../../base/AzmgmtItemsListCommand';
+import { odata } from '../../../../utils';
+import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -13,7 +14,7 @@ interface Options extends GlobalOptions {
   asAdmin: boolean;
 }
 
-class PaAppListCommand extends AzmgmtItemsListCommand<{ name: string; displayName: string; properties: { displayName: string } }> {
+class PaAppListCommand extends PowerAppsCommand {
   public get name(): string {
     return commands.APP_LIST;
   }
@@ -34,17 +35,17 @@ class PaAppListCommand extends AzmgmtItemsListCommand<{ name: string; displayNam
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const url: string = `${this.resource}providers/Microsoft.PowerApps${args.options.asAdmin ? '/scopes/admin' : ''}${args.options.environment ? '/environments/' + encodeURIComponent(args.options.environment) : ''}/apps?api-version=2017-08-01`;
+    const url = `${this.resource}/providers/Microsoft.PowerApps${args.options.asAdmin ? '/scopes/admin' : ''}${args.options.environment ? '/environments/' + encodeURIComponent(args.options.environment) : ''}/apps?api-version=2017-08-01`;
 
-    this
-      .getAllItems(url, logger, true)
-      .then((): void => {
-        if (this.items.length > 0) {
-          this.items.forEach(a => {
+    odata
+      .getAllItems<{ name: string; displayName: string; properties: { displayName: string } }>(url)
+      .then((apps: { name: string; displayName: string; properties: { displayName: string } }[]): void => {
+        if (apps.length > 0) {
+          apps.forEach(a => {
             a.displayName = a.properties.displayName;
           });
 
-          logger.log(this.items);
+          logger.log(apps);
         }
         else {
           if (this.verbose) {

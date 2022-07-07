@@ -6,7 +6,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import AzmgmtCommand from '../../../base/AzmgmtCommand';
+import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import flowCommands from '../../../flow/commands';
 import commands from '../../commands';
 import { Connector } from './Connector';
@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   outputFolder?: string;
 }
 
-class PaConnectorExportCommand extends AzmgmtCommand {
+class PaConnectorExportCommand extends PowerAppsCommand {
   public get name(): string {
     return commands.CONNECTOR_EXPORT;
   }
@@ -38,7 +38,7 @@ class PaConnectorExportCommand extends AzmgmtCommand {
     const outputFolder = path.resolve(args.options.outputFolder || '.', args.options.connector);
 
     const requestOptions: any = {
-      url: `${this.resource}providers/Microsoft.PowerApps/apis/${encodeURIComponent(args.options.connector)}?api-version=2016-11-01&$filter=environment%20eq%20%27${encodeURIComponent(args.options.environment)}%27%20and%20IsCustomApi%20eq%20%27True%27`,
+      url: `${this.resource}/providers/Microsoft.PowerApps/apis/${encodeURIComponent(args.options.connector)}?api-version=2016-11-01&$filter=environment%20eq%20%27${encodeURIComponent(args.options.environment)}%27%20and%20IsCustomApi%20eq%20%27True%27`,
       headers: {
         accept: 'application/json'
       },

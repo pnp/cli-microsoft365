@@ -1,14 +1,14 @@
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import AzmgmtCommand from '../../../base/AzmgmtCommand';
+import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
   options: GlobalOptions;
 }
 
-class PaEnvironmentListCommand extends AzmgmtCommand {
+class PaEnvironmentListCommand extends PowerAppsCommand {
   public get name(): string {
     return commands.ENVIRONMENT_LIST;
   }
@@ -27,7 +27,7 @@ class PaEnvironmentListCommand extends AzmgmtCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}providers/Microsoft.PowerApps/environments?api-version=2017-08-01`,
+      url: `${this.resource}/providers/Microsoft.PowerApps/environments?api-version=2017-08-01`,
       headers: {
         accept: 'application/json'
       },
@@ -37,7 +37,7 @@ class PaEnvironmentListCommand extends AzmgmtCommand {
     request
       .get<{ value: [{ name: string, displayName: string; properties: { displayName: string } }] }>(requestOptions)
       .then((res: { value: [{ name: string, displayName: string; properties: { displayName: string } }] }): void => {
-        if (res.value && res.value.length > 0) {
+        if (res.value.length > 0) {
           res.value.forEach(e => {
             e.displayName = e.properties.displayName;
           });

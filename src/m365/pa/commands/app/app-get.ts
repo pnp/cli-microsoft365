@@ -5,7 +5,7 @@ import Command, {
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
-import AzmgmtCommand from '../../../base/AzmgmtCommand';
+import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
 import * as paAppListCommand from '../app/app-list';
 
@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   displayName?: string;
 }
 
-class PaAppGetCommand extends AzmgmtCommand {
+class PaAppGetCommand extends PowerAppsCommand {
   public get name(): string {
     return commands.APP_GET;
   }
@@ -40,11 +40,8 @@ class PaAppGetCommand extends AzmgmtCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (args.options.name) {
-      let requestUrl: string = '';
-      requestUrl = `${this.resource}providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`;
-
       const requestOptions: any = {
-        url: requestUrl,
+        url: `${this.resource}/providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
         headers: {
           accept: 'application/json'
         },
