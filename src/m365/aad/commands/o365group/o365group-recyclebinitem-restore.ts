@@ -46,10 +46,9 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
       logger.logToStderr(`Restoring Microsoft 365 Group: ${args.options.id || args.options.displayName || args.options.mailNickname}...`);
     }
 
-    (async () => {
-      try {
-        const groupId = await this.getGroupId(args.options);
-  
+    this
+      .getGroupId(args.options)
+      .then((groupId: string): Promise<void> => {
         const requestOptions: AxiosRequestConfig = {
           url: `${this.resource}/v1.0/directory/deleteditems/${groupId}/restore`,
           headers: {
@@ -59,20 +58,16 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
           responseType: 'json'
         };
   
-        await request.post(requestOptions);
-        cb();
-      }
-      catch(err: any) {
-        this.handleRejectedODataJsonPromise(err, logger, cb);
-      }
-    })();
+        return request.post(requestOptions);
+      })
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private async getGroupId(options: Options): Promise<string> {
+  private getGroupId(options: Options): Promise<string> {
     const { id, displayName, mailNickname } = options;
 
     if (id) {
-      return id;
+      return Promise.resolve(id);
     }
 
     let filterValue: string = '';
@@ -92,18 +87,21 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    const response = await request.get<{ value: Group[] }>(requestOptions);
-    const groups = response.value;
+    return request
+      .get<{ value: Group[] }>(requestOptions)
+      .then((response: { value: Group[] }): Promise<string> => {
+        const groups = response.value;
 
-    if (groups.length === 0) {
-      throw Error(`The specified group '${displayName || mailNickname}' does not exist.`);
-    }
+        if (groups.length === 0) {
+          return Promise.reject(`The specified group '${displayName || mailNickname}' does not exist.`);
+        }
+    
+        if (groups.length > 1) {
+          return Promise.reject(`Multiple groups with name '${displayName || mailNickname}' found: ${groups.map(x => x.id).join(',')}.`);
+        }
 
-    if (groups.length > 1) {
-      throw Error(`Multiple groups with name '${displayName || mailNickname}' found: ${groups.map(x => x.id).join(',')}.`);
-    }
-
-    return groups[0].id!;
+        return Promise.resolve(groups[0].id!);
+      });
   }
 
   public optionSets(): string[][] | undefined {
