@@ -2,10 +2,10 @@ import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
 import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
 import { AxiosRequestConfig } from 'axios';
 import { Cli, CommandOutput, Logger } from '../../../../cli';
+import { validation } from '../../../../utils';
 import Command, { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -54,57 +54,52 @@ class SpoGroupSetCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    (async () => {
-      try {
-        
-        const requestOptions: AxiosRequestConfig = {
-          url: `${args.options.webUrl}/_api/web/sitegroups/${args.options.id ? `GetById(${args.options.id})` : `GetByName('${args.options.name}')`}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json'
-          },
-          responseType: 'json',
-          data: {
-            Title: args.options.newName,
-            Description: args.options.description,
-            AllowMembersEditMembership: args.options.allowMembersEditMembership,
-            OnlyAllowMembersViewMembership: args.options.onlyAllowMembersViewMembership,
-            AllowRequestToJoinLeave: args.options.allowRequestToJoinLeave,
-            AutoAcceptRequestToJoinLeave: args.options.autoAcceptRequestToJoinLeave,
-            RequestToJoinLeaveEmailSetting: args.options.requestToJoinLeaveEmailSetting
-          }
-        };
-
-        await request.patch(requestOptions);
-        await this.setGroupOwner(args.options);
-        cb();
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err, logger, cb);
-      }
-    })();
-  }
-
-  private async setGroupOwner(options: Options): Promise<void> {
-    if (!options.ownerEmail && !options.ownerUserName) {
-      return;
-    }
-
-    const ownerId = await this.getOwnerId(options);
-
     const requestOptions: AxiosRequestConfig = {
-      url: `${options.webUrl}/_api/web/sitegroups/${options.id ? `GetById(${options.id})` : `GetByName('${options.name}')`}/SetUserAsOwner(${ownerId})`,
+      url: `${args.options.webUrl}/_api/web/sitegroups/${args.options.id ? `GetById(${args.options.id})` : `GetByName('${args.options.name}')`}`,
       headers: {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json'
       },
-      responseType: 'json'
+      responseType: 'json',
+      data: {
+        Title: args.options.newName,
+        Description: args.options.description,
+        AllowMembersEditMembership: args.options.allowMembersEditMembership,
+        OnlyAllowMembersViewMembership: args.options.onlyAllowMembersViewMembership,
+        AllowRequestToJoinLeave: args.options.allowRequestToJoinLeave,
+        AutoAcceptRequestToJoinLeave: args.options.autoAcceptRequestToJoinLeave,
+        RequestToJoinLeaveEmailSetting: args.options.requestToJoinLeaveEmailSetting
+      }
     };
 
-    await request.post(requestOptions);
+    request
+      .patch(requestOptions)
+      .then(() => this.setGroupOwner(args.options))
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private async getOwnerId(options: Options): Promise<number> {
+  private setGroupOwner(options: Options): Promise<void> {
+    if (!options.ownerEmail && !options.ownerUserName) {
+      return Promise.resolve();
+    }
+
+    return this
+      .getOwnerId(options)
+      .then((ownerId: number): Promise<void> => {
+        const requestOptions: AxiosRequestConfig = {
+          url: `${options.webUrl}/_api/web/sitegroups/${options.id ? `GetById(${options.id})` : `GetByName('${options.name}')`}/SetUserAsOwner(${ownerId})`,
+          headers: {
+            accept: 'application/json;odata.metadata=none',
+            'content-type': 'application/json'
+          },
+          responseType: 'json'
+        };
+    
+        return request.post(requestOptions);
+      });
+  }
+
+  private getOwnerId(options: Options): Promise<number> {
     const cmdOptions: AadUserGetCommandOptions = {
       userName: options.ownerUserName,
       email: options.ownerEmail,
@@ -113,20 +108,23 @@ class SpoGroupSetCommand extends SpoCommand {
       verbose: options.verbose
     };
 
-    const output = await Cli.executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...cmdOptions, _: [] } }) as CommandOutput;
-    const getUserOutput = JSON.parse(output.stdout);
+    return Cli
+      .executeCommandWithOutput(AadUserGetCommand as Command, { options: { ...cmdOptions, _: [] } })
+      .then((output: CommandOutput) => {
+        const getUserOutput = JSON.parse(output.stdout);
 
-    const requestOptions: AxiosRequestConfig = {
-      url: `${options.webUrl}/_api/web/ensureUser('${getUserOutput.userPrincipalName}')?$select=Id`,
-      headers: {
-        accept: 'application/json',
-        'content-type': 'application/json'
-      },
-      responseType: 'json'
-    };
+        const requestOptions: AxiosRequestConfig = {
+          url: `${options.webUrl}/_api/web/ensureUser('${getUserOutput.userPrincipalName}')?$select=Id`,
+          headers: {
+            accept: 'application/json',
+            'content-type': 'application/json'
+          },
+          responseType: 'json'
+        };
 
-    const response = await request.post<{Id: number}>(requestOptions);
-    return response.Id;
+        return request.post<{ Id: number }>(requestOptions);
+      })
+      .then((response: { Id: number}): number => response.Id);
   }
 
   public options(): CommandOption[] {
