@@ -38,7 +38,7 @@ m365 spo group set [options]
 : If auto-accept is enabled, users will automatically be added or removed when they make a request.
 
 `--requestToJoinLeaveEmailSetting [requestToJoinLeaveEmailSetting]`
-: All membership requests will be sent to the e-mail address specified.
+: All membership requests will be sent to the email address specified.
 
 `--ownerEmail [ownerEmail]`
 : Set user with this email as owner of the group. Specify either `ownerEmail` or `ownerUserName` but not both.
