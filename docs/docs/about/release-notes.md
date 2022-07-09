@@ -41,6 +41,8 @@
 - fixed API issue for broken Power Apps commands [#3207](https://github.com/pnp/cli-microsoft365/issues/3207)
 - fixed 'spo listitem list' and 'spo listitem get' commands [#3391](https://github.com/pnp/cli-microsoft365/issues/3391)
 - extended `planner plan add` with more options [#3345](https://github.com/pnp/cli-microsoft365/issues/3345)
+- Updates 'planner task get docs' [#3495](https://github.com/pnp/cli-microsoft365/issues/3495)
+- Extends "teams team remove, archive, and unarchive" with extra options [#3483](https://github.com/pnp/cli-microsoft365/issues/3483)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
