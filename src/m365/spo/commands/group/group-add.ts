@@ -1,9 +1,9 @@
 import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli';
-import {CommandOption } from '../../../../Command';
+import { CommandOption } from '../../../../Command';
+import { validation } from '../../../../utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -33,44 +33,40 @@ class SpoGroupAddCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.description = !!args.options.description;
-    telemetryProps.allowMembersEditMembership = !!args.options.allowMembersEditMembership;
-    telemetryProps.onlyAllowMembersViewMembership = !!args.options.onlyAllowMembersViewMembership;
-    telemetryProps.allowRequestToJoinLeave = !!args.options.allowRequestToJoinLeave;
-    telemetryProps.autoAcceptRequestToJoinLeave = !!args.options.autoAcceptRequestToJoinLeave;
-    telemetryProps.requestToJoinLeaveEmailSetting = !!args.options.requestToJoinLeaveEmailSetting;
+    telemetryProps.description = typeof args.options.description !== 'undefined';
+    telemetryProps.allowMembersEditMembership = typeof args.options.allowMembersEditMembership !== 'undefined';
+    telemetryProps.onlyAllowMembersViewMembership = typeof args.options.onlyAllowMembersViewMembership !== 'undefined';
+    telemetryProps.allowRequestToJoinLeave = typeof args.options.allowRequestToJoinLeave !== 'undefined';
+    telemetryProps.autoAcceptRequestToJoinLeave = typeof args.options.autoAcceptRequestToJoinLeave !== 'undefined';
+    telemetryProps.requestToJoinLeaveEmailSetting = typeof args.options.requestToJoinLeaveEmailSetting !== 'undefined';
     return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    (async () => {
-      try {
-        const requestOptions: AxiosRequestConfig = {
-          url: `${args.options.webUrl}/_api/web/sitegroups`,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json',
-          data: {
-            Title: args.options.name,
-            Description: args.options.description,
-            AllowMembersEditMembership: args.options.allowMembersEditMembership,
-            OnlyAllowMembersViewMembership: args.options.onlyAllowMembersViewMembership,
-            AllowRequestToJoinLeave: args.options.allowRequestToJoinLeave,
-            AutoAcceptRequestToJoinLeave: args.options.autoAcceptRequestToJoinLeave,
-            RequestToJoinLeaveEmailSetting: args.options.requestToJoinLeaveEmailSetting
-          }
-        };
-  
-        const response = await request.post(requestOptions);
-  
+    const requestOptions: AxiosRequestConfig = {
+      url: `${args.options.webUrl}/_api/web/sitegroups`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json',
+      data: {
+        Title: args.options.name,
+        Description: args.options.description,
+        AllowMembersEditMembership: args.options.allowMembersEditMembership,
+        OnlyAllowMembersViewMembership: args.options.onlyAllowMembersViewMembership,
+        AllowRequestToJoinLeave: args.options.allowRequestToJoinLeave,
+        AutoAcceptRequestToJoinLeave: args.options.autoAcceptRequestToJoinLeave,
+        RequestToJoinLeaveEmailSetting: args.options.requestToJoinLeaveEmailSetting
+      }
+    };
+
+    request
+      .post(requestOptions)
+      .then((response: any): void => {
         logger.log(response);
+
         cb();
-      }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err, logger, cb);
-      }
-    })();
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
