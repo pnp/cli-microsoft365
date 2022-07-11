@@ -38,6 +38,7 @@ describe(commands.TEAM_UNARCHIVE, () => {
         log.push(msg);
       }
     };
+
     (command as any).items = [];
   });
 
@@ -65,6 +66,11 @@ describe(commands.TEAM_UNARCHIVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets;
+    assert.deepStrictEqual(optionSets, [['id', 'name']]);
+  });
+
   it('fails validation if the id is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
@@ -86,16 +92,6 @@ describe(commands.TEAM_UNARCHIVE, () => {
   it('fails validation when no option is specified', async () => {
     const actual = await command.validate({
       options: {
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when all options are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);

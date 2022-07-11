@@ -101,15 +101,6 @@ describe(commands.TEAM_ARCHIVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when both id and name are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
 
   it('fails validation when both id and name are specified', async () => {
     const actual = await command.validate({
