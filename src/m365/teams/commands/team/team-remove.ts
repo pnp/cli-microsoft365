@@ -37,6 +37,7 @@ class TeamsTeamRemoveCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -61,17 +62,13 @@ class TeamsTeamRemoveCommand extends GraphCommand {
     );
   }
 
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'name']);
+  }
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.id && !args.options.name) {
-	      return 'Specify either id or name';
-	    }
-
-	    if (args.options.name && args.options.id) {
-	      return 'Specify either id or name but not both';
-	    }
-
 	    if (args.options.id && !validation.isValidGuid(args.options.id)) {
 	      return `${args.options.id} is not a valid GUID`;
 	    }
@@ -124,7 +121,7 @@ class TeamsTeamRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the team ${args.options.teamId}?`
+        message: `Are you sure you want to remove the team ${args.options.id ? args.options.id : args.options.name}?`
       });
       
       if (result.continue) {
