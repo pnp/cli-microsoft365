@@ -22,10 +22,10 @@ m365 teams tab get [options]
 `--channelName [channelName]`
 : The display name of the Microsoft Teams channel where the tab is located. Specify either channelId or channelName but not both
 
-`--tabId [tabId]`
+`-i, --tabId [tabId]`
 : The ID of the Microsoft Teams tab. Specify either tabId or tabName but not both
 
-`--tabName [tabName]`
+`-n, --tabName [tabName]`
 : The display name of the Microsoft Teams tab. Specify either tabId or tabName but not both
 
 --8<-- "docs/cmd/_global.md"

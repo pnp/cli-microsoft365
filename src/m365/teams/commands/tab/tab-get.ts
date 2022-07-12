@@ -169,10 +169,10 @@ class TeamsTabGetCommand extends GraphCommand {
         option: '--channelName [channelName]'
       },
       {
-        option: '--tabId [tabId]'
+        option: '-i, --tabId [tabId]'
       },
       {
-        option: '--tabName [tabName]'
+        option: '-n, --tabName [tabName]'
       }
     ];
 
