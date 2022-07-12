@@ -11,7 +11,7 @@ This script allows you to list all Teams team's owners and members and export th
     # process teams that you have joined only
     $joined = $false
 
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
 
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365

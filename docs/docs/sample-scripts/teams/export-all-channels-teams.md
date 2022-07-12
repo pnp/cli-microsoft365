@@ -43,7 +43,7 @@ Export all the channels from Microsoft Team in a CSV.
     }
     
     Write-Host "Ensure logged in"
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
     if ($m365Status -eq "Logged Out") {
         Write-Host "Logging in the User!"
         m365 login --authType browser

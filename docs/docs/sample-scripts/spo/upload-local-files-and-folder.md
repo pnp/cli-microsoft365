@@ -31,7 +31,7 @@ This script shows how you can use the CLI to upload files located on a local fol
     }
 
     Write-host 'ensure logged in'
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
     if ($m365Status -eq "Logged Out") {
         m365 login
     }

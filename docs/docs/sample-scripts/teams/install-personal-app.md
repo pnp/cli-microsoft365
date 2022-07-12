@@ -51,7 +51,7 @@ Installs or updates a Microsoft Teams app from a provided zipped manifest and th
       [switch]$CurrentUser
     )
 
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
 
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365

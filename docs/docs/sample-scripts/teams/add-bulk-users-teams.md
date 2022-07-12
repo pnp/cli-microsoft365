@@ -22,7 +22,7 @@ Inspired by: [Rakesh Pandey](https://www.flexmind.co/blog/how-to-add-bulk-users-
     #>
 
     #Check if connected to M365
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
     if ($m365Status -eq "Logged Out") {
       m365 login
     }
