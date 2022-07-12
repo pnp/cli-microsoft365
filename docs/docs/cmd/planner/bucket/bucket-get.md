@@ -22,9 +22,6 @@ m365 planner bucket get [options]
 `--planTitle [planTitle]`
 : Title of the plan to which the bucket belongs. Specify either `planId` or `planTitle` when using `name`.
 
-`--planName [planName]`
-: (deprecated. Use `planTitle` instead) Title of the plan to which the bucket belongs.
-
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 

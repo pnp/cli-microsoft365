@@ -20,7 +20,6 @@ interface Options extends GlobalOptions {
   id: string;
   title?: string;
   planId?: string;
-  planName?: string;
   planTitle?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
@@ -56,7 +55,6 @@ class PlannerTaskSetCommand extends GraphCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.title = typeof args.options.title !== 'undefined';
     telemetryProps.planId = typeof args.options.planId !== 'undefined';
-    telemetryProps.planName = typeof args.options.planName !== 'undefined';
     telemetryProps.planTitle = typeof args.options.planTitle !== 'undefined';
     telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
     telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
@@ -76,12 +74,6 @@ class PlannerTaskSetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (args.options.planName) {
-      args.options.planTitle = args.options.planName;
-
-      this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
-    }
-
     if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
@@ -356,7 +348,6 @@ class PlannerTaskSetCommand extends GraphCommand {
       { option: '-i, --id <id>' },
       { option: '-t, --title [title]' },
       { option: '--planId [planId]' },
-      { option: '--planName [planName]' },
       { option: '--planTitle [planTitle]' },
       { option: '--ownerGroupId [ownerGroupId]' },
       { option: '--ownerGroupName [ownerGroupName]' },
@@ -383,19 +374,19 @@ class PlannerTaskSetCommand extends GraphCommand {
       return 'Specify either bucketId or bucketName but not both';
     }
 
-    if (args.options.bucketName && !args.options.planId && !args.options.planName && !args.options.planTitle) {
+    if (args.options.bucketName && !args.options.planId && !args.options.planTitle) {
       return 'Specify either planId or planTitle when using bucketName';
     }
 
-    if (args.options.bucketName && args.options.planId && (args.options.planName || args.options.planTitle)) {
+    if (args.options.bucketName && args.options.planId && args.options.planTitle) {
       return 'Specify either planId or planTitle when using bucketName but not both';
     }
 
-    if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+    if (args.options.planTitle && !args.options.ownerGroupId && !args.options.ownerGroupName) {
       return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
     }
 
-    if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
+    if (args.options.planTitle && args.options.ownerGroupId && args.options.ownerGroupName) {
       return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
     }
 

@@ -21,7 +21,6 @@ interface Options extends GlobalOptions {
   id?: string;
   name?: string;
   planId?: string;
-  planName?: string;
   planTitle?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
@@ -41,7 +40,6 @@ class PlannerBucketGetCommand extends GraphCommand {
     telemetryProps.id = typeof args.options.id !== 'undefined';
     telemetryProps.name = typeof args.options.name !== 'undefined';
     telemetryProps.planId = typeof args.options.planId !== 'undefined';
-    telemetryProps.planName = typeof args.options.planName !== 'undefined';
     telemetryProps.planTitle = typeof args.options.planTitle !== 'undefined';
     telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
     telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
@@ -49,12 +47,6 @@ class PlannerBucketGetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (args.options.planName) {
-      args.options.planTitle = args.options.planName;
-
-      this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
-    }
-
     if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
@@ -152,9 +144,6 @@ class PlannerBucketGetCommand extends GraphCommand {
         option: '--planId [planId]'
       },
       {
-        option: '--planName [planName]'
-      },
-      {
         option: "--planTitle [planTitle]"
       },
       {
@@ -171,7 +160,7 @@ class PlannerBucketGetCommand extends GraphCommand {
 
   public validate(args: CommandArgs): boolean | string {
     if (args.options.id) {
-      if (args.options.planId || args.options.planName || args.options.planTitle  || args.options.ownerGroupId || args.options.ownerGroupName) {
+      if (args.options.planId ||args.options.planTitle  || args.options.ownerGroupId || args.options.ownerGroupName) {
         return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
       }
       if (args.options.name) {
@@ -180,15 +169,15 @@ class PlannerBucketGetCommand extends GraphCommand {
     }
 
     if (args.options.name) {
-      if (!args.options.planId && !args.options.planName && !args.options.planTitle) {
+      if (!args.options.planId && !args.options.planTitle) {
         return 'Specify either planId or planTitle when using name';
       }
 
-      if (args.options.planId && (args.options.planName || args.options.planTitle)) {
+      if (args.options.planId && args.options.planTitle) {
         return 'Specify either planId or planTitle when using name but not both';
       }
 
-      if (args.options.planName || args.options.planTitle) {
+      if (args.options.planTitle) {
         if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
           return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
         }

@@ -729,26 +729,6 @@ describe(commands.TASK_LIST, () => {
     });
   });
 
-  it('correctly lists planner tasks with bucketName, deprecated planName, and ownerGroupName', (done) => {
-    const options: any = {
-      debug: false,
-      bucketName: 'Planner Bucket A',
-      planName: 'My Planner Plan',
-      ownerGroupName: 'My Planner Group',
-      verbose: true
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('correctly handles random API error', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));

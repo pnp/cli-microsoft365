@@ -325,26 +325,6 @@ describe(commands.BUCKET_LIST, () => {
     });
   });
 
-  it('correctly lists planner buckets with deprecated planName and ownerGroupId', (done) => {
-    const options: any = {
-      debug: false,
-      planName: 'My Planner Plan',
-      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
-      verbose: true
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(bucketListResponseValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-
   it('fails validation when ownerGroupName not found', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {

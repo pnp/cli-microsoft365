@@ -624,52 +624,6 @@ describe(commands.TASK_ADD, () => {
     });
   });
 
-  it('correctly adds planner task with title, bucketId, deprecated planName, and ownerGroupId', (done) => {
-    sinonUtil.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
-        return Promise.resolve({
-          value: [
-            {
-              "createdBy": {
-                "application": {
-                  "id": "95e27074-6c4a-447a-aa24-9d718a0b86fa"
-                },
-                "user": {
-                  "id": "ebf3b108-5234-4e22-b93d-656d7dae5874"
-                }
-              },
-              "createdDateTime": "2015-03-30T18:36:49.2407981Z",
-              "owner": "ebf3b108-5234-4e22-b93d-656d7dae5874",
-              "title": "My Planner Plan",
-              "id": "8QZEH7b3wkS_bGQobscsM5gADCBb"
-            }
-          ]
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    const options: any = {
-      title: 'My Planner Task',
-      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-      planName: 'My Planner Plan',
-      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
-      verbose: true
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskAddResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('correctly adds planner task with title, planId, and bucketName', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
