@@ -22,7 +22,7 @@ Use the CLI for Microsoft 365 to migrate an existing plan to a SharePoint Online
         [switch]$SkipListCreation
     )
 
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
 
     if ($m365Status -match "Logged Out") {
         # Connection to Microsoft 365

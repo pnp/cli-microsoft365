@@ -7,7 +7,7 @@ This script creates a report of all flow runs from current day and sends the rep
 === "PowerShell"
 
     ```powershell
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
     if ($m365Status -eq "Logged Out") {
         m365 login
     }

@@ -16,7 +16,7 @@ This script will retrieve all the files in a site that have a specific word (i.e
         [switch]$ShowProgress
     )
 
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365
       m365 login

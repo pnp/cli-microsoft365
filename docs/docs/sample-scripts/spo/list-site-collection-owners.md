@@ -9,7 +9,7 @@ This script helps you to list and export all site collection owners in your Shar
     ```powershell
     $fileExportPath = "<PUTYOURPATHHERE.csv>"
 
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
 
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365

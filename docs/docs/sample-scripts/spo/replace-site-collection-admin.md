@@ -12,12 +12,12 @@ The script removes a user from a site collection and adds a new one as site coll
     $userToRemove = "<upnOfUserToRemove>"
     $webUrl = "<spoUrl>"
 
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
     Write-Host $m365Status
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365
       m365 login
-      $m365Status = m365 status
+      $m365Status = m365 status --output text
     }
 
     m365 spo user remove --webUrl $webUrl --loginName "i:0#.f|membership|$userToRemove" --confirm

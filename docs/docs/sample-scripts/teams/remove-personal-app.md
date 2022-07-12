@@ -31,7 +31,7 @@ Uninstalls an app from the specified users and / or unpublish it from the Micros
       [switch]$CurrentUser
     )
 
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
 
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365
