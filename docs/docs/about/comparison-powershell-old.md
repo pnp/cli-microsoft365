@@ -1,13 +1,9 @@
-Add-PnPAlert|PnP.PowerShell|
-Add-PnPApp|PnP.PowerShell|[spo app add](../cmd/spo/app/app-add.md)
-Add-PnPApplicationCustomizer|[spo customaction add](../cmd/spo/customaction/customaction-add.md)
-Add-PnPAzureADGroupMember
-Add-PnPAzureADGroupOwner
+
     // to remove Add-PnPClientSidePage|PnP.PowerShell|[spo page add](../cmd/spo/page/page-add.md)
     // to remove Add-PnPClientSidePageSection|PnP.PowerShell|[spo page section add](../cmd/spo/page/page-section-add.md)
     // to remove Add-PnPClientSideText|PnP.PowerShell|
     // to remove Add-PnPClientSideWebPart|PnP.PowerShell|[spo page clientsidewebpart add](../cmd/spo/page/page-clientsidewebpart-add.md)
-Add-PnPContentType|PnP.PowerShell|[spo contenttype add](../cmd/spo/contenttype/contenttype-add.md)
+
 Add-PnPContentTypeToDocumentSet|PnP.PowerShell|
 Add-PnPContentTypeToList|PnP.PowerShell|[spo list contenttype add](../cmd/spo/list/list-contenttype-add.md)
 Add-PnPCustomAction|PnP.PowerShell|[spo customaction add](../cmd/spo/customaction/customaction-add.md)
