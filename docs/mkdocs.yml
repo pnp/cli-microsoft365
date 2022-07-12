@@ -147,6 +147,8 @@ nav:
         - serviceannouncement message get: 'cmd/tenant/serviceannouncement/serviceannouncement-message-get.md'
         - serviceannouncement message list: 'cmd/tenant/serviceannouncement/serviceannouncement-message-list.md'
     - Microsoft Graph (graph):
+      - changelog:
+        - changelog list: 'cmd/graph/changelog/changelog-list.md'
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
         - schemaextension get: 'cmd/graph/schemaextension/schemaextension-get.md'
