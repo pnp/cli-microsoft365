@@ -81,16 +81,16 @@ class SpoGroupAddCommand extends SpoCommand {
         option: '--description [description]'
       },
       {
-        option: '--allowMembersEditMembership'
+        option: '--allowMembersEditMembership [allowMembersEditMembership]'
       },
       {
-        option: '--onlyAllowMembersViewMembership'
+        option: '--onlyAllowMembersViewMembership [onlyAllowMembersViewMembership]'
       },
       {
-        option: '--allowRequestToJoinLeave'
+        option: '--allowRequestToJoinLeave [allowRequestToJoinLeave]'
       },
       {
-        option: '--autoAcceptRequestToJoinLeave'
+        option: '--autoAcceptRequestToJoinLeave [autoAcceptRequestToJoinLeave]'
       },
       {
         option: '--requestToJoinLeaveEmailSetting [requestToJoinLeaveEmailSetting]'
@@ -102,7 +102,22 @@ class SpoGroupAddCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return validation.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
+
+    const booleanOptions = [
+      args.options.allowMembersEditMembership, args.options.onlyAllowMembersViewMembership,
+      args.options.allowRequestToJoinLeave, args.options.autoAcceptRequestToJoinLeave
+    ];
+    for (const option of booleanOptions) {
+      if (typeof option !== 'undefined' && !validation.isValidBoolean(option as any)) {
+        return `Value '${option}' is not a valid boolean`;
+      }
+    }
+
+    return true;
   }
 }
 

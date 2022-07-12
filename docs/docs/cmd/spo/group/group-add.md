@@ -17,19 +17,19 @@ m365 spo group add [options]
 : Name of the group to add.
 
 `--description [description]`
-: Description for the group.
+: The description for the group.
 
-`--allowMembersEditMembership`
-: When specified, members can edit membership, otherwise only owners can do this.
+`--allowMembersEditMembership [allowMembersEditMembership]`
+: Who can edit the membership of the group? When `true` members can edit membership, otherwise only owners can do this. Default `false`.
 
-`--onlyAllowMembersViewMembership`
-: When specified, only group members can view the membership, otherwise everyone can.
+`--onlyAllowMembersViewMembership [onlyAllowMembersViewMembership]`
+: Who can view the membership of the group? When `false` everyone can view the group membership, otherwise only group members can. Default `true`.
 
-`--allowRequestToJoinLeave`
-: Allow users to request membership in this group and allow users to request to leave the group.
+`--allowRequestToJoinLeave [allowRequestToJoinLeave]`
+: Specify whether to allow users to request membership in this group and allow users to request to leave the group. Default `false`.
 
-`--autoAcceptRequestToJoinLeave`
-: If auto-accept is enabled, users will automatically be added or removed when they make a request.
+`--autoAcceptRequestToJoinLeave [autoAcceptRequestToJoinLeave]`
+: If auto-accept is enabled, users will automatically be added or removed when they make a request. Default `false`.
 
 `--requestToJoinLeaveEmailSetting [requestToJoinLeaveEmailSetting]`
 : All membership requests will be sent to the email address specified.
@@ -47,5 +47,5 @@ m365 spo group add --webUrl https://contoso.sharepoint.com/sites/project-x --nam
 Create group with membership requests
 
 ```sh
-m365 spo group add --webUrl https://contoso.sharepoint.com/sites/project-x --name "Project leaders" --allowRequestToJoinLeave --requestToJoinLeaveEmailSetting john.doe@contoso.com
+m365 spo group add --webUrl https://contoso.sharepoint.com/sites/project-x --name "Project leaders" --allowRequestToJoinLeave true --requestToJoinLeaveEmailSetting john.doe@contoso.com
 ```
