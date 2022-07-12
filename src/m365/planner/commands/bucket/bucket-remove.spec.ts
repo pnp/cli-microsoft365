@@ -532,48 +532,7 @@ describe(commands.BUCKET_REMOVE, () => {
       }
     });
   });
-
-  it('Correctly deletes bucket by name with deprecated planName', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
-        return Promise.resolve(singlePlanResponse);
-      }
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
-        return Promise.resolve(singleBucketByNameResponse);
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-    sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-
-    command.action(logger, {
-      options: {
-        name: validBucketName,
-        planName: validPlanTitle,
-        ownerGroupId: validOwnerGroupId,
-        verbose: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
+  
   it('supports debug mode', () => {
     const options = command.options;
     let containsOption = false;

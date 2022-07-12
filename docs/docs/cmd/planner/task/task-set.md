@@ -28,9 +28,6 @@ m365 planner task set [options]
 `--planTitle [planTitle]`
 : Title of the plan to which the bucket belongs to. Specify either `planId` or `planTitle` when using `bucketName`.
 
-`--planName [planName]`
-: (deprecated. Use `planTitle` instead) Title of the plan to which the bucket belongs.
-
 `--ownerGroupId [ownerGroupId]`
 : ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
