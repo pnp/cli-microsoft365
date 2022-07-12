@@ -313,26 +313,6 @@ describe(commands.BUCKET_ADD, () => {
     });
   });
 
-  it('correctly adds planner bucket with name, deprecated planName, and ownerGroupId', (done) => {
-    const options: any = {
-      debug: false,
-      name: 'My Planner Bucket',
-      planName: 'My Planner Plan',
-      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
-      verbose: true
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(bucketAddResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('correctly adds planner bucket with name, planTitle, and ownerGroupId', (done) => {
     const options: any = {
       debug: false,

@@ -687,69 +687,6 @@ describe(commands.TASK_SET, () => {
     });
   });
 
-  it('correctly updates planner task  to bucket with bucketName, deprecated planName, and ownerGroupId', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
-        return Promise.resolve(taskResponse);
-      }
-
-      return Promise.reject('Invalid Request');
-    });
-
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${encodeURIComponent('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
-        return Promise.resolve({
-          value: [
-            {
-              "name": "My Planner Bucket",
-              "id": "IK8tuFTwQEa5vTonM7ZMRZgAKdno"
-            }
-          ]
-        });
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}` &&
-        JSON.stringify(opts.headers) === JSON.stringify({
-          'accept': 'application/json'
-        })) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
-        return Promise.resolve({
-          value: [
-            {
-              "title": "My Planner Plan",
-              "id": "8QZEH7b3wkS_bGQobscsM5gADCBb"
-            }
-          ]
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    const options: any = {
-      id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
-      bucketName: 'My Planner Bucket',
-      planName: 'My Planner Plan',
-      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
-      verbose: true
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('correctly updates planner task  to bucket with bucketName, planId', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
