@@ -17,16 +17,19 @@ m365 planner bucket get [options]
 : Name of the bucket to retrieve details. Specify either `id` or `name` but not both. 
 
 `--planId [planId]`
-: Plan ID to which the bucket belongs. Specify either `planId` or `planName` when using `name`.
+: ID of the plan to which the bucket belongs. Specify either `planId` or `planTitle` when using `name`.
+
+`--planTitle [planTitle]`
+: Title of the plan to which the bucket belongs. Specify either `planId` or `planTitle` when using `name`.
 
 `--planName [planName]`
-: Plan Name to which the bucket belongs. Specify either `planId` or `planName` when using `name`.
+: (deprecated. Use `planTitle` instead) Title of the plan to which the bucket belongs.
 
 `--ownerGroupId [ownerGroupId]`
-: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--ownerGroupName [ownerGroupName]`
-: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -47,11 +50,11 @@ m365 planner bucket get --name "Planner Bucket A" --planId "xqQg5FS2LkCp935s-FIF
 Gets the Microsoft Planner bucket in the Plan _My Plan_ owned by group _My Group_
 
 ```sh
-m365 planner bucket get --name "Planner Bucket A" --planName "My Plan" --ownerGroupName "My Group"
+m365 planner bucket get --name "Planner Bucket A" --planTitle "My Plan" --ownerGroupName "My Group"
 ```
 
 Gets the Microsoft Planner bucket in the Plan _My Plan_ owned by groupId ee0f40fc-b2f7-45c7-b62d-11b90dd2ea8e
 
 ```sh
-m365 planner bucket get --name "Planner Bucket A" --planName "My Plan" --ownerGroupId "ee0f40fc-b2f7-45c7-b62d-11b90dd2ea8e"
+m365 planner bucket get --name "Planner Bucket A" --planTitle "My Plan" --ownerGroupId "ee0f40fc-b2f7-45c7-b62d-11b90dd2ea8e"
 ```

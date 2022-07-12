@@ -14,22 +14,25 @@ m365 planner task add [options]
 : Title of the task to add.
 
 `--planId [planId]`
-: Plan ID to which the task belongs. Specify either `planId` or `planName` but not both.
+: ID of the plan to which the task belongs. Specify either `planId` or `planTitle` but not both.
+
+`--planTitle [planTitle]`
+: Title of the plan to which the task belongs. Specify either `planId` or `planTitle` but not both.
 
 `--planName [planName]`
-: Plan Name to which the task belongs. Specify either `planId` or `planName` but not both.
+: (deprecated. Use `planTitle` instead) Title of the plan to which the bucket belongs.
 
 `--ownerGroupId [ownerGroupId]`
-: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--ownerGroupName [ownerGroupName]`
-: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--bucketId [bucketId]`
-: Bucket ID to which the task belongs. The bucket needs to exist in the selected plan. Specify either `bucketId` or `bucketName` but not both.
+: ID of the bucket to which the task belongs. The bucket needs to exist in the selected plan. Specify either `bucketId` or `bucketName` but not both.
 
 `--bucketName [bucketName]`
-: Bucket Name to which the task belongs. The bucket needs to exist in the selected plan. Specify either `bucketId` or `bucketName` but not both.
+: Name of the bucket to which the task belongs. The bucket needs to exist in the selected plan. Specify either `bucketId` or `bucketName` but not both.
 
 `--startDateTime [startDateTime]`
 : The date and time when the task started. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
@@ -89,10 +92,10 @@ Adds a Microsoft Planner task with the name _My Planner Task_ for plan with the 
 m365 planner task add --title "My Planner Task" --planId "8QZEH7b3wkSbGQobscsM5gADCBa" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna"
 ```
 
-Adds a Completed Microsoft Planner task with the name _My Planner Task_ for plan with the name _My Planner Plan_ owned by group _My Planner Group_ and for the bucket with the ID _IK8tuFTwQEa5vTonM7ZMRZgAKdna_
+Adds a Completed Microsoft Planner task with the name _My Planner Task_ for plan with the title _My Planner Plan_ owned by group _My Planner Group_ and for the bucket with the ID _IK8tuFTwQEa5vTonM7ZMRZgAKdna_
 
 ```sh
-m365 planner task add --title "My Planner task" --planName "My Planner Plan" --ownerGroupName "My Planner Group" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna" --percentComplete 100
+m365 planner task add --title "My Planner task" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group" --bucketId "IK8tuFTwQEa5vTonM7ZMRZgAKdna" --percentComplete 100
 ```
 
 Adds a Microsoft Planner task with the name _My Planner Task_ for plan with the ID _8QZEH7b3wkbGQobscsM5gADCBa_ and for the bucket with the ID _IK8tuFTwQEa5vTonM7ZMRZgAKdna_. The new task will be assigned to the users _Allan.Carroll@contoso.com_ and _Ida.Stevens@contoso.com_ and receive a due date for _2021-12-16_

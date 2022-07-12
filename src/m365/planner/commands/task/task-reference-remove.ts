@@ -1,3 +1,4 @@
+import { PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
 import { Cli, Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -93,25 +94,20 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
     let url: string = options.url!;
 
     return request
-      .get(requestOptions)
-      .then((response: any) => {
-        const etag: string | undefined = response ? response['@odata.etag'] : undefined;
-
-        if (!etag) {
-          return Promise.reject(`Error fetching task details`);
-        }
-
+      .get<PlannerTaskDetails>(requestOptions)
+      .then((taskDetails: PlannerTaskDetails) => {        
         if (options.alias) {
-          const alias = options.alias as string;
           const urls: string[] = [];
 
-          Object.entries(response.references).forEach((ref: any) => {
-            if (ref[1].alias?.toLocaleLowerCase() === alias.toLocaleLowerCase()) {
-              urls.push(decodeURIComponent(ref[0]));
-            }
-          });
+          if (taskDetails.references) {
+            Object.entries(taskDetails.references!).forEach((ref: any) => {
+              if (ref[1].alias?.toLocaleLowerCase() === options.alias!.toLocaleLowerCase()) {
+                urls.push(decodeURIComponent(ref[0]));
+              }
+            });
+          }
 
-          if (!urls.length) {
+          if (urls.length === 0) {
             return Promise.reject(`The specified reference with alias ${options.alias} does not exist`);
           }
 
@@ -122,7 +118,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
           url = urls[0];
         }
 
-        return Promise.resolve({ etag, url });
+        return Promise.resolve({ etag: (taskDetails as any)['@odata.etag'], url });
       });
   }
 

@@ -14,7 +14,7 @@ describe(commands.BUCKET_REMOVE, () => {
   const validBucketId = 'vncYUXCRBke28qMLB-d4xJcACtNz';
   const validBucketName = 'Bucket name';
   const validPlanId = 'oUHpnKBFekqfGE_PS6GGUZcAFY7b';
-  const validPlanName = 'Plan name';
+  const validPlanTitle = 'Plan title';
   const validOwnerGroupName = 'Group name';
   const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
   const invalidOwnerGroupId = 'Invalid GUID';
@@ -28,11 +28,24 @@ describe(commands.BUCKET_REMOVE, () => {
     ]
   };
 
+  const multipleGroupResponse = {
+    "value": [
+      {
+        "id": validOwnerGroupId,
+        "displayName": validOwnerGroupName
+      },
+      {
+        "id": validOwnerGroupId,
+        "displayName": validOwnerGroupName
+      }
+    ]
+  };
+
   const singlePlanResponse = {
     "value": [
       {
         "id": validPlanId,
-        "title": validPlanName
+        "title": validPlanTitle
       }
     ]
   };
@@ -138,7 +151,7 @@ describe(commands.BUCKET_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when name is used without plan id or planname', () => {
+  it('fails validation when name is used without plan id or planTitle', () => {
     const actual = command.validate({
       options: {
         name: validBucketName
@@ -147,12 +160,12 @@ describe(commands.BUCKET_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when name is used with both plan id and planname', () => {
+  it('fails validation when name is used with both plan id and planTitle', () => {
     const actual = command.validate({
       options: {
         name: validBucketName,
         planId: validPlanId,
-        planName: validPlanName
+        planTitle: validPlanTitle
       }
     });
     assert.notStrictEqual(actual, true);
@@ -162,7 +175,7 @@ describe(commands.BUCKET_REMOVE, () => {
     const actual = command.validate({
       options: {
         name: validBucketName,
-        planName: validPlanName
+        planTitle: validPlanTitle
       }
     });
     assert.notStrictEqual(actual, true);
@@ -172,7 +185,7 @@ describe(commands.BUCKET_REMOVE, () => {
     const actual = command.validate({
       options: {
         name: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
         ownerGroupId: validOwnerGroupId
       }
@@ -184,7 +197,7 @@ describe(commands.BUCKET_REMOVE, () => {
     const actual = command.validate({
       options: {
         name: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupId: invalidOwnerGroupId
       }
     });
@@ -226,7 +239,7 @@ describe(commands.BUCKET_REMOVE, () => {
     const actual = command.validate({
       options: {
         name: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
       }
     });
@@ -284,6 +297,60 @@ describe(commands.BUCKET_REMOVE, () => {
     }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when no groups found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+        return Promise.resolve({"value": []});
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        name: validBucketName,
+        planTitle: validPlanTitle,
+        ownerGroupName: validOwnerGroupName,
+        confirm: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified group '${validOwnerGroupName}' does not exist.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when multiple groups found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
+        return Promise.resolve(multipleGroupResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        name: validBucketName,
+        planTitle: validPlanTitle,
+        ownerGroupName: validOwnerGroupName,
+        confirm: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple groups with name '${validOwnerGroupName}' found: ${multipleGroupResponse.value.map(x => x.id)}.`)));
         done();
       }
       catch (e) {
@@ -405,7 +472,7 @@ describe(commands.BUCKET_REMOVE, () => {
     command.action(logger, {
       options: {
         name: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
       }
     }, (err?: any) => {
@@ -445,8 +512,49 @@ describe(commands.BUCKET_REMOVE, () => {
     command.action(logger, {
       options: {
         name: validBucketName,
-        planName: validPlanName,
+        planTitle: validPlanTitle,
         ownerGroupId: validOwnerGroupId
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', err?.message);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Correctly deletes bucket by name with deprecated planName', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
+        return Promise.resolve(singlePlanResponse);
+      }
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
+        return Promise.resolve(singleBucketByNameResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    });
+
+    command.action(logger, {
+      options: {
+        name: validBucketName,
+        planName: validPlanTitle,
+        ownerGroupId: validOwnerGroupId,
+        verbose: true
       }
     }, (err?: any) => {
       try {

@@ -52,17 +52,7 @@ class TenantServiceAnnouncementHealthGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request
-      .get<ServiceHealth>(requestOptions)
-      .then(response => {
-        const serviceHealth: ServiceHealth | undefined = response;
-
-        if (!serviceHealth) {
-          return Promise.reject(`Error fetching service health`);
-        }
-
-        return Promise.resolve(serviceHealth);
-      });
+    return request.get<ServiceHealth>(requestOptions);
   }
 
   public options(): CommandOption[] {

@@ -7,11 +7,14 @@ import Command, { CommandError, CommandTypes } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
+import chalk = require('chalk');
 const command: Command = require('./listitem-list');
 
 describe(commands.LISTITEM_LIST, () => {
   let log: any[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   const expectedArrayLength = 2;
   let returnArrayLength = 0;
@@ -109,6 +112,9 @@ describe(commands.LISTITEM_LIST, () => {
         log.push(msg);
       }
     };
+
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -222,6 +228,46 @@ describe(commands.LISTITEM_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('logs deprecation warning when option id is specified', (done) => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    const options: any = {
+      id: '935c13a0-cc53-4103-8b48-c1d0828eaa7f',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'id' is deprecated. Please use 'listId' instead.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs deprecation warning when option title is specified', (done) => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    const options: any = {
+      title: 'Demo List',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'title' is deprecated. Please use 'listTitle' instead.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('returns array of listItemInstance objects when a list of items is requested, and debug mode enabled', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
@@ -333,6 +379,58 @@ describe(commands.LISTITEM_LIST, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(returnArrayLength, expectedArrayLength);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns array of listItemInstance objects when a list of items is requested with no output type specified, a list of fields with lookup field specified', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if ((opts.url as string).indexOf('&$expand=') > -1) {
+        return Promise.resolve({
+          value:
+            [{
+              "ID": 1,
+              "Modified": "2018-08-15T13:43:12Z",
+              "Title": "Example item 1",
+              "Company": { "Title": "Contoso" }
+            },
+            {
+              "ID": 2,
+              "Modified": "2018-08-15T13:44:10Z",
+              "Title": "Example item 2",
+              "Company": { "Title": "Fabrikam" }
+            }]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const options: any = {
+      debug: false,
+      listTitle: 'Demo List',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      fields: "Title,Modified,Company/Title"
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.deepStrictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
+          {
+            "Modified": "2018-08-15T13:43:12Z",
+            "Title": "Example item 1",
+            "Company": { "Title": "Contoso" }
+          },
+          {
+            "Modified": "2018-08-15T13:44:10Z",
+            "Title": "Example item 2",
+            "Company": { "Title": "Fabrikam" }
+          }
+        ]));
         done();
       }
       catch (e) {

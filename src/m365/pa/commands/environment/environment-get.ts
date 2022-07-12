@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import AzmgmtCommand from '../../../base/AzmgmtCommand';
+import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   name: string;
 }
 
-class PaEnvironmentGetCommand extends AzmgmtCommand {
+class PaEnvironmentGetCommand extends PowerAppsCommand {
   public get name(): string {
     return commands.ENVIRONMENT_GET;
   }
@@ -34,7 +34,7 @@ class PaEnvironmentGetCommand extends AzmgmtCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}providers/Microsoft.PowerApps/environments/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+      url: `${this.resource}/providers/Microsoft.PowerApps/environments/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },

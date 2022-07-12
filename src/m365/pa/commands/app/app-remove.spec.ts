@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -357,5 +357,32 @@ describe(commands.APP_REMOVE, () => {
       }
     });
     assert(containsOption);
+  });
+
+  it('correctly handles random api error', (done) => {
+    sinon.stub(request, 'delete').callsFake(() => {
+      return Promise.reject("Something went wrong");
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    });
+
+    command.action(logger, {
+      options:
+      {
+        debug: false,
+        name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
+      }
+    } as any, (err?: any) => {
+      try {
+        assert.deepStrictEqual(err, new CommandError("Something went wrong"));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 });

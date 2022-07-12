@@ -81,4 +81,34 @@ describe('accessToken/accessToken', () => {
     const actual = accessToken.getTenantIdFromAccessToken('abc.def.ghi');
     assert.strictEqual(actual, '');
   });
+
+  it('shows user id from valid access token', () => {
+    const jwt = JSON.stringify({
+      oid: 'de349bc7-1aeb-4506-8cb3-98db021cadb4'
+    });
+    const jwt64 = Buffer.from(jwt).toString('base64');
+    const token = `abc.${jwt64}.def`;
+    const actual = accessToken.getUserIdFromAccessToken(token);
+    assert.strictEqual(actual, 'de349bc7-1aeb-4506-8cb3-98db021cadb4');
+  });
+
+  it('returns empty userd id when access token is undefined', () => {
+    const actual = accessToken.getUserIdFromAccessToken(undefined as any);
+    assert.strictEqual(actual, '');
+  });
+
+  it('returns empty user id when empty access token passed', () => {
+    const actual = accessToken.getUserIdFromAccessToken('');
+    assert.strictEqual(actual, '');
+  });
+
+  it('returns empty user id when invalid access token passed', () => {
+    const actual = accessToken.getUserIdFromAccessToken('abc.def.ghi');
+    assert.strictEqual(actual, '');
+  });
+
+  it('returns empty user id when invalid access token passed', () => {
+    const actual = accessToken.getUserIdFromAccessToken('abc.def');
+    assert.strictEqual(actual, '');
+  });
 });

@@ -9,6 +9,15 @@
 - [planner plan remove](../cmd/planner/plan/plan-remove.md) - removes the Microsoft Planner plan [#3336](https://github.com/pnp/cli-microsoft365/issues/3336)
 - [planner tenant settings set](../cmd/planner/tenant/tenant-settings-set.md) - sets Microsoft Planner configuration of the tenant [#3356](https://github.com/pnp/cli-microsoft365/issues/3356)
 
+**Search:**
+
+- [search externalconnection get](../cmd/search/externalconnection/externalconnection-get.md) - adds search externalconnection get command. [#3169](https://github.com/pnp/cli-microsoft365/issues/3169)
+
+**SharePoint:**
+
+- [spo roledefinition get](../cmd/spo/roledefinition/roledefinition-get.md) - adds spo roledefinition get command. [#3270](https://github.com/pnp/cli-microsoft365/issues/3270)
+- [spo group set](../cmd/spo/group/group-set.md) - adds spo group set command. [#3499](https://github.com/pnp/cli-microsoft365/pull/3499)
+
 **Teams:**
 
 - [teams cache remove](../cmd/teams/cache/cache-remove.md) - removes the Microsoft Teams client cache [#3205](https://github.com/pnp/cli-microsoft365/issues/3205)
@@ -22,6 +31,20 @@
 - extended `spfx project doctor` command with support for SPFx v1.15.0 [#3440](https://github.com/pnp/cli-microsoft365/issues/3440)
 - solved 'spo listitem set' issues with Number and Single Line of Text [#3405](https://github.com/pnp/cli-microsoft365/issues/3405)
 - fixed flow export command with support for illegal file characters [#3404](https://github.com/pnp/cli-microsoft365/issues/3404)
+- fixed `planner plan remove` docs [#3473](https://github.com/pnp/cli-microsoft365/issues/3473)
+- fixed upgrading non-React SPFx projects to v1.15.0 [#3475](https://github.com/pnp/cli-microsoft365/issues/3475)
+- fixed sample script referencing deprecated task details get [#3467](https://github.com/pnp/cli-microsoft365/issues/3467)
+- upgraded SPFx fast serve helper to v1.15 [#3446](https://github.com/pnp/cli-microsoft365/issues/3446)
+- removed unnecessary undefined checks from several commands [#3420](https://github.com/pnp/cli-microsoft365/issues/3420)
+- added `@meId` and `@meUserName` tokens [#3056](https://github.com/pnp/cli-microsoft365/issues/3056)
+- extended spo hubsite get options. [#3378](https://github.com/pnp/cli-microsoft365/issues/3378)
+- fixed planTitle inconsistency in planner commands. [#3342](https://github.com/pnp/cli-microsoft365/issues/3342)
+- fixed API issue for broken Power Apps commands [#3207](https://github.com/pnp/cli-microsoft365/issues/3207)
+- fixed 'spo listitem list' and 'spo listitem get' commands [#3391](https://github.com/pnp/cli-microsoft365/issues/3391)
+- extended `planner plan add` with more options [#3345](https://github.com/pnp/cli-microsoft365/issues/3345)
+- Updates 'planner task get docs' [#3495](https://github.com/pnp/cli-microsoft365/issues/3495)
+- Extends "teams team remove, archive, and unarchive" with extra options [#3483](https://github.com/pnp/cli-microsoft365/issues/3483)
+- Fixes spo field set command options inconsistency [#3418](https://github.com/pnp/cli-microsoft365/pull/3418)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
@@ -69,7 +92,7 @@
 - fixed bug with spo list list throwing access denied [#3373](https://github.com/pnp/cli-microsoft365/issues/3373)
 - fixed --includeAssociatedSites doesn't include associated sites in the result [#3400](https://github.com/pnp/cli-microsoft365/issues/3400)
 - extended 'spo list get' with PrincipalTypeString [#3379](https://github.com/pnp/cli-microsoft365/issues/3379)
-- added more options to planner task add [#3315](https://github.com/pnp/cli-microsoft365/issues/3315)
+- added more options to planner task add [#3246](https://github.com/pnp/cli-microsoft365/issues/3246)
 - added priority option to planner task add and set [#3383](https://github.com/pnp/cli-microsoft365/issues/3383)
 - added support for upgrading SPFx projects to v1.15.0 [#3427](https://github.com/pnp/cli-microsoft365/issues/3427)
 
@@ -193,7 +216,7 @@
 
 **Planner:**
 
-- [planner plan details get](../cmd/planner/plan/plan-details-get.md) - retrieve the planner details about the specified plan [#3051](https://github.com/pnp/cli-microsoft365/issues/3051)
+- [planner plan details get](../cmd/planner/plan/plan-get.md) - retrieve the planner details about the specified plan [#3051](https://github.com/pnp/cli-microsoft365/issues/3051)
 
 **Power Platform:**
 

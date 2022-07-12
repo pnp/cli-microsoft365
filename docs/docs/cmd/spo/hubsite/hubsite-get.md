@@ -10,17 +10,16 @@ m365 spo hubsite get [options]
 
 ## Options
 
-`-i, --id <id>`
-: Hub site ID
+`-i, --id [id]`
+: ID of the hubsite. Specify either `id`, `title` or `url` but not multiple.
+
+`-t, --title [title]`
+: Title of the hubsite. Specify either `id`, `title` or `url` but not multiple.
+
+`-u, --url [url]`
+: URL of the hubsite. Specify either `id`, `title` or `url` but not multiple.
 
 --8<-- "docs/cmd/_global.md"
-
-## Remarks
-
-!!! attention
-    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
-
-If the specified `id` doesn't refer to an existing hub site, you will get a `ResourceNotFoundException` error.
 
 ## Examples
 
@@ -28,6 +27,18 @@ Get information about the hub site with ID _2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
 
 ```sh
 m365 spo hubsite get --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
+```
+
+Get information about the hub site with Title _My Hub Site_
+
+```sh
+m365 spo hubsite get --title 'My Hub Site'
+```
+
+Get information about the hub site with URL _https://contoso.sharepoint.com/sites/HubSite_
+
+```sh
+m365 spo hubsite get --url 'https://contoso.sharepoint.com/sites/HubSite'
 ```
 
 ## More information

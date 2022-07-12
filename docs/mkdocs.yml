@@ -256,6 +256,7 @@ nav:
     - Search (search):
       - externalconnection:
         - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
+        - externalconnection get: 'cmd/search/externalconnection/externalconnection-get.md'
         - externalconnection list: 'cmd/search/externalconnection/externalconnection-list.md'
     - Skype (skype):
       - report:
@@ -351,6 +352,7 @@ nav:
         - group get: 'cmd/spo/group/group-get.md'
         - group list: 'cmd/spo/group/group-list.md'
         - group remove: 'cmd/spo/group/group-remove.md'
+        - group set: 'cmd/spo/group/group-set.md'
         - group user add: 'cmd/spo/group/group-user-add.md'
         - group user list: 'cmd/spo/group/group-user-list.md'
         - group user remove: 'cmd/spo/group/group-user-remove.md'
@@ -466,6 +468,7 @@ nav:
         - report siteusagesitecounts: 'cmd/spo/report/report-siteusagesitecounts.md'
         - report siteusagestorage: 'cmd/spo/report/report-siteusagestorage.md'
       - roledefinition:
+        - roledefinition get: 'cmd/spo/roledefinition/roledefinition-get.md'
         - roledefinition list: 'cmd/spo/roledefinition/roledefinition-list.md'
         - roledefinition remove: 'cmd/spo/roledefinition/roledefinition-remove.md'
       - serviceprincipal:

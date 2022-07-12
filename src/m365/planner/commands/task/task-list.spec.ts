@@ -351,7 +351,7 @@ describe(commands.TASK_LIST, () => {
     done();
   });
 
-  it('fails validation when bucketName is specified without planId or planName', (done) => {
+  it('fails validation when bucketName is specified without planId or planTitle', (done) => {
     const actual = command.validate({
       options: {
         bucketName: 'Planner Bucket A'
@@ -361,19 +361,19 @@ describe(commands.TASK_LIST, () => {
     done();
   });
 
-  it('fails validation when bucketName is specified with both planId and planName', (done) => {
+  it('fails validation when bucketName is specified with both planId and planTitle', (done) => {
     const actual = command.validate({
       options: {
         bucketName: 'Planner Bucket A',
         planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        planName: 'My Planner Plan'
+        planTitle: 'My Planner Plan'
       }
     });
     assert.notStrictEqual(actual, true);
     done();
   });
 
-  it('fails validation when bucketName is specified with neither the planId nor planName', (done) => {
+  it('fails validation when bucketName is specified with neither the planId nor planTitle', (done) => {
     const actual = command.validate({
       options: {
         debug: true,
@@ -384,34 +384,34 @@ describe(commands.TASK_LIST, () => {
     done();
   });
 
-  it('fails validation when both planId and planName are specified', (done) => {
+  it('fails validation when both planId and planTitle are specified', (done) => {
     const actual = command.validate({
       options: {
         bucketName: 'Planner Bucket A',
         planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2',
-        planName: 'My Planner'
+        planTitle: 'My Planner'
       }
     });
     assert.notStrictEqual(actual, true);
     done();
   });
 
-  it('fails validation when planName is specified without ownerGroupId or ownerGroupName', (done) => {
+  it('fails validation when planTitle is specified without ownerGroupId or ownerGroupName', (done) => {
     const actual = command.validate({
       options: {
         bucketName: 'Planner Bucket A',
-        planName: 'My Planner Plan'
+        planTitle: 'My Planner Plan'
       }
     });
     assert.notStrictEqual(actual, true);
     done();
   });
 
-  it('fails validation when planName is specified with both ownerGroupId and ownerGroupName', (done) => {
+  it('fails validation when planTitle is specified with both ownerGroupId and ownerGroupName', (done) => {
     const actual = command.validate({
       options: {
         bucketName: 'Planner Bucket A',
-        planName: 'My Planner Plan',
+        planTitle: 'My Planner Plan',
         ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
         ownerGroupName: 'My Planner Group'
       }
@@ -430,10 +430,10 @@ describe(commands.TASK_LIST, () => {
     done();
   });
 
-  it('passes validation when valid planName and ownerGroupId are specified', (done) => {
+  it('passes validation when valid planTitle and ownerGroupId are specified', (done) => {
     const actual = command.validate({
       options: {
-        planName: 'My Planner Plan',
+        planTitle: 'My Planner Plan',
         ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
       }
     });
@@ -441,10 +441,10 @@ describe(commands.TASK_LIST, () => {
     done();
   });
 
-  it('passes validation when valid planName and ownerGroupName are specified', (done) => {
+  it('passes validation when valid planTitle and ownerGroupName are specified', (done) => {
     const actual = command.validate({
       options: {
-        planName: 'My Planner Plan',
+        planTitle: 'My Planner Plan',
         ownerGroupName: 'My Planner Group'
       }
     });
@@ -463,10 +463,10 @@ describe(commands.TASK_LIST, () => {
     done();
   });
 
-  it('passes validation when bucketName, planName, and ownerGroupId are specified', (done) => {
+  it('passes validation when bucketName, planTitle, and ownerGroupId are specified', (done) => {
     const actual = command.validate({
       options: {
-        planName: 'My Planner Plan',
+        planTitle: 'My Planner Plan',
         bucketName: 'Planner Bucket A',
         ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
       }
@@ -475,10 +475,10 @@ describe(commands.TASK_LIST, () => {
     done();
   });
 
-  it('passes validation when bucketName, planName, and ownerGroupName are specified', (done) => {
+  it('passes validation when bucketName, planTitle, and ownerGroupName are specified', (done) => {
     const actual = command.validate({
       options: {
-        planName: 'My Planner Plan',
+        planTitle: 'My Planner Plan',
         bucketName: 'Planner Bucket A',
         ownerGroupName: 'My Planner Group'
       }
@@ -501,12 +501,38 @@ describe(commands.TASK_LIST, () => {
   it('fails validation if the ownerGroupId is not a valid guid.', (done) => {
     const actual = command.validate({
       options: {
-        planName: 'My Planner Plan',
+        planTitle: 'My Planner Plan',
         ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
     assert.notStrictEqual(actual, true);
     done();
+  });
+
+  it('fails validation when ownerGroupName not found', (done) => {
+    sinonUtil.restore(request.get);
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
+        return Promise.resolve({ value: [] });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        planTitle: 'My Planner Plan',
+        ownerGroupName: 'foo'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified group 'foo' does not exist.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('fails validation when using app only access token', (done) => {
@@ -566,7 +592,7 @@ describe(commands.TASK_LIST, () => {
       options: {
         debug: false,
         bucketName: 'foo',
-        planName: 'My Planner Plan',
+        planTitle: 'My Planner Plan',
         ownerGroupName: 'My Planner Group'
       }
     }, (err?: any) => {
@@ -592,10 +618,10 @@ describe(commands.TASK_LIST, () => {
     });
   });
 
-  it('correctly lists planner tasks with planName and ownerGroupId', (done) => {
+  it('correctly lists planner tasks with planTitle and ownerGroupId', (done) => {
     const options: any = {
       debug: false,
-      planName: 'My Planner Plan',
+      planTitle: 'My Planner Plan',
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
     };
 
@@ -611,10 +637,10 @@ describe(commands.TASK_LIST, () => {
     });
   });
 
-  it('correctly lists planner tasks with planName and ownerGroupName', (done) => {
+  it('correctly lists planner tasks with planTitle and ownerGroupName', (done) => {
     const options: any = {
       debug: false,
-      planName: 'My Planner Plan',
+      planTitle: 'My Planner Plan',
       ownerGroupName: 'My Planner Group'
     };
 
@@ -665,11 +691,11 @@ describe(commands.TASK_LIST, () => {
     });
   });
 
-  it('correctly lists planner tasks with bucketName, planName, and ownerGroupId', (done) => {
+  it('correctly lists planner tasks with bucketName, planTitle, and ownerGroupId', (done) => {
     const options: any = {
       debug: false,
       bucketName: 'Planner Bucket A',
-      planName: 'My Planner Plan',
+      planTitle: 'My Planner Plan',
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
     };
 
@@ -684,12 +710,32 @@ describe(commands.TASK_LIST, () => {
     });
   });
 
-  it('correctly lists planner tasks with bucketName, planName, and ownerGroupName', (done) => {
+  it('correctly lists planner tasks with bucketName, planTitle, and ownerGroupName', (done) => {
+    const options: any = {
+      debug: false,
+      bucketName: 'Planner Bucket A',
+      planTitle: 'My Planner Plan',
+      ownerGroupName: 'My Planner Group'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert(loggerLogSpy.calledWith(taskListResponseBetaValue));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly lists planner tasks with bucketName, deprecated planName, and ownerGroupName', (done) => {
     const options: any = {
       debug: false,
       bucketName: 'Planner Bucket A',
       planName: 'My Planner Plan',
-      ownerGroupName: 'My Planner Group'
+      ownerGroupName: 'My Planner Group',
+      verbose: true
     };
 
     command.action(logger, { options: options } as any, () => {
