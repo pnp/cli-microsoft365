@@ -256,6 +256,16 @@ describe(commands.HUBSITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
+    command.action(logger, { options: { debug: false, id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b', includeAssociatedSites: true, output: 'text' } }, () => {
+      try {
+        assert.fail('No error message thrown.');
+      }
+      catch (ex) {
+        assert.deepStrictEqual(ex, Error(`includeAssociatedSites option is only allowed with json output mode`));
+      }
+    });
+  });
+
   it('gets information about the specified hub site by title', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
