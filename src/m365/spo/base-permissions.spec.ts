@@ -162,4 +162,40 @@ describe('BasePermissions', () => {
 
     assert.strictEqual(basePermissions.has(PermissionKind.FullMask), true);
   });
+
+  it('parse returns correct list of permissions kind', () => {
+    basePermissions.high = 432;
+    basePermissions.low = 1012866047;
+
+    const result: string[] = [
+      "ViewListItems",
+      "AddListItems",
+      "EditListItems",
+      "DeleteListItems",
+      "ApproveItems",
+      "OpenItems",
+      "ViewVersions",
+      "DeleteVersions",
+      "CancelCheckout",
+      "ManagePersonalViews",
+      "ManageLists",
+      "ViewFormPages",
+      "Open",
+      "ViewPages",
+      "AddAndCustomizePages",
+      "ApplyThemeAndBorder",
+      "ApplyStyleSheets",
+      "CreateSSCSite",
+      "BrowseDirectories",
+      "BrowseUserInfo",
+      "AddDelPrivateWebParts",
+      "UpdatePersonalWebParts",
+      "UseClientIntegration",
+      "UseRemoteAPIs",
+      "CreateAlerts",
+      "EditMyUserInfo"
+    ];
+
+    assert.deepEqual(basePermissions.parse(), result);
+  });
 });

@@ -39,20 +39,20 @@ export const planner = {
   },
 
   /**
-   * Get Planner plan by name in a specific group. 
-   * @param name Name of the Planner plan. Case insensitive.
+   * Get Planner plan by title in a specific group. 
+   * @param title Title of the Planner plan. Case insensitive.
    * @param groupId Owner group ID .
    */
-  async getPlanByName(name: string, groupId: string): Promise<PlannerPlan> {
+  async getPlanByTitle(title: string, groupId: string): Promise<PlannerPlan> {
     const plans = await this.getPlansByGroupId(groupId);
-    const filteredPlans = plans.filter(p => p.title && p.title.toLowerCase() === name.toLowerCase());
+    const filteredPlans = plans.filter(p => p.title && p.title.toLowerCase() === title.toLowerCase());
 
     if (!filteredPlans.length) {
-      throw Error(`The specified plan '${name}' does not exist.`);
+      throw Error(`The specified plan '${title}' does not exist.`);
     }
 
     if (filteredPlans.length > 1) {
-      throw Error(`Multiple plans with name '${name}' found: ${filteredPlans.map(x => x.id)}.`);
+      throw Error(`Multiple plans with title '${title}' found: ${filteredPlans.map(x => x.id)}.`);
     }
 
     return filteredPlans[0];

@@ -97,7 +97,7 @@ class PlannerPlanRemoveCommand extends GraphCommand {
     }
 
     const groupId = await this.getGroupId(args);
-    return await planner.getPlanByName(title!, groupId);
+    return await planner.getPlanByTitle(title!, groupId);
   }
 
   private async getGroupId(args: CommandArgs): Promise<string> {

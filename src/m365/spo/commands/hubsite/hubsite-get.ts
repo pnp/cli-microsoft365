@@ -15,7 +15,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  id?: string;
   includeAssociatedSites?: boolean;
   title?: string;
   url?: string;
@@ -103,7 +103,6 @@ class SpoHubSiteGetCommand extends SpoCommand {
       },
       responseType: 'json'
     };
-
     return request.get(requestOptions);
   }
 

@@ -91,6 +91,28 @@ You can use the `@` token in any command, with any option that accepts a value.
 m365 spo sitescript add --title "Contoso" --description "Contoso theme script" --content `@themeScript.json
 ```
 
+## `@meId` and `@meUserName` tokens
+
+CLI for Microsoft 365 contains a number of commands that require you to provide a user ID or username. If you want to pass these values for the current user, instead of looking them up, you can use the built-in tokens. With the `@meId` token you can specify the ID of the current user. Using the `@meUserName` token you can specify the username of the current user.
+
+For example:
+
+```sh
+m365 aad user get --id "@meId"
+```
+
+will execute as `m365 aad user get --id "d1a97db6-ab08-41a9-94fe-bfa104e83f69"`.
+
+When you execute:
+
+```sh
+m365 aad user get --userName "@meUserName"
+```
+
+it will run as `m365 aad user get --userName "admin@contoso.onmicrosoft.com"`.
+
+Both tokens are resolved based on the information stored in the access token. You can use the `@` token in any command, with any option that accepts a value.
+
 ## Verbose and debug mode
 
 By default, commands output only the information returned by the corresponding Microsoft 365 API, whether the command result or error. You can choose for a more user-friendly output by using the `--verbose` option or setting the `CLIMICROSOFT365_VERBOSE` environment variable to `1`. For example: by default, when checking status of the Microsoft 365 Public CDN, you would see:

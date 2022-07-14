@@ -207,30 +207,6 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
     });
   });
 
-  it('fails when serviceAnnouncement endpoint fails', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/healthOverviews/Exchange Online`) {
-        return Promise.resolve(undefined);
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    const options: any = {
-      serviceName: "Exchange Online"
-    };
-
-    command.action(logger, {options} as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, "Error fetching service health");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('correctly handles random API error', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
