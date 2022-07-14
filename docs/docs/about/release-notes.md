@@ -17,6 +17,7 @@
 
 - [spo roledefinition get](../cmd/spo/roledefinition/roledefinition-get.md) - adds spo roledefinition get command. [#3270](https://github.com/pnp/cli-microsoft365/issues/3270)
 - [spo group set](../cmd/spo/group/group-set.md) - adds spo group set command. [#3499](https://github.com/pnp/cli-microsoft365/pull/3499)
+- [spo group add](../cmd/spo/group/group-add.md) - adds spo group add command. [#3493](https://github.com/pnp/cli-microsoft365/pull/3493)
 
 **Teams:**
 
@@ -45,6 +46,7 @@
 - Updates 'planner task get docs' [#3495](https://github.com/pnp/cli-microsoft365/issues/3495)
 - Extends "teams team remove, archive, and unarchive" with extra options [#3483](https://github.com/pnp/cli-microsoft365/issues/3483)
 - Fixes spo field set command options inconsistency [#3418](https://github.com/pnp/cli-microsoft365/pull/3418)
+- Extends 'spo hubsite get' command. [#3454](https://github.com/pnp/cli-microsoft365/pull/3454)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
