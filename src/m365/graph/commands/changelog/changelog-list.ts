@@ -3,7 +3,7 @@ import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils';
 import AnonymousCommand from '../../../base/AnonymousCommand';
-import { Changelog, ChangelogItem } from '../../ChangeLog';
+import { Changelog, ChangelogItem } from '../../Changelog';
 import commands from '../../commands';
 import * as Parser from 'rss-parser';
 
