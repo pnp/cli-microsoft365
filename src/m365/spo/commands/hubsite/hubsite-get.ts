@@ -16,9 +16,9 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id?: string;
-  includeAssociatedSites?: boolean;
   title?: string;
   url?: string;
+  includeAssociatedSites?: boolean;
 }
 
 class SpoHubSiteGetCommand extends SpoCommand {
