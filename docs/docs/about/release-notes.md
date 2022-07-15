@@ -1,5 +1,12 @@
 # Release notes
 
+## [v6.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v6.0.0)
+
+### Changes
+
+- Removes deprecated options for 'spo listitem list' command [#3365](https://github.com/pnp/cli-microsoft365/issues/3365)
+- Removes 'aad app delete' and 'aad app role delete' alias [#3134](https://github.com/pnp/cli-microsoft365/issues/3134)
+
 ## [v5.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.5.0)
 
 ### New commands
