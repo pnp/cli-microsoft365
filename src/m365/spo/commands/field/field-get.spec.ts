@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import chalk = require('chalk');
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -13,10 +14,11 @@ describe(commands.FIELD_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -33,7 +35,9 @@ describe(commands.FIELD_GET, () => {
         log.push(msg);
       }
     };
+
     loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -56,6 +60,31 @@ describe(commands.FIELD_GET, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets();
+    assert.deepStrictEqual(optionSets, [['id', 'title', 'fieldTitle']]);
+  });
+
+  it('fails validation if the specified site URL is not a valid SharePoint URL', () => {
+    const actual = command.validate({ options: { webUrl: 'site.com', id: '03e45e84-1992-4d42-9116-26f756012634' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if the field ID is not a valid GUID', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: 'abc' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if the list ID is not a valid GUID', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '03e45e84-1992-4d42-9116-26f756012634', listId: 'abc' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation when all required parameters are valid', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '03e45e84-1992-4d42-9116-26f756012634' } });
+    assert.strictEqual(actual, true);
   });
 
   it('gets information about a site column', (done) => {
@@ -270,6 +299,28 @@ describe(commands.FIELD_GET, () => {
     });
   });
 
+  it('logs deprecation warning when option fieldTitle is specified', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
+        return Promise.resolve({
+          "Id": "03e45e84-1992-4d42-9116-26f756012634"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', fieldTitle: 'Title', listTitle: 'Documents' } }, () => {
+      try {
+        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'fieldTitle' is deprecated. Please use 'title' instead.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('should call the correct GET url when field title and list title specified (verbose)', (done) => {
     const getStub = sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
@@ -281,7 +332,7 @@ describe(commands.FIELD_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', fieldTitle: 'Title', listTitle: 'Documents' } }, () => {
+    command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'Title', listTitle: 'Documents' } }, () => {
       try {
         assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle(\'Documents\')/fields/getbyinternalnameortitle(\'Title\')');
         done();
@@ -303,7 +354,7 @@ describe(commands.FIELD_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', fieldTitle: 'Title', listTitle: 'Documents' } }, () => {
+    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'Title', listTitle: 'Documents' } }, () => {
       try {
         assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle(\'Documents\')/fields/getbyinternalnameortitle(\'Title\')');
         done();
@@ -325,7 +376,7 @@ describe(commands.FIELD_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', fieldTitle: 'Title', listId: '03e45e84-1992-4d42-9116-26f756012634' } }, () => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'Title', listId: '03e45e84-1992-4d42-9116-26f756012634' } }, () => {
       try {
         assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid\'03e45e84-1992-4d42-9116-26f756012634\')/fields/getbyinternalnameortitle(\'Title\')');
         done();
@@ -435,30 +486,5 @@ describe(commands.FIELD_GET, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('fails validation if the specified site URL is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { webUrl: 'site.com', id: '03e45e84-1992-4d42-9116-26f756012634' } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if neither the field ID nor title are specified', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales' } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the field ID is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: 'abc' } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the list ID is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '03e45e84-1992-4d42-9116-26f756012634', listId: 'abc' } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when all required parameters are valid', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '03e45e84-1992-4d42-9116-26f756012634' } });
-    assert.strictEqual(actual, true);
   });
 });

@@ -19,6 +19,7 @@ interface Options extends GlobalOptions {
   listId?: string;
   group?: string;
   listTitle?: string;
+  title?: string;
   listUrl?: string;
   webUrl: string;
 }
@@ -39,12 +40,24 @@ class SpoFieldRemoveCommand extends SpoCommand {
     telemetryProps.listUrl = typeof args.options.listUrl !== 'undefined';
     telemetryProps.id = typeof args.options.id !== 'undefined';
     telemetryProps.group = typeof args.options.group !== 'undefined';
-    telemetryProps.fieldTitle = typeof args.options.fieldTitle !== 'undefined';
+    telemetryProps.title = typeof args.options.title !== 'undefined';
     telemetryProps.confirm = (!(!args.options.confirm)).toString();
     return telemetryProps;
   }
 
+  public optionSets(): string[][] | undefined {
+    return [
+      ['id', 'title', 'fieldTitle', 'group']
+    ];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (args.options.fieldTitle) {
+      args.options.title = args.options.fieldTitle;
+
+      this.warn(logger, `Option 'fieldTitle' is deprecated. Please use 'title' instead.`);
+    }
+
     let messageEnd: string;
     if (args.options.listId || args.options.listTitle) {
       messageEnd = `in list ${args.options.listId || args.options.listTitle}`;
@@ -53,9 +66,9 @@ class SpoFieldRemoveCommand extends SpoCommand {
       messageEnd = `in site ${args.options.webUrl}`;
     }
 
-    const removeField = (listRestUrl: string, fieldId: string | undefined, fieldTitle: string | undefined): Promise<void> => {
+    const removeField = (listRestUrl: string, fieldId: string | undefined, title: string | undefined): Promise<void> => {
       if (this.verbose) {
-        logger.logToStderr(`Removing field ${fieldId || fieldTitle} ${messageEnd}...`);
+        logger.logToStderr(`Removing field ${fieldId || title} ${messageEnd}...`);
       }
 
       let fieldRestUrl: string = '';
@@ -63,7 +76,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
         fieldRestUrl = `/getbyid('${formatting.encodeQueryParameter(fieldId)}')`;
       }
       else {
-        fieldRestUrl = `/getbyinternalnameortitle('${formatting.encodeQueryParameter(fieldTitle as string)}')`;
+        fieldRestUrl = `/getbyinternalnameortitle('${formatting.encodeQueryParameter(title as string)}')`;
       }
 
       const requestOptions: any = {
@@ -128,7 +141,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
           }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
       }
       else {
-        removeField(listRestUrl, args.options.id, args.options.fieldTitle)
+        removeField(listRestUrl, args.options.id, args.options.title)
           .then((): void => {
             // REST post call doesn't return anything
             cb();
@@ -140,7 +153,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
       prepareRemoval();
     }
     else {
-      const confirmMessage: string = `Are you sure you want to remove the ${args.options.group ? 'fields' : 'field'} ${args.options.id || args.options.fieldTitle || 'from group ' + args.options.group} ${messageEnd}?`;
+      const confirmMessage: string = `Are you sure you want to remove the ${args.options.group ? 'fields' : 'field'} ${args.options.id || args.options.title || 'from group ' + args.options.group} ${messageEnd}?`;
 
       Cli.prompt({
         type: 'confirm',
@@ -176,7 +189,10 @@ class SpoFieldRemoveCommand extends SpoCommand {
         option: '-i, --id [id]'
       },
       {
-        option: '-t, --fieldTitle [fieldTitle]'
+        option: '--fieldTitle [fieldTitle]'
+      },
+      {
+        option: '-t, --title [title]'
       },
       {
         option: '-g, --group [group]'
@@ -194,10 +210,6 @@ class SpoFieldRemoveCommand extends SpoCommand {
     const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
-    }
-
-    if (!args.options.id && !args.options.fieldTitle && !args.options.group) {
-      return 'Specify id, fieldTitle, or group. One is required';
     }
 
     if (args.options.id && !validation.isValidGuid(args.options.id)) {
