@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import chalk = require('chalk');
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -12,12 +13,13 @@ const command: Command = require('./field-remove');
 describe(commands.FIELD_REMOVE, () => {
   let log: any[];
   let logger: Logger;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let requests: any[];
   let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -34,10 +36,14 @@ describe(commands.FIELD_REMOVE, () => {
         log.push(msg);
       }
     };
+
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
+
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
     });
+
     requests = [];
   });
 
@@ -84,7 +90,7 @@ describe(commands.FIELD_REMOVE, () => {
   });
 
   it('prompts before removing field when confirmation argument not passed (title)', (done) => {
-    command.action(logger, { options: { debug: false, fieldTitle: 'myfield1', webUrl: 'https://contoso.sharepoint.com' } }, () => {
+    command.action(logger, { options: { debug: false, title: 'myfield1', webUrl: 'https://contoso.sharepoint.com' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -102,7 +108,7 @@ describe(commands.FIELD_REMOVE, () => {
   });
 
   it('prompts before removing list column when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { debug: false, fieldTitle: 'myfield1', webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List' } }, () => {
+    command.action(logger, { options: { debug: false, title: 'myfield1', webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -143,6 +149,32 @@ describe(commands.FIELD_REMOVE, () => {
     command.action(logger, { options: { debug: false, group: 'MyGroup', webUrl: 'https://contoso.sharepoint.com' } }, () => {
       try {
         assert(requests.length === 0);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs deprecation warning when option fieldTitle is specified', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+
+      if ((opts.url as string).indexOf(`/_api/web/fields(guid'`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          (opts.headers.accept as string).indexOf('application/json') === 0) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', fieldTitle: 'Title', listTitle: 'Documents', confirm: true } }, () => {
+      try {
+        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'fieldTitle' is deprecated. Please use 'title' instead.`)));
         done();
       }
       catch (e) {
@@ -289,18 +321,20 @@ describe(commands.FIELD_REMOVE, () => {
 
     const getStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/GetList(\'%2Fsites%2Fportal%2FLists%2FEvents\')/fields`) {
-        return Promise.resolve({ "value": [{
-          "Id": "03e45e84-1992-4d42-9116-26f756012634",
-          "Group": "MyGroup"
-        },
-        {
-          "Id": "03e45e84-1992-4d42-9116-26f756012635",
-          "Group": "MyGroup"
-        },
-        {
-          "Id": "03e45e84-1992-4d42-9116-26f756012636",
-          "Group": "DifferentGroup"
-        }]});
+        return Promise.resolve({
+          "value": [{
+            "Id": "03e45e84-1992-4d42-9116-26f756012634",
+            "Group": "MyGroup"
+          },
+          {
+            "Id": "03e45e84-1992-4d42-9116-26f756012635",
+            "Group": "MyGroup"
+          },
+          {
+            "Id": "03e45e84-1992-4d42-9116-26f756012636",
+            "Group": "DifferentGroup"
+          }]
+        });
       }
       return Promise.reject('Invalid request');
     });
@@ -338,18 +372,20 @@ describe(commands.FIELD_REMOVE, () => {
   it('calls group and deletes two fields', (done) => {
     const getStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields`) {
-        return Promise.resolve({ "value": [{
-          "Id": "03e45e84-1992-4d42-9116-26f756012634",
-          "Group": "MyGroup"
-        },
-        {
-          "Id": "03e45e84-1992-4d42-9116-26f756012635",
-          "Group": "MyGroup"
-        },
-        {
-          "Id": "03e45e84-1992-4d42-9116-26f756012636",
-          "Group": "DifferentGroup"
-        }]});
+        return Promise.resolve({
+          "value": [{
+            "Id": "03e45e84-1992-4d42-9116-26f756012634",
+            "Group": "MyGroup"
+          },
+          {
+            "Id": "03e45e84-1992-4d42-9116-26f756012635",
+            "Group": "MyGroup"
+          },
+          {
+            "Id": "03e45e84-1992-4d42-9116-26f756012636",
+            "Group": "DifferentGroup"
+          }]
+        });
       }
       return Promise.reject('Invalid request');
     });
@@ -387,18 +423,20 @@ describe(commands.FIELD_REMOVE, () => {
   it('calls group and deletes no fields', (done) => {
     const getStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields`) {
-        return Promise.resolve({ "value": [{
-          "Id": "03e45e84-1992-4d42-9116-26f756012634",
-          "Group": "MyGroup"
-        },
-        {
-          "Id": "03e45e84-1992-4d42-9116-26f756012635",
-          "Group": "MyGroup"
-        },
-        {
-          "Id": "03e45e84-1992-4d42-9116-26f756012636",
-          "Group": "DifferentGroup"
-        }]});
+        return Promise.resolve({
+          "value": [{
+            "Id": "03e45e84-1992-4d42-9116-26f756012634",
+            "Group": "MyGroup"
+          },
+          {
+            "Id": "03e45e84-1992-4d42-9116-26f756012635",
+            "Group": "MyGroup"
+          },
+          {
+            "Id": "03e45e84-1992-4d42-9116-26f756012636",
+            "Group": "DifferentGroup"
+          }]
+        });
       }
       return Promise.reject('Invalid request');
     });
@@ -427,7 +465,7 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('handles failure when get operation fails', (done) => {
     const err = 'Invalid request';
-    
+
     const getStub = sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject(err);
     });
@@ -461,21 +499,23 @@ describe(commands.FIELD_REMOVE, () => {
 
   it('handles failure when one deletion fails', (done) => {
     const err = 'Invalid request';
-    
+
     const getStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/portal/_api/web/fields`) {
-        return Promise.resolve({ "value": [{
-          "Id": "03e45e84-1992-4d42-9116-26f756012634",
-          "Group": "MyGroup"
-        },
-        {
-          "Id": "03e45e84-1992-4d42-9116-26f756012635",
-          "Group": "MyGroup"
-        },
-        {
-          "Id": "03e45e84-1992-4d42-9116-26f756012636",
-          "Group": "DifferentGroup"
-        }]});
+        return Promise.resolve({
+          "value": [{
+            "Id": "03e45e84-1992-4d42-9116-26f756012634",
+            "Group": "MyGroup"
+          },
+          {
+            "Id": "03e45e84-1992-4d42-9116-26f756012635",
+            "Group": "MyGroup"
+          },
+          {
+            "Id": "03e45e84-1992-4d42-9116-26f756012636",
+            "Group": "DifferentGroup"
+          }]
+        });
       }
       return Promise.reject(err);
     });
@@ -519,7 +559,7 @@ describe(commands.FIELD_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', fieldTitle: 'Title', listTitle: 'Documents', confirm: true } }, () => {
+    command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'Title', listTitle: 'Documents', confirm: true } }, () => {
       try {
         assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle(\'Documents\')/fields/getbyinternalnameortitle(\'Title\')');
         done();
@@ -541,7 +581,7 @@ describe(commands.FIELD_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', fieldTitle: 'Title', listTitle: 'Documents', confirm: true } }, () => {
+    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'Title', listTitle: 'Documents', confirm: true } }, () => {
       try {
         assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists/getByTitle(\'Documents\')/fields/getbyinternalnameortitle(\'Title\')');
         done();
@@ -563,7 +603,7 @@ describe(commands.FIELD_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', fieldTitle: 'Title', listId: '03e45e84-1992-4d42-9116-26f756012634', confirm: true } }, () => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', title: 'Title', listId: '03e45e84-1992-4d42-9116-26f756012634', confirm: true } }, () => {
       try {
         assert.strictEqual(getStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/portal/_api/web/lists(guid\'03e45e84-1992-4d42-9116-26f756012634\')/fields/getbyinternalnameortitle(\'Title\')');
         done();
@@ -584,7 +624,7 @@ describe(commands.FIELD_REMOVE, () => {
     });
     const actionTitle: string = 'field1';
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', fieldTitle: actionTitle, confirm: true } } as any, (error?: any) => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', title: actionTitle, confirm: true } } as any, (error?: any) => {
       try {
         assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
@@ -678,9 +718,9 @@ describe(commands.FIELD_REMOVE, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if both id and fieldTitle options are not passed', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', confirm: true, listTitle: 'Documents' } });
-    assert.notStrictEqual(actual, true);
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets();
+    assert.deepStrictEqual(optionSets, [['id', 'title', 'fieldTitle', 'group']]);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {

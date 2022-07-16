@@ -19,6 +19,7 @@ interface Options extends GlobalOptions {
   listUrl?: string;
   id?: string;
   fieldTitle?: string;
+  title?: string;
 }
 
 class SpoFieldGetCommand extends SpoCommand {
@@ -36,11 +37,23 @@ class SpoFieldGetCommand extends SpoCommand {
     telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
     telemetryProps.listUrl = typeof args.options.listUrl !== 'undefined';
     telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.fieldTitle = typeof args.options.fieldTitle !== 'undefined';
+    telemetryProps.title = typeof args.options.title !== 'undefined';
     return telemetryProps;
   }
 
+  public optionSets(): string[][] | undefined {
+    return [
+      ['id', 'title', 'fieldTitle']
+    ];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (args.options.fieldTitle) {
+      args.options.title = args.options.fieldTitle;
+
+      this.warn(logger, `Option 'fieldTitle' is deprecated. Please use 'title' instead.`);
+    }
+
     let listRestUrl: string = '';
 
     if (args.options.listId) {
@@ -60,7 +73,7 @@ class SpoFieldGetCommand extends SpoCommand {
       fieldRestUrl = `/getbyid('${formatting.encodeQueryParameter(args.options.id)}')`;
     }
     else {
-      fieldRestUrl = `/getbyinternalnameortitle('${formatting.encodeQueryParameter(args.options.fieldTitle as string)}')`;
+      fieldRestUrl = `/getbyinternalnameortitle('${formatting.encodeQueryParameter(args.options.title as string)}')`;
     }
 
     const requestOptions: any = {
@@ -98,6 +111,9 @@ class SpoFieldGetCommand extends SpoCommand {
       },
       {
         option: '--fieldTitle [fieldTitle]'
+      },
+      {
+        option: '-t, --title [title]'
       }
     ];
 
@@ -109,10 +125,6 @@ class SpoFieldGetCommand extends SpoCommand {
     const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
     if (isValidSharePointUrl !== true) {
       return isValidSharePointUrl;
-    }
-
-    if (!args.options.id && !args.options.fieldTitle) {
-      return 'Specify id or fieldTitle, one is required';
     }
 
     if (args.options.id && !validation.isValidGuid(args.options.id)) {
