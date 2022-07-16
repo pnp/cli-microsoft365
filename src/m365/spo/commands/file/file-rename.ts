@@ -1,5 +1,6 @@
 import { Cli, Logger } from '../../../../cli';
 import Command, {
+  CommandError,
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -8,6 +9,7 @@ import { urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { Options as SpoFileRemoveOptions } from './file-remove';
+import { FileProperties } from './FileProperties';
 const removeCommand: Command = require('./file-remove');
 
 interface CommandArgs {
@@ -19,6 +21,24 @@ interface Options extends GlobalOptions {
   sourceUrl: string;
   targetFileName: string;
   force?: boolean;
+}
+
+export interface FileDeleteError {
+  error: CommandError;
+  stderr: string;
+}
+
+interface RenameResponse {
+  value: RenameResponseValue[];
+}
+
+interface RenameResponseValue {
+  ErrorCode: number;
+  ErrorMessage: string;
+  FieldName: string;
+  FieldValue: string;
+  HasException: boolean;
+  ItemId: number;
 }
 
 class SpoFileRenameCommand extends SpoCommand {
@@ -41,11 +61,11 @@ class SpoFileRenameCommand extends SpoCommand {
     const originalFileServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.sourceUrl);
     
     this
-      .fileExists(originalFileServerRelativeUrl, webUrl)
-      .then(_ => {
+      .getFile(originalFileServerRelativeUrl, webUrl)
+      .then((_: FileProperties) => {
         if (args.options.force) {
-          return this.deleteTargetItem(webUrl, args.options.sourceUrl, args.options.targetFileName);
-        } 
+          return this.deleteFile(webUrl, args.options.sourceUrl, args.options.targetFileName);
+        }
         return Promise.resolve();
       })
       .then(_ => {
@@ -65,19 +85,16 @@ class SpoFileRenameCommand extends SpoCommand {
           responseType: 'json'
         };
 
-        return request.post(requestOptions);
+        return request.post<RenameResponse>(requestOptions);
       })
-      .then((resp: any): Promise<any> => {
-        return new Promise<void>((resolve: () => void): void => {
-          logger.log(resp.value);
-          resolve();
-        });
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then((resp: RenameResponse) : void => {
+        logger.log(resp.value);
+        cb();
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private fileExists(originalFileServerRelativeUrl: string, webUrl: string): Promise<void> {
-    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(originalFileServerRelativeUrl)}')`;
+  private getFile(originalFileServerRelativeUrl: string, webUrl: string): Promise<FileProperties> {
+    const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(originalFileServerRelativeUrl)}')?$select=UniqueId`;
     const requestOptions: any = {
       url: requestUrl,
       method: 'GET',
@@ -89,7 +106,7 @@ class SpoFileRenameCommand extends SpoCommand {
     return request.get(requestOptions);
   }
 
-  private deleteTargetItem(webUrl: string, sourceUrl: string, targetFileName: string): Promise<void> {
+  private deleteFile(webUrl: string, sourceUrl: string, targetFileName: string): Promise<void> {
     const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(webUrl,sourceUrl.substring(0, sourceUrl.lastIndexOf('/')))}/${targetFileName}`;
 
     const options: SpoFileRemoveOptions = {
@@ -98,11 +115,10 @@ class SpoFileRenameCommand extends SpoCommand {
       recycle: true,
       confirm: true
     };
-
     return Cli.executeCommandWithOutput(removeCommand as Command, { options: { ...options, _: [] } })
       .then(_ => {
         return Promise.resolve();
-      }, (err: any) => {
+      }, (err: FileDeleteError) => {
         if (err.error !== null && err.error.message !== null && err.error.message.includes('does not exist')) {
           return Promise.resolve();
         }

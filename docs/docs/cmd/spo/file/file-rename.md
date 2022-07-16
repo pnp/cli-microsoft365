@@ -16,7 +16,7 @@ m365 spo file rename [options]
 `-s, --sourceUrl <sourceUrl>`
 : Site-relative URL of the file to rename
 
-`-t, --targetFilename <targetFilename>`
+`-t, --targetFileName <targetFileName>`
 : New file name of the file
 
 `--force`
@@ -30,13 +30,13 @@ If you try to rename a file without the `--force` flag and a file with this name
 
 ## Examples
 
-Renames a file with site-relative URL _/Shared Documents/Test1.docx_ located in site _<https://contoso.sharepoint.com/sites/project-x>_ to _Test2.docx_
+Renames a file with server-relative URL _/Shared Documents/Test1.docx_ located in site _<https://contoso.sharepoint.com/sites/project-x>_ to _Test2.docx_
 
 ```sh
 m365 spo file rename --webUrl https://contoso.sharepoint.com/sites/project-x --sourceUrl '/Shared Documents/Test1.docx' --targetFileName 'Test2.docx'
 ```
 
-Renames a file with site-relative URL _/Shared Documents/Test1.docx_ located in site _<https://contoso.sharepoint.com/sites/project-x>_ to _Test2.docx_. If the file with the target file name already exists, this file will be moved to the recycle bin
+Renames a file with server-relative URL _/Shared Documents/Test1.docx_ located in site _<https://contoso.sharepoint.com/sites/project-x>_ to _Test2.docx_. If the file with the target file name already exists, this file will be moved to the recycle bin
 
 ```sh
 m365 spo file rename --webUrl https://contoso.sharepoint.com/sites/project-x --sourceUrl '/Shared Documents/Test1.docx' --targetFileName 'Test2.docx' --force
