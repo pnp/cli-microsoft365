@@ -13,7 +13,7 @@ m365 tenant serviceannouncement healthissue list [options]
 `-s, --service [service]`
 : Retrieve service health issues for the particular service. If not provided, retrieves health issues for all services
 
---8<-- "docs/cmd/\_global.md"
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 

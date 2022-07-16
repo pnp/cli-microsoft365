@@ -689,7 +689,7 @@ describe(commands.HUBSITE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, includeAssociatedSites: true, output: 'json' } }, () => {
+    command.action(logger, { options: { debug: true, includeAssociatedSites: true } }, () => {
       try {
         assert.strictEqual(firstPagedRequest, true);
         done();

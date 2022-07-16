@@ -8,6 +8,7 @@ import request from '../../../../request';
 import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { aadGroup } from '../../../../utils/aadGroup';
 
 interface CommandArgs {
   options: Options;
@@ -18,12 +19,9 @@ interface Options extends GlobalOptions {
   bucketName?: string;
   planId?: string;
   planName?: string;
+  planTitle?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
-}
-
-interface BetaPlannerTask extends PlannerTask {
-  priority?: number;
 }
 
 class PlannerTaskListCommand extends GraphCommand {
@@ -41,6 +39,7 @@ class PlannerTaskListCommand extends GraphCommand {
     telemetryProps.bucketName = typeof args.options.bucketName !== 'undefined';
     telemetryProps.planId = typeof args.options.planId !== 'undefined';
     telemetryProps.planName = typeof args.options.planName !== 'undefined';
+    telemetryProps.planTitle = typeof args.options.planTitle !== 'undefined';
     telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
     telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
     return telemetryProps;
@@ -51,6 +50,12 @@ class PlannerTaskListCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (args.options.planName) {
+      args.options.planTitle = args.options.planName;
+
+      this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
+    }
+
     if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
@@ -58,7 +63,7 @@ class PlannerTaskListCommand extends GraphCommand {
     
     const bucketName: string | undefined = args.options.bucketName;
     let bucketId: string | undefined = args.options.bucketId;
-    const planName: string | undefined = args.options.planName;
+    const planTitle: string | undefined = args.options.planTitle;
     let planId: string | undefined = args.options.planId;
     let taskItems: PlannerTask[] = [];
 
@@ -69,25 +74,25 @@ class PlannerTaskListCommand extends GraphCommand {
           bucketId = retrievedBucketId;
           return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks`);
         })
-        .then((tasks): Promise<BetaPlannerTask[]> => {
+        .then((tasks): Promise<PlannerTask[]> => {
           taskItems = tasks;
-          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/planner/buckets/${bucketId}/tasks`);
+          return odata.getAllItems<PlannerTask>(`${this.resource}/beta/planner/buckets/${bucketId}/tasks`);
         })
         .then((betaTasks): void => {
           logger.log(this.mergeTaskPriority(taskItems, betaTasks));
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
-    else if (planId || planName) {
+    else if (planId || planTitle) {
       this
         .getPlanId(args)
         .then((retrievedPlanId: string): Promise<PlannerTask[]> => {
           planId = retrievedPlanId;
           return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/plans/${planId}/tasks`);
         })
-        .then((tasks): Promise<BetaPlannerTask[]> => {
+        .then((tasks): Promise<PlannerTask[]> => {
           taskItems = tasks;
-          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/planner/plans/${planId}/tasks`);
+          return odata.getAllItems<PlannerTask>(`${this.resource}/beta/planner/plans/${planId}/tasks`);
         })
         .then((betaTasks): void => {
           logger.log(this.mergeTaskPriority(taskItems, betaTasks));
@@ -97,9 +102,9 @@ class PlannerTaskListCommand extends GraphCommand {
     else {
       odata
         .getAllItems<PlannerTask>(`${this.resource}/v1.0/me/planner/tasks`)
-        .then((tasks): Promise<BetaPlannerTask[]> => {
+        .then((tasks): Promise<PlannerTask[]> => {
           taskItems = tasks;
-          return odata.getAllItems<BetaPlannerTask>(`${this.resource}/beta/me/planner/tasks`);
+          return odata.getAllItems<PlannerTask>(`${this.resource}/beta/me/planner/tasks`);
         })
         .then((betaTasks): void => {
           logger.log(this.mergeTaskPriority(taskItems, betaTasks));
@@ -144,7 +149,7 @@ class PlannerTaskListCommand extends GraphCommand {
 
     return this
       .getGroupId(args)
-      .then((groupId: string) => planner.getPlanByName(args.options.planName!, groupId))
+      .then((groupId: string) => planner.getPlanByTitle(args.options.planTitle!, groupId))
       .then(plan => plan.id!);
   }
 
@@ -153,27 +158,12 @@ class PlannerTaskListCommand extends GraphCommand {
       return Promise.resolve(encodeURIComponent(args.options.ownerGroupId));
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.ownerGroupName as string)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: { id: string; }[] }>(requestOptions)
-      .then(response => {
-        const group: { id: string; } | undefined = response.value[0];
-        if (!group) {
-          return Promise.reject(`The specified owner group does not exist`);
-        }
-
-        return Promise.resolve(group.id);
-      });
+    return aadGroup
+      .getGroupByDisplayName(args.options.ownerGroupName!)
+      .then(group => group.id!);
   }
 
-  private mergeTaskPriority(taskItems: PlannerTask[], betaTaskItems: BetaPlannerTask[]): BetaPlannerTask[] {
+  private mergeTaskPriority(taskItems: PlannerTask[], betaTaskItems: PlannerTask[]): PlannerTask[] {
     const findBetaTask = (id: string) => betaTaskItems.find(task => task.id === id);
 
     taskItems.forEach(task => {
@@ -202,6 +192,9 @@ class PlannerTaskListCommand extends GraphCommand {
         option: '--planName [planName]'
       },
       {
+        option: '--planTitle [planTitle]'
+      },
+      {
         option: '--ownerGroupId [ownerGroupId]'
       },
       {
@@ -218,20 +211,20 @@ class PlannerTaskListCommand extends GraphCommand {
       return 'To retrieve tasks from a bucket, specify bucketId or bucketName, but not both';
     }
 
-    if (args.options.bucketName && !args.options.planId && !args.options.planName) {
-      return 'Specify either planId or planName when using bucketName';
+    if (args.options.bucketName && !args.options.planId && !args.options.planName && !args.options.planTitle) {
+      return 'Specify either planId or planTitle when using bucketName';
     }
 
-    if (args.options.planId && args.options.planName) {
-      return 'Specify either planId or planName but not both';
+    if (args.options.planId && (args.options.planName || args.options.planTitle)) {
+      return 'Specify either planId or planTitle but not both';
     }
 
-    if (args.options.planName && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName';
+    if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
     }
 
-    if (args.options.planName && args.options.ownerGroupId && args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
+    if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
     }
 
     if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {

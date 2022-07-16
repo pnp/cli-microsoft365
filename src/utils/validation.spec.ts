@@ -96,8 +96,13 @@ describe('validation/validation', () => {
     assert.strictEqual(result, true);
   });
 
-  it('should validate a valid date with milliseconds-precision time is passed', () => {
+  it('should validate a valid date with milliseconds-precision time is passed (short)', () => {
     const result = validation.isValidISODateTime("2019-01-01T01:01:01.123Z");
+    assert.strictEqual(result, true);
+  });
+
+  it('should validate a valid date with milliseconds-precision time is passed (long)', () => {
+    const result = validation.isValidISODateTime("2019-01-01T01:01:01.1234567Z");
     assert.strictEqual(result, true);
   });
 
@@ -109,6 +114,21 @@ describe('validation/validation', () => {
   it('isValidGuid returns false if invalid guid', () => {
     const result = validation.isValidGuid('b2307a39-e878-458b-bc90-03bc578531dw');
     assert(result === false);
+  });
+
+  it('isValidGuid returns true with @meid token', () => {
+    const result = validation.isValidGuid('@meid');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidGuid returns true with @meid token and spaces', () => {
+    const result = validation.isValidGuid('@meid ');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidGuid returns true with @meId (case sensitive)', () => {
+    const result = validation.isValidGuid('@meId ');
+    assert.strictEqual(result, true);
   });
 
   it('isValidTeamsChannelId returns true if valid channelId (all numbers)', () => {

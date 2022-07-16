@@ -20,7 +20,7 @@ m365 spo listitem roleinheritance break [options]
 : ID of the list. Specify listId or listTitle but not both
 
 `-t, --listTitle [listTitle]`
-Title of the list. Specify listId or listTitle but not both
+: Title of the list. Specify listId or listTitle but not both
 
 `-c, --clearExistingPermissions`
 : Set to clear existing roles from the list item

@@ -6,7 +6,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { validation } from '../../../../utils';
+import { formatting, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -55,8 +55,8 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const baseUrl: string = args.options.listId ?
-      `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')` :
-      `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')`;
+      `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')` :
+      `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
 
     if (this.verbose) {
       logger.logToStderr('Retrieving content type order...');

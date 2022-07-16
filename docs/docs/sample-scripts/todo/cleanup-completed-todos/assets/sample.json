@@ -1,0 +1,52 @@
+[
+  {
+    "name": "cleanup-completed-todos",
+    "version": null,
+    "source": "pnp",
+    "title": "Cleanup completed Microsoft To Do tasks",
+    "url": "https://github.com/pnp/cli-microsoft365/tree/main/docs/docs/sample-scripts/todo/cleanup-completed-todos",
+    "creationDateTime": "2021-04-09",
+    "updateDateTime": "2021-04-09 ",
+    "shortDescription": "This script iterates across all of the task lists and removes the tasks that have been marked as complete.",
+    "longDescription": "Microsoft To Do is my task management tool of choice, I use it for tracking everything I do, which means I generate and complete a lot of tasks during a working week. This script iterates across all of the task lists and removes the tasks that have been marked as complete.",
+    "products": [
+      "Microsoft To Do"
+    ],
+    "categories": [],
+    "tags": [
+      "Microsoft To Do",
+      "m365 todo task remove",
+      "m365 todo task list",
+      "m365 todo list list"
+    ],
+    "metadata": [
+      {
+        "key": "CLI-FOR-MICROSOFT365",
+        "value": "5.3.0"
+      }
+    ],
+    "thumbnails": [
+      {
+        "type": "image",
+        "order": 100,
+        "url": "https://raw.githubusercontent.com/pnp/cli-microsoft365/main/docs/docs/sample-scripts/todo/cleanup-completed-todos/assets/preview.png",
+        "alt": "preview image for the sample",
+        "slides": null
+      }
+    ],
+    "authors": [
+      {
+        "gitHubAccount": "garrytrinder",
+        "pictureUrl": "https://avatars.githubusercontent.com/u/11563347?v=4",
+        "name": "Garry Trinder"
+      }
+    ],
+    "references": [
+      {
+        "name": "Want to learn more about CLI for Microsoft 365 and the commands",
+        "description": "Check out the CLI for Microsoft 365 site to get started and for the reference to the commands.",
+        "url": "https://aka.ms/cli-m365"
+      }
+    ]
+  }
+]

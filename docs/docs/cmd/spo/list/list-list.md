@@ -13,6 +13,9 @@ m365 spo list list [options]
 `-u, --webUrl <webUrl>`
 : URL of the site where the lists to retrieve are located
 
+`--executeWithLimitedPermissions`
+: Use this option to execute this command with site member or visitor permissions. Not specifying this option will require site owner (or admin) permissions.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples

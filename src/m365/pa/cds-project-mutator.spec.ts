@@ -10,11 +10,11 @@ describe('CdsProjectMutator', () => {
     const cdsProjectMutator = new CdsProjectMutator(`<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <PowerAppsTargetsPath>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\PowerApps</PowerAppsTargetsPath>  
+    <PowerAppsTargetsPath>$(MSBuildExtensionsPath)\\Microsoft\\VisualStudio\\v$(VisualStudioVersion)\\PowerApps</PowerAppsTargetsPath>  
   </PropertyGroup>
   
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"/>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
+  <Import Project="$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
 
   <PropertyGroup>
     <ProjectGuid>00cad86b-4f87-4bcc-958c-b89640a96c21</ProjectGuid>
@@ -35,20 +35,20 @@ describe('CdsProjectMutator', () => {
   </ItemGroup>
   
   <ItemGroup>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\.gitignore"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\bin\**"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\obj\**"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\*.cdsproj"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\*.cdsproj.user"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\*.sln"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\.gitignore"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\bin\\**"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\obj\\**"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\*.cdsproj"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\*.cdsproj.user"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\*.sln"/>
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)\**" Exclude="@(ExcludeDirectories)"/>
+    <None Include="$(MSBuildThisFileDirectory)\\**" Exclude="@(ExcludeDirectories)"/>
   </ItemGroup>
 
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets"/>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
+  <Import Project="$(MSBuildToolsPath)\\Microsoft.Common.targets"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
 
 </Project>`);
 
@@ -59,11 +59,11 @@ describe('CdsProjectMutator', () => {
     assert.strictEqual(new XMLSerializer().serializeToString(cdsProjectMutator.cdsProjectDocument), `<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <PowerAppsTargetsPath>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\PowerApps</PowerAppsTargetsPath>  
+    <PowerAppsTargetsPath>$(MSBuildExtensionsPath)\\Microsoft\\VisualStudio\\v$(VisualStudioVersion)\\PowerApps</PowerAppsTargetsPath>  
   </PropertyGroup>
   
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"/>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
+  <Import Project="$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
 
   <PropertyGroup>
     <ProjectGuid>00cad86b-4f87-4bcc-958c-b89640a96c21</ProjectGuid>
@@ -84,24 +84,24 @@ describe('CdsProjectMutator', () => {
   </ItemGroup>
   
   <ItemGroup>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\.gitignore"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\bin\**"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\obj\**"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\*.cdsproj"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\*.cdsproj.user"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\*.sln"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\.gitignore"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\bin\\**"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\obj\\**"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\*.cdsproj"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\*.cdsproj.user"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\*.sln"/>
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)\**" Exclude="@(ExcludeDirectories)"/>
+    <None Include="$(MSBuildThisFileDirectory)\\**" Exclude="@(ExcludeDirectories)"/>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="${pcfProjectFilePath}"/>
   </ItemGroup>
 
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets"/>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
+  <Import Project="$(MSBuildToolsPath)\\Microsoft.Common.targets"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
 
 </Project>`);
   });
@@ -110,11 +110,11 @@ describe('CdsProjectMutator', () => {
     const cdsProjectMutator = new CdsProjectMutator(`<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <PowerAppsTargetsPath>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\PowerApps</PowerAppsTargetsPath>  
+    <PowerAppsTargetsPath>$(MSBuildExtensionsPath)\\Microsoft\\VisualStudio\\v$(VisualStudioVersion)\\PowerApps</PowerAppsTargetsPath>  
   </PropertyGroup>
   
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"/>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
+  <Import Project="$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
 
   <PropertyGroup>
     <ProjectGuid>00cad86b-4f87-4bcc-958c-b89640a96c21</ProjectGuid>
@@ -135,24 +135,24 @@ describe('CdsProjectMutator', () => {
   </ItemGroup>
   
   <ItemGroup>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\.gitignore"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\bin\**"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\obj\**"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\*.cdsproj"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\*.cdsproj.user"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\*.sln"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\.gitignore"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\bin\\**"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\obj\\**"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\*.cdsproj"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\*.cdsproj.user"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\*.sln"/>
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)\**" Exclude="@(ExcludeDirectories)"/>
+    <None Include="$(MSBuildThisFileDirectory)\\**" Exclude="@(ExcludeDirectories)"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\path\to\projectDirectory\project2.pcfproj"/>
+    <ProjectReference Include="..\\path\\to\\projectDirectory\\project2.pcfproj"/>
   </ItemGroup>
 
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets"/>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
+  <Import Project="$(MSBuildToolsPath)\\Microsoft.Common.targets"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
 
 </Project>`);
 
@@ -163,11 +163,11 @@ describe('CdsProjectMutator', () => {
     assert.strictEqual(new XMLSerializer().serializeToString(cdsProjectMutator.cdsProjectDocument), `<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <PowerAppsTargetsPath>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\PowerApps</PowerAppsTargetsPath>  
+    <PowerAppsTargetsPath>$(MSBuildExtensionsPath)\\Microsoft\\VisualStudio\\v$(VisualStudioVersion)\\PowerApps</PowerAppsTargetsPath>  
   </PropertyGroup>
   
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"/>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
+  <Import Project="$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
 
   <PropertyGroup>
     <ProjectGuid>00cad86b-4f87-4bcc-958c-b89640a96c21</ProjectGuid>
@@ -188,25 +188,25 @@ describe('CdsProjectMutator', () => {
   </ItemGroup>
   
   <ItemGroup>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\.gitignore"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\bin\**"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\obj\**"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\*.cdsproj"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\*.cdsproj.user"/>
-    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\*.sln"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\.gitignore"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\bin\\**"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\obj\\**"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\*.cdsproj"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\*.cdsproj.user"/>
+    <ExcludeDirectories Include="$(MSBuildThisFileDirectory)\\*.sln"/>
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)\**" Exclude="@(ExcludeDirectories)"/>
+    <None Include="$(MSBuildThisFileDirectory)\\**" Exclude="@(ExcludeDirectories)"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\path\to\projectDirectory\project2.pcfproj"/>
+    <ProjectReference Include="..\\path\\to\\projectDirectory\\project2.pcfproj"/>
     <ProjectReference Include="${pcfProjectFilePath}"/>
   </ItemGroup>
 
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets"/>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
+  <Import Project="$(MSBuildToolsPath)\\Microsoft.Common.targets"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
 
 </Project>`);
   });
@@ -215,11 +215,11 @@ describe('CdsProjectMutator', () => {
     const cdsProjectMutator = new CdsProjectMutator(`<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <PowerAppsTargetsPath>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\PowerApps</PowerAppsTargetsPath>  
+    <PowerAppsTargetsPath>$(MSBuildExtensionsPath)\\Microsoft\\VisualStudio\\v$(VisualStudioVersion)\\PowerApps</PowerAppsTargetsPath>  
   </PropertyGroup>
   
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"/>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
+  <Import Project="$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
 
   <PropertyGroup>
     <ProjectGuid>00cad86b-4f87-4bcc-958c-b89640a96c21</ProjectGuid>
@@ -229,8 +229,8 @@ describe('CdsProjectMutator', () => {
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets"/>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
+  <Import Project="$(MSBuildToolsPath)\\Microsoft.Common.targets"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
 
 </Project>`);
 
@@ -241,11 +241,11 @@ describe('CdsProjectMutator', () => {
     assert.strictEqual(new XMLSerializer().serializeToString(cdsProjectMutator.cdsProjectDocument), `<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <PowerAppsTargetsPath>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\PowerApps</PowerAppsTargetsPath>  
+    <PowerAppsTargetsPath>$(MSBuildExtensionsPath)\\Microsoft\\VisualStudio\\v$(VisualStudioVersion)\\PowerApps</PowerAppsTargetsPath>  
   </PropertyGroup>
   
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"/>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
+  <Import Project="$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
 
   <PropertyGroup>
     <ProjectGuid>00cad86b-4f87-4bcc-958c-b89640a96c21</ProjectGuid>
@@ -259,8 +259,8 @@ describe('CdsProjectMutator', () => {
     <ProjectReference Include="${pcfProjectFilePath}"/>
   </ItemGroup>
 
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets"/>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
+  <Import Project="$(MSBuildToolsPath)\\Microsoft.Common.targets"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
 
 </Project>`);
   });
@@ -269,11 +269,11 @@ describe('CdsProjectMutator', () => {
     const cdsProjectMutator = new CdsProjectMutator(`<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"/>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
+  <Import Project="$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
 
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets"/>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
+  <Import Project="$(MSBuildToolsPath)\\Microsoft.Common.targets"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
 
 </Project>`);
 
@@ -284,15 +284,15 @@ describe('CdsProjectMutator', () => {
     assert.strictEqual(new XMLSerializer().serializeToString(cdsProjectMutator.cdsProjectDocument), `<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"/>
+  <Import Project="$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props"/>
 
   <ItemGroup>
     <ProjectReference Include="${pcfProjectFilePath}"/>
   </ItemGroup>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.props')"/>
 
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets"/>
-  <Import Project="$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
+  <Import Project="$(MSBuildToolsPath)\\Microsoft.Common.targets"/>
+  <Import Project="$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets" Condition="Exists('$(PowerAppsTargetsPath)\\Microsoft.PowerApps.VisualStudio.Solution.targets')"/>
 
 </Project>`);
   });

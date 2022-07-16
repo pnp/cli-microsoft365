@@ -5,11 +5,15 @@ import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { sinonUtil } from '../../../../utils';
+import { accessToken, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./user-get');
 
 describe(commands.USER_GET, () => {
+  const userId = "68be84bf-a585-4776-80b3-30aa5207aa21";
+  const userName = "AarifS@contoso.onmicrosoft.com";
+  const resultValue = { "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" };
+    
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -61,16 +65,45 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using id', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter=id eq ') > -1) {
-        return Promise.resolve({ value: [{ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" }] });
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) > -1) {
+        return Promise.resolve({ value: [resultValue] });
       }
 
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '68be84bf-a585-4776-80b3-30aa5207aa21' } }, () => {
+    command.action(logger, { options: { debug: false, id: userId } }, () => {
       try {
-        assert(loggerLogSpy.calledWith({ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" }));
+        assert(loggerLogSpy.calledWith(resultValue));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('retrieves user using @userid token', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) > -1) {
+        return Promise.resolve({ value: [resultValue] });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(accessToken, 'getUserIdFromAccessToken').callsFake(() => { return userId; });    
+    auth.service.connected = true;
+    if (!auth.service.accessTokens[auth.defaultResource]) {
+      auth.service.accessTokens[auth.defaultResource] = {
+        expiresOn: '123',
+        accessToken: 'abc'
+      };
+    }
+
+    command.action(logger, { options: { debug: false, id: '@meid' } }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(resultValue));
         done();
       }
       catch (e) {
@@ -81,16 +114,16 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using id (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter=id eq ') > -1) {
-        return Promise.resolve({ value: [{ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" }] });
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) > -1) {
+        return Promise.resolve({ value: [resultValue] });
       }
 
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: '68be84bf-a585-4776-80b3-30aa5207aa21' } }, () => {
+    command.action(logger, { options: { debug: true, id: userId } }, () => {
       try {
-        assert(loggerLogSpy.calledWith({ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" }));
+        assert(loggerLogSpy.calledWith(resultValue));
         done();
       }
       catch (e) {
@@ -101,16 +134,45 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using user name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq ') > -1) {
-        return Promise.resolve({ value: [{ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" }] });
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent(userName)}'`) > -1) {
+        return Promise.resolve({ value: [resultValue] });
       }
 
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, userName: 'AarifS@contoso.onmicrosoft.com' } }, () => {
+    command.action(logger, { options: { debug: false, userName: userName } }, () => {
       try {
-        assert(loggerLogSpy.calledWith({ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" }));
+        assert(loggerLogSpy.calledWith(resultValue));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('retrieves user using @meusername token', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent(userName)}'`) > -1) {
+        return Promise.resolve({ value: [resultValue] });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => { return userName; });    
+    auth.service.connected = true;
+    if (!auth.service.accessTokens[auth.defaultResource]) {
+      auth.service.accessTokens[auth.defaultResource] = {
+        expiresOn: '123',
+        accessToken: 'abc'
+      };
+    }
+
+    command.action(logger, { options: { debug: false, userName: '@meusername' } }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(resultValue));
         done();
       }
       catch (e) {
@@ -121,16 +183,16 @@ describe(commands.USER_GET, () => {
 
   it('retrieves user using email', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter=mail eq ') > -1) {
-        return Promise.resolve({ value: [{ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" }] });
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=mail eq '${encodeURIComponent(userName)}'`) > -1) {
+        return Promise.resolve({ value: [resultValue] });
       }
 
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, email: 'AarifS@contoso.onmicrosoft.com' } }, () => {
+    command.action(logger, { options: { debug: false, email: userName } }, () => {
       try {
-        assert(loggerLogSpy.calledWith({ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "businessPhones": ["+1 425 555 0100"], "displayName": "Aarif Sherzai", "givenName": "Aarif", "jobTitle": "Administrative", "mail": null, "mobilePhone": "+1 425 555 0100", "officeLocation": null, "preferredLanguage": null, "surname": "Sherzai", "userPrincipalName": "AarifS@contoso.onmicrosoft.com" }));
+        assert(loggerLogSpy.calledWith(resultValue));
         done();
       }
       catch (e) {
@@ -141,16 +203,16 @@ describe(commands.USER_GET, () => {
 
   it('retrieves only the specified properties', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'AarifS%40contoso.onmicrosoft.com'&$select=id,mail`) {
-        return Promise.resolve({ value: [{ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "mail": null }] });
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent(userName)}'&$select=id,mail`) {
+        return Promise.resolve({ value: [{ "id": "userId", "mail": null }] });
       }
 
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, userName: 'AarifS@contoso.onmicrosoft.com', properties: 'id,mail' } }, () => {
+    command.action(logger, { options: { debug: false, userName: userName, properties: 'id,mail' } }, () => {
       try {
-        assert(loggerLogSpy.calledWith({ "id": "68be84bf-a585-4776-80b3-30aa5207aa21", "mail": null }));
+        assert(loggerLogSpy.calledWith({ "id": "userId", "mail": null }));
         done();
       }
       catch (e) {
@@ -186,16 +248,16 @@ describe(commands.USER_GET, () => {
 
   it('fails to get user when user with provided id does not exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter=id eq ') > -1) {
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=id eq '${userId}'`) > -1) {
         return Promise.resolve({ value: [] });
       }
 
-      return Promise.reject('The specified user with id 68be84bf-a585-4776-80b3-30aa5207aa22 does not exist');
+      return Promise.reject(`The specified user with id ${userId} does not exist`);
     });
 
-    command.action(logger, { options: { debug: false, id: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, id: userId } }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified user with id 68be84bf-a585-4776-80b3-30aa5207aa22 does not exist`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified user with id ${userId} does not exist`)));
         done();
       }
       catch (e) {
@@ -206,16 +268,16 @@ describe(commands.USER_GET, () => {
 
   it('fails to get user when user with provided user name does not exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq ') > -1) {
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent(userName)}'`) > -1) {
         return Promise.resolve({ value: [] });
       }
 
-      return Promise.reject('The specified user with user name AarifS@contoso.onmicrosoft.com does not exist');
+      return Promise.reject(`The specified user with user name ${userName} does not exist`);
     });
 
-    command.action(logger, { options: { debug: false, userName: 'AarifS@contoso.onmicrosoft.com' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, userName: userName } }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified user with user name AarifS@contoso.onmicrosoft.com does not exist`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified user with user name ${userName} does not exist`)));
         done();
       }
       catch (e) {
@@ -226,16 +288,16 @@ describe(commands.USER_GET, () => {
 
   it('fails to get user when user with provided email does not exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter=mail eq ') > -1) {
+      if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/users?$filter=mail eq '${encodeURIComponent(userName)}'`) > -1) {
         return Promise.resolve({ value: [] });
       }
 
-      return Promise.reject('The specified user with email AarifS@contoso.onmicrosoft.com does not exist');
+      return Promise.reject(`The specified user with email ${userName} does not exist`);
     });
 
-    command.action(logger, { options: { debug: false, email: 'AarifS@contoso.onmicrosoft.com' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, email: userName } }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified user with email AarifS@contoso.onmicrosoft.com does not exist`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified user with email ${userName} does not exist`)));
         done();
       }
       catch (e) {
@@ -249,23 +311,23 @@ describe(commands.USER_GET, () => {
       if ((opts.url as string).indexOf('https://graph.microsoft.com/v1.0/users?$filter') > -1) {
         return Promise.resolve({
           value: [
-            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', userPrincipalName: 'AarifS@contoso.onmicrosoft.com' },
-            { id: '68be84bf-a585-4776-80b3-30aa5207aa21', userPrincipalName: 'DebraB@contoso.onmicrosoft.com' }
+            resultValue,
+            { id: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', userPrincipalName: 'DebraB@contoso.onmicrosoft.com' }
           ]
         });
       }
 
-      return Promise.reject(`Multiple users with email AarifS@contoso.onmicrosoft.com found. Please disambiguate (user names): AarifS@contoso.onmicrosoft.com, DebraB@contoso.onmicrosoft.com or (ids): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 68be84bf-a585-4776-80b3-30aa5207aa21`);
+      return Promise.reject('Invalid request');
     });
 
     command.action(logger, {
       options: {
         debug: false,
-        email: 'AarifS@contoso.onmicrosoft.com'
+        email: userName
       }
     }, (err?: any) => {
       try {
-        assert.strictEqual(err.message, `Multiple users with email AarifS@contoso.onmicrosoft.com found. Please disambiguate (user names): AarifS@contoso.onmicrosoft.com, DebraB@contoso.onmicrosoft.com or (ids): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 68be84bf-a585-4776-80b3-30aa5207aa21`);
+        assert.strictEqual(err.message, `Multiple users with email ${userName} found. Please disambiguate (user names): ${userName}, DebraB@contoso.onmicrosoft.com or (ids): ${userId}, 9b1b1e42-794b-4c71-93ac-5ed92488b67f`);
         done();
       }
       catch (e) {

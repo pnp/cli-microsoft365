@@ -265,7 +265,8 @@ describe(commands.LIST_GET, () => {
                 "Description": null,
                 "OnlyAllowMembersViewMembership": false,
                 "OwnerTitle": "MySite Owners",
-                "RequestToJoinLeaveEmailSetting": ""
+                "RequestToJoinLeaveEmailSetting": "",
+                "PrincipalTypeString": "SharePointGroup"
               },
               "RoleDefinitionBindings": [
                 {
@@ -296,7 +297,8 @@ describe(commands.LIST_GET, () => {
                 "Description": null,
                 "OnlyAllowMembersViewMembership": false,
                 "OwnerTitle": "MySite Owners",
-                "RequestToJoinLeaveEmailSetting": ""
+                "RequestToJoinLeaveEmailSetting": "",
+                "PrincipalTypeString": "SharePointGroup"
               },
               "RoleDefinitionBindings": [
                 {
@@ -327,7 +329,8 @@ describe(commands.LIST_GET, () => {
                 "Description": null,
                 "OnlyAllowMembersViewMembership": false,
                 "OwnerTitle": "MySite Owners",
-                "RequestToJoinLeaveEmailSetting": ""
+                "RequestToJoinLeaveEmailSetting": "",
+                "PrincipalTypeString": "SharePointGroup"
               },
               "RoleDefinitionBindings": [
                 {
@@ -361,7 +364,8 @@ describe(commands.LIST_GET, () => {
                   "NameId": "10032000f65ded70",
                   "NameIdIssuer": "urn:federation:microsoftonline"
                 },
-                "UserPrincipalName": "user@contoso.onmicrosoft.com"
+                "UserPrincipalName": "user@contoso.onmicrosoft.com",
+                "PrincipalTypeString": "User"
               },
               "RoleDefinitionBindings": [
                 {
@@ -507,7 +511,8 @@ describe(commands.LIST_GET, () => {
                 Description: null,
                 OnlyAllowMembersViewMembership: false,
                 OwnerTitle: "MySite Owners",
-                RequestToJoinLeaveEmailSetting: ""
+                RequestToJoinLeaveEmailSetting: "",
+                PrincipalTypeString: "SharePointGroup"
               },
               RoleDefinitionBindings: [
                 {
@@ -538,7 +543,8 @@ describe(commands.LIST_GET, () => {
                 Description: null,
                 OnlyAllowMembersViewMembership: false,
                 OwnerTitle: "MySite Owners",
-                RequestToJoinLeaveEmailSetting: ""
+                RequestToJoinLeaveEmailSetting: "",
+                PrincipalTypeString: "SharePointGroup"
               },
               RoleDefinitionBindings: [
                 {
@@ -569,7 +575,8 @@ describe(commands.LIST_GET, () => {
                 Description: null,
                 OnlyAllowMembersViewMembership: false,
                 OwnerTitle: "MySite Owners",
-                RequestToJoinLeaveEmailSetting: ""
+                RequestToJoinLeaveEmailSetting: "",
+                PrincipalTypeString: "SharePointGroup"
               },
               RoleDefinitionBindings: [
                 {
@@ -603,7 +610,8 @@ describe(commands.LIST_GET, () => {
                   NameId: "10032000f65ded70",
                   NameIdIssuer: "urn:federation:microsoftonline"
                 },
-                UserPrincipalName: "user@contoso.onmicrosoft.com"
+                UserPrincipalName: "user@contoso.onmicrosoft.com",
+                PrincipalTypeString: "User"
               },
               RoleDefinitionBindings: [
                 {
@@ -653,7 +661,8 @@ describe(commands.LIST_GET, () => {
                 "Description": null,
                 "OnlyAllowMembersViewMembership": false,
                 "OwnerTitle": "MySite Owners",
-                "RequestToJoinLeaveEmailSetting": ""
+                "RequestToJoinLeaveEmailSetting": "",
+                "PrincipalTypeString": "SharePointGroup"
               },
               "RoleDefinitionBindings": [
                 {
@@ -684,7 +693,8 @@ describe(commands.LIST_GET, () => {
                 "Description": null,
                 "OnlyAllowMembersViewMembership": false,
                 "OwnerTitle": "MySite Owners",
-                "RequestToJoinLeaveEmailSetting": ""
+                "RequestToJoinLeaveEmailSetting": "",
+                "PrincipalTypeString": "SharePointGroup"
               },
               "RoleDefinitionBindings": [
                 {
@@ -715,7 +725,8 @@ describe(commands.LIST_GET, () => {
                 "Description": null,
                 "OnlyAllowMembersViewMembership": false,
                 "OwnerTitle": "MySite Owners",
-                "RequestToJoinLeaveEmailSetting": ""
+                "RequestToJoinLeaveEmailSetting": "",
+                "PrincipalTypeString": "SharePointGroup"
               },
               "RoleDefinitionBindings": [
                 {
@@ -749,7 +760,8 @@ describe(commands.LIST_GET, () => {
                   "NameId": "10032000f65ded70",
                   "NameIdIssuer": "urn:federation:microsoftonline"
                 },
-                "UserPrincipalName": "user@contoso.onmicrosoft.com"
+                "UserPrincipalName": "user@contoso.onmicrosoft.com",
+                "PrincipalTypeString": "User"
               },
               "RoleDefinitionBindings": [
                 {
@@ -802,7 +814,8 @@ describe(commands.LIST_GET, () => {
                 Description: null,
                 OnlyAllowMembersViewMembership: false,
                 OwnerTitle: "MySite Owners",
-                RequestToJoinLeaveEmailSetting: ""
+                RequestToJoinLeaveEmailSetting: "",
+                PrincipalTypeString: "SharePointGroup"
               },
               RoleDefinitionBindings: [
                 {
@@ -833,7 +846,8 @@ describe(commands.LIST_GET, () => {
                 Description: null,
                 OnlyAllowMembersViewMembership: false,
                 OwnerTitle: "MySite Owners",
-                RequestToJoinLeaveEmailSetting: ""
+                RequestToJoinLeaveEmailSetting: "",
+                PrincipalTypeString: "SharePointGroup"
               },
               RoleDefinitionBindings: [
                 {
@@ -864,7 +878,8 @@ describe(commands.LIST_GET, () => {
                 Description: null,
                 OnlyAllowMembersViewMembership: false,
                 OwnerTitle: "MySite Owners",
-                RequestToJoinLeaveEmailSetting: ""
+                RequestToJoinLeaveEmailSetting: "",
+                PrincipalTypeString: "SharePointGroup"
               },
               RoleDefinitionBindings: [
                 {
@@ -898,7 +913,8 @@ describe(commands.LIST_GET, () => {
                   NameId: "10032000f65ded70",
                   NameIdIssuer: "urn:federation:microsoftonline"
                 },
-                UserPrincipalName: "user@contoso.onmicrosoft.com"
+                UserPrincipalName: "user@contoso.onmicrosoft.com",
+                PrincipalTypeString: "User"
               },
               RoleDefinitionBindings: [
                 {
@@ -945,7 +961,8 @@ describe(commands.LIST_GET, () => {
                 "Description": null,
                 "OnlyAllowMembersViewMembership": false,
                 "OwnerTitle": "MySite Owners",
-                "RequestToJoinLeaveEmailSetting": ""
+                "RequestToJoinLeaveEmailSetting": "",
+                "PrincipalTypeString": "SharePointGroup"
               },
               "RoleDefinitionBindings": [
                 {
@@ -976,7 +993,8 @@ describe(commands.LIST_GET, () => {
                 "Description": null,
                 "OnlyAllowMembersViewMembership": false,
                 "OwnerTitle": "MySite Owners",
-                "RequestToJoinLeaveEmailSetting": ""
+                "RequestToJoinLeaveEmailSetting": "",
+                "PrincipalTypeString": "SharePointGroup"
               },
               "RoleDefinitionBindings": [
                 {
@@ -1007,7 +1025,8 @@ describe(commands.LIST_GET, () => {
                 "Description": null,
                 "OnlyAllowMembersViewMembership": false,
                 "OwnerTitle": "MySite Owners",
-                "RequestToJoinLeaveEmailSetting": ""
+                "RequestToJoinLeaveEmailSetting": "",
+                "PrincipalTypeString": "SharePointGroup"
               },
               "RoleDefinitionBindings": [
                 {
@@ -1041,7 +1060,8 @@ describe(commands.LIST_GET, () => {
                   "NameId": "10032000f65ded70",
                   "NameIdIssuer": "urn:federation:microsoftonline"
                 },
-                "UserPrincipalName": "user@contoso.onmicrosoft.com"
+                "UserPrincipalName": "user@contoso.onmicrosoft.com",
+                "PrincipalTypeString": "User"
               },
               "RoleDefinitionBindings": [
                 {
@@ -1094,7 +1114,8 @@ describe(commands.LIST_GET, () => {
                 Description: null,
                 OnlyAllowMembersViewMembership: false,
                 OwnerTitle: "MySite Owners",
-                RequestToJoinLeaveEmailSetting: ""
+                RequestToJoinLeaveEmailSetting: "",
+                PrincipalTypeString: "SharePointGroup"
               },
               RoleDefinitionBindings: [
                 {
@@ -1125,7 +1146,8 @@ describe(commands.LIST_GET, () => {
                 Description: null,
                 OnlyAllowMembersViewMembership: false,
                 OwnerTitle: "MySite Owners",
-                RequestToJoinLeaveEmailSetting: ""
+                RequestToJoinLeaveEmailSetting: "",
+                PrincipalTypeString: "SharePointGroup"
               },
               RoleDefinitionBindings: [
                 {
@@ -1156,7 +1178,8 @@ describe(commands.LIST_GET, () => {
                 Description: null,
                 OnlyAllowMembersViewMembership: false,
                 OwnerTitle: "MySite Owners",
-                RequestToJoinLeaveEmailSetting: ""
+                RequestToJoinLeaveEmailSetting: "",
+                PrincipalTypeString: "SharePointGroup"
               },
               RoleDefinitionBindings: [
                 {
@@ -1190,7 +1213,8 @@ describe(commands.LIST_GET, () => {
                   NameId: "10032000f65ded70",
                   NameIdIssuer: "urn:federation:microsoftonline"
                 },
-                UserPrincipalName: "user@contoso.onmicrosoft.com"
+                UserPrincipalName: "user@contoso.onmicrosoft.com",
+                PrincipalTypeString: "User"
               },
               RoleDefinitionBindings: [
                 {

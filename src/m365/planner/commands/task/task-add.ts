@@ -1,13 +1,16 @@
-import { Group, PlannerBucket, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
+import { PlannerBucket, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
 import Auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { planner } from '../../../../utils/planner';
 import { accessToken, formatting, validation } from '../../../../utils';
+import { aadGroup } from '../../../../utils/aadGroup';
+import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
+import { AppliedCategories } from '../../AppliedCategories';
 import commands from '../../commands';
+import { taskPriority } from '../../taskPriority';
 
 interface CommandArgs {
   options: Options;
@@ -16,6 +19,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   planId?: string;
   planName?: string;
+  planTitle?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
   bucketId?: string;
@@ -26,13 +30,19 @@ interface Options extends GlobalOptions {
   percentComplete?: number;
   assignedToUserIds?: string;
   assignedToUserNames?: string;
+  assigneePriority?: string;
   description?: string;
+  appliedCategories?: string;
+  previewType?: string;
   orderHint?: string;
+  priority?: number | string;
 }
 
 class PlannerTaskAddCommand extends GraphCommand {
   private planId: string | undefined;
   private bucketId: string | undefined;
+  private allowedAppliedCategories: string[] = ['category1', 'category2', 'category3', 'category4', 'category5', 'category6'];
+  private allowedPreviewTypes: string[] = ['automatic', 'nopreview', 'checklist', 'description', 'reference'];
 
   public get name(): string {
     return commands.TASK_ADD;
@@ -46,6 +56,7 @@ class PlannerTaskAddCommand extends GraphCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.planId = typeof args.options.planId !== 'undefined';
     telemetryProps.planName = typeof args.options.planName !== 'undefined';
+    telemetryProps.planTitle = typeof args.options.planTitle !== 'undefined';
     telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
     telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
     telemetryProps.bucketId = typeof args.options.bucketId !== 'undefined';
@@ -55,17 +66,27 @@ class PlannerTaskAddCommand extends GraphCommand {
     telemetryProps.percentComplete = typeof args.options.percentComplete !== 'undefined';
     telemetryProps.assignedToUserIds = typeof args.options.assignedToUserIds !== 'undefined';
     telemetryProps.assignedToUserNames = typeof args.options.assignedToUserNames !== 'undefined';
+    telemetryProps.assigneePriority = typeof args.options.assigneePriority !== 'undefined';
     telemetryProps.description = typeof args.options.description !== 'undefined';
+    telemetryProps.appliedCategories = typeof args.options.appliedCategories !== 'undefined';
+    telemetryProps.previewType = typeof args.options.previewType !== 'undefined';
     telemetryProps.orderHint = typeof args.options.orderHint !== 'undefined';
+    telemetryProps.priority = typeof args.options.priority !== 'undefined';
     return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (args.options.planName) {
+      args.options.planTitle = args.options.planName;
+
+      this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
+    }
+
     if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
     }
-    
+
     this
       .getPlanId(args)
       .then(planId => {
@@ -77,10 +98,12 @@ class PlannerTaskAddCommand extends GraphCommand {
         return this.generateUserAssignments(args);
       })
       .then(assignments => {
+        const appliedCategories = this.generateAppliedCategories(args.options);
+
         const requestOptions: any = {
           url: `${this.resource}/v1.0/planner/tasks`,
           headers: {
-            'accept': 'application/json;odata.metadata=none'
+            accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json',
           data: {
@@ -91,7 +114,10 @@ class PlannerTaskAddCommand extends GraphCommand {
             dueDateTime: args.options.dueDateTime,
             percentComplete: args.options.percentComplete,
             assignments: assignments,
-            orderHint: args.options.orderHint
+            orderHint: args.options.orderHint,
+            assigneePriority: args.options.assigneePriority,
+            appliedCategories: appliedCategories,
+            priority: taskPriority.getPriorityValue(args.options.priority)
           }
         };
 
@@ -115,21 +141,23 @@ class PlannerTaskAddCommand extends GraphCommand {
 
     return request
       .get(requestOptions)
-      .then((response: any) => {
-        const etag: string | undefined = response ? response['@odata.etag'] : undefined;
+      .then((response: any) => response['@odata.etag']);
+  }
 
-        if (!etag) {
-          return Promise.reject(`Error fetching task details`);
-        }
+  private generateAppliedCategories(options: Options): AppliedCategories {
+    if (!options.appliedCategories) {
+      return {};
+    }
 
-        return Promise.resolve(etag);
-      });
+    const categories: AppliedCategories = {};
+    options.appliedCategories.toLocaleLowerCase().split(',').forEach(x => categories[x] = true);
+    return categories;
   }
 
   private updateTaskDetails(options: Options, newTask: PlannerTask): Promise<PlannerTask & PlannerTaskDetails> {
     const taskId = newTask.id as string;
 
-    if (!options.description) {
+    if (!options.description && !options.previewType) {
       return Promise.resolve(newTask);
     }
 
@@ -145,7 +173,8 @@ class PlannerTaskAddCommand extends GraphCommand {
           },
           responseType: 'json',
           data: {
-            description: options.description
+            description: options.description,
+            previewType: options.previewType
           }
         };
 
@@ -208,7 +237,7 @@ class PlannerTaskAddCommand extends GraphCommand {
 
     return this
       .getGroupId(args)
-      .then((groupId: string) => planner.getPlanByName(args.options.planName!, groupId))
+      .then((groupId: string) => planner.getPlanByTitle(args.options.planTitle!, groupId))
       .then(plan => plan.id!);
   }
 
@@ -217,25 +246,9 @@ class PlannerTaskAddCommand extends GraphCommand {
       return Promise.resolve(args.options.ownerGroupId);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.ownerGroupName as string)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: Group[] }>(requestOptions)
-      .then(response => {
-        const group: Group | undefined = response.value[0];
-
-        if (!group) {
-          return Promise.reject(`The specified owner group does not exist`);
-        }
-
-        return Promise.resolve(group.id as string);
-      });
+    return aadGroup
+      .getGroupByDisplayName(args.options.ownerGroupName!)
+      .then(group => group.id!);
   }
 
   private getUserIds(options: Options): Promise<string[]> {
@@ -284,6 +297,7 @@ class PlannerTaskAddCommand extends GraphCommand {
       { option: '-t, --title <title>' },
       { option: '--planId [planId]' },
       { option: '--planName [planName]' },
+      { option: '--planTitle [planTitle]' },
       { option: '--ownerGroupId [ownerGroupId]' },
       { option: '--ownerGroupName [ownerGroupName]' },
       { option: '--bucketId [bucketId]' },
@@ -293,8 +307,18 @@ class PlannerTaskAddCommand extends GraphCommand {
       { option: '--percentComplete [percentComplete]' },
       { option: '--assignedToUserIds [assignedToUserIds]' },
       { option: '--assignedToUserNames [assignedToUserNames]' },
+      { option: '--assigneePriority [assigneePriority]' },
       { option: '--description [description]' },
-      { option: '--orderHint [orderHint]' }
+      {
+        option: '--appliedCategories [appliedCategories]',
+        autocomplete: this.allowedAppliedCategories
+      },
+      {
+        option: '--previewType [previewType]',
+        autocomplete: this.allowedPreviewTypes
+      },
+      { option: '--orderHint [orderHint]' },
+      { option: '--priority [priority]', autocomplete: taskPriority.priorityValues }
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -302,20 +326,20 @@ class PlannerTaskAddCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!args.options.planId && !args.options.planName) {
-      return 'Specify either planId or planName';
+    if (!args.options.planId && !args.options.planName && !args.options.planTitle) {
+      return 'Specify either planId or planTitle';
     }
 
-    if (args.options.planId && args.options.planName) {
-      return 'Specify either planId or planName but not both';
+    if (args.options.planId && (args.options.planName || args.options.planTitle)) {
+      return 'Specify either planId or planTitle but not both';
     }
 
-    if (args.options.planName && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName';
+    if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
     }
 
-    if (args.options.planName && args.options.ownerGroupId && args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
+    if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
     }
 
     if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
@@ -343,7 +367,7 @@ class PlannerTaskAddCommand extends GraphCommand {
     }
 
     if (args.options.percentComplete && (args.options.percentComplete < 0 || args.options.percentComplete > 100)) {
-      return `percentComplete should be between 0 and 100 `;
+      return `percentComplete should be between 0 and 100`;
     }
 
     if (args.options.assignedToUserIds && !validation.isValidGuidArray(args.options.assignedToUserIds.split(','))) {
@@ -352,6 +376,25 @@ class PlannerTaskAddCommand extends GraphCommand {
 
     if (args.options.assignedToUserIds && args.options.assignedToUserNames) {
       return 'Specify either assignedToUserIds or assignedToUserNames but not both';
+    }
+
+    if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => this.allowedAppliedCategories.indexOf(category.toLocaleLowerCase()) < 0).length !== 0) {
+      return `The appliedCategories contains invalid value. Specify either ${this.allowedAppliedCategories.join(', ')} as properties`;
+    }
+
+    if (args.options.previewType && this.allowedPreviewTypes.indexOf(args.options.previewType.toLocaleLowerCase()) === -1) {
+      return `${args.options.previewType} is not a valid preview type value. Allowed values are ${this.allowedPreviewTypes.join(', ')}`;
+    }
+
+    if (args.options.priority !== undefined) {
+      if (typeof args.options.priority === "number") {
+        if (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10 || !Number.isInteger(args.options.priority)) {
+          return 'priority should be an integer between 0 and 10.';
+        }
+      }
+      else if (taskPriority.priorityValues.map(l => l.toLowerCase()).indexOf(args.options.priority.toString().toLowerCase()) === -1) {
+        return `${args.options.priority} is not a valid priority value. Allowed values are ${taskPriority.priorityValues.join('|')}.`;
+      }
     }
 
     return true;

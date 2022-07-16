@@ -14,16 +14,19 @@ m365 planner bucket add [options]
 : Name of the bucket to add.
 
 `--planId [planId]`
-: Plan ID to which the bucket belongs. Specify either `planId` or `planName` but not both.
+: ID of the plan to which the bucket belongs. Specify either `planId` or `planTitle` but not both.
+
+`--planTitle [planTitle]`
+: Title of the plan to which the bucket belongs. Specify either `planId` or `planTitle` but not both.
 
 `--planName [planName]`
-: Plan Name to which the bucket belongs. Specify either `planId` or `planName` but not both.
+: (deprecated. Use `planTitle` instead) Title of the plan to which the bucket belongs.
 
 `--ownerGroupId [ownerGroupId]`
-: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--ownerGroupName [ownerGroupName]`
-: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--orderHint [orderHint]`
 : Hint used to order items of this type in a list view. The format is defined as outlined [here](https://docs.microsoft.com/en-us/graph/api/resources/planner-order-hint-format?view=graph-rest-1.0).
@@ -38,8 +41,8 @@ Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with 
 m365 planner bucket add --name "My Planner Bucket" --planId "xqQg5FS2LkCp935s-FIFm2QAFkHM" --orderHint " !"
 ```
 
-Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with the name _My Planner Plan_ owned by group _My Planner Group_
+Adds a Microsoft Planner bucket with the name _My Planner Bucket_ for plan with the title _My Planner Plan_ owned by group _My Planner Group_
 
 ```sh
-m365 planner bucket add --name "My Planner Bucket" --planName "My Planner Plan" --ownerGroupName "My Planner Group"
+m365 planner bucket add --name "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
 ```

@@ -17,10 +17,7 @@ m365 spo hubsite list [options]
 
 ## Remarks
 
-!!! attention
-    This command is based on a SharePoint API that is currently in preview and is subject to change once the API reached general availability.
-
-When using the text output type (default), the command lists only the values of the `ID`, `SiteUrl` and `Title` properties of the hub site. When setting the output type to JSON, all available properties are included in the command output.
+When using the text or csv output type, the command lists only the values of the `ID`, `SiteUrl` and `Title` properties of the hub site. With the output type as JSON, all available properties are included in the command output.
 
 ## Examples
 
