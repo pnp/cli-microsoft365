@@ -36,7 +36,7 @@ Permission Level mapping assumptions are given below
 
     ```powershell
     #Check the M365 login status for CLI
-    $LoginStatus = m365 status
+    $LoginStatus = m365 status --output text
     if($LoginStatus -Match "Logged out"){
         #Executing login command for CLI
         m365 login   
