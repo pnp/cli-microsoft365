@@ -47,6 +47,9 @@
 - Extends "teams team remove, archive, and unarchive" with extra options [#3483](https://github.com/pnp/cli-microsoft365/issues/3483)
 - Fixes spo field set command options inconsistency [#3418](https://github.com/pnp/cli-microsoft365/pull/3418)
 - Extends 'spo hubsite get' command. [#3454](https://github.com/pnp/cli-microsoft365/pull/3454)
+- consolidates spo site list and spo site classic list commands. [#3456](https://github.com/pnp/cli-microsoft365/pull/3456)
+- extends aad o365group recyclebinitem restore command with extra options. [#3428](https://github.com/pnp/cli-microsoft365/pull/3428)
+- fixed samples contain an invalid condition check. [#3511](https://github.com/pnp/cli-microsoft365/pull/3511)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
