@@ -14,7 +14,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  id?: string;
+  title?: string;
   url: string;
   scope?: string;
   confirm?: boolean;
@@ -27,6 +28,12 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
 
   public get description(): string {
     return 'Removes the specified custom action';
+  }
+
+  public optionSets(): string[][] | undefined {
+    return [
+      ['id', 'title']
+    ];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -75,17 +82,49 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
     }
   }
 
-  private removeScopedCustomAction(options: Options): Promise<undefined> {
-    const requestOptions: any = {
-      url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
+  private getCustomActionId(options: Options): Promise<string> {
+    if (options.id) {
+      return Promise.resolve(options.id);
+    }
+
+    const customActionRequestOptions: any = {
+      url: `${options.url}/_api/${options.scope}/UserCustomActions?$filter=Title eq '${encodeURIComponent(options.title as string)}'`,
       headers: {
-        accept: 'application/json;odata=nometadata',
-        'X-HTTP-Method': 'DELETE'
+        accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    return request.post(requestOptions);
+    return request
+      .get<{ value: CustomAction[] }>(customActionRequestOptions)
+      .then((res: { value: CustomAction[] }): Promise<string> => {
+        if (res.value.length === 1) {
+          return Promise.resolve(res.value[0].Id);
+        }
+
+        if (res.value.length === 0) {
+          return Promise.reject(`No user custom action with title '${options.title}' found`);
+        }
+
+        return Promise.reject(`Multiple user custom actions with title '${options.title}' found. Please disambiguate using IDs: ${res.value.map(a => a.Id).join(', ')}`);
+      });
+  }
+
+  private removeScopedCustomAction(options: Options): Promise<undefined> {
+    return this
+      .getCustomActionId(options)
+      .then((customActionId: string): Promise<undefined> => {
+        const requestOptions: any = {
+          url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(customActionId)}')')`,
+          headers: {
+            accept: 'application/json;odata=nometadata',
+            'X-HTTP-Method': 'DELETE'
+          },
+          responseType: 'json'
+        };
+
+        return request.post(requestOptions);
+      });
   }
 
   /**
@@ -121,7 +160,10 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>'
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-t, --title [title]'
       },
       {
         option: '-u, --url <url>'
@@ -140,7 +182,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (validation.isValidGuid(args.options.id) === false) {
+    if (args.options.id && validation.isValidGuid(args.options.id) === false) {
       return `${args.options.id} is not valid. Custom action Id (GUID) expected.`;
     }
 
