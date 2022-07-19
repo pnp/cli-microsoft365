@@ -16,7 +16,7 @@ To get all the Site Collections in your tenant and export to a .csv file, you ca
 === "PowerShell"
 
     ```powershell
-    $allSites = m365 spo site classic list --query "[?Template!='SRCHCEN#0']" -o json | ConvertFrom-Json
+    $allSites = m365 spo site list --query "[?Template!='SRCHCEN#0']" | ConvertFrom-Json
     $results = @()
 
     foreach($site in $allSites){
@@ -34,7 +34,7 @@ The script above has a query to ignore the _Search_ site collection by filtering
 === "PowerShell"
 
     ```powershell
-    $privateChannelSites = m365 spo site classic list --query "[?Template=='TEAMCHANNEL#0']" -o json | ConvertFrom-Json
+    $privateChannelSites = m365 spo site list --query "[?Template=='TEAMCHANNEL#0']" | ConvertFrom-Json
     ```
 
 ## Add the user as Site Collection Admin

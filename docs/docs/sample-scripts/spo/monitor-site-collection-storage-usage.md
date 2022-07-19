@@ -29,7 +29,7 @@ Inspired by [Salaudeen Rajack](https://www.sharepointdiary.com/2020/08/sharepoin
             [string]$sendTo
         )
         #Declare variables
-        $allSites = m365 spo site classic list -o json | ConvertFrom-Json
+        $allSites = m365 spo site list | ConvertFrom-Json
         $largeSites = $allSites | Where-Object { $_.StorageUsage -gt 1 }
         $results = @()
 

@@ -41,7 +41,7 @@ Another example how you can delete all Microsoft 365 Groups and SharePoint Onlin
     }
 
     Write-host "Retrieving all SPO sites..."
-    $allSites = m365 spo site classic list -o json --query "[?contains(Template,'SITEPAGEPUBLISHING') || contains(Template,'STS')]" | ConvertFrom-Json
+    $allSites = m365 spo site list --query "[?contains(Template,'SITEPAGEPUBLISHING') || contains(Template,'STS')]" | ConvertFrom-Json
     $siteCount = $allSites.Count
 
     Write-Host "Processing $siteCount sites..."
