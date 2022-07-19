@@ -7,7 +7,7 @@ Changing the URL of a site results in a new site type: a Redirect Site. However 
 === "PowerShell"
 
     ```powershell
-    $sites = m365 spo site classic list --t "REDIRECTSITE#0" --output json | ConvertFrom-Json
+    $sites = m365 spo site list --webTemplate "REDIRECTSITE#0" | ConvertFrom-Json
 
     $sites | ForEach-Object {
       Write-Host -f Green "Processing redirect site: " $_.Url
