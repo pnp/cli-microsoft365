@@ -744,6 +744,7 @@ nav:
       - 'List all checked out files': 'sample-scripts/spo/list-all-checked-out-files.md'
       - 'List all documents with a specific name within a SharePoint site': 'sample-scripts/spo/list-all-files-specific-name.md'
       - 'Lists all external users in all site collections': 'sample-scripts/spo/list-site-externalusers.md'
+      - 'List all external users in site groups across all site collections': 'sample-scripts/spo/list-externalusers-in-sitegroups.md'
       - 'Lists all failed site designs': 'sample-scripts/spo/list-failed-sitedesigns.md'
       - 'List all items with unique permissions': 'sample-scripts/spo/list-all-items-with-unique-permissions.md'
       - 'List all large files within a SharePoint Site': 'sample-scripts/spo/list-large-files-within-a-site.md'
