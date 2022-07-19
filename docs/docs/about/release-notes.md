@@ -50,6 +50,8 @@
 - consolidates spo site list and spo site classic list commands. [#3456](https://github.com/pnp/cli-microsoft365/pull/3456)
 - extends aad o365group recyclebinitem restore command with extra options. [#3428](https://github.com/pnp/cli-microsoft365/pull/3428)
 - fixed samples contain an invalid condition check. [#3511](https://github.com/pnp/cli-microsoft365/pull/3511)
+- updated spo customaction to get by title or id. [#3463](https://github.com/pnp/cli-microsoft365/pull/3463)
+- updated spo customaction to remove by title or id. [#3464](https://github.com/pnp/cli-microsoft365/pull/3464)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
