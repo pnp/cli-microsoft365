@@ -7,7 +7,7 @@ The following script iterates through all site collections and lists all site de
 === "PowerShell"
 
     ```powershell
-    $allSPOSites = m365 spo site classic list -o json | ConvertFrom-Json
+    $allSPOSites = m365 spo site list | ConvertFrom-Json
     $siteCount = $allSPOSites.Count
     Write-Output "Processing $siteCount sites..."
     foreach ($site in $allSPOSites) {

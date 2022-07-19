@@ -8,7 +8,7 @@ When you delete Microsoft 365 groups, the modern group-connected team sites get 
 
     ```powershell
     $sparksjoy = "Cat Lovers United", "Extranet", "Hub"
-    $sites = m365 spo site classic list -o json |ConvertFrom-Json
+    $sites = m365 spo site list |ConvertFrom-Json
     $sites = $sites | where {  $_.template -eq "SITEPAGEPUBLISHING#0" -or $_.template -eq "STS#3" -and -not ($sparksjoy -contains $_.Title)}
     if ($sites.Count -eq 0) { break }
     $sites | Format-Table Title, Url, Template
@@ -49,7 +49,7 @@ When you delete Microsoft 365 groups, the modern group-connected team sites get 
         sitestoremove+=("$site")
       fi
 
-    done < <(m365 spo site classic list -o json | jq -c '.[] | select(.Template == "SITEPAGEPUBLISHING#0" or .Template == "STS#3")')
+    done < <(m365 spo site list | jq -c '.[] | select(.Template == "SITEPAGEPUBLISHING#0" or .Template == "STS#3")')
 
     if [ ${#sitestoremove[@]} = 0 ]; then
       exit 1
