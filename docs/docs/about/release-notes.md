@@ -52,6 +52,8 @@
 - fixed samples contain an invalid condition check. [#3511](https://github.com/pnp/cli-microsoft365/pull/3511)
 - updated spo customaction to get by title or id. [#3463](https://github.com/pnp/cli-microsoft365/pull/3463)
 - updated spo customaction to remove by title or id. [#3464](https://github.com/pnp/cli-microsoft365/pull/3464)
+- consolidate spo site set and spo site classic set commands. [#3450](https://github.com/pnp/cli-microsoft365/pull/3450)
+- Updates spo tenant appcatalog add reference to deprecated spo site classic add command. [#3459](https://github.com/pnp/cli-microsoft365/pull/3459)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
