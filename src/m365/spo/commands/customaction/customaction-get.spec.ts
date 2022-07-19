@@ -17,7 +17,7 @@ describe(commands.CUSTOMACTION_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -60,7 +60,115 @@ describe(commands.CUSTOMACTION_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves and prints all details user custom actions', (done) => {
+  it('defines correct option sets', () => {
+    assert.deepStrictEqual(command.optionSets(), [
+      ['id', 'title']
+    ]);
+  });
+
+  it('handles error when multiple user custom actions with the specified title found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/UserCustomActions?$filter=Title eq ') > -1) {
+        return Promise.resolve({
+          value: [
+            {
+              ClientSideComponentId: 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
+              ClientSideComponentProperties: "'{testMessage:Test message}'",
+              CommandUIExtension: null,
+              Description: null,
+              Group: null,
+              HostProperties: '',
+              Id: 'a70d8013-3b9f-4601-93a5-0e453ab9a1f3',
+              ImageUrl: null,
+              Location: 'ClientSideExtension.ApplicationCustomizer',
+              Name: 'YourName',
+              RegistrationId: null,
+              RegistrationType: 0,
+              Rights: [Object],
+              Scope: 3,
+              ScriptBlock: null,
+              ScriptSrc: null,
+              Sequence: 0,
+              Title: 'YourAppCustomizer',
+              Url: null,
+              VersionOfUserCustomAction: '16.0.1.0'
+            },
+            {
+              ClientSideComponentId: 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
+              ClientSideComponentProperties: "'{testMessage:Test message}'",
+              CommandUIExtension: null,
+              Description: null,
+              Group: null,
+              HostProperties: '',
+              Id: '63aa745f-b4dd-4055-a4d7-d9032a0cfc59',
+              ImageUrl: null,
+              Location: 'ClientSideExtension.ApplicationCustomizer',
+              Name: 'YourName',
+              RegistrationId: null,
+              RegistrationType: 0,
+              Rights: [Object],
+              Scope: 3,
+              ScriptBlock: null,
+              ScriptSrc: null,
+              Sequence: 0,
+              Title: 'YourAppCustomizer',
+              Url: null,
+              VersionOfUserCustomAction: '16.0.1.0'
+            }
+          ]
+        });
+      }
+
+      return Promise.reject(`Invalid request`);
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        title: 'YourAppCustomizer',
+        url: 'https://contoso.sharepoint.com'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(err.message, `Multiple user custom actions with title 'YourAppCustomizer' found. Please disambiguate using IDs: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59`);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('handles error when no user custom actions with the specified title found', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/UserCustomActions?$filter=Title eq ') > -1) {
+        return Promise.resolve({
+          value: [
+          ]
+        });
+      }
+
+      return Promise.reject(`Invalid request`);
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        title: 'YourAppCustomizer',
+        url: 'https://contoso.sharepoint.com'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(err.message, `No user custom action with title 'YourAppCustomizer' found`);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('retrieves and prints all details user custom actions by id', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.resolve(
@@ -90,13 +198,15 @@ describe(commands.CUSTOMACTION_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: {
-      debug: false,
-      id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-      url: 'https://contoso.sharepoint.com'
-    } }, () => {
+    command.action(logger, {
+      options: {
+        debug: false,
+        id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+        url: 'https://contoso.sharepoint.com'
+      }
+    }, () => {
       try {
-        assert(loggerLogSpy.calledWith({ 
+        assert(loggerLogSpy.calledWith({
           ClientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
           ClientSideComponentProperties: '{"testMessage":"Test message"}',
           CommandUIExtension: null,
@@ -115,7 +225,76 @@ describe(commands.CUSTOMACTION_GET, () => {
           Sequence: 65536,
           Title: 'Places',
           Url: null,
-          VersionOfUserCustomAction: '1.0.1.0' 
+          VersionOfUserCustomAction: '1.0.1.0'
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('retrieves and prints all details user custom actions by title', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/UserCustomActions?$filter=Title eq ') > -1) {
+        return Promise.resolve({
+          value: [
+            {
+              "ClientSideComponentId": "015e0fcf-fe9d-4037-95af-0a4776cdfbb4",
+              "ClientSideComponentProperties": "{\"testMessage\":\"Test message\"}",
+              "CommandUIExtension": null,
+              "Description": null,
+              "Group": null,
+              "Id": "d26af83a-6421-4bb3-9f5c-8174ba645c80",
+              "ImageUrl": null,
+              "Location": "ClientSideExtension.ApplicationCustomizer",
+              "Name": "{d26af83a-6421-4bb3-9f5c-8174ba645c80}",
+              "RegistrationId": null,
+              "RegistrationType": 0,
+              "Rights": { "High": 0, "Low": 0 },
+              "Scope": "1",
+              "ScriptBlock": null,
+              "ScriptSrc": null,
+              "Sequence": 65536,
+              "Title": "Places",
+              "Url": null,
+              "VersionOfUserCustomAction": "1.0.1.0"
+            }
+          ]
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        title: 'Places',
+        url: 'https://contoso.sharepoint.com'
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith({
+          ClientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
+          ClientSideComponentProperties: '{"testMessage":"Test message"}',
+          CommandUIExtension: null,
+          Description: null,
+          Group: null,
+          Id: 'd26af83a-6421-4bb3-9f5c-8174ba645c80',
+          ImageUrl: null,
+          Location: 'ClientSideExtension.ApplicationCustomizer',
+          Name: '{d26af83a-6421-4bb3-9f5c-8174ba645c80}',
+          RegistrationId: null,
+          RegistrationType: 0,
+          Rights: '{"High":0,"Low":0}',
+          Scope: '1',
+          ScriptBlock: null,
+          ScriptSrc: null,
+          Sequence: 65536,
+          Title: 'Places',
+          Url: null,
+          VersionOfUserCustomAction: '1.0.1.0'
         }));
         done();
       }
@@ -472,10 +651,10 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          url: 'foo'
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        url: 'foo'
+      }
     });
     assert.notStrictEqual(actual, true);
   });
@@ -483,10 +662,10 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('fails validation if the id option is not a valid guid', () => {
     const actual = command.validate({
       options:
-        {
-          id: "foo",
-          url: 'https://contoso.sharepoint.com'
-        }
+      {
+        id: "foo",
+        url: 'https://contoso.sharepoint.com'
+      }
     });
     assert.notStrictEqual(actual, true);
   });
@@ -494,10 +673,10 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('passes validation when the id and url options specified', () => {
     const actual = command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          url: "https://contoso.sharepoint.com"
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        url: "https://contoso.sharepoint.com"
+      }
     });
     assert.strictEqual(actual, true);
   });
@@ -505,11 +684,11 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('passes validation when the id, url and scope options specified', () => {
     const actual = command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          url: "https://contoso.sharepoint.com",
-          scope: "Site"
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        url: "https://contoso.sharepoint.com",
+        scope: "Site"
+      }
     });
     assert.strictEqual(actual, true);
   });
@@ -517,10 +696,10 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('passes validation when the id and url option specified', () => {
     const actual = command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          url: "https://contoso.sharepoint.com"
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        url: "https://contoso.sharepoint.com"
+      }
     });
     assert.strictEqual(actual, true);
   });
@@ -543,11 +722,11 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('accepts scope to be All', () => {
     const actual = command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          url: "https://contoso.sharepoint.com",
-          scope: 'All'
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        url: "https://contoso.sharepoint.com",
+        scope: 'All'
+      }
     });
     assert.strictEqual(actual, true);
   });
@@ -555,11 +734,11 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('accepts scope to be Site', () => {
     const actual = command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          url: "https://contoso.sharepoint.com",
-          scope: 'Site'
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        url: "https://contoso.sharepoint.com",
+        scope: 'Site'
+      }
     });
     assert.strictEqual(actual, true);
   });
@@ -567,11 +746,11 @@ describe(commands.CUSTOMACTION_GET, () => {
   it('accepts scope to be Web', () => {
     const actual = command.validate({
       options:
-        {
-          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          url: "https://contoso.sharepoint.com",
-          scope: 'Web'
-        }
+      {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        url: "https://contoso.sharepoint.com",
+        scope: 'Web'
+      }
     });
     assert.strictEqual(actual, true);
   });
@@ -604,10 +783,10 @@ describe(commands.CUSTOMACTION_GET, () => {
     const actual = command.validate(
       {
         options:
-          {
-            id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-            url: "https://contoso.sharepoint.com"
-          }
+        {
+          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+          url: "https://contoso.sharepoint.com"
+        }
       });
     assert.strictEqual(actual, true);
   });

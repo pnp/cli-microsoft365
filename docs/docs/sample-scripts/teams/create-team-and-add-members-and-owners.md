@@ -30,7 +30,7 @@ This sample script shows you how to create a Team and add members and owners usi
     # process teams that you have joined only
     $membersList = Import-Csv $importFile -Delimiter ","
 
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
 
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365

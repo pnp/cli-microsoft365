@@ -12,7 +12,7 @@ Another example how you can delete all Microsoft 365 Groups and SharePoint Onlin
     ### Deletes the resources from the recyclebin. The CLI does not support this feature yet
     $skipRecycleBin = $true
 
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
     Write-Host $m365Status
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365

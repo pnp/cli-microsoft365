@@ -17,7 +17,7 @@ This script is a good starting point for a setup script to create site with some
     Write-host 'setup script example'
 
     Write-host 'ensure logged in'
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
     if ($m365Status -eq "Logged Out") {
       m365 login
     }

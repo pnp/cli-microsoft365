@@ -16,6 +16,8 @@
 **SharePoint:**
 
 - [spo roledefinition get](../cmd/spo/roledefinition/roledefinition-get.md) - adds spo roledefinition get command. [#3270](https://github.com/pnp/cli-microsoft365/issues/3270)
+- [spo group set](../cmd/spo/group/group-set.md) - adds spo group set command. [#3499](https://github.com/pnp/cli-microsoft365/pull/3499)
+- [spo group add](../cmd/spo/group/group-add.md) - adds spo group add command. [#3493](https://github.com/pnp/cli-microsoft365/pull/3493)
 
 **Teams:**
 
@@ -38,6 +40,18 @@
 - added `@meId` and `@meUserName` tokens [#3056](https://github.com/pnp/cli-microsoft365/issues/3056)
 - extended spo hubsite get options. [#3378](https://github.com/pnp/cli-microsoft365/issues/3378)
 - fixed planTitle inconsistency in planner commands. [#3342](https://github.com/pnp/cli-microsoft365/issues/3342)
+- fixed API issue for broken Power Apps commands [#3207](https://github.com/pnp/cli-microsoft365/issues/3207)
+- fixed 'spo listitem list' and 'spo listitem get' commands [#3391](https://github.com/pnp/cli-microsoft365/issues/3391)
+- extended `planner plan add` with more options [#3345](https://github.com/pnp/cli-microsoft365/issues/3345)
+- Updates 'planner task get docs' [#3495](https://github.com/pnp/cli-microsoft365/issues/3495)
+- Extends "teams team remove, archive, and unarchive" with extra options [#3483](https://github.com/pnp/cli-microsoft365/issues/3483)
+- Fixes spo field set command options inconsistency [#3418](https://github.com/pnp/cli-microsoft365/pull/3418)
+- Extends 'spo hubsite get' command. [#3454](https://github.com/pnp/cli-microsoft365/pull/3454)
+- consolidates spo site list and spo site classic list commands. [#3456](https://github.com/pnp/cli-microsoft365/pull/3456)
+- extends aad o365group recyclebinitem restore command with extra options. [#3428](https://github.com/pnp/cli-microsoft365/pull/3428)
+- fixed samples contain an invalid condition check. [#3511](https://github.com/pnp/cli-microsoft365/pull/3511)
+- updated spo customaction to get by title or id. [#3463](https://github.com/pnp/cli-microsoft365/pull/3463)
+- updated spo customaction to remove by title or id. [#3464](https://github.com/pnp/cli-microsoft365/pull/3464)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 

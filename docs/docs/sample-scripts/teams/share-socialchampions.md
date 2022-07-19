@@ -10,7 +10,7 @@ Retrieves activities for SharePoint Online, Teams and Yammer and shares the top 
 === "PowerShell"
 
     ```powershell
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
 
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365

@@ -9,7 +9,7 @@ This script will create multiple tasks to a Planner plan from the information pr
 === "PowerShell"
 
     ```powershell
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365
       m365 login

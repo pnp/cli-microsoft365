@@ -12,7 +12,7 @@ Find all the Microsoft 365 Groups that a user is an Owner of and replace them wi
     $newUser = "newUserUpn"
     # Parameters end
 
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
 
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365

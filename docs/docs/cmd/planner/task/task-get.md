@@ -8,6 +8,12 @@ Retrieve the specified planner task
 m365 planner task get [options]
 ```
 
+## Alias
+
+```sh
+m365 planner task details get [options]
+```
+
 ## Options
 
 `-i, --id  [id]`

@@ -10,8 +10,14 @@ m365 teams team remove [options]
 
 ## Options
 
-`-i, --teamId <teamId>`
-: The ID of the Teams team to remove
+`-i, --id [id]`
+: The ID of the Microsoft Teams team to remove. Specify either id or name but not both
+
+`-n, --name [name]`
+: The display name of the Microsoft Teams team to remove. Specify either id or name but not both
+
+`--teamId [teamId]`
+: (deprecated. Use `id` instead) The ID of the Teams team to remove
 
 `--confirm`
 : Don't prompt for confirming removing the specified team
@@ -22,18 +28,26 @@ m365 teams team remove [options]
 
 When deleted, Microsoft 365 groups are moved to a temporary container and can be restored within 30 days. After that time, they are permanently deleted. This applies only to Microsoft 365 groups.
 
+If the command finds multiple Microsoft Teams teams with the specified name, it will prompt you to disambiguate which team it should use, listing the discovered team IDs.
+
 ## Examples
 
-Removes the specified team
+Removes the specified Microsoft Teams team with id _00000000-0000-0000-0000-000000000000_
 
 ```sh
-m365 teams team remove --teamId '00000000-0000-0000-0000-000000000000'
+m365 teams team remove --id 00000000-0000-0000-0000-000000000000
+```
+
+Removes the specified Microsoft Teams team with name _Team Name_
+
+```sh
+m365 teams team remove --name "Team Name"
 ```
 
 Removes the specified team without confirmation
 
 ```sh
-m365 teams team remove --teamId '00000000-0000-0000-0000-000000000000' --confirm
+m365 teams team remove --id 00000000-0000-0000-0000-000000000000 --confirm
 ```
 
 ## More information

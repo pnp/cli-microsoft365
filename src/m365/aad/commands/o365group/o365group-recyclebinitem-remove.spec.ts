@@ -245,7 +245,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
     });
   });
 
-  it('correctly deletes plan by displayName', (done) => {
+  it('correctly deletes group by displayName', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupDisplayName)}'`) {
         return Promise.resolve(singleGroupsResponse);
@@ -280,7 +280,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
     });
   });
 
-  it('correctly deletes plan by mailNickname', (done) => {
+  it('correctly deletes group by mailNickname', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'`) {
         return Promise.resolve(singleGroupsResponse);

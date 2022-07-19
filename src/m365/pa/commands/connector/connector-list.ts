@@ -3,9 +3,11 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { AzmgmtItemsListCommand } from '../../../base/AzmgmtItemsListCommand';
+import { odata } from '../../../../utils';
+import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import flowCommands from '../../../flow/commands';
 import commands from '../../commands';
+import { Connector } from './Connector';
 
 interface CommandArgs {
   options: Options;
@@ -15,7 +17,7 @@ interface Options extends GlobalOptions {
   environment: string;
 }
 
-class PaConnectorListCommand extends AzmgmtItemsListCommand<{ name: string; displayName: string; properties: { displayName: string } }> {
+class PaConnectorListCommand extends PowerAppsCommand {
   public get name(): string {
     return commands.CONNECTOR_LIST;
   }
@@ -33,17 +35,17 @@ class PaConnectorListCommand extends AzmgmtItemsListCommand<{ name: string; disp
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const url: string = `${this.resource}providers/Microsoft.PowerApps/apis?api-version=2016-11-01&$filter=environment%20eq%20%27${encodeURIComponent(args.options.environment)}%27%20and%20IsCustomApi%20eq%20%27True%27`;
+    const url = `${this.resource}/providers/Microsoft.PowerApps/apis?api-version=2016-11-01&$filter=environment%20eq%20%27${encodeURIComponent(args.options.environment)}%27%20and%20IsCustomApi%20eq%20%27True%27`;
 
-    this
-      .getAllItems(url, logger, true)
-      .then((): void => {
-        if (this.items.length > 0) {
-          this.items.forEach(c => {
+    odata
+      .getAllItems<Connector>(url)
+      .then((connectors: Connector[]): void => {
+        if (connectors.length > 0) {
+          connectors.forEach(c => {
             c.displayName = c.properties.displayName;
           });
 
-          logger.log(this.items);
+          logger.log(connectors);
         }
         else {
           if (this.verbose) {

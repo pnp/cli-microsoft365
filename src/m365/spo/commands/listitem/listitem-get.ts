@@ -46,19 +46,17 @@ class SpoListItemGetCommand extends SpoCommand {
     const listIdArgument = args.options.listId || '';
     const listTitleArgument = args.options.listTitle || '';
     const listRestUrl: string = (args.options.listId ?
-      `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listIdArgument)}')`
-      : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitleArgument)}')`);
+      `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(listIdArgument)}')` :
+      `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(listTitleArgument)}')`);
 
-    const propertiesSelect: string = args.options.properties ?
-      `?$select=${encodeURIComponent(args.options.properties)}` :
-      (
-        (!args.options.output || args.options.output === 'text') ?
-          `?$select=Id,Title` :
-          ``
-      );
+    const propertiesSelect: string[] = args.options.properties ? args.options.properties.split(',') : [];
+    const propertiesWithSlash: string[] = propertiesSelect.filter(item => item.includes('/'));
+    const propertiesToExpand: string[] = propertiesWithSlash.map(e => e.split('/')[0]);
+    const expandPropertiesArray: string[] = propertiesToExpand.filter((item, pos) => propertiesToExpand.indexOf(item) === pos);
+    const fieldExpand: string = expandPropertiesArray.length > 0 ? `&$expand=${expandPropertiesArray.join(",")}` : ``;
 
     const requestOptions: any = {
-      url: `${listRestUrl}/items(${args.options.id})${propertiesSelect}`,
+      url: `${listRestUrl}/items(${args.options.id})?$select=${encodeURIComponent(propertiesSelect.join(","))}${fieldExpand}`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -68,7 +66,7 @@ class SpoListItemGetCommand extends SpoCommand {
     request
       .get(requestOptions)
       .then((response: any): void => {
-        delete response["ID"];
+        delete response['ID'];
         logger.log(<ListItemInstance>response);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));

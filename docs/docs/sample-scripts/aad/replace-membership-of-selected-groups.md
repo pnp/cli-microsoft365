@@ -12,7 +12,7 @@ This script can be used to replace the membership of a user for a selected list 
     $newUser = "upnOfNewUser"
     # Parameters end
 
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
 
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365

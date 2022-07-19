@@ -43,6 +43,8 @@ class SpoSiteClassicListCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+    this.showDeprecationWarning(logger, commands.SITE_CLASSIC_LIST, commands.SITE_LIST);
+
     const webTemplate: string = args.options.webTemplate || '';
     const includeOneDriveSites: boolean = args.options.includeOneDriveSites || false;
     const personalSite: string = includeOneDriveSites === false ? '0' : '1';

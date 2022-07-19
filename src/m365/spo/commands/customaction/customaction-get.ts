@@ -14,7 +14,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  id?: string;
+  title?: string;
   url: string;
   scope?: string;
 }
@@ -26,6 +27,12 @@ class SpoCustomActionGetCommand extends SpoCommand {
 
   public get description(): string {
     return 'Gets details for the specified custom action';
+  }
+
+  public optionSets(): string[][] | undefined {
+    return [
+      ['id', 'title']
+    ];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -76,15 +83,39 @@ class SpoCustomActionGetCommand extends SpoCommand {
   }
 
   private getCustomAction(options: Options): Promise<CustomAction> {
+    const filter: string = options.id ?
+      `('${encodeURIComponent(options.id as string)}')` :
+      `?$filter=Title eq '${encodeURIComponent(options.title as string)}'`;
+
     const requestOptions: any = {
-      url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
+      url: `${options.url}/_api/${options.scope}/UserCustomActions${filter}`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    return request.get(requestOptions);
+    if (options.id) {
+      return request
+        .get<CustomAction>(requestOptions)
+        .then((res: CustomAction): Promise<CustomAction> => {
+          return Promise.resolve(res);
+        });
+    }
+
+    return request
+      .get<{ value: CustomAction[] }>(requestOptions)
+      .then((res: { value: CustomAction[] }): Promise<CustomAction> => {
+        if (res.value.length === 1) {
+          return Promise.resolve(res.value[0]);
+        }
+
+        if (res.value.length === 0) {
+          return Promise.reject(`No user custom action with title '${options.title}' found`);
+        }
+
+        return Promise.reject(`Multiple user custom actions with title '${options.title}' found. Please disambiguate using IDs: ${res.value.map(a => a.Id).join(', ')}`);
+      });
   }
 
   /**
@@ -131,7 +162,10 @@ class SpoCustomActionGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>'
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-t, --title [title]'
       },
       {
         option: '-u, --url <url>'
@@ -147,7 +181,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (validation.isValidGuid(args.options.id) === false) {
+    if (args.options.id && validation.isValidGuid(args.options.id) === false) {
       return `${args.options.id} is not valid. Custom action id (Guid) expected.`;
     }
 
