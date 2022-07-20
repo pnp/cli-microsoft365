@@ -6,6 +6,11 @@
 
 - removed deprecated options for 'spo listitem list' command [#3365](https://github.com/pnp/cli-microsoft365/issues/3365)
 - removed 'aad app delete' and 'aad app role delete' alias [#3134](https://github.com/pnp/cli-microsoft365/issues/3134)
+- removed executeWithLimitedPermission option from spo list list [#3468](https://github.com/pnp/cli-microsoft365/pull/3468)
+- removed references and alias for deprecated planner task details get [#3518](https://github.com/pnp/cli-microsoft365/pull/3518)
+- removed references and alias for deprecated planner plan details get [#3469](https://github.com/pnp/cli-microsoft365/pull/3469)
+- removed deprecated options for 'spo listitem list' command [#3365](https://github.com/pnp/cli-microsoft365/issues/3365)
+- removed 'aad app delete' and 'aad app role delete' alias [#3134](https://github.com/pnp/cli-microsoft365/issues/3134)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
