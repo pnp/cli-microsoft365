@@ -14,39 +14,47 @@ class StatusCommand extends Command {
   }
 
   public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
-    auth
-      .ensureAccessToken(auth.defaultResource, logger, this.debug)
-      .then((): void => {
-        if (this.debug) {
-          logger.logToStderr({
-            connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
-            authType: AuthType[auth.service.authType],
-            accessTokens: JSON.stringify(auth.service.accessTokens, null, 2)
-          });
-        }
-        else {
-          logger.log({
-            connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken)
-          });
-        }
-        cb();
-      }, (rej: Error): void => {
-        if (this.debug) {
-          logger.logToStderr('Error:');
-          logger.logToStderr(rej);
-          logger.logToStderr('');
-        }
 
-        auth.service.logout();
-        if (this.verbose) {
-          logger.logToStderr('Logged out from Microsoft 365');
-        }
-        else {
-          logger.log('Logged out');
-        }
+    if (auth.service.connected) {
+      auth
+        .ensureAccessToken(auth.defaultResource, logger, this.debug)
+        .then((): void => {
+          if (this.debug) {
+            logger.logToStderr({
+              connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
+              authType: AuthType[auth.service.authType],
+              accessTokens: JSON.stringify(auth.service.accessTokens, null, 2)
+            });
+          }
+          else {
+            logger.log({
+              connectedAs: accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken)
+            });
+          }
+          cb();
+        }, (rej: Error): void => {
+          if (this.debug) {
+            logger.logToStderr(rej);
+          }
 
-        cb(new CommandError(rej.message));
-      });
+          auth.service.logout();
+          if (this.verbose) {
+            logger.logToStderr('Logged out from Microsoft 365');
+          }
+          else {
+            logger.log('Logged out');
+          }
+        });
+    }
+    else {
+      if (this.verbose) {
+        logger.logToStderr('Logged out from Microsoft 365');
+      }
+      else {
+        logger.log('Logged out');
+      }
+      cb();
+    }
   }
 
   public action(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {

@@ -59,7 +59,7 @@ describe(commands.STATUS, () => {
   });
 
   it('shows logged out status when not logged in', (done) => {
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error')); });
+    auth.service.connected = false;
     command.action(logger, { options: {} }, () => {
       try {
         assert(loggerLogSpy.calledWith('Logged out'));
@@ -72,10 +72,49 @@ describe(commands.STATUS, () => {
   });
 
   it('shows logged out status when not logged in (verbose)', (done) => {
+    auth.service.connected = false;
+    command.action(logger, { options: { verbose: true } }, () => {
+      try {
+        assert(loggerLogToStderrSpy.calledWith('Logged out from Microsoft 365'));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('shows logged out status when the refresh token is expired', (done) => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error')); });
+    command.action(logger, { options: {} }, () => {
+      try {
+        assert(loggerLogSpy.calledWith('Logged out'));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('shows logged out status when refresh token is expired (verbose)', (done) => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error')); });
     command.action(logger, { options: { verbose: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.calledWith('Logged out from Microsoft 365'));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('shows logged out status when refresh token is expired (debug)', (done) => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error')); });
+    command.action(logger, { options: { debug: true } }, (err?: any) => {
+      try {
+        loggerLogSpy.calledWith(err);
         done();
       }
       catch (e) {
@@ -121,6 +160,32 @@ describe(commands.STATUS, () => {
       try {
         assert(loggerLogToStderrSpy.calledWith({
           connectedAs: 'admin@contoso.onmicrosoft.com',
+          authType: 'DeviceCode',
+          accessTokens: '{\n  "https://graph.microsoft.com": {\n    "expiresOn": "123",\n    "accessToken": "abc"\n  }\n}'
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly reports access token - no user', (done) => {
+    auth.service.connected = true;
+    auth.service.authType = AuthType.DeviceCode;
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
+    auth.service.accessTokens = {
+      'https://graph.microsoft.com': {
+        expiresOn: '123',
+        accessToken: 'abc'
+      }
+    };
+
+    command.action(logger, { options: { debug: true } }, () => {
+      try {
+        assert(loggerLogToStderrSpy.calledWith({
+          connectedAs: '',
           authType: 'DeviceCode',
           accessTokens: '{\n  "https://graph.microsoft.com": {\n    "expiresOn": "123",\n    "accessToken": "abc"\n  }\n}'
         }));
