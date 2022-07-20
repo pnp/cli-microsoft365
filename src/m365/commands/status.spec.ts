@@ -1,10 +1,10 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../appInsights';
-import auth from '../../Auth';
+import auth, { AuthType } from '../../Auth';
 import { Logger } from '../../cli';
 import Command, { CommandError } from '../../Command';
-import { sinonUtil } from '../../utils';
+import { accessToken, sinonUtil } from '../../utils';
 import commands from './commands';
 const command: Command = require('./status');
 
@@ -16,7 +16,7 @@ describe(commands.STATUS, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
   });
 
   beforeEach(() => {
@@ -36,6 +36,13 @@ describe(commands.STATUS, () => {
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
+  afterEach(() => {
+    sinonUtil.restore([
+      auth.ensureAccessToken,
+      accessToken.getUserNameFromAccessToken
+    ]);
+  });
+
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
@@ -52,7 +59,7 @@ describe(commands.STATUS, () => {
   });
 
   it('shows logged out status when not logged in', (done) => {
-    auth.service.connected = false;
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error')); });
     command.action(logger, { options: {} }, () => {
       try {
         assert(loggerLogSpy.calledWith('Logged out'));
@@ -65,7 +72,7 @@ describe(commands.STATUS, () => {
   });
 
   it('shows logged out status when not logged in (verbose)', (done) => {
-    auth.service.connected = false;
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error')); });
     command.action(logger, { options: { verbose: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.calledWith('Logged out from Microsoft 365'));
@@ -82,7 +89,10 @@ describe(commands.STATUS, () => {
       expiresOn: 'abc',
       accessToken: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ing0NTh4eU9wbHNNMkg3TlhrMlN4MTd4MXVwYyIsImtpZCI6Ing0NTh4eU9wbHNNMkg3TlhrN1N4MTd4MXVwYyJ9.eyJhdWQiOiJodHRwczovL2dyYXBoLndpbmRvd3MubmV0IiwiaXNzIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvY2FlZTMyZTYtNDA1ZC00MjRhLTljZjEtMjA3MWQwNDdmMjk4LyIsImlhdCI6MTUxNTAwNDc4NCwibmJmIjoxNTE1MDA0Nzg0LCJleHAiOjE1MTUwMDg2ODQsImFjciI6IjEiLCJhaW8iOiJBQVdIMi84R0FBQUFPN3c0TDBXaHZLZ1kvTXAxTGJMWFdhd2NpOEpXUUpITmpKUGNiT2RBM1BvPSIsImFtciI6WyJwd2QiXSwiYXBwaWQiOiIwNGIwNzc5NS04ZGRiLTQ2MWEtYmJlZS0wMmY5ZTFiZjdiNDYiLCJhcHBpZGFjciI6IjAiLCJmYW1pbHlfbmFtZSI6IkRvZSIsImdpdmVuX25hbWUiOiJKb2huIiwiaXBhZGRyIjoiOC44LjguOCIsIm5hbWUiOiJKb2huIERvZSIsIm9pZCI6ImYzZTU5NDkxLWZjMWEtNDdjYy1hMWYwLTk1ZWQ0NTk4MzcxNyIsInB1aWQiOiIxMDk0N0ZGRUE2OEJDQ0NFIiwic2NwIjoiNjJlOTAzOTQtNjlmNS00MjM3LTkxOTAtMDEyMTc3MTQ1ZTEwIiwic3ViIjoiemZicmtUV1VQdEdWUUg1aGZRckpvVGp3TTBrUDRsY3NnLTJqeUFJb0JuOCIsInRlbmFudF9yZWdpb25fc2NvcGUiOiJOQSIsInRpZCI6ImNhZWUzM2U2LTQwNWQtNDU0YS05Y2YxLTMwNzFkMjQxYTI5OCIsInVuaXF1ZV9uYW1lIjoiYWRtaW5AY29udG9zby5vbm1pY3Jvc29mdC5jb20iLCJ1cG4iOiJhZG1pbkBjb250b3NvLm9ubWljcm9zb2Z0LmNvbSIsInV0aSI6ImFUZVdpelVmUTBheFBLMVRUVXhsQUEiLCJ2ZXIiOiIxLjAifQ==.abc'
     };
+
     auth.service.connected = true;
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
+    sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => { return 'admin@contoso.onmicrosoft.com'; });
     command.action(logger, { options: {} }, () => {
       try {
         assert(loggerLogSpy.calledWith({
@@ -98,6 +108,9 @@ describe(commands.STATUS, () => {
 
   it('correctly reports access token', (done) => {
     auth.service.connected = true;
+    auth.service.authType = AuthType.DeviceCode;
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
+    sinon.stub(accessToken, 'getUserNameFromAccessToken').callsFake(() => { return 'admin@contoso.onmicrosoft.com'; });
     auth.service.accessTokens = {
       'https://graph.microsoft.com': {
         expiresOn: '123',
@@ -107,7 +120,7 @@ describe(commands.STATUS, () => {
     command.action(logger, { options: { debug: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.calledWith({
-          connectedAs: '',
+          connectedAs: 'admin@contoso.onmicrosoft.com',
           authType: 'DeviceCode',
           accessTokens: '{\n  "https://graph.microsoft.com": {\n    "expiresOn": "123",\n    "accessToken": "abc"\n  }\n}'
         }));
