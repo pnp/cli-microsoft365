@@ -47,7 +47,7 @@ class SpoSiteListCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
       	webTemplate: args.options.webTemplate,
-        siteType: args.options.type || 'TeamSite',
+        type: args.options.type,
         filter: (!(!args.options.filter)).toString(),
         deleted: args.options.deleted,
         includeOneDriveSites: typeof args.options.includeOneDriveSites !== 'undefined'
@@ -59,9 +59,7 @@ class SpoSiteListCommand extends SpoCommand {
     this.options.unshift(
       {
         option: '-t, --type [type]',
-        // To not introduce a breaking change, 'All' has been added.
-        // You should use all when using '--includeOneDriveSites'
-        autocomplete: ['TeamSite', 'CommunicationSite', 'All']
+        autocomplete: ['TeamSite', 'CommunicationSite']
       },
       {
         option: '--webTemplate [webTemplate]'
@@ -85,15 +83,15 @@ class SpoSiteListCommand extends SpoCommand {
 	      return 'Specify either type or webTemplate, but not both';
 	    }
 
-	    const typeValues = ['TeamSite', 'CommunicationSite', 'All'];
+	    const typeValues = ['TeamSite', 'CommunicationSite'];
 	    if (args.options.type &&
 	      typeValues.indexOf(args.options.type) < 0) {
 	      return `${args.options.type} is not a valid value for the type option. Allowed values are ${typeValues.join('|')}`;
 	    }
 
 	    if (args.options.includeOneDriveSites
-	      && (!args.options.type || args.options.type !== 'All')) {
-	      return 'When using includeOneDriveSites, specify All as value for type';
+	      && (args.options.type || args.options.webTemplate)) {
+	      return 'When using includeOneDriveSites, don\'t specify the type or webTemplate options';
 	    }
 
 	    return true;
@@ -170,11 +168,6 @@ class SpoSiteListCommand extends SpoCommand {
     });
   }
 
-  /* 
-    The type property currently defaults to Teamsite. 
-    It makes more sense to default to All. Certainly after adding the 'includeOneDriveSites' option.
-    Changing this will be a breaking change. We'll remove the default the next major version.
-  */
   private getWebTemplateId(options: Options): string {
     if (options.webTemplate) {
       return options.webTemplate;
@@ -184,13 +177,7 @@ class SpoSiteListCommand extends SpoCommand {
       return '';
     }
 
-    let siteType = options.type;
-
-    if (!siteType) {
-      siteType = 'TeamSite';
-    }
-
-    switch (siteType) {
+    switch (options.type) {
       case "TeamSite":
         return 'GROUP#0';
       case "CommunicationSite":
