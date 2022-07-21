@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import chalk = require('chalk');
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -13,6 +14,7 @@ describe(commands.TEAM_CLONE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -34,6 +36,7 @@ describe(commands.TEAM_CLONE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -63,7 +66,19 @@ describe(commands.TEAM_CLONE, () => {
     const actual = command.validate({
       options: {
         teamId: 'invalid',
-        displayName: "Library Assist",
+        name: "Library Assist",
+        partsToClone: "apps,tabs,settings,channels,members"
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if the id is not a valid GUID.', (done) => {
+    const actual = command.validate({
+      options: {
+        id: 'invalid',
+        name: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
     });
@@ -72,15 +87,22 @@ describe(commands.TEAM_CLONE, () => {
   });
 
   it('fails validation on invalid visibility', () => {
-    const actual = command.validate({ options: { visibility: 'abc' } });
+    const actual = command.validate({
+      options: {
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: "Library Assist",
+        partsToClone: "apps,tabs,settings,channels,members",
+        visibility: 'abc'
+      }
+    });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation on valid \'private\' visibility', () => {
     const actual = command.validate({
       options: {
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: "Library Assist",
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members",
         visibility: 'private'
       }
@@ -91,8 +113,8 @@ describe(commands.TEAM_CLONE, () => {
   it('passes validation on valid \'public\' visibility', () => {
     const actual = command.validate({
       options: {
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: "Library Assist",
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members",
         visibility: 'public'
       }
@@ -103,8 +125,8 @@ describe(commands.TEAM_CLONE, () => {
   it('passes validation when the input is correct with mandatory parameters', () => {
     const actual = command.validate({
       options: {
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: "Library Assist",
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
     });
@@ -114,8 +136,8 @@ describe(commands.TEAM_CLONE, () => {
   it('passes validation when the input is correct with mandatory and optional parameters', () => {
     const actual = command.validate({
       options: {
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: "Library Assist",
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members",
         description: "Self help community for library",
         visibility: "public",
@@ -128,8 +150,8 @@ describe(commands.TEAM_CLONE, () => {
   it('fails validation if visibility is set to private', () => {
     const actual = command.validate({
       options: {
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: "Library Assist",
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members",
         visibility: "abc"
       }
@@ -140,8 +162,8 @@ describe(commands.TEAM_CLONE, () => {
   it('fails validation if partsToClone is set to invalid value', () => {
     const actual = command.validate({
       options: {
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: "Library Assist",
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: "Library Assist",
         partsToClone: "abc"
       }
     });
@@ -151,13 +173,76 @@ describe(commands.TEAM_CLONE, () => {
   it('passes validation if visibility is set to private', () => {
     const actual = command.validate({
       options: {
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: "Library Assist",
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members",
         visibility: "private"
       }
     });
     assert.strictEqual(actual, true);
+  });
+
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets();
+    assert.deepStrictEqual(optionSets, [['id', 'teamId'], ['name', 'displayName']]);
+  });
+
+  it('logs deprecation warning when option teamId is specified', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone`) {
+        return Promise.resolve({
+          "location": "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: "Library Assist",
+        partsToClone: "apps,tabs,settings,channels,members"
+      }
+    } as any, () => {
+      try {
+        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs deprecation warning when option displayName is specified', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone`) {
+        return Promise.resolve({
+          "location": "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        displayName: "Library Assist",
+        partsToClone: "apps,tabs,settings,channels,members"
+      }
+    } as any, () => {
+      try {
+        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'displayName' is deprecated. Please use 'name' instead.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('creates a clone of a Microsoft Teams team with mandatory parameters', (done) => {
@@ -174,8 +259,8 @@ describe(commands.TEAM_CLONE, () => {
     command.action(logger, {
       options: {
         debug: false,
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: "Library Assist",
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
     } as any, () => {
@@ -203,8 +288,8 @@ describe(commands.TEAM_CLONE, () => {
     command.action(logger, {
       options: {
         debug: true,
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: 'Library Assist',
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: 'Library Assist',
         partsToClone: 'apps,tabs,settings,channels,members',
         description: 'abc',
         visibility: 'public',
@@ -233,8 +318,8 @@ describe(commands.TEAM_CLONE, () => {
     command.action(logger, {
       options: {
         debug: true,
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: 'Library Assist',
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        name: 'Library Assist',
         partsToClone: 'apps,tabs,settings,channels,members',
         description: 'abc',
         visibility: 'public',

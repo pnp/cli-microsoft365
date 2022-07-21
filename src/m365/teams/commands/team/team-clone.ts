@@ -1,4 +1,3 @@
-
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -12,8 +11,10 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  teamId: string;
-  displayName: string;
+  id?: string;
+  teamId?: string;
+  name?: string;
+  displayName?: string;
   partsToClone: string;
   description?: string;
   classification?: string;
@@ -33,28 +34,46 @@ class TeamsTeamCloneCommand extends GraphCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.description = typeof args.options.description !== 'undefined';
     telemetryProps.classification = typeof args.options.classification !== 'undefined';
-    telemetryProps.visibility = typeof args.options.visibility !== 'undefined';
+    telemetryProps.id = typeof args.options.id !== 'undefined';
+    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
+    telemetryProps.name = typeof args.options.name !== 'undefined';
+    telemetryProps.displayName = typeof args.options.displayName !== 'undefined';
     return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (args.options.teamId) {
+      args.options.id = args.options.teamId;
+
+      this.warn(logger, `Option 'teamId' is deprecated. Please use 'id' instead.`);
+    }
+
+    if (args.options.displayName) {
+      args.options.name = args.options.displayName;
+
+      this.warn(logger, `Option 'displayName' is deprecated. Please use 'name' instead.`);
+    }
+
     const data: any = {
-      displayName: args.options.displayName,
-      mailNickname: this.generateMailNickname(args.options.displayName),
+      displayName: args.options.name,
+      mailNickname: this.generateMailNickname(args.options.name as string),
       partsToClone: args.options.partsToClone
     };
+
     if (args.options.description) {
       data.description = args.options.description;
     }
+
     if (args.options.classification) {
       data.classification = args.options.classification;
     }
+
     if (args.options.visibility) {
       data.visibility = args.options.visibility;
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/clone`,
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.id as string)}/clone`,
       headers: {
         "content-type": "application/json",
         accept: 'application/json;odata.metadata=none'
@@ -68,13 +87,26 @@ class TeamsTeamCloneCommand extends GraphCommand {
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
+  public optionSets(): string[][] | undefined {
+    return [
+      ['id', 'teamId'],
+      ['name', 'displayName']
+    ];
+  }
+
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>'
+        option: '-i, --id [teamId]'
       },
       {
-        option: '-n, --displayName <displayName>'
+        option: '--teamId [teamId]'
+      },
+      {
+        option: '-n, --name [name]'
+      },
+      {
+        option: '--displayName [displayName]'
       },
       {
         option: '-p, --partsToClone <partsToClone>',
@@ -97,8 +129,12 @@ class TeamsTeamCloneCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.teamId)) {
+    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
       return `${args.options.teamId} is not a valid GUID`;
+    }
+
+    if (args.options.id && !validation.isValidGuid(args.options.id)) {
+      return `${args.options.id} is not a valid GUID`;
     }
 
     const partsToClone: string[] = args.options.partsToClone.replace(/\s/g, '').split(',');

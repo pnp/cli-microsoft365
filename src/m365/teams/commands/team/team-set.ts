@@ -13,7 +13,9 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  teamId: string;
+  id?: string;
+  teamId?: string;
+  name?: string;
   displayName?: string;
   description?: string;
   mailNickName?: string;
@@ -48,8 +50,8 @@ class TeamsTeamSetCommand extends GraphCommand {
 
   private mapRequestBody(options: Options): any {
     const requestBody: any = {};
-    if (options.displayName) {
-      requestBody.displayName = options.displayName;
+    if (options.name) {
+      requestBody.displayName = options.name;
     }
     if (options.description) {
       requestBody.description = options.description;
@@ -67,10 +69,22 @@ class TeamsTeamSetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (args.options.teamId) {
+      args.options.id = args.options.teamId;
+
+      this.warn(logger, `Option 'teamId' is deprecated. Please use 'id' instead.`);
+    }
+
+    if (args.options.displayName) {
+      args.options.name = args.options.displayName;
+
+      this.warn(logger, `Option 'displayName' is deprecated. Please use 'name' instead.`);
+    }
+
     const data: any = this.mapRequestBody(args.options);
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups/${encodeURIComponent(args.options.teamId)}`,
+      url: `${this.resource}/v1.0/groups/${encodeURIComponent(args.options.id as string)}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -83,10 +97,20 @@ class TeamsTeamSetCommand extends GraphCommand {
       .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
+  public optionSets(): string[][] | undefined {
+    return [['id', 'teamId']];
+  }
+
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>'
+        option: '-i, --id [id]'
+      },
+      {
+        option: '--teamId [teamId]'
+      },
+      {
+        option: '-n, --name [name]'
       },
       {
         option: '--displayName [displayName]'
@@ -111,8 +135,12 @@ class TeamsTeamSetCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.teamId)) {
+    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
       return `${args.options.teamId} is not a valid GUID`;
+    }
+
+    if (args.options.id && !validation.isValidGuid(args.options.id)) {
+      return `${args.options.id} is not a valid GUID`;
     }
 
     if (args.options.visibility) {
