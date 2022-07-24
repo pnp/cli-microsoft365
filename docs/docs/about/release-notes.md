@@ -10,7 +10,9 @@
 - removed references and alias for deprecated planner task details get [#3518](https://github.com/pnp/cli-microsoft365/pull/3518)
 - removed references and alias for deprecated planner plan details get [#3469](https://github.com/pnp/cli-microsoft365/pull/3469)
 - removed deprecated options for 'spo listitem list' command [#3365](https://github.com/pnp/cli-microsoft365/issues/3365)
-- removed 'aad app delete' and 'aad app role delete' alias [#3134](https://github.com/pnp/cli-microsoft365/issues/3134)
+- removed deprecated planName options [#3363](https://github.com/pnp/cli-microsoft365/pull/3363)
+- removed default type of spo site list [#3526](https://github.com/pnp/cli-microsoft365/pull/3526)
+- removed deprecated spo site classic _verb_ commands [#3458](https://github.com/pnp/cli-microsoft365/pull/3458)
 
 ## [v5.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.7.0)
 
