@@ -54,6 +54,7 @@
 - updated spo customaction to remove by title or id. [#3464](https://github.com/pnp/cli-microsoft365/pull/3464)
 - consolidate spo site set and spo site classic set commands. [#3450](https://github.com/pnp/cli-microsoft365/pull/3450)
 - Updates spo tenant appcatalog add reference to deprecated spo site classic add command. [#3459](https://github.com/pnp/cli-microsoft365/pull/3459)
+- Updated the status command to show correct connection status. [#3260](https://github.com/pnp/cli-microsoft365/pull/3260)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
