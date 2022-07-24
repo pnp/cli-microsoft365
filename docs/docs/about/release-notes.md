@@ -55,6 +55,9 @@
 - consolidate spo site set and spo site classic set commands. [#3450](https://github.com/pnp/cli-microsoft365/pull/3450)
 - Updates spo tenant appcatalog add reference to deprecated spo site classic add command. [#3459](https://github.com/pnp/cli-microsoft365/pull/3459)
 - Updated the status command to show correct connection status. [#3260](https://github.com/pnp/cli-microsoft365/pull/3260)
+- Updated 'teams tab get' provide shorthand options. [#3509](https://github.com/pnp/cli-microsoft365/pull/3509)
+- Added sample script on listing external users in site groups across all site collections. [#3521](https://github.com/pnp/cli-microsoft365/pull/3521)
+- Fixed 'spo field get' and 'spo field remove' commands. [#3515](https://github.com/pnp/cli-microsoft365/pull/3515)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
