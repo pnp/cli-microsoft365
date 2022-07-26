@@ -1,7 +1,8 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -14,9 +15,10 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   subject: string;
   to: string;
-  bodyContents?: string;
+  bodyContents: string;
   bodyContentType?: string;
   saveToSentItems?: string;
+  attachment?: string | string[];
 }
 
 class OutlookMailSendCommand extends GraphCommand {
@@ -25,7 +27,7 @@ class OutlookMailSendCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Sends e-mail on behalf of the current user';
+    return 'Sends an email on behalf of the current user';
   }
 
   public alias(): string[] | undefined {
@@ -36,14 +38,21 @@ class OutlookMailSendCommand extends GraphCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.bodyContents = typeof args.options.bodyContents !== 'undefined';
     telemetryProps.bodyContentType = args.options.bodyContentType;
-    telemetryProps.saveToSentItems = args.options.saveToSentItems;
+    telemetryProps.saveToSentItems = typeof args.options.saveToSentItems !== 'undefined';
+    telemetryProps.attachment = typeof args.options.attachment !== 'undefined';
     return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const bodyContents: string = args.options.bodyContents as string;
+    const attachmentPaths: string[] | undefined = typeof args.options.attachment === 'string' ? [args.options.attachment] : args.options.attachment;
 
-    const requestOptions: any = {
+    const attachments = attachmentPaths?.map(a => ({
+      '@odata.type': '#microsoft.graph.fileAttachment',
+      name: path.basename(a),
+      contentBytes: fs.readFileSync(a, { encoding: 'base64' })
+    }));
+
+    const requestOptions: AxiosRequestConfig = {
       url: `${this.resource}/v1.0/me/sendMail`,
       headers: {
         accept: 'application/json;odata.metadata=none',
@@ -55,15 +64,14 @@ class OutlookMailSendCommand extends GraphCommand {
           subject: args.options.subject,
           body: {
             contentType: args.options.bodyContentType || 'Text',
-            content: bodyContents
+            content: args.options.bodyContents
           },
-          toRecipients: args.options.to.split(',').map(e => {
-            return {
-              emailAddress: {
-                address: e.trim()
-              }
-            };
-          })
+          toRecipients: args.options.to.split(',').map(e => ({
+            emailAddress: {
+              address: e.trim()
+            }
+          })),
+          attachments: attachments
         },
         saveToSentItems: args.options.saveToSentItems
       }
@@ -91,6 +99,9 @@ class OutlookMailSendCommand extends GraphCommand {
       },
       {
         option: '--saveToSentItems [saveToSentItems]'
+      },
+      {
+        option: '--attachment [attachment]'
       }
     ];
 
@@ -109,6 +120,27 @@ class OutlookMailSendCommand extends GraphCommand {
       args.options.saveToSentItems !== 'true' &&
       args.options.saveToSentItems !== 'false') {
       return `${args.options.saveToSentItems} is not a valid value for the saveToSentItems option. Allowed values are true|false`;
+    }
+
+    if (args.options.attachment) {
+      let totalSize: number = 0;
+      const attachmentPaths: string[] = typeof args.options.attachment === 'string' ? [args.options.attachment] : args.options.attachment;
+      for (const attachment of attachmentPaths) {
+        if (!fs.existsSync(attachment)) {
+          return `File with path '${attachment}' was not found.`;
+        }
+
+        const fileInfo = fs.lstatSync(attachment);
+        if (!fileInfo.isFile()) {
+          return `'${attachment}' is not a file.`;
+        }
+
+        totalSize += fileInfo.size;
+      }
+
+      if (totalSize > 3_100_000) {
+        return `Exceeded the max total size of attachments which is 3 MB.`;
+      }
     }
 
     return true;

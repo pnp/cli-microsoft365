@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import * as fs from 'fs';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
@@ -37,7 +38,10 @@ describe(commands.MAIL_SEND, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      fs.existsSync,
+      fs.lstatSync,
+      fs.readFileSync
     ]);
   });
 
@@ -198,6 +202,66 @@ describe(commands.MAIL_SEND, () => {
     });
   });
 
+  it('sends email with multiple attachments', (done) => {
+    const fileContentBase64 = 'TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=';
+    sinon.stub(fs, 'readFileSync').returns(fileContentBase64);
+
+    const requestPostStub = sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/sendMail`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        subject: 'Lorem ipsum',
+        to: 'mail@domain.com',
+        bodyContents: 'Lorem ipsum',
+        attachment: ['C:/File1.txt', 'C:/File2.txt']
+      }
+    }, () => {
+      try {
+        assert.deepStrictEqual(requestPostStub.lastCall.args[0].data.message.attachments, [{ '@odata.type': '#microsoft.graph.fileAttachment', name: 'File1.txt', contentBytes: fileContentBase64 }, { '@odata.type': '#microsoft.graph.fileAttachment', name: 'File2.txt', contentBytes: fileContentBase64 }]);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sends email with single attachment', (done) => {
+    const fileContentBase64 = 'TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=';
+    sinon.stub(fs, 'readFileSync').returns(fileContentBase64);
+
+    const requestPostStub = sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/sendMail`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        subject: 'Lorem ipsum',
+        to: 'mail@domain.com',
+        bodyContents: 'Lorem ipsum',
+        attachment: 'C:/File1.txt'
+      }
+    }, () => {
+      try {
+        assert.deepStrictEqual(requestPostStub.lastCall.args[0].data.message.attachments, [{ '@odata.type': '#microsoft.graph.fileAttachment', name: 'File1.txt', contentBytes: fileContentBase64 }]);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles error', (done) => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
@@ -230,6 +294,26 @@ describe(commands.MAIL_SEND, () => {
 
   it('fails validation if saveToSentItems is invalid', () => {
     const actual = command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'Invalid' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if file doesn\'t exist', () => {
+    sinon.stub(fs, 'existsSync').returns(false);
+    const actual = command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: 'C:/File.txt' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if attachment is no file', () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns({ isFile: () => false } as any);
+    const actual = command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: 'C:/Folder' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if attachments are larger than 3 MB', () => {
+    sinon.stub(fs, 'existsSync').returns(true);
+    sinon.stub(fs, 'lstatSync').returns({ isFile: () => true, size: 2_500_000 } as any);
+    const actual = command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', attachment: ['C:/File.txt', 'C:/File2.txt'] } });
     assert.notStrictEqual(actual, true);
   });
 
