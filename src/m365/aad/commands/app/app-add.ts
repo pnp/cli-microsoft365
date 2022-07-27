@@ -71,9 +71,9 @@ interface Options extends GlobalOptions {
 }
 
 interface AppPermissions {
-  ResourceId: string;
+  resourceId: string;
   resourceAccess: ResourceAccess[];
-  Scope: string[];
+  scope: string[];
 }
 
 class AadAppAddCommand extends GraphCommand {
@@ -222,23 +222,20 @@ class AadAppAddCommand extends GraphCommand {
 
         const tasks: Promise<void>[] = [];
 
-        // Parse resolved permissions
         this.appPermissions.forEach(permission => {
-          if (permission.Scope.length > 0) {
-            // Send delegated permissions requests
-            tasks.push(this.grantOAuth2Permission(sp.id, permission.ResourceId, permission.Scope.join(' ')));
+          if (permission.scope.length > 0) {
+            tasks.push(this.grantOAuth2Permission(sp.id, permission.resourceId, permission.scope.join(' ')));
             
             if (this.debug) {
-              logger.logToStderr(`Admin consent for following resource ${permission.ResourceId}, with delegated permissions: ${permission.Scope.join(',')}`);
+              logger.logToStderr(`Admin consent for following resource ${permission.resourceId}, with delegated permissions: ${permission.scope.join(',')}`);
             }
           }
 
           permission.resourceAccess.filter(access => access.type === "Role").forEach((access: ResourceAccess) => {
-            // Send application permissions requests
-            tasks.push(this.addRoleToServicePrincipal(sp.id, permission.ResourceId, access.id));
+            tasks.push(this.addRoleToServicePrincipal(sp.id, permission.resourceId, access.id));
 
             if (this.debug) {
-              logger.logToStderr(`Admin consent for following resource ${permission.ResourceId}, with application permission: ${access.id}`);
+              logger.logToStderr(`Admin consent for following resource ${permission.resourceId}, with application permission: ${access.id}`);
             }
           });
         });
@@ -589,7 +586,7 @@ class AadAppAddCommand extends GraphCommand {
           if (this.verbose) {
             logger.logToStderr(`Merged delegated and application permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
             logger.logToStderr(`App role assignments: ${JSON.stringify(this.appPermissions.flatMap(permission => permission.resourceAccess.filter(access => access.type === "Role")), null, 2)}`);
-            logger.logToStderr(`OAuth2 permissions: ${JSON.stringify(this.appPermissions.flatMap(permission => permission.Scope), null, 2)}`);
+            logger.logToStderr(`OAuth2 permissions: ${JSON.stringify(this.appPermissions.flatMap(permission => permission.scope), null, 2)}`);
           }
 
           return Promise.resolve(resolvedApis);
@@ -647,19 +644,19 @@ class AadAppAddCommand extends GraphCommand {
 
       // During API resolution, we store globally both app role assignments and oauth2permissions
       // So that we'll be able to parse them during the admin consent process
-      let existingPermission = this.appPermissions.find(oauth => oauth.ResourceId === servicePrincipal.id);
+      let existingPermission = this.appPermissions.find(oauth => oauth.resourceId === servicePrincipal.id);
       if (!existingPermission) {
         existingPermission = {
-          ResourceId: servicePrincipal.id,
+          resourceId: servicePrincipal.id,
           resourceAccess: [],
-          Scope: []
+          scope: []
         };
 
         this.appPermissions.push(existingPermission);
       }
 
       if (scopeType === 'Scope') {
-        existingPermission.Scope.push(permission.value);
+        existingPermission.scope.push(permission.value);
       }
 
       existingPermission.resourceAccess.push(resourceAccessPermission);
