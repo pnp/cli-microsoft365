@@ -201,7 +201,7 @@ Add-PnPContentType|PnP.PowerShell|[spo contenttype add](../cmd/spo/contenttype/c
 Add-PnPContentTypesFromContentTypeHub|PnP.PowerShell|
 Add-PnPContentTypeToDocumentSet|PnP.PowerShell|
 Add-PnPContentTypeToList|PnP.PowerShell|[spo list contenttype add](../cmd/spo/list/list-contenttype-add.md)
-Add-|PnP.PowerShell|[spo customaction add](../cmd/spo/customaction/customaction-add.md)
+Add-PnPCustomAction|PnP.PowerShell|[spo customaction add](../cmd/spo/customaction/customaction-add.md)
 Add-PnPDataRowsToSiteTemplate|PnP.PowerShell|
 Add-PnPDocumentSet|PnP.PowerShell|
 Add-PnPEventReceiver|PnP.PowerShell|
