@@ -60,6 +60,9 @@ m365 aad app add [options]
 `--grantAdminConsent`
 : When specified, grants application & delegated permissions through admin consent
 
+`--grantAdminConsent`
+: When specified, grants application & delegated permissions through admin consent
+
 `--manifest [manifest]`
 : Azure AD app manifest as retrieved from the Azure Portal to create the app registration from
 
