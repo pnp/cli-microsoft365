@@ -257,7 +257,7 @@ Add-PnPTeamsChannel|PnP.PowerShell|[teams channel add](../cmd/teams/channel/chan
 Add-PnpTeamsChannelUser|PnP.PowerShell|[teams channel member add](../cmd/teams/channel/channel-member-add.md)
 Add-PnPTeamsTab|PnP.PowerShell|[teams tab add](../cmd/teams/tab/tab-add.md)
 Add-PnPTeamsTeam|PnP.PowerShell|[teams team add](../cmd/teams/team/team-add.md)
-Add-PnPTeamsUser|PnP.PowerShell|[teams user add](../cmd/aad/o365group/o365group-user-add.md)Add-PnPTenantCdnOrigin
+Add-PnPTeamsUser|PnP.PowerShell|[teams user add](../cmd/aad/o365group/o365group-user-add.md)
 Add-PnPTenantSequence|PnP.PowerShell
 Add-PnPTenantSequenceSite|PnP.PowerShell
 Add-PnPTenantSequenceSubSite|PnP.PowerShell
