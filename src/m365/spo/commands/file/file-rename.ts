@@ -96,7 +96,9 @@ class SpoFileRenameCommand extends SpoCommand {
       webUrl: webUrl,
       url: targetFileServerRelativeUrl,
       recycle: true,
-      confirm: true
+      confirm: true,
+      debug: this.debug,
+      verbose: this.verbose
     };
 
     return Cli.executeCommandWithOutput(removeCommand as Command, { options: { ...options, _: [] } })
