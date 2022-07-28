@@ -97,6 +97,9 @@ nav:
         - user signin list: 'cmd/aad/user/user-signin-list.md'
     - Adaptive Card (adaptivecard):
       - send: 'cmd/adaptivecard/adaptivecard-send.md'
+    - Bookings (booking):
+      - business:
+        - business get: 'cmd/booking/business/business-get.md'
     - CLI (cli):
       - consent: 'cmd/cli/cli-consent.md'
       - doctor: 'cmd/cli/cli-doctor.md'
