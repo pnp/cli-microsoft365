@@ -55,8 +55,9 @@ nav:
         - o365group conversation post list: 'cmd/aad/o365group/o365group-conversation-post-list.md'
         - o365group get: 'cmd/aad/o365group/o365group-get.md'
         - o365group list: 'cmd/aad/o365group/o365group-list.md'
-        - o365group recyclebinitem list: 'cmd/aad/o365group/o365group-recyclebinitem-list.md'
         - o365group recyclebinitem clear: 'cmd/aad/o365group/o365group-recyclebinitem-clear.md'
+        - o365group recyclebinitem list: 'cmd/aad/o365group/o365group-recyclebinitem-list.md'
+        - o365group recyclebinitem remove: 'cmd/aad/o365group/o365group-recyclebinitem-remove.md'
         - o365group recyclebinitem restore: 'cmd/aad/o365group/o365group-recyclebinitem-restore.md'
         - o365group remove: 'cmd/aad/o365group/o365group-remove.md'
         - o365group renew: 'cmd/aad/o365group/o365group-renew.md'
@@ -190,17 +191,26 @@ nav:
         - bucket remove: 'cmd/planner/bucket/bucket-remove.md'
       - plan:
         - plan add: 'cmd/planner/plan/plan-add.md'
-        - plan details get: 'cmd/planner/plan/plan-details-get.md'
+        - plan details get: 'cmd/planner/plan/plan-get.md'
         - plan get: 'cmd/planner/plan/plan-get.md'
         - plan list: 'cmd/planner/plan/plan-list.md'
+        - plan remove: 'cmd/planner/plan/plan-remove.md'
       - task:
         - task add: 'cmd/planner/task/task-add.md'
-        - task details get: 'cmd/planner/task/task-details-get.md'
+        - task checklistitem add: 'cmd/planner/task/task-checklistitem-add.md'        
+        - task checklistitem list: 'cmd/planner/task/task-checklistitem-list.md'
+        - task checklistitem remove: 'cmd/planner/task/task-checklistitem-remove.md'
+        - task details get: 'cmd/planner/task/task-get.md'
         - task get: 'cmd/planner/task/task-get.md'
         - task list: 'cmd/planner/task/task-list.md'
         - task reference add: 'cmd/planner/task/task-reference-add.md'
         - task reference list: 'cmd/planner/task/task-reference-list.md'
+        - task reference remove: 'cmd/planner/task/task-reference-remove.md'
+        - task remove: 'cmd/planner/task/task-remove.md'
         - task set: 'cmd/planner/task/task-set.md'
+      - tenant:
+        - tenant settings list: 'cmd/planner/tenant/tenant-settings-list.md'
+        - tenant settings set: 'cmd/planner/tenant/tenant-settings-set.md'
     - Power Apps (pa):
       - app:
         - app get: 'cmd/pa/app/app-get.md'
@@ -246,6 +256,7 @@ nav:
     - Search (search):
       - externalconnection:
         - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
+        - externalconnection get: 'cmd/search/externalconnection/externalconnection-get.md'
         - externalconnection list: 'cmd/search/externalconnection/externalconnection-list.md'
     - Skype (skype):
       - report:
@@ -306,6 +317,7 @@ nav:
         - customaction set: 'cmd/spo/customaction/customaction-set.md'
       - eventreceiver:
         - eventreceiver get: 'cmd/spo/eventreceiver/eventreceiver-get.md'
+        - eventreceiver list: 'cmd/spo/eventreceiver/eventreceiver-list.md'
       - externaluser:
         - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
       - feature:
@@ -338,9 +350,11 @@ nav:
         - folder remove: 'cmd/spo/folder/folder-remove.md'
         - folder rename: 'cmd/spo/folder/folder-rename.md'
       - group:
+        - group add: 'cmd/spo/group/group-add.md'
         - group get: 'cmd/spo/group/group-get.md'
         - group list: 'cmd/spo/group/group-list.md'
         - group remove: 'cmd/spo/group/group-remove.md'
+        - group set: 'cmd/spo/group/group-set.md'
         - group user add: 'cmd/spo/group/group-user-add.md'
         - group user list: 'cmd/spo/group/group-user-list.md'
         - group user remove: 'cmd/spo/group/group-user-remove.md'
@@ -456,7 +470,9 @@ nav:
         - report siteusagesitecounts: 'cmd/spo/report/report-siteusagesitecounts.md'
         - report siteusagestorage: 'cmd/spo/report/report-siteusagestorage.md'
       - roledefinition:
+        - roledefinition get: 'cmd/spo/roledefinition/roledefinition-get.md'
         - roledefinition list: 'cmd/spo/roledefinition/roledefinition-list.md'
+        - roledefinition remove: 'cmd/spo/roledefinition/roledefinition-remove.md'
       - serviceprincipal:
         - serviceprincipal grant add: 'cmd/spo/serviceprincipal/serviceprincipal-grant-add.md'
         - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'
@@ -563,6 +579,8 @@ nav:
         - app remove: 'cmd/teams/app/app-remove.md'
         - app uninstall: 'cmd/teams/app/app-uninstall.md'
         - app update: 'cmd/teams/app/app-update.md'
+      - cache:
+        - cache remove: 'cmd/teams/cache/cache-remove.md'
       - channel:
         - channel add: 'cmd/teams/channel/channel-add.md'
         - channel get: 'cmd/teams/channel/channel-get.md'
@@ -764,7 +782,7 @@ nav:
       - 'Remove Wiki tab in a Microsoft Teams channel': 'sample-scripts/teams/remove-wikitab-teams.md'
       - 'Share social champions to Teams': 'sample-scripts/teams/share-socialchampions.md'
     - Microsoft To Do:
-      - 'Cleanup completed Microsoft To Do tasks': 'sample-scripts/todo/cleanup-completed-todos.md'
+      - 'Cleanup completed Microsoft To Do tasks': 'sample-scripts/todo/cleanup-completed-todos/index.md'
     - Microsoft 365 tenant:
       - 'Monitor and notify Microsoft 365 health status': 'sample-scripts/tenant/tenant-monitor-notify-healthstatus.md'
   - About:

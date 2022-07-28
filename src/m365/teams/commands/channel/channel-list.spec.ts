@@ -113,145 +113,6 @@ describe(commands.CHANNEL_LIST, () => {
     done();
   });
 
-  it('fails to get team when team does not exists', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
-        return Promise.resolve({ value: [] });
-      }
-      return Promise.reject('The specified team does not exist in the Microsoft Teams');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        teamName: 'Team Name'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails when multiple teams with same name exists', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
-          "value": [
-            {
-              "@odata.id": "https://graph.microsoft.com/v2/00000000-0000-0000-0000-000000000000/directoryObjects/00000000-0000-0000-0000-000000000000/Microsoft.DirectoryServices.Group",
-              "id": "00000000-0000-0000-0000-000000000000",
-              "deletedDateTime": null,
-              "classification": null,
-              "createdDateTime": "2020-10-11T09:35:26Z",
-              "creationOptions": [
-                "Team",
-                "ExchangeProvisioningFlags:3552"
-              ],
-              "description": "Team Description",
-              "displayName": "Team Name",
-              "expirationDateTime": null,
-              "groupTypes": [
-                "Unified"
-              ],
-              "isAssignableToRole": null,
-              "mail": "TeamName@contoso.com",
-              "mailEnabled": true,
-              "mailNickname": "TeamName",
-              "membershipRule": null,
-              "membershipRuleProcessingState": null,
-              "onPremisesDomainName": null,
-              "onPremisesLastSyncDateTime": null,
-              "onPremisesNetBiosName": null,
-              "onPremisesSamAccountName": null,
-              "onPremisesSecurityIdentifier": null,
-              "onPremisesSyncEnabled": null,
-              "preferredDataLocation": null,
-              "preferredLanguage": null,
-              "proxyAddresses": [
-                "SPO:SPO_97df7113-c3f3-447f-8010-9f88eb0fc7f1@SPO_00000000-0000-0000-0000-000000000000",
-                "SMTP:TeamName@contoso.com"
-              ],
-              "renewedDateTime": "2020-10-11T09:35:26Z",
-              "resourceBehaviorOptions": [
-                "HideGroupInOutlook",
-                "SubscribeMembersToCalendarEventsDisabled",
-                "WelcomeEmailDisabled"
-              ],
-              "resourceProvisioningOptions": [
-                "Team"
-              ],
-              "securityEnabled": false,
-              "securityIdentifier": "S-1-12-1-1927732186-1159088485-2915259540-28248825",
-              "theme": null,
-              "visibility": "Private",
-              "onPremisesProvisioningErrors": []
-            },
-            {
-              "@odata.id": "https://graph.microsoft.com/v2/00000000-0000-0000-0000-000000000000/directoryObjects/00000000-0000-0000-0000-000000000000/Microsoft.DirectoryServices.Group",
-              "id": "00000000-0000-0000-0000-000000000000",
-              "deletedDateTime": null,
-              "classification": null,
-              "createdDateTime": "2021-09-05T09:14:38Z",
-              "creationOptions": [],
-              "description": "Team Description",
-              "displayName": "Team Name",
-              "expirationDateTime": null,
-              "groupTypes": [],
-              "isAssignableToRole": null,
-              "mail": null,
-              "mailEnabled": false,
-              "mailNickname": "00000000-0000-0000-0000-000000000000",
-              "membershipRule": null,
-              "membershipRuleProcessingState": null,
-              "onPremisesDomainName": null,
-              "onPremisesLastSyncDateTime": null,
-              "onPremisesNetBiosName": null,
-              "onPremisesSamAccountName": null,
-              "onPremisesSecurityIdentifier": null,
-              "onPremisesSyncEnabled": null,
-              "preferredDataLocation": null,
-              "preferredLanguage": null,
-              "proxyAddresses": [],
-              "renewedDateTime": "2021-09-05T09:14:38Z",
-              "resourceBehaviorOptions": [],
-              "resourceProvisioningOptions": [
-                "Team"
-              ],
-              "securityEnabled": true,
-              "securityIdentifier": "S-1-12-1-4278539468-1089637032-1626171811-2046493509",
-              "theme": null,
-              "visibility": null,
-              "onPremisesProvisioningErrors": []
-            }
-          ]
-        });
-      }
-
-      return Promise.reject('Multiple Microsoft Teams teams with name Team Name found: 00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        teamName: 'Team Name'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple Microsoft Teams teams with name Team Name found: 00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('correctly lists all channels in a Microsoft teams team by team id', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels`) {
@@ -323,6 +184,39 @@ describe(commands.CHANNEL_LIST, () => {
           ]
         ));
 
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails when group has no team', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
+          "@odata.count": 1,
+          "value": [
+            {
+              "id": "00000000-0000-0000-0000-000000000000",
+              "resourceProvisioningOptions": []
+            }
+          ]
+        }
+        );
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        teamName: 'Team Name'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
         done();
       }
       catch (e) {

@@ -1,10 +1,11 @@
-import { Group, PlannerBucket, PlannerTask } from '@microsoft/microsoft-graph-types';
+import { PlannerBucket, PlannerTask, PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
 import Auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { accessToken, validation } from '../../../../utils';
+import { aadGroup } from '../../../../utils/aadGroup';
 import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -14,12 +15,14 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  taskId?: string; // This option has been added to support task details get alias. Needs to be removed when deprecation is removed. 
   id?: string;
   title?: string;
   bucketId?: string;
   bucketName?: string;
   planId?: string;
   planName?: string;
+  planTitle?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
 }
@@ -27,6 +30,10 @@ interface Options extends GlobalOptions {
 class PlannerTaskGetCommand extends GraphCommand {
   public get name(): string {
     return commands.TASK_GET;
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.TASK_DETAILS_GET];
   }
 
   public get description(): string {
@@ -47,28 +54,61 @@ class PlannerTaskGetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    this.showDeprecationWarning(logger, commands.TASK_DETAILS_GET, commands.TASK_GET);
+    
+    if (args.options.planName) {
+      args.options.planTitle = args.options.planName;
+
+      this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
+    }
+
     if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
     }
 
+    // This check has been added to support task details get alias. Needs to be removed when deprecation is removed. 
+    if (args.options.taskId) {
+      args.options.id = args.options.taskId;
+    }
+    
     this
       .getTaskId(args.options)
-      .then(taskId => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
-
-        return request.get<{ value: PlannerTask }>(requestOptions);
-      })
+      .then(taskId => this.getTask(taskId))
+      .then(task => this.getTaskDetails(task))
       .then((res: any): void => {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  }
+
+  private getTask(taskId: string): Promise<PlannerTask> {
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    }; 
+
+    return request.get<PlannerTask>(requestOptions);
+  }
+
+  private getTaskDetails(task: PlannerTask): Promise<PlannerTask & PlannerTaskDetails> {
+    const requestOptionsTaskDetails: any = {
+      url: `${this.resource}/v1.0/planner/tasks/${task.id}/details`,
+      headers: {
+        'accept': 'application/json;odata.metadata=none',
+        'Prefer': 'return=representation'
+      },
+      responseType: 'json'
+    };
+
+    return request
+      .get(requestOptionsTaskDetails)
+      .then(taskDetails => {
+        return { ...task, ...taskDetails as PlannerTaskDetails };
+      });
   }
 
   private getTaskId(options: Options): Promise<string> {
@@ -146,7 +186,7 @@ class PlannerTaskGetCommand extends GraphCommand {
 
     return this
       .getGroupId(options)
-      .then(groupId => planner.getPlanByName(options.planName!, groupId))
+      .then(groupId => planner.getPlanByTitle(options.planTitle!, groupId))
       .then(plan => plan.id!);
   }
 
@@ -155,29 +195,9 @@ class PlannerTaskGetCommand extends GraphCommand {
       return Promise.resolve(options.ownerGroupId);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(options.ownerGroupName as string)}'&$select=id`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: Group[] }>(requestOptions)
-      .then(response => {
-        const groups: Group[] | undefined = response.value;
-
-        if (!groups.length) {
-          return Promise.reject(`The specified ownerGroup ${options.ownerGroupName} does not exist`);
-        }
-
-        if (groups.length > 1) {
-          return Promise.reject(`Multiple ownerGroups with name ${options.ownerGroupName} found: ${groups.map(x => x.id)}`);
-        }
-
-        return Promise.resolve(groups[0].id as string);
-      });
+    return aadGroup
+      .getGroupByDisplayName(options.ownerGroupName!)
+      .then(group => group.id!);
   }
 
   public optionSets(): string[][] | undefined {
@@ -188,12 +208,14 @@ class PlannerTaskGetCommand extends GraphCommand {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
+      { option: '--taskId [taskId]' }, // This option has been added to support task details get alias. Needs to be removed when deprecation is removed. 
       { option: '-i, --id [id]' },
       { option: '-t, --title [title]' },
       { option: '--bucketId [bucketId]' },
       { option: '--bucketName [bucketName]' },
       { option: '--planId [planId]' },
       { option: '--planName [planName]' },
+      { option: '--planTitle [planTitle]' },
       { option: '--ownerGroupId [ownerGroupId]' },
       { option: '--ownerGroupName [ownerGroupName]' }
     ];
@@ -211,20 +233,20 @@ class PlannerTaskGetCommand extends GraphCommand {
       return 'Specify either bucketId or bucketName when using title but not both';
     }
 
-    if (args.options.bucketName && !args.options.planId && !args.options.planName) {
-      return 'Specify either planId or planName when using bucketName';
+    if (args.options.bucketName && !args.options.planId && !args.options.planName && !args.options.planTitle) {
+      return 'Specify either planId or planTitle when using bucketName';
     }
 
-    if (args.options.bucketName && args.options.planId && args.options.planName) {
-      return 'Specify either planId or planName when using bucketName but not both';
+    if (args.options.bucketName && args.options.planId && (args.options.planName || args.options.planTitle)) {
+      return 'Specify either planId or planTitle when using bucketName but not both';
     }
 
-    if (args.options.planName && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName';
+    if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
     }
 
-    if (args.options.planName && args.options.ownerGroupId && args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
+    if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
     }
 
     if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {

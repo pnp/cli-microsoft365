@@ -5,10 +5,15 @@ export const validation = {
     return guids.every(guid => this.isValidGuid(guid));
   },
 
-  isValidGuid(guid: string): boolean {
-    const guidRegEx: RegExp = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+  isValidGuid(guid?: string): boolean {
+    if (!guid) {
+      return false;
+    }
 
-    return guidRegEx.test(guid);
+    const guidRegEx: RegExp = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+    
+    // verify if the guid is a valid guid. @meid will be replaced in a later stage with the actual user id of the logged in user
+    return guidRegEx.test(guid) || guid.toLocaleLowerCase().trim() === "@meid";
   },
 
   isValidTeamsChannelId(guid: string): boolean {
@@ -54,29 +59,42 @@ export const validation = {
   },
 
   isValidISODateTime(dateTime: string): boolean {
-    const withMilliSecsPattern: RegExp = new RegExp(
-      /^[0-9]{4}-((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|(0[469]|11)-(0[1-9]|[12][0-9]|30)|(02)-(0[1-9]|[12][0-9]))T(0[0-9]|1[0-9]|2[0-3]):(0[0-9]|[1-5][0-9]):(0[0-9]|[1-5][0-9])\.[0-9]{3}Z$/);
-    if (withMilliSecsPattern.test(dateTime)) {
+    // Format: 2000-01-01T00:00:00.0000000Z
+    const withMilliSecsLongPattern: RegExp = new RegExp(
+      /^[0-9]{4}-((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|(0[469]|11)-(0[1-9]|[12][0-9]|30)|(02)-(0[1-9]|[12][0-9]))T(0[0-9]|1[0-9]|2[0-3]):(0[0-9]|[1-5][0-9]):(0[0-9]|[1-5][0-9])\.[0-9]{7}Z$/);
+    if (withMilliSecsLongPattern.test(dateTime)) {
       return true;
     }
+    
+    // Format: 2000-01-01T00:00:00.000Z
+    const withMilliSecsShortPattern: RegExp = new RegExp(
+      /^[0-9]{4}-((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|(0[469]|11)-(0[1-9]|[12][0-9]|30)|(02)-(0[1-9]|[12][0-9]))T(0[0-9]|1[0-9]|2[0-3]):(0[0-9]|[1-5][0-9]):(0[0-9]|[1-5][0-9])\.[0-9]{3}Z$/);
+    if (withMilliSecsShortPattern.test(dateTime)) {
+      return true;
+    }
+
+    // Format: 2000-01-01T00:00:00Z
     const withSecsPattern: RegExp = new RegExp(
       /^[0-9]{4}-((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|(0[469]|11)-(0[1-9]|[12][0-9]|30)|(02)-(0[1-9]|[12][0-9]))T(0[0-9]|1[0-9]|2[0-3]):(0[0-9]|[1-5][0-9]):(0[0-9]|[1-5][0-9])Z$/);
     if (withSecsPattern.test(dateTime)) {
       return true;
     }
 
+    // Format: 2000-01-01T00:00Z
     const withMinutesPattern: RegExp = new RegExp(
       /^[0-9]{4}-((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|(0[469]|11)-(0[1-9]|[12][0-9]|30)|(02)-(0[1-9]|[12][0-9]))T(0[0-9]|1[0-9]|2[0-3]):(0[0-9]|[1-5][0-9])Z$/);
     if (withMinutesPattern.test(dateTime)) {
       return true;
     }
 
+    // Format: 2000-01-01T00Z
     const withHoursPattern: RegExp = new RegExp(
       /^[0-9]{4}-((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|(0[469]|11)-(0[1-9]|[12][0-9]|30)|(02)-(0[1-9]|[12][0-9]))T(0[0-9]|1[0-9]|2[0-3])Z$/);
     if (withHoursPattern.test(dateTime)) {
       return true;
     }
 
+    // Format: 2000-01-01
     const withoutTimePattern: RegExp = new RegExp(
       /^[0-9]{4}-((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01])|(0[469]|11)-(0[1-9]|[12][0-9]|30)|(02)-(0[1-9]|[12][0-9]))$/);
     if (withoutTimePattern.test(dateTime)) {

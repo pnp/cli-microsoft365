@@ -1,7 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
-import { urlUtil, validation } from '../../../../utils';
+import { formatting, urlUtil, validation } from '../../../../utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
@@ -83,13 +83,13 @@ class SpoListViewAddCommand extends SpoCommand {
   private getRestUrl(options: Options): string {
     let result: string = `${options.webUrl}/_api/web/`;
     if (options.listId) {
-      result += `lists(guid'${encodeURIComponent(options.listId)}')`;
+      result += `lists(guid'${formatting.encodeQueryParameter(options.listId)}')`;
     }
     else if (options.listTitle) {
-      result += `lists/getByTitle('${encodeURIComponent(options.listTitle)}')`;
+      result += `lists/getByTitle('${formatting.encodeQueryParameter(options.listTitle)}')`;
     }
     else if (options.listUrl) {
-      result += `GetList('${encodeURIComponent(urlUtil.getServerRelativePath(options.webUrl, options.listUrl))}')`;
+      result += `GetList('${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(options.webUrl, options.listUrl))}')`;
     }
     result += '/views/add';
     

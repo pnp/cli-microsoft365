@@ -56,6 +56,18 @@ For the user with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_ retrieve the user na
 m365 aad user get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --properties "userPrincipalName,mail,displayName"
 ```
 
+Get information about the currently logged user using the Id token
+
+```sh
+m365 aad user get --id "@meId"
+```
+
+Get information about the currently logged in user using the UserName token
+
+```sh
+m365 aad user get --userName "@meUserName"
+```
+
 ## More information
 
 - Microsoft Graph User properties: [https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/resources/user#properties](https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/resources/user#properties)

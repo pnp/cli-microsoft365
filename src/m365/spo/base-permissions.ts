@@ -22,6 +22,16 @@ export class BasePermissions {
     this._low = value;
   }
 
+  public parse(): string[] {
+    const result: string[] = [];
+    for (const permissionKind in PermissionKind)  {
+      if (this.has((<any>PermissionKind)[permissionKind])) {
+        result.push(permissionKind);
+      }
+    }
+    return result;
+  }
+
   public has(perm: PermissionKind): boolean {
     let hasPermission = false;
 

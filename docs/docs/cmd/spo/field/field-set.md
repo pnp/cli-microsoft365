@@ -20,10 +20,13 @@ m365 spo field set [options]
 : Title of the list where the field is located (if list column). Specify `listTitle` or `listId` but not both
 
 `-i, --id [id]`
-: ID of the field to update. Specify `name` or `id` but not both
+: ID of the field to update. Specify `id` or `title` but not both
+
+`-t, --title [title]`
+: Title or internal name of the field to update. Specify `id` or `title` but not both
 
 `-n, --name [name]`
-: Title or internal name of the field to update. Specify `name` or `id` but not both
+: (deprecated. Use `title` instead) Title or internal name of the field to update. Specify `id` or `name` but not both
 
 `--updateExistingLists`
 : Set, to push the update to existing lists. Otherwise, the changes will apply to new lists only
@@ -39,7 +42,7 @@ Specify properties to update using their names, eg. `--Title 'New Title' --JSLin
 Update the title of the site column specified by its internal name and push changes to existing lists
 
 ```sh
-m365 spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --name 'MyColumn' --updateExistingLists --Title 'My column'
+m365 spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --title 'MyColumn' --updateExistingLists --Title 'My column'
 ```
 
 Update the title of the list column specified by its ID
@@ -51,5 +54,5 @@ m365 spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --lis
 Update column formatting of the specified list column
 
 ```sh
-m365 spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --name 'MyColumn' --CustomFormatter '`{"schema":"https://developer.microsoft.com/json-schemas/sp/column-formatting.schema.json", "elmType": "div", "txtContent": "@currentField"}`'
+m365 spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --title 'MyColumn' --CustomFormatter '`{"schema":"https://developer.microsoft.com/json-schemas/sp/column-formatting.schema.json", "elmType": "div", "txtContent": "@currentField"}`'
 ```

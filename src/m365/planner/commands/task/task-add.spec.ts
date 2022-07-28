@@ -38,7 +38,7 @@ describe(commands.TASK_ADD, () => {
     "appliedCategories": {},
     "assignments": {}
   };
-  
+
   const taskAddResponseWithDetails = {
     "planId": "8QZEH7b3wkS_bGQobscsM5gADCBb",
     "bucketId": "IK8tuFTwQEa5vTonM7ZMRZgAKdno",
@@ -218,7 +218,7 @@ describe(commands.TASK_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if neither the planId nor planName are provided.', (done) => {
+  it('fails validation if neither the planId nor planTitle are provided.', (done) => {
     const actual = command.validate({
       options: {
         title: 'My Planner Task',
@@ -229,12 +229,12 @@ describe(commands.TASK_ADD, () => {
     done();
   });
 
-  it('fails validation when both planId and planName are specified', (done) => {
+  it('fails validation when both planId and planTitle are specified', (done) => {
     const actual = command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        planName: 'My Planner',
+        planTitle: 'My Planner',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
       }
     });
@@ -242,11 +242,11 @@ describe(commands.TASK_ADD, () => {
     done();
   });
 
-  it('fails validation when planName is specified without ownerGroupId or ownerGroupName', (done) => {
+  it('fails validation when planTitle is specified without ownerGroupId or ownerGroupName', (done) => {
     const actual = command.validate({
       options: {
         title: 'My Planner Task',
-        planName: 'My Planner Plan',
+        planTitle: 'My Planner Plan',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
       }
     });
@@ -254,11 +254,11 @@ describe(commands.TASK_ADD, () => {
     done();
   });
 
-  it('fails validation when planName is specified with both ownerGroupId and ownerGroupName', (done) => {
+  it('fails validation when planTitle is specified with both ownerGroupId and ownerGroupName', (done) => {
     const actual = command.validate({
       options: {
         title: 'My Planner Task',
-        planName: 'My Planner Plan',
+        planTitle: 'My Planner Plan',
         ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
         ownerGroupName: 'My Planner Group',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
@@ -280,11 +280,11 @@ describe(commands.TASK_ADD, () => {
     done();
   });
 
-  it('passes validation when valid title, planName, and ownerGroupId are specified', (done) => {
+  it('passes validation when valid title, planTitle, and ownerGroupId are specified', (done) => {
     const actual = command.validate({
       options: {
         title: 'My Planner Task',
-        planName: 'My Planner Plan',
+        planTitle: 'My Planner Plan',
         ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
       }
@@ -293,11 +293,11 @@ describe(commands.TASK_ADD, () => {
     done();
   });
 
-  it('passes validation when valid title, planName, ownerGroupName, and bucketId are specified', (done) => {
+  it('passes validation when valid title, planTitle, ownerGroupName, and bucketId are specified', (done) => {
     const actual = command.validate({
       options: {
         title: 'My Planner Task',
-        planName: 'My Planner Plan',
+        planTitle: 'My Planner Plan',
         ownerGroupName: 'My Planner Group',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
       }
@@ -310,7 +310,7 @@ describe(commands.TASK_ADD, () => {
     const actual = command.validate({
       options: {
         title: 'My Planner Task',
-        planName: 'My Planner Plan',
+        planTitle: 'My Planner Plan',
         ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
       }
@@ -422,6 +422,84 @@ describe(commands.TASK_ADD, () => {
     done();
   });
 
+  it('fails validation if incorrect appliedCategory is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        appliedCategories: "category1,category9"
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if priority lower than 0 is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        priority: -1
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if incorrect previewType is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        previewType: "test"
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if priority higher than 10 is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        priority: 11
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if priority is specified which is a number with decimals.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        priority: 5.6
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if unknown priority label is specified.', (done) => {
+    const actual = command.validate({
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        priority: 'invalid'
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
   it('correctly adds planner task with title, planId, and bucketId', (done) => {
     const options: any = {
       title: 'My Planner Task',
@@ -461,7 +539,7 @@ describe(commands.TASK_ADD, () => {
     });
   });
 
-  it('correctly adds planner bucket with title, bucketId, planName, and ownerGroupName', (done) => {
+  it('correctly adds planner bucket with title, bucketId, planTitle, and ownerGroupName', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
@@ -475,7 +553,7 @@ describe(commands.TASK_ADD, () => {
           ]
         });
       }
-      
+
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('My Planner Group')}'`) {
         return Promise.resolve(groupByDisplayNameResponse);
       }
@@ -486,7 +564,7 @@ describe(commands.TASK_ADD, () => {
     const options: any = {
       title: 'My Planner Task',
       bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-      planName: 'My Planner Plan',
+      planTitle: 'My Planner Plan',
       ownerGroupName: 'My Planner Group'
     };
 
@@ -501,7 +579,52 @@ describe(commands.TASK_ADD, () => {
     });
   });
 
-  it('correctly adds planner task with title, bucketId, planName, and ownerGroupId', (done) => {
+  it('correctly adds planner task with title, bucketId, planTitle, and ownerGroupId', (done) => {
+    sinonUtil.restore(request.get);
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
+        return Promise.resolve({
+          value: [
+            {
+              "createdBy": {
+                "application": {
+                  "id": "95e27074-6c4a-447a-aa24-9d718a0b86fa"
+                },
+                "user": {
+                  "id": "ebf3b108-5234-4e22-b93d-656d7dae5874"
+                }
+              },
+              "createdDateTime": "2015-03-30T18:36:49.2407981Z",
+              "owner": "ebf3b108-5234-4e22-b93d-656d7dae5874",
+              "title": "My Planner Plan",
+              "id": "8QZEH7b3wkS_bGQobscsM5gADCBb"
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const options: any = {
+      title: 'My Planner Task',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      planTitle: 'My Planner Plan',
+      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert(loggerLogSpy.calledWith(taskAddResponse));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly adds planner task with title, bucketId, deprecated planName, and ownerGroupId', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/0d0402ee-970f-4951-90b5-2f24519d2e40/planner/plans`) {
@@ -532,7 +655,8 @@ describe(commands.TASK_ADD, () => {
       title: 'My Planner Task',
       bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
       planName: 'My Planner Plan',
-      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
+      ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
+      verbose: true
     };
 
     command.action(logger, { options: options } as any, () => {
@@ -601,7 +725,7 @@ describe(commands.TASK_ADD, () => {
     });
   });
 
-  it('correctly adds planner task with title, bucketId, planId, and assignedToUserNames', (done) => {
+  it('correctly adds planner task with title, bucketId, planId, assignedToUserNames, and appliedCategories', (done) => {
     sinonUtil.restore(request.get);
     sinonUtil.restore(request.post);
 
@@ -609,7 +733,53 @@ describe(commands.TASK_ADD, () => {
       title: 'My Planner Task',
       planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
       bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-      assignedToUserNames: 'user@contoso.onmicrosoft.com'
+      assignedToUserNames: 'user@contoso.onmicrosoft.com',
+      appliedCategories: "category1,category3"
+    };
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${encodeURIComponent('user@contoso.onmicrosoft.com')}'&$select=id,userPrincipalName`) {
+        return Promise.resolve({
+          value: [
+            {
+              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
+              userPrincipalName: 'user@contoso.onmicrosoft.com'
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks`) {
+        return Promise.resolve(taskAddResponseWithAssignments);
+      }
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert(loggerLogSpy.calledWith(taskAddResponseWithAssignments));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly adds planner task with title, bucketId, planId, assignedToUserNames, and appliedCategories split with space', (done) => {
+    sinonUtil.restore(request.get);
+    sinonUtil.restore(request.post);
+
+    const options: any = {
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      assignedToUserNames: 'user@contoso.onmicrosoft.com',
+      appliedCategories: "category1 category2"
     };
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -665,7 +835,7 @@ describe(commands.TASK_ADD, () => {
           "@odata.etag": "TestEtag"
         });
       }
-      
+
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks`) {
         return Promise.resolve(taskAddResponseWithDetails);
       }
@@ -694,7 +864,99 @@ describe(commands.TASK_ADD, () => {
       }
     });
   });
-  
+
+  it('uses correct value for urgent priority', (done) => {
+    sinonUtil.restore(request.post);
+    const requestPostStub = sinon.stub(request, 'post');
+    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
+
+    const options: any = {
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: 'Urgent'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 1);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct value for important priority', (done) => {
+    sinonUtil.restore(request.post);
+    const requestPostStub = sinon.stub(request, 'post');
+    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
+
+    const options: any = {
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: 'Important'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 3);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct value for medium priority', (done) => {
+    sinonUtil.restore(request.post);
+    const requestPostStub = sinon.stub(request, 'post');
+    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
+
+    const options: any = {
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: 'Medium'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 5);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses correct value for low priority', (done) => {
+    sinonUtil.restore(request.post);
+    const requestPostStub = sinon.stub(request, 'post');
+    requestPostStub.callsFake(() => Promise.resolve(taskAddResponseWithAssignments));
+
+    const options: any = {
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      priority: 'Low'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(requestPostStub.lastCall.args[0].data.priority, 9);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('fails when no bucket is found', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -723,7 +985,7 @@ describe(commands.TASK_ADD, () => {
       }
     });
   });
-  
+
   it('fails when an invalid user is specified', (done) => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -778,12 +1040,12 @@ describe(commands.TASK_ADD, () => {
       options: {
         debug: false,
         name: 'My Planner Bucket',
-        planName: 'My Planner Plan',
+        planTitle: 'My Planner Plan',
         ownerGroupName: 'foo'
       }
     }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified owner group does not exist`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified group 'foo' does not exist.`)));
         done();
       }
       catch (e) {
@@ -797,7 +1059,7 @@ describe(commands.TASK_ADD, () => {
 
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details`) {
-        return Promise.resolve(undefined);
+        return Promise.reject('Error fetching task details');
       }
 
       return Promise.reject('Invalid request');

@@ -65,7 +65,7 @@ class SpoHubSiteListCommand extends SpoCommand {
       .then((res: { value: HubSite[] }): Promise<any[] | void> => {
         hubSites = res.value;
 
-        if (args.options.includeAssociatedSites !== true || args.options.output !== 'json') {
+        if (args.options.includeAssociatedSites !== true || args.options.output && args.options.output !== 'json') {
           return Promise.resolve();
         }
         else {

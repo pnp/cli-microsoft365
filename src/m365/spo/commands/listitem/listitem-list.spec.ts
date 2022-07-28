@@ -7,11 +7,14 @@ import Command, { CommandError, CommandTypes } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
+import chalk = require('chalk');
 const command: Command = require('./listitem-list');
 
 describe(commands.LISTITEM_LIST, () => {
   let log: any[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   const expectedArrayLength = 2;
   let returnArrayLength = 0;
@@ -109,6 +112,9 @@ describe(commands.LISTITEM_LIST, () => {
         log.push(msg);
       }
     };
+
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -162,8 +168,13 @@ describe(commands.LISTITEM_LIST, () => {
     assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
   });
 
-  it('fails validation if title and id option not specified', () => {
+  it('fails validation if listTitle and listId option not specified', () => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if listTitle and listId are specified together', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } });
     assert.notStrictEqual(actual, true);
   });
 
@@ -173,13 +184,18 @@ describe(commands.LISTITEM_LIST, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'foo', title: 'Demo List' } });
+    const actual = command.validate({ options: { webUrl: 'foo', listTitle: 'Demo List' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List' } });
     assert(actual);
+  });
+
+  it('fails validation if the listId option is not a valid GUID', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo' } });
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the id option is not a valid GUID', () => {
@@ -187,39 +203,79 @@ describe(commands.LISTITEM_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the id option is a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } });
+  it('passes validation if the listId option is a valid GUID', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } });
     assert(actual);
   });
 
   it('fails validation if camlQuery and fields are specified together', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', camlQuery: '<Query><ViewFields><FieldRef Name="Title" /><FieldRef Name="Id" /></ViewFields></Query>', fields: 'Title,Id' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', camlQuery: '<Query><ViewFields><FieldRef Name="Title" /><FieldRef Name="Id" /></ViewFields></Query>', fields: 'Title,Id' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if camlQuery and pageSize are specified together', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', camlQuery: '<Query><RowLimit>2</RowLimit></Query>', pageSize: 3 } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', camlQuery: '<Query><RowLimit>2</RowLimit></Query>', pageSize: 3 } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if camlQuery and pageNumber are specified together', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', camlQuery: '<Query><RowLimit>2</RowLimit></Query>', pageNumber: 3 } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', camlQuery: '<Query><RowLimit>2</RowLimit></Query>', pageNumber: 3 } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if pageNumber is specified and pageSize is not', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', pageNumber: 3 } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', pageNumber: 3 } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the specific pageSize is not a number', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', pageSize: 'abc' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', pageSize: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the specific pageNumber is not a number', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', pageSize: 3, pageNumber: 'abc' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', pageSize: 3, pageNumber: 'abc' } });
     assert.notStrictEqual(actual, true);
+  });
+
+  it('logs deprecation warning when option id is specified', (done) => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    const options: any = {
+      id: '935c13a0-cc53-4103-8b48-c1d0828eaa7f',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'id' is deprecated. Please use 'listId' instead.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs deprecation warning when option title is specified', (done) => {
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(request, 'post').callsFake(postFakes);
+
+    const options: any = {
+      title: 'Demo List',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'title' is deprecated. Please use 'listTitle' instead.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('returns array of listItemInstance objects when a list of items is requested, and debug mode enabled', (done) => {
@@ -228,7 +284,7 @@ describe(commands.LISTITEM_LIST, () => {
 
     const options: any = {
       debug: true,
-      title: 'Demo List',
+      listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x'
     };
 
@@ -241,7 +297,6 @@ describe(commands.LISTITEM_LIST, () => {
         done(e);
       }
     });
-
   });
 
   it('returns array of listItemInstance objects when a list of items is requested with an output type of json, and a list of fields and a filter specified', (done) => {
@@ -250,7 +305,7 @@ describe(commands.LISTITEM_LIST, () => {
 
     const options: any = {
       debug: true,
-      title: 'Demo List',
+      listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       output: "json",
       pageSize: 2,
@@ -267,7 +322,6 @@ describe(commands.LISTITEM_LIST, () => {
         done(e);
       }
     });
-
   });
 
   it('returns array of listItemInstance objects when a list of items is requested with an output type of json, a page number specified, a list of fields and a filter specified', (done) => {
@@ -276,7 +330,7 @@ describe(commands.LISTITEM_LIST, () => {
 
     const options: any = {
       debug: true,
-      title: 'Demo List',
+      listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       output: "json",
       pageSize: 2,
@@ -294,7 +348,6 @@ describe(commands.LISTITEM_LIST, () => {
         done(e);
       }
     });
-
   });
 
   it('returns array of listItemInstance objects when a list of items is requested with an output type of json, and a pageNumber is specified', (done) => {
@@ -303,7 +356,7 @@ describe(commands.LISTITEM_LIST, () => {
 
     const options: any = {
       debug: false,
-      title: 'Demo List',
+      listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       output: "json",
       pageSize: 2,
@@ -320,7 +373,6 @@ describe(commands.LISTITEM_LIST, () => {
         done(e);
       }
     });
-
   });
 
   it('returns array of listItemInstance objects when a list of items is requested with no output type specified, and a list of fields specified', (done) => {
@@ -329,7 +381,7 @@ describe(commands.LISTITEM_LIST, () => {
 
     const options: any = {
       debug: false,
-      title: 'Demo List',
+      listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       fields: "Title,ID"
     };
@@ -343,7 +395,58 @@ describe(commands.LISTITEM_LIST, () => {
         done(e);
       }
     });
+  });
 
+  it('returns array of listItemInstance objects when a list of items is requested with no output type specified, a list of fields with lookup field specified', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if ((opts.url as string).indexOf('&$expand=') > -1) {
+        return Promise.resolve({
+          value:
+            [{
+              "ID": 1,
+              "Modified": "2018-08-15T13:43:12Z",
+              "Title": "Example item 1",
+              "Company": { "Title": "Contoso" }
+            },
+            {
+              "ID": 2,
+              "Modified": "2018-08-15T13:44:10Z",
+              "Title": "Example item 2",
+              "Company": { "Title": "Fabrikam" }
+            }]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const options: any = {
+      debug: false,
+      listTitle: 'Demo List',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      fields: "Title,Modified,Company/Title"
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.deepStrictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify([
+          {
+            "Modified": "2018-08-15T13:43:12Z",
+            "Title": "Example item 1",
+            "Company": { "Title": "Contoso" }
+          },
+          {
+            "Modified": "2018-08-15T13:44:10Z",
+            "Title": "Example item 2",
+            "Company": { "Title": "Fabrikam" }
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('returns array of listItemInstance objects when a list of items is requested with an output type of text, and no fields specified', (done) => {
@@ -352,7 +455,7 @@ describe(commands.LISTITEM_LIST, () => {
 
     const options: any = {
       debug: false,
-      title: 'Demo List',
+      listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       output: "text"
     };
@@ -366,7 +469,6 @@ describe(commands.LISTITEM_LIST, () => {
         done(e);
       }
     });
-
   });
 
   it('returns array of listItemInstance objects when a list of items is requested with a camlQuery specified, and output set to json, and debug mode is enabled', (done) => {
@@ -375,7 +477,7 @@ describe(commands.LISTITEM_LIST, () => {
 
     const options: any = {
       debug: true,
-      title: 'Demo List',
+      listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       camlQuery: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>",
       output: "json"
@@ -398,7 +500,7 @@ describe(commands.LISTITEM_LIST, () => {
 
     const options: any = {
       debug: false,
-      title: 'Demo List',
+      listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       camlQuery: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
     };
@@ -420,7 +522,7 @@ describe(commands.LISTITEM_LIST, () => {
 
     const options: any = {
       debug: false,
-      id: '935c13a0-cc53-4103-8b48-c1d0828eaa7f',
+      listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       camlQuery: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
     };

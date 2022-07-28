@@ -1,4 +1,4 @@
-import { PlannerBucket, Group } from '@microsoft/microsoft-graph-types';
+import { PlannerBucket } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { AxiosRequestConfig } from 'axios';
 import {
@@ -11,6 +11,7 @@ import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import Auth from '../../../../Auth';
 import { planner } from '../../../../utils/planner';
+import { aadGroup } from '../../../../utils/aadGroup';
 
 interface CommandArgs {
   options: Options;
@@ -21,6 +22,7 @@ interface Options extends GlobalOptions {
   name?: string;
   planId?: string;
   planName?: string;
+  planTitle?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
 }
@@ -40,12 +42,19 @@ class PlannerBucketGetCommand extends GraphCommand {
     telemetryProps.name = typeof args.options.name !== 'undefined';
     telemetryProps.planId = typeof args.options.planId !== 'undefined';
     telemetryProps.planName = typeof args.options.planName !== 'undefined';
+    telemetryProps.planTitle = typeof args.options.planTitle !== 'undefined';
     telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
     telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
     return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (args.options.planName) {
+      args.options.planTitle = args.options.planName;
+
+      this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
+    }
+
     if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
@@ -95,7 +104,7 @@ class PlannerBucketGetCommand extends GraphCommand {
   }
 
   private getPlanId(args: CommandArgs): Promise<string> {
-    const { planId, planName } = args.options;
+    const { planId, planTitle } = args.options;
 
     if (planId) {
       return Promise.resolve(planId);
@@ -103,7 +112,7 @@ class PlannerBucketGetCommand extends GraphCommand {
 
     return this
       .getGroupId(args)
-      .then(groupId => planner.getPlanByName(planName!, groupId))
+      .then(groupId => planner.getPlanByTitle(planTitle!, groupId))
       .then(plan => plan.id!);
   }
 
@@ -116,7 +125,7 @@ class PlannerBucketGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    return request.get<PlannerBucket>(requestOptions);    
+    return request.get<PlannerBucket>(requestOptions);
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {
@@ -126,27 +135,9 @@ class PlannerBucketGetCommand extends GraphCommand {
       return Promise.resolve(ownerGroupId);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(ownerGroupName as string)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: Group[] }>(requestOptions)
-      .then(response => {
-        if (!response.value.length) {
-          return Promise.reject(`The specified owner group ${ownerGroupName} does not exist`);
-        }
-
-        if (response.value.length > 1) {
-          return Promise.reject(`Multiple owner groups with name ${ownerGroupName} found: ${response.value.map(x => x.id)}`);
-        }
-
-        return Promise.resolve(response.value[0].id!);
-      });
+    return aadGroup
+      .getGroupByDisplayName(ownerGroupName!)
+      .then(group => group.id!);
   }
 
   public options(): CommandOption[] {
@@ -155,13 +146,16 @@ class PlannerBucketGetCommand extends GraphCommand {
         option: '-i, --id [id]'
       },
       {
-        option: '--name [name]'
+        option: '-n, --name [name]'
       },
       {
         option: '--planId [planId]'
       },
       {
         option: '--planName [planName]'
+      },
+      {
+        option: "--planTitle [planTitle]"
       },
       {
         option: '--ownerGroupId [ownerGroupId]'
@@ -177,8 +171,8 @@ class PlannerBucketGetCommand extends GraphCommand {
 
   public validate(args: CommandArgs): boolean | string {
     if (args.options.id) {
-      if (args.options.planId || args.options.planName || args.options.ownerGroupId || args.options.ownerGroupName) {
-        return 'Don\'t specify planId, planName, ownerGroupId or ownerGroupName when using id';
+      if (args.options.planId || args.options.planName || args.options.planTitle  || args.options.ownerGroupId || args.options.ownerGroupName) {
+        return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
       }
       if (args.options.name) {
         return 'Specify either id or name';
@@ -186,21 +180,21 @@ class PlannerBucketGetCommand extends GraphCommand {
     }
 
     if (args.options.name) {
-      if (!args.options.planId && !args.options.planName) {
-        return 'Specify either planId or planName when using name';
+      if (!args.options.planId && !args.options.planName && !args.options.planTitle) {
+        return 'Specify either planId or planTitle when using name';
       }
 
-      if (args.options.planId && args.options.planName) {
-        return 'Specify either planId or planName when using name but not both';
+      if (args.options.planId && (args.options.planName || args.options.planTitle)) {
+        return 'Specify either planId or planTitle when using name but not both';
       }
 
-      if (args.options.planName) {
+      if (args.options.planName || args.options.planTitle) {
         if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
-          return 'Specify either ownerGroupId or ownerGroupName when using planName';
+          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
         }
 
         if (args.options.ownerGroupId && args.options.ownerGroupName) {
-          return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
+          return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
         }
 
         if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {

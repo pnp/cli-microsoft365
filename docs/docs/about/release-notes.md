@@ -1,11 +1,102 @@
 # Release notes
 
+## [v5.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.5.0)
+
+### New commands
+
+**Planner:**
+
+- [planner plan remove](../cmd/planner/plan/plan-remove.md) - removes the Microsoft Planner plan [#3336](https://github.com/pnp/cli-microsoft365/issues/3336)
+- [planner tenant settings set](../cmd/planner/tenant/tenant-settings-set.md) - sets Microsoft Planner configuration of the tenant [#3356](https://github.com/pnp/cli-microsoft365/issues/3356)
+
+**Search:**
+
+- [search externalconnection get](../cmd/search/externalconnection/externalconnection-get.md) - adds search externalconnection get command. [#3169](https://github.com/pnp/cli-microsoft365/issues/3169)
+
+**SharePoint:**
+
+- [spo roledefinition get](../cmd/spo/roledefinition/roledefinition-get.md) - adds spo roledefinition get command. [#3270](https://github.com/pnp/cli-microsoft365/issues/3270)
+- [spo group set](../cmd/spo/group/group-set.md) - adds spo group set command. [#3499](https://github.com/pnp/cli-microsoft365/pull/3499)
+- [spo group add](../cmd/spo/group/group-add.md) - adds spo group add command. [#3493](https://github.com/pnp/cli-microsoft365/pull/3493)
+
+**Teams:**
+
+- [teams cache remove](../cmd/teams/cache/cache-remove.md) - removes the Microsoft Teams client cache [#3205](https://github.com/pnp/cli-microsoft365/issues/3205)
+
+### Changes
+
+- fixed login issue [#3431](https://github.com/pnp/cli-microsoft365/issues/3431)
+- fixed issue with wrong _global.md reference breaking the docs and cli help [#3425](https://github.com/pnp/cli-microsoft365/issues/3425)
+- combined `planner plan get` with `planner plan details get` [#3344](https://github.com/pnp/cli-microsoft365/issues/3344)
+- extended `spfx doctor command` with support for SPFx v1.15.0 [#3432](https://github.com/pnp/cli-microsoft365/issues/3432)
+- extended `spfx project doctor` command with support for SPFx v1.15.0 [#3440](https://github.com/pnp/cli-microsoft365/issues/3440)
+- solved 'spo listitem set' issues with Number and Single Line of Text [#3405](https://github.com/pnp/cli-microsoft365/issues/3405)
+- fixed flow export command with support for illegal file characters [#3404](https://github.com/pnp/cli-microsoft365/issues/3404)
+- fixed `planner plan remove` docs [#3473](https://github.com/pnp/cli-microsoft365/issues/3473)
+- fixed upgrading non-React SPFx projects to v1.15.0 [#3475](https://github.com/pnp/cli-microsoft365/issues/3475)
+- fixed sample script referencing deprecated task details get [#3467](https://github.com/pnp/cli-microsoft365/issues/3467)
+- upgraded SPFx fast serve helper to v1.15 [#3446](https://github.com/pnp/cli-microsoft365/issues/3446)
+- removed unnecessary undefined checks from several commands [#3420](https://github.com/pnp/cli-microsoft365/issues/3420)
+- added `@meId` and `@meUserName` tokens [#3056](https://github.com/pnp/cli-microsoft365/issues/3056)
+- extended spo hubsite get options. [#3378](https://github.com/pnp/cli-microsoft365/issues/3378)
+- fixed planTitle inconsistency in planner commands. [#3342](https://github.com/pnp/cli-microsoft365/issues/3342)
+- fixed API issue for broken Power Apps commands [#3207](https://github.com/pnp/cli-microsoft365/issues/3207)
+- fixed 'spo listitem list' and 'spo listitem get' commands [#3391](https://github.com/pnp/cli-microsoft365/issues/3391)
+- extended `planner plan add` with more options [#3345](https://github.com/pnp/cli-microsoft365/issues/3345)
+- Updates 'planner task get docs' [#3495](https://github.com/pnp/cli-microsoft365/issues/3495)
+- Extends "teams team remove, archive, and unarchive" with extra options [#3483](https://github.com/pnp/cli-microsoft365/issues/3483)
+- Fixes spo field set command options inconsistency [#3418](https://github.com/pnp/cli-microsoft365/pull/3418)
+- Extends 'spo hubsite get' command. [#3454](https://github.com/pnp/cli-microsoft365/pull/3454)
+
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad o365group recyclebinitem remove](../cmd/aad/o365group/o365group-recyclebinitem-remove.md) - permanently deletes a Microsoft 365 Group from the recycle bin in the current tenant [#1982](https://github.com/pnp/cli-microsoft365/issues/1982)
+
+**Planner:**
+
+- [planner task checklistitem add](../cmd/planner/task/task-checklistitem-add.md) - adds a new checklist item to a Planner task [#3280](https://github.com/pnp/cli-microsoft365/issues/3280)
+- [planner task checklistitem list](../cmd/planner/task/task-checklistitem-list.md) - lists the checklist items of a Planner task [#3280](https://github.com/pnp/cli-microsoft365/issues/3281)
+- [planner task checklistitem remove](../cmd/planner/task/task-checklistitem-remove.md) - removes a checklist item from a Planner task [#3282](https://github.com/pnp/cli-microsoft365/issues/3282)
+- [planner task reference remove](../cmd/planner/task/task-reference-remove.md) - removes a reference from a Microsoft Planner task [#3285](https://github.com/pnp/cli-microsoft365/issues/3285)
+- [planner task remove](../cmd/planner/task/task-remove.md) - removes a Microsoft Planner task [#3227](https://github.com/pnp/cli-microsoft365/issues/3227)
+- [planner tenant settings list](../cmd/planner/tenant/tenant-settings-list.md) - lists the Microsoft Planner configuration of the tenant [#3255](https://github.com/pnp/cli-microsoft365/issues/3355)
+
+**SharePoint Online:**
+
+- [spo eventreceiver list](../cmd/spo/eventreceiver/eventreceiver-list.md) - lists all event receivers attached to the specified site, web or list [#3305](https://github.com/pnp/cli-microsoft365/issues/3305)
+- [spo roledefinition remove](../cmd/spo/roledefinition/roledefinition-remove.md) - removes the role definition from the specified site [#3272](https://github.com/pnp/cli-microsoft365/issues/3272)
 
 ### Changes
 
 - fixed 'planner task get' [#3324](https://github.com/pnp/cli-microsoft365/issues/3324)
 - extended spo list view add command with viewQuery option [#1862](https://github.com/pnp/cli-microsoft365/issues/1862)
+- updated planner task list options docs [#3347](https://github.com/pnp/cli-microsoft365/issues/3347)
+- updated PowerShell comparison docs [#3332](https://github.com/pnp/cli-microsoft365/issues/3332)
+- added short options to planner bucket commands [#3343](https://github.com/pnp/cli-microsoft365/issues/3343)
+- fixed spo listitem roleinheritance break docs option description formatting [#3358](https://github.com/pnp/cli-microsoft365/issues/3358)
+- added support for upgrading SPFx projects to v1.15.0-rc.0 [#3376](https://github.com/pnp/cli-microsoft365/issues/3376)
+- fixed listTitle option values with single quote [#3357](https://github.com/pnp/cli-microsoft365/issues/3357)
+- fixed planner documentation inconsistency [#3338](https://github.com/pnp/cli-microsoft365/issues/3338)
+- fixed invalid ISO date pattern with 7 milliseconds digits [#3372](https://github.com/pnp/cli-microsoft365/issues/3372)
+- fixed documentation for spo file checkout [#3388](https://github.com/pnp/cli-microsoft365/pull/3388)
+- fixed issue with mkdocs serve because of pygments version [#3389](https://github.com/pnp/cli-microsoft365/issues/3389)
+- fixed spo listitem list options [#3361](https://github.com/pnp/cli-microsoft365/issues/3361)
+- added aadGroup utils class [#3267](https://github.com/pnp/cli-microsoft365/issues/3267)
+- combined planner task details get with planner task get [#3257](https://github.com/pnp/cli-microsoft365/issues/3257)
+- fixed the documentation of the m365 file list command [#3368](https://github.com/pnp/cli-microsoft365/issues/3368)
+- fixed error with the teams team get --name command parameter [#3395](https://github.com/pnp/cli-microsoft365/issues/3395)
+- fixed gateway timeout on flow export [#3393](https://github.com/pnp/cli-microsoft365/issues/3393)
+- extended 'aad app set' with support for multiple identifier URIs [#3333](https://github.com/pnp/cli-microsoft365/issues/3333)
+- fixed bug with spo list list throwing access denied [#3373](https://github.com/pnp/cli-microsoft365/issues/3373)
+- fixed --includeAssociatedSites doesn't include associated sites in the result [#3400](https://github.com/pnp/cli-microsoft365/issues/3400)
+- extended 'spo list get' with PrincipalTypeString [#3379](https://github.com/pnp/cli-microsoft365/issues/3379)
+- added more options to planner task add [#3246](https://github.com/pnp/cli-microsoft365/issues/3246)
+- added priority option to planner task add and set [#3383](https://github.com/pnp/cli-microsoft365/issues/3383)
+- added support for upgrading SPFx projects to v1.15.0 [#3427](https://github.com/pnp/cli-microsoft365/issues/3427)
 
 ## [v5.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.3.0)
 
@@ -127,7 +218,7 @@
 
 **Planner:**
 
-- [planner plan details get](../cmd/planner/plan/plan-details-get.md) - retrieve the planner details about the specified plan [#3051](https://github.com/pnp/cli-microsoft365/issues/3051)
+- [planner plan details get](../cmd/planner/plan/plan-get.md) - retrieve the planner details about the specified plan [#3051](https://github.com/pnp/cli-microsoft365/issues/3051)
 
 **Power Platform:**
 
@@ -191,7 +282,7 @@
 **Planner:**
 
 - [planner task get](../cmd/planner/task/task-get.md) - retrieves the the specified planner task [#3019](https://github.com/pnp/cli-microsoft365/issues/3019)
-- [planner task details get](../cmd/planner/task/task-details-get.md) - retrieves the details of the specified planner task [#3015](https://github.com/pnp/cli-microsoft365/issues/3015)
+- [planner task details get](../cmd/planner/task/task-get.md) - retrieves the details of the specified planner task [#3015](https://github.com/pnp/cli-microsoft365/issues/3015)
 
 **SharePoint:**
 

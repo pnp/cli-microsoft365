@@ -20,7 +20,7 @@ m365 aad app set [options]
 : Name of the Azure AD application registration to update. Specify either `appId`, `objectId` or `name`
 
 `-u, --uri [uri]`
-: Application ID URI to update
+: Comma-separated list of Application ID URIs to update
 
 `-r, --redirectUris [redirectUris]`
 : Comma-separated list of redirect URIs to add to the app registration. Requires `platform` to be specified

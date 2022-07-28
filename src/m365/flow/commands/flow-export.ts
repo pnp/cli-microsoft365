@@ -87,9 +87,9 @@ class FlowExportCommand extends AzmgmtCommand {
         }
 
         const requestOptions: any = {
-          url: `${this.resource}providers/${formatArgument === 'json' ?
-            `Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.id)}?api-version=2016-11-01`
-            : `Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(args.options.environment)}/exportPackage?api-version=2016-11-01`}`,
+          url: formatArgument === 'json' ?
+            `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.id)}?api-version=2016-11-01`
+            : `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(args.options.environment)}/exportPackage?api-version=2016-11-01`,
           headers: {
             accept: 'application/json'
           },
@@ -129,6 +129,9 @@ class FlowExportCommand extends AzmgmtCommand {
         const downloadFileUrl: string = formatArgument === 'json' ? '' : res.packageLink.value;
         const filenameRegEx: RegExp = /([^\/]+\.zip)/i;
         filenameFromApi = formatArgument === 'json' ? `${res.properties.displayName}.json` : (filenameRegEx.exec(downloadFileUrl) || ['output.zip'])[0];
+        // Replace all illegal characters from the file name
+        const illegalCharsRegEx = /[\\\/:*?"<>|]/g;
+        filenameFromApi = filenameFromApi.replace(illegalCharsRegEx, '_');
 
         if (this.debug) {
           logger.logToStderr(`Filename from PowerApps API: ${filenameFromApi}`);

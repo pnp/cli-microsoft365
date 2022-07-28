@@ -12,10 +12,11 @@ const command: Command = require('./listitem-get');
 describe(commands.LISTITEM_GET, () => {
   let log: any[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
 
   const expectedTitle = `List Item 1`;
-
   const expectedId = 147;
+
   let actualId = 0;
 
   const getFakes = (opts: any) => {
@@ -37,10 +38,10 @@ describe(commands.LISTITEM_GET, () => {
     }
     return Promise.reject('Invalid request');
   };
-  
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -57,6 +58,7 @@ describe(commands.LISTITEM_GET, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -148,10 +150,10 @@ describe(commands.LISTITEM_GET, () => {
 
     command.allowUnknownOptions();
 
-    const options: any = { 
-      debug: true, 
-      listTitle: 'Demo List', 
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+    const options: any = {
+      debug: true,
+      listTitle: 'Demo List',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       id: expectedId
     };
 
@@ -171,10 +173,10 @@ describe(commands.LISTITEM_GET, () => {
 
     command.allowUnknownOptions();
 
-    const options: any = { 
-      debug: false, 
-      listTitle: 'Demo List', 
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+    const options: any = {
+      debug: false,
+      listTitle: 'Demo List',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       id: expectedId,
       output: "json",
       properties: "ID,Modified"
@@ -191,15 +193,58 @@ describe(commands.LISTITEM_GET, () => {
     });
   });
 
+  it('returns listItemInstance object when list item is requested with an output type of json, a list of fields with lookup field are specified', (done) => {
+    sinon.stub(request, 'get').callsFake((opts: any) => {
+      if ((opts.url as string).indexOf('&$expand=') > -1) {
+        actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
+        return Promise.resolve(
+          {
+            "ID": actualId,
+            "Modified": "2018-03-15T10:43:10Z",
+            "Title": expectedTitle,
+            "Company": `{ "Title": "Contoso" }`
+          }
+        );
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.allowUnknownOptions();
+
+    const options: any = {
+      debug: false,
+      listTitle: 'Demo List',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      id: expectedId,
+      output: "json",
+      properties: "Title,Modified,Company/Title"
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.deepStrictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify({
+          "Modified": "2018-03-15T10:43:10Z",
+          "Title": expectedTitle,
+          "Company": `{ "Title": "Contoso" }`
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('returns listItemInstance object when list item is requested with an output type of text, and no list of fields', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     command.allowUnknownOptions();
 
-    const options: any = { 
-      debug: false, 
-      listTitle: 'Demo List', 
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+    const options: any = {
+      debug: false,
+      listTitle: 'Demo List',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       id: expectedId,
       output: "text"
     };
@@ -220,10 +265,10 @@ describe(commands.LISTITEM_GET, () => {
 
     command.allowUnknownOptions();
 
-    const options: any = { 
-      debug: false, 
-      listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', 
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+    const options: any = {
+      debug: false,
+      listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       id: expectedId,
       output: "json"
     };
@@ -236,16 +281,16 @@ describe(commands.LISTITEM_GET, () => {
       catch (e) {
         done(e);
       }
-    });    
+    });
   });
 
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    const options: any = { 
-      debug: false, 
-      listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', 
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+    const options: any = {
+      debug: false,
+      listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       id: expectedId,
       output: "json"
     };
@@ -258,6 +303,6 @@ describe(commands.LISTITEM_GET, () => {
       catch (e) {
         done(e);
       }
-    });    
+    });
   });
 });

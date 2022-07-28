@@ -5,7 +5,7 @@ import { Cli } from './cli';
 import { Logger } from './cli/Logger';
 import GlobalOptions from './GlobalOptions';
 import request from './request';
-import { GraphResponseError } from './utils';
+import { accessToken, GraphResponseError } from './utils';
 
 export interface CommandOption {
   option: string;
@@ -113,6 +113,7 @@ export default abstract class Command {
           return;
         }
 
+        this.loadValuesFromAccessToken(args);
         this.commandAction(logger, args, cb);
       }, (error: any): void => {
         cb(new CommandError(error));
@@ -350,6 +351,29 @@ export default abstract class Command {
     const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
     unknownOptionsNames.forEach(o => {
       payload[o] = unknownOptions[o];
+    });
+  }
+
+  private loadValuesFromAccessToken(args: CommandArgs) {
+    if (!auth.service.accessTokens[auth.defaultResource]) {
+      return;
+    }
+
+    const token = auth.service.accessTokens[auth.defaultResource].accessToken;
+    const optionNames: string[] = Object.getOwnPropertyNames(args.options);
+    optionNames.forEach(option => {
+      const value = args.options[option];
+      if (!value || typeof value !== 'string') {
+        return;  
+      }
+      
+      const lowerCaseValue = value.toLowerCase();
+      if (lowerCaseValue === '@meid') {
+        args.options[option] = accessToken.getUserIdFromAccessToken(token);
+      }
+      if (lowerCaseValue === '@meusername') {
+        args.options[option] = accessToken.getUserNameFromAccessToken(token);
+      }
     });
   }
 }

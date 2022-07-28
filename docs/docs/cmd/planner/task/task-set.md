@@ -17,22 +17,25 @@ m365 planner task set [options]
 : New title of the task.
 
 `--bucketId [bucketId]`
-: ID of the bucket to move the task to. Specify either `bucketId` or `bucketName` but not both.
+: ID of the bucket to move the task to. Specify either `bucketId` or `bucketName` when using `title`.
 
 `--bucketName [bucketName]`
-: Name of the bucket to move the task to. The bucket needs to exist in the selected plan. Specify either `bucketId` or `bucketName` but not both.
+: Name of the bucket to move the task to. The bucket needs to exist in the selected plan. Specify either `bucketId` or `bucketName` when using `title`.
 
 `--planId [planId]`
-: ID of the plan to which the bucket belongs to. Specify either `planId` or `planName` when using `bucketName`.
+: ID of the plan to which the bucket belongs to. Specify either `planId` or `planTitle` when using `bucketName`.
+
+`--planTitle [planTitle]`
+: Title of the plan to which the bucket belongs to. Specify either `planId` or `planTitle` when using `bucketName`.
 
 `--planName [planName]`
-: Name of the plan to which the bucket belongs to. Specify either `planId` or `planName` when using `bucketName`.
+: (deprecated. Use `planTitle` instead) Title of the plan to which the bucket belongs.
 
 `--ownerGroupId [ownerGroupId]`
-: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: ID of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--ownerGroupName [ownerGroupName]`
-: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planName`.
+: Name of the group to which the plan belongs. Specify `ownerGroupId` or `ownerGroupName` when using `planTitle`.
 
 `--startDateTime [startDateTime]`
 : The date and time when the task started. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
@@ -61,15 +64,25 @@ m365 planner task set [options]
 `--appliedCategories [appliedCategories]`
 : Comma-separated categories that should be added to the task
 
+`--priority [priority]`
+: Priority of the task: Urgent, Important, Medium, Low. Or an integer between 0 and 10 (check remarks section for more info).
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
-When you specify the value for `percentageComplete`, consider the following:
+When you specify the value for `percentComplete`, consider the following:
 
 - when set to 0, the task is considered _Not started_
 - when set between 1 and 99, the task is considered _In progress_
 - when set to 100, the task is considered _Completed_
+
+When you specify an integer value for `priority`, consider the following:
+
+- values 0 and 1 are interpreted as _Urgent_
+- values 2, 3 and 4 are interpreted as _Important_
+- values 5, 6 and 7 are interpreted as _Medium_
+- values 8, 9 and 10 are interpreted as _Low_
 
 You can add up to 6 categories to the task. An example to add _category1_ and _category3_ would be `category1,category3`.
 
@@ -81,10 +94,10 @@ Updates a Microsoft Planner task name to _My Planner Task_ for the task with the
 m365 planner task set --id "Z-RLQGfppU6H3663DBzfs5gAMD3o" --title "My Planner Task"
 ```
 
-Moves a Microsoft Planner task with the ID _Z-RLQGfppU6H3663DBzfs5gAMD3o_ to the bucket named _My Planner Bucket_. Based on the plan with the name _My Planner Plan_ owned by the group _My Planner Group_
+Moves a Microsoft Planner task with the ID _Z-RLQGfppU6H3663DBzfs5gAMD3o_ to the bucket named _My Planner Bucket_. Based on the plan with the title _My Planner Plan_ owned by the group _My Planner Group_
 
 ```sh
-m365 planner task set  --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --bucketName "My Planner Bucket" --planName "My Planner Plan" --ownerGroupName "My Planner Group"
+m365 planner task set  --id "2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2" --bucketName "My Planner Bucket" --planTitle "My Planner Plan" --ownerGroupName "My Planner Group"
 ```
 
 Marks a Microsoft Planner task with the ID _Z-RLQGfppU6H3663DBzfs5gAMD3o_ as 50% complete and assigned to categories 1 and 3.

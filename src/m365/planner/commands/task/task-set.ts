@@ -1,4 +1,4 @@
-import { Group, PlannerBucket, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
+import { PlannerBucket, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import { AppliedCategories } from '../../AppliedCategories';
@@ -9,6 +9,8 @@ import request from '../../../../request';
 import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { aadGroup } from '../../../../utils/aadGroup';
+import { taskPriority } from '../../taskPriority';
 
 interface CommandArgs {
   options: Options;
@@ -19,6 +21,7 @@ interface Options extends GlobalOptions {
   title?: string;
   planId?: string;
   planName?: string;
+  planTitle?: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
   bucketId?: string;
@@ -33,6 +36,7 @@ interface Options extends GlobalOptions {
   description?: string;
   appliedCategories?: string;
   orderHint?: string;
+  priority?: number | string;
 }
 
 class PlannerTaskSetCommand extends GraphCommand {
@@ -53,6 +57,7 @@ class PlannerTaskSetCommand extends GraphCommand {
     telemetryProps.title = typeof args.options.title !== 'undefined';
     telemetryProps.planId = typeof args.options.planId !== 'undefined';
     telemetryProps.planName = typeof args.options.planName !== 'undefined';
+    telemetryProps.planTitle = typeof args.options.planTitle !== 'undefined';
     telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
     telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
     telemetryProps.bucketId = typeof args.options.bucketId !== 'undefined';
@@ -66,10 +71,17 @@ class PlannerTaskSetCommand extends GraphCommand {
     telemetryProps.description = typeof args.options.description !== 'undefined';
     telemetryProps.appliedCategories = typeof args.options.appliedCategories !== 'undefined';
     telemetryProps.orderHint = typeof args.options.orderHint !== 'undefined';
+    telemetryProps.priority = typeof args.options.priority !== 'undefined';
     return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (args.options.planName) {
+      args.options.planTitle = args.options.planName;
+
+      this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
+    }
+
     if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
@@ -152,15 +164,7 @@ class PlannerTaskSetCommand extends GraphCommand {
 
     return request
       .get(requestOptions)
-      .then((response: any) => {
-        const etag: string | undefined = response ? response['@odata.etag'] : undefined;
-
-        if (!etag) {
-          return Promise.reject(`Error fetching task details`);
-        }
-
-        return Promise.resolve(etag);
-      });
+      .then((response: any) => response['@odata.etag']);
   }
 
   private getTaskEtag(taskId: string): Promise<string> {
@@ -174,15 +178,7 @@ class PlannerTaskSetCommand extends GraphCommand {
 
     return request
       .get(requestOptions)
-      .then((response: any) => {
-        const etag: string | undefined = response ? response['@odata.etag'] : undefined;
-
-        if (!etag) {
-          return Promise.reject(`Error fetching task`);
-        }
-
-        return Promise.resolve(etag);
-      });
+      .then((response: any) => response['@odata.etag']);
   }
 
   private generateAppliedCategories(options: Options): AppliedCategories {
@@ -295,7 +291,7 @@ class PlannerTaskSetCommand extends GraphCommand {
 
     return this
       .getGroupId(options)
-      .then((groupId: string) => planner.getPlanByName(options.planName!, groupId))
+      .then((groupId: string) => planner.getPlanByTitle(options.planTitle!, groupId))
       .then(plan => plan.id!);
   }
 
@@ -304,25 +300,9 @@ class PlannerTaskSetCommand extends GraphCommand {
       return Promise.resolve(options.ownerGroupId);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(options.ownerGroupName as string)}'&$select=id`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: Group[] }>(requestOptions)
-      .then(response => {
-        const group: Group | undefined = response.value[0];
-
-        if (!group) {
-          return Promise.reject(`The specified owner group does not exist`);
-        }
-
-        return Promise.resolve(group.id as string);
-      });
+    return aadGroup
+      .getGroupByDisplayName(options.ownerGroupName!)
+      .then(group => group.id!);
   }
 
   private mapRequestBody(options: Options, appliedCategories: AppliedCategories): any {
@@ -364,6 +344,10 @@ class PlannerTaskSetCommand extends GraphCommand {
       requestBody.orderHint = options.orderHint;
     }
 
+    if (options.priority !== undefined) {
+      requestBody.priority = taskPriority.getPriorityValue(options.priority);
+    }
+
     return requestBody;
   }
 
@@ -373,6 +357,7 @@ class PlannerTaskSetCommand extends GraphCommand {
       { option: '-t, --title [title]' },
       { option: '--planId [planId]' },
       { option: '--planName [planName]' },
+      { option: '--planTitle [planTitle]' },
       { option: '--ownerGroupId [ownerGroupId]' },
       { option: '--ownerGroupName [ownerGroupName]' },
       { option: '--bucketId [bucketId]' },
@@ -385,7 +370,8 @@ class PlannerTaskSetCommand extends GraphCommand {
       { option: '--assigneePriority [assigneePriority]' },
       { option: '--description [description]' },
       { option: '--appliedCategories [appliedCategories]' },
-      { option: '--orderHint [orderHint]' }
+      { option: '--orderHint [orderHint]' },
+      { option: '--priority [priority]', autocomplete: taskPriority.priorityValues }
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -397,20 +383,20 @@ class PlannerTaskSetCommand extends GraphCommand {
       return 'Specify either bucketId or bucketName but not both';
     }
 
-    if (args.options.bucketName && !args.options.planId && !args.options.planName) {
-      return 'Specify either planId or planName when using bucketName';
+    if (args.options.bucketName && !args.options.planId && !args.options.planName && !args.options.planTitle) {
+      return 'Specify either planId or planTitle when using bucketName';
     }
 
-    if (args.options.bucketName && args.options.planId && args.options.planName) {
-      return 'Specify either planId or planName when using bucketName but not both';
+    if (args.options.bucketName && args.options.planId && (args.options.planName || args.options.planTitle)) {
+      return 'Specify either planId or planTitle when using bucketName but not both';
     }
 
-    if (args.options.planName && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName';
+    if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
     }
 
-    if (args.options.planName && args.options.ownerGroupId && args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planName but not both';
+    if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
+      return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
     }
 
     if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
@@ -440,8 +426,20 @@ class PlannerTaskSetCommand extends GraphCommand {
     if (args.options.assignedToUserIds && args.options.assignedToUserNames) {
       return 'Specify either assignedToUserIds or assignedToUserNames but not both';
     }
+    
     if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => this.allowedAppliedCategories.indexOf(category.toLocaleLowerCase()) < 0).length !== 0) {
       return 'The appliedCategories contains invalid value. Specify either category1, category2, category3, category4, category5 and/or category6 as properties';
+    }
+
+    if (args.options.priority !== undefined) {
+      if (typeof args.options.priority === "number") {
+        if (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10 || !Number.isInteger(args.options.priority)) {
+          return 'priority should be an integer between 0 and 10.';
+        }
+      }
+      else if (taskPriority.priorityValues.map(l => l.toLowerCase()).indexOf(args.options.priority.toString().toLowerCase()) === -1) {
+        return `${args.options.priority} is not a valid priority value. Allowed values are ${taskPriority.priorityValues.join('|')}.`;
+      }
     }
 
     return true;

@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { spo, ContextInfo, validation } from '../../../../utils';
+import { spo, ContextInfo, validation, formatting } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -33,7 +33,7 @@ class SpoFieldAddCommand extends SpoCommand {
       .getRequestDigest(args.options.webUrl)
       .then((res: ContextInfo): Promise<any> => {
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}fields/CreateFieldAsXml`,
+          url: `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/` : '')}fields/CreateFieldAsXml`,
           headers: {
             'X-RequestDigest': res.FormDigestValue,
             accept: 'application/json;odata=nometadata'
