@@ -97,7 +97,6 @@ class SpoFileRenameCommand extends SpoCommand {
     const requestUrl = `${webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(originalFileServerRelativeUrl)}')?$select=UniqueId`;
     const requestOptions: any = {
       url: requestUrl,
-      method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
