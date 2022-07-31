@@ -1,5 +1,13 @@
 # Release notes
 
+## [v5.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.6.0)
+
+### New commands
+
+**SharePoint:**
+
+- [m365 spo file rename](../cmd/spo/file/file-rename.md) - adds spo file rename command. [#1763](https://github.com/pnp/cli-microsoft365/issues/1763)
+
 ## [v5.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.5.0)
 
 ### New commands
