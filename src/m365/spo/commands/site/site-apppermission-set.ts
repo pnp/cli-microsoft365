@@ -112,7 +112,7 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
             'content-type': 'application/json;odata=nometadata'
           },
           data: {
-            roles: args.options.permission.split(',')
+            roles: [args.options.permission]
           },
           responseType: 'json'
         };
@@ -157,11 +157,8 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
       return `${args.options.appId} is not a valid GUID`;
     }
 
-    const permissions: string[] = args.options.permission.split(',');
-    for (let i = 0; i < permissions.length; i++) {
-      if (['read', 'write'].indexOf(permissions[i]) === -1) {
-        return `${permissions[i]} is not a valid permission value. Allowed values are read|write|read,write`;
-      }
+    if (['read', 'write', 'owner'].indexOf(args.options.permission) === -1) {
+      return `${args.options.permission} is not a valid permission value. Allowed values are read|write|owner`;
     }
 
     return validation.isValidSharePointUrl(args.options.siteUrl);

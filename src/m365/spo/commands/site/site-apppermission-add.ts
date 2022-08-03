@@ -102,7 +102,7 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
 
   private mapRequestBody(permission: string, appInfo: AppInfo): any {
     const requestBody: any = {
-      roles: permission.split(',')
+      roles: [permission]
     };
 
     requestBody.grantedToIdentities = [];
@@ -168,11 +168,8 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
       return `${args.options.appId} is not a valid GUID`;
     }
 
-    const permissions: string[] = args.options.permission.split(',');
-    for (let i = 0; i < permissions.length; i++) {
-      if (['read', 'write'].indexOf(permissions[i]) === -1) {
-        return `${permissions[i]} is not a valid permission value. Allowed values read|write|read,write`;
-      }
+    if (['read', 'write', 'owner'].indexOf(args.options.permission) === -1) {
+      return `${args.options.permission} is not a valid permission value. Allowed values are read|write|owner`;
     }
 
     return validation.isValidSharePointUrl(args.options.siteUrl);
