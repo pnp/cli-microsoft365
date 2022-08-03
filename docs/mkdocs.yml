@@ -386,6 +386,7 @@ nav:
         - list get: 'cmd/spo/list/list-get.md'
         - list list: 'cmd/spo/list/list-list.md'
         - list remove: 'cmd/spo/list/list-remove.md'
+        - list roleassignment add: 'cmd/spo/list/list-roleassignment-add.md'
         - list roleinheritance break: 'cmd/spo/list/list-roleinheritance-break.md'
         - list roleinheritance reset: 'cmd/spo/list/list-roleinheritance-reset.md'
         - list set: 'cmd/spo/list/list-set.md'
