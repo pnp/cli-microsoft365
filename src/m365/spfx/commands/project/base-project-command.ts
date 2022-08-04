@@ -149,6 +149,11 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
       };
     }
 
+    const esLintRcJsPath: string = path.join(projectRootPath, '.eslintrc.js');
+    if (fs.existsSync(esLintRcJsPath)) {
+      project.esLintRcJs = new TsFile(esLintRcJsPath);
+    }
+
     project.vsCode = {};
     const vsCodeSettingsPath: string = path.join(projectRootPath, '.vscode', 'settings.json');
     if (fs.existsSync(vsCodeSettingsPath)) {

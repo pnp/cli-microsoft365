@@ -28,7 +28,7 @@ interface Options extends GlobalOptions {
 
 class SpfxProjectUpgradeCommand extends BaseProjectCommand {
   private static packageManagers: string[] = ['npm', 'pnpm', 'yarn'];
-  private static shells: string[] = ['bash', 'powershell', 'cmd'];  
+  private static shells: string[] = ['bash', 'powershell', 'cmd'];
 
   public constructor() {
     super();
@@ -69,7 +69,8 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     '1.13.0',
     '1.13.1',
     '1.14.0',
-    '1.15.0'
+    '1.15.0',
+    '1.15.2'
   ];
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;

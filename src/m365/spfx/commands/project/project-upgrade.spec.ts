@@ -2730,6 +2730,71 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
   //#endregion
 
+  //#region 1.15.0
+  it('e2e: shows correct number of findings for upgrading application customizer 1.15.0 project to 1.15.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1150-applicationcustomizer'));
+
+    command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 15);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.15.0 project to 1.15.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1150-fieldcustomizer-react'));
+
+    command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 14);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.15.0 project to 1.15.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1150-listviewcommandset'));
+
+    command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 15);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.15.0 project to 1.15.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1150-webpart-nolib'));
+
+    command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 16);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.15.0 project to 1.15.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1150-webpart-react'));
+
+    command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 16);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.15.0 project to 1.15.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1150-webpart-optionaldeps'));
+
+    command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 26);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading ace 1.15.0 project to 1.15.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1150-ace'));
+
+    command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 13);
+    });
+  });
+  //#endregion
+
   //#region superseded rules
   it('ignores superseded findings (1.1.0 > 1.2.0)', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-110-webpart-react'));
@@ -2780,7 +2845,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-nolib'));
 
     command.action(logger, { options: { output: 'text' } } as any, () => {
-      assert(log[0].indexOf('1.15.0') > -1);
+      assert(log[0].indexOf('1.15.2') > -1);
     });
   });
 
