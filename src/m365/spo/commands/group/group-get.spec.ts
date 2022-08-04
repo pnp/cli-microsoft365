@@ -58,6 +58,11 @@ describe(commands.GROUP_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct option sets', () => {
+    const optionSets = command.optionSets();
+    assert.deepStrictEqual(optionSets, [['id', 'name', 'associatedGroup']]);
+  });
+
   it('retrieves group by id with output option json', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
@@ -174,6 +179,102 @@ describe(commands.GROUP_GET, () => {
     });
   });
 
+  it('correctly retrieves the associated owner group', (done) => {
+    const ownerGroupResponse = {
+      Id: 3,
+      IsHiddenInUI: false,
+      LoginName: "Team Site Owners",
+      Title: "Team Site Owners",
+      PrincipalType: 8
+    };
+
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url!.endsWith('/_api/web/AssociatedOwnerGroup')) {
+        return Promise.resolve(ownerGroupResponse);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        associatedGroup: 'Owner'
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(ownerGroupResponse));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly retrieves the associated member group', (done) => {
+    const memberGroupResponse = {
+      Id: 3,
+      IsHiddenInUI: false,
+      LoginName: "Team Site Members",
+      Title: "Team Site Members",
+      PrincipalType: 8
+    };
+
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url!.endsWith('/_api/web/AssociatedMemberGroup')) {
+        return Promise.resolve(memberGroupResponse);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        associatedGroup: 'Member'
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(memberGroupResponse));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly retrieves the associated visitor group', (done) => {
+    const visitorGroupResponse = {
+      Id: 3,
+      IsHiddenInUI: false,
+      LoginName: "Team Site Visitors",
+      Title: "Team Site Visitors",
+      PrincipalType: 8
+    };
+
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url!.endsWith('/_api/web/AssociatedVisitorGroup')) {
+        return Promise.resolve(visitorGroupResponse);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        associatedGroup: 'Visitor'
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(visitorGroupResponse));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('supports specifying URL', () => {
     const options = command.options();
     let containsTypeOption = false;
@@ -190,13 +291,8 @@ describe(commands.GROUP_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both id and name options are not passed', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if id and name both are passed(multiple options)', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 7, name: "Team Site Members" } });
+  it('fails validation if associatedGroup has an invalid value', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', associatedGroup: 'invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
