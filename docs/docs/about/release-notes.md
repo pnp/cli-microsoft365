@@ -8,6 +8,11 @@
 
 - [m365 spo file rename](../cmd/spo/file/file-rename.md) - adds spo file rename command. [#1763](https://github.com/pnp/cli-microsoft365/issues/1763)
 
+### Changes
+
+- fixes 'spo site apppermission add' and 'spo site apppermission set' permission option [#3353](https://github.com/pnp/cli-microsoft365/issues/3353)
+- extends 'spo group get' with support for returning associated groups [#3545](https://github.com/pnp/cli-microsoft365/issues/3545)
+
 ## [v5.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.5.0)
 
 ### New commands
