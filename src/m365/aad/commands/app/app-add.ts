@@ -39,6 +39,7 @@ interface AppInfo {
     displayName: string;
     value: string;
   }[];
+  requiredResourceAccess: RequiredResourceAccess[];
 }
 
 interface CommandArgs {
@@ -249,16 +250,7 @@ class AadAppAddCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .resolveApis(args, logger)
-      .then(apis => {
-        return this.createAppRegistration(args, apis, logger)
-          .then(appInfo => {
-            if (args.options.grantAdminConsent && apis.length > 0) {
-              return this.grantAdminConsent(appInfo, logger);
-            }
-
-            return Promise.resolve(appInfo);
-          });
-      })
+      .then(apis => this.createAppRegistration(args, apis, logger))
       .then(appInfo => {
         // based on the assumption that we're adding AAD app to the current
         // directory. If we in the future extend the command with allowing
@@ -268,6 +260,7 @@ class AadAppAddCommand extends GraphCommand {
         return Promise.resolve(appInfo);
       })
       .then(appInfo => this.updateAppFromManifest(args, appInfo))
+      .then(appInfo => this.grantAdminConsent(appInfo, args.options.grantAdminConsent, logger))
       .then(appInfo => this.configureUri(args, appInfo, logger))
       .then(appInfo => this.configureSecret(args, appInfo, logger))
       .then(appInfo => this.saveAppInfo(args, appInfo, logger))
@@ -349,7 +342,11 @@ class AadAppAddCommand extends GraphCommand {
     return request.post<AppInfo>(createApplicationRequestOptions);
   }
 
-  private grantAdminConsent(appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
+  private grantAdminConsent(appInfo: AppInfo, adminConsent: boolean | undefined, logger: Logger): Promise<AppInfo> {
+    if (!adminConsent || this.appPermissions.length === 0) {
+      return Promise.resolve(appInfo);
+    }
+
     return this.createServicePrincipal(appInfo.appId)
       .then((sp: ServicePrincipalInfo) => {
         if (this.debug) {
@@ -361,9 +358,9 @@ class AadAppAddCommand extends GraphCommand {
         this.appPermissions.forEach(permission => {
           if (permission.scope.length > 0) {
             tasks.push(this.grantOAuth2Permission(sp.id, permission.resourceId, permission.scope.join(' ')));
-            
+
             if (this.debug) {
-              logger.logToStderr(`Admin consent for following resource ${permission.resourceId}, with delegated permissions: ${permission.scope.join(',')}`);
+              logger.logToStderr(`Admin consent granted for following resource ${permission.resourceId}, with delegated permissions: ${permission.scope.join(',')}`);
             }
           }
 
@@ -371,11 +368,11 @@ class AadAppAddCommand extends GraphCommand {
             tasks.push(this.addRoleToServicePrincipal(sp.id, permission.resourceId, access.id));
 
             if (this.debug) {
-              logger.logToStderr(`Admin consent for following resource ${permission.resourceId}, with application permission: ${access.id}`);
+              logger.logToStderr(`Admin consent granted for following resource ${permission.resourceId}, with application permission: ${access.id}`);
             }
           });
         });
-    
+
         return Promise.all(tasks)
           .then(_ => {
             return appInfo;
@@ -450,6 +447,13 @@ class AadAppAddCommand extends GraphCommand {
     // separately
     const secrets: { name: string, expirationDate: Date }[] = this.getSecretsFromManifest(v2Manifest);
     // Azure Portal returns v2 manifest whereas the Graph API expects a v1.6
+
+    if (args.options.apisApplication || args.options.apisDelegated) {
+      // take submitted delegated / application permissions as options
+      // otherwise, they will be skipped in the app update
+      v2Manifest.requiredResourceAccess = appInfo.requiredResourceAccess;
+    }
+    
     const graphManifest = this.transformManifest(v2Manifest);
 
     const updateAppRequestOptions: any = {
@@ -688,7 +692,8 @@ class AadAppAddCommand extends GraphCommand {
   }
 
   private resolveApis(args: CommandArgs, logger: Logger): Promise<RequiredResourceAccess[]> {
-    if (!args.options.apisDelegated && !args.options.apisApplication) {
+    if (!args.options.apisDelegated && !args.options.apisApplication 
+      && (typeof this.manifest?.requiredResourceAccess === 'undefined' || this.manifest.requiredResourceAccess.length === 0)) {
       return Promise.resolve([]);
     }
 
@@ -699,25 +704,58 @@ class AadAppAddCommand extends GraphCommand {
     return odata
       .getAllItems<ServicePrincipalInfo>(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames`)
       .then(servicePrincipals => {
+        let resolvedApis: RequiredResourceAccess[] = [];
+
         try {
-          const resolvedApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisDelegated, 'Scope', logger);
-          if (this.debug) {
-            logger.logToStderr(`Resolved delegated permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
-          }
-          const resolvedApplicationApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisApplication, 'Role', logger);
-          if (this.debug) {
-            logger.logToStderr(`Resolved application permissions: ${JSON.stringify(resolvedApplicationApis, null, 2)}`);
-          }
-          // merge resolved application APIs onto resolved delegated APIs
-          resolvedApplicationApis.forEach(resolvedRequiredResource => {
-            const requiredResource = resolvedApis.find(api => api.resourceAppId === resolvedRequiredResource.resourceAppId);
-            if (requiredResource) {
-              requiredResource.resourceAccess.push(...resolvedRequiredResource.resourceAccess);
+          if (args.options.apisDelegated || args.options.apisApplication) {
+            resolvedApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisDelegated, 'Scope', logger);
+            if (this.verbose) {
+              logger.logToStderr(`Resolved delegated permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
             }
-            else {
-              resolvedApis.push(resolvedRequiredResource);
+            const resolvedApplicationApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisApplication, 'Role', logger);
+            if (this.verbose) {
+              logger.logToStderr(`Resolved application permissions: ${JSON.stringify(resolvedApplicationApis, null, 2)}`);
             }
-          });
+            // merge resolved application APIs onto resolved delegated APIs
+            resolvedApplicationApis.forEach(resolvedRequiredResource => {
+              const requiredResource = resolvedApis.find(api => api.resourceAppId === resolvedRequiredResource.resourceAppId);
+              if (requiredResource) {
+                requiredResource.resourceAccess.push(...resolvedRequiredResource.resourceAccess);
+              }
+              else {
+                resolvedApis.push(resolvedRequiredResource);
+              }
+            });
+          }
+          
+          if (typeof this.manifest?.requiredResourceAccess !== 'undefined' && this.manifest.requiredResourceAccess.length > 0) {
+            const manifestApis = (this.manifest.requiredResourceAccess as RequiredResourceAccess[]);
+
+            manifestApis.forEach(manifestApi => {
+              const requiredResource = resolvedApis.find(api => api.resourceAppId === manifestApi.resourceAppId);
+              if (requiredResource) {
+                // exclude if any duplicate required resources in both manifest and submitted options
+                requiredResource.resourceAccess.push(...manifestApi.resourceAccess.filter(manRes => !requiredResource.resourceAccess.some(res => res.id === manRes.id)));
+              }
+              else {
+                resolvedApis.push(manifestApi);
+              }
+
+              const app = servicePrincipals.find(servicePrincipals => servicePrincipals.appId === manifestApi.resourceAppId);
+
+              if (app) {
+                manifestApi.resourceAccess.forEach((res => {
+                  const resourceAccessPermission = {
+                    id: res.id,
+                    type: res.type
+                  };
+
+                  const oAuthValue = app.oauth2PermissionScopes.find(scp => scp.id === res.id)?.value;
+                  this.updateAppPermissions(app.id, resourceAccessPermission, oAuthValue);
+                }));
+              }
+            });
+          }
 
           if (this.verbose) {
             logger.logToStderr(`Merged delegated and application permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
@@ -778,27 +816,33 @@ class AadAppAddCommand extends GraphCommand {
 
       resolvedApi.resourceAccess.push(resourceAccessPermission);
 
-      // During API resolution, we store globally both app role assignments and oauth2permissions
-      // So that we'll be able to parse them during the admin consent process
-      let existingPermission = this.appPermissions.find(oauth => oauth.resourceId === servicePrincipal.id);
-      if (!existingPermission) {
-        existingPermission = {
-          resourceId: servicePrincipal.id,
-          resourceAccess: [],
-          scope: []
-        };
-
-        this.appPermissions.push(existingPermission);
-      }
-
-      if (scopeType === 'Scope') {
-        existingPermission.scope.push(permission.value);
-      }
-
-      existingPermission.resourceAccess.push(resourceAccessPermission);
+      this.updateAppPermissions(servicePrincipal.id, resourceAccessPermission, permission.value);
     });
 
     return resolvedApis;
+  }
+
+  private updateAppPermissions(spId: string, resourceAccessPermission: ResourceAccess, oAuth2PermissionValue?: string) {
+    // During API resolution, we store globally both app role assignments and oauth2permissions
+    // So that we'll be able to parse them during the admin consent process
+    let existingPermission = this.appPermissions.find(oauth => oauth.resourceId === spId);
+    if (!existingPermission) {
+      existingPermission = {
+        resourceId: spId,
+        resourceAccess: [],
+        scope: []
+      };
+
+      this.appPermissions.push(existingPermission);
+    }
+
+    if (resourceAccessPermission.type === 'Scope' && oAuth2PermissionValue && !existingPermission.scope.find(scp => scp === oAuth2PermissionValue)) {
+      existingPermission.scope.push(oAuth2PermissionValue);
+    }
+
+    if (!existingPermission.resourceAccess.find(res => res.id === resourceAccessPermission.id)) {
+      existingPermission.resourceAccess.push(resourceAccessPermission);
+    }
   }
 
   private configureSecret(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {

@@ -57,8 +57,6 @@ m365 aad app add [options]
 
 `--certificateDisplayName [certificateDisplayName]`
 : Display name for the certificate. If not given, the displayName will be set to the certificate subject. When specified, also specify either `certificateFile` or `certificateBase64Encoded`
-`--grantAdminConsent`
-: When specified, grants application & delegated permissions through admin consent
 
 `--grantAdminConsent`
 : When specified, grants application & delegated permissions through admin consent
