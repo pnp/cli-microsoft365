@@ -1,10 +1,17 @@
-import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
+import { Cli, CommandOutput, Logger } from '../../../../cli';
+import Command, { CommandErrorWithOutput, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import * as SpoUserGetCommand from '../user/user-get';
+import { Options as SpoUserGetCommandOptions } from '../user/user-get';
+import * as SpoGroupGetCommand from '../group/group-get';
+import { Options as SpoGroupGetCommandOptions } from '../group/group-get';
+import * as SpoRoleDefinitionListCommand from '../roledefinition/roledefinition-list';
+import { Options as SpoRoleDefinitionListCommandOptions } from '../roledefinition/roledefinition-list';
+import { RoleDefinition } from '../roledefinition/RoleDefinition';
 
 interface CommandArgs {
   options: Options;
@@ -18,7 +25,7 @@ interface Options extends GlobalOptions {
   principalId?: number;
   upn?: string;
   groupName?: string;
-  roleDefinitionId?: string;
+  roleDefinitionId?: number;
   roleDefinitionName?: string;
 }
 
@@ -61,19 +68,32 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
       requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
     }
 
-    if (args.options.upn) {
-      // TODO: Add support for adding role assignment to user by UPN
-    } 
-    else if (args.options.groupName) {
-      // TODO: Add support for adding role assignment to group by name
-    }
+    this.GetRoleDefinitionId(args.options)
+      .then((roleDefinitionId: number) => {
+        args.options.roleDefinitionId = roleDefinitionId;
+        if (args.options.upn) {
+          this.GetUserPrincipalId(args.options)
+            .then((userPrincipalId: number) => {
+              args.options.principalId = userPrincipalId;
+              this.AddRoleAssignment(requestUrl, logger, args.options, cb);
+            }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        }
+        else if (args.options.groupName) {
+          this.GetGroupPrincipalId(args.options)
+            .then((groupPrincipalId: number) => {
+              args.options.principalId = groupPrincipalId;
+              this.AddRoleAssignment(requestUrl, logger, args.options, cb);
+            }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        }
+        else {
+          this.AddRoleAssignment(requestUrl, logger, args.options, cb);
+        }
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  }
 
-    if (args.options.roleDefinitionName) {
-      // TODO: Add support for adding role assignment by role definition name
-    }
-
+  private AddRoleAssignment(requestUrl: string, logger: Logger, options: Options, cb: () => void): void {
     const requestOptions: any = {
-      url: `${requestUrl}/roleassignments/addroleassignment(principalid='${args.options.principalId}',roledefid='${args.options.roleDefinitionId}')`,
+      url: `${requestUrl}roleassignments/addroleassignment(principalid='${options.principalId}',roledefid='${options.roleDefinitionId}')`,
       method: 'POST',
       headers: {
         'accept': 'application/json;odata=nometadata',
@@ -85,6 +105,65 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
     request
       .post(requestOptions)
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  }
+
+  private GetRoleDefinitionId(options: Options): Promise<number> {
+    if (!options.roleDefinitionName) {
+      return Promise.resolve(options.roleDefinitionId as number);
+    }
+
+    const roleDefinitionListCommandOptions: SpoRoleDefinitionListCommandOptions = {
+      webUrl: options.webUrl,
+      output: 'json',
+      debug: this.debug,
+      verbose: this.verbose
+    };
+
+    return Cli.executeCommandWithOutput(SpoRoleDefinitionListCommand as Command, { options: { ...roleDefinitionListCommandOptions, _: [] } })
+      .then((output: CommandOutput): Promise<number> => {
+        const getRoleDefinitionListOutput = JSON.parse(output.stdout);
+        const roleDefinitionId: number = getRoleDefinitionListOutput.find((role: RoleDefinition) => role.Name === options.roleDefinitionName).Id;
+        return Promise.resolve(roleDefinitionId);
+      }, (err: CommandErrorWithOutput) => {
+        return Promise.reject(err);
+      });
+  }
+
+  private GetGroupPrincipalId(options: Options): Promise<number> {
+    const groupGetCommandOptions: SpoGroupGetCommandOptions = {
+      webUrl: options.webUrl,
+      name: options.groupName,
+      output: 'json',
+      debug: this.debug,
+      verbose: this.verbose
+    };
+
+    return Cli.executeCommandWithOutput(SpoGroupGetCommand as Command, { options: { ...groupGetCommandOptions, _: [] } })
+      .then((output: CommandOutput): Promise<number> => {
+        const getGroupOutput = JSON.parse(output.stdout);
+        return Promise.resolve(getGroupOutput.Id);
+      }, (err: CommandErrorWithOutput) => {
+        return Promise.reject(err);
+      });
+  }
+
+  private GetUserPrincipalId(options: Options): Promise<number> {
+    const userGetCommandOptions: SpoUserGetCommandOptions = {
+      webUrl: options.webUrl,
+      email: options.upn,
+      id: undefined,
+      output: 'json',
+      debug: this.debug,
+      verbose: this.verbose
+    };
+
+    return Cli.executeCommandWithOutput(SpoUserGetCommand as Command, { options: { ...userGetCommandOptions, _: [] } })
+      .then((output: CommandOutput): Promise<number> => {
+        const getUserOutput = JSON.parse(output.stdout);
+        return Promise.resolve(getUserOutput.Id);
+      }, (err: CommandErrorWithOutput) => {
+        return Promise.reject(err);
+      });
   }
 
   public options(): CommandOption[] {
@@ -134,6 +213,10 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
 
     if (args.options.principalId && isNaN(args.options.principalId)) {
       return `Specified principalId ${args.options.principalId} is not a number`;
+    }
+
+    if (args.options.roleDefinitionId && isNaN(args.options.roleDefinitionId)) {
+      return `Specified roleDefinitionId ${args.options.roleDefinitionId} is not a number`;
     }
 
     const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
