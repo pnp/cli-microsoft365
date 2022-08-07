@@ -88,7 +88,7 @@ describe(commands.FEATURE_LIST, () => {
       options: {
         debug: false,
         verbose: false,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'Site'
       }
     });
@@ -128,7 +128,7 @@ describe(commands.FEATURE_LIST, () => {
       options: {
         debug: false,
         verbose: false,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web'
       }
     });
@@ -172,7 +172,7 @@ describe(commands.FEATURE_LIST, () => {
       options: {
         debug: false,
         verbose: false,
-        url: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com'
       }
     });
     assert(loggerLogSpy.calledWith([
@@ -215,7 +215,7 @@ describe(commands.FEATURE_LIST, () => {
 
     const options: any = {
       debug: true,
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site',
       output: 'json'
     };
@@ -251,7 +251,7 @@ describe(commands.FEATURE_LIST, () => {
 
     const options: any = {
       debug: false,
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site'
     };
 
@@ -270,7 +270,7 @@ describe(commands.FEATURE_LIST, () => {
 
     const options: any = {
       debug: false,
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web'
     };
 
@@ -290,7 +290,7 @@ describe(commands.FEATURE_LIST, () => {
     const options: any = {
       verbose: true,
       debug: false,
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site'
     };
     await command.action(logger, { options: options } as any);
@@ -319,7 +319,7 @@ describe(commands.FEATURE_LIST, () => {
     const options: any = {
       verbose: true,
       debug: false,
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web'
     };
     await command.action(logger, { options: options } as any);
@@ -349,7 +349,7 @@ describe(commands.FEATURE_LIST, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: false,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web'
       }
     }), new CommandError(err));
@@ -369,7 +369,7 @@ describe(commands.FEATURE_LIST, () => {
       options: {
         debug: false,
         verbose: true,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'Site'
       }
     }), new CommandError(err));
@@ -412,7 +412,7 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/abc', scope: 'Web' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/abc', scope: 'Web' } });
     assert(loggerLogSpy.calledWith([
       {
         DefinitionId: '00bfea71-5932-4f9c-ad71-1557e5751100',
@@ -437,7 +437,7 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/abc', scope: 'Site' } });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/abc', scope: 'Site' } });
     assert(loggerLogSpy.calledWith([
       {
         DefinitionId: '3019c9b4-e371-438d-98f6-0a08c34d06eb',
@@ -450,7 +450,7 @@ describe(commands.FEATURE_LIST, () => {
     const actual = await command.validate({
       options:
       {
-        url: 'foo'
+        webUrl: 'foo'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -460,7 +460,7 @@ describe(commands.FEATURE_LIST, () => {
     const actual = await command.validate({
       options:
       {
-        url: "https://contoso.sharepoint.com"
+        webUrl: "https://contoso.sharepoint.com"
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -470,7 +470,7 @@ describe(commands.FEATURE_LIST, () => {
     const actual = await command.validate({
       options:
       {
-        url: "https://contoso.sharepoint.com",
+        webUrl: "https://contoso.sharepoint.com",
         scope: "Site"
       }
     }, commandInfo);
@@ -481,7 +481,7 @@ describe(commands.FEATURE_LIST, () => {
     const actual = await command.validate({
       options:
       {
-        url: "https://contoso.sharepoint.com",
+        webUrl: "https://contoso.sharepoint.com",
         scope: 'Site'
       }
     }, commandInfo);
@@ -492,7 +492,7 @@ describe(commands.FEATURE_LIST, () => {
     const actual = await command.validate({
       options:
       {
-        url: "https://contoso.sharepoint.com",
+        webUrl: "https://contoso.sharepoint.com",
         scope: 'Web'
       }
     }, commandInfo);
@@ -503,7 +503,7 @@ describe(commands.FEATURE_LIST, () => {
     const scope = 'foo';
     const actual = await command.validate({
       options: {
-        url: "https://contoso.sharepoint.com",
+        webUrl: "https://contoso.sharepoint.com",
         scope: scope
       }
     }, commandInfo);
@@ -514,7 +514,7 @@ describe(commands.FEATURE_LIST, () => {
     const scope = 123;
     const actual = await command.validate({
       options: {
-        url: "https://contoso.sharepoint.com",
+        webUrl: "https://contoso.sharepoint.com",
         scope: scope
       }
     }, commandInfo);
@@ -526,7 +526,7 @@ describe(commands.FEATURE_LIST, () => {
       {
         options:
         {
-          url: "https://contoso.sharepoint.com"
+          webUrl: "https://contoso.sharepoint.com"
         }
       }, commandInfo);
     assert.strictEqual(actual, true);

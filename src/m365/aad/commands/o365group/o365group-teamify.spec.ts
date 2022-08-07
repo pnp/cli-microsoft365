@@ -65,7 +65,7 @@ describe(commands.O365GROUP_TEAMIFY, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both groupId and mailNickname options are not passed', async () => {
+  it('fails validation if both id and mailNickname options are not passed', async () => {
     const actual = await command.validate({
       options: {
       }
@@ -73,20 +73,20 @@ describe(commands.O365GROUP_TEAMIFY, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both groupId and mailNickname options are passed', async () => {
+  it('fails validation if both id and mailNickname options are passed', async () => {
     const actual = await command.validate({
       options: {
-        groupId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
+        id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
         mailNickname: 'GroupName'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('validates for a correct groupId', async () => {
+  it('validates for a correct id', async () => {
     const actual = await command.validate({
       options: {
-        groupId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'
+        id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -213,7 +213,7 @@ describe(commands.O365GROUP_TEAMIFY, () => {
     }), new CommandError(`Multiple Microsoft 365 Groups with name GroupName found: 00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000`));
   });
 
-  it('Teamify o365 group by groupId', async () => {
+  it('Teamify o365 group by id', async () => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'put').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee/team`) {
         return Promise.resolve({
@@ -262,7 +262,7 @@ describe(commands.O365GROUP_TEAMIFY, () => {
     });
 
     await command.action(logger, {
-      options: { debug: false, groupId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' }
+      options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' }
     });
     assert.strictEqual(requestStub.lastCall.args[0].url, 'https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee/team');
   });
@@ -394,17 +394,17 @@ describe(commands.O365GROUP_TEAMIFY, () => {
     });
 
     await assert.rejects(command.action(logger, {
-      options: { debug: false, groupId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' }
+      options: { debug: false, id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' }
     } as any), new CommandError('Failed to execute MS Graph backend request GetGroupInternalApiRequest'));
   });
 
-  it('fails validation if the groupId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: 'invalid' } }, commandInfo);
+  it('fails validation if the id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the groupId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { groupId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } }, commandInfo);
+  it('passes validation if the id is a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

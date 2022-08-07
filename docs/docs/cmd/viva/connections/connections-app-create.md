@@ -13,7 +13,7 @@ m365 viva connections app create [options]
 `--portalUrl <portalUrl>`
 : The URL of the site to pin in Microsoft Teams. Must be a Communication site
 
-`--appName <appName>`
+`--name <name>`
 : Name of the app to create, eg. `Contoso`. No longer than 30 characters
 
 `--description <description>`
@@ -63,7 +63,7 @@ After creating the Viva Connections desktop app package, you need to upload it t
 Create a Viva Connections desktop app package
 
 ```sh
-m365 viva connections app create --portalUrl https://contoso.sharepoint.com --appName Contoso --description "Contoso company app" --longDescription "Stay on top of what's happening at Contoso" --companyName Contoso --companyWebsiteUrl https://contoso.com --coloredIconPath icon-color.png --outlineIconPath icon-outline.png
+m365 viva connections app create --portalUrl https://contoso.sharepoint.com --name Contoso --description "Contoso company app" --longDescription "Stay on top of what's happening at Contoso" --companyName Contoso --companyWebsiteUrl https://contoso.com --coloredIconPath icon-color.png --outlineIconPath icon-outline.png
 ```
 
 ## More information

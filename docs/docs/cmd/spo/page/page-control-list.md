@@ -10,7 +10,7 @@ m365 spo page control list [options]
 
 ## Options
 
-`-n, --name <name>`
+`-n, --pageName <pageName>`
 : Name of the page to list controls of
 
 `-u, --webUrl <webUrl>`
@@ -20,12 +20,12 @@ m365 spo page control list [options]
 
 ## Remarks
 
-If the specified name doesn't refer to an existing modern page, you will get a `File doesn't exists` error.
+If the specified `pageName` doesn't refer to an existing modern page, you will get a `File doesn't exists` error.
 
 ## Examples
 
 List controls on the modern page with name _home.aspx_
 
 ```sh
-m365 spo page control list --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
+m365 spo page control list --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx
 ```

@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   listUrl?: string;
-  contentTypeId: string;
+  id: string;
 }
 
 interface ContentTypeAddRequestBody {
@@ -67,7 +67,7 @@ class SpoListContentTypeAddCommand extends SpoCommand {
         option: '--listUrl [listUrl]'
       },
       {
-        option: '-c, --contentTypeId <contentTypeId>'
+        option: '-i, --id <id>'
       }
     );
   }
@@ -90,7 +90,7 @@ class SpoListContentTypeAddCommand extends SpoCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('contentTypeId', 'c');
+    this.types.string.push('id', 'i');
   }
 
   #initOptionSets(): void {
@@ -100,7 +100,7 @@ class SpoListContentTypeAddCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       const list: string = (args.options.listId ? args.options.listId : args.options.listTitle ? args.options.listTitle : args.options.listUrl) as string;
-      logger.logToStderr(`Adding content type ${args.options.contentTypeId} to list ${list} in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Adding content type ${args.options.id} to list ${list} in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = `${args.options.webUrl}/_api/web/`;
@@ -116,7 +116,7 @@ class SpoListContentTypeAddCommand extends SpoCommand {
     }
 
     const requestBody: ContentTypeAddRequestBody = {
-      contentTypeId: args.options.contentTypeId
+      contentTypeId: args.options.id
     };
 
     const requestOptions: any = {

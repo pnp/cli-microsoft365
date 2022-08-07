@@ -16,7 +16,7 @@ m365 spo app uninstall [options]
 `-s, --siteUrl <siteUrl>`
 : Absolute URL of the site to uninstall the app from
 
-`--scope [scope]`
+`--appCatalogScope [appCatalogScope]`
 : Scope of the app catalog: `tenant,sitecollection`. Default `tenant`
 
 `--confirm`
@@ -45,7 +45,7 @@ m365 spo app uninstall --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https
 Uninstall the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site where the app is deployed to the site collection app catalog of _https://contoso.sharepoint.com_.
 
 ```sh
-m365 spo app uninstall --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
+m365 spo app uninstall --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --appCatalogScope sitecollection
 ```
 
 ## More information

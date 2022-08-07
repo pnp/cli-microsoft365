@@ -10,7 +10,7 @@ m365 spo page section add [options]
 
 ## Options
 
--n`, --name <name>`
+`-n, --pageName <pageName>`
 : Name of the page to add section to
 
 `-u, --webUrl <webUrl>`
@@ -26,12 +26,12 @@ m365 spo page section add [options]
 
 ## Remarks
 
-If the specified `name` doesn't refer to an existing modern page, you will get a _File doesn't exists_ error.
+If the specified `pageName` doesn't refer to an existing modern page, you will get a _File doesn't exists_ error.
 
 ## Examples
 
 Add section to the modern page named _home.aspx_
 
 ```sh
-m365 spo page section add --name home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter  --sectionTemplate OneColumn --order 1
+m365 spo page section add --pageName home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter  --sectionTemplate OneColumn --order 1
 ```

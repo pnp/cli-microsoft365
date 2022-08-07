@@ -69,7 +69,7 @@ describe(commands.APPPAGE_SET, () => {
       {
         options: {
           debug: false,
-          pageName: "failme",
+          name: "failme",
           webUrl: "https://contoso.sharepoint.com/",
           webPartData: JSON.stringify({})
         }
@@ -107,11 +107,11 @@ describe(commands.APPPAGE_SET, () => {
     assert(containsOption);
   });
 
-  it("supports specifying pageName", () => {
+  it("supports specifying name", () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf("--pageName") > -1) {
+      if (o.option.indexOf("--name") > -1) {
         containsOption = true;
       }
     });
@@ -140,7 +140,7 @@ describe(commands.APPPAGE_SET, () => {
     assert(containsOption);
   });
 
-  it("fails validation if pageName not specified", async () => {
+  it("fails validation if name not specified", async () => {
     const actual = await command.validate({
       options: {
         webPartData: JSON.stringify({ abc: "def" }),
@@ -153,7 +153,7 @@ describe(commands.APPPAGE_SET, () => {
   it("fails validation if webPartData not specified", async () => {
     const actual = await command.validate({
       options: {
-        pageName: "Contoso.aspx",
+        name: "Contoso.aspx",
         webUrl: "https://contoso.sharepoint.com"
       }
     }, commandInfo);
@@ -164,7 +164,7 @@ describe(commands.APPPAGE_SET, () => {
     const actual = await command.validate({
       options: {
         webPartData: JSON.stringify({ abc: "def" }),
-        pageName: "page.aspx"
+        name: "page.aspx"
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -173,7 +173,7 @@ describe(commands.APPPAGE_SET, () => {
   it("fails validation if webPartData is not a valid JSON string", async () => {
     const actual = await command.validate({
       options: {
-        pageName: "Contoso.aspx",
+        name: "Contoso.aspx",
         webUrl: "https://contoso",
         webPartData: "abc"
       }
@@ -184,7 +184,7 @@ describe(commands.APPPAGE_SET, () => {
   it("validation passes on all required options", async () => {
     const actual = await command.validate({
       options: {
-        pageName: "Contoso.aspx",
+        name: "Contoso.aspx",
         webPartData: "{}",
         webUrl: "https://contoso.sharepoint.com"
       }

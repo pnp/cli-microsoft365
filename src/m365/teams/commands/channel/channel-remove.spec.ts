@@ -71,27 +71,27 @@ describe(commands.CHANNEL_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when valid channelId & teamId is specified', async () => {
+  it('passes validation when valid id & teamId is specified', async () => {
     const actual = await command.validate({
       options: {
-        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+        id: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when channelName & teamId is specified', async () => {
+  it('passes validation when name & teamId is specified', async () => {
     const actual = await command.validate({
       options: {
-        channelName: 'Channel Name',
+        name: 'Channel Name',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the channelId and channelName are not provided', async () => {
+  it('fails validation if the id and name are not provided', async () => {
     const actual = await command.validate({
       options: {
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
@@ -100,11 +100,11 @@ describe(commands.CHANNEL_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the channelId is not valid channelId', async () => {
+  it('fails validation if the id is not valid id', async () => {
     const actual = await command.validate({
       options: {
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
-        channelId: 'invalid'
+        id: 'invalid'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -114,18 +114,18 @@ describe(commands.CHANNEL_REMOVE, () => {
     const actual = await command.validate({
       options: {
         teamId: 'invalid',
-        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype'
+        id: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both channelName and channelId are provided', async () => {
+  it('fails validation if both name and id are provided', async () => {
     const actual = await command.validate({
       options: {
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
-        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        channelName: 'channelname'
+        id: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+        name: 'channelname'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -133,7 +133,7 @@ describe(commands.CHANNEL_REMOVE, () => {
 
   it('fails to remove channel when channel does not exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'channelName'`) > -1) {
+      if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'name'`) > -1) {
         return Promise.resolve({ value: [] });
       }
       return Promise.reject('Invalid request');
@@ -142,7 +142,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     await assert.rejects(command.action(logger, { options: {
       debug: true,
       teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
-      channelName: 'channelName',
+      name: 'name',
       confirm: true } } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
   });
 
@@ -150,7 +150,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: false,
-        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+        id: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     });
@@ -168,7 +168,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+        id: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     });
@@ -187,7 +187,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+        id: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     });
@@ -200,7 +200,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+        id: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     });
@@ -222,12 +222,12 @@ describe(commands.CHANNEL_REMOVE, () => {
 
   it('removes the specified channel by name when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'channelName'`) > -1) {
+      if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'name'`) > -1) {
         return Promise.resolve({
           value: [
             {
               "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
-              "displayName": "channelName",
+              "displayName": "name",
               "description": null,
               "email": "",
               "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6%40thread.skype/%F0%9F%92%A1+Ideas?groupId=d66b8110-fcad-49e8-8159-0d488ddb7656&tenantId=eff8592e-e14a-4ae8-8771-d96d5c549e1c"
@@ -254,7 +254,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        channelName: 'channelName',
+        name: 'name',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     });
@@ -289,7 +289,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     await command.action(logger, {
       options: {
         debug: true,
-        channelName: 'channelName',
+        name: 'channelName',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
         confirm: true
       }
@@ -320,7 +320,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     ));
 
     await assert.rejects(command.action(logger, { options: {
-      channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+      id: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
       teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656' } } as any), new CommandError('Failed to execute Skype backend request GetThreadS2SRequest.'));
   });
 

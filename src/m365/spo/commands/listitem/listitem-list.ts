@@ -88,47 +88,47 @@ class SpoListItemListCommand extends SpoCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-	    if (isValidSharePointUrl !== true) {
-	      return isValidSharePointUrl;
-	    }
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
 
-	    if (!args.options.listId && !args.options.listTitle) {
-	      return `Specify listId or listTitle`;
-	    }
+        if (!args.options.listId && !args.options.listTitle) {
+          return `Specify listId or listTitle`;
+        }
 
-	    if (args.options.listId && args.options.listTitle) {
-	      return 'Specify listId or listTitle but not both';
-	    }
+        if (args.options.listId && args.options.listTitle) {
+          return `Specify listId or listTitle but not both`;
+        }
 
-	    if (args.options.camlQuery && args.options.fields) {
-	      return `Specify camlQuery or fields but not both`;
-	    }
+        if (args.options.camlQuery && args.options.fields) {
+          return `Specify camlQuery or fields but not both`;
+        }
 
-	    if (args.options.camlQuery && args.options.pageSize) {
-	      return `Specify camlQuery or pageSize but not both`;
-	    }
+        if (args.options.camlQuery && args.options.pageSize) {
+          return `Specify camlQuery or pageSize but not both`;
+        }
 
-	    if (args.options.camlQuery && args.options.pageNumber) {
-	      return `Specify camlQuery or pageNumber but not both`;
-	    }
+        if (args.options.camlQuery && args.options.pageNumber) {
+          return `Specify camlQuery or pageNumber but not both`;
+        }
 
-	    if (args.options.pageSize && isNaN(Number(args.options.pageSize))) {
-	      return `pageSize must be numeric`;
-	    }
+        if (args.options.pageSize && isNaN(Number(args.options.pageSize))) {
+          return `pageSize must be numeric`;
+        }
 
-	    if (args.options.pageNumber && !args.options.pageSize) {
-	      return `pageSize must be specified if pageNumber is specified`;
-	    }
+        if (args.options.pageNumber && !args.options.pageSize) {
+          return `pageSize must be specified if pageNumber is specified`;
+        }
 
-	    if (args.options.pageNumber && isNaN(Number(args.options.pageNumber))) {
-	      return `pageNumber must be numeric`;
-	    }
+        if (args.options.pageNumber && isNaN(Number(args.options.pageNumber))) {
+          return `pageNumber must be numeric`;
+        }
 
-	    if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-	      return `${args.options.listId} is not a valid GUID`;
-	    }
+        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} is not a valid GUID`;
+        }
 
-	    return true;
+        return true;
       }
     );
   }
