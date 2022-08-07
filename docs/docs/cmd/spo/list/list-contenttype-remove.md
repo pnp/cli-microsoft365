@@ -19,7 +19,7 @@ m365 spo list contenttype remove [options]
 `-t, --listTitle [listTitle]`
 : Title of the list from which to remove the content type, specify `listId` or `listTitle` but not both
 
-`-c, --contentTypeId <contentTypeId>`
+`-i, --id <id>`
 : ID of the content type to remove from the list
 
 `--confirm`
@@ -32,11 +32,11 @@ m365 spo list contenttype remove [options]
 Remove content type with ID _0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A_ from the list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo list contenttype remove --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --contentTypeId 0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A
+m365 spo list contenttype remove --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id 0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A
 ```
 
 Remove content type with ID _0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A_ from the list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo list contenttype remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --contentTypeId 0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A
+m365 spo list contenttype remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --id 0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A
 ```

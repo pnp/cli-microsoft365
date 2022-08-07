@@ -24,7 +24,7 @@ interface Options extends GlobalOptions {
   exposePageContextGlobally: boolean;
   exposeTeamsContextGlobally: boolean;
   html: string;
-  packageName: string;
+  name: string;
   webPartDescription: string;
   webPartTitle: string;
 }
@@ -69,7 +69,7 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
     this.options.unshift(
       { option: '-t, --webPartTitle <webPartTitle>' },
       { option: '-d, --webPartDescription <webPartDescription>' },
-      { option: '-n, --packageName <packageName>' },
+      { option: '-n, --name <name>' },
       { option: '--html <html>' },
       {
         option: '--enableForTeams [enableForTeams]',
@@ -199,7 +199,7 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
       if (this.debug) {
         logger.log('Writing archive...');
       }
-      this.archive.writeZip(`${args.options.packageName}.sppkg`);
+      this.archive.writeZip(`${args.options.name}.sppkg`);
     }
     catch (err: any) {
       error = err.message;

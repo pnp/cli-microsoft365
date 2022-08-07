@@ -9,8 +9,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: number;
-  userId?: number;
+  groupId: number;
+  id?: number;
   confirm?: boolean;
 }
 
@@ -34,7 +34,7 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        userId: args.options.userId !== undefined,
+        userId: args.options.id !== undefined,
         confirm: (!(!args.options.confirm)).toString()
       });
     });
@@ -43,10 +43,10 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--id <id>'
+        option: '--groupId <groupId>'
       },
       {
-        option: '--userId [userId]'
+        option: '--id [id]'
       },
       {
         option: '--confirm'
@@ -57,12 +57,12 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && typeof args.options.id !== 'number') {
-          return `${args.options.id} is not a number`;
+        if (args.options.groupId && typeof args.options.groupId !== 'number') {
+          return `${args.options.groupId} is not a number`;
         }
 
-        if (args.options.userId && typeof args.options.userId !== 'number') {
-          return `${args.options.userId} is not a number`;
+        if (args.options.id && typeof args.options.id !== 'number') {
+          return `${args.options.id} is not a number`;
         }
 
         return true;
@@ -82,8 +82,8 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
         },
         responseType: 'json',
         data: {
-          group_id: args.options.id,
-          user_id: args.options.userId
+          group_id: args.options.groupId,
+          user_id: args.options.id
         }
       };
 
@@ -97,9 +97,9 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
       executeRemoveAction();
     }
     else {
-      let messagePrompt: string = `Are you sure you want to leave group ${args.options.id}?`;
-      if (args.options.userId) {
-        messagePrompt = `Are you sure you want to remove the user ${args.options.userId} from the group ${args.options.id}?`;
+      let messagePrompt: string = `Are you sure you want to leave group ${args.options.groupId}?`;
+      if (args.options.id) {
+        messagePrompt = `Are you sure you want to remove the user ${args.options.id} from the group ${args.options.groupId}?`;
       }
 
       Cli.prompt({

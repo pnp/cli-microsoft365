@@ -10,7 +10,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   name: string;
-  environment: string;
+  environmentName: string;
   asAdmin: boolean;
 }
 
@@ -35,7 +35,7 @@ class FlowEnableCommand extends AzmgmtCommand {
         option: '-n, --name <name>'
       },
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '--asAdmin'
@@ -49,7 +49,7 @@ class FlowEnableCommand extends AzmgmtCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.name)}/start?api-version=2016-11-01`,
+      url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${encodeURIComponent(args.options.environmentName)}/flows/${encodeURIComponent(args.options.name)}/start?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },

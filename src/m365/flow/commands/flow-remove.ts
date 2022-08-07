@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment: string;
+  environmentName: string;
   name: string;
   asAdmin?: boolean;
   confirm?: boolean;
@@ -49,7 +49,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
         option: '-n, --name <name>'
       },
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '--asAdmin'
@@ -79,7 +79,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
 
     const removeFlow: () => void = (): void => {
       const requestOptions: any = {
-        url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+        url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${encodeURIComponent(args.options.environmentName)}/flows/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
         resolveWithFullResponse: true,
         headers: {
           accept: 'application/json'
@@ -93,7 +93,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
           // handle 204 and throw error message to cmd when invalid flow id is passed
           // https://github.com/pnp/cli-microsoft365/issues/1063#issuecomment-537218957
           if (rawRes.statusCode === 204) {
-            logger.log(chalk.red(`Error: Resource '${args.options.name}' does not exist in environment '${args.options.environment}'`));
+            logger.log(chalk.red(`Error: Resource '${args.options.name}' does not exist in environment '${args.options.environmentName}'`));
             cb();
           }
           else {

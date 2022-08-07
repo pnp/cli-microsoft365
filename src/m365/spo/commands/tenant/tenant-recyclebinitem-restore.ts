@@ -10,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  url: string;
+  siteUrl: string;
   wait: boolean;
 }
 
@@ -42,7 +42,7 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --url <url>'
+        option: '-u, --siteUrl <siteUrl>'
       },
       {
         option: '--wait'
@@ -52,7 +52,7 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.siteUrl)
     );
   }
 
@@ -67,7 +67,7 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
             'content-type': 'application/json;charset=utf-8'
           },
           data: {
-            siteUrl: args.options.url
+            siteUrl: args.options.siteUrl
           }
         };
 

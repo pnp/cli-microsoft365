@@ -10,10 +10,10 @@ m365 spo feature enable [options]
 
 ## Options
 
-`-u, --url <url>`
+`-u, --webUrl <webUrl>`
 : The URL of the site or web for which to enable the feature
 
-`-f, --featureId <id>`
+`-i, --id <id>`
 : The ID of the feature to enable
 
 `-s, --scope [scope]`

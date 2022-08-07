@@ -8,7 +8,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment: string;
+  environmentName: string;
   asAdmin: boolean;
 }
 
@@ -43,7 +43,7 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '--asAdmin'
@@ -52,7 +52,7 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const url: string = `${this.resource}providers/Microsoft.ProcessSimple${args.options.asAdmin ? '/scopes/admin' : ''}/environments/${encodeURIComponent(args.options.environment)}/flows?api-version=2016-11-01`;
+    const url: string = `${this.resource}providers/Microsoft.ProcessSimple${args.options.asAdmin ? '/scopes/admin' : ''}/environments/${encodeURIComponent(args.options.environmentName)}/flows?api-version=2016-11-01`;
 
     this
       .getAllItems(url, logger, true)

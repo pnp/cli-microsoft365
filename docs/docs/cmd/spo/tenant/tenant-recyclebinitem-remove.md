@@ -10,7 +10,7 @@ m365 spo tenant recyclebinitem remove [options]
 
 ## Options
 
-`-u, --url`
+`-u, --siteUrl <siteUrl>`
 : URL of the site to remove
 
 `--wait`
@@ -33,11 +33,11 @@ Removing a site collection is by default asynchronous and depending on the curre
 Removes the specified deleted site collection from tenant recycle bin
 
 ```sh
-m365 spo tenant recyclebinitem remove --url https://contoso.sharepoint.com/sites/team
+m365 spo tenant recyclebinitem remove --siteUrl https://contoso.sharepoint.com/sites/team
 ```
 
 Removes the specified deleted site collection from tenant recycle bin and wait for the removing process to complete
 
 ```sh
-m365 spo tenant recyclebinitem remove --url https://contoso.sharepoint.com/sites/team --wait
+m365 spo tenant recyclebinitem remove --siteUrl https://contoso.sharepoint.com/sites/team --wait
 ```

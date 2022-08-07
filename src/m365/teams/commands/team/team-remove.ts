@@ -18,7 +18,6 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   name?: string;
-  teamId?: string;
   confirm?: boolean;
 }
 
@@ -56,9 +55,6 @@ class TeamsTeamRemoveCommand extends GraphCommand {
         option: '-n, --name [name]'
       },
       {
-        option: '--teamId [teamId]'
-      },
-      {
         option: '--confirm'
       }
     );
@@ -67,16 +63,12 @@ class TeamsTeamRemoveCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.id && !args.options.name && !args.options.teamId) {
+        if (!args.options.id && !args.options.name) {
 	      return 'Specify either id or name';
 	    }
 
-	    if (args.options.name && (args.options.id || args.options.teamId)) {
+	    if (args.options.name && args.options.id) {
 	      return 'Specify either id or name but not both';
-	    }
-
-	    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-	      return `${args.options.teamId} is not a valid GUID`;
 	    }
 
 	    if (args.options.id && !validation.isValidGuid(args.options.id)) {
@@ -105,12 +97,6 @@ class TeamsTeamRemoveCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (args.options.teamId) {
-      args.options.id = args.options.teamId;
-
-      this.warn(logger, `Option 'teamId' is deprecated. Please use 'id' instead.`);
-    }
-
     const removeTeam: () => void = (): void => {
       this
         .getTeamId(args)

@@ -10,8 +10,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  url: string;
-  hubSiteId: string;
+  siteUrl: string;
+  id: string;
 }
 
 class SpoHubSiteConnectCommand extends SpoCommand {
@@ -33,10 +33,10 @@ class SpoHubSiteConnectCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --url <url>'
+        option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '-i, --hubSiteId <hubSiteId>'
+        option: '-i, --id <id>'
       }
     );
   }
@@ -44,13 +44,13 @@ class SpoHubSiteConnectCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.siteUrl);
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
     
-        if (!validation.isValidGuid(args.options.hubSiteId)) {
-          return `${args.options.hubSiteId} is not a valid GUID`;
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
         }
     
         return true;
@@ -60,10 +60,10 @@ class SpoHubSiteConnectCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     spo
-      .getRequestDigest(args.options.url)
+      .getRequestDigest(args.options.siteUrl)
       .then((res: ContextInfo): Promise<void> => {
         const requestOptions: any = {
-          url: `${args.options.url}/_api/site/JoinHubSite('${encodeURIComponent(args.options.hubSiteId)}')`,
+          url: `${args.options.siteUrl}/_api/site/JoinHubSite('${encodeURIComponent(args.options.id)}')`,
           headers: {
             'X-RequestDigest': res.FormDigestValue,
             accept: 'application/json;odata=nometadata'

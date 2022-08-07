@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   mailNickname: string;
   owners?: string;
   members?: string;
-  isPrivate?: string;
+  isPrivate?: boolean;
   logoPath?: string;
   allowMembersToPost?: boolean;
   hideGroupInOutlook?: boolean;
@@ -78,7 +78,7 @@ class AadO365GroupAddCommand extends GraphCommand {
         option: '--members [members]'
       },
       {
-        option: '--isPrivate [isPrivate]'
+        option: '--isPrivate'
       },
       {
         option: '--allowMembersToPost [allowMembersToPost]'
@@ -117,12 +117,6 @@ class AadO365GroupAddCommand extends GraphCommand {
               return `${members[i]} is not a valid userPrincipalName`;
             }
           }
-        }
-    
-        if (typeof args.options.isPrivate !== 'undefined' &&
-          args.options.isPrivate !== 'true' &&
-          args.options.isPrivate !== 'false') {
-          return `${args.options.isPrivate} is not a valid boolean value`;
         }
     
         if (args.options.logoPath) {
@@ -184,7 +178,7 @@ class AadO365GroupAddCommand extends GraphCommand {
         mailNickname: args.options.mailNickname,
         resourceBehaviorOptions: resourceBehaviorOptionsCollection,
         securityEnabled: false,
-        visibility: args.options.isPrivate === 'true' ? 'Private' : 'Public'
+        visibility: args.options.isPrivate ? 'Private' : 'Public'
       }
     };
 

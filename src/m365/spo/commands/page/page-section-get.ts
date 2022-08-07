@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  name: string;
+  pageName: string;
   section: number;
   webUrl: string;
 }
@@ -38,7 +38,7 @@ class SpoPageSectionGetCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-n, --name <name>'
+        option: '-n, --pageName <pageName>'
       },
       {
         option: '-s, --section <section>'
@@ -60,7 +60,7 @@ class SpoPageSectionGetCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     Page
-      .getPage(args.options.name, args.options.webUrl, logger, this.debug, this.verbose)
+      .getPage(args.options.pageName, args.options.webUrl, logger, this.debug, this.verbose)
       .then((clientSidePage: ClientSidePage): void => {
         const sections: CanvasSection[] = clientSidePage.sections
           .filter(section => section.order === args.options.section);

@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import chalk = require('chalk');
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -13,7 +12,6 @@ const command: Command = require('./team-remove');
 describe(commands.TEAM_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
   let commandInfo: CommandInfo;
 
@@ -38,7 +36,6 @@ describe(commands.TEAM_REMOVE, () => {
       }
     };
 
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     promptOptions = undefined;
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
@@ -82,8 +79,7 @@ describe(commands.TEAM_REMOVE, () => {
     const actual = await command.validate({
       options: {
         name: 'Finance',
-        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -94,25 +90,6 @@ describe(commands.TEAM_REMOVE, () => {
       options: {
         name: 'Finance',
         id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both teamId and name are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'invalid'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -134,26 +111,6 @@ describe(commands.TEAM_REMOVE, () => {
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
-  });
-
-  it('logs deprecation warning when option teamId is specified', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000`) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", confirm: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('fails when team name does not exist', (done) => {

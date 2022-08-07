@@ -68,22 +68,22 @@ describe(commands.RUN_RESUBMIT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the flow is not valid GUID', async () => {
+  it('fails validation if the flowName is not valid GUID', async () => {
     const actual = await command.validate({
       options: {
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
-        flow: 'invalid',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        flowName: 'invalid',
         name: '08585981115186985105550762687CU161'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the name, environment and flow specified', async () => {
+  it('passes validation when the name, environmentName and flowName specified', async () => {
     const actual = await command.validate({
       options: {
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
-        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
       }
     }, commandInfo);
@@ -94,8 +94,8 @@ describe(commands.RUN_RESUBMIT, () => {
     command.action(logger, {
       options: {
         debug: false,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
-        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
       }
     }, () => {
@@ -125,8 +125,8 @@ describe(commands.RUN_RESUBMIT, () => {
     command.action(logger, {
       options: {
         debug: false,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
-        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
       }
     }, () => {
@@ -160,8 +160,8 @@ describe(commands.RUN_RESUBMIT, () => {
       options:
       {
         debug: false,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
-        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+        environmentName: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
       }
     } as any, (err?: any) => {
@@ -194,8 +194,8 @@ describe(commands.RUN_RESUBMIT, () => {
       options:
       {
         debug: false,
-        environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
-        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
+        environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
+        flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
         name: '08585981115186985105550762687CU161'
       }
     } as any, (err?: any) => {
@@ -253,8 +253,8 @@ describe(commands.RUN_RESUBMIT, () => {
       options:
       {
         debug: false,
-        environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
-        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+        environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
+        flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762688CP233'
       }
     } as any, (err?: any) => {
@@ -310,8 +310,8 @@ describe(commands.RUN_RESUBMIT, () => {
       options:
       {
         debug: true,
-        environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
-        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
+        environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
+        flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
         name: '08585981115186985105550762687CU161'
       }
     }, () => {
@@ -364,8 +364,8 @@ describe(commands.RUN_RESUBMIT, () => {
       options:
       {
         debug: true,
-        environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
-        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
+        environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
+        flowName: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
         name: '08585981115186985105550762687CU161',
         confirm: true
       }

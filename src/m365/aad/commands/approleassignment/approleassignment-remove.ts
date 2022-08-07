@@ -14,8 +14,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   appId?: string;
-  displayName?: string;
-  objectId?: string;
+  appDisplayName?: string;
+  appObjectId?: string;
   resource: string;
   scope: string;
   confirm?: boolean;
@@ -43,8 +43,8 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         appId: typeof args.options.appId !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined',
-        objectId: typeof args.options.objectId !== 'undefined',
+        appDisplayName: typeof args.options.appDisplayName !== 'undefined',
+        appObjectId: typeof args.options.appObjectId !== 'undefined',
         confirm: (!!args.options.confirm).toString()
       });
     });
@@ -56,10 +56,10 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
         option: '--appId [appId]'
       },
       {
-        option: '--objectId [objectId]'
+        option: '--appObjectId [appObjectId]'
       },
       {
-        option: '--displayName [displayName]'
+        option: '--appDisplayName [appDisplayName]'
       },
       {
         option: '-r, --resource <resource>',
@@ -76,13 +76,13 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {    
+      async (args: CommandArgs) => {
         if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
           return `${args.options.appId} is not a valid GUID`;
         }
     
-        if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
-          return `${args.options.objectId} is not a valid GUID`;
+        if (args.options.appObjectId && !validation.isValidGuid(args.options.appObjectId)) {
+          return `${args.options.appObjectId} is not a valid GUID`;
         }
     
         return true;
@@ -91,7 +91,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'objectId', 'displayName']);
+    this.optionSets.push(['appId', 'appObjectId', 'appDisplayName']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -102,11 +102,11 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
       if (args.options.appId) {
         spMatchQuery = `appId eq '${encodeURIComponent(args.options.appId)}'`;
       }
-      else if (args.options.objectId) {
-        spMatchQuery = `id eq '${encodeURIComponent(args.options.objectId)}'`;
+      else if (args.options.appObjectId) {
+        spMatchQuery = `id eq '${encodeURIComponent(args.options.appObjectId)}'`;
       }
       else {
-        spMatchQuery = `displayName eq '${encodeURIComponent(args.options.displayName as string)}'`;
+        spMatchQuery = `displayName eq '${encodeURIComponent(args.options.appDisplayName as string)}'`;
       }
 
       this

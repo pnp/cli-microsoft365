@@ -67,7 +67,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -89,7 +89,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test' } }, () => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test' } }, () => {
       try {
         assert.strictEqual(Object.keys(data).length, 0);
         done();
@@ -111,7 +111,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', disableMegaMenu: "true" } }, () => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', disableMegaMenu: "true" } }, () => {
       try {
         assert.strictEqual(data.megaMenuEnabled, false);
         done();
@@ -133,7 +133,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', disableFooter: "true" } }, () => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', disableFooter: "true" } }, () => {
       try {
         assert.strictEqual(data.footerEnabled, false);
         done();
@@ -155,7 +155,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', hideTitleInHeader: "true" } }, () => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', hideTitleInHeader: "true" } }, () => {
       try {
         assert.strictEqual(data.hideTitleInHeader, true);
         done();
@@ -177,7 +177,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', headerLayout: "Extended", headerEmphasis: "Light", logoAlignment: "Center", footerLayout: "Extended", footerEmphasis: "Light" } }, () => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/test', headerLayout: "Extended", headerEmphasis: "Light", logoAlignment: "Center", footerLayout: "Extended", footerEmphasis: "Light" } }, () => {
       try {
         assert.strictEqual(data.headerLayout, 4);
         assert.strictEqual(data.headerEmphasis, 1);
@@ -197,7 +197,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', footerEmphasis: 'Light' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales', footerEmphasis: 'Light' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -223,7 +223,7 @@ describe(commands.SITE_CHROME_SET, () => {
     const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('<url>') > -1) {
+      if (o.option.indexOf('<siteUrl>') > -1) {
         containsTypeOption = true;
       }
     });
@@ -231,12 +231,12 @@ describe(commands.SITE_CHROME_SET, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { url: 'foo' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -285,12 +285,12 @@ describe(commands.SITE_CHROME_SET, () => {
   });
 
   it('fails validation if the footer emphasis option is not a valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', footerEmphasis: "None" } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', footerEmphasis: "None" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the footer emphasis option is a valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', footerEmphasis: "Dark" } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', footerEmphasis: "Dark" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -306,12 +306,12 @@ describe(commands.SITE_CHROME_SET, () => {
   });
 
   it('fails validation if the footer layout option is not a valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', footerLayout: "None" } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', footerLayout: "None" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the footer layout option is a valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', footerLayout: "Simple" } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', footerLayout: "Simple" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -327,12 +327,12 @@ describe(commands.SITE_CHROME_SET, () => {
   });
 
   it('fails validation if the header emphasis option is not a valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', headerEmphasis: "None" } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', headerEmphasis: "None" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the header emphasis option is a valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', headerEmphasis: "Dark" } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', headerEmphasis: "Dark" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -348,12 +348,12 @@ describe(commands.SITE_CHROME_SET, () => {
   });
 
   it('fails validation if the header emphasis layout is not a valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', headerLayout: "None" } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', headerLayout: "None" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the header emphasis layout is a valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', headerLayout: "Standard" } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', headerLayout: "Standard" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -369,12 +369,12 @@ describe(commands.SITE_CHROME_SET, () => {
   });
 
   it('fails validation if the header logo alignment is not a valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', logoAlignment: "None" } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', logoAlignment: "None" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the logo alignment is a valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', logoAlignment: "Center" } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', logoAlignment: "Center" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

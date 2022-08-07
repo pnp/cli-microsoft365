@@ -10,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  appId: string;
+  id: string;
   userId: string;
 }
 
@@ -33,7 +33,7 @@ class TeamsUserAppAddCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--appId <appId>'
+        option: '--id <id>'
       },
       {
         option: '--userId <userId>'
@@ -44,8 +44,8 @@ class TeamsUserAppAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.appId)) {
-          return `${args.options.appId} is not a valid GUID`;
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
         }
 
         if (!validation.isValidGuid(args.options.userId)) {
@@ -68,7 +68,7 @@ class TeamsUserAppAddCommand extends GraphCommand {
       },
       responseType: 'json',
       data: {
-        'teamsApp@odata.bind': `${endpoint}/appCatalogs/teamsApps/${args.options.appId}`
+        'teamsApp@odata.bind': `${endpoint}/appCatalogs/teamsApps/${args.options.id}`
       }
     };
 

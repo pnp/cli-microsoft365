@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   siteUrl: string;
   appId?: string;
   appDisplayName?: string;
-  permissionId?: string;
+  id?: string;
   confirm?: boolean;
 }
 
@@ -43,7 +43,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         appId: typeof args.options.appId !== 'undefined',
         appDisplayName: typeof args.options.appDisplayName !== 'undefined',
-        permissionId: typeof args.options.permissionId !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
         confirm: (!!args.options.confirm).toString()
       });
     });
@@ -55,7 +55,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
         option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '-i, --permissionId [permissionId]'
+        option: '-i, --id [id]'
       },
       {
         option: '--appId [appId]'
@@ -82,7 +82,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'appDisplayName', 'permissionId']);
+    this.optionSets.push(['appId', 'appDisplayName', 'id']);
   }
 
   private getSpoSiteId(args: CommandArgs): Promise<string> {
@@ -128,8 +128,8 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
   }
 
   private getPermissionIds(args: CommandArgs): Promise<string[]> {
-    if (args.options.permissionId) {
-      return Promise.resolve([args.options.permissionId!]);
+    if (args.options.id) {
+      return Promise.resolve([args.options.id!]);
     }
 
     return this

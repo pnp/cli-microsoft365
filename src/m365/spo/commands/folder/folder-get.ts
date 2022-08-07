@@ -13,7 +13,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  folderUrl: string;
+  url: string;
 }
 
 class SpoFolderGetCommand extends SpoCommand {
@@ -38,7 +38,7 @@ class SpoFolderGetCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folderUrl <folderUrl>'
+        option: '-f, --url <url>'
       }
     );
   }
@@ -54,7 +54,7 @@ class SpoFolderGetCommand extends SpoCommand {
       logger.logToStderr(`Retrieving folder from site ${args.options.webUrl}...`);
     }
 
-    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
+    const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
     const requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')`;
     const requestOptions: any = {
       url: requestUrl,

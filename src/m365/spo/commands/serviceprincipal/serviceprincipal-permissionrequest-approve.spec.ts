@@ -95,7 +95,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } }, () => {
+    command.action(logger, { options: { debug: true, id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
@@ -138,7 +138,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } }, () => {
+    command.action(logger, { options: { debug: false, id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
@@ -206,24 +206,24 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
     assert(containsOption);
   });
 
-  it('allows specifying requestId', () => {
+  it('allows specifying id', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--requestId') > -1) {
+      if (o.option.indexOf('--id') > -1) {
         containsOption = true;
       }
     });
     assert(containsOption);
   });
 
-  it('fails validation if the requestId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { requestId: '123' } }, commandInfo);
+  it('fails validation if the id option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the requestId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } }, commandInfo);
+  it('passes validation when the id is a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

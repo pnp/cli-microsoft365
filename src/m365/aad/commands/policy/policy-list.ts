@@ -9,7 +9,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  policyType?: string;
+  type?: string;
 }
 
 const policyEndPoints: any = {
@@ -44,7 +44,7 @@ class AadPolicyListCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        policyType: args.options.policyType || 'all'
+        policyType: args.options.type || 'all'
       });
     });
   }
@@ -52,7 +52,7 @@ class AadPolicyListCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-p, --policyType [policyType]',
+        option: '-t, --type [type]',
         autocomplete: AadPolicyListCommand.supportedPolicyTypes
       }
     );
@@ -61,10 +61,10 @@ class AadPolicyListCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.policyType) {
-          const policyType: string = args.options.policyType.toLowerCase();
+        if (args.options.type) {
+          const policyType: string = args.options.type.toLowerCase();
           if (!AadPolicyListCommand.supportedPolicyTypes.find(p => p.toLowerCase() === policyType)) {
-            return `${args.options.policyType} is not a valid policyType. Allowed values are ${AadPolicyListCommand.supportedPolicyTypes.join(', ')}`;
+            return `${args.options.type} is not a valid type. Allowed values are ${AadPolicyListCommand.supportedPolicyTypes.join(', ')}`;
           }
         }
     
@@ -78,7 +78,7 @@ class AadPolicyListCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const policyType: string = args.options.policyType ? args.options.policyType.toLowerCase() : 'all';
+    const policyType: string = args.options.type ? args.options.type.toLowerCase() : 'all';
 
     if (policyType && policyType !== "all") {
       this

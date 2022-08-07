@@ -138,7 +138,7 @@ describe(commands.FOLDER_RENAME, () => {
     const requestStub: sinon.SinonStub = stubAllPostRequests();
     const options = {
       webUrl: 'https://contoso.sharepoint.com/sites/abc',
-      folderUrl: '/Shared Documents/Test2',
+      url: '/Shared Documents/Test2',
       name: 'test1',
       verbose: true,
       debug: true
@@ -161,7 +161,7 @@ describe(commands.FOLDER_RENAME, () => {
     stubAllPostRequests();
     const options = {
       webUrl: 'https://contoso.sharepoint.com/sites/abc',
-      folderUrl: '/Shared Documents/Test2',
+      url: '/Shared Documents/Test2',
       name: 'test1'
     };
 
@@ -180,7 +180,7 @@ describe(commands.FOLDER_RENAME, () => {
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('requestObjectIdentity error'); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
-      folderUrl: '/Shared Documents/test',
+      url: '/Shared Documents/test',
       name: 'test1',
       verbose: true
     };
@@ -200,7 +200,7 @@ describe(commands.FOLDER_RENAME, () => {
     stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
-      folderUrl: '/Shared Documents/test',
+      url: '/Shared Documents/test',
       name: 'test1',
       verbose: true
     };
@@ -219,7 +219,7 @@ describe(commands.FOLDER_RENAME, () => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return reject('abc 1'); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
-      folderUrl: '/Shared Documents/test',
+      url: '/Shared Documents/test',
       name: 'test1',
       verbose: true
     };
@@ -239,7 +239,7 @@ describe(commands.FOLDER_RENAME, () => {
     stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
-      folderUrl: '/Shared Documents/test',
+      url: '/Shared Documents/test',
       name: 'test1',
       verbose: true
     };
@@ -259,7 +259,7 @@ describe(commands.FOLDER_RENAME, () => {
     stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
-      folderUrl: '/Shared Documents/test',
+      url: '/Shared Documents/test',
       name: 'test1',
       verbose: true
     };
@@ -279,7 +279,7 @@ describe(commands.FOLDER_RENAME, () => {
     stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve('[{}]'); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
-      folderUrl: '/Shared Documents/test',
+      url: '/Shared Documents/test',
       name: 'abc'
     };
 
@@ -298,7 +298,7 @@ describe(commands.FOLDER_RENAME, () => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('folder remove promise error'); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
-      folderUrl: '/Shared Documents/test',
+      url: '/Shared Documents/test',
       name: 'abc'
     };
 
@@ -318,7 +318,7 @@ describe(commands.FOLDER_RENAME, () => {
     stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
-      folderUrl: '/Shared Documents/test',
+      url: '/Shared Documents/test',
       name: 'abc'
     };
 
@@ -338,7 +338,7 @@ describe(commands.FOLDER_RENAME, () => {
     stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
       webUrl: 'https://contoso.sharepoint.com',
-      folderUrl: '/Shared Documents/test',
+      url: '/Shared Documents/test',
       name: 'test1',
       verbose: true
     };
@@ -366,7 +366,7 @@ describe(commands.FOLDER_RENAME, () => {
   });
 
   it('fails validation if the webUrl option is not valid', async () => {
-    const actual = await command.validate({ options: { webUrl: 'abc', folderUrl: '/Shared Documents/test', name: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'abc', url: '/Shared Documents/test', name: 'abc' } }, commandInfo);
     assert.strictEqual(actual, "abc is not a valid SharePoint Online site URL");
   });
 
@@ -375,7 +375,7 @@ describe(commands.FOLDER_RENAME, () => {
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
-        folderUrl: '/Shared Documents/test',
+        url: '/Shared Documents/test',
         name: 'abc'
       }
     }, commandInfo);

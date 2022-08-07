@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment: string;
+  environmentName: string;
 }
 
 class PaConnectorListCommand extends PowerAppsCommand {
@@ -40,13 +40,13 @@ class PaConnectorListCommand extends PowerAppsCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       }
     );
   }
   
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const url = `${this.resource}/providers/Microsoft.PowerApps/apis?api-version=2016-11-01&$filter=environment%20eq%20%27${encodeURIComponent(args.options.environment)}%27%20and%20IsCustomApi%20eq%20%27True%27`;
+    const url = `${this.resource}/providers/Microsoft.PowerApps/apis?api-version=2016-11-01&$filter=environment%20eq%20%27${encodeURIComponent(args.options.environmentName)}%27%20and%20IsCustomApi%20eq%20%27True%27`;
 
     odata
       .getAllItems<Connector>(url)

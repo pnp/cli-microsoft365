@@ -9,8 +9,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment: string;
-  flow: string;
+  environmentName: string;
+  flowName: string;
   name: string;
 }
 
@@ -39,21 +39,21 @@ class FlowRunGetCommand extends AzmgmtCommand {
         option: '-n, --name <name>'
       },
       {
-        option: '-f, --flow <flow>'
+        option: '-f, --flowName <flowName>'
       },
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       }
     );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving information about run ${args.options.name} of Microsoft Flow ${args.options.flow}...`);
+      logger.logToStderr(`Retrieving information about run ${args.options.name} of Microsoft Flow ${args.options.flowName}...`);
     }
 
     const requestOptions: any = {
-      url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/runs/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+      url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environmentName)}/flows/${encodeURIComponent(args.options.flowName)}/runs/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },

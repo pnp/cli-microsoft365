@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import chalk = require('chalk');
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -14,7 +13,6 @@ describe(commands.TEAM_UNARCHIVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -38,7 +36,6 @@ describe(commands.TEAM_UNARCHIVE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -63,15 +60,6 @@ describe(commands.TEAM_UNARCHIVE, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the id is not a valid guid.', async () => {
@@ -104,8 +92,7 @@ describe(commands.TEAM_UNARCHIVE, () => {
     const actual = await command.validate({
       options: {
         name: 'Finance',
-        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -119,40 +106,6 @@ describe(commands.TEAM_UNARCHIVE, () => {
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation when both teamId and name are specified', async () => {
-    const actual = await command.validate({
-      options: {
-        name: 'Finance',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('logs deprecation warning when option teamId is specified', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/unarchive`) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
-      }
-    } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('fails when team name does not exist', (done) => {

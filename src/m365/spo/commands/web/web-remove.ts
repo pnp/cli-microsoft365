@@ -10,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  webUrl: string;
+  url: string;
   confirm?: boolean;
 }
 
@@ -42,7 +42,7 @@ class SpoWebRemoveCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --webUrl <webUrl>'
+        option: '-u, --url <url>'
       },
       {
         option: '--confirm'
@@ -52,14 +52,14 @@ class SpoWebRemoveCommand extends SpoCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
     );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeWeb = (): void => {
       const requestOptions: any = {
-        url: `${encodeURI(args.options.webUrl)}/_api/web`,
+        url: `${encodeURI(args.options.url)}/_api/web`,
         headers: {
           accept: 'application/json;odata=nometadata',
           'X-HTTP-Method': 'DELETE'
@@ -68,7 +68,7 @@ class SpoWebRemoveCommand extends SpoCommand {
       };
 
       if (this.verbose) {
-        logger.logToStderr(`Deleting subsite ${args.options.webUrl} ...`);
+        logger.logToStderr(`Deleting subsite ${args.options.url} ...`);
       }
 
       request
@@ -84,7 +84,7 @@ class SpoWebRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the subsite ${args.options.webUrl}`
+        message: `Are you sure you want to remove the subsite ${args.options.url}`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

@@ -13,7 +13,7 @@ m365 spo apppage set [options]
 `-u, --webUrl <webUrl>`
 : The URL of the site where the page to update is located
 
-`-n, --pageName <pageName>`
+`-n, --name <name>`
 : The name of the page to be updated, eg. page.aspx
 
 `-d, --webPartData <webPartData>`
@@ -26,5 +26,5 @@ m365 spo apppage set [options]
 Updates the single-part app page located in a site with url https://contoso.sharepoint.com. Web part data is stored in the `$webPartData` variable
 
 ```sh
-m365 spo apppage set --webUrl "https://contoso.sharepoint.com" --pageName "Contoso.aspx" --webPartData $webPartData
+m365 spo apppage set --webUrl "https://contoso.sharepoint.com" --name "Contoso.aspx" --webPartData $webPartData
 ```

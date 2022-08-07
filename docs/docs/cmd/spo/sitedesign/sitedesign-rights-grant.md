@@ -10,7 +10,7 @@ m365 spo sitedesign rights grant [options]
 
 ## Options
 
-`-i, --id <id>`
+`-i, --siteDesignId <siteDesignId>`
 : The ID of the site design to grant rights on
 
 `-p, --principals <principals>`
@@ -26,19 +26,19 @@ m365 spo sitedesign rights grant [options]
 Grant user with alias _PattiF_ view permission to the specified site design
 
 ```sh
-m365 spo sitedesign rights grant --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals PattiF --rights View
+m365 spo sitedesign rights grant --siteDesignId 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals PattiF --rights View
 ```
 
 Grant users with aliases _PattiF_ and _AdeleV_ view permission to the specified site design
 
 ```sh
-m365 spo sitedesign rights grant --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals "PattiF,AdeleV" --rights View
+m365 spo sitedesign rights grant --siteDesignId 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals "PattiF,AdeleV" --rights View
 ```
 
 Grant user with email _PattiF@contoso.com_ view permission to the specified site design
 
 ```sh
-m365 spo sitedesign rights grant --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals PattiF@contoso.com --rights View
+m365 spo sitedesign rights grant --siteDesignId 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --principals PattiF@contoso.com --rights View
 ```
 
 ## More information
