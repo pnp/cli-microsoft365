@@ -110,7 +110,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
         debug: true,
         listTitle: 'Documents',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
-        contentTypeId: '0x0120'
+        id: '0x0120'
       }
     });
     assert(loggerLogSpy.calledWith({
@@ -187,7 +187,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
         debug: false,
         listTitle: 'Documents',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
-        contentTypeId: '0x0120'
+        id: '0x0120'
       }
     });
     assert(loggerLogSpy.calledWith({
@@ -264,7 +264,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
         debug: true,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
-        contentTypeId: '0x0120'
+        id: '0x0120'
       }
     });
     assert(loggerLogSpy.calledWith({
@@ -341,7 +341,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
         debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
-        contentTypeId: '0x0120'
+        id: '0x0120'
       }
     });
     assert(loggerLogSpy.calledWith({
@@ -389,7 +389,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
         debug: true,
         listTitle: actionTitle,
         webUrl: 'https://contoso.sharepoint.com',
-        contentTypeId: '0x0120'
+        id: '0x0120'
       }
     }), new CommandError(err));
   });
@@ -435,7 +435,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
         debug: false,
         listTitle: actionTitle,
         webUrl: 'https://contoso.sharepoint.com',
-        contentTypeId: '0x0120'
+        id: '0x0120'
       }
     });
   });
@@ -481,43 +481,43 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
         debug: false,
         listId: actionId,
         webUrl: 'https://contoso.sharepoint.com',
-        contentTypeId: '0x0120'
+        id: '0x0120'
       }
     });
   });
 
   it('fails validation if both listId and listTitle options are not passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', contentTypeId: '0x0120' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0x0120' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', contentTypeId: '0x0120' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '0x0120' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', contentTypeId: '0x0120' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '0x0120' } }, commandInfo);
     assert(actual);
   });
 
   it('fails validation if the listId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345', contentTypeId: '0x0120' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345', id: '0x0120' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the listId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', contentTypeId: '0x0120' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '0x0120' } }, commandInfo);
     assert(actual);
   });
 
   it('passes validation if the listTitle option is passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', contentTypeId: '0x0120' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', id: '0x0120' } }, commandInfo);
     assert(actual);
   });
 
   it('fails validation if both listId and listTitle options are passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', contentTypeId: '0x0120' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', id: '0x0120' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -542,9 +542,9 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
     assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
-  it('configures contentTypeId as string option', () => {
+  it('configures content type ID as string option', () => {
     const types = command.types;
-    ['c', 'contentTypeId'].forEach(o => {
+    ['i', 'id'].forEach(o => {
       assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
     });
   });

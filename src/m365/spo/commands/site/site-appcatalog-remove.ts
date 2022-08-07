@@ -13,7 +13,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  url: string;
+  siteUrl: string;
 }
 
 class SpoSiteAppCatalogRemoveCommand extends SpoCommand {
@@ -35,19 +35,19 @@ class SpoSiteAppCatalogRemoveCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --url <url>'
+        option: '-u, --siteUrl <siteUrl>'
       }
     );
   }
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.siteUrl)
     );
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const url: string = args.options.url;
+    const url: string = args.options.siteUrl;
 
     try {
       const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);

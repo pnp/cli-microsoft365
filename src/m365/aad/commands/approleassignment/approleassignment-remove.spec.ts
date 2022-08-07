@@ -118,7 +118,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } });
+    await command.action(logger, { options: { appDisplayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } });
     assert(deleteRequestStub.notCalled);
   });
 
@@ -127,17 +127,17 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { debug: true, displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } });
+    await command.action(logger, { options: { debug: true, appDisplayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } });
     assert(deleteRequestStub.called);
   });
 
   it('deletes app role assignments for service principal with specified displayName', async () => {
-    await command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All', confirm: true } });
+    await command.action(logger, { options: { appDisplayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All', confirm: true } });
     assert(deleteRequestStub.called);
   });
 
   it('deletes app role assignments for service principal with specified objectId and multiple scopes', async () => {
-    await command.action(logger, { options: { objectId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scope: 'Sites.Read.All,Sites.FullControl.All', confirm: true } });
+    await command.action(logger, { options: { appObjectId: '3e64c22f-3f14-4bce-a267-cb44c9a08e17', resource: 'SharePoint', scope: 'Sites.Read.All,Sites.FullControl.All', confirm: true } });
     assert(deleteRequestStub.calledTwice);
   });
 
@@ -257,7 +257,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
       new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
-  it('fails validation if neither appId, objectId nor displayName are not specified', async () => {
+  it('fails validation if neither appId, appObjectId nor appDisplayName are not specified', async () => {
     const actual = await command.validate({ options: { resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -267,23 +267,23 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the objectId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { objectId: '123', resource: 'abc', scope: 'abc' } }, commandInfo);
+  it('fails validation if the appObjectId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { appObjectId: '123', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both appId and displayName are specified', async () => {
-    const actual = await command.validate({ options: { appId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
+  it('fails validation if both appId and appDisplayName are specified', async () => {
+    const actual = await command.validate({ options: { appId: '123', appDisplayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both objectId and displayName are specified', async () => {
-    const actual = await command.validate({ options: { objectId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
+  it('fails validation if both appObjectId and appDisplayName are specified', async () => {
+    const actual = await command.validate({ options: { appObjectId: '123', appDisplayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both objectId, appId and displayName are specified', async () => {
-    const actual = await command.validate({ options: { appId: '123', objectId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
+  it('fails validation if both appObjectId, appId and appDisplayName are specified', async () => {
+    const actual = await command.validate({ options: { appId: '123', appObjectId: '123', appDisplayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -314,11 +314,11 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
     assert(containsOption);
   });
 
-  it('supports specifying displayName', () => {
+  it('supports specifying appDisplayName', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--displayName') > -1) {
+      if (o.option.indexOf('--appDisplayName') > -1) {
         containsOption = true;
       }
     });

@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  url: string;
+  webUrl: string;
   name: string;
   title: string;
   location: string;
@@ -74,7 +74,7 @@ class SpoCustomActionAddCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --url <url>'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-n, --name <name>'
@@ -136,7 +136,7 @@ class SpoCustomActionAddCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
@@ -237,7 +237,7 @@ class SpoCustomActionAddCommand extends SpoCommand {
       const requestBody: any = this.mapRequestBody(args.options);
   
       const requestOptions: any = {
-        url: `${args.options.url}/_api/${args.options.scope}/UserCustomActions`,
+        url: `${args.options.webUrl}/_api/${args.options.scope}/UserCustomActions`,
         headers: {
           accept: 'application/json;odata=nometadata'
         },

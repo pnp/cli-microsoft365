@@ -13,10 +13,10 @@ m365 flow run cancel [options]
 `-n, --name <name>`
 : The name of the run to cancel
 
-`-f, --flow <flow>`
+`-f, --flowName <flowName>`
 : The name of the flow to cancel the run for
 
-`-e, --environment <environment>`
+`-e, --environmentName <environmentName>`
 : The name of the environment where the flow is located
 
 --8<-- "docs/cmd/_global.md"
@@ -37,5 +37,5 @@ If the run with the name you specified doesn't exist, you will get the `The work
 Cancel the given run of the specified flow
 
 ```sh
-m365 flow run cancel --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flow 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62
+m365 flow run cancel --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62
 ```

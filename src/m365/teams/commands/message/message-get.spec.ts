@@ -64,7 +64,7 @@ describe(commands.MESSAGE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if teamId, channelId and messageId are not specified', async () => {
+  it('fails validation if teamId, channelId and id are not specified', async () => {
     const actual = await command.validate({
       options: {
         debug: false
@@ -73,7 +73,7 @@ describe(commands.MESSAGE_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if channelId and messageId are not specified', async () => {
+  it('fails validation if channelId and id are not specified', async () => {
     const actual = await command.validate({
       options: {
         debug: false,
@@ -88,7 +88,7 @@ describe(commands.MESSAGE_GET, () => {
       options: {
         teamId: "5f5d7b71-1161-44",
         channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
-        messageId: "1540911392778"
+        id: "1540911392778"
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -111,7 +111,7 @@ describe(commands.MESSAGE_GET, () => {
       options: {
         teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
         channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
-        messageId: "1540911392778"
+        id: "1540911392778"
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -122,7 +122,7 @@ describe(commands.MESSAGE_GET, () => {
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
-        messageId: "1540911392778"
+        id: "1540911392778"
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -133,7 +133,7 @@ describe(commands.MESSAGE_GET, () => {
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
-        messageId: "1540911392778"
+        id: "1540911392778"
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -171,7 +171,7 @@ describe(commands.MESSAGE_GET, () => {
         debug: true,
         teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
         channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
-        messageId: "1540911392778"
+        id: "1540911392778"
       }
     });
     assert(loggerLogSpy.calledWith({
@@ -227,7 +227,7 @@ describe(commands.MESSAGE_GET, () => {
         debug: false,
         teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
         channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
-        messageId: "1540911392778"
+        id: "1540911392778"
       }
     });
     assert(loggerLogSpy.calledWith({
@@ -260,6 +260,6 @@ describe(commands.MESSAGE_GET, () => {
       debug: false,
       teamId: "5f5d7b71-1161-44d8-bcc1-3da710eb4171",
       channelId: "19:88f7e66a8dfe42be92db19505ae912a8@thread.skype",
-      messageId: "1540911392778" } } as any), new CommandError('An error has occurred'));
+      id: "1540911392778" } } as any), new CommandError('An error has occurred'));
   });
 });

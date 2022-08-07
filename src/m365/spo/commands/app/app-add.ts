@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   appCatalogUrl?: string;
   filePath: string;
   overwrite?: boolean;
-  scope?: string;
+  appCatalogScope?: string;
 }
 
 class SpoAppAddCommand extends SpoAppBaseCommand {
@@ -40,7 +40,7 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         overwrite: (!(!args.options.overwrite)).toString(),
-        scope: args.options.scope || 'tenant',
+        appCatalogScope: args.options.appCatalogScope || 'tenant',
         appCatalogUrl: (!(!args.options.appCatalogUrl)).toString()
       });
     });
@@ -52,7 +52,7 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
         option: '-p, --filePath <filePath>'
       },
       {
-        option: '-s, --scope [scope]',
+        option: '-s, --appCatalogScope [appCatalogScope]',
         autocomplete: ['tenant', 'sitecollection']
       },
       {
@@ -68,14 +68,14 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         // verify either 'tenant' or 'sitecollection' specified if scope provided
-        if (args.options.scope) {
-          const testScope: string = args.options.scope.toLowerCase();
+        if (args.options.appCatalogScope) {
+          const testScope: string = args.options.appCatalogScope.toLowerCase();
           if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-            return `Scope must be either 'tenant' or 'sitecollection'`;
+            return `appCatalogScope must be either 'tenant' or 'sitecollection'`;
           }
 
           if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-            return `You must specify appCatalogUrl when the scope is sitecollection`;
+            return `You must specify appCatalogUrl when the appCatalogScope is sitecollection`;
           }
         }
 
@@ -99,7 +99,7 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
+    const scope: string = (args.options.appCatalogScope) ? args.options.appCatalogScope.toLowerCase() : 'tenant';
     const overwrite: boolean = args.options.overwrite || false;
 
     try {
