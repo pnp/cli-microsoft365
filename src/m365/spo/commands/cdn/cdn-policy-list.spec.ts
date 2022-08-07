@@ -90,7 +90,7 @@ describe(commands.CDN_POLICY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, type: 'Public' } });
+    await command.action(logger, { options: { debug: true, cdnType: 'Public' } });
     assert(loggerLogSpy.calledWith([{
       Policy: 'IncludeFileExtensions',
       Value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON'
@@ -120,7 +120,7 @@ describe(commands.CDN_POLICY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, type: 'Private' } });
+    await command.action(logger, { options: { debug: true, cdnType: 'Private' } });
     assert(loggerLogSpy.calledWith([{
       Policy: 'IncludeFileExtensions',
       Value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON'
@@ -218,7 +218,7 @@ describe(commands.CDN_POLICY_LIST, () => {
     const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('[type]') > -1) {
+      if (o.option.indexOf('[cdnType]') > -1) {
         containsTypeOption = true;
       }
     });
@@ -226,18 +226,18 @@ describe(commands.CDN_POLICY_LIST, () => {
   });
 
   it('accepts Public SharePoint Online CDN type', async () => {
-    const actual = await command.validate({ options: { type: 'Public' } }, commandInfo);
+    const actual = await command.validate({ options: { cdnType: 'Public' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('accepts Private SharePoint Online CDN type', async () => {
-    const actual = await command.validate({ options: { type: 'Private' } }, commandInfo);
+    const actual = await command.validate({ options: { cdnType: 'Private' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN type', async () => {
     const type = 'foo';
-    const actual = await command.validate({ options: { type: type } }, commandInfo);
+    const actual = await command.validate({ options: { cdnType: type } }, commandInfo);
     assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
   });
 

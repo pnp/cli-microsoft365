@@ -81,19 +81,19 @@ describe(commands.FEATURE_DISABLE, () => {
     const scope = 'list';
     const actual = await command.validate({
       options: {
-        url: "https://contoso.sharepoint.com",
-        featureId: "780ac353-eaf8-4ac2-8c47-536d93c03fd6",
+        webUrl: "https://contoso.sharepoint.com",
+        id: "780ac353-eaf8-4ac2-8c47-536d93c03fd6",
         scope: scope
       }
     }, commandInfo);
     assert.strictEqual(actual, `${scope} is not a valid Feature scope. Allowed values are Site|Web`);
   });
 
-  it('passes validation if url and featureId is correct', async () => {
+  it('passes validation if webUrl and id is correct', async () => {
     const actual = await command.validate({
       options: {
-        url: "https://contoso.sharepoint.com",
-        featureId: "780ac353-eaf8-4ac2-8c47-536d93c03fd6"
+        webUrl: "https://contoso.sharepoint.com",
+        id: "780ac353-eaf8-4ac2-8c47-536d93c03fd6"
       }
     }, commandInfo);
 
@@ -129,7 +129,7 @@ describe(commands.FEATURE_DISABLE, () => {
     });
 
     try {
-      await command.action(logger, { options: { debug: true, featureId: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', url: 'https://contoso.sharepoint.com' } });
+      await command.action(logger, { options: { debug: true, id: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', webUrl: 'https://contoso.sharepoint.com' } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
@@ -160,7 +160,7 @@ describe(commands.FEATURE_DISABLE, () => {
     });
 
     try {
-      await command.action(logger, { options: { debug: true, featureId: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', url: 'https://contoso.sharepoint.com', force: true } });
+      await command.action(logger, { options: { debug: true, id: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', webUrl: 'https://contoso.sharepoint.com', force: true } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
@@ -191,7 +191,7 @@ describe(commands.FEATURE_DISABLE, () => {
     });
 
     try {
-      await command.action(logger, { options: { debug: true, featureId: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', url: 'https://contoso.sharepoint.com', scope: 'site' } });
+      await command.action(logger, { options: { debug: true, id: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', webUrl: 'https://contoso.sharepoint.com', scope: 'site' } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
@@ -220,8 +220,8 @@ describe(commands.FEATURE_DISABLE, () => {
     await assert.rejects(command.action(logger, {
       options: {
         debug: false,
-        url: 'https://contoso.sharepoint.com',
-        featureId: "780ac353-eaf8-4ac2-8c47-536d93c03fd6",
+        webUrl: 'https://contoso.sharepoint.com',
+        id: "780ac353-eaf8-4ac2-8c47-536d93c03fd6",
         scope: 'web'
       }
     }), new CommandError(err));

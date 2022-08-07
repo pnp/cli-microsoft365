@@ -10,7 +10,7 @@ m365 yammer user get [options]
 
 ## Options
 
-`-i, --userId [userId]`
+`-i, --id [id]`
 : Retrieve a user by ID
 
 `--email [email]`
@@ -36,7 +36,7 @@ m365 yammer user get
 Returns the user with the ID 1496550697
 
 ```sh
-m365 yammer user get --userId 1496550697
+m365 yammer user get --id 1496550697
 ```
 
 Returns an array of users matching the e-mail john.smith@contoso.com

@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  taskId: string;
+  id: string;
 }
 
 class SpoSiteDesignTaskGetCommand extends SpoCommand {
@@ -34,7 +34,7 @@ class SpoSiteDesignTaskGetCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --taskId <taskId>'
+        option: '-i, --id <id>'
       }
     );
   }
@@ -42,8 +42,8 @@ class SpoSiteDesignTaskGetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.taskId)) {
-          return `${args.options.taskId} is not a valid GUID`;
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
         }
 
         return true;
@@ -60,7 +60,7 @@ class SpoSiteDesignTaskGetCommand extends SpoCommand {
           accept: 'application/json;odata=nometadata'
         },
         data: {
-          taskId: args.options.taskId
+          taskId: args.options.id
         },
         responseType: 'json'
       };

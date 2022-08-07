@@ -10,7 +10,7 @@ m365 spo sitedesign task remove [options]
 
 ## Options
 
-`-i, --taskId <taskId>`
+`-i, --id <id>`
 : The ID of the site design task to remove
 
 `--confirm`
@@ -20,16 +20,16 @@ m365 spo sitedesign task remove [options]
 
 ## Examples
 
-Removes the specified site design task with taskId _6ec3ca5b-d04b-4381-b169-61378556d76e_ scheduled for execution without prompting confirmation
+Removes the specified site design task with id _6ec3ca5b-d04b-4381-b169-61378556d76e_ scheduled for execution without prompting confirmation
 
 ```sh
-m365 spo sitedesign task remove --taskId 6ec3ca5b-d04b-4381-b169-61378556d76e --confirm
+m365 spo sitedesign task remove --id 6ec3ca5b-d04b-4381-b169-61378556d76e --confirm
 ```
 
-Removes the specified site design task with taskId _6ec3ca5b-d04b-4381-b169-61378556d76e_ scheduled for execution with prompt for confirmation before removing
+Removes the specified site design task with id _6ec3ca5b-d04b-4381-b169-61378556d76e_ scheduled for execution with prompt for confirmation before removing
 
 ```sh
-m365 spo sitedesign task remove --taskId 6ec3ca5b-d04b-4381-b169-61378556d76e
+m365 spo sitedesign task remove --id 6ec3ca5b-d04b-4381-b169-61378556d76e
 ```
 
 ## More information

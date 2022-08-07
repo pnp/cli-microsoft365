@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  siteDesignId: string;
   principals: string;
   rights: string;
 }
@@ -35,7 +35,7 @@ class SpoSiteDesignRightsGrantCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id <id>'
+        option: '-i, --siteDesignId <siteDesignId>'
       },
       {
         option: '-p, --principals <principals>'
@@ -50,8 +50,8 @@ class SpoSiteDesignRightsGrantCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
+        if (!validation.isValidGuid(args.options.siteDesignId)) {
+          return `${args.options.siteDesignId} is not a valid GUID`;
         }
 
         if (args.options.rights !== 'View') {
@@ -76,7 +76,7 @@ class SpoSiteDesignRightsGrantCommand extends SpoCommand {
           accept: 'application/json;odata=nometadata'
         },
         data: {
-          id: args.options.id,
+          id: args.options.siteDesignId,
           principalNames: args.options.principals.split(',').map(p => p.trim()),
           grantedRights: grantedRights
         },

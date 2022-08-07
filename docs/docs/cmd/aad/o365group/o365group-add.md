@@ -25,8 +25,8 @@ m365 aad o365group add [options]
 `--members [members]`
 : Comma-separated list of Microsoft 365 Group members
 
-`--isPrivate [isPrivate]`
-: Set to `true` if the Microsoft 365 Group should be private and to `false` if it should be public (default)
+`--isPrivate`
+: Specify, if the Microsoft 365 Group should be private. If not specified, will create a public group (default)
 
 `--allowMembersToPost [allowMembersToPost]`
 : Set if only group members should be able to post conversations to the group
@@ -61,7 +61,7 @@ m365 aad o365group add --displayName Finance --description "This is the Contoso 
 Create a private Microsoft 365 Group
 
 ```sh
-m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --isPrivate true
+m365 aad o365group add --displayName Finance --description "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more." --mailNickname finance --isPrivate
 ```
 
 Create a public Microsoft 365 Group and set specified users as its owners

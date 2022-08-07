@@ -11,7 +11,6 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id?: string;
-  teamId?: string;
   name?: string;
   displayName?: string;
   description?: string;
@@ -43,7 +42,6 @@ class TeamsTeamSetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
-    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -58,9 +56,6 @@ class TeamsTeamSetCommand extends GraphCommand {
     this.options.unshift(
       {
         option: '-i, --id [id]'
-      },
-      {
-        option: '--teamId [teamId]'
       },
       {
         option: '-n, --name [name]'
@@ -87,27 +82,19 @@ class TeamsTeamSetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-	      return `${args.options.teamId} is not a valid GUID`;
-	    }
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
 
-	    if (args.options.id && !validation.isValidGuid(args.options.id)) {
-	      return `${args.options.id} is not a valid GUID`;
-	    }
+        if (args.options.visibility) {
+          if (args.options.visibility.toLowerCase() !== 'private' && args.options.visibility.toLowerCase() !== 'public') {
+            return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
+          }
+        }
 
-	    if (args.options.visibility) {
-	      if (args.options.visibility.toLowerCase() !== 'private' && args.options.visibility.toLowerCase() !== 'public') {
-	        return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
-	      }
-	    }
-
-	    return true;
+        return true;
       }
     );
-  }
-
-  #initOptionSets(): void {
-    this.optionSets.push(['id', 'teamId']);
   }
 
   private mapRequestBody(options: Options): any {
@@ -131,12 +118,6 @@ class TeamsTeamSetCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.teamId) {
-      args.options.id = args.options.teamId;
-
-      this.warn(logger, `Option 'teamId' is deprecated. Please use 'id' instead.`);
-    }
-
     if (args.options.displayName) {
       args.options.name = args.options.displayName;
 

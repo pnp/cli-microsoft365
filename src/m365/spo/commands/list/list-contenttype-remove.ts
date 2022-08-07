@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
-  contentTypeId: string;
+  id: string;
   confirm?: boolean;
 }
 
@@ -60,7 +60,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
         option: '-t, --listTitle [listTitle]'
       },
       {
-        option: '-c, --contentTypeId <contentTypeId>'
+        option: '-i, --id <id>'
       },
       {
         option: '--confirm'
@@ -88,7 +88,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('contentTypeId', 'c');
+    this.types.string.push('id', 'i');
   }
 
   #initOptionSets(): void {
@@ -99,16 +99,16 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
     const removeContentTypeFromList: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         const list: string = (args.options.listId ? args.options.listId : args.options.listTitle) as string;
-        logger.logToStderr(`Removing content type ${args.options.contentTypeId} from list ${list} in site at ${args.options.webUrl}...`);
+        logger.logToStderr(`Removing content type ${args.options.id} from list ${list} in site at ${args.options.webUrl}...`);
       }
 
       let requestUrl: string = '';
 
       if (args.options.listId) {
-        requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/ContentTypes('${encodeURIComponent(args.options.contentTypeId)}')`;
+        requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/ContentTypes('${encodeURIComponent(args.options.id)}')`;
       }
       else {
-        requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/ContentTypes('${encodeURIComponent(args.options.contentTypeId)}')`;
+        requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/ContentTypes('${encodeURIComponent(args.options.id)}')`;
       }
 
       const requestOptions: any = {
@@ -137,7 +137,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the content type ${args.options.contentTypeId} from the list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}?`
+        message: `Are you sure you want to remove the content type ${args.options.id} from the list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}?`
       });
 
       if (result.continue) {

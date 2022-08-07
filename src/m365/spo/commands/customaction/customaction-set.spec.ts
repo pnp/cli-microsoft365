@@ -57,7 +57,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     defaultCommandOptions = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       id: '058140e3-0e37-44fc-a1d3-79c487d371a3',
       title: 'title'
     };
@@ -95,7 +95,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   it('correct https body send when custom action with location StandardMenu', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 102,
@@ -122,7 +122,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   it('correct https data send when custom action with location ClientSideExtension.ApplicationCustomizer', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 101,
@@ -150,7 +150,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   it('correct https data send when custom action with location ClientSideExtension.ListViewCommandSet', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 103,
@@ -181,7 +181,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   it('correct https data send when custom action with location EditControlBlock', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 104,
@@ -210,7 +210,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   it('correct https data send when custom action with location ScriptLink', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 105,
@@ -236,7 +236,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   it('correct https data send when custom action with location ScriptLink and ScriptBlock', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 108,
@@ -259,7 +259,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   it('correct https data send when custom action with location CommandUI.Ribbon', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 106,
@@ -287,7 +287,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   it('correct https data send when custom action with delegated rights', async () => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 107,
@@ -324,7 +324,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     const updateCustomActionSpy = sinon.spy((command as any), 'updateCustomAction');
     const options = {
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web'
     };
 
@@ -332,7 +332,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     assert(postRequestSpy.calledOnce, 'postRequestSpy.calledOnce');
     assert(updateCustomActionSpy.calledWith({
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web'
     }), 'updateCustomActionSpy.calledWith');
     assert(updateCustomActionSpy.calledOnce, 'updateCustomActionSpy.calledOnce');
@@ -350,7 +350,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     const updateCustomActionSpy = sinon.spy((command as any), 'updateCustomAction');
     const options = {
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site'
     };
 
@@ -359,7 +359,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     assert(updateCustomActionSpy.calledWith(
       {
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'Site'
       }), 'updateCustomActionSpy.calledWith');
     assert(updateCustomActionSpy.calledOnce, 'updateCustomActionSpy.calledOnce');
@@ -379,7 +379,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     await command.action(logger, {
       options: {
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'All',
         title: 'title'
       }
@@ -406,7 +406,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     await command.action(logger, {
       options: {
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com'
       }
     });
     assert(postRequestSpy.calledTwice, 'postRequest');
@@ -425,7 +425,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
     const options = {
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: "All"
     };
 
@@ -433,7 +433,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     assert(searchAllScopesSpy.calledWith(sinon.match(
       {
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com'
       })), 'searchAllScopesSpy.calledWith');
     assert(searchAllScopesSpy.calledOnce, 'searchAllScopesSpy.calledOnce');
   });
@@ -474,7 +474,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
     const options = {
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: "All",
       debug: true
     };
@@ -487,7 +487,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     assert(updateCustomActionSpy.calledWith(sinon.match(
       {
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'Site'
       })), 'searchAllScopesSpy.calledWith');
   });
@@ -511,7 +511,7 @@ describe(commands.CUSTOMACTION_SET, () => {
       options: {
         verbose: true,
         id: actionId,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
     });
@@ -534,7 +534,7 @@ describe(commands.CUSTOMACTION_SET, () => {
         options: {
           debug: false,
           id: actionId,
-          url: 'https://contoso.sharepoint.com',
+          webUrl: 'https://contoso.sharepoint.com',
           scope: 'All'
         }
       }), new CommandError(err));
@@ -565,7 +565,7 @@ describe(commands.CUSTOMACTION_SET, () => {
         debug: false,
         verbose: true,
         id: actionId,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
     }), new CommandError(err));
@@ -630,12 +630,12 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('fails validation if no other fields specified than url, id, scope', async () => {
-    const actual = await command.validate({ options: { id: '058140e3-0e37-44fc-a1d3-79c487d371a3', url: 'https://contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { id: '058140e3-0e37-44fc-a1d3-79c487d371a3', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, 'Please specify option to be updated');
   });
 
   it('fails if the specified URL is invalid', async () => {
-    defaultCommandOptions.url = 'foo';
+    defaultCommandOptions.webUrl = 'foo';
     const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -666,12 +666,12 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('fails validation if invalid id', async () => {
-    const actual = await command.validate({ options: { id: '1', url: 'https://contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { id: '1', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, '1 is not valid. Custom action id (Guid) expected');
   });
 
   it('fails validation if undefined id', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, 'Required option id not specified');
   });
 
