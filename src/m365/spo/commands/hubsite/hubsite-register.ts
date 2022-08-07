@@ -10,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  url: string;
+  siteUrl: string;
 }
 
 class SpoHubSiteRegisterCommand extends SpoCommand {
@@ -32,23 +32,23 @@ class SpoHubSiteRegisterCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --url <url>'
+        option: '-u, --siteUrl <siteUrl>'
       }
     );
   }
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.siteUrl)
     );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     spo
-      .getRequestDigest(args.options.url)
+      .getRequestDigest(args.options.siteUrl)
       .then((res: ContextInfo): Promise<any> => {
         const requestOptions: any = {
-          url: `${args.options.url}/_api/site/RegisterHubSite`,
+          url: `${args.options.siteUrl}/_api/site/RegisterHubSite`,
           headers: {
             'X-RequestDigest': res.FormDigestValue,
             accept: 'application/json;odata=nometadata'

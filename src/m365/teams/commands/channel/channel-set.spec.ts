@@ -66,8 +66,8 @@ describe(commands.CHANNEL_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        channelName: 'Reviews',
-        newChannelName: 'Gen',
+        name: 'Reviews',
+        newName: 'Gen',
         description: 'this is a new description'
       }
     }, commandInfo);
@@ -78,20 +78,20 @@ describe(commands.CHANNEL_SET, () => {
     const actual = await command.validate({
       options: {
         teamId: 'invalid',
-        channelName: 'Reviews',
-        newChannelName: 'Gen',
+        name: 'Reviews',
+        newName: 'Gen',
         description: 'this is a new description'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when channelName is General', async () => {
+  it('fails validation when name is General', async () => {
     const actual = await command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        channelName: 'General',
-        newChannelName: 'Reviews',
+        name: 'General',
+        newName: 'Reviews',
         description: 'this is a new description'
       }
     }, commandInfo);
@@ -110,8 +110,8 @@ describe(commands.CHANNEL_SET, () => {
       options: {
         debug: true,
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelName: 'Latest',
-        newChannelName: 'New Review',
+        name: 'Latest',
+        newName: 'New Review',
         description: 'New Review'
       }
     } as any, (err?: any) => {
@@ -153,8 +153,8 @@ describe(commands.CHANNEL_SET, () => {
       options: {
         debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelName: 'Review',
-        newChannelName: 'New Review',
+        name: 'Review',
+        newName: 'New Review',
         description: 'New Review'
       }
     } as any, () => {

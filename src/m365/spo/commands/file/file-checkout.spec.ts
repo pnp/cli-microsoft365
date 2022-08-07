@@ -188,7 +188,7 @@ describe(commands.FILE_CHECKOUT, () => {
     command.action(logger, {
       options: {
         debug: false,
-        fileUrl: '/sites/project-x/Documents/Test1.docx',
+        url: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
     }, () => {
@@ -208,7 +208,7 @@ describe(commands.FILE_CHECKOUT, () => {
     command.action(logger, {
       options: {
         debug: false,
-        fileUrl: '/Documents/Test1.docx',
+        url: '/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
@@ -269,8 +269,8 @@ describe(commands.FILE_CHECKOUT, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both id and fileUrl options are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b', fileUrl: '/sites/project-x/documents' } }, commandInfo);
+  it('fails validation if both id and url options are specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b', url: '/sites/project-x/documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

@@ -13,9 +13,6 @@ m365 teams team set [options]
 `-i, --id [id]`
 : The ID of the Microsoft Teams team for which to update settings
 
-`--teamId [teamId]`
-: (deprecated. Use `id` instead) The ID of the Microsoft Teams team for which to update settings
-
 `-n, --name [name]`
 : The display name for the Microsoft Teams team for which to update settings
 

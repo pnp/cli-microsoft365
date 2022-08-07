@@ -10,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  groupId?: string;
+  id?: string;
   mailNickname?: string;
 }
 
@@ -34,7 +34,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        groupId: typeof args.options.groupId !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
         mailNickname: typeof args.options.mailNickname !== 'undefined'
       });
     });
@@ -43,7 +43,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --groupId [groupId]'
+        option: '-i, --id [id]'
       },
       {
         option: '--mailNickname [mailNickname]'
@@ -54,16 +54,16 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.groupId && args.options.mailNickname) {
-          return 'Specify either groupId or mailNickname, but not both.';
+        if (args.options.id && args.options.mailNickname) {
+          return 'Specify either id or mailNickname, but not both.';
         }
 
-        if (!args.options.groupId && !args.options.mailNickname) {
-          return 'Specify groupId or mailNickname, one is required';
+        if (!args.options.id && !args.options.mailNickname) {
+          return 'Specify id or mailNickname, one is required';
         }
 
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
-          return `${args.options.groupId} is not a valid GUID`;
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
         }
 
         return true;
@@ -72,8 +72,8 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {
-    if (args.options.groupId) {
-      return Promise.resolve(args.options.groupId);
+    if (args.options.id) {
+      return Promise.resolve(args.options.id);
     }
 
     const requestOptions: any = {
@@ -119,9 +119,9 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
 
     this
       .getGroupId(args)
-      .then((groupId: string): Promise<string> => {
+      .then((id: string): Promise<string> => {
         const requestOptions: any = {
-          url: `${this.resource}/v1.0/groups/${encodeURIComponent(groupId)}/team`,
+          url: `${this.resource}/v1.0/groups/${encodeURIComponent(id)}/team`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },

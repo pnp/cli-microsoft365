@@ -65,7 +65,7 @@ describe(commands.TAB_GET, () => {
     const actual = await command.validate({
       options: {
         channelId: '19:00000000000000000000000000000000@thread.skype',
-        tabId: '00000000-0000-0000-0000-000000000000'
+        id: '00000000-0000-0000-0000-000000000000'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -77,7 +77,7 @@ describe(commands.TAB_GET, () => {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
         teamName: 'Team Name',
         channelId: '19:00000000000000000000000000000000@thread.skype',
-        tabId: '00000000-0000-0000-0000-000000000000'
+        id: '00000000-0000-0000-0000-000000000000'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -87,7 +87,7 @@ describe(commands.TAB_GET, () => {
     const actual = await command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
-        tabId: '00000000-0000-0000-0000-000000000000'
+        id: '00000000-0000-0000-0000-000000000000'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -99,13 +99,13 @@ describe(commands.TAB_GET, () => {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         channelName: 'Channel Name',
-        tabId: '00000000-0000-0000-0000-000000000000'
+        id: '00000000-0000-0000-0000-000000000000'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both tabId and tabName options are not passed', async () => {
+  it('fails validation if both id and name options are not passed', async () => {
     const actual = await command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
@@ -115,13 +115,13 @@ describe(commands.TAB_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both tabId and tabName options are passed', async () => {
+  it('fails validation if both id and name options are passed', async () => {
     const actual = await command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
         channelId: '19:00000000000000000000000000000000@thread.skype',
-        tabId: '00000000-0000-0000-0000-000000000000',
-        tabName: 'Tab Name'
+        id: '00000000-0000-0000-0000-000000000000',
+        name: 'Tab Name'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -132,7 +132,7 @@ describe(commands.TAB_GET, () => {
       options: {
         teamId: '00000000-0000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
-        tabId: '00000000-0000-0000-0000-000000000000'
+        id: '00000000-0000-0000-0000-000000000000'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -142,7 +142,7 @@ describe(commands.TAB_GET, () => {
     const actual = await command.validate({
       options: {
         channelId: '19:00000000000000000000000000000000@thread.skype',
-        tabId: '00000000-0000-0000-0000-000000000000'
+        id: '00000000-0000-0000-0000-000000000000'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -178,18 +178,18 @@ describe(commands.TAB_GET, () => {
   });
 
 
-  it('fails validation if the tabId is not a valid guid.', async () => {
+  it('fails validation if the id is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
-        tabId: '00000000-0000'
+        id: '00000000-0000'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the tabId is not provided.', async () => {
+  it('fails validation if the id is not provided.', async () => {
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -204,7 +204,7 @@ describe(commands.TAB_GET, () => {
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
-        tabName: 'Tab Name'
+        name: 'Tab Name'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -232,7 +232,7 @@ describe(commands.TAB_GET, () => {
         debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '29:00000000000000000000000000000000@thread.skype',
-        tabId: '00000000-0000-0000-0000-000000000000'
+        id: '00000000-0000-0000-0000-000000000000'
       }
     }, (error?: any) => {
       try {
@@ -269,7 +269,7 @@ describe(commands.TAB_GET, () => {
         debug: true,
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
-        tabId: '00000000-0000-0000-0000-000000000000'
+        id: '00000000-0000-0000-0000-000000000000'
       }
     }, () => {
       try {
@@ -331,7 +331,7 @@ describe(commands.TAB_GET, () => {
         debug: true,
         teamName: 'Team Name',
         channelName: 'Channel Name',
-        tabName: 'Tab Name'
+        name: 'Tab Name'
       }
     }, (err?: any) => {
       try {
@@ -429,7 +429,7 @@ describe(commands.TAB_GET, () => {
         debug: true,
         teamName: 'Team Name',
         channelName: 'Channel Name',
-        tabName: 'Tab Name'
+        name: 'Tab Name'
       }
     }, () => {
       try {
@@ -512,7 +512,7 @@ describe(commands.TAB_GET, () => {
         debug: true,
         teamId: '00000000-0000-0000-0000-000000000000',
         channelName: 'Channel Name',
-        tabName: 'Tab Name'
+        name: 'Tab Name'
       }
     }, () => {
       try {
@@ -549,7 +549,7 @@ describe(commands.TAB_GET, () => {
         debug: true,
         teamId: '00000000-0000-0000-0000-000000000000',
         channelName: 'Channel Name',
-        tabName: 'Tab Name'
+        name: 'Tab Name'
       }
     }, (err?: any) => {
       try {
@@ -575,7 +575,7 @@ describe(commands.TAB_GET, () => {
         debug: true,
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
-        tabName: 'Tab Name'
+        name: 'Tab Name'
       }
     }, (err?: any) => {
       try {

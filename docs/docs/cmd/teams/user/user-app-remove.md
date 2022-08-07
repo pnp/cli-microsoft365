@@ -10,7 +10,7 @@ m365 teams user app remove [options]
 
 ## Options
 
-`--appId <appId>`
+`--id <id>`
 : The unique id of the app instance installed for the user
 
 `--userId <userId>`
@@ -23,7 +23,7 @@ m365 teams user app remove [options]
 
 ## Remarks
 
-The `appId` has to be the id of the app instance installed for the user.
+The `id` has to be the id of the app instance installed for the user.
 Do not use the ID from the manifest of the zip app package or the id from the Microsoft Teams App Catalog.
 
 ## Examples
@@ -31,5 +31,5 @@ Do not use the ID from the manifest of the zip app package or the id from the Mi
 Uninstall an app for the specified user
 
 ```sh
-m365 teams user app remove --appId YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY= --userId 2609af39-7775-4f94-a3dc-0dd67657e900
+m365 teams user app remove --id YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY= --userId 2609af39-7775-4f94-a3dc-0dd67657e900
 ```

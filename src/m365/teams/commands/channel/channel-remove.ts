@@ -11,8 +11,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  channelId?: string;
-  channelName?: string;
+  id?: string;
+  name?: string;
   teamId: string;
   confirm?: boolean;
 }
@@ -37,8 +37,8 @@ class TeamsChannelRemoveCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        channelId: typeof args.options.channelId !== 'undefined',
-        channelName: typeof args.options.channelName !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
+        name: typeof args.options.name !== 'undefined',
         confirm: (!(!args.options.confirm)).toString()
       });
     });
@@ -47,10 +47,10 @@ class TeamsChannelRemoveCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-c, --channelId [channelId]'
+        option: '-c, --id [id]'
       },
       {
-        option: '-n, --channelName [channelName]'
+        option: '-n, --name [name]'
       },
       {
         option: '-i, --teamId <teamId>'
@@ -64,16 +64,16 @@ class TeamsChannelRemoveCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.channelId && args.options.channelName) {
-          return 'Specify channelId or channelName but not both';
+        if (args.options.id && args.options.name) {
+          return 'Specify id or name but not both';
         }
 
-        if (!args.options.channelId && !args.options.channelName) {
-          return 'Specify channelId or channelName';
+        if (!args.options.id && !args.options.name) {
+          return 'Specify id or name';
         }
 
-        if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
-          return `${args.options.channelId} is not a valid Teams Channel Id`;
+        if (args.options.id && !validation.isValidTeamsChannelId(args.options.id)) {
+          return `${args.options.id} is not a valid Teams channel id`;
         }
 
         if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
@@ -87,9 +87,9 @@ class TeamsChannelRemoveCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const removeChannel: () => void = (): void => {
-      if (args.options.channelName) {
+      if (args.options.name) {
         const requestOptions: any = {
-          url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName)}'`,
+          url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.name)}'`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
@@ -120,9 +120,9 @@ class TeamsChannelRemoveCommand extends GraphCommand {
           .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
       }
 
-      if (args.options.channelId) {
+      if (args.options.id) {
         const requestOptions: any = {
-          url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(args.options.channelId)}`,
+          url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(args.options.id)}`,
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
@@ -139,7 +139,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
       removeChannel();
     }
     else {
-      const channelName = args.options.channelName ? args.options.channelName : args.options.channelId;
+      const channelName = args.options.name ? args.options.name : args.options.id;
       Cli.prompt({
         type: 'confirm',
         name: 'continue',

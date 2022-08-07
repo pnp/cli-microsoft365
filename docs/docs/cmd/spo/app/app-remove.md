@@ -16,7 +16,7 @@ m365 spo app remove [options]
 `-u, --appCatalogUrl [appCatalogUrl]`
 : URL of the tenant or site collection app catalog. It must be specified when the scope is `sitecollection`
 
-`-s, --scope [scope]`
+`-s, --appCatalogScope [appCatalogScope]`
 : Scope of the app catalog: `tenant,sitecollection`. Default `tenant`
 
 `--confirm`
@@ -55,7 +55,7 @@ m365 spo app remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl ht
 Remove the specified app from a site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_.
 
 ```sh
-m365 spo app remove --id d95f8c94-67a1-4615-9af8-361ad33be93c --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1/AppCatalog
+m365 spo app remove --id d95f8c94-67a1-4615-9af8-361ad33be93c --appCatalogScope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1/AppCatalog
 ```
 
 ## More information

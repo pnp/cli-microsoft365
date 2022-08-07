@@ -22,7 +22,7 @@ m365 spo app deploy [options]
 `--skipFeatureDeployment`
 : If the app supports tenant-wide deployment, deploy it to the whole tenant
 
-`-s, --scope [scope]`
+`-s, --appCatalogScope [appCatalogScope]`
 : Scope of the app catalog: `tenant,sitecollection`. Default `tenant`
 
 --8<-- "docs/cmd/_global.md"
@@ -46,7 +46,7 @@ m365 spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3
 Deploy the specified app in the site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_
 
 ```sh
-m365 spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+m365 spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogScope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 ```
 
 Deploy the app with the specified name in the tenant app catalog. Try to resolve the URL of the tenant app catalog automatically.

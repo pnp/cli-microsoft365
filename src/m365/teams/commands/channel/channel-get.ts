@@ -19,8 +19,8 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   teamId?: string;
   teamName?: string;
-  channelId?: string;
-  channelName?: string;
+  id?: string;
+  name?: string;
   primary?: boolean;
 }
 
@@ -48,8 +48,8 @@ class TeamsChannelGetCommand extends GraphCommand {
       Object.assign(this.telemetryProperties, {
         teamId: typeof args.options.teamId !== 'undefined',
         teamName: typeof args.options.teamName !== 'undefined',
-        channelId: typeof args.options.channelId !== 'undefined',
-        channelName: typeof args.options.channelName !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
+        name: typeof args.options.name !== 'undefined',
         primary: (!(!args.options.primary)).toString()
       });
     });
@@ -64,10 +64,10 @@ class TeamsChannelGetCommand extends GraphCommand {
         option: '--teamName [teamName]'
       },
       {
-        option: '-c, --channelId [channelId]'
+        option: '-c, --id [id]'
       },
       {
-        option: '--channelName [channelName]'
+        option: '--name [name]'
       },
       {
         option: '--primary'
@@ -90,28 +90,28 @@ class TeamsChannelGetCommand extends GraphCommand {
           return `${args.options.teamId} is not a valid GUID`;
         }
 
-        if (args.options.channelId && args.options.channelName && args.options.primary) {
-          return 'Specify channelId, channelName or primary';
+        if (args.options.id && args.options.name && args.options.primary) {
+          return 'Specify id, name or primary';
         }
 
-        if (!args.options.channelId && args.options.channelName && args.options.primary) {
-          return 'Specify channelId, channelName or primary.';
+        if (!args.options.id && args.options.name && args.options.primary) {
+          return 'Specify id, name or primary.';
         }
 
-        if (args.options.channelId && !args.options.channelName && args.options.primary) {
-          return 'Specify channelId, channelName or primary.';
+        if (args.options.id && !args.options.name && args.options.primary) {
+          return 'Specify id, name or primary.';
         }
 
-        if (args.options.channelId && args.options.channelName && !args.options.primary) {
-          return 'Specify channelId, channelName or primary.';
+        if (args.options.id && args.options.name && !args.options.primary) {
+          return 'Specify id, name or primary.';
         }
 
-        if (!args.options.channelId && !args.options.channelName && !args.options.primary) {
-          return 'Specify channelId, channelName or primary, one is required';
+        if (!args.options.id && !args.options.name && !args.options.primary) {
+          return 'Specify id, name or primary, one is required';
         }
 
-        if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
-          return `${args.options.channelId} is not a valid Teams ChannelId`;
+        if (args.options.id && !validation.isValidTeamsChannelId(args.options.id as string)) {
+          return `${args.options.id} is not a valid Teams channel id`;
         }
 
         return true;
@@ -136,8 +136,8 @@ class TeamsChannelGetCommand extends GraphCommand {
   }
 
   private getChannelId(args: CommandArgs): Promise<string> {
-    if (args.options.channelId) {
-      return Promise.resolve(args.options.channelId);
+    if (args.options.id) {
+      return Promise.resolve(args.options.id);
     }
 
     if (args.options.primary) {
@@ -145,7 +145,7 @@ class TeamsChannelGetCommand extends GraphCommand {
     }
 
     const channelRequestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName as string)}'`,
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.name as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

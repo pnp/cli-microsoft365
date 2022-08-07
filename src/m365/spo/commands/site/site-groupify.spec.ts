@@ -81,7 +81,7 @@ describe(commands.SITE_GROUPIFY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
@@ -119,7 +119,7 @@ describe(commands.SITE_GROUPIFY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
@@ -157,7 +157,7 @@ describe(commands.SITE_GROUPIFY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', isPublic: true } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', isPublic: true } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
@@ -197,7 +197,7 @@ describe(commands.SITE_GROUPIFY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', description: 'Team A space' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', description: 'Team A space' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
@@ -237,7 +237,7 @@ describe(commands.SITE_GROUPIFY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', classification: 'HBI' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', classification: 'HBI' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
@@ -277,7 +277,7 @@ describe(commands.SITE_GROUPIFY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', keepOldHomepage: true } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', keepOldHomepage: true } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
@@ -309,7 +309,7 @@ describe(commands.SITE_GROUPIFY, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The group alias already exists.')));
         done();
@@ -335,7 +335,7 @@ describe(commands.SITE_GROUPIFY, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This site already has an O365 Group attached.')));
         done();
@@ -351,7 +351,7 @@ describe(commands.SITE_GROUPIFY, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -373,18 +373,18 @@ describe(commands.SITE_GROUPIFY, () => {
     assert(containsOption);
   });
 
-  it('fails validation if siteUrl is not an absolute URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: '/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, commandInfo);
+  it('fails validation if url is not an absolute URL', async () => {
+    const actual = await command.validate({ options: { url: '/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if siteUrl is not a SharePoint URL', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'http://contoso/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, commandInfo);
+  it('fails validation if url is not a SharePoint URL', async () => {
+    const actual = await command.validate({ options: { url: 'http://contoso/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if all required options are specified', async () => {
-    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, commandInfo);
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

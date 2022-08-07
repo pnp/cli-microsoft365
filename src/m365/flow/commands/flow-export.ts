@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment: string;
+  environmentName: string;
   id: string;
   packageDisplayName?: string;
   packageDescription?: string;
@@ -58,7 +58,7 @@ class FlowExportCommand extends AzmgmtCommand {
         option: '-i, --id <id>'
       },
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '-n, --packageDisplayName [packageDisplayName]'
@@ -139,7 +139,7 @@ class FlowExportCommand extends AzmgmtCommand {
       }
 
       const requestOptions: any = {
-        url: `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(args.options.environment)}/listPackageResources?api-version=2016-11-01`,
+        url: `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(args.options.environmentName)}/listPackageResources?api-version=2016-11-01`,
         headers: {
           accept: 'application/json'
         },
@@ -164,8 +164,8 @@ class FlowExportCommand extends AzmgmtCommand {
 
         const requestOptions: any = {
           url: formatArgument === 'json' ?
-            `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.id)}?api-version=2016-11-01`
-            : `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(args.options.environment)}/exportPackage?api-version=2016-11-01`,
+            `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environmentName)}/flows/${encodeURIComponent(args.options.id)}?api-version=2016-11-01`
+            : `https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(args.options.environmentName)}/exportPackage?api-version=2016-11-01`,
           headers: {
             accept: 'application/json'
           },
@@ -216,7 +216,7 @@ class FlowExportCommand extends AzmgmtCommand {
 
         const requestOptions: any = {
           url: formatArgument === 'json' ?
-            `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.id)}/exportToARMTemplate?api-version=2016-11-01`
+            `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environmentName)}/flows/${encodeURIComponent(args.options.id)}/exportToARMTemplate?api-version=2016-11-01`
             : downloadFileUrl,
           // Set responseType to arraybuffer, otherwise binary data will be encoded
           // to utf8 and binary data is corrupt

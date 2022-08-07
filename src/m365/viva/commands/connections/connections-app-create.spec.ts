@@ -87,7 +87,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     command.action(logger, {
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
-        appName: 'Contoso',
+        name: 'Contoso',
         description: 'Contoso',
         longDescription: `Stay on top of what's happening at Contoso`,
         companyName: 'Contoso',
@@ -125,7 +125,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     command.action(logger, {
       options: {
         portalUrl: 'https://contoso.sharepoint.com/sites/contoso',
-        appName: 'Contoso',
+        name: 'Contoso',
         description: 'Contoso',
         longDescription: `Stay on top of what's happening at Contoso`,
         companyName: 'Contoso',
@@ -164,7 +164,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     command.action(logger, {
       options: {
         portalUrl: 'https://contoso.sharepoint.com/teams/contoso?param=value',
-        appName: 'Contoso',
+        name: 'Contoso',
         description: 'Contoso',
         longDescription: `Stay on top of what's happening at Contoso`,
         companyName: 'Contoso',
@@ -197,7 +197,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     command.action(logger, {
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
-        appName: 'Contoso',
+        name: 'Contoso',
         description: 'Contoso',
         longDescription: `Stay on top of what's happening at Contoso`,
         companyName: 'Contoso',
@@ -226,7 +226,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     command.action(logger, {
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
-        appName: 'Contoso',
+        name: 'Contoso',
         description: 'Contoso',
         longDescription: `Stay on top of what's happening at Contoso`,
         companyName: 'Contoso',
@@ -258,7 +258,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     command.action(logger, {
       options: {
         portalUrl: 'https://contoso.sharepoint.com/sites/contoso',
-        appName: 'Contoso',
+        name: 'Contoso',
         description: 'Contoso',
         longDescription: `Stay on top of what's happening at Contoso`,
         companyName: 'Contoso',
@@ -293,7 +293,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     command.action(logger, {
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
-        appName: 'Contoso',
+        name: 'Contoso',
         description: 'Contoso',
         longDescription: `Stay on top of what's happening at Contoso`,
         companyName: 'Contoso',
@@ -317,7 +317,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
-        appName: `Stay on top of what's happening at Contoso`,
+        name: `Stay on top of what's happening at Contoso`,
         description: 'Contoso',
         longDescription: `Stay on top of what's happening at Contoso`,
         companyName: 'Contoso',
@@ -334,7 +334,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
-        appName: 'Contoso',
+        name: 'Contoso',
         description: `Stay on top of what's happening at Contoso Stay on top of what's happening at Contoso`,
         longDescription: `Stay on top of what's happening at Contoso`,
         companyName: 'Contoso',
@@ -351,7 +351,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
-        appName: 'Contoso',
+        name: 'Contoso',
         description: 'Contoso',
         longDescription: `
 
@@ -384,7 +384,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
-        appName: 'Contoso',
+        name: 'Contoso',
         description: 'Contoso',
         longDescription: `Stay on top of what's happening at Contoso`,
         companyName: 'Contoso',
@@ -407,7 +407,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
-        appName: 'Contoso',
+        name: 'Contoso',
         description: 'Contoso',
         longDescription: `Stay on top of what's happening at Contoso`,
         companyName: 'Contoso',
@@ -430,7 +430,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
-        appName: 'Contoso',
+        name: 'Contoso',
         description: 'Contoso',
         longDescription: `Stay on top of what's happening at Contoso`,
         companyName: 'Contoso',
@@ -447,7 +447,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
-        appName: 'Contoso',
+        name: 'Contoso',
         description: 'Contoso',
         longDescription: `Stay on top of what's happening at Contoso`,
         companyName: 'Contoso',
@@ -465,7 +465,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
-        appName: 'Contoso',
+        name: 'Contoso',
         description: 'Contoso',
         longDescription: `Stay on top of what's happening at Contoso`,
         companyName: 'Contoso',

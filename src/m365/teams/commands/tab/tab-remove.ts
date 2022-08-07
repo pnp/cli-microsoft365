@@ -12,7 +12,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   teamId: string;
   channelId: string;
-  tabId: string;
+  id: string;
   confirm?: boolean;
 }
 
@@ -44,13 +44,13 @@ class TeamsTabRemoveCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: "-i, --teamId <teamId>"
+        option: "-t, --teamId <teamId>"
       },
       {
         option: "-c, --channelId <channelId>"
       },
       {
-        option: "-t, --tabId <tabId>"
+        option: "-i, --id <id>"
       },
       {
         option: "--confirm"
@@ -69,8 +69,8 @@ class TeamsTabRemoveCommand extends GraphCommand {
           return `${args.options.channelId} is not a valid Teams ChannelId`;
         }
 
-        if (!validation.isValidGuid(args.options.tabId as string)) {
-          return `${args.options.tabId} is not a valid GUID`;
+        if (!validation.isValidGuid(args.options.id as string)) {
+          return `${args.options.id} is not a valid GUID`;
         }
 
         return true;
@@ -81,7 +81,7 @@ class TeamsTabRemoveCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const removeTab: () => void = (): void => {
       const requestOptions: any = {
-        url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${args.options.channelId}/tabs/${encodeURIComponent(args.options.tabId)}`,
+        url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${args.options.channelId}/tabs/${encodeURIComponent(args.options.id)}`,
         headers: {
           accept: "application/json;odata.metadata=none"
         },
@@ -100,7 +100,7 @@ class TeamsTabRemoveCommand extends GraphCommand {
           type: "confirm",
           name: "continue",
           default: false,
-          message: `Are you sure you want to remove the tab with id ${args.options.tabId} from channel ${args.options.channelId} in team ${args.options.teamId}?`
+          message: `Are you sure you want to remove the tab with id ${args.options.id} from channel ${args.options.channelId} in team ${args.options.teamId}?`
         },
         (result: { continue: boolean }): void => {
           if (!result.continue) {

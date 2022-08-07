@@ -13,7 +13,7 @@ m365 spo page column get [options]
 `-u, --webUrl <webUrl>`
 : URL of the site where the page to retrieve is located
 
-`-n, --name <name>`
+`-n, --pageName <pageName>`
 : Name of the page to get column information of
 
 `-s, --section <section>`
@@ -26,12 +26,12 @@ m365 spo page column get [options]
 
 ## Remarks
 
-If the specified name doesn't refer to an existing modern page, you will get a _File doesn't exists_ error.
+If the specified `pageName` doesn't refer to an existing modern page, you will get a _File doesn't exists_ error.
 
 ## Examples
 
 Get information about the first column in the first section of a modern page with name _home.aspx_
 
 ```sh
-m365 spo page column get --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --section 1 --column 1
+m365 spo page column get --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --section 1 --column 1
 ```

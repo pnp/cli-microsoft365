@@ -19,8 +19,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   appId?: string;
-  objectId?: string;
-  displayName?: string;
+  appObjectId?: string;
+  appDisplayName?: string;
   resource: string;
   scope: string;
 }
@@ -46,8 +46,8 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         appId: typeof args.options.appId !== 'undefined',
-        objectId: typeof args.options.objectId !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined'
+        appObjectId: typeof args.options.appObjectId !== 'undefined',
+        appDisplayName: typeof args.options.appDisplayName !== 'undefined'
       });
     });
   }
@@ -58,10 +58,10 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
         option: '--appId [appId]'
       },
       {
-        option: '--objectId [objectId]'
+        option: '--appObjectId [appObjectId]'
       },
       {
-        option: '--displayName [displayName]'
+        option: '--appDisplayName [appDisplayName]'
       },
       {
         option: '-r, --resource <resource>',
@@ -78,18 +78,18 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
       async (args: CommandArgs) => {
         let optionsSpecified: number = 0;
         optionsSpecified += args.options.appId ? 1 : 0;
-        optionsSpecified += args.options.displayName ? 1 : 0;
-        optionsSpecified += args.options.objectId ? 1 : 0;
+        optionsSpecified += args.options.appDisplayName ? 1 : 0;
+        optionsSpecified += args.options.appObjectId ? 1 : 0;
         if (optionsSpecified !== 1) {
-          return 'Specify either appId, objectId or displayName';
+          return 'Specify either appId, appObjectId or appDisplayName';
         }
 
         if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
           return `${args.options.appId} is not a valid GUID`;
         }
 
-        if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
-          return `${args.options.objectId} is not a valid GUID`;
+        if (args.options.appObjectId && !validation.isValidGuid(args.options.appObjectId)) {
+          return `${args.options.appObjectId} is not a valid GUID`;
         }
 
         return true;
@@ -103,11 +103,11 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
     if (args.options.appId) {
       queryFilter = `$filter=appId eq '${encodeURIComponent(args.options.appId)}'`;
     }
-    else if (args.options.objectId) {
-      queryFilter = `$filter=id eq '${encodeURIComponent(args.options.objectId)}'`;
+    else if (args.options.appObjectId) {
+      queryFilter = `$filter=id eq '${encodeURIComponent(args.options.appObjectId)}'`;
     }
     else {
-      queryFilter = `$filter=displayName eq '${encodeURIComponent(args.options.displayName as string)}'`;
+      queryFilter = `$filter=displayName eq '${encodeURIComponent(args.options.appDisplayName as string)}'`;
     }
 
     const getServicePrinciplesRequestOptions: any = {
@@ -122,7 +122,7 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
       .get<{ value: ServicePrincipal[] }>(getServicePrinciplesRequestOptions)
       .then((servicePrincipalResult: { value: ServicePrincipal[] }): Promise<{ value: ServicePrincipal[] }> => {
         if (servicePrincipalResult.value.length > 1) {
-          return Promise.reject('More than one service principal found. Please use the appId or objectId option to make sure the right service principal is specified.');
+          return Promise.reject('More than one service principal found. Please use the appId or appObjectId option to make sure the right service principal is specified.');
         }
 
         objectId = servicePrincipalResult.value[0].id;

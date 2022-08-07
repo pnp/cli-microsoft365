@@ -78,7 +78,7 @@ describe(commands.HUBSITE_CONNECT, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
+    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -104,7 +104,7 @@ describe(commands.HUBSITE_CONNECT, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Exception of type \'Microsoft.SharePoint.Client.ResourceNotFoundException\' was thrown.')));
         done();
@@ -130,7 +130,7 @@ describe(commands.HUBSITE_CONNECT, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--url') > -1) {
+      if (o.option.indexOf('--siteUrl') > -1) {
         containsOption = true;
       }
     });
@@ -141,7 +141,7 @@ describe(commands.HUBSITE_CONNECT, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--hubSiteId') > -1) {
+      if (o.option.indexOf('--id') > -1) {
         containsOption = true;
       }
     });
@@ -149,17 +149,17 @@ describe(commands.HUBSITE_CONNECT, () => {
   });
 
   it('fails validation if the specified site collection URL is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'site.com', hubSiteId: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'site.com', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the hub site ID is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when all required parameters are valid', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

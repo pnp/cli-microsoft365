@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  url: string;
+  webUrl: string;
   scope?: string;
 }
 
@@ -47,7 +47,7 @@ class SpoCustomActionListCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --url <url>'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-s, --scope [scope]',
@@ -59,8 +59,9 @@ class SpoCustomActionListCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (validation.isValidSharePointUrl(args.options.url) !== true) {
-          return 'Missing required option url';
+        const isValidUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (typeof isValidUrl === 'string') {
+          return isValidUrl;
         }
 
         if (args.options.scope) {
@@ -110,7 +111,7 @@ class SpoCustomActionListCommand extends SpoCommand {
 
   private getCustomActions(options: Options): Promise<CustomAction[]> {
     const requestOptions: any = {
-      url: `${options.url}/_api/${options.scope}/UserCustomActions`,
+      url: `${options.webUrl}/_api/${options.scope}/UserCustomActions`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },

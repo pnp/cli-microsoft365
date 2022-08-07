@@ -42,7 +42,6 @@ class ServicePrincipalAppRoleAssignments {
 }
 
 class ServicePrincipalCollections {
-
   private static oneServicePrincipalWithAppRoleAssignments: any = {
     value: [
       {
@@ -342,7 +341,6 @@ class ServicePrincipalObject {
 }
 
 class CommandActionParameters {
-
   static appIdWithRoleAssignments: string = "36e3a540-6f25-4483-9542-9f5fa00bb633";
   static appNameWithRoleAssignments: string = "Product Catalog daemon";
   static appIdWithNoRoleAssignments: string = "1c21749e-df7a-4fed-b3ab-921dce3bb124";
@@ -404,7 +402,6 @@ class RequestStub {
     return Promise.reject('Invalid request');
   });
 }
-
 
 describe(commands.APPROLEASSIGNMENT_LIST, () => {
   let log: string[];
@@ -482,10 +479,10 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['resourceDisplayName', 'roleName']);
   });
 
-  it('retrieves App Role assignments for the specified displayName', (done) => {
+  it('retrieves App Role assignments for the specified appDisplayName', (done) => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    command.action(logger, { options: { output: 'json', displayName: CommandActionParameters.appNameWithRoleAssignments } }, () => {
+    command.action(logger, { options: { output: 'json', appDisplayName: CommandActionParameters.appNameWithRoleAssignments } }, () => {
       try {
         assert(loggerLogSpy.calledWith(jsonOutput));
         done();
@@ -525,10 +522,10 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
     });
   });
 
-  it('retrieves App Role assignments for the specified objectId and outputs text', (done) => {
+  it('retrieves App Role assignments for the specified appObjectId and outputs text', (done) => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    command.action(logger, { options: { output: 'text', objectId: CommandActionParameters.objectIdWithRoleAssignments } }, () => {
+    command.action(logger, { options: { output: 'text', appObjectId: CommandActionParameters.objectIdWithRoleAssignments } }, () => {
       try {
         assert(loggerLogSpy.calledWith(jsonOutput));
         done();
@@ -556,7 +553,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   it('correctly handles a service principal that does not have any app role assignments', (done) => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    command.action(logger, { options: { objectId: CommandActionParameters.objectIdNoRoleAssignments } } as any, (err?: any) => {
+    command.action(logger, { options: { appObjectId: CommandActionParameters.objectIdNoRoleAssignments } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('no app role assignments found')));
         done();
@@ -595,7 +592,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, objectId: '021d971f-779d-439b-8006-9f084423f344' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, appObjectId: '021d971f-779d-439b-8006-9f084423f344' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
         done();
@@ -606,7 +603,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
     });
   });
 
-  it('fails validation if neither appId nor displayName are not specified', async () => {
+  it('fails validation if neither appId nor appDisplayName are not specified', async () => {
     const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
@@ -616,18 +613,18 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the objectId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { objectId: '123' } }, commandInfo);
+  it('fails validation if the appObjectId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { appObjectId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both appId and displayName are specified', async () => {
-    const actual = await command.validate({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments, displayName: CommandActionParameters.appNameWithRoleAssignments } }, commandInfo);
+  it('fails validation if both appId and appDisplayName are specified', async () => {
+    const actual = await command.validate({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments, appDisplayName: CommandActionParameters.appNameWithRoleAssignments } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if objectId and displayName are specified', async () => {
-    const actual = await command.validate({ options: { displayName: CommandActionParameters.appNameWithRoleAssignments, objectId: CommandActionParameters.objectIdWithRoleAssignments } }, commandInfo);
+  it('fails validation if appObjectId and appDisplayName are specified', async () => {
+    const actual = await command.validate({ options: { appDisplayName: CommandActionParameters.appNameWithRoleAssignments, appObjectId: CommandActionParameters.objectIdWithRoleAssignments } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -658,11 +655,11 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
     assert(containsOption);
   });
 
-  it('supports specifying displayName', () => {
+  it('supports specifying appDisplayName', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--displayName') > -1) {
+      if (o.option.indexOf('--appDisplayName') > -1) {
         containsOption = true;
       }
     });

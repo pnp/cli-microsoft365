@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 export interface Options extends GlobalOptions {
-  webUrl: string;
+  url: string;
   withGroups?: boolean;
 }
 
@@ -43,7 +43,7 @@ class SpoWebGetCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --webUrl <webUrl>'
+        option: '-u, --url <url>'
       },
       {
         option: '--withGroups'
@@ -53,12 +53,12 @@ class SpoWebGetCommand extends SpoCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
     );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let url: string = `${args.options.webUrl}/_api/web`;
+    let url: string = `${args.options.url}/_api/web`;
     if (args.options.withGroups) {
       url += '?$expand=AssociatedMemberGroup,AssociatedOwnerGroup,AssociatedVisitorGroup';
     }

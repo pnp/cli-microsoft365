@@ -99,7 +99,7 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/site' } }, () => {
+    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/site' } }, () => {
       try {
         done();
       }
@@ -138,7 +138,7 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/site' } }, () => {
+    command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -170,7 +170,7 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/site' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Unknown Error")));
         done();
@@ -184,7 +184,7 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/site' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/site' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
         done();
@@ -209,7 +209,7 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
   it('supports specifying site url', () => {
     const options = command.options;
     for (let i = 0; i < options.length; i++) {
-      if (options[i].option.indexOf('--url') > -1) {
+      if (options[i].option.indexOf('--siteUrl') > -1) {
         assert(true);
         return;
       }
@@ -220,7 +220,7 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
   it('passes validation when the url option specified', async () => {
     const actual = await command.validate({
       options: {
-        url: 'https://contoso.sharepoint.com/sites/site'
+        siteUrl: 'https://contoso.sharepoint.com/sites/site'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -236,7 +236,7 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
   it('fails validation when the url option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({
       options: {
-        url: 'foo'
+        siteUrl: 'foo'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);

@@ -65,16 +65,16 @@ describe(commands.USER_APP_ADD, () => {
     const actual = await command.validate({
       options: {
         userId: 'invalid',
-        appId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the appId is not a valid guid.', async () => {
+  it('fails validation if the id is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
-        appId: 'not-c49b-4fd4-8223-28f0ac3a6402',
+        id: 'not-c49b-4fd4-8223-28f0ac3a6402',
         userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     }, commandInfo);
@@ -84,7 +84,7 @@ describe(commands.USER_APP_ADD, () => {
   it('passes validation when the input is correct', async () => {
     const actual = await command.validate({
       options: {
-        appId: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
         userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     }, commandInfo);
@@ -104,7 +104,7 @@ describe(commands.USER_APP_ADD, () => {
     command.action(logger, {
       options: {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        appId: '4440558e-8c73-4597-abc7-3644a64c4bce'
+        id: '4440558e-8c73-4597-abc7-3644a64c4bce'
       }
     } as any, () => {
       try {
@@ -125,7 +125,7 @@ describe(commands.USER_APP_ADD, () => {
     command.action(logger, {
       options: {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        appId: '4440558e-8c73-4597-abc7-3644a64c4bce'
+        id: '4440558e-8c73-4597-abc7-3644a64c4bce'
       }
     } as any, (err?: any) => {
       try {

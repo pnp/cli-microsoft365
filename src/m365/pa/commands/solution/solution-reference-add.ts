@@ -14,7 +14,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  path: string;
+  projectPath: string;
 }
 
 /*
@@ -41,7 +41,7 @@ class PaSolutionReferenceAddCommand extends AnonymousCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-p, --path <path>'
+        option: '-p, --projectPath <projectPath>'
       }
     );
   }
@@ -59,17 +59,17 @@ class PaSolutionReferenceAddCommand extends AnonymousCommand {
           return 'Multiple CDS solution project files with extension cdsproj were found in the current directory.';
         }
         
-        if (!fs.existsSync(args.options.path)) {
-          return `Path ${args.options.path} is not a valid path.`;
+        if (!fs.existsSync(args.options.projectPath)) {
+          return `Path ${args.options.projectPath} is not a valid path.`;
         }
     
-        const existingSupportedProjects: string[] = this.getSupportedProjectFiles(args.options.path);
+        const existingSupportedProjects: string[] = this.getSupportedProjectFiles(args.options.projectPath);
         if (existingSupportedProjects.length === 0) {
-          return `No supported project type found in path ${args.options.path}.`;
+          return `No supported project type found in path ${args.options.projectPath}.`;
         }
     
         if (existingSupportedProjects.length !== 1) {
-          return `More than one supported project type found in path ${args.options.path}.`;
+          return `More than one supported project type found in path ${args.options.projectPath}.`;
         }
     
         const cdsProjectName: string = path.parse(path.basename(existingCdsProjects[0])).name;
@@ -86,7 +86,7 @@ class PaSolutionReferenceAddCommand extends AnonymousCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     try {
-      const referencedProjectFilePath: string = this.getSupportedProjectFiles(args.options.path)[0];
+      const referencedProjectFilePath: string = this.getSupportedProjectFiles(args.options.projectPath)[0];
       const relativeReferencedProjectFilePath: string = path.relative(process.cwd(), referencedProjectFilePath);
       const cdsProjectFilePath: string = this.getCdsProjectFile(process.cwd())[0];
       const cdsProjectFileContent: string = fs.readFileSync(cdsProjectFilePath, 'utf8');

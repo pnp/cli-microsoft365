@@ -87,7 +87,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } }, () => {
+    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -109,7 +109,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } }, () => {
+    command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -121,7 +121,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   });
 
   it('prompts before disconnecting the specified site from its hub site when confirm option not passed', (done) => {
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -144,7 +144,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
         assert(postSpy.notCalled);
         done();
@@ -163,7 +163,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
         assert(postStub.called);
         done();
@@ -189,7 +189,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/sales', confirm: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Exception of type \'Microsoft.SharePoint.Client.ResourceNotFoundException\' was thrown.')));
         done();
@@ -215,7 +215,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--url') > -1) {
+      if (o.option.indexOf('--siteUrl') > -1) {
         containsOption = true;
       }
     });
@@ -223,12 +223,12 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   });
 
   it('fails validation if url is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when url is a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/Sales' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/Sales' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  webUrl: string;
+  url: string;
 }
 
 class SpoWebListCommand extends SpoCommand {
@@ -37,23 +37,23 @@ class SpoWebListCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --webUrl <webUrl>'
+        option: '-u, --url <url>'
       }
     );
   }
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
     );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving all webs in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving all webs in site at ${args.options.url}...`);
     }
 
-    let requestUrl: string = `${args.options.webUrl}/_api/web/webs`;
+    let requestUrl: string = `${args.options.url}/_api/web/webs`;
 
     if (args.options.output !== 'json') {
       requestUrl += '?$select=Title,Id,URL';

@@ -14,7 +14,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  type: string;
+  cdnType: string;
 }
 
 class SpoCdnPolicyListCommand extends SpoCommand {
@@ -37,7 +37,7 @@ class SpoCdnPolicyListCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        cdnType: args.options.type || 'Public'
+        cdnType: args.options.cdnType || 'Public'
       });
     });
   }
@@ -45,7 +45,7 @@ class SpoCdnPolicyListCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-t, --type [type]',
+        option: '-t, --cdnType [cdnType]',
         autocomplete: ['Public', 'Private']
       }
     );
@@ -54,10 +54,10 @@ class SpoCdnPolicyListCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.type) {
-          if (args.options.type !== 'Public' &&
-            args.options.type !== 'Private') {
-            return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private`;
+        if (args.options.cdnType) {
+          if (args.options.cdnType !== 'Public' &&
+            args.options.cdnType !== 'Private') {
+            return `${args.options.cdnType} is not a valid CDN type. Allowed values are Public|Private`;
           }
         }
 
@@ -67,7 +67,7 @@ class SpoCdnPolicyListCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    const cdnTypeString: string = args.options.type || 'Public';
+    const cdnTypeString: string = args.options.cdnType || 'Public';
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
     let spoAdminUrl: string = '';
     let tenantId: string = '';

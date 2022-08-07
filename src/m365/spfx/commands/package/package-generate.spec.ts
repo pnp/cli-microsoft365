@@ -94,7 +94,7 @@ describe(commands.PACKAGE_GENERATE, () => {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
-        packageName: 'amsterdam-weather',
+        name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'all',
@@ -118,7 +118,7 @@ describe(commands.PACKAGE_GENERATE, () => {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
-        packageName: 'amsterdam-weather',
+        name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'all',
@@ -144,7 +144,7 @@ describe(commands.PACKAGE_GENERATE, () => {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
-        packageName: 'amsterdam-weather',
+        name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'tab',
@@ -169,7 +169,7 @@ describe(commands.PACKAGE_GENERATE, () => {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
-        packageName: 'amsterdam-weather',
+        name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'personalApp',
@@ -194,7 +194,7 @@ describe(commands.PACKAGE_GENERATE, () => {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
-        packageName: 'amsterdam-weather',
+        name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'all',
@@ -219,7 +219,7 @@ describe(commands.PACKAGE_GENERATE, () => {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
-        packageName: 'amsterdam-weather',
+        name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'all',
@@ -243,7 +243,7 @@ describe(commands.PACKAGE_GENERATE, () => {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
-        packageName: 'amsterdam-weather',
+        name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'all',
@@ -267,7 +267,7 @@ describe(commands.PACKAGE_GENERATE, () => {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
-        packageName: 'amsterdam-weather',
+        name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'all',
@@ -293,7 +293,7 @@ describe(commands.PACKAGE_GENERATE, () => {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
-        packageName: 'amsterdam-weather',
+        name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'all',
@@ -318,7 +318,7 @@ describe(commands.PACKAGE_GENERATE, () => {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
-        packageName: 'amsterdam-weather',
+        name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'all',
@@ -343,7 +343,7 @@ describe(commands.PACKAGE_GENERATE, () => {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
-        packageName: 'amsterdam-weather',
+        name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         enableForTeams: 'tab',
@@ -368,7 +368,7 @@ describe(commands.PACKAGE_GENERATE, () => {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
-        packageName: 'amsterdam-weather',
+        name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         exposePageContextGlobally: true,
@@ -393,7 +393,7 @@ describe(commands.PACKAGE_GENERATE, () => {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
-        packageName: 'amsterdam-weather',
+        name: 'amsterdam-weather',
         html: 'abc',
         allowTenantWideDeployment: true,
         exposeTeamsContextGlobally: true,
@@ -414,7 +414,7 @@ describe(commands.PACKAGE_GENERATE, () => {
     const actual = await command.validate({
       options: {
         webPartTitle: 'Amsterdam weather',
-        webPartDescription: 'Shows weather in Amsterdam', packageName: 'amsterdam-weather',
+        webPartDescription: 'Shows weather in Amsterdam', name: 'amsterdam-weather',
         html: '@amsterdam-weather.html', allowTenantWideDeployment: true,
         enableForTeams: 'invalid'
       }
@@ -426,7 +426,7 @@ describe(commands.PACKAGE_GENERATE, () => {
     const actual = await command.validate({
       options: {
         webPartTitle: 'Amsterdam weather',
-        webPartDescription: 'Shows weather in Amsterdam', packageName: 'amsterdam-weather',
+        webPartDescription: 'Shows weather in Amsterdam', name: 'amsterdam-weather',
         html: '@amsterdam-weather.html', allowTenantWideDeployment: true,
         enableForTeams: 'tab'
       }
@@ -438,7 +438,7 @@ describe(commands.PACKAGE_GENERATE, () => {
     const actual = await command.validate({
       options: {
         webPartTitle: 'Amsterdam weather',
-        webPartDescription: 'Shows weather in Amsterdam', packageName: 'amsterdam-weather',
+        webPartDescription: 'Shows weather in Amsterdam', name: 'amsterdam-weather',
         html: '@amsterdam-weather.html', allowTenantWideDeployment: true,
         enableForTeams: 'personalApp'
       }
@@ -450,7 +450,7 @@ describe(commands.PACKAGE_GENERATE, () => {
     const actual = await command.validate({
       options: {
         webPartTitle: 'Amsterdam weather',
-        webPartDescription: 'Shows weather in Amsterdam', packageName: 'amsterdam-weather',
+        webPartDescription: 'Shows weather in Amsterdam', name: 'amsterdam-weather',
         html: '@amsterdam-weather.html', allowTenantWideDeployment: true,
         enableForTeams: 'all'
       }

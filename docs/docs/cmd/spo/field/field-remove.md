@@ -25,9 +25,6 @@ m365 spo field remove [options]
 `-i, --id [id]`
 : The ID of the field to remove. Specify id, title, or group
 
-`--fieldTitle [fieldTitle]`
-: (deprecated. Use `title` instead) The display name (case-sensitive) of the field to remove. Specify id, fieldTitle, or group
-
 `-t, --title [title]`
 : The display name (case-sensitive) of the field to remove. Specify id, title, or group
 
