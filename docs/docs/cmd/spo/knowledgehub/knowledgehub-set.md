@@ -10,7 +10,7 @@ m365 spo knowledgehub set [options]
 
 ## Options
 
-`-u, --url <url>`
+`-u, --siteUrl <siteUrl>`
 : URL of the site to set as Knowledge Hub
 
 --8<-- "docs/cmd/_global.md"
@@ -27,5 +27,5 @@ If the specified url doesn't refer to an existing site collection, you will get 
 Sets the Knowledge Hub Site for your tenant
 
 ```sh
-m365 spo knowledgehub set --url https://contoso.sharepoint.com/sites/knowledgesite
+m365 spo knowledgehub set --siteUrl https://contoso.sharepoint.com/sites/knowledgesite
 ```

@@ -76,26 +76,6 @@ describe(commands.TEAM_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('defines correct option sets', () => {
-    const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [['id', 'teamId']]);
-  });
-
-  it('logs deprecation warning when option teamId is specified', async () => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee`) {
-        return Promise.resolve({});
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, {
-      options: { debug: false, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', visibility: 'Public' }
-    } as any);
-    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
-  });
-
   it('logs deprecation warning when option displayName is specified', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee`) {
@@ -201,19 +181,9 @@ describe(commands.TEAM_SET, () => {
       name: 'NewName' } } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
   });
 
-  it('fails validation if the teamId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { teamId: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if the id is not a valid GUID', async () => {
     const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the teamId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } }, commandInfo);
-    assert.strictEqual(actual, true);
   });
 
   it('passes validation if the id is a valid GUID', async () => {

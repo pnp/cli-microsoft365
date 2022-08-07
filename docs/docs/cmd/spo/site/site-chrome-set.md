@@ -10,7 +10,7 @@ m365 spo site chrome set [options]
 
 ## Options
 
-`-u, --url <url>`
+`-u, --siteUrl <siteUrl>`
 : URL of the site collection to which you want to change the chrome header/footer
 
 `--headerLayout [headerLayout]`
@@ -42,17 +42,17 @@ m365 spo site chrome set [options]
 Show site header in compact mode
 
 ```sh
-m365 spo site chrome set --url https://contoso.sharepoint.com/sites/project-x --headerLayout Compact
+m365 spo site chrome set --siteUrl https://contoso.sharepoint.com/sites/project-x --headerLayout Compact
 ```
 
 Show site header in extended mode and display the logo on the right
 
 ```sh
-m365 spo site chrome set --url https://contoso.sharepoint.com/sites/project-x  --headerLayout Extended --logoAlignment Right
+m365 spo site chrome set --siteUrl https://contoso.sharepoint.com/sites/project-x  --headerLayout Extended --logoAlignment Right
 ```
 
 Disable the footer on the site
 
 ```sh
-m365 spo site chrome set --url https://contoso.sharepoint.com/sites/project-x --disableFooter true
+m365 spo site chrome set --siteUrl https://contoso.sharepoint.com/sites/project-x --disableFooter true
 ```

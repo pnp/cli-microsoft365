@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
-  contentTypeId: string;
+  id: string;
 }
 
 class SpoListContentTypeAddCommand extends SpoCommand {
@@ -57,7 +57,7 @@ class SpoListContentTypeAddCommand extends SpoCommand {
         option: '-t, --listTitle [listTitle]'
       },
       {
-        option: '-c, --contentTypeId <contentTypeId>'
+        option: '-i, --id <id>'
       }
     );
   }
@@ -82,7 +82,7 @@ class SpoListContentTypeAddCommand extends SpoCommand {
   }
 
   #initTypes(): void {
-    this.types.string.push('contentTypeId', 'c');
+    this.types.string.push('id', 'i');
   }
 
   #initOptionSets(): void {
@@ -92,7 +92,7 @@ class SpoListContentTypeAddCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       const list: string = (args.options.listId ? args.options.listId : args.options.listTitle) as string;
-      logger.logToStderr(`Adding content type ${args.options.contentTypeId} to list ${list} in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Adding content type ${args.options.id} to list ${list} in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -126,7 +126,7 @@ class SpoListContentTypeAddCommand extends SpoCommand {
 
   private mapRequestBody(options: Options): any {
     return {
-      contentTypeId: options.contentTypeId
+      contentTypeId: options.id
     };
   }
 }

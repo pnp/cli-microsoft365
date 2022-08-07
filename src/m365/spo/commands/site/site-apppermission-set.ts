@@ -13,7 +13,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   appId?: string;
   appDisplayName?: string;
-  permissionId?: string;
+  id?: string;
   siteUrl: string;
 }
 
@@ -41,7 +41,7 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        permissionId: typeof args.options.permissionId !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
         appId: typeof args.options.appId !== 'undefined',
         appDisplayName: typeof args.options.appDisplayName !== 'undefined',
         permissions: args.options.permissions
@@ -55,7 +55,7 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
         option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '-i, --permissionId [permissionId]'
+        option: '-i, --id [id]'
       },
       {
         option: '--appId [appId]'
@@ -87,7 +87,7 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['permissionId', 'appId', 'appDisplayName']);
+    this.optionSets.push(['id', 'appId', 'appDisplayName']);
   }
 
   private getSpoSiteId(args: CommandArgs): Promise<string> {
@@ -121,8 +121,8 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
   }
 
   private getPermission(args: CommandArgs): Promise<string> {
-    if (args.options.permissionId) {
-      return Promise.resolve(args.options.permissionId);
+    if (args.options.id) {
+      return Promise.resolve(args.options.id);
     }
 
     const permissionRequestOptions: any = {

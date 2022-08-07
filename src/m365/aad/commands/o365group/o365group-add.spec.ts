@@ -250,7 +250,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'true' } });
+    await command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: true } });
     assert(loggerLogSpy.calledWith({
       id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
       deletedDateTime: null,
@@ -1196,21 +1196,6 @@ describe(commands.O365GROUP_ADD, () => {
 
   it('passes validation with multiple members, comma-separated with an additional space', async () => {
     const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if isPrivate is invalid boolean', async () => {
-    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'invalid' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if isPrivate is true', async () => {
-    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'true' } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation if isPrivate is false', async () => {
-    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

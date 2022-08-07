@@ -10,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  siteUrl: string;
+  url: string;
   alias: string;
   displayName: string;
   description?: string;
@@ -50,7 +50,7 @@ class SpoSiteGroupifyCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --siteUrl <siteUrl>'
+        option: '-u, --url <url>'
       },
       {
         option: '-a, --alias <alias>'
@@ -75,7 +75,7 @@ class SpoSiteGroupifyCommand extends SpoCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.siteUrl)
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
     );
   }
 
@@ -99,7 +99,7 @@ class SpoSiteGroupifyCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${args.options.siteUrl}/_api/GroupSiteManager/CreateGroupForSite`,
+      url: `${args.options.url}/_api/GroupSiteManager/CreateGroupForSite`,
       headers: {
         'content-type': 'application/json;odata=nometadata',
         accept: 'application/json;odata=nometadata',

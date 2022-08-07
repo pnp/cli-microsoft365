@@ -68,7 +68,7 @@ describe(commands.APP_INSTALL, () => {
   it('fails validation when neither teamId, userId nor userName are specified', async () => {
     const actual = await command.validate({
       options: {
-        appId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -77,7 +77,7 @@ describe(commands.APP_INSTALL, () => {
   it('fails validation when teamId and userId are specified', async () => {
     const actual = await command.validate({
       options: {
-        appId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         teamId: '00000000-0000-0000-0000-000000000000',
         userId: '00000000-0000-0000-0000-000000000000'
       }
@@ -88,7 +88,7 @@ describe(commands.APP_INSTALL, () => {
   it('fails validation when teamId and userName are specified', async () => {
     const actual = await command.validate({
       options: {
-        appId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         teamId: '00000000-0000-0000-0000-000000000000',
         userName: 'steve@contoso.com'
       }
@@ -99,7 +99,7 @@ describe(commands.APP_INSTALL, () => {
   it('fails validation when userId and userName are specified', async () => {
     const actual = await command.validate({
       options: {
-        appId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         userId: '00000000-0000-0000-0000-000000000000',
         userName: 'steve@contoso.com'
       }
@@ -111,16 +111,16 @@ describe(commands.APP_INSTALL, () => {
     const actual = await command.validate({
       options: {
         teamId: 'invalid',
-        appId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the appId is not a valid guid.', async () => {
+  it('fails validation if the id is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
-        appId: 'not-c49b-4fd4-8223-28f0ac3a6402',
+        id: 'not-c49b-4fd4-8223-28f0ac3a6402',
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     }, commandInfo);
@@ -131,36 +131,36 @@ describe(commands.APP_INSTALL, () => {
     const actual = await command.validate({
       options: {
         userId: 'not-c49b-4fd4-8223-28f0ac3a6402',
-        appId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the appId and teamId are correct', async () => {
+  it('passes validation when the id and teamId are correct', async () => {
     const actual = await command.validate({
       options: {
-        appId: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the appId and userId are correct', async () => {
+  it('passes validation when the id and userId are correct', async () => {
     const actual = await command.validate({
       options: {
-        appId: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
         userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the appId and userName are correct', async () => {
+  it('passes validation when the id and userName are correct', async () => {
     const actual = await command.validate({
       options: {
-        appId: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
         userName: 'steve@contoso.com'
       }
     }, commandInfo);
@@ -180,7 +180,7 @@ describe(commands.APP_INSTALL, () => {
     await command.action(logger, {
       options: {
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        appId: '4440558e-8c73-4597-abc7-3644a64c4bce'
+        id: '4440558e-8c73-4597-abc7-3644a64c4bce'
       }
     });
     assert.strictEqual(log.length, 0);
@@ -224,7 +224,7 @@ describe(commands.APP_INSTALL, () => {
     await command.action(logger, {
       options: {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        appId: '4440558e-8c73-4597-abc7-3644a64c4bce'
+        id: '4440558e-8c73-4597-abc7-3644a64c4bce'
       }
     });
     assert.strictEqual(log.length, 0);
@@ -268,7 +268,7 @@ describe(commands.APP_INSTALL, () => {
     await command.action(logger, {
       options: {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        appId: '4440558e-8c73-4597-abc7-3644a64c4bce',
+        id: '4440558e-8c73-4597-abc7-3644a64c4bce',
         debug: true
       }
     });
@@ -287,7 +287,7 @@ describe(commands.APP_INSTALL, () => {
     await command.action(logger, {
       options: {
         userName: 'steve@contoso.com',
-        appId: '4440558e-8c73-4597-abc7-3644a64c4bce'
+        id: '4440558e-8c73-4597-abc7-3644a64c4bce'
       }
     });
     assert.strictEqual(log.length, 0);
@@ -300,7 +300,7 @@ describe(commands.APP_INSTALL, () => {
 
     await assert.rejects(command.action(logger, { options: { 
       teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-      appId: '4440558e-8c73-4597-abc7-3644a64c4bce' } } as any), new CommandError('An error has occurred'));
+      id: '4440558e-8c73-4597-abc7-3644a64c4bce' } } as any), new CommandError('An error has occurred'));
   });
 
   it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user name)`, async () => {
@@ -318,7 +318,7 @@ describe(commands.APP_INSTALL, () => {
       });
     });
 
-    await assert.rejects(command.action(logger, { options: { userName: 'steve@contoso.com', appId: '4440558e-8c73-4597-abc7-3644a64c4bce' } } as any), new CommandError("Failed to find user with id 'steve@contoso.com' in the tenant"));
+    await assert.rejects(command.action(logger, { options: { userName: 'steve@contoso.com', id: '4440558e-8c73-4597-abc7-3644a64c4bce' } } as any), new CommandError("Failed to find user with id 'steve@contoso.com' in the tenant"));
   });
 
   it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user ID)`, async () => {
@@ -343,7 +343,7 @@ describe(commands.APP_INSTALL, () => {
     
     await assert.rejects(command.action(logger, { options: { 
       userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-      appId: '4440558e-8c73-4597-abc7-3644a64c4bce' } } as any), new CommandError("User with ID c527a470-a882-481c-981c-ee6efaba85c7 not found. Original error: Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present."));
+      id: '4440558e-8c73-4597-abc7-3644a64c4bce' } } as any), new CommandError("User with ID c527a470-a882-481c-981c-ee6efaba85c7 not found. Original error: Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present."));
   });
 
   it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user ID; debug)`, async () => {
@@ -368,7 +368,7 @@ describe(commands.APP_INSTALL, () => {
     
     await assert.rejects(command.action(logger, { options: { 
       userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-      appId: '4440558e-8c73-4597-abc7-3644a64c4bce',
+      id: '4440558e-8c73-4597-abc7-3644a64c4bce',
       debug: true } } as any), new CommandError("User with ID c527a470-a882-481c-981c-ee6efaba85c7 not found. Original error: Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present."));
   });
 
