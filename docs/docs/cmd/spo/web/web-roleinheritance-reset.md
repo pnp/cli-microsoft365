@@ -11,7 +11,7 @@ m365 spo web roleinheritance reset [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the list is located
+: URL of the site
 
 --8<-- "docs/cmd/_global.md"
 
