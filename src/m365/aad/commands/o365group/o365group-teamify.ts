@@ -10,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  groupId?: string;
+  id?: string;
   mailNickname?: string;
 }
 
@@ -35,7 +35,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        groupId: typeof args.options.groupId !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
         mailNickname: typeof args.options.mailNickname !== 'undefined'
       });
     });
@@ -44,7 +44,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --groupId [groupId]'
+        option: '-i, --id [id]'
       },
       {
         option: '--mailNickname [mailNickname]'
@@ -55,8 +55,8 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
-          return `${args.options.groupId} is not a valid GUID`;
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
         }
 
         return true;
@@ -65,12 +65,12 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['groupId', 'mailNickname']);
+    this.optionSets.push(['id', 'mailNickname']);
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {
-    if (args.options.groupId) {
-      return Promise.resolve(args.options.groupId);
+    if (args.options.id) {
+      return Promise.resolve(args.options.id);
     }
 
     const requestOptions: any = {

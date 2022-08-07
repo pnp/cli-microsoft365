@@ -10,8 +10,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  displayName?: string;
-  mailNickname?: string;
+  groupDisplayName?: string;
+  groupMailNickname?: string;
 }
 
 class AadO365GroupRecycleBinItemListCommand extends GraphCommand {
@@ -33,8 +33,8 @@ class AadO365GroupRecycleBinItemListCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        displayName: typeof args.options.displayName !== 'undefined',
-        mailNickname: typeof args.options.mailNickname !== 'undefined'
+        groupDisplayName: typeof args.options.groupDisplayName !== 'undefined',
+        groupMailNickname: typeof args.options.groupMailNickname !== 'undefined'
       });
     });
   }
@@ -42,10 +42,10 @@ class AadO365GroupRecycleBinItemListCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-d, --displayName [displayName]'
+        option: '-d, --groupDisplayName [groupDisplayName]'
       },
       {
-        option: '-m, --mailNickname [mailNickname]'
+        option: '-m, --groupMailNickname [groupMailNickname]'
       }
     );
   }
@@ -57,8 +57,8 @@ class AadO365GroupRecycleBinItemListCommand extends GraphCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const filter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
-      const displayNameFilter: string = args.options.displayName ? ` and startswith(DisplayName,'${encodeURIComponent(args.options.displayName).replace(/'/g, `''`)}')` : '';
-      const mailNicknameFilter: string = args.options.mailNickname ? ` and startswith(MailNickname,'${encodeURIComponent(args.options.mailNickname).replace(/'/g, `''`)}')` : '';
+      const displayNameFilter: string = args.options.groupDisplayName ? ` and startswith(DisplayName,'${encodeURIComponent(args.options.groupDisplayName).replace(/'/g, `''`)}')` : '';
+      const mailNicknameFilter: string = args.options.groupMailNickname ? ` and startswith(MailNickname,'${encodeURIComponent(args.options.groupMailNickname).replace(/'/g, `''`)}')` : '';
       const topCount: string = '&$top=100';
       const endpoint: string = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${filter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
 

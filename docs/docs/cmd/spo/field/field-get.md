@@ -25,9 +25,6 @@ m365 spo field get [options]
 `-i, --id [id]`
 : The ID of the field to retrieve. Specify id or title but not both
 
-`--fieldTitle [fieldTitle]`
-: (deprecated. Use `title` instead) The display name (case-sensitive) of the field to retrieve. Specify id or fieldTitle but not both
-
 `-t, --title [title]`
 : The display name (case-sensitive) of the field to remove. Specify id or title, or group but not both
 

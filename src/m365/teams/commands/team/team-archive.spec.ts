@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import chalk = require('chalk');
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -16,7 +15,6 @@ const command: Command = require('./team-archive');
 describe(commands.TEAM_ARCHIVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -40,7 +38,6 @@ describe(commands.TEAM_ARCHIVE, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -68,15 +65,6 @@ describe(commands.TEAM_ARCHIVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the teamId is not a valid guid.', async () => {
-    const actual = await command.validate({
-      options: {
-        teamId: 'invalid'
-      }
-    }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if the id is not a valid guid.', async () => {
     const actual = await command.validate({
       options: {
@@ -89,7 +77,7 @@ describe(commands.TEAM_ARCHIVE, () => {
   it('passes validation when the input is correct', async () => {
     const actual = await command.validate({
       options: {
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
+        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -107,8 +95,7 @@ describe(commands.TEAM_ARCHIVE, () => {
     const actual = await command.validate({
       options: {
         name: 'Finance',
-        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -124,27 +111,14 @@ describe(commands.TEAM_ARCHIVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when both teamId and name are specified', async () => {
+  it('fails validation when both id and name are specified', async () => {
     const actual = await command.validate({
       options: {
         name: 'Finance',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
-  });
-
-  it('logs deprecation warning when option teamId is specified', async () => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/archive`) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000" } });
-    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
   });
 
   it('fails when team name does not exist', async () => {

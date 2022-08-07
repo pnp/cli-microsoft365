@@ -155,7 +155,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     const options: any = {
       debug: true,
       listTitle: 'Test List',
-      id: 147,
+      listItemId: 147,
       webUrl: `https://contoso.sharepoint.com/sites/project-y/`
     };
 
@@ -170,7 +170,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
 
     const options: any = {
       listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
-      id: 147,
+      listItemId: 147,
       webUrl: `https://contoso.sharepoint.com/sites/project-y/`,
       debug: true
     };
@@ -187,7 +187,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     const options: any = {
       debug: true,
       listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
-      id: 147,
+      listItemId: 147,
       date: '2019-03-14',
       webUrl: `https://contoso.sharepoint.com/sites/project-y/`
     };
@@ -203,7 +203,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
 
     const options: any = {
       listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
-      id: 147,
+      listItemId: 147,
       date: '2019-03-14',
       webUrl: `https://contoso.sharepoint.com/sites/project-y/`
     };
@@ -220,7 +220,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     const options: any = {
       debug: true,
       listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
-      id: 147,
+      listItemId: 147,
       date: '2019-03-14',
       webUrl: `https://alreadydeclared.sharepoint.com/sites/project-y/`
     };
@@ -235,7 +235,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     const options: any = {
       debug: true,
       listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
-      id: 147,
+      listItemId: 147,
       date: '2019-03-14',
       webUrl: `https://returnerror.sharepoint.com/sites/project-y/`
     };
@@ -252,7 +252,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     const options: any = {
       debug: true,
       listTitle: 'Test List',
-      id: 147,
+      listItemId: 147,
       webUrl: 'https://rejectme.sharepoint.com/sites/project-y'
     };
 
@@ -284,52 +284,52 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
   });
 
   it('fails validation if listTitle and listId option not specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if listTitle and listId are specified together', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listTitle: 'Test List', id: '1' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', listTitle: 'Test List', listItemId: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the item ID is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: 'foo' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', listItemId: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the item ID is not a positive number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: '-1' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', listItemId: '-1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL and numerical ID specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: '1' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', listItemId: '1' } }, commandInfo);
     assert(actual);
   });
 
   it('fails validation if the listId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo', id: '1' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo', listItemId: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the listId option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', debug: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: '1', debug: true } }, commandInfo);
     assert(actual);
   });
 
   it('fails validation if the date passed in is not in ISO format', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', date: 'foo', debug: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: '1', date: 'foo', debug: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the date passed in is in ISO format', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', date: 'foo', debug: true } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: '1', date: 'foo', debug: true } }, commandInfo);
     assert(actual);
   });
 });

@@ -98,7 +98,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: true, grantId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } });
+    await command.action(logger, { options: { debug: true, id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } });
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -127,7 +127,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, grantId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } });
+    await command.action(logger, { options: { debug: false, id: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } });
     assert(loggerLogSpy.notCalled);
   });
 
@@ -167,11 +167,11 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
     assert(containsOption);
   });
 
-  it('allows specifying grantId', () => {
+  it('allows specifying id', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--grantId') > -1) {
+      if (o.option.indexOf('--id') > -1) {
         containsOption = true;
       }
     });
