@@ -13,8 +13,8 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
-  viewId?: string;
-  viewTitle?: string;
+  id?: string;
+  title?: string;
 }
 
 class SpoListViewSetCommand extends SpoCommand {
@@ -44,8 +44,8 @@ class SpoListViewSetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
-        viewId: typeof args.options.viewId !== 'undefined',
-        viewTitle: typeof args.options.viewTitle !== 'undefined'
+        id: typeof args.options.id !== 'undefined',
+        title: typeof args.options.title !== 'undefined'
       });
     });
   }
@@ -62,10 +62,10 @@ class SpoListViewSetCommand extends SpoCommand {
         option: '--listTitle [listTitle]'
       },
       {
-        option: '--viewId [viewId]'
+        option: '--id [id]'
       },
       {
-        option: '--viewTitle [viewTitle]'
+        option: '--title [title]'
       }
     );
   }
@@ -83,9 +83,9 @@ class SpoListViewSetCommand extends SpoCommand {
           return `${args.options.listId} in option listId is not a valid GUID`;
         }
 
-        if (args.options.viewId &&
-          !validation.isValidGuid(args.options.viewId)) {
-          return `${args.options.viewId} in option viewId is not a valid GUID`;
+        if (args.options.id &&
+          !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} in option id is not a valid GUID`;
         }
 
         return true;
@@ -96,7 +96,7 @@ class SpoListViewSetCommand extends SpoCommand {
   #initOptionSets(): void {
     this.optionSets.push(
       ['listId', 'listTitle'],
-      ['viewId', 'viewTitle']
+      ['id', 'title']
     );
   }
 
@@ -105,7 +105,7 @@ class SpoListViewSetCommand extends SpoCommand {
     const listRestUrl: string = args.options.listId ?
       `(guid'${formatting.encodeQueryParameter(args.options.listId)}')`
       : `/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
-    const viewRestUrl: string = `/views/${(args.options.viewId ? `getById('${formatting.encodeQueryParameter(args.options.viewId)}')` : `getByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`)}`;
+    const viewRestUrl: string = `/views/${(args.options.id ? `getById('${formatting.encodeQueryParameter(args.options.id)}')` : `getByTitle('${formatting.encodeQueryParameter(args.options.title as string)}')`)}`;
 
     spo
       .getRequestDigest(args.options.webUrl)
@@ -132,8 +132,8 @@ class SpoListViewSetCommand extends SpoCommand {
       'webUrl',
       'listId',
       'listTitle',
-      'viewId',
-      'viewTitle',
+      'id',
+      'title',
       'debug',
       'verbose',
       'output'

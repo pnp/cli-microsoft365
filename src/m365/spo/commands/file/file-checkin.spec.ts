@@ -190,7 +190,7 @@ describe(commands.FILE_CHECKIN, () => {
     command.action(logger, {
       options: {
         debug: false,
-        fileUrl: '/sites/project-x/Documents/Test1.docx',
+        url: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
     }, () => {
@@ -210,7 +210,7 @@ describe(commands.FILE_CHECKIN, () => {
     command.action(logger, {
       options: {
         debug: false,
-        fileUrl: '/Documents/Test1.docx',
+        url: '/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
@@ -230,7 +230,7 @@ describe(commands.FILE_CHECKIN, () => {
     command.action(logger, {
       options: {
         debug: false,
-        fileUrl: '/sites/project-x/Documents/Test1.docx',
+        url: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         type: 'minor'
       }
@@ -251,7 +251,7 @@ describe(commands.FILE_CHECKIN, () => {
     command.action(logger, {
       options: {
         debug: false,
-        fileUrl: '/sites/project-x/Documents/Test1.docx',
+        url: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         type: 'overwrite'
       }
@@ -272,7 +272,7 @@ describe(commands.FILE_CHECKIN, () => {
     command.action(logger, {
       options: {
         debug: false,
-        fileUrl: '/sites/project-x/Documents/Test1.docx',
+        url: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         comment: 'abc1'
       }
@@ -413,7 +413,7 @@ describe(commands.FILE_CHECKIN, () => {
   });
 
   it('fails validation if both id and url options are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b', fileUrl: '/sites/project-x/documents' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b', url: '/sites/project-x/documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -423,17 +423,17 @@ describe(commands.FILE_CHECKIN, () => {
   });
 
   it('passes validation url, type and comment params correct', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileUrl: '/sites/docs/abc.txt', type: 'overwrite', comment: '123' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', url: '/sites/docs/abc.txt', type: 'overwrite', comment: '123' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation type is major', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileUrl: '/sites/docs/abc.txt', type: 'major' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', url: '/sites/docs/abc.txt', type: 'major' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation type is minor', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', fileUrl: '/sites/docs/abc.txt', type: 'minor' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', url: '/sites/docs/abc.txt', type: 'minor' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

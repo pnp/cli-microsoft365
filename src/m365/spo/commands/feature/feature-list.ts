@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  url: string;
+  webUrl: string;
   scope?: string;
 }
 
@@ -43,7 +43,7 @@ class SpoFeatureListCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --url <url>'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-s, --scope [scope]',
@@ -62,7 +62,7 @@ class SpoFeatureListCommand extends SpoCommand {
           }
         }
     
-        return validation.isValidSharePointUrl(args.options.url);
+        return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
   }
@@ -70,7 +70,7 @@ class SpoFeatureListCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope : 'Web';
     const requestOptions: any = {
-      url: `${args.options.url}/_api/${scope}/Features?$select=DisplayName,DefinitionId`,
+      url: `${args.options.webUrl}/_api/${scope}/Features?$select=DisplayName,DefinitionId`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },

@@ -128,7 +128,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     const options: any = {
       debug: false,
       listTitle: 'Demo List',
-      id: 147,
+      listItemId: 147,
       webUrl: 'https://returnerror.com/sites/project-y'
     };
 
@@ -152,7 +152,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     const options: any = {
       debug: true,
       listTitle: 'Demo List',
-      id: 47,
+      listItemId: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x'
     };
     command.action(logger, { options: options } as any, () => {
@@ -174,7 +174,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     const options: any = {
       debug: true,
       listId: '770fe148-1d72-480e-8cde-f9d3832798b6',
-      id: 47,
+      listItemId: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x'
     };
     command.action(logger, { options: options } as any, () => {
@@ -196,7 +196,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     const options: any = {
       debug: false,
       listTitle: 'Demo List',
-      id: 47,
+      listItemId: 47,
       webUrl: 'https://rejectme.com/sites/project-y'
     };
 
@@ -233,32 +233,32 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   });
 
   it('fails validation if both id and title options are not passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', id: 1, listTitle: 'Documents' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', listItemId: 1, listTitle: 'Documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: 1 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: 1 } }, commandInfo);
     assert(actual);
   });
 
   it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345', id: 1 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345', listItemId: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the id option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: 1 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listItemId: 1 } }, commandInfo);
     assert(actual);
   });
 
   it('fails validation if both id and title options are passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', id: 1 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', listItemId: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -268,7 +268,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   });
 
   it('fails validation if id is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'abc', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: 'abc', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

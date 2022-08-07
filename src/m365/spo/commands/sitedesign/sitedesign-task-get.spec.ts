@@ -73,7 +73,7 @@ describe(commands.SITEDESIGN_TASK_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, taskId: 'e40b1c66-0292-4697-b686-f2b05446a588' } }, () => {
+    command.action(logger, { options: { debug: false, id: 'e40b1c66-0292-4697-b686-f2b05446a588' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "ID": "e40b1c66-0292-4697-b686-f2b05446a588", "LogonName": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "SiteDesignID": "6ec3ca5b-d04b-4381-b169-61378556d76e", "SiteID": "24cea241-ad89-44b8-8669-d60d88d38575", "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
@@ -97,7 +97,7 @@ describe(commands.SITEDESIGN_TASK_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, taskId: 'e40b1c66-0292-4697-b686-f2b05446a588' } }, () => {
+    command.action(logger, { options: { debug: true, id: 'e40b1c66-0292-4697-b686-f2b05446a588' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "ID": "e40b1c66-0292-4697-b686-f2b05446a588", "LogonName": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "SiteDesignID": "6ec3ca5b-d04b-4381-b169-61378556d76e", "SiteID": "24cea241-ad89-44b8-8669-d60d88d38575", "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
@@ -121,7 +121,7 @@ describe(commands.SITEDESIGN_TASK_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, taskId: 'e40b1c66-0292-4697-b686-f2b05446a588' } }, () => {
+    command.action(logger, { options: { debug: false, id: 'e40b1c66-0292-4697-b686-f2b05446a588' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -159,13 +159,13 @@ describe(commands.SITEDESIGN_TASK_GET, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if taskId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { taskId: 'invalid' } }, commandInfo);
+  it('fails validation if id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if taskId is valid', async () => {
-    const actual = await command.validate({ options: { taskId: '6ec3ca5b-d04b-4381-b169-61378556d76e' } }, commandInfo);
+  it('passes validation if id is valid', async () => {
+    const actual = await command.validate({ options: { id: '6ec3ca5b-d04b-4381-b169-61378556d76e' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

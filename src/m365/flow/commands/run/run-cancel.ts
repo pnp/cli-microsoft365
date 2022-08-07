@@ -10,8 +10,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment: string;
-  flow: string;
+  environmentName: string;
+  flowName: string;
   name: string;
 }
 
@@ -37,10 +37,10 @@ class FlowRunCancelCommand extends AzmgmtCommand {
         option: '-n, --name <name>'
       },
       {
-        option: '-f, --flow <flow>'
+        option: '-f, --flowName <flowName>'
       },
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       },
       {
         option: '--confirm'
@@ -51,8 +51,8 @@ class FlowRunCancelCommand extends AzmgmtCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.flow)) {
-          return `${args.options.flow} is not a valid GUID`;
+        if (!validation.isValidGuid(args.options.flowName)) {
+          return `${args.options.flowName} is not a valid GUID`;
         }
         
         return true;
@@ -62,12 +62,12 @@ class FlowRunCancelCommand extends AzmgmtCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Cancelling run ${args.options.name} of Microsoft Flow ${args.options.flow}...`);
+      logger.log(`Cancelling run ${args.options.name} of Microsoft Flow ${args.options.flowName}...`);
     }
 
     const cancelFlow: () => void = (): void => {
       const requestOptions: any = {
-        url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/runs/${encodeURIComponent(args.options.name)}/cancel?api-version=2016-11-01`,
+        url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environmentName)}/flows/${encodeURIComponent(args.options.flowName)}/runs/${encodeURIComponent(args.options.name)}/cancel?api-version=2016-11-01`,
         headers: {
           accept: 'application/json'
         },

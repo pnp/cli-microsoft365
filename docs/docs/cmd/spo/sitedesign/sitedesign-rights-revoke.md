@@ -10,7 +10,7 @@ m365 spo sitedesign rights revoke [options]
 
 ## Options
 
-`-i, --id <id>`
+`-i, --siteDesignId <siteDesignId>`
 : The ID of the site design to revoke rights from
 
 `-p, --principals <principals>`
@@ -34,13 +34,13 @@ If you try to revoke access for a user that doesn't have access granted to the s
 Revoke access to the site design with ID _2c1ba4c4-cd9b-4417-832f-92a34bc34b2a_ from user with alias _PattiF_. Will prompt for confirmation before revoking the access
 
 ```sh
-m365 spo sitedesign rights revoke --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --principals PattiF
+m365 spo sitedesign rights revoke --siteDesignId 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --principals PattiF
 ```
 
 Revoke access to the site design with ID _2c1ba4c4-cd9b-4417-832f-92a34bc34b2a_ from users with aliases _PattiF_ and _AdeleV_ without prompting for confirmation
 
 ```sh
-m365 spo sitedesign rights revoke --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --principals "PattiF,AdeleV" --confirm
+m365 spo sitedesign rights revoke --siteDesignId 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --principals "PattiF,AdeleV" --confirm
 ```
 
 ## More information

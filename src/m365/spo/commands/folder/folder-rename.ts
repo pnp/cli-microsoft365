@@ -12,7 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  folderUrl: string;
+  url: string;
   name: string;
 }
 
@@ -39,7 +39,7 @@ class SpoFolderRenameCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folderUrl <folderUrl>'
+        option: '-f, --url <url>'
       },
       {
         option: '-n, --name <name>'
@@ -64,14 +64,14 @@ class SpoFolderRenameCommand extends SpoCommand {
         return spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
       })
       .then((webIdentityResp: IdentityResponse): Promise<IdentityResponse> => {
-        return spo.getFolderIdentity(webIdentityResp.objectIdentity, args.options.webUrl, args.options.folderUrl, formDigestValue);
+        return spo.getFolderIdentity(webIdentityResp.objectIdentity, args.options.webUrl, args.options.url, formDigestValue);
       })
       .then((folderObjectIdentity: IdentityResponse): Promise<void> => {
         if (this.verbose) {
-          logger.logToStderr(`Renaming folder ${args.options.folderUrl} to ${args.options.name}`);
+          logger.logToStderr(`Renaming folder ${args.options.url} to ${args.options.name}`);
         }
 
-        const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
+        const serverRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.url);
         const serverRelativeUrlWithoutOldFolder: string = serverRelativeUrl.substring(0, serverRelativeUrl.lastIndexOf('/'));
         const renamedServerRelativeUrl: string = `${serverRelativeUrlWithoutOldFolder}/${args.options.name}`;
 

@@ -11,7 +11,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  fileUrl?: string;
+  url?: string;
   id?: string;
   type?: string;
   comment?: string;
@@ -45,7 +45,7 @@ class SpoFileCheckinCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         id: (!(!args.options.id)).toString(),
-        url: (!(!args.options.fileUrl)).toString(),
+        url: (!(!args.options.url)).toString(),
         type: args.options.type || 'Major',
         comment: typeof args.options.comment !== 'undefined'
       });
@@ -58,7 +58,7 @@ class SpoFileCheckinCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --fileUrl [fileUrl]'
+        option: '-f, --url [url]'
       },
       {
         option: '-i, --id [id]'
@@ -105,7 +105,7 @@ class SpoFileCheckinCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['fileUrl', 'id']);
+    this.optionSets.push(['url', 'id']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -130,8 +130,8 @@ class SpoFileCheckinCommand extends SpoCommand {
       requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${encodeURIComponent(args.options.id)}')/checkin(comment='${comment}',checkintype=${type})`;
     }
 
-    if (args.options.fileUrl) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(args.options.fileUrl)}')/checkin(comment='${comment}',checkintype=${type})`;
+    if (args.options.url) {
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(args.options.url)}')/checkin(comment='${comment}',checkintype=${type})`;
     }
 
     const requestOptions: any = {

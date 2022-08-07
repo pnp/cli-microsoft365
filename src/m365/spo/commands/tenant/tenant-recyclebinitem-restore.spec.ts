@@ -73,12 +73,12 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { url: 'foo' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/hr' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr' } }, commandInfo);
     assert(actual);
   });
 
@@ -96,7 +96,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr' } }, (err?: any) => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr' } }, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -121,7 +121,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr' } }, (err?: any) => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr' } }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("{\"odata.error\":{\"code\":\"-2147024809, System.ArgumentException\",\"message\":{\"lang\":\"en-US\",\"value\":\"Unable to find the deleted site: https://contoso.sharepoint.com/sites/hr.\"}}}")));
         done();

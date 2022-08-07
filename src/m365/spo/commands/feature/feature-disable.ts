@@ -9,8 +9,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  url: string;
-  featureId: string;
+  webUrl: string;
+  id: string;
   scope?: string;
   force: boolean;
 }
@@ -45,10 +45,10 @@ class SpoFeatureDisableCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --url <url>'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --featureId <id>'
+        option: '-i, --id <id>'
       },
       {
         option: '-s, --scope [scope]',
@@ -90,10 +90,10 @@ class SpoFeatureDisableCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.logToStderr(`Disabling feature '${args.options.featureId}' on scope '${scope}' for url '${args.options.url}' (force='${force}')...`);
+      logger.logToStderr(`Disabling feature '${args.options.id}' on scope '${scope}' for url '${args.options.webUrl}' (force='${force}')...`);
     }
 
-    const url: string = `${args.options.url}/_api/${scope}/features/remove(featureId=guid'${args.options.featureId}',force=${force})`;
+    const url: string = `${args.options.webUrl}/_api/${scope}/features/remove(featureId=guid'${args.options.id}',force=${force})`;
 
     const requestOptions: any = {
       url: url,

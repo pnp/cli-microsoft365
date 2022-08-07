@@ -15,7 +15,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   date?: string;
-  id: string;
+  listItemId: string;
   listId?: string;
   listTitle?: string;
   webUrl: string;
@@ -61,7 +61,7 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
         option: '-t, --listTitle [listTitle]'
       },
       {
-        option: '-i, --id <id>'
+        option: '-i, --listItemId <listItemId>'
       },
       {
         option: '-d, --date [date]'
@@ -81,9 +81,9 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
           return `${args.options.listId} in option listId is not a valid GUID`;
         }
 
-        const id: number = parseInt(args.options.id);
+        const id: number = parseInt(args.options.listItemId);
         if (isNaN(id)) {
-          return `${args.options.id} is not a number`;
+          return `${args.options.listItemId} is not a number`;
         }
 
         if (id < 1) {
@@ -138,7 +138,7 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
       })
       .then((res: { Id: string }): Promise<string> => {
         listId = res.Id;
-        const requestBody: string = this.getDeclareRecordRequestBody(webIdentity, listId, args.options.id, args.options.date || '');
+        const requestBody: string = this.getDeclareRecordRequestBody(webIdentity, listId, args.options.listItemId, args.options.date || '');
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,

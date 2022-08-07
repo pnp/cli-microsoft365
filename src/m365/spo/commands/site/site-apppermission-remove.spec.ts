@@ -143,7 +143,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if appId or appDisplayName or permissionId options are not passed', async () => {
+  it('fails validation if appId or appDisplayName or id options are not passed', async () => {
     const actual = await command.validate({
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name'
@@ -152,13 +152,13 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if appId, appDisplayName and permissionId options are passed (multiple options)', async () => {
+  it('fails validation if appId, appDisplayName and id options are passed (multiple options)', async () => {
     const actual = await command.validate({
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appId: '89ea5c94-7736-4e25-95ad-3fa95f62b66e',
         appDisplayName: 'Foo',
-        permissionId: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
+        id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -175,23 +175,23 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if appId and permissionId options are passed (multiple options)', async () => {
+  it('fails validation if appId and id options are passed (multiple options)', async () => {
     const actual = await command.validate({
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appId: '89ea5c94-7736-4e25-95ad-3fa95f62b66e',
-        permissionId: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
+        id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if appDisplayName and permissionId options are passed (multiple options)', async () => {
+  it('fails validation if appDisplayName and id options are passed (multiple options)', async () => {
     const actual = await command.validate({
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appDisplayName: 'Foo',
-        permissionId: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
+        id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -271,7 +271,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       options: {
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        permissionId: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
+        id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
       }
     }, () => {
       try {

@@ -153,7 +153,7 @@ describe(commands.APP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
+    command.action(logger, { options: { debug: true, appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -315,7 +315,7 @@ describe(commands.APP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
+    command.action(logger, { options: { debug: false, appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
       try {
         assert.strictEqual(log.length, 0);
         done();
@@ -381,7 +381,7 @@ describe(commands.APP_LIST, () => {
   });
 
   it('fails validation when invalid scope is specified', async () => {
-    const actual = await command.validate({ options: { scope: 'foo' } }, commandInfo);
+    const actual = await command.validate({ options: { appCatalogScope: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -391,27 +391,27 @@ describe(commands.APP_LIST, () => {
   });
 
   it('passes validation when the scope is specified with \'tenant\'', async () => {
-    const actual = await command.validate({ options: { scope: 'tenant' } }, commandInfo);
+    const actual = await command.validate({ options: { appCatalogScope: 'tenant' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('fails validation when appCatalogUrl is not a valid url', async () => {
-    const actual = await command.validate({ options: { scope: 'sitecollection', appCatalogUrl: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { appCatalogScope: 'sitecollection', appCatalogUrl: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', async () => {
-    const actual = await command.validate({ options: { scope: 'sitecollection' } }, commandInfo);
+    const actual = await command.validate({ options: { appCatalogScope: 'sitecollection' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('should fail when \'sitecollection\' scope, but  bad appCatalogUrl format specified', async () => {
-    const actual = await command.validate({ options: { scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { appCatalogScope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the scope is specified with \'sitecollection\' and appCatalogUrl present', async () => {
-    const actual = await command.validate({ options: { scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { appCatalogScope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

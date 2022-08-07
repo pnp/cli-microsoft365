@@ -96,17 +96,17 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { url: 'foo' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert(actual);
   });
 
   it('aborts removing deleting site when prompt not confirmed', (done) => {
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', debug: true, verbose: true } }, () => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', debug: true, verbose: true } }, () => {
       try {
         assert(requests.length === 0);
         done();
@@ -150,7 +150,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       cb({ continue: true });
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr' } }, () => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -194,7 +194,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, debug: true } }, () => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', confirm: true, debug: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -238,7 +238,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, verbose: true } }, () => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', confirm: true, verbose: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -282,7 +282,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true } }, () => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -342,7 +342,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true } }, () => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -402,7 +402,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true, debug: true } }, () => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true, debug: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -462,7 +462,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true, verbose: true } }, () => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true, verbose: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -504,7 +504,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true } }, (err?: any) => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true } }, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Unable to find the deleted site: https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fhr.")));
         done();

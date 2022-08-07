@@ -88,27 +88,27 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   it('passes validation with parameters', async () => {
-    const actual = await command.validate({ options: { id: 10123123 } }, commandInfo);
+    const actual = await command.validate({ options: { messageId: 10123123 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('id must be a number', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { messageId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if enabled set to "true"', async () => {
-    const actual = await command.validate({ options: { id: 10123123, enable: 'true' } }, commandInfo);
+    const actual = await command.validate({ options: { messageId: 10123123, enable: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if enabled set to "true"', async () => {
-    const actual = await command.validate({ options: { id: 10123123, enable: 'false' } }, commandInfo);
+    const actual = await command.validate({ options: { messageId: 10123123, enable: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('does not pass validation if enable not set to either "true" or "false"', async () => {
-    const actual = await command.validate({ options: { id: 10123123, enable: 'fals' } }, commandInfo);
+    const actual = await command.validate({ options: { messageId: 10123123, enable: 'fals' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -124,7 +124,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   it('prompts when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { debug: false, id: 1231231, enable: 'false' } }, () => {
+    command.action(logger, { options: { debug: false, messageId: 1231231, enable: 'false' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -149,7 +149,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: 1231231 } }, () => {
+    command.action(logger, { options: { debug: true, messageId: 1231231 } }, () => {
       try {
         assert(requestPostedStub.called);
         done();
@@ -168,7 +168,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: 1231231, confirm: 'true' } }, () => {
+    command.action(logger, { options: { debug: true, messageId: 1231231, confirm: 'true' } }, () => {
       try {
         assert(requestPostedStub.called);
         done();
@@ -187,7 +187,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: 1231231, enable: 'true' } }, () => {
+    command.action(logger, { options: { debug: true, messageId: 1231231, enable: 'true' } }, () => {
       try {
         assert(requestPostedStub.called);
         done();
@@ -206,7 +206,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: 1231231, enable: 'false', confirm: true } }, () => {
+    command.action(logger, { options: { debug: true, messageId: 1231231, enable: 'false', confirm: true } }, () => {
       try {
         assert(requestPostedStub.called);
         done();
@@ -218,7 +218,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   });
 
   it('prompts when disliking and confirmation parameter is denied', (done) => {
-    command.action(logger, { options: { debug: false, id: 1231231, enable: 'false', confirm: false } }, () => {
+    command.action(logger, { options: { debug: false, messageId: 1231231, enable: 'false', confirm: false } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -248,7 +248,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
       cb({ continue: true });
     });
 
-    command.action(logger, { options: { debug: true, id: 1231231, enable: 'false' } }, () => {
+    command.action(logger, { options: { debug: true, messageId: 1231231, enable: 'false' } }, () => {
       try {
         assert(requestDeleteStub.called);
         done();
@@ -264,7 +264,7 @@ describe(commands.MESSAGE_LIKE_SET, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
-    command.action(logger, { options: { debug: false, id: 1231231, enable: 'false' } }, () => {
+    command.action(logger, { options: { debug: false, messageId: 1231231, enable: 'false' } }, () => {
       try {
         assert(requests.length === 0);
         done();

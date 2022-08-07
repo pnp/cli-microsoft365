@@ -85,7 +85,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
     command.action(logger, {
       options: {
         debug: true,
-        name: 'home',
+        pageName: 'home',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         sectionTemplate: 'OneColumn'
       }
@@ -128,7 +128,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
 
     command.action(logger, {
       options: {
-        name: 'home.aspx',
+        pageName: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         sectionTemplate: 'OneColumn'
       }
@@ -168,7 +168,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
     command.action(logger, {
       options:
       {
-        name: 'home.aspx',
+        pageName: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         sectionTemplate: 'OneColumn'
       }
@@ -208,7 +208,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
     command.action(logger, {
       options:
       {
-        name: 'home.aspx',
+        pageName: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         sectionTemplate: 'OneColumn',
         order: 1
@@ -249,7 +249,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
     command.action(logger, {
       options:
       {
-        name: 'home.aspx',
+        pageName: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         sectionTemplate: 'OneColumn'
       }
@@ -289,7 +289,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
     command.action(logger, {
       options:
       {
-        name: 'home.aspx',
+        pageName: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         sectionTemplate: 'OneColumnFullWidth',
         order: 1
@@ -330,7 +330,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
     command.action(logger, {
       options:
       {
-        name: 'home.aspx',
+        pageName: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         sectionTemplate: 'TwoColumnLeft',
         order: 1
@@ -371,7 +371,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
     command.action(logger, {
       options:
       {
-        name: 'home.aspx',
+        pageName: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         sectionTemplate: 'TwoColumnRight'
       }
@@ -411,7 +411,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
     command.action(logger, {
       options:
       {
-        name: 'home.aspx',
+        pageName: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         sectionTemplate: 'TwoColumnRight',
         order: 2
@@ -452,7 +452,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
     command.action(logger, {
       options:
       {
-        name: 'home.aspx',
+        pageName: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         sectionTemplate: 'TwoColumnRight',
         order: 5
@@ -493,7 +493,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
     command.action(logger, {
       options:
       {
-        name: 'home.aspx',
+        pageName: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         sectionTemplate: 'ThreeColumn',
         order: 2
@@ -534,7 +534,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
     command.action(logger, {
       options:
       {
-        name: 'home.aspx',
+        pageName: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         sectionTemplate: 'TwoColumn',
         order: 2
@@ -558,7 +558,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
     command.action(logger, {
       options:
       {
-        name: 'home.aspx',
+        pageName: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         sectionTemplate: 'TwoColumn',
         order: 2
@@ -577,7 +577,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
   it('fails validation if order has invalid (negative) value', async () => {
     const actual = await command.validate({
       options: {
-        name: 'page.aspx',
+        pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         order: -1,
         sectionTemplate: 'OneColumn'
@@ -589,7 +589,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
   it('fails validation if order has invalid (non number) value', async () => {
     const actual = await command.validate({
       options: {
-        name: 'page.aspx',
+        pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         order: 'abc',
         sectionTemplate: 'OneColumn'
@@ -601,7 +601,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
   it('fails validation if sectionTemplate is not valid', async () => {
     const actual = await command.validate({
       options: {
-        name: 'page.aspx',
+        pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         order: 'abc',
         sectionTemplate: 'OneColumnInvalid'
@@ -613,7 +613,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
   it('fails validation if webUrl is not valid', async () => {
     const actual = await command.validate({
       options: {
-        name: 'page.aspx',
+        pageName: 'page.aspx',
         order: 1,
         sectionTemplate: 'OneColumn',
         webUrl: 'http://notasharepointurl'
@@ -628,7 +628,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
         order: 1,
         sectionTemplate: 'OneColumn',
         webUrl: 'https://contoso.sharepoint.com',
-        name: 'Home.aspx'
+        pageName: 'Home.aspx'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -639,7 +639,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       options: {
         sectionTemplate: 'OneColumn',
         webUrl: 'https://contoso.sharepoint.com',
-        name: 'Home.aspx'
+        pageName: 'Home.aspx'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -649,7 +649,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
-      if (o.option.indexOf('--name') > -1) {
+      if (o.option.indexOf('--pageName') > -1) {
         containsOption = true;
       }
     });

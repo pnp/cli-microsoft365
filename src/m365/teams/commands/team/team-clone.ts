@@ -11,9 +11,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id?: string;
-  teamId?: string;
   name?: string;
-  displayName?: string;
   partsToClone: string;
   description?: string;
   classification?: string;
@@ -45,10 +43,7 @@ class TeamsTeamCloneCommand extends GraphCommand {
         classification: typeof args.options.classification !== 'undefined',
         visibility: typeof args.options.visibility !== 'undefined',
         id: typeof args.options.id !== 'undefined',
-        teamId: typeof args.options.teamId !== 'undefined',
-        name: typeof args.options.name !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined'
-        
+        name: typeof args.options.name !== 'undefined'
       });
     });
   }
@@ -56,16 +51,10 @@ class TeamsTeamCloneCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --id [teamId]'
-      },
-      {
-        option: '--teamId [teamId]'
+        option: '-i, --id [id]'
       },
       {
         option: '-n, --name [name]'
-      },
-      {
-        option: '--displayName [displayName]'
       },
       {
         option: '-p, --partsToClone <partsToClone>',
@@ -87,60 +76,43 @@ class TeamsTeamCloneCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-	      return `${args.options.teamId} is not a valid GUID`;
-	    }
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
 
-	    if (args.options.id && !validation.isValidGuid(args.options.id)) {
-	      return `${args.options.id} is not a valid GUID`;
-	    }
+        const partsToClone: string[] = args.options.partsToClone.replace(/\s/g, '').split(',');
+        for (const partToClone of partsToClone) {
+          const part: string = partToClone.toLowerCase();
+          if (part !== 'apps' &&
+            part !== 'channels' &&
+            part !== 'members' &&
+            part !== 'settings' &&
+            part !== 'tabs') {
+            return `${part} is not a valid partsToClone. Allowed values are apps|channels|members|settings|tabs`;
+          }
+        }
 
-	    const partsToClone: string[] = args.options.partsToClone.replace(/\s/g, '').split(',');
-	    for (const partToClone of partsToClone) {
-	      const part: string = partToClone.toLowerCase();
-	      if (part !== 'apps' &&
-	        part !== 'channels' &&
-	        part !== 'members' &&
-	        part !== 'settings' &&
-	        part !== 'tabs') {
-	        return `${part} is not a valid partsToClone. Allowed values are apps|channels|members|settings|tabs`;
-	      }
-	    }
+        if (args.options.visibility) {
+          const visibility: string = args.options.visibility.toLowerCase();
 
-	    if (args.options.visibility) {
-	      const visibility: string = args.options.visibility.toLowerCase();
+          if (visibility !== 'private' &&
+            visibility !== 'public') {
+            return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
+          }
+        }
 
-	      if (visibility !== 'private' &&
-	        visibility !== 'public') {
-	        return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
-	      }
-	    }
-
-	    return true;
+        return true;
       }
     );
   }
 
   #initOptionSets(): void {
-  	this.optionSets.push(
-  	  ['id', 'teamId'],
-      ['name', 'displayName']
-  	);
+    this.optionSets.push(
+      ['id', 'name']
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (args.options.teamId) {
-      args.options.id = args.options.teamId;
-
-      this.warn(logger, `Option 'teamId' is deprecated. Please use 'id' instead.`);
-    }
-
-    if (args.options.displayName) {
-      args.options.name = args.options.displayName;
-
-      this.warn(logger, `Option 'displayName' is deprecated. Please use 'name' instead.`);
-    }
-
     const data: any = {
       displayName: args.options.name,
       mailNickname: this.generateMailNickname(args.options.name as string),

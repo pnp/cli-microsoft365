@@ -12,7 +12,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   siteUrl: string;
-  permissionId: string
+  id: string
 }
 
 class SpoSiteAppPermissionGetCommand extends GraphCommand {
@@ -37,7 +37,7 @@ class SpoSiteAppPermissionGetCommand extends GraphCommand {
         option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '-i, --permissionId <permissionId>'
+        option: '-i, --id <id>'
       }
     );
   }
@@ -65,7 +65,7 @@ class SpoSiteAppPermissionGetCommand extends GraphCommand {
 
   private getApplicationPermission(args: CommandArgs, siteId: string): Promise<SitePermission> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/sites/${siteId}/permissions/${args.options.permissionId}`,
+      url: `${this.resource}/v1.0/sites/${siteId}/permissions/${args.options.id}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

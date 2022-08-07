@@ -13,8 +13,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   appId?: string;
-  displayName?: string;
-  objectId?: string;
+  appDisplayName?: string;
+  appObjectId?: string;
 }
 
 class AadAppRoleAssignmentListCommand extends GraphCommand {
@@ -39,8 +39,8 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         appId: typeof args.options.appId !== 'undefined',
-        displayName: typeof args.options.displayName !== 'undefined',
-        objectId: typeof args.options.objectId !== 'undefined'
+        appDisplayName: typeof args.options.appDisplayName !== 'undefined',
+        appObjectId: typeof args.options.appObjectId !== 'undefined'
       });
     });
   }
@@ -51,10 +51,10 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
         option: '-i, --appId [appId]'
       },
       {
-        option: '-n, --displayName [displayName]'
+        option: '-n, --appDisplayName [appDisplayName]'
       },
       {
-        option: '--objectId [objectId]'
+        option: '--appObjectId [appObjectId]'
       }
     );
   }
@@ -66,8 +66,8 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
           return `${args.options.appId} is not a valid GUID`;
         }
     
-        if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
-          return `${args.options.objectId} is not a valid GUID`;
+        if (args.options.appObjectId && !validation.isValidGuid(args.options.appObjectId)) {
+          return `${args.options.appObjectId} is not a valid GUID`;
         }
     
         return true;
@@ -76,7 +76,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['appId', 'objectId', 'displayName']);
+    this.optionSets.push(['appId', 'appObjectId', 'appDisplayName']);
   }
 
   public defaultProperties(): string[] | undefined {
@@ -132,8 +132,8 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
 
   private getAppRoleAssignments(argOptions: Options): Promise<AppRoleAssignment[]> {
     return new Promise<AppRoleAssignment[]>((resolve: (approleAssignments: AppRoleAssignment[]) => void, reject: (err: any) => void) => {
-      if (argOptions.objectId) {
-        this.getSPAppRoleAssignments(argOptions.objectId)
+      if (argOptions.appObjectId) {
+        this.getSPAppRoleAssignments(argOptions.appObjectId)
           .then((spAppRoleAssignments: { value: AppRoleAssignment[] }) => {
             if (!spAppRoleAssignments.value.length) {
               reject('no app role assignments found');
@@ -152,7 +152,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
           spMatchQuery = `appId eq '${encodeURIComponent(argOptions.appId)}'`;
         }
         else {
-          spMatchQuery = `displayName eq '${encodeURIComponent(argOptions.displayName as string)}'`;
+          spMatchQuery = `displayName eq '${encodeURIComponent(argOptions.appDisplayName as string)}'`;
         }
 
         this.getServicePrincipalForApp(spMatchQuery)

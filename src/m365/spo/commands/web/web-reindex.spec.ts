@@ -110,7 +110,7 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.resolve(JSON.stringify({}));
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
         assert(loggerLogSpy.notCalled, 'Something has been logged');
         assert.strictEqual(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
@@ -161,7 +161,7 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.resolve(JSON.stringify({}));
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
         assert.strictEqual(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
         assert.strictEqual(propertyValue, '2', 'Incorrect property value stored in the property bag');
@@ -250,7 +250,7 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.resolve(JSON.stringify({}));
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
         assert(loggerLogSpy.notCalled, 'Something has been logged');
         assert.strictEqual(propertyName[0], 'vti_searchversion');
@@ -342,7 +342,7 @@ describe(commands.WEB_REINDEX, () => {
       return Promise.resolve(JSON.stringify({}));
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
         assert(loggerLogToStderrSpy.called, 'Nothing has been logged');
         assert.strictEqual(propertyName[0], 'vti_searchversion');
@@ -427,7 +427,7 @@ describe(commands.WEB_REINDEX, () => {
     sinon.stub(SpoPropertyBagBaseCommand, 'isNoScriptSite').callsFake(() => Promise.resolve(true));
     sinon.stub(SpoPropertyBagBaseCommand, 'setProperty').callsFake(() => Promise.reject('ClientSvc unknown error'));
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team-a' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
@@ -449,13 +449,13 @@ describe(commands.WEB_REINDEX, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'invalid' } }, commandInfo);
+  it('fails validation if url is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { url: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if webUrl is valid', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+  it('passes validation if url is valid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

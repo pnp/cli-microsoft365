@@ -13,7 +13,7 @@ interface Options extends GlobalOptions {
   id: string;
   siteUrl: string;
   confirm?: boolean;
-  scope?: string;
+  appCatalogScope?: string;
 }
 
 class SpoAppUninstallCommand extends SpoCommand {
@@ -37,7 +37,7 @@ class SpoAppUninstallCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         confirm: (!(!args.options.confirm)).toString(),
-        scope: args.options.scope || 'tenant'
+        appCatalogScope: args.options.appCatalogScope || 'tenant'
       });
     });
   }
@@ -51,7 +51,7 @@ class SpoAppUninstallCommand extends SpoCommand {
         option: '-s, --siteUrl <siteUrl>'
       },
       {
-        option: '--scope [scope]',
+        option: '--appCatalogScope [appCatalogScope]',
         autocomplete: ['tenant', 'sitecollection']
       },
       {
@@ -63,10 +63,10 @@ class SpoAppUninstallCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.scope) {
-          const testScope: string = args.options.scope.toLowerCase();
+        if (args.options.appCatalogScope) {
+          const testScope: string = args.options.appCatalogScope.toLowerCase();
           if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-            return `Scope must be either 'tenant' or 'sitecollection' if specified`;
+            return `appCatalogScope must be either 'tenant' or 'sitecollection' if specified`;
           }
         }
     
@@ -81,7 +81,7 @@ class SpoAppUninstallCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const uninstallApp: () => void = (): void => {
-      const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
+      const scope: string = (args.options.appCatalogScope) ? args.options.appCatalogScope.toLowerCase() : 'tenant';
 
       if (this.verbose) {
         logger.logToStderr(`Uninstalling app '${args.options.id}' from the site '${args.options.siteUrl}'...`);

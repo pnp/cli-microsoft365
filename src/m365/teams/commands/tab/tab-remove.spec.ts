@@ -65,18 +65,18 @@ describe(commands.TAB_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when valid channelId, teamId and tabId is specified', async () => {
+  it('passes validation when valid channelId, teamId and id is specified', async () => {
     const actual = await command.validate({
       options: {
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
+        id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the teamId , channelId and tabId are not provided', async () => {
+  it('fails validation if the teamId , channelId and id are not provided', async () => {
     const actual = await command.validate({
       options: {
 
@@ -90,7 +90,7 @@ describe(commands.TAB_REMOVE, () => {
       options: {
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
         channelId: 'invalid',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
+        id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -101,17 +101,17 @@ describe(commands.TAB_REMOVE, () => {
       options: {
         teamId: 'invalid',
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
+        id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('fails validation if the tabId is not a valid guid', async () => {
+  it('fails validation if the id is not a valid guid', async () => {
     const actual = await command.validate({
       options: {
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        tabId: 'invalid'
+        id: 'invalid'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -124,7 +124,7 @@ describe(commands.TAB_REMOVE, () => {
         debug: false,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
+        id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, () => {
       let promptIssued = false;
@@ -149,7 +149,7 @@ describe(commands.TAB_REMOVE, () => {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
+        id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, () => {
       let promptIssued = false;
@@ -175,7 +175,7 @@ describe(commands.TAB_REMOVE, () => {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
+        id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, () => {
       try {
@@ -195,7 +195,7 @@ describe(commands.TAB_REMOVE, () => {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
+        id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, () => {
       try {
@@ -226,7 +226,7 @@ describe(commands.TAB_REMOVE, () => {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
+        id: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, (err?: any) => {
       try {
@@ -254,7 +254,7 @@ describe(commands.TAB_REMOVE, () => {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        id: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
         confirm: true
       }
     }, (err?: any) => {

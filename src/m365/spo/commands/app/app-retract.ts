@@ -11,8 +11,8 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   id: string;
+  appCatalogScope?: string;
   appCatalogUrl?: string;
-  scope?: string;
   confirm?: boolean;
 }
 
@@ -38,7 +38,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
       Object.assign(this.telemetryProperties, {
         appCatalogUrl: (!(!args.options.appCatalogUrl)).toString(),
         confirm: (!(!args.options.confirm)).toString(),
-        scope: args.options.scope || 'tenant'
+        appCatalogScope: args.options.appCatalogScope || 'tenant'
       });
     });
   }
@@ -52,7 +52,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
         option: '-u, --appCatalogUrl [appCatalogUrl]'
       },
       {
-        option: '-s, --scope [scope]',
+        option: '-s, --appCatalogScope [appCatalogScope]',
         autocomplete: ['tenant', 'sitecollection']
       },
       {
@@ -64,14 +64,14 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.scope) {
-          const testScope: string = args.options.scope.toLowerCase();
+        if (args.options.appCatalogScope) {
+          const testScope: string = args.options.appCatalogScope.toLowerCase();
           if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-            return `Scope must be either 'tenant' or 'sitecollection' if specified`;
+            return `appCatalogScope must be either 'tenant' or 'sitecollection' if specified`;
           }
     
           if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-            return `You must specify appCatalogUrl when the scope is sitecollection`;
+            return `You must specify appCatalogUrl when the appCatalogScope is sitecollection`;
           }
         }
     
@@ -89,7 +89,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
+    const scope: string = (args.options.appCatalogScope) ? args.options.appCatalogScope.toLowerCase() : 'tenant';
 
     const retractApp: () => void = (): void => {
       spo

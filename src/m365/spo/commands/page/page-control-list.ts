@@ -13,7 +13,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  name: string;
+  pageName: string;
   webUrl: string;
 }
 
@@ -40,7 +40,7 @@ class SpoPageControlListCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-n, --name <name>'
+        option: '-n, --pageName <pageName>'
       },
       {
         option: '-u, --webUrl <webUrl>'
@@ -55,8 +55,8 @@ class SpoPageControlListCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    let pageName: string = args.options.name;
-    if (args.options.name.indexOf('.aspx') < 0) {
+    let pageName: string = args.options.pageName;
+    if (args.options.pageName.indexOf('.aspx') < 0) {
       pageName += '.aspx';
     }
 

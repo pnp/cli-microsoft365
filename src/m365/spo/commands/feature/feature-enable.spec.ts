@@ -88,7 +88,7 @@ describe(commands.FEATURE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, featureId: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' } }, () => {
+    command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
@@ -124,7 +124,7 @@ describe(commands.FEATURE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, featureId: '915c240e-a6cc-49b8-8b2c-0bff8b553ed3', url: 'https://contoso.sharepoint.com', scope: 'site', force: true } }, () => {
+    command.action(logger, { options: { debug: true, id: '915c240e-a6cc-49b8-8b2c-0bff8b553ed3', webUrl: 'https://contoso.sharepoint.com', scope: 'site', force: true } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
@@ -159,8 +159,8 @@ describe(commands.FEATURE_ENABLE, () => {
     command.action(logger, {
       options: {
         debug: false,
-        url: 'https://contoso.sharepoint.com',
-        featureId: "b2307a39-e878-458b-bc90-03bc578531d6",
+        webUrl: 'https://contoso.sharepoint.com',
+        id: "b2307a39-e878-458b-bc90-03bc578531d6",
         scope: 'web'
       }
     }, (error?: any) => {
@@ -189,7 +189,7 @@ describe(commands.FEATURE_ENABLE, () => {
     const actual = await command.validate({
       options:
       {
-        url: 'foo'
+        webUrl: 'foo'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -199,8 +199,8 @@ describe(commands.FEATURE_ENABLE, () => {
     const actual = await command.validate({
       options:
       {
-        url: "https://contoso.sharepoint.com",
-        featureId: "00bfea71-5932-4f9c-ad71-1557e5751100"
+        webUrl: "https://contoso.sharepoint.com",
+        id: "00bfea71-5932-4f9c-ad71-1557e5751100"
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -210,8 +210,8 @@ describe(commands.FEATURE_ENABLE, () => {
     const actual = await command.validate({
       options:
       {
-        url: "https://contoso.sharepoint.com",
-        featureId: "00bfea71-5932-4f9c-ad71-1557e5751100",
+        webUrl: "https://contoso.sharepoint.com",
+        id: "00bfea71-5932-4f9c-ad71-1557e5751100",
         scope: 'Site'
       }
     }, commandInfo);
@@ -222,8 +222,8 @@ describe(commands.FEATURE_ENABLE, () => {
     const actual = await command.validate({
       options:
       {
-        url: "https://contoso.sharepoint.com",
-        featureId: "00bfea71-5932-4f9c-ad71-1557e5751100",
+        webUrl: "https://contoso.sharepoint.com",
+        id: "00bfea71-5932-4f9c-ad71-1557e5751100",
         scope: 'Web'
       }
     }, commandInfo);
@@ -234,8 +234,8 @@ describe(commands.FEATURE_ENABLE, () => {
     const scope = 'foo';
     const actual = await command.validate({
       options: {
-        url: "https://contoso.sharepoint.com",
-        featureId: "00bfea71-5932-4f9c-ad71-1557e5751100",
+        webUrl: "https://contoso.sharepoint.com",
+        id: "00bfea71-5932-4f9c-ad71-1557e5751100",
         scope: scope
       }
     }, commandInfo);
@@ -247,8 +247,8 @@ describe(commands.FEATURE_ENABLE, () => {
       {
         options:
         {
-          featureId: "00bfea71-5932-4f9c-ad71-1557e5751100",
-          url: "https://contoso.sharepoint.com"
+          id: "00bfea71-5932-4f9c-ad71-1557e5751100",
+          webUrl: "https://contoso.sharepoint.com"
         }
       }, commandInfo);
     assert.strictEqual(actual, true);

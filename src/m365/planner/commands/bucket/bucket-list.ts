@@ -72,27 +72,19 @@ class PlannerBucketListCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.planId && !args.options.planTitle) {
-	      return 'Specify either planId or planTitle';
-	    }
+        if (args.options.planTitle && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
+        }
 
-	    if (args.options.planId && args.options.planTitle) {
-	      return 'Specify either planId or planTitle but not both';
-	    }
+        if (args.options.planTitle && args.options.ownerGroupId && args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
+        }
 
-	    if (args.options.planTitle && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-	      return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
-	    }
+        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
+          return `${args.options.ownerGroupId} is not a valid GUID`;
+        }
 
-	    if (args.options.planTitle && args.options.ownerGroupId && args.options.ownerGroupName) {
-	      return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
-	    }
-
-	    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-	      return `${args.options.ownerGroupId} is not a valid GUID`;
-	    }
-
-	    return true;
+        return true;
       }
     );
   }

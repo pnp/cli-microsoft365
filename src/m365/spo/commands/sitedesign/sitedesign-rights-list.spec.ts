@@ -95,7 +95,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
+    command.action(logger, { options: { debug: false, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -143,7 +143,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
+    command.action(logger, { options: { debug: true, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -191,7 +191,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
+    command.action(logger, { options: { debug: false, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -218,7 +218,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, siteDesignId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
         done();
@@ -244,7 +244,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--id') > -1) {
+      if (o.option.indexOf('--siteDesignId') > -1) {
         containsOption = true;
       }
     });
@@ -252,12 +252,12 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
   });
 
   it('fails validation if the id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { siteDesignId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the id is a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
+    const actual = await command.validate({ options: { siteDesignId: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

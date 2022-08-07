@@ -154,7 +154,7 @@ describe(commands.APP_INSTALL, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com/sites/site1', scope: 'sitecollection' } }, () => {
+    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com/sites/site1', appCatalogScope: 'sitecollection' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/install`) > -1 &&
@@ -379,12 +379,12 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('fails validation when the scope is not \'tenant\' nor \'sitecollection\'', async () => {
-    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', scope: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', appCatalogScope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the scope is \'sitecollection\'', async () => {
-    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', scope: 'sitecollection' } }, commandInfo);
+    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', siteUrl: 'https://contoso.sharepoint.com', appCatalogScope: 'sitecollection' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

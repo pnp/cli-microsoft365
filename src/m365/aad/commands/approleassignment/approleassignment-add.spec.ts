@@ -83,11 +83,11 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('sets App Role assignments for service principal with specified displayName', (done) => {
+  it('sets App Role assignments for service principal with specified appDisplayName', (done) => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } }, () => {
+    command.action(logger, { options: { appDisplayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } }, () => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0][0].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
         assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
@@ -100,11 +100,11 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     });
   });
 
-  it('sets App Role assignments for service principal with specified objectId and multiple scopes', (done) => {
+  it('sets App Role assignments for service principal with specified appObjectId and multiple scopes', (done) => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { objectId: '24448e9c-d0fa-43d1-a1dd-e279720969a0', resource: 'SharePoint', scope: 'Sites.Read.All,Sites.ReadWrite.All' } }, () => {
+    command.action(logger, { options: { appObjectId: '24448e9c-d0fa-43d1-a1dd-e279720969a0', resource: 'SharePoint', scope: 'Sites.Read.All,Sites.ReadWrite.All' } }, () => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0][0].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
         assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
@@ -124,7 +124,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All', output: 'json' } }, () => {
+    command.action(logger, { options: { appDisplayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All', output: 'json' } }, () => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
         assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
@@ -266,7 +266,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("More than one service principal found. Please use the appId or objectId option to make sure the right service principal is specified.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("More than one service principal found. Please use the appId or appObjectId option to make sure the right service principal is specified.")));
         done();
       }
       catch (e) {
@@ -311,22 +311,22 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
   });
 
   it('fails validation if the objectId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { objectId: '123', resource: 'abc', scope: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { appObjectId: '123', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both appId and displayName are specified', async () => {
-    const actual = await command.validate({ options: { appId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
+  it('fails validation if both appId and appDisplayName are specified', async () => {
+    const actual = await command.validate({ options: { appId: '123', appDisplayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both objectId and displayName are specified', async () => {
-    const actual = await command.validate({ options: { objectId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
+  it('fails validation if both appObjectId and appDisplayName are specified', async () => {
+    const actual = await command.validate({ options: { appObjectId: '123', appDisplayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both objectId, appId and displayName are specified', async () => {
-    const actual = await command.validate({ options: { appId: '123', objectId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
+  it('fails validation if both appObjectId, appId and appDisplayName are specified', async () => {
+    const actual = await command.validate({ options: { appId: '123', appObjectId: '123', appDisplayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -357,11 +357,11 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     assert(containsOption);
   });
 
-  it('supports specifying displayName', () => {
+  it('supports specifying appDisplayName', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--displayName') > -1) {
+      if (o.option.indexOf('--appDisplayName') > -1) {
         containsOption = true;
       }
     });

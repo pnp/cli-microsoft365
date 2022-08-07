@@ -85,7 +85,7 @@ describe(commands.FOLDER_REMOVE, () => {
   });
 
   it('prompts before removing folder when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } }, () => {
       let promptIssued = false;
       if (promptOptions && promptOptions.type === 'confirm') {
         promptIssued = true;
@@ -106,7 +106,7 @@ describe(commands.FOLDER_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } }, () => {
       try {
         assert(requests.length === 0);
         done();
@@ -127,7 +127,7 @@ describe(commands.FOLDER_REMOVE, () => {
     command.action(logger, { options: 
       { debug: false, 
         webUrl: 'https://contoso.sharepoint.com', 
-        folderUrl: '/Shared Documents/Folder1' 
+        url: '/Shared Documents/Folder1' 
       } }, () => {
       try {
         assert(loggerLogSpy.notCalled === true);
@@ -145,7 +145,7 @@ describe(commands.FOLDER_REMOVE, () => {
     command.action(logger, { options: 
       { verbose: true, 
         webUrl: 'https://contoso.sharepoint.com', 
-        folderUrl: '/Shared Documents/Folder1',
+        url: '/Shared Documents/Folder1',
         confirm: true
       } }, () => {
       try {
@@ -171,7 +171,7 @@ describe(commands.FOLDER_REMOVE, () => {
     command.action(logger, { options: 
       { verbose: true, 
         webUrl: 'https://contoso.sharepoint.com/sites/test1', 
-        folderUrl: '/Shared Documents/Folder1' 
+        url: '/Shared Documents/Folder1' 
       } }, () => {
       try {
         const lastCall: any = request.lastCall.args[0];
@@ -197,7 +197,7 @@ describe(commands.FOLDER_REMOVE, () => {
       { 
         debug: true,
         webUrl: 'https://contoso.sharepoint.com', 
-        folderUrl: '/Shared Documents/Folder1', 
+        url: '/Shared Documents/Folder1', 
         recycle: true 
       } }, () => {
       try {
@@ -224,7 +224,7 @@ describe(commands.FOLDER_REMOVE, () => {
       { 
         debug: true,
         webUrl: 'https://contoso.sharepoint.com', 
-        folderUrl: '/Shared Documents/Folder1', 
+        url: '/Shared Documents/Folder1', 
         recycle: true 
       } } as any, (err?: any) => {
       try {
@@ -260,12 +260,12 @@ describe(commands.FOLDER_REMOVE, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', folderUrl: '/Shared Documents' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', url: '/Shared Documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL and folderUrl specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folderUrl: '/Shared Documents' } }, commandInfo);
+  it('passes validation if the webUrl option is a valid SharePoint site URL and url specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', url: '/Shared Documents' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

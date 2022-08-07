@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  webUrl: string;
+  url: string;
 }
 
 class SpoWebReindexCommand extends SpoCommand {
@@ -36,14 +36,14 @@ class SpoWebReindexCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --webUrl <webUrl>'
+        option: '-u, --url <url>'
       }
     );
   }
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
     );
   }
 
@@ -52,7 +52,7 @@ class SpoWebReindexCommand extends SpoCommand {
     let webIdentityResp: IdentityResponse;
 
     spo
-      .getRequestDigest(args.options.webUrl)
+      .getRequestDigest(args.options.url)
       .then((res: ContextInfo): Promise<IdentityResponse> => {
         requestDigest = res.FormDigestValue;
 
@@ -60,7 +60,7 @@ class SpoWebReindexCommand extends SpoCommand {
           logger.logToStderr(`Retrieved request digest. Retrieving web identity...`);
         }
 
-        return spo.getCurrentWebIdentity(args.options.webUrl, requestDigest);
+        return spo.getCurrentWebIdentity(args.options.url, requestDigest);
       })
       .then((identityResp: IdentityResponse): Promise<boolean> => {
         webIdentityResp = identityResp;
@@ -72,7 +72,7 @@ class SpoWebReindexCommand extends SpoCommand {
           logger.logToStderr(`Checking if the site is a no-script site...`);
         }
 
-        return SpoPropertyBagBaseCommand.isNoScriptSite(args.options.webUrl, requestDigest, webIdentityResp, logger, this.debug);
+        return SpoPropertyBagBaseCommand.isNoScriptSite(args.options.url, requestDigest, webIdentityResp, logger, this.debug);
       })
       .then((isNoScriptSite: boolean): Promise<{ vti_x005f_searchversion?: number }> => {
         if (isNoScriptSite) {
@@ -80,7 +80,7 @@ class SpoWebReindexCommand extends SpoCommand {
             logger.logToStderr(`Site is a no-script site. Reindexing lists instead...`);
           }
 
-          return this.reindexLists(args.options.webUrl, requestDigest, logger, webIdentityResp) as any;
+          return this.reindexLists(args.options.url, requestDigest, logger, webIdentityResp) as any;
         }
 
         if (this.verbose) {
@@ -88,7 +88,7 @@ class SpoWebReindexCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/allproperties`,
+          url: `${args.options.url}/_api/web/allproperties`,
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
@@ -101,7 +101,7 @@ class SpoWebReindexCommand extends SpoCommand {
         let searchVersion: number = webProperties.vti_x005f_searchversion || 0;
         searchVersion++;
 
-        return SpoPropertyBagBaseCommand.setProperty('vti_searchversion', searchVersion.toString(), args.options.webUrl, requestDigest, webIdentityResp, logger, this.debug);
+        return SpoPropertyBagBaseCommand.setProperty('vti_searchversion', searchVersion.toString(), args.options.url, requestDigest, webIdentityResp, logger, this.debug);
       })
       .then(_ => cb(), (err: any): void => {
         if (this.reindexedLists) {
