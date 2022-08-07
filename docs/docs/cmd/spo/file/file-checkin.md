@@ -13,11 +13,11 @@ m365 spo file checkin [options]
 `-u, --webUrl <webUrl>`
 : The URL of the site where the file is located
 
-`-f, --fileUrl [fileUrl]`
-: The server-relative URL of the file to retrieve. Specify either `fileUrl` or `id` but not both
+`-f, --url [url]`
+: The server-relative URL of the file to retrieve. Specify either `url` or `id` but not both
 
 `-i, --id [id]`
-: The UniqueId (GUID) of the file to retrieve. Specify either `fileUrl` or `id` but not both
+: The UniqueId (GUID) of the file to retrieve. Specify either `url` or `id` but not both
 
 `-t, --type [type]`
 : Type of the check in. Available values `Minor,Major,Overwrite`. Default is Major
@@ -38,17 +38,17 @@ m365 spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --
 Checks in file with server-relative url _/sites/project-x/documents/Test1.docx_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx'
+m365 spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx'
 ```
 
 Checks in minor version of file with server-relative url _/sites/project-x/documents/Test1.docx_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --type Minor
+m365 spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --type Minor
 ```
 
 Checks in file _/sites/project-x/documents/Test1.docx_ with comment located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --comment 'approved'
+m365 spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --comment 'approved'
 ```

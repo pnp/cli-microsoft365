@@ -14,7 +14,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   title?: string;
-  url: string;
+  webUrl: string;
   scope?: string;
   confirm?: boolean;
 }
@@ -55,7 +55,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
         option: '-t, --title [title]'
       },
       {
-        option: '-u, --url <url>'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-s, --scope [scope]',
@@ -71,28 +71,29 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.id && validation.isValidGuid(args.options.id) === false) {
-	      return `${args.options.id} is not valid. Custom action Id (GUID) expected.`;
-	    }
+          return `${args.options.id} is not valid. Custom action Id (GUID) expected.`;
+        }
 
-	    if (validation.isValidSharePointUrl(args.options.url) !== true) {
-	      return 'Missing required option url';
-	    }
+        const isValidUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (typeof isValidUrl === 'string') {
+          return isValidUrl;
+        }
 
-	    if (args.options.scope) {
-	      if (args.options.scope !== 'Site' &&
-	        args.options.scope !== 'Web' &&
-	        args.options.scope !== 'All') {
-	        return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
-	      }
-	    }
+        if (args.options.scope) {
+          if (args.options.scope !== 'Site' &&
+            args.options.scope !== 'Web' &&
+            args.options.scope !== 'All') {
+            return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
+          }
+        }
 
-	    return true;
+        return true;
       }
     );
   }
 
   #initOptionSets(): void {
-  	this.optionSets.push(['id', 'title']);
+    this.optionSets.push(['id', 'title']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -140,7 +141,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
     }
 
     const customActionRequestOptions: any = {
-      url: `${options.url}/_api/${options.scope}/UserCustomActions?$filter=Title eq '${encodeURIComponent(options.title as string)}'`,
+      url: `${options.webUrl}/_api/${options.scope}/UserCustomActions?$filter=Title eq '${encodeURIComponent(options.title as string)}'`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
@@ -167,7 +168,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
       .getCustomActionId(options)
       .then((customActionId: string): Promise<undefined> => {
         const requestOptions: any = {
-          url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(customActionId)}')')`,
+          url: `${options.webUrl}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(customActionId)}')')`,
           headers: {
             accept: 'application/json;odata=nometadata',
             'X-HTTP-Method': 'DELETE'

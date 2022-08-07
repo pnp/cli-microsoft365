@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  messageId: string;
+  id: string;
   sourceFolderId?: string;
   sourceFolderName?: string;
   targetFolderId?: string;
@@ -49,7 +49,7 @@ class OutlookMessageMoveCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--messageId <messageId>'
+        option: '--id <id>'
       },
       {
         option: '--sourceFolderName [sourceFolderName]',
@@ -85,7 +85,7 @@ class OutlookMessageMoveCommand extends GraphCommand {
       sourceFolder = await this.getFolderId(args.options.sourceFolderId, args.options.sourceFolderName);
       targetFolder = await this.getFolderId(args.options.targetFolderId, args.options.targetFolderName);
 
-      const messageUrl: string = `mailFolders/${sourceFolder}/messages/${args.options.messageId}`;
+      const messageUrl: string = `mailFolders/${sourceFolder}/messages/${args.options.id}`;
 
       const requestOptions: any = {
         url: `${this.resource}/v1.0/me/${messageUrl}/move`,

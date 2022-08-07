@@ -10,10 +10,10 @@ m365 flow run list [options]
 
 ## Options
 
-`-f, --flow <flow>`
+`-f, --flowName <flowName>`
 : The name of the Microsoft Flow to retrieve the runs for
 
-`-e, --environment <environment>`
+`-e, --environmentName <environmentName>`
 : The name of the environment to which the flow belongs
 
 --8<-- "docs/cmd/_global.md"
@@ -32,5 +32,5 @@ If the Microsoft Flow with the name you specified doesn't exist, you will get th
 List runs of the specified Microsoft Flow
 
 ```sh
-m365 flow run list --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flow 5923cb07-ce1a-4a5c-ab81-257ce820109a
+m365 flow run list --environmentName Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flowName 5923cb07-ce1a-4a5c-ab81-257ce820109a
 ```

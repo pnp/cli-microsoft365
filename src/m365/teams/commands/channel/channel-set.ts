@@ -11,9 +11,9 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  channelName: string;
+  name: string;
   description?: string
-  newChannelName?: string;
+  newName?: string;
   teamId: string;
 }
 
@@ -36,7 +36,7 @@ class TeamsChannelSetCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        newChannelName: typeof args.options.newChannelName !== 'undefined',
+        newName: typeof args.options.newName !== 'undefined',
         description: typeof args.options.description !== 'undefined'
       });
     });
@@ -48,10 +48,10 @@ class TeamsChannelSetCommand extends GraphCommand {
         option: '-i, --teamId <teamId>'
       },
       {
-        option: '--channelName <channelName>'
+        option: '--name <name>'
       },
       {
-        option: '--newChannelName [newChannelName]'
+        option: '--newName [newName]'
       },
       {
         option: '--description [description]'
@@ -66,7 +66,7 @@ class TeamsChannelSetCommand extends GraphCommand {
           return `${args.options.teamId} is not a valid GUID`;
         }
 
-        if (args.options.channelName.toLowerCase() === "general") {
+        if (args.options.name.toLowerCase() === "general") {
           return 'General channel cannot be updated';
         }
 
@@ -77,7 +77,7 @@ class TeamsChannelSetCommand extends GraphCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName)}'`,
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.name)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -113,8 +113,8 @@ class TeamsChannelSetCommand extends GraphCommand {
   private mapRequestBody(options: Options): any {
     const requestBody: any = {};
 
-    if (options.newChannelName) {
-      requestBody.displayName = options.newChannelName;
+    if (options.newName) {
+      requestBody.displayName = options.newName;
     }
 
     if (options.description) {

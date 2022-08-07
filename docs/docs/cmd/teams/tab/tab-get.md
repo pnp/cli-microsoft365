@@ -22,11 +22,11 @@ m365 teams tab get [options]
 `--channelName [channelName]`
 : The display name of the Microsoft Teams channel where the tab is located. Specify either channelId or channelName but not both
 
-`-i, --tabId [tabId]`
-: The ID of the Microsoft Teams tab. Specify either tabId or tabName but not both
+`-i, --id [id]`
+: The ID of the Microsoft Teams tab. Specify either `id` or `name` but not both
 
-`-n, --tabName [tabName]`
-: The display name of the Microsoft Teams tab. Specify either tabId or tabName but not both
+`-n, --name [name]`
+: The display name of the Microsoft Teams tab. Specify either `id` or `name` but not both
 
 --8<-- "docs/cmd/_global.md"
 
@@ -39,11 +39,11 @@ You can only retrieve tabs for teams of which you are a member.
 Get a Microsoft Teams Tab with ID _1432c9da-8b9c-4602-9248-e0800f3e3f07_
 
 ```sh
-m365 teams tab get --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --tabId 1432c9da-8b9c-4602-9248-e0800f3e3f07
+m365 teams tab get --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --id 1432c9da-8b9c-4602-9248-e0800f3e3f07
 ```
 
 Get a Microsoft Teams Tab with name _Tab Name_
 
 ```sh
-m365 teams tab get --teamName "Team Name" --channelName "Channel Name" --tabName "Tab Name"
+m365 teams tab get --teamName "Team Name" --channelName "Channel Name" --name "Tab Name"
 ```

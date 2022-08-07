@@ -99,7 +99,7 @@ class SpoListItemListCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (!args.options.id && !args.options.title && !args.options.listId && !args.options.listTitle && !args.options.listUrl) {
+        if (!args.options.listId && !args.options.listTitle && !args.options.listUrl) {
           return `Specify listId or listTitle or listUrl`;
         }
 

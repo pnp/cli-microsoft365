@@ -91,14 +91,14 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
     await command.action(logger, { options: {
       verbose: false,
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       confirm: true
     } });
     assert(loggerLogSpy.notCalled);
   });
 
   it('should prompt before clearing custom actions when confirmation argument not passed', async () => {
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com'} });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com'} });
     let promptIssued = false;
 
     if (promptOptions && promptOptions.type === 'confirm') {
@@ -115,7 +115,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: false }
     ));
-    await command.action(logger, { options: {  url: 'https://contoso.sharepoint.com'}} as any);
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com'}} as any);
     assert(postCallsSpy.notCalled);
   });
 
@@ -129,11 +129,11 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     ));
     
     try {
-      await command.action(logger, { options: {  url: 'https://contoso.sharepoint.com' }} as any);
+      await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com' }} as any);
       assert(postCallsSpy.calledTwice);
       assert(clearScopedCustomActionsSpy.calledWith(sinon.match(
         { 
-          url: 'https://contoso.sharepoint.com'
+          webUrl: 'https://contoso.sharepoint.com'
         })) === true);
     }
     finally {
@@ -147,7 +147,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
     const options = {
       debug: false,
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web',
       confirm: true
     };
@@ -157,7 +157,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       assert(postCallsSpy.calledOnce);
       assert(clearScopedCustomActionsSpy.calledWith({
         debug: false,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'Web',
         confirm: true
       }), 'clearScopedCustomActionsSpy data error');
@@ -173,7 +173,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
     const options = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site',
       confirm: true
     };
@@ -183,7 +183,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       assert(postCallsSpy.calledOnce === true);
       assert(clearScopedCustomActionsSpy.calledWith(
         {
-          url: 'https://contoso.sharepoint.com',
+          webUrl: 'https://contoso.sharepoint.com',
           scope: 'Site',
           confirm: true
         }), 'clearScopedCustomActionsSpy data error');
@@ -203,7 +203,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       await command.action(logger, {
         options: {
           debug: true,
-          url: 'https://contoso.sharepoint.com',
+          webUrl: 'https://contoso.sharepoint.com',
           confirm: true
         }
       });
@@ -219,7 +219,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
     const clearScopedCustomActionsSpy: sinon.SinonSpy = sinon.spy((command as any), 'clearScopedCustomActions');
     const options = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       confirm: true
     };
 
@@ -237,7 +237,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
     const options = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       confirm: true
     };
 
@@ -264,7 +264,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'All',
         confirm: true
       }
@@ -289,7 +289,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
     await assert.rejects(command.action(logger, {
       options: {
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'All',
         confirm: true
       }
@@ -327,7 +327,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const actual = await command.validate({
       options:
         {
-          url: 'foo'
+          webUrl: 'foo'
         }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -337,7 +337,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const actual = await command.validate({
       options:
         {
-          url: "https://contoso.sharepoint.com"
+          webUrl: "https://contoso.sharepoint.com"
         }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -347,7 +347,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const actual = await command.validate({
       options:
         {
-          url: "https://contoso.sharepoint.com",
+          webUrl: "https://contoso.sharepoint.com",
           scope: "Site"
         }
     }, commandInfo);
@@ -358,7 +358,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const actual = await command.validate({
       options:
         {
-          url: "https://contoso.sharepoint.com",
+          webUrl: "https://contoso.sharepoint.com",
           scope: 'All'
         }
     }, commandInfo);
@@ -369,7 +369,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const actual = await command.validate({
       options:
         {
-          url: "https://contoso.sharepoint.com",
+          webUrl: "https://contoso.sharepoint.com",
           scope: 'Site'
         }
     }, commandInfo);
@@ -380,7 +380,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const actual = await command.validate({
       options:
         {
-          url: "https://contoso.sharepoint.com",
+          webUrl: "https://contoso.sharepoint.com",
           scope: 'Web'
         }
     }, commandInfo);
@@ -391,7 +391,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const scope = 'foo';
     const actual = await command.validate({
       options: {
-        url: "https://contoso.sharepoint.com",
+        webUrl: "https://contoso.sharepoint.com",
         scope: scope
       }
     }, commandInfo);
@@ -402,7 +402,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const scope = 123;
     const actual = await command.validate({
       options: {
-        url: "https://contoso.sharepoint.com",
+        webUrl: "https://contoso.sharepoint.com",
         scope: scope
       }
     }, commandInfo);
