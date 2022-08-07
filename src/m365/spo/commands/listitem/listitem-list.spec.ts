@@ -177,11 +177,6 @@ describe(commands.LISTITEM_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if listTitle and listId are specified together', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'foo', listTitle: 'Demo List' } }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -190,11 +185,6 @@ describe(commands.LISTITEM_LIST, () => {
   it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List' } }, commandInfo);
     assert(actual);
-  });
-
-  it('fails validation if the listId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the listId option is not a valid GUID', async () => {

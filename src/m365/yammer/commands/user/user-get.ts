@@ -9,7 +9,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  userId?: number;
+  id?: number;
   email?: string;
 }
 
@@ -37,7 +37,7 @@ class YammerUserGetCommand extends YammerCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        userId: args.options.userId !== undefined,
+        userId: args.options.id !== undefined,
         email: args.options.email !== undefined
       });
     });
@@ -46,7 +46,7 @@ class YammerUserGetCommand extends YammerCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --userId [userId]'
+        option: '-i, --id [id]'
       },
       {
         option: '--email [email]'
@@ -57,7 +57,7 @@ class YammerUserGetCommand extends YammerCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.userId !== undefined && args.options.email !== undefined) {
+        if (args.options.id !== undefined && args.options.email !== undefined) {
           return `You are only allowed to search by ID or e-mail but not both`;
         }
 
@@ -69,8 +69,8 @@ class YammerUserGetCommand extends YammerCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let endPoint = `${this.resource}/v1/users/current.json`;
 
-    if (args.options.userId) {
-      endPoint = `${this.resource}/v1/users/${encodeURIComponent(args.options.userId)}.json`;
+    if (args.options.id) {
+      endPoint = `${this.resource}/v1/users/${encodeURIComponent(args.options.id)}.json`;
     }
     else if (args.options.email) {
       endPoint = `${this.resource}/v1/users/by_email.json?email=${encodeURIComponent(args.options.email)}`;

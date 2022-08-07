@@ -12,7 +12,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  url: string;
+  webUrl: string;
   id: string;
   name?: string;
   title?: string;
@@ -90,7 +90,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --url <url>'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-i, --id <id>'
@@ -159,7 +159,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
           return `${args.options.id} is not valid. Custom action id (Guid) expected`;
         }
     
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
@@ -236,7 +236,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
     const requestBody: any = this.mapRequestBody(options);
 
     const requestOptions: any = {
-      url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
+      url: `${options.webUrl}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
       headers: {
         accept: 'application/json;odata=nometadata',
         'X-HTTP-Method': 'MERGE'

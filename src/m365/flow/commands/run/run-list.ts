@@ -8,8 +8,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment: string;
-  flow: string;
+  environmentName: string;
+  flowName: string;
 }
 
 class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTime: string, status: string, properties: { startTime: string, status: string } }> {
@@ -34,20 +34,20 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-f, --flow <flow>'
+        option: '-f, --flowName <flowName>'
       },
       {
-        option: '-e, --environment <environment>'
+        option: '-e, --environmentName <environmentName>'
       }
     );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.logToStderr(`Retrieving list of runs for Microsoft Flow ${args.options.flow}...`);
+      logger.logToStderr(`Retrieving list of runs for Microsoft Flow ${args.options.flowName}...`);
     }
 
-    const url: string = `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/runs?api-version=2016-11-01`;
+    const url: string = `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environmentName)}/flows/${encodeURIComponent(args.options.flowName)}/runs?api-version=2016-11-01`;
 
     this
       .getAllItems(url, logger, true)

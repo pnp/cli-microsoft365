@@ -9,13 +9,13 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   appCatalogUrl?: string;
-  scope?: string;
+  appCatalogScope?: string;
 }
 
 export abstract class SpoAppBaseCommand extends SpoCommand {
   public getAppCatalogSiteUrl(logger: Logger, authSiteUrl: string, args: CommandArgs): Promise<string> {
     return new Promise<string>((resolve: (appCatalogSiteUrl: string) => void, reject: (error: any) => void): void => {
-      if (args.options.scope === 'sitecollection') {
+      if (args.options.appCatalogScope === 'sitecollection') {
         return resolve((args.options.appCatalogUrl as string).toLowerCase().replace('/appcatalog', ''));
       }
 

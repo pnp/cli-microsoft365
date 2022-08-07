@@ -117,7 +117,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
     });
     sinon.stub(fs, 'existsSync').callsFake(() => false);
 
-    command.action(logger, { options: { debug: false, environment: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } }, () => {
+    command.action(logger, { options: { debug: false, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } }, () => {
       try {
         assert(retrievedConnectorInfo, 'Did not retrieve connector info');
         assert(retrievedSwagger, 'Did not retrieve swagger');
@@ -181,7 +181,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
     });
     sinon.stub(fs, 'existsSync').callsFake(() => false);
 
-    command.action(logger, { options: { debug: true, environment: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } }, () => {
+    command.action(logger, { options: { debug: true, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } }, () => {
       try {
         assert(loggerLogToStderrSpy.calledWithExactly('Downloaded swagger'));
         done();
@@ -205,7 +205,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    command.action(logger, { options: { debug: false, environment: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Properties not present in the api registration information.')));
         done();
@@ -317,7 +317,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    command.action(logger, { options: { debug: false, environment: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, (err?: any) => {
       try {
         assert.strictEqual(err, undefined);
         done();
@@ -429,7 +429,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    command.action(logger, { options: { debug: true, environment: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, () => {
+    command.action(logger, { options: { debug: true, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, () => {
       try {
         assert(loggerLogToStderrSpy.calledWith('originalSwaggerUrl not set. Skipping'));
         done();
@@ -531,7 +531,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    command.action(logger, { options: { debug: false, environment: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, (err?: any) => {
       try {
         assert.strictEqual(err, undefined);
         done();
@@ -633,7 +633,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    command.action(logger, { options: { debug: true, environment: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, () => {
+    command.action(logger, { options: { debug: true, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, () => {
       try {
         assert(loggerLogToStderrSpy.calledWith('iconUri not set. Skipping'));
         done();
@@ -654,7 +654,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, environment: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The environment 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b' could not be found in the tenant '0d645e38-ec52-4a4f-ac58-65f2ac4015f6'.`)));
         done();
@@ -675,7 +675,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, environment: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfb' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfb' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Could not find API 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfb'.`)));
         done();
@@ -700,7 +700,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, environment: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, environmentName: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -713,24 +713,24 @@ describe(commands.CONNECTOR_EXPORT, () => {
 
   it('fails validation when the specified output folder does not exist', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = await command.validate({ options: { environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa', outputFolder: '123' } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa', outputFolder: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the specified connector folder already exists', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = await command.validate({ options: { environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when all required options specified', async () => {
-    const actual = await command.validate({ options: { environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when the specified output folder exists', async () => {
     sinon.stub(fs, 'existsSync').callsFake((folder) => folder.toString().indexOf('connector') < 0);
-    const actual = await command.validate({ options: { environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa', outputFolder: '123' } }, commandInfo);
+    const actual = await command.validate({ options: { environmentName: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa', outputFolder: '123' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

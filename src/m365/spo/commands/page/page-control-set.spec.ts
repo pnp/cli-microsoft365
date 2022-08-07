@@ -75,7 +75,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Control with ID 3ede60d3-dc2c-438b-b5bf-cc40bb2351e6 not found on page home.aspx")));
         done();
@@ -95,7 +95,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Page home.aspx doesn't contain canvas controls.")));
         done();
@@ -119,7 +119,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, (err) => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, (err) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -149,7 +149,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, (err: any) => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, (err: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Page home.aspx information not retrieved with the checkout')));
         done();
@@ -179,7 +179,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Control with ID ede2ee65-157d-4523-b4ed-87b9b64374a6 not found on page home.aspx')));
         done();
@@ -209,7 +209,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, () => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, () => {
       try {
         done();
       }
@@ -243,7 +243,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartData: '{}' } }, () => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartData: '{}' } }, () => {
       try {
         done();
       }
@@ -277,7 +277,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartProperties: '{}' } }, () => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartProperties: '{}' } }, () => {
       try {
         done();
       }
@@ -311,7 +311,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartProperties: '{}' } }, () => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', pageName: 'home', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartProperties: '{}' } }, () => {
       try {
         done();
       }
@@ -326,7 +326,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: true, id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webPartData: "{}", webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webPartData: "{}", webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -353,37 +353,37 @@ describe(commands.PAGE_CONTROL_SET, () => {
   // VALIDATION
 
   it('fails validation if the specified id is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { id: 'abc', name: 'home.aspx', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { id: 'abc', pageName: 'home.aspx', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the specified webPartProperties is not a valid JSON string', async () => {
-    const actual = await command.validate({ options: { webPartProperties: "abc", id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', name: 'home.aspx', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { webPartProperties: "abc", id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', pageName: 'home.aspx', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the specified webPartData is not a valid JSON string', async () => {
-    const actual = await command.validate({ options: { webPartData: "abc", id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', name: 'home.aspx', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({ options: { webPartData: "abc", id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', pageName: 'home.aspx', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the webPartData and webPartProperties options are provided', async () => {
-    const actual = await command.validate({ options: { webPartProperties: "{}", webPartData: "{}", id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webUrl: 'foo', name: 'home.aspx' } }, commandInfo);
+    const actual = await command.validate({ options: { webPartProperties: "{}", webPartData: "{}", id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webUrl: 'foo', pageName: 'home.aspx' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webUrl: 'foo', name: 'home.aspx' } }, commandInfo);
+    const actual = await command.validate({ options: { id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webUrl: 'foo', pageName: 'home.aspx' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when right properties with webPartData are provided', async () => {
-    const actual = await command.validate({ options: { id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webPartData: "{}", webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx' } }, commandInfo);
+    const actual = await command.validate({ options: { id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webPartData: "{}", webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when right properties with webPartProperties are provided', async () => {
-    const actual = await command.validate({ options: { id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webPartProperties: "{}", webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx' } }, commandInfo);
+    const actual = await command.validate({ options: { id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webPartProperties: "{}", webUrl: 'https://contoso.sharepoint.com', pageName: 'home.aspx' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

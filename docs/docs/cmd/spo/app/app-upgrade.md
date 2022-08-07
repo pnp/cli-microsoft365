@@ -16,7 +16,7 @@ m365 spo app upgrade [options]
 `-s, --siteUrl <siteUrl>`
 : Absolute URL of the site to upgrade the app in
 
-`--scope [scope]`
+`--appCatalogScope [appCatalogScope]`
 : Scope of the app catalog: `tenant,sitecollection`. Default `tenant`
 
 --8<-- "docs/cmd/_global.md"
@@ -36,7 +36,7 @@ m365 spo app upgrade --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https:/
 Upgrade the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ in the _https://contoso.sharepoint.com_ site from site collection app catalog.
 
 ```sh
-m365 spo app upgrade --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
+m365 spo app upgrade --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --appCatalogScope sitecollection
 ```
 
 ## More information

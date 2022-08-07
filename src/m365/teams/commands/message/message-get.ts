@@ -12,7 +12,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   teamId: string;
   channelId: string;
-  messageId: string;
+  id: string;
 }
 
 class TeamsMessageGetCommand extends GraphCommand {
@@ -34,13 +34,13 @@ class TeamsMessageGetCommand extends GraphCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-i, --teamId <teamId>'
+        option: '-t, --teamId <teamId>'
       },
       {
         option: '-c, --channelId <channelId>'
       },
       {
-        option: '-m, --messageId <messageId>'
+        option: '-i, --id <id>'
       }
     );
   }
@@ -63,7 +63,7 @@ class TeamsMessageGetCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${args.options.channelId}/messages/${args.options.messageId}`,
+      url: `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${args.options.channelId}/messages/${args.options.id}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

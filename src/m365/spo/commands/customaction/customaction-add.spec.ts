@@ -51,7 +51,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     defaultCommandOptions = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title',
       name: 'name',
       location: 'Microsoft.SharePoint.StandardMenu',
@@ -88,7 +88,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
   it('correct https data send when custom action with location StandardMenu', (done) => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 102,
@@ -122,7 +122,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
   it('correct https data send when custom action with location ClientSideExtension.ApplicationCustomizer', (done) => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 101,
@@ -157,7 +157,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
   it('correct https data send when custom action with location ClientSideExtension.ListViewCommandSet', (done) => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 103,
@@ -195,7 +195,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
   it('correct https data send when custom action with location EditControlBlock', (done) => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 104,
@@ -231,7 +231,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
   it('correct https data send when custom action with location ScriptLink', (done) => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 105,
@@ -264,7 +264,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
   it('correct https data send when custom action with location ScriptLink and ScriptBlock', (done) => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 108,
@@ -294,7 +294,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
   it('correct https data send when custom action with location CommandUI.Ribbon', (done) => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 106,
@@ -329,7 +329,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
   it('correct https data send when custom action with delegated rights', (done) => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       title: 'title1',
       name: 'name1',
       sequence: 107,
@@ -580,7 +580,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
   it('fails if the specified URL is invalid', async () => {
     defaultCommandOptions.location = 'Microsoft.SharePoint.StandardMenu';
     defaultCommandOptions.group = 'SiteActions';
-    defaultCommandOptions.url = 'foo';
+    defaultCommandOptions.webUrl = 'foo';
     const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
     assert.notStrictEqual(actual, true);
   });

@@ -11,7 +11,6 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   confirm?: boolean;
-  fieldTitle?: string;
   id?: string;
   listId?: string;
   group?: string;
@@ -71,9 +70,6 @@ class SpoFieldRemoveCommand extends SpoCommand {
         option: '-i, --id [id]'
       },
       {
-        option: '--fieldTitle [fieldTitle]'
-      },
-      {
         option: '-t, --title [title]'
       },
       {
@@ -107,16 +103,10 @@ class SpoFieldRemoveCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'title', 'fieldTitle', 'group']);
+    this.optionSets.push(['id', 'title', 'group']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (args.options.fieldTitle) {
-      args.options.title = args.options.fieldTitle;
-
-      this.warn(logger, `Option 'fieldTitle' is deprecated. Please use 'title' instead.`);
-    }
-
     let messageEnd: string;
     if (args.options.listId || args.options.listTitle) {
       messageEnd = `in list ${args.options.listId || args.options.listTitle}`;

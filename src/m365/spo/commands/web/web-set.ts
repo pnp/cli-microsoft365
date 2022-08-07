@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   quickLaunchEnabled?: string;
   siteLogoUrl?: string;
   title?: string;
-  webUrl: string;
+  url: string;
   footerEnabled?: string;
   searchScope?: string;
 }
@@ -61,7 +61,7 @@ class SpoWebSetCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --webUrl <webUrl>'
+        option: '-u, --url <url>'
       },
       {
         option: '-t, --title [title]'
@@ -101,7 +101,7 @@ class SpoWebSetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
@@ -189,7 +189,7 @@ class SpoWebSetCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web`,
+      url: `${args.options.url}/_api/web`,
       headers: {
         'content-type': 'application/json;odata=nometadata',
         accept: 'application/json;odata=nometadata'
@@ -199,7 +199,7 @@ class SpoWebSetCommand extends SpoCommand {
     };
 
     if (this.verbose) {
-      logger.logToStderr(`Updating properties of subsite ${args.options.webUrl}...`);
+      logger.logToStderr(`Updating properties of subsite ${args.options.url}...`);
     }
 
     request

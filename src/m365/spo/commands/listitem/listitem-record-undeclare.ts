@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  listItemId: string;
   listId?: string;
   listTitle?: string;
   webUrl: string;
@@ -49,7 +49,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id <id>'
+        option: '-i, --listItemId <listItemId>'
       },
       {
         option: '-l, --listId [listId]'
@@ -63,9 +63,9 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        const id: number = parseInt(args.options.id);
+        const id: number = parseInt(args.options.listItemId);
         if (isNaN(id)) {
-          return `${args.options.id} is not a valid list item ID`;
+          return `${args.options.listItemId} is not a valid list item ID`;
         }
 
         const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
@@ -144,7 +144,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
             'Content-Type': 'text/xml',
             'X-RequestDigest': formDigestValue
           },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><StaticMethod TypeId="{ea8e1356-5910-4e69-bc05-d0c30ed657fc}" Name="UndeclareItemAsRecord" Id="53"><Parameters><Parameter ObjectPathId="49" /></Parameters></StaticMethod></Actions><ObjectPaths><Identity Id="49" Name="${objectIdentity.objectIdentity}:list:${environmentListId}:item:${args.options.id},1" /></ObjectPaths></Request>`
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><StaticMethod TypeId="{ea8e1356-5910-4e69-bc05-d0c30ed657fc}" Name="UndeclareItemAsRecord" Id="53"><Parameters><Parameter ObjectPathId="49" /></Parameters></StaticMethod></Actions><ObjectPaths><Identity Id="49" Name="${objectIdentity.objectIdentity}:list:${environmentListId}:item:${args.options.listItemId},1" /></ObjectPaths></Request>`
         };
 
         return request.post(requestOptions);

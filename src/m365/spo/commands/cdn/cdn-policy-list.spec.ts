@@ -86,7 +86,7 @@ describe(commands.CDN_POLICY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, type: 'Public' } }, () => {
+    command.action(logger, { options: { debug: true, cdnType: 'Public' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([{
           Policy: 'IncludeFileExtensions',
@@ -126,7 +126,7 @@ describe(commands.CDN_POLICY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, type: 'Private' } }, () => {
+    command.action(logger, { options: { debug: true, cdnType: 'Private' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([{
           Policy: 'IncludeFileExtensions',
@@ -264,7 +264,7 @@ describe(commands.CDN_POLICY_LIST, () => {
     const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('[type]') > -1) {
+      if (o.option.indexOf('[cdnType]') > -1) {
         containsTypeOption = true;
       }
     });
@@ -272,18 +272,18 @@ describe(commands.CDN_POLICY_LIST, () => {
   });
 
   it('accepts Public SharePoint Online CDN type', async () => {
-    const actual = await command.validate({ options: { type: 'Public' } }, commandInfo);
+    const actual = await command.validate({ options: { cdnType: 'Public' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('accepts Private SharePoint Online CDN type', async () => {
-    const actual = await command.validate({ options: { type: 'Private' } }, commandInfo);
+    const actual = await command.validate({ options: { cdnType: 'Private' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN type', async () => {
     const type = 'foo';
-    const actual = await command.validate({ options: { type: type } }, commandInfo);
+    const actual = await command.validate({ options: { cdnType: type } }, commandInfo);
     assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
   });
 

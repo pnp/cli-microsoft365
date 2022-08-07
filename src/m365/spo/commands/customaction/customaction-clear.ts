@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  url: string;
+  webUrl: string;
   scope?: string;
   confirm?: boolean;
 }
@@ -45,7 +45,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-u, --url <url>'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-s, --scope [scope]',
@@ -60,7 +60,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        const isValidUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
+        const isValidUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
         if (typeof isValidUrl === 'string') {
           return isValidUrl;
         }
@@ -111,7 +111,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
 
   private clearScopedCustomActions(options: Options): Promise<void> {
     const requestOptions: any = {
-      url: `${options.url}/_api/${options.scope}/UserCustomActions/clear`,
+      url: `${options.webUrl}/_api/${options.scope}/UserCustomActions/clear`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },

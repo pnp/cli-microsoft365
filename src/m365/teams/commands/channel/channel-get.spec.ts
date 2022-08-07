@@ -64,7 +64,7 @@ describe(commands.CHANNEL_GET, () => {
   it('fails validation if both teamId and teamName options are not passed', async () => {
     const actual = await command.validate({
       options: {
-        channelId: '19:00000000000000000000000000000000@thread.skype'
+        id: '19:00000000000000000000000000000000@thread.skype'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -75,13 +75,13 @@ describe(commands.CHANNEL_GET, () => {
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
         teamName: 'Team Name',
-        channelId: '19:00000000000000000000000000000000@thread.skype'
+        id: '19:00000000000000000000000000000000@thread.skype'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if channelId, channelName and primary options are not passed', async () => {
+  it('fails validation if id, name and primary options are not passed', async () => {
     const actual = await command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6'
@@ -90,46 +90,46 @@ describe(commands.CHANNEL_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if channelId with primary options are passed', async () => {
+  it('fails validation if id with primary options are passed', async () => {
     const actual = await command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
+        id: '19:00000000000000000000000000000000@thread.skype',
         primary: true
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if channelName and primary options are passed', async () => {
+  it('fails validation if name and primary options are passed', async () => {
     const actual = await command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
-        channelName: 'Channel Name',
+        name: 'Channel Name',
         primary: true
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if channelId, channelName and primary options are passed', async () => {
+  it('fails validation if id, name and primary options are passed', async () => {
     const actual = await command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        channelName: 'Channel Name',
+        id: '19:00000000000000000000000000000000@thread.skype',
+        name: 'Channel Name',
         primary: true
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if channelId and channelName are passed', async () => {
+  it('fails validation if id and name are passed', async () => {
     const actual = await command.validate({
       options: {
         teamId: '26b48cd6-3da7-493d-8010-1b246ef552d6',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        channelName: 'Channel Name'
+        id: '19:00000000000000000000000000000000@thread.skype',
+        name: 'Channel Name'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -139,7 +139,7 @@ describe(commands.CHANNEL_GET, () => {
     const actual = await command.validate({
       options: {
         teamId: 'invalid',
-        channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
+        id: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -148,13 +148,13 @@ describe(commands.CHANNEL_GET, () => {
   it('fails validation if the teamId is not provided.', async () => {
     const actual = await command.validate({
       options: {
-        channelId: '19:00000000000000000000000000000000@thread.skype'
+        id: '19:00000000000000000000000000000000@thread.skype'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the channelId is not provided.', async () => {
+  it('fails validation if the id is not provided.', async () => {
     const actual = await command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
@@ -163,21 +163,21 @@ describe(commands.CHANNEL_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validates for a incorrect channelId missing leading 19:.', async () => {
+  it('fails validates for a incorrect id missing leading 19:.', async () => {
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00000000000000000000000000000000@thread.skype'
+        id: '00000000000000000000000000000000@thread.skype'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validates for a incorrect channelId missing trailing @thread.skype.', async () => {
+  it('fails validates for a incorrect id missing trailing @thread.skype.', async () => {
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread'
+        id: '19:552b7125655c46d5b5b86db02ee7bfdf@thread'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -187,7 +187,7 @@ describe(commands.CHANNEL_GET, () => {
     const actual = await command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
+        id: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -214,7 +214,7 @@ describe(commands.CHANNEL_GET, () => {
       options: {
         debug: true,
         teamId: '39958f28-eefb-4006-8f83-13b6ac2a4a7f',
-        channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
+        id: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
       }
     } as any, (err?: any) => {
       try {
@@ -264,7 +264,7 @@ describe(commands.CHANNEL_GET, () => {
       options: {
         debug: true,
         teamName: 'Team Name',
-        channelName: 'Channel Name',
+        name: 'Channel Name',
         tabName: 'Tab Name'
       }
     }, (err?: any) => {
@@ -290,7 +290,7 @@ describe(commands.CHANNEL_GET, () => {
       options: {
         debug: true,
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelName: 'Channel Name',
+        name: 'Channel Name',
         tabName: 'Tab Name'
       }
     }, (err?: any) => {
@@ -321,7 +321,7 @@ describe(commands.CHANNEL_GET, () => {
     command.action(logger, {
       options: {
         teamId: '39958f28-eefb-4006-8f83-13b6ac2a4a7f',
-        channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
+        id: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
       }
     }, () => {
       try {
@@ -432,7 +432,7 @@ describe(commands.CHANNEL_GET, () => {
     command.action(logger, {
       options: {
         teamName: 'Team Name',
-        channelName: 'Channel Name'
+        name: 'Channel Name'
       }
     }, () => {
       try {
@@ -544,7 +544,7 @@ describe(commands.CHANNEL_GET, () => {
       options: {
         debug: true,
         teamId: '39958f28-eefb-4006-8f83-13b6ac2a4a7f',
-        channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
+        id: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
       }
     }, () => {
       try {

@@ -16,7 +16,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   contentTypeId: string;
-  fieldId: string;
+  id: string;
   hidden?: string;
   required?: string;
   webUrl: string;
@@ -68,7 +68,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         option: '-c, --contentTypeId <contentTypeId>'
       },
       {
-        option: '-f, --fieldId <fieldId>'
+        option: '-f, --id <id>'
       },
       {
         option: '-r, --required [required]'
@@ -82,8 +82,8 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!validation.isValidGuid(args.options.fieldId)) {
-          return `${args.options.fieldId} is not a valid GUID`;
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
         }
     
         if (typeof args.options.required !== 'undefined') {
@@ -113,11 +113,11 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     let schemaXmlWithResourceTokens: string = '';
 
     if (this.verbose) {
-      logger.logToStderr(`Retrieving field link for field ${args.options.fieldId}...`);
+      logger.logToStderr(`Retrieving field link for field ${args.options.id}...`);
     }
 
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.fieldId}')`,
+      url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.id}')`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
@@ -137,11 +137,11 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
         if (this.verbose) {
           logger.logToStderr('Field link not found. Creating...');
-          logger.logToStderr(`Retrieving information about site column ${args.options.fieldId}...`);
+          logger.logToStderr(`Retrieving information about site column ${args.options.id}...`);
         }
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/fields('${args.options.fieldId}')?$select=SchemaXmlWithResourceTokens`,
+          url: `${args.options.webUrl}/_api/web/fields('${args.options.id}')?$select=SchemaXmlWithResourceTokens`,
           headers: {
             accept: 'application/json;odata=nometadata'
           },
@@ -164,11 +164,11 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          logger.logToStderr(`Retrieving information about field link for field ${args.options.fieldId}...`);
+          logger.logToStderr(`Retrieving information about field link for field ${args.options.id}...`);
         }
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.fieldId}')`,
+          url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.id}')`,
           headers: {
             accept: 'application/json;odata=nometadata'
           },
@@ -183,7 +183,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
 
         if (!this.fieldLink) {
-          return Promise.reject(`Couldn't find field link for field ${args.options.fieldId}`);
+          return Promise.reject(`Couldn't find field link for field ${args.options.id}`);
         }
 
         let updateHidden: boolean = false;
@@ -350,7 +350,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
             headers: {
               'X-RequestDigest': this.requestDigest
             },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="5" ObjectPathId="4" /><ObjectIdentityQuery Id="6" ObjectPathId="4" /><Method Name="Update" Id="7" ObjectPathId="1"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="2" Name="d6667b9e-50fb-0000-2693-032ae7a0df25|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:field:${args.options.fieldId}" /><Method Id="4" ParentId="3" Name="Add"><Parameters><Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}"><Property Name="Field" ObjectPathId="2" /></Parameter></Parameters></Method><Identity Id="1" Name="d6667b9e-80f4-0000-2693-05528ff416bf|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${formatting.escapeXml(args.options.contentTypeId)}" /><Property Id="3" ParentId="1" Name="FieldLinks" /></ObjectPaths></Request>`
+            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="5" ObjectPathId="4" /><ObjectIdentityQuery Id="6" ObjectPathId="4" /><Method Name="Update" Id="7" ObjectPathId="1"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="2" Name="d6667b9e-50fb-0000-2693-032ae7a0df25|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:field:${args.options.id}" /><Method Id="4" ParentId="3" Name="Add"><Parameters><Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}"><Property Name="Field" ObjectPathId="2" /></Parameter></Parameters></Method><Identity Id="1" Name="d6667b9e-80f4-0000-2693-05528ff416bf|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${formatting.escapeXml(args.options.contentTypeId)}" /><Property Id="3" ParentId="1" Name="FieldLinks" /></ObjectPaths></Request>`
           };
 
           return request.post(requestOptions);
@@ -374,7 +374,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       if (!requiresUpdate) {
         if (this.verbose) {
-          logger.logToStderr(`Schema of field ${args.options.fieldId} is already up-to-date`);
+          logger.logToStderr(`Schema of field ${args.options.id} is already up-to-date`);
         }
         resolve();
         return;
@@ -388,7 +388,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           }
 
           const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/fields('${args.options.fieldId}')`,
+            url: `${args.options.webUrl}/_api/web/fields('${args.options.id}')`,
             headers: {
               accept: 'application/json;odata=nometadata',
               'content-type': 'application/json;odata=nometadata',

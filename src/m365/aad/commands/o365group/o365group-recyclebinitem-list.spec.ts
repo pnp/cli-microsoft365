@@ -373,7 +373,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { displayName: 'Deleted' } }, () => {
+    command.action(logger, { options: { groupDisplayName: 'Deleted' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -497,7 +497,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { mailNickname: 'd_team' } }, () => {
+    command.action(logger, { options: { groupMailNickname: 'd_team' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -621,7 +621,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { displayName: 'Deleted', mailNickname: 'd_team' } }, () => {
+    command.action(logger, { options: { groupDisplayName: 'Deleted', groupMailNickname: 'd_team' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -683,22 +683,22 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
     });
   });
 
-  it('supports specifying displayName', () => {
+  it('supports specifying groupDisplayName', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--displayName') > -1) {
+      if (o.option.indexOf('--groupDisplayName') > -1) {
         containsOption = true;
       }
     });
     assert(containsOption);
   });
 
-  it('supports specifying mailNickname', () => {
+  it('supports specifying groupMailNickname', () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--mailNickname') > -1) {
+      if (o.option.indexOf('--groupMailNickname') > -1) {
         containsOption = true;
       }
     });

@@ -88,7 +88,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, confirm: true, taskId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
+    command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -100,7 +100,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   });
 
   it('prompts before removing the specified site design task when confirm option not passed', (done) => {
-    command.action(logger, { options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
+    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -120,7 +120,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   it('aborts removing site design task when prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'post');
 
-    command.action(logger, { options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
+    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
       try {
         assert(postSpy.notCalled);
         done();
@@ -138,7 +138,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
-    command.action(logger, { options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
+    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
       try {
         assert(postStub.called);
         done();
@@ -164,7 +164,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
     const options = command.options;
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--taskId') > -1) {
+      if (o.option.indexOf('--id') > -1) {
         containsOption = true;
       }
     });
@@ -183,12 +183,12 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   });
 
   it('fails validation if the taskId is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { taskId: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the taskId is a valid GUID', async () => {
-    const actual = await command.validate({ options: { taskId: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
+    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

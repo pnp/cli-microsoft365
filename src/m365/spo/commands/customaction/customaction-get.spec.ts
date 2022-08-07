@@ -128,7 +128,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options: {
         debug: false,
         title: 'YourAppCustomizer',
-        url: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, (err?: any) => {
       try {
@@ -157,7 +157,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options: {
         debug: false,
         title: 'YourAppCustomizer',
-        url: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, (err?: any) => {
       try {
@@ -204,7 +204,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options: {
         debug: false,
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
       try {
@@ -273,7 +273,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options: {
         debug: false,
         title: 'Places',
-        url: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
       try {
@@ -319,7 +319,7 @@ describe(commands.CUSTOMACTION_GET, () => {
     const options = {
       debug: false,
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: 'Web'
     };
 
@@ -329,7 +329,7 @@ describe(commands.CUSTOMACTION_GET, () => {
         assert(getCustomActionSpy.calledWith({
           debug: false,
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-          url: 'https://contoso.sharepoint.com',
+          webUrl: 'https://contoso.sharepoint.com',
           scope: 'Web'
         }), 'getCustomActionSpy.calledWith');
         assert(getCustomActionSpy.calledOnce, 'getCustomActionSpy.calledOnce');
@@ -357,7 +357,7 @@ describe(commands.CUSTOMACTION_GET, () => {
     const options = {
       debug: false,
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: 'Site'
     };
 
@@ -368,7 +368,7 @@ describe(commands.CUSTOMACTION_GET, () => {
           {
             debug: false,
             id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-            url: 'https://contoso.sharepoint.com',
+            webUrl: 'https://contoso.sharepoint.com',
             scope: 'Site'
           }), 'getCustomActionSpy.calledWith');
         assert(getCustomActionSpy.calledOnce, 'getCustomActionSpy.calledOnce');
@@ -398,7 +398,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options: {
         debug: false,
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
     }, () => {
@@ -435,7 +435,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options: {
         debug: true,
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
       try {
@@ -465,7 +465,7 @@ describe(commands.CUSTOMACTION_GET, () => {
     const options = {
       debug: false,
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-      url: 'https://contoso.sharepoint.com',
+      webUrl: 'https://contoso.sharepoint.com',
       scope: "All"
     };
 
@@ -474,7 +474,7 @@ describe(commands.CUSTOMACTION_GET, () => {
         assert(searchAllScopesSpy.calledWith(sinon.match(
           {
             id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-            url: 'https://contoso.sharepoint.com'
+            webUrl: 'https://contoso.sharepoint.com'
           })), 'searchAllScopesSpy.calledWith');
         assert(searchAllScopesSpy.calledOnce, 'searchAllScopesSpy.calledOnce');
         done();
@@ -508,7 +508,7 @@ describe(commands.CUSTOMACTION_GET, () => {
         debug: false,
         verbose: false,
         id: actionId,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
     }, () => {
@@ -542,7 +542,7 @@ describe(commands.CUSTOMACTION_GET, () => {
         debug: false,
         verbose: true,
         id: actionId,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
     }, () => {
@@ -572,7 +572,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options: {
         debug: false,
         id: actionId,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
     }, (error?: any) => {
@@ -607,7 +607,7 @@ describe(commands.CUSTOMACTION_GET, () => {
         debug: false,
         verbose: true,
         id: actionId,
-        url: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
     }, (error?: any) => {
@@ -648,7 +648,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options:
         {
           id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          url: 'foo'
+          webUrl: 'foo'
         }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -659,7 +659,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options:
         {
           id: "foo",
-          url: 'https://contoso.sharepoint.com'
+          webUrl: 'https://contoso.sharepoint.com'
         }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -670,7 +670,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options:
         {
           id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          url: "https://contoso.sharepoint.com"
+          webUrl: "https://contoso.sharepoint.com"
         }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -681,7 +681,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options:
         {
           id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          url: "https://contoso.sharepoint.com",
+          webUrl: "https://contoso.sharepoint.com",
           scope: "Site"
         }
     }, commandInfo);
@@ -693,7 +693,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options:
         {
           id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          url: "https://contoso.sharepoint.com"
+          webUrl: "https://contoso.sharepoint.com"
         }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -719,7 +719,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options:
         {
           id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          url: "https://contoso.sharepoint.com",
+          webUrl: "https://contoso.sharepoint.com",
           scope: 'All'
         }
     }, commandInfo);
@@ -731,7 +731,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options:
         {
           id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          url: "https://contoso.sharepoint.com",
+          webUrl: "https://contoso.sharepoint.com",
           scope: 'Site'
         }
     }, commandInfo);
@@ -743,7 +743,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       options:
         {
           id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-          url: "https://contoso.sharepoint.com",
+          webUrl: "https://contoso.sharepoint.com",
           scope: 'Web'
         }
     }, commandInfo);
@@ -755,7 +755,7 @@ describe(commands.CUSTOMACTION_GET, () => {
     const actual = await command.validate({
       options: {
         id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        url: "https://contoso.sharepoint.com",
+        webUrl: "https://contoso.sharepoint.com",
         scope: scope
       }
     }, commandInfo);
@@ -767,7 +767,7 @@ describe(commands.CUSTOMACTION_GET, () => {
     const actual = await command.validate({
       options: {
         id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        url: "https://contoso.sharepoint.com",
+        webUrl: "https://contoso.sharepoint.com",
         scope: scope
       }
     }, commandInfo);
@@ -780,7 +780,7 @@ describe(commands.CUSTOMACTION_GET, () => {
         options:
           {
             id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-            url: "https://contoso.sharepoint.com"
+            webUrl: "https://contoso.sharepoint.com"
           }
       }, commandInfo);
     assert.strictEqual(actual, true);

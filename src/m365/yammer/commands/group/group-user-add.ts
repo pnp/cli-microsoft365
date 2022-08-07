@@ -9,8 +9,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: number;
-  userId?: number;
+  groupId: number;
+  id?: number;
   email?: string;
 }
 
@@ -34,7 +34,7 @@ class YammerGroupUserAddCommand extends YammerCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        userId: typeof args.options.userId !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
         email: typeof args.options.email !== 'undefined'
       });
     });
@@ -43,10 +43,10 @@ class YammerGroupUserAddCommand extends YammerCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '--id <id>'
+        option: '--groupId <groupId>'
       },
       {
-        option: '--userId [userId]'
+        option: '--id [id]'
       },
       {
         option: '--email [email]'
@@ -57,12 +57,12 @@ class YammerGroupUserAddCommand extends YammerCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && typeof args.options.id !== 'number') {
-          return `${args.options.id} is not a number`;
+        if (typeof args.options.groupId !== 'number') {
+          return `${args.options.groupId} is not a number`;
         }
 
-        if (args.options.userId && typeof args.options.userId !== 'number') {
-          return `${args.options.userId} is not a number`;
+        if (args.options.id && typeof args.options.id !== 'number') {
+          return `${args.options.id} is not a number`;
         }
 
         return true;
@@ -79,8 +79,8 @@ class YammerGroupUserAddCommand extends YammerCommand {
       },
       responseType: 'json',
       data: {
-        group_id: args.options.id,
-        user_id: args.options.userId,
+        group_id: args.options.groupId,
+        user_id: args.options.id,
         email: args.options.email
       }
     };

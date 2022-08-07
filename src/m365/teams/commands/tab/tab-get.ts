@@ -22,8 +22,8 @@ interface Options extends GlobalOptions {
   teamName?: string;
   channelId?: string;
   channelName?: string;
-  tabId?: string;
-  tabName?: string;
+  id?: string;
+  name?: string;
 }
 
 interface ExtendedGroup extends Group {
@@ -57,8 +57,8 @@ class TeamsTabGetCommand extends GraphCommand {
         teamName: typeof args.options.teamName !== 'undefined',
         channelId: typeof args.options.channelId !== 'undefined',
         channelName: typeof args.options.channelName !== 'undefined',
-        tabId: typeof args.options.tabId !== 'undefined',
-        tabName: typeof args.options.tabName !== 'undefined'
+        id: typeof args.options.id !== 'undefined',
+        name: typeof args.options.name !== 'undefined'
       });
     });
   }
@@ -78,10 +78,10 @@ class TeamsTabGetCommand extends GraphCommand {
         option: '--channelName [channelName]'
       },
       {
-        option: '-i, --tabId [tabId]'
+        option: '-i, --id [id]'
       },
       {
-        option: '-n, --tabName [tabName]'
+        option: '-n, --name [name]'
       }
     );
   }
@@ -90,42 +90,42 @@ class TeamsTabGetCommand extends GraphCommand {
     this.validators.push(
       async (args: CommandArgs) => {
         if (args.options.teamId && args.options.teamName) {
-	      return 'Specify either teamId or teamName, but not both.';
-	    }
+          return 'Specify either teamId or teamName, but not both.';
+        }
 
-	    if (!args.options.teamId && !args.options.teamName) {
-	      return 'Specify teamId or teamName, one is required';
-	    }
+        if (!args.options.teamId && !args.options.teamName) {
+          return 'Specify teamId or teamName, one is required';
+        }
 
-	    if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
-	      return `${args.options.teamId} is not a valid GUID`;
-	    }
+        if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
 
-	    if (args.options.channelId && args.options.channelName) {
-	      return 'Specify either channelId or channelName, but not both.';
-	    }
+        if (args.options.channelId && args.options.channelName) {
+          return 'Specify either channelId or channelName, but not both.';
+        }
 
-	    if (!args.options.channelId && !args.options.channelName) {
-	      return 'Specify channelId or channelName, one is required';
-	    }
+        if (!args.options.channelId && !args.options.channelName) {
+          return 'Specify channelId or channelName, one is required';
+        }
 
-	    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
-	      return `${args.options.channelId} is not a valid Teams ChannelId`;
-	    }
+        if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
+          return `${args.options.channelId} is not a valid Teams ChannelId`;
+        }
 
-	    if (args.options.tabId && args.options.tabName) {
-	      return 'Specify either tabId or tabName, but not both.';
-	    }
+        if (args.options.id && args.options.name) {
+          return 'Specify either id or name, but not both.';
+        }
 
-	    if (!args.options.tabId && !args.options.tabName) {
-	      return 'Specify tabId or tabName, one is required';
-	    }
+        if (!args.options.id && !args.options.name) {
+          return 'Specify id or name, one is required';
+        }
 
-	    if (args.options.tabId && !validation.isValidGuid(args.options.tabId as string)) {
-	      return `${args.options.tabId} is not a valid GUID`;
-	    }
+        if (args.options.id && !validation.isValidGuid(args.options.id as string)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
 
-	    return true;
+        return true;
       }
     );
   }
@@ -173,12 +173,12 @@ class TeamsTabGetCommand extends GraphCommand {
   }
 
   private getTabId(args: CommandArgs): Promise<string> {
-    if (args.options.tabId) {
-      return Promise.resolve(args.options.tabId);
+    if (args.options.id) {
+      return Promise.resolve(args.options.id);
     }
 
     const tabRequestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(this.channelId)}/tabs?$filter=displayName eq '${encodeURIComponent(args.options.tabName as string)}'`,
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(this.channelId)}/tabs?$filter=displayName eq '${encodeURIComponent(args.options.name as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

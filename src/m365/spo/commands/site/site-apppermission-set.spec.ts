@@ -88,7 +88,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if permissionId, appId, and appDisplayName options are not specified', async () => {
+  it('fails validation if id, appId, and appDisplayName options are not specified', async () => {
     const actual = await command.validate({
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
@@ -469,7 +469,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     });
   });
 
-  it('Updates an application permission to the site by permissionId', (done) => {
+  it('Updates an application permission to the site by id', (done) => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
@@ -509,7 +509,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
         permission: "write",
-        permissionId: "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
+        id: "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
         output: "json"
       }
     }, () => {

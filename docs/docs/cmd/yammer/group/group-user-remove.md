@@ -10,10 +10,10 @@ m365 yammer group user remove [options]
 
 ## Options
 
-`--id <id>`
+`--groupId <groupId>`
 : The ID of the Yammer group
 
-`--userId [userId]`
+`--id [id]`
 : ID of the user to remove from the group. If not specified, removes the current user
 
 `--confirm`
@@ -31,17 +31,17 @@ m365 yammer group user remove [options]
 Remove the current user from the group with the ID `5611239081`
 
 ```sh
-m365 yammer group user remove --id 5611239081
+m365 yammer group user remove --groupId 5611239081
 ```
 
 Remove the user with the ID `66622349` from the group with the ID `5611239081`
 
 ```sh
-m365 yammer group user remove --id 5611239081 --userId 66622349
+m365 yammer group user remove --groupId 5611239081 --id 66622349
 ```
 
 Remove the user with the ID `66622349` from the group with the ID `5611239081` without asking for confirmation
 
 ```sh
-m365 yammer group user remove --id 5611239081 --userId 66622349 --confirm
+m365 yammer group user remove --groupId 5611239081 --id 66622349 --confirm
 ```

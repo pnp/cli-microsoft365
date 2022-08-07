@@ -15,7 +15,6 @@ interface Options extends GlobalOptions {
   listTitle?: string;
   listUrl?: string;
   id?: string;
-  fieldTitle?: string;
   title?: string;
 }
 
@@ -67,9 +66,6 @@ class SpoFieldGetCommand extends SpoCommand {
         option: '-i, --id [id]'
       },
       {
-        option: '--fieldTitle [fieldTitle]'
-      },
-      {
         option: '-t, --title [title]'
       }
     );
@@ -97,16 +93,10 @@ class SpoFieldGetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-    this.optionSets.push(['id', 'title', 'fieldTitle']);
+    this.optionSets.push(['id', 'title']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (args.options.fieldTitle) {
-      args.options.title = args.options.fieldTitle;
-
-      this.warn(logger, `Option 'fieldTitle' is deprecated. Please use 'title' instead.`);
-    }
-
     let listRestUrl: string = '';
 
     if (args.options.listId) {

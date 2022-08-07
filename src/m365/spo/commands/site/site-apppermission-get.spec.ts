@@ -65,7 +65,7 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
     const actual = await command.validate({
       options: {
         siteUrl: 'https;//contoso,sharepoint:com/sites/sitecollection-name',
-        permissionId: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
+        id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -75,7 +75,7 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
     const actual = await command.validate({
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        permissionId: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
+        id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -84,7 +84,7 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
   it('passes validation with a correct URL and a filter value', async () => {
     const actual = await command.validate({
       options: {
-        permissionId: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0',
+        id: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0',
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name'
       }
     }, commandInfo);
@@ -136,7 +136,7 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
     command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
+        id: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
         output: 'json'
       }
     }, () => {

@@ -18,7 +18,6 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   name?: string;
-  teamId?: string;
   shouldSetSpoSiteReadOnlyForMembers: boolean;
 }
 
@@ -42,10 +41,9 @@ class TeamsTeamArchiveCommand extends GraphCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-      	id: typeof args.options.id !== 'undefined',
-      	name: typeof args.options.name !== 'undefined',
-        shouldSetSpoSiteReadOnlyForMembers: args.options.shouldSetSpoSiteReadOnlyForMembers === true,
-        teamId: typeof args.options.teamId !== 'undefined'
+        id: typeof args.options.id !== 'undefined',
+        name: typeof args.options.name !== 'undefined',
+        shouldSetSpoSiteReadOnlyForMembers: args.options.shouldSetSpoSiteReadOnlyForMembers === true
       });
     });
   }
@@ -59,9 +57,6 @@ class TeamsTeamArchiveCommand extends GraphCommand {
         option: '-n, --name [name]'
       },
       {
-        option: '--teamId [teamId]'
-      },
-      {
         option: '--shouldSetSpoSiteReadOnlyForMembers'
       }
     );
@@ -70,23 +65,19 @@ class TeamsTeamArchiveCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.id && !args.options.name && !args.options.teamId) {
-	      return 'Specify either id or name';
-	    }
+        if (!args.options.id && !args.options.name) {
+          return 'Specify either id or name';
+        }
 
-	    if (args.options.name && (args.options.id || args.options.teamId)) {
-	      return 'Specify either id or name but not both';
-	    }
+        if (args.options.name && args.options.id) {
+          return 'Specify either id or name but not both';
+        }
 
-	    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-	      return `${args.options.teamId} is not a valid GUID`;
-	    }
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
 
-	    if (args.options.id && !validation.isValidGuid(args.options.id)) {
-	      return `${args.options.id} is not a valid GUID`;
-	    }
-
-	    return true;
+        return true;
       }
     );
   }
@@ -108,12 +99,6 @@ class TeamsTeamArchiveCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (args.options.teamId) {
-      args.options.id = args.options.teamId;
-
-      this.warn(logger, `Option 'teamId' is deprecated. Please use 'id' instead.`);
-    }
-
     const siteReadOnlyForMembers: boolean = args.options.shouldSetSpoSiteReadOnlyForMembers === true;
 
     this

@@ -67,7 +67,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
   });
 
   it('prompts before removing view from list when confirmation argument not passed (list title and view id)', (done) => {
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', id: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -85,7 +85,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
   });
 
   it('prompts before removing view from list when confirmation argument not passed (list title and view title)', (done) => {
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewTitle: 'My view' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', title: 'My view' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -103,7 +103,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
   });
 
   it('prompts before removing view from list when confirmation argument not passed (list id and view id)', (done) => {
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', id: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -121,7 +121,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
   });
 
   it('prompts before removing view from list when confirmation argument not passed (list id and view title)', (done) => {
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'My view' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', title: 'My view' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -139,7 +139,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
   });
 
   it('aborts removing view from list when prompt not confirmed', (done) => {
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', id: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, () => {
       try {
         assert(requests.length === 0);
         done();
@@ -150,7 +150,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     });
   });
 
-  it('removes the viewId from listTitle when prompt confirmed (debug)', (done) => {
+  it('removes the id from listTitle when prompt confirmed (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -174,7 +174,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
-        viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81'
+        id: 'cc27a922-8224-4296-90a5-ebbc54da2e81'
       }
     }, () => {
       let correctRequestIssued = false;
@@ -197,7 +197,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     });
   });
 
-  it('removes the viewId from listTitle when prompt confirmed', (done) => {
+  it('removes the id from listTitle when prompt confirmed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -216,7 +216,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', id: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views(guid'cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1 &&
@@ -235,7 +235,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     });
   });
 
-  it('removes the viewTitle from listTitle when prompt confirmed (debug)', (done) => {
+  it('removes the title from listTitle when prompt confirmed (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -259,7 +259,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
-        viewTitle: 'MyView'
+        title: 'MyView'
       }
     }, () => {
       let correctRequestIssued = false;
@@ -282,7 +282,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     });
   });
 
-  it('removes the viewTitle from listTitle when prompt confirmed', (done) => {
+  it('removes the title from listTitle when prompt confirmed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -301,7 +301,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewTitle: 'MyView' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', title: 'MyView' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/lists/GetByTitle('Documents')/views/GetByTitle('MyView')`) > -1 &&
@@ -320,7 +320,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     });
   });
 
-  it('removes the viewTitle from listId when prompt confirmed (debug)', (done) => {
+  it('removes the title from listId when prompt confirmed (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -344,7 +344,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        viewTitle: 'MyView'
+        title: 'MyView'
       }
     }, () => {
       let correctRequestIssued = false;
@@ -367,7 +367,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     });
   });
 
-  it('removes the viewTitle from listId when prompt confirmed', (done) => {
+  it('removes the title from listId when prompt confirmed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -386,7 +386,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', title: 'MyView' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views/GetByTitle('MyView')`) > -1 &&
@@ -405,7 +405,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     });
   });
 
-  it('removes the viewTitle from listId when prompt confirmed (debug)', (done) => {
+  it('removes the title from listId when prompt confirmed (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -429,7 +429,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81'
+        id: 'cc27a922-8224-4296-90a5-ebbc54da2e81'
       }
     }, () => {
       let correctRequestIssued = false;
@@ -452,7 +452,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     });
   });
 
-  it('removes the viewId from listId when prompt confirmed', (done) => {
+  it('removes the id from listId when prompt confirmed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -471,7 +471,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', id: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views(guid'cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1 &&
@@ -502,7 +502,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     command.action(logger, {
       options: {
         debug: false,
-        viewId: '0cd891ef-afce-4e55-b836-fce03286cccf',
+        id: '0cd891ef-afce-4e55-b836-fce03286cccf',
         webUrl: 'https://contoso.sharepoint.com',
         listId: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         confirm: true
@@ -531,7 +531,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     command.action(logger, {
       options: {
         debug: false,
-        viewId: '0cd891ef-afce-4e55-b836-fce03286cccf',
+        id: '0cd891ef-afce-4e55-b836-fce03286cccf',
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'Documents',
         confirm: true
@@ -571,52 +571,52 @@ describe(commands.LIST_VIEW_REMOVE, () => {
   });
 
   it('fails validation if both listId and listTitle options are not passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if viewId and viewTitle options are not passed', async () => {
+  it('fails validation if id and title options are not passed', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', id: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', id: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, commandInfo);
     assert(actual);
   });
 
   it('fails validation if the listId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345', id: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the viewId option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: '12345' } }, commandInfo);
+  it('fails validation if the id option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', id: '12345' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the listid option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', id: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, commandInfo);
     assert(actual);
   });
 
   it('passes validation if the viewid option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', id: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, commandInfo);
     assert(actual);
   });
 
   it('fails validation if both listId and listTitle options are passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', listTitle: 'Documents', id: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both viewId and viewTitle options are passed', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'My view', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, commandInfo);
+  it('fails validation if both id and title options are passed', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', title: 'My view', id: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

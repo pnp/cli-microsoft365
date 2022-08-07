@@ -11,7 +11,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  fileUrl?: string;
+  url?: string;
   id?: string;
   type?: string;
   comment?: string;
@@ -44,7 +44,7 @@ class SpoFileCheckinCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         id: (!(!args.options.id)).toString(),
-        url: (!(!args.options.fileUrl)).toString(),
+        url: (!(!args.options.url)).toString(),
         type: args.options.type || 'Major',
         comment: typeof args.options.comment !== 'undefined'
       });
@@ -57,7 +57,7 @@ class SpoFileCheckinCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --fileUrl [fileUrl]'
+        option: '-f, --url [url]'
       },
       {
         option: '-i, --id [id]'
@@ -86,12 +86,12 @@ class SpoFileCheckinCommand extends SpoCommand {
           }
         }
     
-        if (args.options.id && args.options.fileUrl) {
-          return 'Specify either fileUrl or id but not both';
+        if (args.options.id && args.options.url) {
+          return 'Specify either url or id but not both';
         }
     
-        if (!args.options.id && !args.options.fileUrl) {
-          return 'Specify fileUrl or id, one is required';
+        if (!args.options.id && !args.options.url) {
+          return 'Specify url or id, one is required';
         }
     
         if (args.options.comment && args.options.comment.length > 1023) {
@@ -133,8 +133,8 @@ class SpoFileCheckinCommand extends SpoCommand {
       requestUrl = `${args.options.webUrl}/_api/web/GetFileById('${encodeURIComponent(args.options.id)}')/checkin(comment='${comment}',checkintype=${type})`;
     }
 
-    if (args.options.fileUrl) {
-      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(args.options.fileUrl)}')/checkin(comment='${comment}',checkintype=${type})`;
+    if (args.options.url) {
+      requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(args.options.url)}')/checkin(comment='${comment}',checkintype=${type})`;
     }
 
     const requestOptions: any = {
