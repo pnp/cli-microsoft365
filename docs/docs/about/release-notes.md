@@ -12,6 +12,8 @@
 
 - fixes 'spo site apppermission add' and 'spo site apppermission set' permission option [#3353](https://github.com/pnp/cli-microsoft365/issues/3353)
 - extends 'spo group get' with support for returning associated groups [#3545](https://github.com/pnp/cli-microsoft365/issues/3545)
+- extends 'spfx project upgrade' with support for upgrading SPFx projects to v1.15.2 [#3556](https://github.com/pnp/cli-microsoft365/issues/3556)
+- extends 'spfx project doctor' with support for validating SPFx projects to v1.15.2 [#3560](https://github.com/pnp/cli-microsoft365/issues/3560)
 
 ## [v5.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.5.0)
 
