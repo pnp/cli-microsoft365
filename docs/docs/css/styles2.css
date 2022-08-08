@@ -21,6 +21,117 @@
   margin-top: 5em;
 }
 
+.cli-grid {  
+  display: grid;
+  grid-auto-columns: 1fr;  
+  
+  justify-content: space-around;
+  align-content: start;
+  grid-column-gap: 36px;
+  grid-row-gap: 36px;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: auto;
+}
+
+.cli-grid-item-container {  
+  max-width: 100%;
+  display: inline-block;
+}
+
+.cli-grid-item {  
+  position: relative;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  flex-direction: column;
+  border: 1px solid #ecebea;
+  border-radius: 6px;
+  background-color: #fff;
+  padding: 10px;
+  box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.02);
+  height: 100%;
+}
+
+#cli-grid-item-template {
+  display: none;
+}
+
+.cli-grid-item-align-center {    
+  display: flex;
+  width: 100%;
+  -webkit-box-align: center;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cli-grid-item-align-center:last-of-type {      
+  margin-top: auto;
+}
+
+.cli-grid-item-img {  
+  width: 42px;
+  -webkit-box-flex: 0;
+  flex: 0 0 auto;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 50%;  
+  display: inline-block;
+}
+
+.cli-grid-item-text {  
+  width: 100%;
+  text-align: center;
+}
+
+.cli-grid-item-name {  
+  margin-top: 0px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.cli-grid-item-company {  
+  color: #636e72;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.cli-grid-item-link, .cli-grid-item-link-img {
+  opacity: 0.5;
+  -webkit-transition: opacity 200ms ease-in-out;
+  transition: opacity 200ms ease-in-out;
+}
+
+.cli-grid-item-link {
+  color: #636e72;
+  margin-bottom: 0px;
+  padding-top: 10px;
+  padding-bottom: 8px;
+  padding-left: 4px;
+  padding-right: 4px;
+  font-size: 13px;
+  font-weight: 300;
+  text-decoration: none;
+  cursor: pointer;
+  max-width: 100%;
+  display: inline-block;
+}
+
+.cli-grid-item-link:hover {  
+  opacity: 1;
+}
+
+.cli-grid-item-link-img {
+  min-height: 24px;
+  fill: #636e72;
+  display: block;
+}
+
 @media only screen and (max-width: 76.1875em) {
   .md-nav--primary .md-nav__title--site .md-nav__button {
     width: 150px;
@@ -30,6 +141,12 @@
 @media screen and (min-width: 964px) {
   .md-typeset__scrollwrap {
     overflow: visible;
+  }
+}
+
+@media screen and (max-width: 964px) {
+  .cli-grid {    
+    grid-template-columns: 1fr 1fr;
   }
 }
 

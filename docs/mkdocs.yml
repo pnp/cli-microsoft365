@@ -790,6 +790,7 @@ nav:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Comparison to SharePoint and Microsoft 365 PowerShell': 'about/comparison-powershell.md'
     - 'Release notes': 'about/release-notes.md'
+    - 'Team': 'about/team.md'
     - License: 'about/license.md'
 theme:
     name: 'material'
