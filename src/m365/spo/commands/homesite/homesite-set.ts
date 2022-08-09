@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -24,6 +24,27 @@ class SpoHomeSiteSetCommand extends SpoCommand {
 
   public get description(): string {
     return 'Sets the specified site as the Home Site';
+  }
+
+  constructor() {
+    super();
+  
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --siteUrl <siteUrl>'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.siteUrl)
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -60,21 +81,6 @@ class SpoHomeSiteSetCommand extends SpoCommand {
         
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    return validation.isValidSharePointUrl(args.options.siteUrl);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

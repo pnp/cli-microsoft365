@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.USER_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -161,28 +163,28 @@ describe(commands.USER_GET, () => {
     });
   });
 
-  it('passes validation without parameters', () => {
-    const actual = command.validate({ options: {} });
+  it('passes validation without parameters', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if userId set ', () => {
-    const actual = command.validate({ options: { userId: 1496550646 } });
+  it('passes validation if userId set ', async () => {
+    const actual = await command.validate({ options: { userId: 1496550646 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if email set', () => {
-    const actual = command.validate({ options: { email: "pl@nubo.eu" } });
+  it('passes validation if email set', async () => {
+    const actual = await command.validate({ options: { email: "pl@nubo.eu" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('does not pass with userId and e-mail', () => {
-    const actual = command.validate({ options: { userId: 1496550646, email: "pl@nubo.eu" } });
+  it('does not pass with userId and e-mail', async () => {
+    const actual = await command.validate({ options: { userId: 1496550646, email: "pl@nubo.eu" } }, commandInfo);
     assert.strictEqual(actual, "You are only allowed to search by ID or e-mail but not both");
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -30,11 +30,47 @@ class SpoStorageEntitySetCommand extends SpoCommand {
     return 'Sets tenant property on the specified SharePoint Online app catalog';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.description = (!(!args.options.description)).toString();
-    telemetryProps.comment = (!(!args.options.comment)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        description: (!(!args.options.description)).toString(),
+        comment: (!(!args.options.comment)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --appCatalogUrl <appCatalogUrl>'
+      },
+      {
+        option: '-k, --key <key>'
+      },
+      {
+        option: '-v, --value <value>'
+      },
+      {
+        option: '-d, --description [description]'
+      },
+      {
+        option: '-c, --comment [comment]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.appCatalogUrl)
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -74,42 +110,9 @@ class SpoStorageEntitySetCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        
+
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --appCatalogUrl <appCatalogUrl>'
-      },
-      {
-        option: '-k, --key <key>'
-      },
-      {
-        option: '-v, --value <value>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-c, --comment [comment]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const result: boolean | string = validation.isValidSharePointUrl(args.options.appCatalogUrl);
-    if (result === false) {
-      return 'Missing required option appCatalogUrl';
-    }
-    else {
-      return result;
-    }
   }
 }
 

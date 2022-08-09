@@ -4,7 +4,7 @@ import * as path from 'path';
 import { v4 } from 'uuid';
 import { Logger } from "../../../../cli";
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils';
@@ -34,6 +34,49 @@ class PaSolutionInitCommand extends AnonymousCommand {
 
   public get description(): string {
     return 'Initializes a directory with a new CDS solution project';
+  }
+
+  constructor() {
+    super();
+
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--publisherName <publisherName>'
+      },
+      {
+        option: '--publisherPrefix <publisherPrefix>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (fs.readdirSync(process.cwd()).some(fn => path.extname(fn).toLowerCase() === '.cdsproj')) {
+          return 'CDS project creation failed. The current directory already contains a project. Please create a new directory and retry the operation.';
+        }
+
+        const workingDirectoryName: string = path.basename(process.cwd());
+        if (!validation.isValidFileName(workingDirectoryName)) {
+          return `Empty or invalid project name '${workingDirectoryName}'`;
+        }
+
+        if (args.options.publisherPrefix.length < 2 || args.options.publisherPrefix.length > 8 || !/^(?!mscrm)^([a-zA-Z])\w*$/i.test(args.options.publisherPrefix)) {
+          return `Value of 'publisherPrefix' is invalid. The prefix must be 2 to 8 characters long, can only consist of alpha-numerics, must start with a letter, and cannot start with 'mscrm'.`;
+        }
+
+        if (!/^([a-zA-Z_])\w*$/i.test(args.options.publisherName)) {
+          return `Value of 'publisherName' is invalid. Only characters within the ranges [A-Z], [a-z], [0-9], or _ are allowed. The first character may only be in the ranges [A-Z], [a-z], or _.`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -91,51 +134,6 @@ class PaSolutionInitCommand extends AnonymousCommand {
     catch (err: any) {
       cb(new CommandError(err));
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--publisherName <publisherName>'
-      },
-      {
-        option: '--publisherPrefix <publisherPrefix>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (fs.readdirSync(process.cwd()).some(fn => path.extname(fn).toLowerCase() === '.cdsproj')) {
-      return 'CDS project creation failed. The current directory already contains a project. Please create a new directory and retry the operation.';
-    }
-
-    const workingDirectoryName: string = path.basename(process.cwd());
-    if (!validation.isValidFileName(workingDirectoryName)) {
-      return `Empty or invalid project name '${workingDirectoryName}'`;
-    }
-
-    if (args.options.publisherPrefix) {
-      if (args.options.publisherPrefix.length < 2 || args.options.publisherPrefix.length > 8 || !/^(?!mscrm)^([a-zA-Z])\w*$/i.test(args.options.publisherPrefix)) {
-        return `Value of 'publisherPrefix' is invalid. The prefix must be 2 to 8 characters long, can only consist of alpha-numerics, must start with a letter, and cannot start with 'mscrm'.`;
-      }
-    }
-    else {
-      return 'Missing required option publisherPrefix.';
-    }
-
-    if (args.options.publisherName) {
-      if (!/^([a-zA-Z_])\w*$/i.test(args.options.publisherName)) {
-        return `Value of 'publisherName' is invalid. Only characters within the ranges [A-Z], [a-z], [0-9], or _ are allowed. The first character may only be in the ranges [A-Z], [a-z], or _.`;
-      }
-    }
-    else {
-      return 'Missing required option publisherName.';
-    }
-
-    return true;
   }
 
   private generateOptionValuePrefixForPublisher(customizationPrefix: string): string {

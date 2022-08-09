@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo, validation } from '../../../../utils';
@@ -27,10 +24,46 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
     return 'Applies a site design to an existing site collection';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.asTask = args.options.asTask || false;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        asTask: args.options.asTask || false
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--asTask'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        return validation.isValidSharePointUrl(args.options.webUrl);
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -64,31 +97,6 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--asTask'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

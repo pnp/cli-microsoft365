@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -15,6 +15,7 @@ describe(commands.THEME_APPLY, () => {
   let requests: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -27,6 +28,7 @@ describe(commands.THEME_APPLY, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -622,7 +624,7 @@ describe(commands.THEME_APPLY, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -632,28 +634,28 @@ describe(commands.THEME_APPLY, () => {
     assert(containsDebugOption);
   });
 
-  it('passes validation when name is passed', () => {
-    const actual = command.validate({ options: { name: 'Contoso-Blue', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+  it('passes validation when name is passed', async () => {
+    const actual = await command.validate({ options: { name: 'Contoso-Blue', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if webUrl is not passed', () => {
-    const actual = command.validate({ options: { name: 'Contoso-Blue', webUrl: '' } });
+  it('fails validation if webUrl is not passed', async () => {
+    const actual = await command.validate({ options: { name: 'Contoso-Blue', webUrl: '' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { name: 'Contoso-Blue', webUrl: 'invalid' } });
+  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { name: 'Contoso-Blue', webUrl: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when webUrl is passed', () => {
-    const actual = command.validate({ options: { name: 'Contoso-Blue', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+  it('passes validation when webUrl is passed', async () => {
+    const actual = await command.validate({ options: { name: 'Contoso-Blue', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if name is not a valid SharePoint theme name', () => {
-    const actual = command.validate({ options: { name: 'invalid', webUrl: 'https://contoso.sharepoint.com/sites/project-x', sharePointTheme: true } });
+  it('fails validation if name is not a valid SharePoint theme name', async () => {
+    const actual = await command.validate({ options: { name: 'invalid', webUrl: 'https://contoso.sharepoint.com/sites/project-x', sharePointTheme: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

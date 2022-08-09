@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,14 +12,16 @@ const command: Command = require('./app-remove');
 describe(commands.APP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let requests: any[];
   let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -402,65 +404,64 @@ describe(commands.APP_REMOVE, () => {
     });
   });
 
-  it('fails validation if the id is not a valid GUID', () => {
-    const actual = command.validate({ options: { id: 'foo' } });
+  it('fails validation if the id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the appCatalogUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogUrl: 'foo' } });
+  it('fails validation if the appCatalogUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when invalid scope is specified', () => {
-    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'foo' } });
+  it('fails validation when invalid scope is specified', async () => {
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', () => {
+  it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', async () => {
 
-    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', filePath: 'abc', scope: 'sitecollection' } });
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'sitecollection' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('should pass when \'tenant\' scope and appCatalogUrl specified', () => {
-    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', filePath: 'abc', scope: 'tenant', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+  it('should pass when \'tenant\' scope and appCatalogUrl specified', async () => {
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'tenant', appCatalogUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('should fail when \'sitecollection\' scope, but  bad appCatalogUrl format specified', () => {
-
-    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', filePath: 'abc', scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } });
+  it('should fail when \'sitecollection\' scope, but  bad appCatalogUrl format specified', async () => {
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the id is specified and the appCatalogUrl is not', () => {
-    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4' } });
+  it('passes validation when the id is specified and the appCatalogUrl is not', async () => {
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the id and appCatalogUrl options are specified', () => {
-    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'tenant' } });
+  it('passes validation when the id and appCatalogUrl options are specified', async () => {
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'tenant' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when no scope is specified', () => {
-    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4' } });
+  it('passes validation when no scope is specified', async () => {
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the scope is specified with \'tenant\'', () => {
-    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'tenant' } });
+  it('passes validation when the scope is specified with \'tenant\'', async () => {
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'tenant' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the scope is specified with \'sitecollection\'', () => {
-    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+  it('passes validation when the scope is specified with \'sitecollection\'', async () => {
+    const actual = await command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

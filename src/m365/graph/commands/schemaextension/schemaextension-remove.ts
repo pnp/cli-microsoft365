@@ -1,7 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -24,10 +21,31 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
   public get description(): string {
     return 'Removes specified Microsoft Graph schema extension';
   }
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.confirm = typeof args.options.confirm !== 'undefined';
-    return telemetryProps;
+
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        confirm: typeof args.options.confirm !== 'undefined'
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '--confirm'
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -66,20 +84,6 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 module.exports = new GraphSchemaExtensionRemoveCommand();

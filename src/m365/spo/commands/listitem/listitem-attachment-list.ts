@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -26,11 +25,67 @@ class SpoListItemAttachmentListCommand extends SpoCommand {
     return 'Gets the attachments associated to a list item';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listId = typeof args.options.listId !== 'undefined';
-    telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--itemId <itemId>'
+      },
+      {
+        option: '--listId [listId]'
+      },
+      {
+        option: '--listTitle [listTitle]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (!args.options.listId && !args.options.listTitle) {
+          return `Specify listId or listTitle`;
+        }
+
+        if (args.options.listId && args.options.listTitle) {
+          return `Specify listId or listTitle but not both`;
+        }
+
+        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} in option listId is not a valid GUID`;
+        }
+
+        if (isNaN(parseInt(args.options.itemId))) {
+          return `${args.options.itemId} is not a number`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public defaultProperties(): string[] | undefined {
@@ -66,51 +121,6 @@ class SpoListItemAttachmentListCommand extends SpoCommand {
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--itemId <itemId>'
-      },
-      {
-        option: '--listId [listId]'
-      },
-      {
-        option: '--listTitle [listTitle]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (!args.options.listId && !args.options.listTitle) {
-      return `Specify listId or listTitle`;
-    }
-
-    if (args.options.listId && args.options.listTitle) {
-      return `Specify listId or listTitle but not both`;
-    }
-
-    if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-      return `${args.options.listId} in option listId is not a valid GUID`;
-    }
-
-    if (isNaN(parseInt(args.options.itemId))) {
-      return `${args.options.itemId} is not a number`;
-    }
-
-    return true;
   }
 }
 

@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import { fsUtil, packageManager, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -14,6 +14,7 @@ const command: Command = require('./project-upgrade');
 describe(commands.PROJECT_UPGRADE, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let trackEvent: any;
   let telemetry: any;
   let packagesDevExact: string[];
@@ -28,6 +29,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       telemetry = t;
     });
     project141webPartNoLib = (command as any).getProject(projectPath);
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -2730,6 +2732,71 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
   //#endregion
 
+  //#region 1.15.0
+  it('e2e: shows correct number of findings for upgrading application customizer 1.15.0 project to 1.15.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1150-applicationcustomizer'));
+
+    command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 15);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.15.0 project to 1.15.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1150-fieldcustomizer-react'));
+
+    command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 14);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.15.0 project to 1.15.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1150-listviewcommandset'));
+
+    command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 15);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.15.0 project to 1.15.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1150-webpart-nolib'));
+
+    command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 16);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.15.0 project to 1.15.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1150-webpart-react'));
+
+    command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 16);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.15.0 project to 1.15.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1150-webpart-optionaldeps'));
+
+    command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 26);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading ace 1.15.0 project to 1.15.2', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1150-ace'));
+
+    command.action(logger, { options: { toVersion: '1.15.2', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 13);
+    });
+  });
+  //#endregion
+
   //#region superseded rules
   it('ignores superseded findings (1.1.0 > 1.2.0)', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-110-webpart-react'));
@@ -2780,7 +2847,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-nolib'));
 
     command.action(logger, { options: { output: 'text' } } as any, () => {
-      assert(log[0].indexOf('1.15.0') > -1);
+      assert(log[0].indexOf('1.15.2') > -1);
     });
   });
 
@@ -2849,7 +2916,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -2859,53 +2926,53 @@ describe(commands.PROJECT_UPGRADE, () => {
     assert(containsOption);
   });
 
-  it('passes validation when package manager not specified', () => {
-    const actual = command.validate({ options: {} });
+  it('passes validation when package manager not specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when unsupported package manager specified', () => {
-    const actual = command.validate({ options: { packageManager: 'abc' } });
+  it('fails validation when unsupported package manager specified', async () => {
+    const actual = await command.validate({ options: { packageManager: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when npm package manager specified', () => {
-    const actual = command.validate({ options: { packageManager: 'npm' } });
+  it('passes validation when npm package manager specified', async () => {
+    const actual = await command.validate({ options: { packageManager: 'npm' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when pnpm package manager specified', () => {
-    const actual = command.validate({ options: { packageManager: 'pnpm' } });
+  it('passes validation when pnpm package manager specified', async () => {
+    const actual = await command.validate({ options: { packageManager: 'pnpm' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when yarn package manager specified', () => {
-    const actual = command.validate({ options: { packageManager: 'yarn' } });
+  it('passes validation when yarn package manager specified', async () => {
+    const actual = await command.validate({ options: { packageManager: 'yarn' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when shell not specified', () => {
-    const actual = command.validate({ options: {} });
+  it('passes validation when shell not specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when unsupported shell specified', () => {
-    const actual = command.validate({ options: { shell: 'abc' } });
+  it('fails validation when unsupported shell specified', async () => {
+    const actual = await command.validate({ options: { shell: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when bash shell specified', () => {
-    const actual = command.validate({ options: { shell: 'bash' } });
+  it('passes validation when bash shell specified', async () => {
+    const actual = await command.validate({ options: { shell: 'bash' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when powershell shell specified', () => {
-    const actual = command.validate({ options: { shell: 'powershell' } });
+  it('passes validation when powershell shell specified', async () => {
+    const actual = await command.validate({ options: { shell: 'powershell' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when cmd shell specified', () => {
-    const actual = command.validate({ options: { shell: 'cmd' } });
+  it('passes validation when cmd shell specified', async () => {
+    const actual = await command.validate({ options: { shell: 'cmd' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

@@ -1,6 +1,5 @@
 import { Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata, validation } from '../../../../utils';
 import { aadGroup } from '../../../../utils/aadGroup';
@@ -31,16 +30,56 @@ class TeamsAppListCommand extends GraphCommand {
     return 'Lists apps from the Microsoft Teams app catalog or apps installed in the specified team';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.all = args.options.all || false;
-    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
-    telemetryProps.teamName = typeof args.options.teamName !== 'undefined';
-    return telemetryProps;
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['id', 'displayName', 'distributionMethod'];
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        all: args.options.all || false,
+        teamId: typeof args.options.teamId !== 'undefined',
+        teamName: typeof args.options.teamName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-a, --all'
+      },
+      {
+        option: '-i, --teamId [teamId]'
+      },
+      {
+        option: '-t --teamName [teamName]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.teamId && args.options.teamName) {
+          return 'Specify either teamId or teamName, but not both.';
+        }
+
+        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
+
+        return true;
+      }
+    );
   }
 
   private getTeamId(args: CommandArgs): Promise<string> {
@@ -104,35 +143,6 @@ class TeamsAppListCommand extends GraphCommand {
         logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-a, --all'
-      },
-      {
-        option: '-i, --teamId [teamId]'
-      },
-      {
-        option: '-t --teamName [teamName]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.teamId && args.options.teamName) {
-      return 'Specify either teamId or teamName, but not both.';
-    }
-
-    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

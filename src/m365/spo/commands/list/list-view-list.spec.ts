@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.LIST_VIEW_LIST, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -322,38 +324,38 @@ describe(commands.LIST_VIEW_LIST, () => {
     });
   });
 
-  it('fails validation if both listId and listTitle options are not passed', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+  it('fails validation if both listId and listTitle options are not passed', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'foo', listId: '1f187321-f086-4d3d-8523-517e94cc9df9' } });
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'foo', listId: '1f187321-f086-4d3d-8523-517e94cc9df9' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '1f187321-f086-4d3d-8523-517e94cc9df9' } });
+  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '1f187321-f086-4d3d-8523-517e94cc9df9' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the listId option is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345' } });
+  it('fails validation if the listId option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the listId option is a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '1f187321-f086-4d3d-8523-517e94cc9df9' } });
+  it('passes validation if the listId option is a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '1f187321-f086-4d3d-8523-517e94cc9df9' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if both listId and listTitle options are passed', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '1f187321-f086-4d3d-8523-517e94cc9df9', listTitle: 'Documents' } });
+  it('fails validation if both listId and listTitle options are passed', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '1f187321-f086-4d3d-8523-517e94cc9df9', listTitle: 'Documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -1,7 +1,6 @@
 import * as chalk from 'chalk';
 import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command, {
-  CommandOption,
   CommandErrorWithOutput
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -54,6 +53,93 @@ class SpoSiteEnsureCommand extends SpoCommand {
 
   public get description(): string {
     return 'Ensures that the particular site collection exists and updates its properties if necessary';
+  }
+
+  constructor() {
+    super();
+
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '--type [type]',
+        autocomplete: ['TeamSite', 'CommunicationSite', 'ClassicSite']
+      },
+      {
+        option: '-t, --title <title>'
+      },
+      {
+        option: '-a, --alias [alias]'
+      },
+      {
+        option: '-z, --timeZone [timeZone]'
+      },
+      {
+        option: '-d, --description [description]'
+      },
+      {
+        option: '-l, --lcid [lcid]'
+      },
+      {
+        option: '--owners [owners]'
+      },
+      {
+        option: '--isPublic'
+      },
+      {
+        option: '-c, --classification [classification]'
+      },
+      {
+        option: '--siteDesign [siteDesign]',
+        autocomplete: ['Topic', 'Showcase', 'Blank']
+      },
+      {
+        option: '--siteDesignId [siteDesignId]'
+      },
+      {
+        option: '--shareByEmailEnabled'
+      },
+      {
+        option: '-w, --webTemplate [webTemplate]'
+      },
+      {
+        option: '--resourceQuota [resourceQuota]'
+      },
+      {
+        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
+      },
+      {
+        option: '--storageQuota [storageQuota]'
+      },
+      {
+        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
+      },
+      {
+        option: '--removeDeletedSite'
+      },
+      {
+        option: '--disableFlows [disableFlows]'
+      },
+      {
+        option: '--sharingCapability [sharingCapability]',
+        autocomplete: this.sharingCapabilities
+      },
+      {
+        option: '--wait'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -149,7 +235,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
     return Cli.executeCommandWithOutput(spoWebGetCommand as Command, { options: { ...options, _: [] } });
   }
 
-  private createSite(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
+  private async createSite(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
     if (this.verbose) {
       logger.logToStderr(`Creating site...`);
     }
@@ -179,7 +265,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
       debug: this.debug
     };
 
-    const validationResult: boolean | string = (spoSiteAddCommand as Command).validate({ options: options });
+    const validationResult: boolean | string = await (spoSiteAddCommand as Command).validate({ options: options }, Cli.getCommandInfo(spoSiteAddCommand as Command));
     if (validationResult !== true) {
       return Promise.reject(validationResult);
     }
@@ -187,14 +273,9 @@ class SpoSiteEnsureCommand extends SpoCommand {
     return Cli.executeCommandWithOutput(spoSiteAddCommand as Command, { options: { ...options, _: [] } });
   }
 
-  private updateSite(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
+  private async updateSite(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
     if (this.verbose) {
       logger.logToStderr(`Updating site...`);
-    }
-
-    const validationResult: boolean | string = (spoSiteSetCommand as Command).validate(args);
-    if (validationResult !== true) {
-      return Promise.reject(validationResult);
     }
 
     const options: SpoSiteSetCommandOptions = {
@@ -210,6 +291,11 @@ class SpoSiteEnsureCommand extends SpoCommand {
       verbose: this.verbose,
       debug: this.debug
     };
+    const validationResult: boolean | string = await (spoSiteSetCommand as Command).validate({ options: options }, Cli.getCommandInfo(spoSiteSetCommand as Command));
+    if (validationResult !== true) {
+      return Promise.reject(validationResult);
+    }
+
     return Cli.executeCommandWithOutput(spoSiteSetCommand as Command, { options: { ...options, _: [] } });
   }
 
@@ -227,87 +313,6 @@ class SpoSiteEnsureCommand extends SpoCommand {
     }
 
     return result;
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '--type [type]',
-        autocomplete: ['TeamSite', 'CommunicationSite', 'ClassicSite']
-      },
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '-a, --alias [alias]'
-      },
-      {
-        option: '-z, --timeZone [timeZone]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-l, --lcid [lcid]'
-      },
-      {
-        option: '--owners [owners]'
-      },
-      {
-        option: '--isPublic'
-      },
-      {
-        option: '-c, --classification [classification]'
-      },
-      {
-        option: '--siteDesign [siteDesign]',
-        autocomplete: ['Topic', 'Showcase', 'Blank']
-      },
-      {
-        option: '--siteDesignId [siteDesignId]'
-      },
-      {
-        option: '--shareByEmailEnabled'
-      },
-      {
-        option: '-w, --webTemplate [webTemplate]'
-      },
-      {
-        option: '--resourceQuota [resourceQuota]'
-      },
-      {
-        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
-      },
-      {
-        option: '--storageQuota [storageQuota]'
-      },
-      {
-        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
-      },
-      {
-        option: '--removeDeletedSite'
-      },
-      {
-        option: '--disableFlows [disableFlows]'
-      },
-      {
-        option: '--sharingCapability [sharingCapability]',
-        autocomplete: this.sharingCapabilities
-      },
-      {
-        option: '--wait'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    return validation.isValidSharePointUrl(args.options.url);
   }
 }
 

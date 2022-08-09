@@ -1,10 +1,13 @@
 import type * as Chalk from 'chalk';
+import type { Inquirer } from 'inquirer';
+import * as os from 'os';
 import appInsights from './appInsights';
 import auth from './Auth';
-import { Cli } from './cli';
+import { Cli, CommandInfo, CommandOptionInfo } from './cli';
 import { Logger } from './cli/Logger';
 import GlobalOptions from './GlobalOptions';
 import request from './request';
+import { settingsNames } from './settingsNames';
 import { accessToken, GraphResponseError } from './utils';
 
 export interface CommandOption {
@@ -17,8 +20,8 @@ export interface CommandHelp {
 }
 
 export interface CommandTypes {
-  string?: string[];
-  boolean?: string[];
+  string: string[];
+  boolean: string[];
 }
 
 export class CommandError {
@@ -46,94 +49,155 @@ export interface CommandArgs {
 }
 
 export default abstract class Command {
-  protected _debug: boolean = false;
-  protected _verbose: boolean = false;
+  protected debug: boolean = false;
+  protected verbose: boolean = false;
 
-  protected get debug(): boolean {
-    return this._debug;
-  }
+  public telemetry: ((args: any) => void)[] = [];
+  protected telemetryProperties: any = {};
 
-  protected get verbose(): boolean {
-    return this._verbose;
-  }
+  public options: CommandOption[] = [];
+  public optionSets: string[][] = [];
+  public types: CommandTypes = {
+    boolean: [],
+    string: []
+  };
+
+  protected validators: ((args: any, command: CommandInfo) => Promise<boolean | string>)[] = [];
 
   public abstract get name(): string;
   public abstract get description(): string;
 
-  public abstract commandAction(logger: Logger, args: any, cb: () => void): void;
+  constructor() {
+    // These functions must be defined with # so that they're truly private
+    // otherwise you'll get a ts2415 error (Types have separate declarations of
+    // a private property 'x'.).
+    // `private` in TS is a design-time flag and private members end-up being
+    // regular class properties that would collide on runtime, which is why we
+    // need the extra `#`
 
-  protected showDeprecationWarning(logger: Logger, deprecated: string, recommended: string): void {
-    const cli: Cli = Cli.getInstance();
-    if (cli.currentCommandName &&
-      cli.currentCommandName.indexOf(deprecated) === 0) {
-      const chalk: typeof Chalk = require('chalk');
-      logger.logToStderr(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
-    }
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
   }
 
-  protected warn(logger: Logger, warning: string): void {
-    const chalk: typeof Chalk = require('chalk');
-    logger.logToStderr(chalk.yellow(warning));
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        debug: this.debug.toString(),
+        verbose: this.verbose.toString(),
+        output: args.options.output,
+        query: typeof args.options.query !== 'undefined'
+      });
+    });
   }
 
-  protected getUsedCommandName(): string {
-    const cli: Cli = Cli.getInstance();
-    const commandName: string = this.getCommandName();
-    if (!cli.currentCommandName) {
-      return commandName;
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '--query [query]' },
+      {
+        option: '-o, --output [output]',
+        autocomplete: ['csv', 'json', 'text']
+      },
+      { option: '--verbose' },
+      { option: '--debug' }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      (args, command) => this.validateUnknownOptions(args, command),
+      (args, command) => this.validateRequiredOptions(args, command),
+      (args, command) => this.validateOptionSets(args, command),
+    );
+  }
+
+  private async validateUnknownOptions(args: CommandArgs, command: CommandInfo): Promise<string | boolean> {
+    if (this.allowUnknownOptions()) {
+      return true;
     }
 
-    if (cli.currentCommandName &&
-      cli.currentCommandName.indexOf(commandName) === 0) {
-      return commandName;
-    }
+    // if the command doesn't allow unknown options, check if all specified
+    // options match command options
+    for (const optionFromArgs in args.options) {
+      let matches: boolean = false;
 
-    // since the command was called by something else than its name
-    // it must have aliases
-    const aliases: string[] = this.alias() as string[];
+      for (let i = 0; i < command.options.length; i++) {
+        const option: CommandOptionInfo = command.options[i];
+        if (optionFromArgs === option.long ||
+          optionFromArgs === option.short) {
+          matches = true;
+          break;
+        }
+      }
 
-    for (let i: number = 0; i < aliases.length; i++) {
-      if (cli.currentCommandName.indexOf(aliases[i]) === 0) {
-        return aliases[i];
+      if (!matches) {
+        return `Invalid option: '${optionFromArgs}'${os.EOL}`;
       }
     }
 
-    // shouldn't happen because the command is called either by its name or alias
-    return '';
+    return true;
   }
 
-  public action(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    auth
-      .restoreAuth()
-      .then((): void => {
-        this.initAction(args, logger);
+  private async validateRequiredOptions(args: CommandArgs, command: CommandInfo): Promise<string | boolean> {
+    const shouldPrompt = Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
 
-        if (!auth.service.connected) {
-          cb(new CommandError('Log in to Microsoft 365 first'));
-          return;
-        }
+    let inquirer: Inquirer | undefined;
+    let prompted: boolean = false;
+    for (let i = 0; i < command.options.length; i++) {
+      if (!command.options[i].required ||
+        typeof args.options[command.options[i].name] !== 'undefined') {
+        continue;
+      }
 
-        this.loadValuesFromAccessToken(args);
-        this.commandAction(logger, args, cb);
-      }, (error: any): void => {
-        cb(new CommandError(error));
-      });
+      if (!shouldPrompt) {
+        return `Required option ${command.options[i].name} not specified`;
+      }
+
+      if (!prompted) {
+        prompted = true;
+        Cli.log('Provide values for the following parameters:');
+      }
+
+      if (!inquirer) {
+        inquirer = require('inquirer');
+      }
+
+      const missingRequireOptionValue = await (inquirer as Inquirer)
+        .prompt({
+          name: 'missingRequireOptionValue',
+          message: `${command.options[i].name}: `
+        })
+        .then(result => result.missingRequireOptionValue);
+
+      args.options[command.options[i].name] = missingRequireOptionValue;
+    }
+
+    return true;
   }
 
-  public getTelemetryProperties(args: any): any {
-    return {
-      debug: this.debug.toString(),
-      verbose: this.verbose.toString(),
-      output: args.options.output,
-      query: typeof args.options.query !== 'undefined'
-    };
+  private async validateOptionSets(args: CommandArgs, command: CommandInfo): Promise<string | boolean> {
+    const optionsSets: string[][] | undefined = command.command.optionSets;
+    if (!optionsSets || optionsSets.length === 0) {
+      return true;
+    }
+
+    const argsOptions: string[] = Object.keys(args.options);
+    for (const optionSet of optionsSets) {
+      const commonOptions = argsOptions.filter(opt => optionSet.includes(opt));
+
+      if (commonOptions.length === 0) {
+        return `Specify one of the following options: ${optionSet.map(opt => opt).join(', ')}.`;
+      }
+
+      if (commonOptions.length > 1) {
+        return `Specify one of the following options: ${optionSet.map(opt => opt).join(', ')}, but not multiple.`;
+      }
+    }
+
+    return true;
   }
 
   public alias(): string[] | undefined {
-    return;
-  }
-
-  public autocomplete(): string[] | undefined {
     return;
   }
 
@@ -149,37 +213,6 @@ export default abstract class Command {
     return;
   }
 
-  public options(): CommandOption[] {
-    return [
-      {
-        option: '--query [query]'
-      },
-      {
-        option: '-o, --output [output]',
-        autocomplete: ['csv', 'json', 'text']
-      },
-      {
-        option: '--verbose'
-      },
-      {
-        option: '--debug'
-      }
-    ];
-  }
-
-  public optionSets(): string[][] | undefined {
-    return;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public validate(args: any): boolean | string {
-    return true;
-  }
-
-  public types(): CommandTypes | undefined {
-    return;
-  }
-
   /**
    * Processes options after resolving them from the user input and before
    * passing them on to command action for execution. Used for example for
@@ -188,6 +221,42 @@ export default abstract class Command {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   public async processOptions(options: any): Promise<void> {
+  }
+
+  public abstract commandAction(logger: Logger, args: any, cb: () => void): void;
+
+  public action(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+    auth
+      .restoreAuth()
+      .then((): void => {
+        this.initAction(args, logger);
+
+        if (!auth.service.connected) {
+          cb(new CommandError('Log in to Microsoft 365 first'));
+          return;
+        }
+
+        try {
+          this.loadValuesFromAccessToken(args);
+          this.commandAction(logger, args, cb);
+        }
+        catch (ex) {
+          cb(new CommandError(ex as any));
+        }
+      }, (error: any): void => {
+        cb(new CommandError(error));
+      });
+  }
+
+  public async validate(args: CommandArgs, command: CommandInfo): Promise<boolean | string> {
+    for (const validate of this.validators) {
+      const result = await validate(args, command);
+      if (result !== true) {
+        return result;
+      }
+    }
+
+    return true;
   }
 
   public getCommandName(alias?: string): string {
@@ -243,7 +312,6 @@ export default abstract class Command {
   }
 
   protected handleRejectedODataJsonPromise(response: any, logger: Logger, callback: (err?: any) => void): void {
-    // console.log(JSON.stringify(response, null, 2));
     if (response.error &&
       response.error['odata.error'] &&
       response.error['odata.error'].message) {
@@ -302,9 +370,9 @@ export default abstract class Command {
   }
 
   protected initAction(args: CommandArgs, logger: Logger): void {
-    this._debug = args.options.debug || process.env.CLIMICROSOFT365_DEBUG === '1';
-    this._verbose = this._debug || args.options.verbose || process.env.CLIMICROSOFT365_VERBOSE === '1';
-    request.debug = this._debug;
+    this.debug = args.options.debug || process.env.CLIMICROSOFT365_DEBUG === '1';
+    this.verbose = this.debug || args.options.verbose || process.env.CLIMICROSOFT365_VERBOSE === '1';
+    request.debug = this.debug;
     request.logger = logger;
 
     appInsights.trackEvent({
@@ -319,7 +387,7 @@ export default abstract class Command {
     // remove minimist catch-all option
     delete unknownOptions._;
 
-    const knownOptions: CommandOption[] = this.options();
+    const knownOptions: CommandOption[] = this.options;
     const longOptionRegex: RegExp = /--([^\s]+)/;
     const shortOptionRegex: RegExp = /-([a-z])\b/;
     knownOptions.forEach(o => {
@@ -364,9 +432,9 @@ export default abstract class Command {
     optionNames.forEach(option => {
       const value = args.options[option];
       if (!value || typeof value !== 'string') {
-        return;  
+        return;
       }
-      
+
       const lowerCaseValue = value.toLowerCase();
       if (lowerCaseValue === '@meid') {
         args.options[option] = accessToken.getUserIdFromAccessToken(token);
@@ -375,5 +443,50 @@ export default abstract class Command {
         args.options[option] = accessToken.getUserNameFromAccessToken(token);
       }
     });
+  }
+
+  protected showDeprecationWarning(logger: Logger, deprecated: string, recommended: string): void {
+    const cli: Cli = Cli.getInstance();
+    if (cli.currentCommandName &&
+      cli.currentCommandName.indexOf(deprecated) === 0) {
+      const chalk: typeof Chalk = require('chalk');
+      logger.logToStderr(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
+    }
+  }
+
+  protected warn(logger: Logger, warning: string): void {
+    const chalk: typeof Chalk = require('chalk');
+    logger.logToStderr(chalk.yellow(warning));
+  }
+
+  protected getUsedCommandName(): string {
+    const cli: Cli = Cli.getInstance();
+    const commandName: string = this.getCommandName();
+    if (!cli.currentCommandName) {
+      return commandName;
+    }
+
+    if (cli.currentCommandName &&
+      cli.currentCommandName.indexOf(commandName) === 0) {
+      return commandName;
+    }
+
+    // since the command was called by something else than its name
+    // it must have aliases
+    const aliases: string[] = this.alias() as string[];
+
+    for (let i: number = 0; i < aliases.length; i++) {
+      if (cli.currentCommandName.indexOf(aliases[i]) === 0) {
+        return aliases[i];
+      }
+    }
+
+    // shouldn't happen because the command is called either by its name or alias
+    return '';
+  }
+
+  private getTelemetryProperties(args: any): any {
+    this.telemetry.forEach(t => t(args));
+    return this.telemetryProperties;
   }
 }

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { formatting, sinonUtil } from '../../../../utils';
@@ -10,7 +10,6 @@ import commands from '../../commands';
 const command: Command = require('./o365group-recyclebinitem-remove');
 
 describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
-
   const validGroupId = '00000000-0000-0000-0000-000000000000';
   const validGroupDisplayName = 'Dev Team';
   const validGroupMailNickname = 'Devteam';
@@ -54,12 +53,14 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
 
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -106,25 +107,25 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('defines correct option sets', () => {
-    const optionSets = command.optionSets();
+    const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [['id', 'displayName', 'mailNickname']]);
   });
 
-  it('fails validation when id is not a valid GUID', () => {
-    const actual = command.validate({
+  it('fails validation when id is not a valid GUID', async () => {
+    const actual = await command.validate({
       options: {
         id: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('validates for a correct input with id', () => {
-    const actual = command.validate({
+  it('validates for a correct input with id', async () => {
+    const actual = await command.validate({
       options: {
         id: validGroupId
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -335,7 +336,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.SITESCRIPT_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,6 +26,7 @@ describe(commands.SITESCRIPT_ADD, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -225,7 +227,7 @@ describe(commands.SITESCRIPT_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -236,7 +238,7 @@ describe(commands.SITESCRIPT_ADD, () => {
   });
 
   it('supports specifying title', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--title') > -1) {
@@ -247,7 +249,7 @@ describe(commands.SITESCRIPT_ADD, () => {
   });
 
   it('supports specifying description', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--description') > -1) {
@@ -258,7 +260,7 @@ describe(commands.SITESCRIPT_ADD, () => {
   });
 
   it('supports specifying script content', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--content') > -1) {
@@ -268,13 +270,13 @@ describe(commands.SITESCRIPT_ADD, () => {
     assert(containsOption);
   });
 
-  it('fails validation if script content is not a valid JSON string', () => {
-    const actual = command.validate({ options: { title: 'Contoso', content: 'abc' } });
+  it('fails validation if script content is not a valid JSON string', async () => {
+    const actual = await command.validate({ options: { title: 'Contoso', content: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when title specified and  script content is valid JSON', () => {
-    const actual = command.validate({ options: { title: 'Contoso', content: JSON.stringify({}) } });
+  it('passes validation when title specified and  script content is valid JSON', async () => {
+    const actual = await command.validate({ options: { title: 'Contoso', content: JSON.stringify({}) } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

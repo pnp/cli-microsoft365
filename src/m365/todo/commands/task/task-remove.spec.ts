@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.TASK_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -22,6 +23,7 @@ describe(commands.TASK_REMOVE, () => {
       promptOptions = options;
       cb({ continue: true });
     });
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -292,56 +294,56 @@ describe(commands.TASK_REMOVE, () => {
     });
   });
 
-  it('passes validation when all parameters are valid with listId', () => {
-    const actual = command.validate({
+  it('passes validation when all parameters are valid with listId', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=',
         listId: 'BBMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhBBB='
       }
-    });
+    }, commandInfo);
 
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when all parameters are valid with listName', () => {
-    const actual = command.validate({
+  it('passes validation when all parameters are valid with listName', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=',
         listName: 'Tasks'
       }
-    });
+    }, commandInfo);
 
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if both listName and listId are not set', () => {
-    const actual = command.validate({
+  it('fails validation if both listName and listId are not set', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=',
         listName: null,
         listId: null
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both listName and listId are set', () => {
-    const actual = command.validate({
+  it('fails validation if both listName and listId are set', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=',
         listName: 'Tasks',
         listId: 'BBMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhBBB='
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

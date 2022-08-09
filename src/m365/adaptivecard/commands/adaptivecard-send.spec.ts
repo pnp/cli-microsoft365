@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
-import { Logger } from '../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../cli';
 import Command, { CommandError } from '../../../Command';
 import request from '../../../request';
 import { sinonUtil } from '../../../utils';
@@ -14,10 +14,12 @@ import 'adaptivecards-templating';
 describe(commands.SEND, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -914,38 +916,38 @@ describe(commands.SEND, () => {
     });
   });
 
-  it(`fails validation if the neither title nor card specified`, () => {
-    const actual = command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547' } });
+  it(`fails validation if the neither title nor card specified`, async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`passes validation if the title is specified`, () => {
-    const actual = command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547', title: 'Lorem' } });
+  it(`passes validation if the title is specified`, async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547', title: 'Lorem' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it(`fails validation if the specified card is not a valid JSON string`, () => {
-    const actual = command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547', card: 'abc' } });
+  it(`fails validation if the specified card is not a valid JSON string`, async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547', card: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`passes validation if the specified card is a valid JSON string`, () => {
-    const actual = command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547', card: '{}' } });
+  it(`passes validation if the specified card is a valid JSON string`, async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547', card: '{}' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it(`fails validation if specified cardData without card`, () => {
-    const actual = command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547', cardData: '{}' } });
+  it(`fails validation if specified cardData without card`, async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547', cardData: '{}' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`fails validation if specified cardData is not a valid JSON string`, () => {
-    const actual = command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547', card: '{}', cardData: 'abc' } });
+  it(`fails validation if specified cardData is not a valid JSON string`, async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547', card: '{}', cardData: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`passes validation if the specified cardData is a valid JSON string`, () => {
-    const actual = command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547', card: '{}', cardData: '{}' } });
+  it(`passes validation if the specified cardData is a valid JSON string`, async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.webhook.office.com/webhookb2/892e8ed3-997c-4b6e-8f8a-7f32728a8a87@f7322380-f203-42ff-93e8-66e266f6d2e4/IncomingWebhook/fcc6565ec7a944928bd43d6fc193b258/4f0482d4-b147-4f67-8a61-11f0a5019547', card: '{}', cardData: '{}' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -954,7 +956,7 @@ describe(commands.SEND, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

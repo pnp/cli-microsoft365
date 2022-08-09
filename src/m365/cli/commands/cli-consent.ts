@@ -1,7 +1,4 @@
 import { Logger } from '../../../cli';
-import {
-  CommandOption
-} from '../../../Command';
 import config from '../../../config';
 import GlobalOptions from '../../../GlobalOptions';
 import AnonymousCommand from '../../base/AnonymousCommand';
@@ -24,10 +21,41 @@ class CliConsentCommand extends AnonymousCommand {
     return 'Consent additional permissions for the Azure AD application used by the CLI for Microsoft 365';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.service = args.options.service;
-    return telemetryProps;
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        service: args.options.service
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-s, --service <service>',
+        autocomplete: ['yammer']
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.service !== 'yammer') {
+          return `${args.options.service} is not a valid value for the service option. Allowed values: yammer`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -45,26 +73,6 @@ class CliConsentCommand extends AnonymousCommand {
   public action(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     this.initAction(args, logger);
     this.commandAction(logger, args, cb);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-s, --service <service>',
-        autocomplete: ['yammer']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.service !== 'yammer') {
-      return `${args.options.service} is not a valid value for the service option. Allowed values: yammer`;
-    }
-
-    return true;
   }
 }
 

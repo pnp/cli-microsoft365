@@ -1,14 +1,13 @@
-import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
-import { accessToken } from '../../../../utils/accessToken';
 import { PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
 import { v4 } from 'uuid';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
-import Auth from '../../../../Auth';
+import request from '../../../../request';
+import { accessToken } from '../../../../utils/accessToken';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import request from '../../../../request';
 
 interface CommandArgs {
   options: Options;
@@ -29,18 +28,35 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
     return 'Adds a new checklist item to a Planner task.';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.isChecked = args.options.isChecked || false;
-    return telemetryProps;
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['id', 'title', 'isChecked'];
   }
 
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        isChecked: args.options.isChecked || false
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '-i, --taskId <taskId>' },
+      { option: '-t, --title <title>' },
+      { option: '--isChecked' }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
     }
@@ -98,17 +114,6 @@ class PlannerTaskChecklistItemAddCommand extends GraphCommand {
       .get(requestOptions)
       .then((task: any) => task['@odata.etag'],
         () => Promise.reject('Planner task was not found.'));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '-i, --taskId <taskId>' },
-      { option: '-t, --title <title>' },
-      { option: '--isChecked' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

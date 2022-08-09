@@ -1,8 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption,
-
-  CommandTypes
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -32,12 +30,62 @@ class SpoHubSiteSetCommand extends SpoCommand {
     return 'Updates properties of the specified hub site';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.title = typeof args.options.title === 'string';
-    telemetryProps.description = typeof args.options.description === 'string';
-    telemetryProps.logoUrl = typeof args.options.logoUrl === 'string';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initTypes();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        title: typeof args.options.title === 'string',
+        description: typeof args.options.description === 'string',
+        logoUrl: typeof args.options.logoUrl === 'string'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '-t, --title [title]'
+      },
+      {
+        option: '-d, --description [description]'
+      },
+      {
+        option: '-l, --logoUrl [logoUrl]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        if (!args.options.title &&
+          !args.options.description &&
+          !args.options.logoUrl) {
+          return 'Specify title, description or logoUrl to update';
+        }
+
+        return true;
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('t', 'title', 'd', 'description', 'l', 'logoUrl');
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -85,50 +133,9 @@ class SpoHubSiteSetCommand extends SpoCommand {
 
           logger.log(hubSite);
         }
-        
+
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-l, --logoUrl [logoUrl]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    if (!args.options.title &&
-      !args.options.description &&
-      !args.options.logoUrl) {
-      return 'Specify title, description or logoUrl to update';
-    }
-
-    return true;
-  }
-
-  public types(): CommandTypes {
-    // required to support passing empty strings as valid values
-    return {
-      string: ['t', 'title', 'd', 'description', 'l', 'logoUrl']
-    };
   }
 }
 

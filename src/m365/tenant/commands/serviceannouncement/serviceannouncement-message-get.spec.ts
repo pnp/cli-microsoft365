@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   const testId = 'MC001337';
   const testIncorrectId = '123456';
@@ -70,6 +71,7 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -111,24 +113,22 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if incorrect message ID is provided', (done) => {
-    const actual = command.validate({
+  it('fails validation if incorrect message ID is provided', async () => {
+    const actual = await command.validate({
       options: {
         id: testIncorrectId
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, `${testIncorrectId} is not a valid message ID`);
-    done();
   });
 
-  it('passes validation if correct message ID is provided', (done) => {
-    const actual = command.validate({
+  it('passes validation if correct message ID is provided', async () => {
+    const actual = await command.validate({
       options: {
         id: testId
       }
-    });
+    }, commandInfo);
     assert(actual);
-    done();
   });
 
   it('correctly retrieves service update message', (done) => {
@@ -237,7 +237,7 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

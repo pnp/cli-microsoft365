@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,10 +14,11 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
-  
+  let commandInfo: CommandInfo;
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'abc',
       FormDigestTimeoutSeconds: 1800,
@@ -26,6 +27,7 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -198,7 +200,7 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -209,7 +211,7 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
   });
 
   it('supports specifying site url', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--url') > -1) {
         assert(true);
@@ -219,28 +221,28 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
     assert(false);
   });
 
-  it('passes validation when the url option specified', () => {
-    const actual = command.validate({
+  it('passes validation when the url option specified', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/site'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when the url option not specified', () => {
-    const actual = command.validate({
+  it('fails validation when the url option not specified', async () => {
+    const actual = await command.validate({
       options: {}
-    });
+    }, commandInfo);
     assert.notDeepEqual(actual, true);
   });
 
-  it('fails validation when the url option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({
+  it('fails validation when the url option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({
       options: {
         url: 'foo'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

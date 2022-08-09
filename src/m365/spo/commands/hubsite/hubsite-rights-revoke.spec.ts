@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,6 +14,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
@@ -28,6 +29,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -340,7 +342,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -351,7 +353,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
   });
 
   it('supports specifying hub site URL', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--url') > -1) {
@@ -362,7 +364,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
   });
 
   it('supports specifying principals', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--principals') > -1) {
@@ -373,7 +375,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
   });
 
   it('supports specifying confirmation flag', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--confirm') > -1) {
@@ -383,28 +385,28 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
     assert(containsOption);
   });
 
-  it('fails validation if url is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { url: 'abc', principals: 'admin' } });
+  it('fails validation if url is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { url: 'abc', principals: 'admin' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when all parameters are valid', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
+  it('passes validation when all parameters are valid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when all parameters are valid (multiple principals)', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin,user' } });
+  it('passes validation when all parameters are valid (multiple principals)', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin,user' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when all parameters are valid (multiple principals separated with an extra space)', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin, user' } });
+  it('passes validation when all parameters are valid (multiple principals separated with an extra space)', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin, user' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when all parameters are valid (multiple principals with email address)', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com' } });
+  it('passes validation when all parameters are valid (multiple principals with email address)', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

@@ -1,0 +1,17 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "version": "1.15.0",
+    "libraryName": "spfx",
+    "libraryId": "12226667-eb77-452e-bda6-d3b5978aff77",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "spfx",
+    "solutionShortDescription": "spfx description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "extension",
+    "extensionType": "FieldCustomizer"
+  }
+}

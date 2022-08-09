@@ -200,7 +200,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -211,7 +211,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('requires tenant property name', () => {
-    const options = command.options();
+    const options = command.options;
     let requiresTenantPropertyName = false;
     options.forEach(o => {
       if (o.option.indexOf('<key>') > -1) {
@@ -219,13 +219,6 @@ describe(commands.STORAGEENTITY_GET, () => {
       }
     });
     assert(requiresTenantPropertyName);
-  });
-
-  it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = command.options();
-    sinonUtil.restore(Command.prototype.options);
-    assert(options.length > 0);
   });
 
   it('handles promise rejection', (done) => {

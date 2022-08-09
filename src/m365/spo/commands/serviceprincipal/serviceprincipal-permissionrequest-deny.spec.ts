@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,6 +14,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   
   before(() => {
@@ -27,6 +28,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -169,7 +171,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -180,7 +182,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
   });
 
   it('allows specifying requestId', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--requestId') > -1) {
@@ -190,13 +192,13 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
     assert(containsOption);
   });
 
-  it('fails validation if the requestId option is not a valid GUID', () => {
-    const actual = command.validate({ options: { requestId: '123' } });
+  it('fails validation if the requestId option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { requestId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the requestId is a valid GUID', () => {
-    const actual = command.validate({ options: { requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } });
+  it('passes validation when the requestId is a valid GUID', async () => {
+    const actual = await command.validate({ options: { requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,11 +12,13 @@ const command: Command = require('./mail-send');
 describe(commands.MAIL_SEND, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -223,53 +225,53 @@ describe(commands.MAIL_SEND, () => {
     });
   });
 
-  it('fails validation if bodyContentType is invalid', () => {
-    const actual = command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'Invalid' } });
+  it('fails validation if bodyContentType is invalid', async () => {
+    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'Invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if saveToSentItems is invalid', () => {
-    const actual = command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'Invalid' } });
+  it('fails validation if saveToSentItems is invalid', async () => {
+    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'Invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when subject, to and bodyContents are specified', () => {
-    const actual = command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } });
+  it('passes validation when subject, to and bodyContents are specified', async () => {
+    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when multiple to emails are specified', () => {
-    const actual = command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bodyContents: 'Lorem ipsum' } });
+  it('passes validation when multiple to emails are specified', async () => {
+    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bodyContents: 'Lorem ipsum' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when multiple to emails separated with command and space are specified', () => {
-    const actual = command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com, mail2@domain.com', bodyContents: 'Lorem ipsum' } });
+  it('passes validation when multiple to emails separated with command and space are specified', async () => {
+    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com, mail2@domain.com', bodyContents: 'Lorem ipsum' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when bodyContentType is set to Text', () => {
-    const actual = command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'Text' } });
+  it('passes validation when bodyContentType is set to Text', async () => {
+    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'Text' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when bodyContentType is set to HTML', () => {
-    const actual = command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'HTML' } });
+  it('passes validation when bodyContentType is set to HTML', async () => {
+    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'HTML' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when saveToSentItems is set to false', () => {
-    const actual = command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'false' } });
+  it('passes validation when saveToSentItems is set to false', async () => {
+    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when saveToSentItems is set to true', () => {
-    const actual = command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'true' } });
+  it('passes validation when saveToSentItems is set to true', async () => {
+    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

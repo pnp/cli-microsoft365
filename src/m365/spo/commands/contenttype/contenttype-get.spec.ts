@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
-import Command, { CommandError, CommandTypes } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -13,11 +13,13 @@ describe(commands.CONTENTTYPE_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -257,19 +259,19 @@ describe(commands.CONTENTTYPE_GET, () => {
   });
 
   it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
+    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
+    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
   it('configures id as string option', () => {
-    const types = (command.types() as CommandTypes);
+    const types = command.types;
     ['i', 'id'].forEach(o => {
       assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
     });
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -279,23 +281,23 @@ describe(commands.CONTENTTYPE_GET, () => {
     assert(containsOption);
   });
 
-  it('fails validation if the specified site URL is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { webUrl: 'site.com', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } });
+  it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'site.com', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } }, commandInfo);
     assert.notStrictEqual(actual, false);
   });
 
-  it('fails validation if both id and name are specified', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', name: 'titleOfContentType' } });
+  it('fails validation if both id and name are specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', name: 'titleOfContentType' } }, commandInfo);
     assert.notStrictEqual(actual, false);
   });
 
-  it('fails validation if none id or name are specified', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: undefined, name: undefined } });
+  it('fails validation if none id or name are specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: undefined, name: undefined } }, commandInfo);
     assert.notStrictEqual(actual, false);
   });
 
-  it('passes validation when all required parameters are valid', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } });
+  it('passes validation when all required parameters are valid', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

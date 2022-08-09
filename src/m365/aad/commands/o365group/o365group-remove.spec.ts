@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -14,6 +14,7 @@ describe(commands.O365GROUP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let promptOptions: any;
 
   before(() => {
@@ -21,6 +22,7 @@ describe(commands.O365GROUP_REMOVE, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -259,7 +261,7 @@ describe(commands.O365GROUP_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -270,7 +272,7 @@ describe(commands.O365GROUP_REMOVE, () => {
   });
 
   it('supports specifying id', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {
@@ -281,7 +283,7 @@ describe(commands.O365GROUP_REMOVE, () => {
   });
 
   it('supports specifying confirmation flag', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--confirm') > -1) {
@@ -291,13 +293,13 @@ describe(commands.O365GROUP_REMOVE, () => {
     assert(containsOption);
   });
 
-  it('fails validation if the id is not a valid GUID', () => {
-    const actual = command.validate({ options: { id: 'abc' } });
+  it('fails validation if the id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the id is a valid GUID', () => {
-    const actual = command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } });
+  it('passes validation when the id is a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

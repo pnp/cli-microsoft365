@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.USERPROFILE_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,6 +26,7 @@ describe(commands.USERPROFILE_GET, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -177,7 +179,7 @@ describe(commands.USERPROFILE_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -188,7 +190,7 @@ describe(commands.USERPROFILE_GET, () => {
   });
 
   it('supports specifying userName', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--userName') > -1) {
@@ -198,13 +200,13 @@ describe(commands.USERPROFILE_GET, () => {
     assert(containsOption);
   });
 
-  it('fails validation if the user principal name is not a valid', () => {
-    const actual = command.validate({ options: { userName: 'abc' } });
+  it('fails validation if the user principal name is not a valid', async () => {
+    const actual = await command.validate({ options: { userName: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the user principal name is a valid', () => {
-    const actual = command.validate({ options: { userName: 'john.doe@mytenant.onmicrosoft.com' } });
+  it('passes validation when the user principal name is a valid', async () => {
+    const actual = await command.validate({ options: { userName: 'john.doe@mytenant.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

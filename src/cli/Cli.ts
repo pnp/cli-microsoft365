@@ -125,62 +125,8 @@ export class Cli {
       return Promise.resolve();
     }
 
-    // if the command doesn't allow unknown options, check if all specified
-    // options match command options
-    if (!this.commandToExecute.command.allowUnknownOptions()) {
-      for (const optionFromArgs in this.optionsFromArgs.options) {
-        if (optionFromArgs === '_') {
-          // ignore catch-all option
-          continue;
-        }
-
-        let matches: boolean = false;
-
-        for (let i = 0; i < this.commandToExecute.options.length; i++) {
-          const option: CommandOptionInfo = this.commandToExecute.options[i];
-          if (optionFromArgs === option.long ||
-            optionFromArgs === option.short) {
-            matches = true;
-            break;
-          }
-        }
-
-        if (!matches) {
-          return this.closeWithError(`Invalid option: '${optionFromArgs}'${os.EOL}`, this.optionsFromArgs, true);
-        }
-      }
-    }
-
-    const shouldPrompt = this.getSettingWithDefaultValue<boolean>(settingsNames.prompt, false);
-
-    let inquirer: Inquirer | undefined;
-    for (let i = 0; i < this.commandToExecute.options.length; i++) {
-      if (this.commandToExecute.options[i].required &&
-        typeof this.optionsFromArgs.options[this.commandToExecute.options[i].name] === 'undefined') {
-        if (!shouldPrompt) {
-          return this.closeWithError(`Required option ${this.commandToExecute.options[i].name} not specified`, this.optionsFromArgs, true);
-        }
-
-        if (i === 0) {
-          Cli.log('Provide values for the following parameters:');
-        }
-
-        if (!inquirer) {
-          inquirer = require('inquirer');
-        }
-
-        const missingRequireOptionValue = await (inquirer as Inquirer)
-          .prompt({
-            name: 'missingRequireOptionValue',
-            message: `${this.commandToExecute.options[i].name}: `
-          })
-          .then(result => result.missingRequireOptionValue);
-
-        this.optionsFromArgs.options[this.commandToExecute.options[i].name] = missingRequireOptionValue;
-      }
-    }
-
     const optionsWithoutShorts = Cli.removeShortOptions(this.optionsFromArgs);
+
     try {
       // replace values staring with @ with file contents
       Cli.loadOptionValuesFromFiles(optionsWithoutShorts);
@@ -202,25 +148,8 @@ export class Cli {
       optionsWithoutShorts.options.output = this.getSettingWithDefaultValue<string | undefined>(settingsNames.output, undefined);
     }
 
-    // validate options sets defined by the command
-    const optionsSets: string[][] | undefined = this.commandToExecute.command.optionSets();
-    const argsOptions: string[] = Object.keys(this.optionsFromArgs.options);
-    const cmdArgs = this.optionsFromArgs;
-    optionsSets?.forEach((optionSet) => {
-      const commonOptions = argsOptions.filter(opt => optionSet.includes(opt));
-
-      if (commonOptions.length === 0) {
-        return this.closeWithError(`Specify one of the following options: ${optionSet.map(opt => opt).join(', ')}.`, cmdArgs, true);
-      }
-
-      if (commonOptions.length > 1) {
-        return this.closeWithError(`Specify one of the following options: ${optionSet.map(opt => opt).join(', ')}, but not multiple.`, cmdArgs, true);
-      }
-    });
-
-
-    const validationResult: boolean | string = this.commandToExecute.command.validate(optionsWithoutShorts);
-    if (typeof validationResult === 'string') {
+    const validationResult = await this.commandToExecute.command.validate(optionsWithoutShorts, this.commandToExecute);
+    if (validationResult !== true) {
       return this.closeWithError(validationResult, optionsWithoutShorts, true);
     }
 
@@ -417,20 +346,24 @@ export class Cli {
     }
   }
 
-  private loadCommand(command: Command): void {
-    this.commands.push({
+  public static getCommandInfo(command: Command): CommandInfo {
+    return {
       aliases: command.alias(),
       name: command.name,
       command: command,
       options: this.getCommandOptions(command),
       defaultProperties: command.defaultProperties()
-    });
+    };
   }
 
-  private getCommandOptions(command: Command): CommandOptionInfo[] {
+  private loadCommand(command: Command): void {
+    this.commands.push(Cli.getCommandInfo(command));
+  }
+
+  private static getCommandOptions(command: Command): CommandOptionInfo[] {
     const options: CommandOptionInfo[] = [];
 
-    command.options().forEach(option => {
+    command.options.forEach(option => {
       const required: boolean = option.option.indexOf('<') > -1;
       const optionArgs: string[] = option.option.split(/[ ,|]+/);
       let short: string | undefined;
@@ -465,7 +398,7 @@ export class Cli {
     };
 
     if (commandInfo) {
-      const commandTypes = commandInfo.command.types();
+      const commandTypes = commandInfo.command.types;
       if (commandTypes) {
         minimistOptions.string = commandTypes.string;
         minimistOptions.boolean = commandTypes.boolean;
@@ -835,7 +768,7 @@ export class Cli {
     /* c8 ignore next */
   }
 
-  private static log(message?: any, ...optionalParams: any[]): void {
+  public static log(message?: any, ...optionalParams: any[]): void {
     if (message) {
       console.log(message, ...optionalParams);
     }

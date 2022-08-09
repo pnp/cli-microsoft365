@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,6 +12,7 @@ const command: Command = require('./externalconnection-add');
 describe(commands.EXTERNALCONNECTION_ADD, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   const externalConnectionAddResponse: any = {
     configuration: {
@@ -39,6 +40,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -178,71 +180,74 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
     });
   });
 
-  it('fails validation if id is less than 3 characters', (done) => {
-    const actual = command.validate({
+  it('fails validation if id is less than 3 characters', async () => {
+    const actual = await command.validate({
       options: {
         id: 'T',
-        name: 'Test Connection for CLI'
+        name: 'Test Connection for CLI',
+        description: 'Test connection'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, false);
-    done();
   });
 
-  it('fails validation if id is more than 32 characters', (done) => {
-    const actual = command.validate({
+  it('fails validation if id is more than 32 characters', async () => {
+    const actual = await command.validate({
       options: {
         id: 'TestConnectionForCLIXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-        name: 'Test Connection for CLI'
+        name: 'Test Connection for CLI',
+        description: 'Test connection'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, false);
-    done();
   });
 
-  it('fails validation if id is not alphanumeric', (done) => {
-    const actual = command.validate({
+  it('fails validation if id is not alphanumeric', async () => {
+    const actual = await command.validate({
       options: {
         id: 'Test_Connection!',
-        name: 'Test Connection for CLI'
+        name: 'Test Connection for CLI',
+        description: 'Test connection'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, false);
-    done();
   });
 
-  it('fails validation if id starts with Microsoft', () => {
-    const actual = command.validate({
+  it('fails validation if id starts with Microsoft', async () => {
+    const actual = await command.validate({
       options: {
         id: 'MicrosoftTestConnectionForCLI',
-        name: 'Test Connection for CLI'
+        name: 'Test Connection for CLI',
+        description: 'Test connection'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, false);
   });
 
-  it('fails validation if id is SharePoint', () => {
-    const actual = command.validate({
+  it('fails validation if id is SharePoint', async () => {
+    const actual = await command.validate({
       options: {
         id: 'SharePoint',
-        name: 'Test Connection for CLI'
+        name: 'Test Connection for CLI',
+        description: 'Test connection'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, false);
   });
 
-  it('passes validation for a valid id', () => {
-    const actual = command.validate({
+  it('passes validation for a valid id', async () => {
+    const actual = await command.validate({
       options: {
         id: 'myapp',
-        name: 'Test Connection for CLI'
+        name: 'Test Connection for CLI',
+        description: 'Test connection'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports specifying id', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {
@@ -253,7 +258,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   });
 
   it('supports specifying name', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--name') > -1) {
@@ -264,7 +269,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   });
 
   it('supports specifying description', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--description') > -1) {

@@ -1,5 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -30,11 +29,41 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
     return 'Removes the specified deleted site collection from tenant recycle bin';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.wait = typeof args.options.wait !== 'undefined';
-    telemetryProps.confirm = typeof args.options.confirm !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        wait: typeof args.options.wait !== 'undefined',
+        confirm: typeof args.options.confirm !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '--wait'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -115,27 +144,6 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '--wait'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    return validation.isValidSharePointUrl(args.options.url);
   }
 }
 

@@ -1605,7 +1605,7 @@ describe(commands.LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -1616,7 +1616,7 @@ describe(commands.LIST, () => {
   });
 
   it('supports specifying environment name', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--environment') > -1) {
@@ -1627,7 +1627,7 @@ describe(commands.LIST, () => {
   });
 
   it('supports specifying option to retrieve Flows as admin', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--asAdmin') > -1) {

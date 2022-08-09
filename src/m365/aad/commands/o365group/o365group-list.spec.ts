@@ -3,7 +3,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -14,11 +14,13 @@ describe(commands.O365GROUP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -2697,7 +2699,7 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -2707,28 +2709,28 @@ describe(commands.O365GROUP_LIST, () => {
     assert(containsOption);
   });
 
-  it('fails validation if both deleted and includeSiteUrl options set', () => {
-    const actual = command.validate({ options: { deleted: true, includeSiteUrl: true } });
+  it('fails validation if both deleted and includeSiteUrl options set', async () => {
+    const actual = await command.validate({ options: { deleted: true, includeSiteUrl: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if only deleted option set', () => {
-    const actual = command.validate({ options: { deleted: true } });
+  it('passes validation if only deleted option set', async () => {
+    const actual = await command.validate({ options: { deleted: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if only includeSiteUrl option set', () => {
-    const actual = command.validate({ options: { includeSiteUrl: true } });
+  it('passes validation if only includeSiteUrl option set', async () => {
+    const actual = await command.validate({ options: { includeSiteUrl: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if only orphaned option set', () => {
-    const actual = command.validate({ options: { orphaned: true } });
+  it('passes validation if only orphaned option set', async () => {
+    const actual = await command.validate({ options: { orphaned: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if no options set', () => {
-    const actual = command.validate({ options: {} });
+  it('passes validation if no options set', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

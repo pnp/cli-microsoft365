@@ -1,5 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -23,6 +22,48 @@ class TeamsAppUninstallCommand extends GraphCommand {
 
   public get description(): string {
     return 'Uninstalls an app from a Microsoft Team team';
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        confirm: args.options.confirm || false
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--appId <appId>'
+      },
+      {
+        option: '--teamId <teamId>'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.teamId)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -57,31 +98,6 @@ class TeamsAppUninstallCommand extends GraphCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--appId <appId>'
-      },
-      {
-        option: '--teamId <teamId>'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.teamId)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

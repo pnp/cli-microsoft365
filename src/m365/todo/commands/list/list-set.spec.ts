@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,11 +12,13 @@ const command: Command = require('./list-set');
 describe(commands.LIST_SET, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -215,52 +217,52 @@ describe(commands.LIST_SET, () => {
     });
   });
 
-  it('fails validation if new name is not set', () => {
-    const actual = command.validate({
+  it('fails validation if new name is not set', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA="
       }
-    });
+    }, commandInfo);
     assert.notEqual(actual, true);
   });
 
-  it('fails validation if neither id nor name is not set', () => {
-    const actual = command.validate({
+  it('fails validation if neither id nor name is not set', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         newName: "Foo"
       }
-    });
+    }, commandInfo);
     assert.notEqual(actual, true);
   });
 
-  it('fails validation if both id and name are set', () => {
-    const actual = command.validate({
+  it('fails validation if both id and name are set', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=",
         name: "FooList",
         newName: "Foo"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when all parameters are valid', () => {
-    const actual = command.validate({
+  it('passes validation when all parameters are valid', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=",
         newName: 'Foo'
       }
-    });
+    }, commandInfo);
 
     assert.equal(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

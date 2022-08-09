@@ -1,9 +1,8 @@
 import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
-import { formatting, urlUtil, validation } from '../../../../utils';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { formatting, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -34,19 +33,81 @@ class SpoListViewAddCommand extends SpoCommand {
     return 'Adds a new view to a SharePoint list.';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listId = typeof args.options.listId !== 'undefined';
-    telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
-    telemetryProps.listUrl = typeof args.options.listUrl !== 'undefined';
-    telemetryProps.title = typeof args.options.title !== 'undefined';
-    telemetryProps.viewQuery = typeof args.options.viewQuery !== 'undefined';
-    telemetryProps.personal = !!args.options.personal;
-    telemetryProps.default = !!args.options.default;
-    telemetryProps.orderedView = !!args.options.orderedView;
-    telemetryProps.paged = !!args.options.paged;
-    telemetryProps.rowLimit = typeof args.options.rowLimit !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
+        title: typeof args.options.title !== 'undefined',
+        viewQuery: typeof args.options.viewQuery !== 'undefined',
+        personal: !!args.options.personal,
+        default: !!args.options.default,
+        orderedView: !!args.options.orderedView,
+        paged: !!args.options.paged,
+        rowLimit: typeof args.options.rowLimit !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '-u, --webUrl <webUrl>' },
+      { option: '--listId [listId]' },
+      { option: '--listTitle [listTitle]' },
+      { option: '--listUrl [listUrl]' },
+      { option: '--title <title>' },
+      { option: '--fields <fields>' },
+      { option: '--viewQuery [viewQuery]' },
+      { option: '--personal' },
+      { option: '--default' },
+      { option: '--paged' },
+      { option: '--rowLimit [rowLimit]' }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const webUrlValidation = validation.isValidSharePointUrl(args.options.webUrl);
+        if (webUrlValidation !== true) {
+          return webUrlValidation;
+        }
+    
+        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} in option listId is not a valid GUID`;
+        }
+    
+        if (args.options.rowLimit !== undefined) {
+          if (isNaN(args.options.rowLimit)) {
+            return `${args.options.rowLimit} is not a number`;
+          }
+    
+          if (+args.options.rowLimit <= 0) {
+            return 'rowLimit option must be greater than 0.';
+          }
+        }
+    
+        if (args.options.personal && args.options.default) {
+          return 'Default view cannot be a personal view.';
+        }
+    
+        return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -92,60 +153,8 @@ class SpoListViewAddCommand extends SpoCommand {
       result += `GetList('${formatting.encodeQueryParameter(urlUtil.getServerRelativePath(options.webUrl, options.listUrl))}')`;
     }
     result += '/views/add';
-    
+
     return result;
-  }
-
-  public optionSets(): string[][] | undefined {
-    return [
-      ['listId', 'listTitle', 'listUrl']
-    ];
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '-u, --webUrl <webUrl>' },
-      { option: '--listId [listId]' },
-      { option: '--listTitle [listTitle]' },
-      { option: '--listUrl [listUrl]' },
-      { option: '--title <title>' },
-      { option: '--fields <fields>' },
-      { option: '--viewQuery [viewQuery]' },
-      { option: '--personal' },
-      { option: '--default' },
-      { option: '--paged' },
-      { option: '--rowLimit [rowLimit]' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const webUrlValidation = validation.isValidSharePointUrl(args.options.webUrl);
-    if (webUrlValidation !== true) {
-      return webUrlValidation;
-    }
-
-    if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-      return `${args.options.listId} in option listId is not a valid GUID`;
-    }
-
-    if (args.options.rowLimit !== undefined) {
-      if (isNaN(args.options.rowLimit)) {
-        return `${args.options.rowLimit} is not a number`;
-      }
-
-      if (+args.options.rowLimit <= 0) {
-        return 'rowLimit option must be greater than 0.';
-      }
-    }
-
-    if (args.options.personal && args.options.default) {
-      return 'Default view cannot be a personal view.';
-    }
-
-    return true;
   }
 }
 

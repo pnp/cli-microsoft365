@@ -1,8 +1,8 @@
 import * as assert from 'assert';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
-import Command, { CommandError, CommandTypes } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -12,12 +12,14 @@ const command: Command = require('./feature-disable');
 describe(commands.FEATURE_DISABLE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let requests: any[];
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -59,43 +61,43 @@ describe(commands.FEATURE_DISABLE, () => {
   });
 
   it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
+    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
+    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
   it('configures scope as string option', () => {
-    const types = (command.types() as CommandTypes);
+    const types = command.types;
     ['s', 'scope'].forEach(o => {
       assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
     });
   });
 
-  it('fails validation if scope is not site|web', () => {
+  it('fails validation if scope is not site|web', async () => {
     const scope = 'list';
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         url: "https://contoso.sharepoint.com",
         featureId: "780ac353-eaf8-4ac2-8c47-536d93c03fd6",
         scope: scope
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, `${scope} is not a valid Feature scope. Allowed values are Site|Web`);
   });
 
-  it('passes validation if url and featureId is correct', () => {
-    const actual = command.validate({
+  it('passes validation if url and featureId is correct', async () => {
+    const actual = await command.validate({
       options: {
         url: "https://contoso.sharepoint.com",
         featureId: "780ac353-eaf8-4ac2-8c47-536d93c03fd6"
       }
-    });
+    }, commandInfo);
 
     assert.strictEqual(actual, true);
 
   });
 
   it('supports specifying scope', () => {
-    const options = command.options();
+    const options = command.options;
     let containsScopeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[scope]') > -1) {

@@ -1,8 +1,5 @@
 import { Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { odata } from '../../../../utils';
@@ -27,10 +24,27 @@ class TeamsTeamListCommand extends GraphCommand {
     return 'Lists Microsoft Teams in the current tenant';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.joined = args.options.joined;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        joined: args.options.joined
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-j, --joined'
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -94,17 +108,6 @@ class TeamsTeamListCommand extends GraphCommand {
           }
         });
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-j, --joined'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

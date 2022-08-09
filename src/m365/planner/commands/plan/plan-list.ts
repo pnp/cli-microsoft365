@@ -1,14 +1,11 @@
+import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
-import { accessToken, validation } from '../../../../utils';
-import Auth from '../../../../Auth';
 import GlobalOptions from '../../../../GlobalOptions';
+import { accessToken, validation } from '../../../../utils';
+import { aadGroup } from '../../../../utils/aadGroup';
 import { planner } from '../../../../utils/planner';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { aadGroup } from '../../../../utils/aadGroup';
 
 interface CommandArgs {
   options: Options;
@@ -28,11 +25,52 @@ class PlannerPlanListCommand extends GraphCommand {
     return 'Returns a list of plans associated with a specified group';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
-    telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
+        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: "--ownerGroupId [ownerGroupId]"
+      },
+      {
+        option: "--ownerGroupName [ownerGroupName]"
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName';
+        }
+    
+        if (args.options.ownerGroupId && args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName but not both';
+        }
+    
+        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
+          return `${args.options.ownerGroupId} is not a valid GUID`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public defaultProperties(): string[] | undefined {
@@ -40,7 +78,7 @@ class PlannerPlanListCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
     }
@@ -64,36 +102,6 @@ class PlannerPlanListCommand extends GraphCommand {
     return aadGroup
       .getGroupByDisplayName(args.options.ownerGroupName!)
       .then(group => group.id!);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: "--ownerGroupId [ownerGroupId]"
-      },
-      {
-        option: "--ownerGroupName [ownerGroupName]"
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName';
-    }
-
-    if (args.options.ownerGroupId && args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName but not both';
-    }
-
-    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-      return `${args.options.ownerGroupId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

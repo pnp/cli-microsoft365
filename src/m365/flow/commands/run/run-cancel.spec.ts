@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,12 +13,14 @@ describe(commands.RUN_CANCEL, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -65,25 +67,25 @@ describe(commands.RUN_CANCEL, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the flow is not valid GUID', () => {
-    const actual = command.validate({
+  it('fails validation if the flow is not valid GUID', async () => {
+    const actual = await command.validate({
       options: {
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flow: 'invalid',
         name: '08585981115186985105550762687CU161'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the name, environment and flow specified', () => {
-    const actual = command.validate({
+  it('passes validation when the name, environment and flow specified', async () => {
+    const actual = await command.validate({
       options: {
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -361,7 +363,7 @@ describe(commands.RUN_CANCEL, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -372,7 +374,7 @@ describe(commands.RUN_CANCEL, () => {
   });
 
   it('supports specifying name', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--name') > -1) {
@@ -383,7 +385,7 @@ describe(commands.RUN_CANCEL, () => {
   });
 
   it('supports specifying environment', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--environment') > -1) {
@@ -394,7 +396,7 @@ describe(commands.RUN_CANCEL, () => {
   });
 
   it('supports specifying flow', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--flow') > -1) {

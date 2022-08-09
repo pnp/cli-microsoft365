@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let requests: any[];
   let promptOptions: any;
 
@@ -26,6 +27,7 @@ describe(commands.HUBSITE_UNREGISTER, () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     }));
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -192,18 +194,18 @@ describe(commands.HUBSITE_UNREGISTER, () => {
     });
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { url: 'foo' } });
+  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { url: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the url is a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com' } });
+  it('passes validation when the url is a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

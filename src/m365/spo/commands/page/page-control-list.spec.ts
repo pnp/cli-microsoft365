@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -15,11 +15,13 @@ describe(commands.PAGE_CONTROL_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -222,7 +224,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -232,13 +234,13 @@ describe(commands.PAGE_CONTROL_LIST, () => {
     assert(containsOption);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'foo', name: 'home.aspx' } });
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'foo', name: 'home.aspx' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the webUrl is a valid SharePoint URL and name is specified', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx' } });
+  it('passes validation when the webUrl is a valid SharePoint URL and name is specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

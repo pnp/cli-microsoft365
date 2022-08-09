@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -15,6 +15,7 @@ describe(commands.O365GROUP_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
@@ -22,6 +23,7 @@ describe(commands.O365GROUP_SET, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -452,94 +454,94 @@ describe(commands.O365GROUP_SET, () => {
     });
   });
 
-  it('fails validation if the id is not a valid GUID', () => {
-    const actual = command.validate({ options: { id: 'invalid', description: 'My awesome group' } });
+  it('fails validation if the id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: 'invalid', description: 'My awesome group' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the id is a valid GUID and displayName specified', () => {
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'My group' } });
+  it('passes validation when the id is a valid GUID and displayName specified', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', displayName: 'My group' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the id is a valid GUID and description specified', () => {
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', description: 'My awesome group' } });
+  it('passes validation when the id is a valid GUID and description specified', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', description: 'My awesome group' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if no property to update is specified', () => {
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+  it('fails validation if no property to update is specified', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if one of the owners is invalid', () => {
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', owners: 'user' } });
+  it('fails validation if one of the owners is invalid', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', owners: 'user' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the owner is valid', () => {
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', owners: 'user@contoso.onmicrosoft.com' } });
+  it('passes validation if the owner is valid', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', owners: 'user@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation with multiple owners, comma-separated', () => {
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
+  it('passes validation with multiple owners, comma-separated', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation with multiple owners, comma-separated with an additional space', () => {
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', owners: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } });
+  it('passes validation with multiple owners, comma-separated with an additional space', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', owners: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if one of the members is invalid', () => {
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', members: 'user' } });
+  it('fails validation if one of the members is invalid', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', members: 'user' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the member is valid', () => {
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', members: 'user@contoso.onmicrosoft.com' } });
+  it('passes validation if the member is valid', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', members: 'user@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation with multiple members, comma-separated', () => {
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
+  it('passes validation with multiple members, comma-separated', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation with multiple members, comma-separated with an additional space', () => {
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', members: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } });
+  it('passes validation with multiple members, comma-separated with an additional space', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', members: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if isPrivate is invalid boolean', () => {
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: 'invalid' } });
+  it('fails validation if isPrivate is invalid boolean', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if isPrivate is true', () => {
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: 'true' } });
+  it('passes validation if isPrivate is true', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if isPrivate is false', () => {
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: 'false' } });
+  it('passes validation if isPrivate is false', async () => {
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', isPrivate: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if logoPath points to a non-existent file', () => {
+  it('fails validation if logoPath points to a non-existent file', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'invalid' } });
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'invalid' } }, commandInfo);
     sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if logoPath points to a folder', () => {
+  it('fails validation if logoPath points to a folder', async () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => true);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } });
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } }, commandInfo);
     sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
@@ -547,12 +549,12 @@ describe(commands.O365GROUP_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if logoPath points to an existing file', () => {
+  it('passes validation if logoPath points to an existing file', async () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-    const actual = command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } });
+    const actual = await command.validate({ options: { id: '28beab62-7540-4db1-a23f-29a6018a3848', logoPath: 'folder' } }, commandInfo);
     sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
@@ -561,7 +563,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -572,7 +574,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   it('supports specifying id', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {
@@ -583,7 +585,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   it('supports specifying displayName', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--displayName') > -1) {
@@ -594,7 +596,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   it('supports specifying description', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--description') > -1) {
@@ -605,7 +607,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   it('supports specifying owners', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--owners') > -1) {
@@ -616,7 +618,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   it('supports specifying members', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--members') > -1) {
@@ -627,7 +629,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   it('supports specifying group type', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--isPrivate') > -1) {
@@ -638,7 +640,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   it('supports specifying logo file path', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--logoPath') > -1) {

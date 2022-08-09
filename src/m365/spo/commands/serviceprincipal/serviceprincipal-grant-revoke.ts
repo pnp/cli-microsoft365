@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -28,6 +28,20 @@ class SpoServicePrincipalGrantRevokeCommand extends SpoCommand {
 
   public alias(): string[] | undefined {
     return [commands.SP_GRANT_REVOKE];
+  }
+
+  constructor() {
+    super();
+
+    this.#initOptions();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --grantId <grantId>'
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -62,18 +76,9 @@ class SpoServicePrincipalGrantRevokeCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        
+
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [{
-      option: '-i, --grantId <grantId>'
-    }];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

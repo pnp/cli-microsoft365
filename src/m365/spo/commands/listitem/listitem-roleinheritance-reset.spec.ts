@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,11 +12,13 @@ const command: Command = require('./listitem-roleinheritance-reset');
 describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -57,7 +59,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -68,7 +70,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -79,37 +81,37 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
   });
 
   it('defines correct option sets', () => {
-    const optionSets = command.optionSets();
+    const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [['listId', 'listTitle']]);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'foo', listItemId: 8, listTitle: 'Demo List' } });
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'foo', listItemId: 8, listTitle: 'Demo List' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: 8, listId: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: 8, listId: '0cd891ef-afce-4e55-b836-fce03286cccf' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the listId option is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: 8, listId: 'foo' } });
+  it('fails validation if the listId option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: 8, listId: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the listId option is a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: 8, listId: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+  it('passes validation if the listId option is a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listItemId: 8, listId: '0cd891ef-afce-4e55-b836-fce03286cccf' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the specified list item id is not a number', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listItemId: 'a' } });
+  it('fails validation if the specified list item id is not a number', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listItemId: 'a' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the specified list item id is a number', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listItemId: '4' } });
+  it('passes validation if the specified list item id is a number', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listItemId: '4' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

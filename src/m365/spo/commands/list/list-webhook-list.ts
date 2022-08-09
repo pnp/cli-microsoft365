@@ -1,8 +1,5 @@
 import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -30,17 +27,87 @@ class SpoListWebhookListCommand extends SpoCommand {
     return 'Lists all webhooks for the specified list';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = (!(!args.options.id)).toString();
-    telemetryProps.listId = (!(!args.options.listId)).toString();
-    telemetryProps.listTitle = (!(!args.options.listTitle)).toString();
-    telemetryProps.title = (!(!args.options.title)).toString();
-    return telemetryProps;
-  }
 
   public defaultProperties(): string[] | undefined {
     return ['id', 'clientState', 'expirationDateTime', 'resource'];
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: (!(!args.options.id)).toString(),
+        listId: (!(!args.options.listId)).toString(),
+        listTitle: (!(!args.options.listTitle)).toString(),
+        title: (!(!args.options.title)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-i, --listId [listId]'
+      },
+      {
+        option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '--id [id]'
+      },
+      {
+        option: '--title [title]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.id) {
+          if (!validation.isValidGuid(args.options.id)) {
+            return `${args.options.id} is not a valid GUID`;
+          }
+        }
+
+        if (args.options.listId) {
+          if (!validation.isValidGuid(args.options.listId)) {
+            return `${args.options.listId} is not a valid GUID`;
+          }
+        }
+
+        if (args.options.id && args.options.title) {
+          return 'Specify id or title, but not both';
+        }
+
+        if (args.options.listId && args.options.listTitle) {
+          return 'Specify listId or listTitle, but not both';
+        }
+
+        if (!args.options.id && !args.options.title) {
+          if (!args.options.listId && !args.options.listTitle) {
+            return 'Specify listId or listTitle, one is required';
+          }
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -99,64 +166,6 @@ class SpoListWebhookListCommand extends SpoCommand {
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '--id [id]'
-      },
-      {
-        option: '--title [title]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.id) {
-      if (!validation.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
-      }
-    }
-
-    if (args.options.listId) {
-      if (!validation.isValidGuid(args.options.listId)) {
-        return `${args.options.listId} is not a valid GUID`;
-      }
-    }
-
-    if (args.options.id && args.options.title) {
-      return 'Specify id or title, but not both';
-    }
-
-    if (args.options.listId && args.options.listTitle) {
-      return 'Specify listId or listTitle, but not both';
-    }
-
-    if (!args.options.id && !args.options.title) {
-      if (!args.options.listId && !args.options.listTitle) {
-        return 'Specify listId or listTitle, one is required';
-      }
-    }
-
-    return true;
   }
 }
 

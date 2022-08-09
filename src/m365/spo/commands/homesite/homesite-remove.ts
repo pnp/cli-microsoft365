@@ -1,11 +1,11 @@
 import { Cli, Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { spo, ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -26,10 +26,27 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
     return 'Removes the current Home Site';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.confirm = args.options.confirm || false;
-    return telemetryProps;
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        confirm: args.options.confirm || false
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--confirm'
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -88,17 +105,6 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

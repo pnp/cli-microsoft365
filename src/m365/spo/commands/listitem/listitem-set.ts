@@ -1,8 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption,
-  CommandTypes
-} from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -37,13 +33,84 @@ class SpoListItemSetCommand extends SpoCommand {
     return 'Updates a list item in the specified list';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listId = typeof args.options.listId !== 'undefined';
-    telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
-    telemetryProps.contentType = typeof args.options.contentType !== 'undefined';
-    telemetryProps.systemUpdate = typeof args.options.systemUpdate !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initTypes();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        contentType: typeof args.options.contentType !== 'undefined',
+        systemUpdate: typeof args.options.systemUpdate !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '-l, --listId [listId]'
+      },
+      {
+        option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '-c, --contentType [contentType]'
+      },
+      {
+        option: '-s, --systemUpdate'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (!args.options.listId && !args.options.listTitle) {
+          return `Specify listId or listTitle`;
+        }
+
+        if (args.options.listId && args.options.listTitle) {
+          return `Specify listId or listTitle but not both`;
+        }
+
+        if (args.options.listId &&
+          !validation.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} in option listId is not a valid GUID`;
+        }
+
+        return true;
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push(
+      'webUrl',
+      'listId',
+      'listTitle',
+      'id',
+      'contentType'
+    );
+    this.types.boolean.push('systemUpdate');
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -250,69 +317,6 @@ class SpoListItemSetCommand extends SpoCommand {
         logger.log(<ListItemInstance>response);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-l, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '-c, --contentType [contentType]'
-      },
-      {
-        option: '-s, --systemUpdate'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public types(): CommandTypes {
-    return {
-      string: [
-        'webUrl',
-        'listId',
-        'listTitle',
-        'id',
-        'contentType'
-      ],
-      boolean: [
-        'systemUpdate'
-      ]
-    };
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (!args.options.listId && !args.options.listTitle) {
-      return `Specify listId or listTitle`;
-    }
-
-    if (args.options.listId && args.options.listTitle) {
-      return `Specify listId or listTitle but not both`;
-    }
-
-    if (args.options.listId &&
-      !validation.isValidGuid(args.options.listId)) {
-      return `${args.options.listId} in option listId is not a valid GUID`;
-    }
-
-    return true;
   }
 
   private mapRequestBody(options: Options): any {

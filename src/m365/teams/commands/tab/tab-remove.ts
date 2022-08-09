@@ -1,7 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -28,10 +25,57 @@ class TeamsTabRemoveCommand extends GraphCommand {
     return "Removes a tab from the specified channel";
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.confirm = (!!args.options.confirm).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        confirm: (!!args.options.confirm).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: "-i, --teamId <teamId>"
+      },
+      {
+        option: "-c, --channelId <channelId>"
+      },
+      {
+        option: "-t, --tabId <tabId>"
+      },
+      {
+        option: "--confirm"
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.teamId as string)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
+
+        if (!validation.isValidTeamsChannelId(args.options.channelId as string)) {
+          return `${args.options.channelId} is not a valid Teams ChannelId`;
+        }
+
+        if (!validation.isValidGuid(args.options.tabId as string)) {
+          return `${args.options.tabId} is not a valid GUID`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -68,42 +112,6 @@ class TeamsTabRemoveCommand extends GraphCommand {
         }
       );
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: "-i, --teamId <teamId>"
-      },
-      {
-        option: "-c, --channelId <channelId>"
-      },
-      {
-        option: "-t, --tabId <tabId>"
-      },
-      {
-        option: "--confirm"
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.teamId as string)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    if (!validation.isValidTeamsChannelId(args.options.channelId as string)) {
-      return `${args.options.channelId} is not a valid Teams ChannelId`;
-    }
-
-    if (!validation.isValidGuid(args.options.tabId as string)) {
-      return `${args.options.tabId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

@@ -1,13 +1,12 @@
+import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import { Cli, Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
+import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
-import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import commands from '../../commands';
 import { ConversationMember } from '../../ConversationMember';
-import { aadGroup } from '../../../../utils/aadGroup';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -44,26 +43,85 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
     return [commands.CONVERSATIONMEMBER_REMOVE];
   }
 
-  public optionSets(): string[][] | undefined {
-    return [
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        teamId: typeof args.options.teamId !== 'undefined',
+        teamName: typeof args.options.teamName !== 'undefined',
+        channelId: typeof args.options.channelId !== 'undefined',
+        channelName: typeof args.options.channelName !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined',
+        userId: typeof args.options.userId !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--teamId [teamId]'
+      },
+      {
+        option: '--teamName [teamName]'
+      },
+      {
+        option: '--channelId [channelId]'
+      },
+      {
+        option: '--channelName [channelName]'
+      },
+      {
+        option: '--userName [userName]'
+      },
+      {
+        option: '--userId [userId]'
+      },
+      {
+        option: '--id [id]'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
+
+        if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
+          return `${args.options.channelId} is not a valid Teams Channel ID`;
+        }
+
+        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
+          return `${args.options.userId} is not a valid GUID`;
+        }
+
+        return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
       ['teamId', 'teamName'],
       ['channelId', 'channelName'],
       ['userId', 'userName', 'id']
-    ];
-  }
-
-
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
-    telemetryProps.teamName = typeof args.options.teamName !== 'undefined';
-    telemetryProps.channelId = typeof args.options.channelId !== 'undefined';
-    telemetryProps.channelName = typeof args.options.channelName !== 'undefined';
-    telemetryProps.userName = typeof args.options.userName !== 'undefined';
-    telemetryProps.userId = typeof args.options.userId !== 'undefined';
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -202,54 +260,6 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
 
         return Promise.resolve(conversationMember.id);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--teamId [teamId]'
-      },
-      {
-        option: '--teamName [teamName]'
-      },
-      {
-        option: '--channelId [channelId]'
-      },
-      {
-        option: '--channelName [channelName]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--id [id]'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
-      return `${args.options.channelId} is not a valid Teams Channel ID`;
-    }
-
-    if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-      return `${args.options.userId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

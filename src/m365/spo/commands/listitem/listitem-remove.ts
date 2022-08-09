@@ -1,7 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -30,13 +27,77 @@ class SpoListItemRemoveCommand extends SpoCommand {
     return 'Removes the specified list item';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listId = (!(!args.options.listId)).toString();
-    telemetryProps.listTitle = (!(!args.options.listTitle)).toString();
-    telemetryProps.recycle = (!(!args.options.recycle)).toString();
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listId: (!(!args.options.listId)).toString(),
+        listTitle: (!(!args.options.listTitle)).toString(),
+        recycle: (!(!args.options.recycle)).toString(),
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '-l, --listId [listId]'
+      },
+      {
+        option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '--recycle'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const id: number = parseInt(args.options.id);
+        if (isNaN(id)) {
+          return `${args.options.id} is not a valid list item ID`;
+        }
+
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.listId &&
+          !validation.isValidGuid(args.options.listId as string)) {
+          return `${args.options.listId} is not a valid GUID`;
+        }
+
+        if (args.options.listId && args.options.listTitle) {
+          return 'Specify id or title, but not both';
+        }
+
+        if (!args.options.listId && !args.options.listTitle) {
+          return 'Specify id or title';
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -97,59 +158,6 @@ class SpoListItemRemoveCommand extends SpoCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-l, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '--recycle'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const id: number = parseInt(args.options.id);
-    if (isNaN(id)) {
-      return `${args.options.id} is not a valid list item ID`;
-    }
-
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.listId &&
-      !validation.isValidGuid(args.options.listId as string)) {
-      return `${args.options.listId} is not a valid GUID`;
-    }
-
-    if (args.options.listId && args.options.listTitle) {
-      return 'Specify id or title, but not both';
-    }
-
-    if (!args.options.listId && !args.options.listTitle) {
-      return 'Specify id or title';
-    }
-
-    return true;
   }
 }
 

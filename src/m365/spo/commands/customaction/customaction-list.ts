@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -27,14 +24,56 @@ class SpoCustomActionListCommand extends SpoCommand {
     return 'Lists all user custom actions at the given scope';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.scope = args.options.scope || 'All';
-    return telemetryProps;
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['Name', 'Location', 'Scope', 'Id'];
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        scope: args.options.scope || 'All'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '-s, --scope [scope]',
+        autocomplete: ['Site', 'Web', 'All']
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (validation.isValidSharePointUrl(args.options.url) !== true) {
+          return 'Missing required option url';
+        }
+
+        if (args.options.scope) {
+          if (args.options.scope !== 'Site' &&
+            args.options.scope !== 'Web' &&
+            args.options.scope !== 'All') {
+            return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
+          }
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -125,37 +164,6 @@ class SpoCustomActionListCommand extends SpoCommand {
     }
 
     return `${scope}`;
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: ['Site', 'Web', 'All']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (validation.isValidSharePointUrl(args.options.url) !== true) {
-      return 'Missing required option url';
-    }
-
-    if (args.options.scope) {
-      if (args.options.scope !== 'Site' &&
-        args.options.scope !== 'Web' &&
-        args.options.scope !== 'All') {
-        return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
-      }
-    }
-
-    return true;
   }
 }
 

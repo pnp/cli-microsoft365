@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils';
@@ -17,13 +16,54 @@ interface Options extends GlobalOptions {
   type?: string;
 }
 
-class PlannerTaskReferenceAddCommand extends GraphCommand {  
+class PlannerTaskReferenceAddCommand extends GraphCommand {
   public get name(): string {
     return commands.TASK_REFERENCE_ADD;
   }
 
   public get description(): string {
     return 'Adds a new reference to a Planner task';
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        alias: typeof args.options.alias !== 'undefined',
+        type: args.options.type
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '-i, --taskId <taskId>' },
+      { option: '-u, --url <url>' },
+      { option: '--alias [alias]' },
+      {
+        option: '--type [type]',
+        autocomplete: ['PowerPoint', 'Word', 'Excel', 'Other']
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.type && ['powerpoint', 'word', 'excel', 'other'].indexOf(args.options.type.toLocaleLowerCase()) === -1) {
+          return `${args.options.type} is not a valid type value. Allowed values PowerPoint|Word|Excel|Other`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -43,8 +83,8 @@ class PlannerTaskReferenceAddCommand extends GraphCommand {
               [formatting.openTypesEncoder(args.options.url)]: {
                 '@odata.type': 'microsoft.graph.plannerExternalReference',
                 previewPriority: ' !',
-                ...(args.options.alias && {alias: args.options.alias}),
-                ...(args.options.type && {type: args.options.type})
+                ...(args.options.alias && { alias: args.options.alias }),
+                ...(args.options.type && { type: args.options.type })
               }
             }
           }
@@ -70,26 +110,6 @@ class PlannerTaskReferenceAddCommand extends GraphCommand {
     return request
       .get(requestOptions)
       .then((response: any) => response['@odata.etag']);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '-i, --taskId <taskId>' },
-      { option: '-u, --url <url>' },
-      { option: '--alias [alias]' },
-      { option: '--type [type]' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-  
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.type && ['powerpoint', 'word', 'excel', 'other'].indexOf(args.options.type.toLocaleLowerCase()) === -1) {
-      return `${args.options.type} is not a valid type value. Allowed values PowerPoint|Word|Excel|Other`;
-    } 
-
-    return true;
   }
 }
 

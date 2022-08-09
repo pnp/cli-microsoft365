@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -26,11 +23,51 @@ class TodoListSetCommand extends GraphCommand {
     return 'Updates a Microsoft To Do task list';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.name = typeof args.options.name !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        name: typeof args.options.name !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --name [name]'
+      },
+      {
+        option: '--newName <newName>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.name && !args.options.id) {
+          return 'Specify name or id of the list to update';
+        }
+
+        if (args.options.name && args.options.id) {
+          return 'Specify either the name or the id of the list to update but not both';
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -78,39 +115,6 @@ class TodoListSetCommand extends GraphCommand {
     return request
       .get(requestOptions)
       .then((response: any) => response.value && response.value.length === 1 ? response.value[0].id : null);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '--newName <newName>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.name && !args.options.id) {
-      return 'Specify name or id of the list to update';
-    }
-
-    if (args.options.name && args.options.id) {
-      return 'Specify either the name or the id of the list to update but not both';
-    }
-
-    if (!args.options.newName) {
-      return 'Required option newName is missing';
-    }
-
-    return true;
   }
 }
 

@@ -1,8 +1,5 @@
 import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -29,12 +26,61 @@ class SpoGroupGetCommand extends SpoCommand {
     return 'Gets site group';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = (!(!args.options.id)).toString();
-    telemetryProps.name = (!(!args.options.name)).toString();
-    telemetryProps.associatedGroup = args.options.associatedGroup;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: (!(!args.options.id)).toString(),
+        name: (!(!args.options.name)).toString(),
+        associatedGroup: args.options.associatedGroup
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '--name [name]'
+      },
+      {
+        option: '--associatedGroup [associatedGroup]',
+        autocomplete: ['Owner', 'Member', 'Visitor']
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.id && isNaN(args.options.id)) {
+	      return `Specified id ${args.options.id} is not a number`;
+	    }
+
+	    if (args.options.associatedGroup && ['owner', 'member', 'visitor'].indexOf(args.options.associatedGroup.toLowerCase()) === -1) {
+	      return `${args.options.associatedGroup} is not a valid associatedGroup value. Allowed values are Owner|Member|Visitor.`;
+	    }
+
+	    return validation.isValidSharePointUrl(args.options.webUrl);
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'name', 'associatedGroup']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -80,45 +126,6 @@ class SpoGroupGetCommand extends SpoCommand {
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '--name [name]'
-      },
-      {
-        option: '--associatedGroup [associatedGroup]',
-        autocomplete: ['Owner', 'Member', 'Visitor']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public optionSets(): string[][] | undefined {
-    return [
-      ['id', 'name', 'associatedGroup']
-    ];
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.id && isNaN(args.options.id)) {
-      return `Specified id ${args.options.id} is not a number`;
-    }
-
-    if (args.options.associatedGroup && ['owner', 'member', 'visitor'].indexOf(args.options.associatedGroup.toLowerCase()) === -1) {
-      return `${args.options.associatedGroup} is not a valid associatedGroup value. Allowed values are Owner|Member|Visitor.`;
-    }
-
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

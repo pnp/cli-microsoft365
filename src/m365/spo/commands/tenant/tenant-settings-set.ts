@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption, CommandTypes
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -110,200 +110,108 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     return 'Sets tenant global settings';
   }
 
-  public types(): CommandTypes {
-    return {
-      boolean: [
-        'EnableAzureADB2BIntegration',
-        'SyncAadB2BManagementPolicy'
-      ]
-    };
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initTypes();
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.MinCompatibilityLevel = (!(!args.options.MinCompatibilityLevel)).toString();
-    telemetryProps.MaxCompatibilityLevel = (!(!args.options.MaxCompatibilityLevel)).toString();
-    telemetryProps.ExternalServicesEnabled = (!(!args.options.ExternalServicesEnabled)).toString();
-    telemetryProps.NoAccessRedirectUrl = (!(!args.options.NoAccessRedirectUrl)).toString();
-    telemetryProps.SharingCapability = (!(!args.options.SharingCapability)).toString();
-    telemetryProps.DisplayStartASiteOption = (!(!args.options.DisplayStartASiteOption)).toString();
-    telemetryProps.StartASiteFormUrl = (!(!args.options.StartASiteFormUrl)).toString();
-    telemetryProps.ShowEveryoneClaim = (!(!args.options.ShowEveryoneClaim)).toString();
-    telemetryProps.ShowAllUsersClaim = (!(!args.options.ShowAllUsersClaim)).toString();
-    telemetryProps.ShowEveryoneExceptExternalUsersClaim = (!(!args.options.ShowEveryoneExceptExternalUsersClaim)).toString();
-    telemetryProps.SearchResolveExactEmailOrUPN = (!(!args.options.SearchResolveExactEmailOrUPN)).toString();
-    telemetryProps.OfficeClientADALDisabled = (!(!args.options.OfficeClientADALDisabled)).toString();
-    telemetryProps.LegacyAuthProtocolsEnabled = (!(!args.options.LegacyAuthProtocolsEnabled)).toString();
-    telemetryProps.RequireAcceptingAccountMatchInvitedAccount = (!(!args.options.RequireAcceptingAccountMatchInvitedAccount)).toString();
-    telemetryProps.ProvisionSharedWithEveryoneFolder = (!(!args.options.ProvisionSharedWithEveryoneFolder)).toString();
-    telemetryProps.SignInAccelerationDomain = (!(!args.options.SignInAccelerationDomain)).toString();
-    telemetryProps.EnableGuestSignInAcceleration = (!(!args.options.EnableGuestSignInAcceleration)).toString();
-    telemetryProps.UsePersistentCookiesForExplorerView = (!(!args.options.UsePersistentCookiesForExplorerView)).toString();
-    telemetryProps.BccExternalSharingInvitations = (!(!args.options.BccExternalSharingInvitations)).toString();
-    telemetryProps.BccExternalSharingInvitationsList = (!(!args.options.BccExternalSharingInvitationsList)).toString();
-    telemetryProps.UserVoiceForFeedbackEnabled = (!(!args.options.UserVoiceForFeedbackEnabled)).toString();
-    telemetryProps.PublicCdnEnabled = (!(!args.options.PublicCdnEnabled)).toString();
-    telemetryProps.PublicCdnAllowedFileTypes = (!(!args.options.PublicCdnAllowedFileTypes)).toString();
-    telemetryProps.RequireAnonymousLinksExpireInDays = (!(!args.options.RequireAnonymousLinksExpireInDays)).toString();
-    telemetryProps.SharingAllowedDomainList = (!(!args.options.SharingAllowedDomainList)).toString();
-    telemetryProps.SharingBlockedDomainList = (!(!args.options.SharingBlockedDomainList)).toString();
-    telemetryProps.SharingDomainRestrictionMode = (!(!args.options.SharingDomainRestrictionMode)).toString();
-    telemetryProps.OneDriveStorageQuota = (!(!args.options.OneDriveStorageQuota)).toString();
-    telemetryProps.OneDriveForGuestsEnabled = (!(!args.options.OneDriveForGuestsEnabled)).toString();
-    telemetryProps.IPAddressEnforcement = (!(!args.options.IPAddressEnforcement)).toString();
-    telemetryProps.IPAddressAllowList = (!(!args.options.IPAddressAllowList)).toString();
-    telemetryProps.IPAddressWACTokenLifetime = (!(!args.options.IPAddressWACTokenLifetime)).toString();
-    telemetryProps.UseFindPeopleInPeoplePicker = (!(!args.options.UseFindPeopleInPeoplePicker)).toString();
-    telemetryProps.DefaultSharingLinkType = (!(!args.options.DefaultSharingLinkType)).toString();
-    telemetryProps.ODBMembersCanShare = (!(!args.options.ODBMembersCanShare)).toString();
-    telemetryProps.ODBAccessRequests = (!(!args.options.ODBAccessRequests)).toString();
-    telemetryProps.PreventExternalUsersFromResharing = (!(!args.options.PreventExternalUsersFromResharing)).toString();
-    telemetryProps.ShowPeoplePickerSuggestionsForGuestUsers = (!(!args.options.ShowPeoplePickerSuggestionsForGuestUsers)).toString();
-    telemetryProps.FileAnonymousLinkType = (!(!args.options.FileAnonymousLinkType)).toString();
-    telemetryProps.FolderAnonymousLinkType = (!(!args.options.FolderAnonymousLinkType)).toString();
-    telemetryProps.NotifyOwnersWhenItemsReshared = (!(!args.options.NotifyOwnersWhenItemsReshared)).toString();
-    telemetryProps.NotifyOwnersWhenInvitationsAccepted = (!(!args.options.NotifyOwnersWhenInvitationsAccepted)).toString();
-    telemetryProps.NotificationsInOneDriveForBusinessEnabled = (!(!args.options.NotificationsInOneDriveForBusinessEnabled)).toString();
-    telemetryProps.NotificationsInSharePointEnabled = (!(!args.options.NotificationsInSharePointEnabled)).toString();
-    telemetryProps.OwnerAnonymousNotification = (!(!args.options.OwnerAnonymousNotification)).toString();
-    telemetryProps.CommentsOnSitePagesDisabled = (!(!args.options.CommentsOnSitePagesDisabled)).toString();
-    telemetryProps.SocialBarOnSitePagesDisabled = (!(!args.options.SocialBarOnSitePagesDisabled)).toString();
-    telemetryProps.OrphanedPersonalSitesRetentionPeriod = (!(!args.options.OrphanedPersonalSitesRetentionPeriod)).toString();
-    telemetryProps.DisallowInfectedFileDownload = (!(!args.options.DisallowInfectedFileDownload)).toString();
-    telemetryProps.DefaultLinkPermission = (!(!args.options.DefaultLinkPermission)).toString();
-    telemetryProps.ConditionalAccessPolicy = (!(!args.options.ConditionalAccessPolicy)).toString();
-    telemetryProps.AllowDownloadingNonWebViewableFiles = (!(!args.options.AllowDownloadingNonWebViewableFiles)).toString();
-    telemetryProps.AllowEditing = (!(!args.options.AllowEditing)).toString();
-    telemetryProps.ApplyAppEnforcedRestrictionsToAdHocRecipients = (!(!args.options.ApplyAppEnforcedRestrictionsToAdHocRecipients)).toString();
-    telemetryProps.FilePickerExternalImageSearchEnabled = (!(!args.options.FilePickerExternalImageSearchEnabled)).toString();
-    telemetryProps.EmailAttestationRequired = (!(!args.options.EmailAttestationRequired)).toString();
-    telemetryProps.EmailAttestationReAuthDays = (!(!args.options.EmailAttestationReAuthDays)).toString();
-    telemetryProps.HideDefaultThemes = (!(!args.options.HideDefaultThemes)).toString();
-    telemetryProps.BlockAccessOnUnmanagedDevices = (!(!args.options.BlockAccessOnUnmanagedDevices)).toString();
-    telemetryProps.AllowLimitedAccessOnUnmanagedDevices = (!(!args.options.AllowLimitedAccessOnUnmanagedDevices)).toString();
-    telemetryProps.BlockDownloadOfAllFilesForGuests = (!(!args.options.BlockDownloadOfAllFilesForGuests)).toString();
-    telemetryProps.BlockDownloadOfAllFilesOnUnmanagedDevices = (!(!args.options.BlockDownloadOfAllFilesOnUnmanagedDevices)).toString();
-    telemetryProps.BlockDownloadOfViewableFilesForGuests = (!(!args.options.BlockDownloadOfViewableFilesForGuests)).toString();
-    telemetryProps.BlockDownloadOfViewableFilesOnUnmanagedDevices = (!(!args.options.BlockDownloadOfViewableFilesOnUnmanagedDevices)).toString();
-    telemetryProps.BlockMacSync = (!(!args.options.BlockMacSync)).toString();
-    telemetryProps.DisableReportProblemDialog = (!(!args.options.DisableReportProblemDialog)).toString();
-    telemetryProps.DisplayNamesOfFileViewers = (!(!args.options.DisplayNamesOfFileViewers)).toString();
-    telemetryProps.EnableMinimumVersionRequirement = (!(!args.options.EnableMinimumVersionRequirement)).toString();
-    telemetryProps.HideSyncButtonOnODB = (!(!args.options.HideSyncButtonOnODB)).toString();
-    telemetryProps.IsUnmanagedSyncClientForTenantRestricted = (!(!args.options.IsUnmanagedSyncClientForTenantRestricted)).toString();
-    telemetryProps.LimitedAccessFileType = (!(!args.options.LimitedAccessFileType)).toString();
-    telemetryProps.OptOutOfGrooveBlock = (!(!args.options.OptOutOfGrooveBlock)).toString();
-    telemetryProps.OptOutOfGrooveSoftBlock = (!(!args.options.OptOutOfGrooveSoftBlock)).toString();
-    telemetryProps.OrgNewsSiteUrl = (!(!args.options.OrgNewsSiteUrl)).toString();
-    telemetryProps.PermissiveBrowserFileHandlingOverride = (!(!args.options.PermissiveBrowserFileHandlingOverride)).toString();
-    telemetryProps.ShowNGSCDialogForSyncOnODB = (!(!args.options.ShowNGSCDialogForSyncOnODB)).toString();
-    telemetryProps.SpecialCharactersStateInFileFolderNames = (!(!args.options.SpecialCharactersStateInFileFolderNames)).toString();
-    telemetryProps.SyncPrivacyProfileProperties = (!(!args.options.SyncPrivacyProfileProperties)).toString();
-    telemetryProps.ExcludedFileExtensionsForSyncClient = (!(!args.options.ExcludedFileExtensionsForSyncClient)).toString();
-    telemetryProps.DisabledWebPartIds = (!(!args.options.DisabledWebPartIds)).toString();
-    telemetryProps.AllowedDomainListForSyncClient = (!(!args.options.AllowedDomainListForSyncClient)).toString();
-    telemetryProps.DisableCustomAppAuthentication = (!(!args.options.DisableCustomAppAuthentication)).toString();
-    telemetryProps.EnableAzureADB2BIntegration = typeof args.options.EnableAzureADB2BIntegration !== 'undefined';
-    telemetryProps.SyncAadB2BManagementPolicy = typeof args.options.SyncAadB2BManagementPolicy !== 'undefined';
-    return telemetryProps;
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        MinCompatibilityLevel: (!(!args.options.MinCompatibilityLevel)).toString(),
+        MaxCompatibilityLevel: (!(!args.options.MaxCompatibilityLevel)).toString(),
+        ExternalServicesEnabled: (!(!args.options.ExternalServicesEnabled)).toString(),
+        NoAccessRedirectUrl: (!(!args.options.NoAccessRedirectUrl)).toString(),
+        SharingCapability: (!(!args.options.SharingCapability)).toString(),
+        DisplayStartASiteOption: (!(!args.options.DisplayStartASiteOption)).toString(),
+        StartASiteFormUrl: (!(!args.options.StartASiteFormUrl)).toString(),
+        ShowEveryoneClaim: (!(!args.options.ShowEveryoneClaim)).toString(),
+        ShowAllUsersClaim: (!(!args.options.ShowAllUsersClaim)).toString(),
+        ShowEveryoneExceptExternalUsersClaim: (!(!args.options.ShowEveryoneExceptExternalUsersClaim)).toString(),
+        SearchResolveExactEmailOrUPN: (!(!args.options.SearchResolveExactEmailOrUPN)).toString(),
+        OfficeClientADALDisabled: (!(!args.options.OfficeClientADALDisabled)).toString(),
+        LegacyAuthProtocolsEnabled: (!(!args.options.LegacyAuthProtocolsEnabled)).toString(),
+        RequireAcceptingAccountMatchInvitedAccount: (!(!args.options.RequireAcceptingAccountMatchInvitedAccount)).toString(),
+        ProvisionSharedWithEveryoneFolder: (!(!args.options.ProvisionSharedWithEveryoneFolder)).toString(),
+        SignInAccelerationDomain: (!(!args.options.SignInAccelerationDomain)).toString(),
+        EnableGuestSignInAcceleration: (!(!args.options.EnableGuestSignInAcceleration)).toString(),
+        UsePersistentCookiesForExplorerView: (!(!args.options.UsePersistentCookiesForExplorerView)).toString(),
+        BccExternalSharingInvitations: (!(!args.options.BccExternalSharingInvitations)).toString(),
+        BccExternalSharingInvitationsList: (!(!args.options.BccExternalSharingInvitationsList)).toString(),
+        UserVoiceForFeedbackEnabled: (!(!args.options.UserVoiceForFeedbackEnabled)).toString(),
+        PublicCdnEnabled: (!(!args.options.PublicCdnEnabled)).toString(),
+        PublicCdnAllowedFileTypes: (!(!args.options.PublicCdnAllowedFileTypes)).toString(),
+        RequireAnonymousLinksExpireInDays: (!(!args.options.RequireAnonymousLinksExpireInDays)).toString(),
+        SharingAllowedDomainList: (!(!args.options.SharingAllowedDomainList)).toString(),
+        SharingBlockedDomainList: (!(!args.options.SharingBlockedDomainList)).toString(),
+        SharingDomainRestrictionMode: (!(!args.options.SharingDomainRestrictionMode)).toString(),
+        OneDriveStorageQuota: (!(!args.options.OneDriveStorageQuota)).toString(),
+        OneDriveForGuestsEnabled: (!(!args.options.OneDriveForGuestsEnabled)).toString(),
+        IPAddressEnforcement: (!(!args.options.IPAddressEnforcement)).toString(),
+        IPAddressAllowList: (!(!args.options.IPAddressAllowList)).toString(),
+        IPAddressWACTokenLifetime: (!(!args.options.IPAddressWACTokenLifetime)).toString(),
+        UseFindPeopleInPeoplePicker: (!(!args.options.UseFindPeopleInPeoplePicker)).toString(),
+        DefaultSharingLinkType: (!(!args.options.DefaultSharingLinkType)).toString(),
+        ODBMembersCanShare: (!(!args.options.ODBMembersCanShare)).toString(),
+        ODBAccessRequests: (!(!args.options.ODBAccessRequests)).toString(),
+        PreventExternalUsersFromResharing: (!(!args.options.PreventExternalUsersFromResharing)).toString(),
+        ShowPeoplePickerSuggestionsForGuestUsers: (!(!args.options.ShowPeoplePickerSuggestionsForGuestUsers)).toString(),
+        FileAnonymousLinkType: (!(!args.options.FileAnonymousLinkType)).toString(),
+        FolderAnonymousLinkType: (!(!args.options.FolderAnonymousLinkType)).toString(),
+        NotifyOwnersWhenItemsReshared: (!(!args.options.NotifyOwnersWhenItemsReshared)).toString(),
+        NotifyOwnersWhenInvitationsAccepted: (!(!args.options.NotifyOwnersWhenInvitationsAccepted)).toString(),
+        NotificationsInOneDriveForBusinessEnabled: (!(!args.options.NotificationsInOneDriveForBusinessEnabled)).toString(),
+        NotificationsInSharePointEnabled: (!(!args.options.NotificationsInSharePointEnabled)).toString(),
+        OwnerAnonymousNotification: (!(!args.options.OwnerAnonymousNotification)).toString(),
+        CommentsOnSitePagesDisabled: (!(!args.options.CommentsOnSitePagesDisabled)).toString(),
+        SocialBarOnSitePagesDisabled: (!(!args.options.SocialBarOnSitePagesDisabled)).toString(),
+        OrphanedPersonalSitesRetentionPeriod: (!(!args.options.OrphanedPersonalSitesRetentionPeriod)).toString(),
+        DisallowInfectedFileDownload: (!(!args.options.DisallowInfectedFileDownload)).toString(),
+        DefaultLinkPermission: (!(!args.options.DefaultLinkPermission)).toString(),
+        ConditionalAccessPolicy: (!(!args.options.ConditionalAccessPolicy)).toString(),
+        AllowDownloadingNonWebViewableFiles: (!(!args.options.AllowDownloadingNonWebViewableFiles)).toString(),
+        AllowEditing: (!(!args.options.AllowEditing)).toString(),
+        ApplyAppEnforcedRestrictionsToAdHocRecipients: (!(!args.options.ApplyAppEnforcedRestrictionsToAdHocRecipients)).toString(),
+        FilePickerExternalImageSearchEnabled: (!(!args.options.FilePickerExternalImageSearchEnabled)).toString(),
+        EmailAttestationRequired: (!(!args.options.EmailAttestationRequired)).toString(),
+        EmailAttestationReAuthDays: (!(!args.options.EmailAttestationReAuthDays)).toString(),
+        HideDefaultThemes: (!(!args.options.HideDefaultThemes)).toString(),
+        BlockAccessOnUnmanagedDevices: (!(!args.options.BlockAccessOnUnmanagedDevices)).toString(),
+        AllowLimitedAccessOnUnmanagedDevices: (!(!args.options.AllowLimitedAccessOnUnmanagedDevices)).toString(),
+        BlockDownloadOfAllFilesForGuests: (!(!args.options.BlockDownloadOfAllFilesForGuests)).toString(),
+        BlockDownloadOfAllFilesOnUnmanagedDevices: (!(!args.options.BlockDownloadOfAllFilesOnUnmanagedDevices)).toString(),
+        BlockDownloadOfViewableFilesForGuests: (!(!args.options.BlockDownloadOfViewableFilesForGuests)).toString(),
+        BlockDownloadOfViewableFilesOnUnmanagedDevices: (!(!args.options.BlockDownloadOfViewableFilesOnUnmanagedDevices)).toString(),
+        BlockMacSync: (!(!args.options.BlockMacSync)).toString(),
+        DisableReportProblemDialog: (!(!args.options.DisableReportProblemDialog)).toString(),
+        DisplayNamesOfFileViewers: (!(!args.options.DisplayNamesOfFileViewers)).toString(),
+        EnableMinimumVersionRequirement: (!(!args.options.EnableMinimumVersionRequirement)).toString(),
+        HideSyncButtonOnODB: (!(!args.options.HideSyncButtonOnODB)).toString(),
+        IsUnmanagedSyncClientForTenantRestricted: (!(!args.options.IsUnmanagedSyncClientForTenantRestricted)).toString(),
+        LimitedAccessFileType: (!(!args.options.LimitedAccessFileType)).toString(),
+        OptOutOfGrooveBlock: (!(!args.options.OptOutOfGrooveBlock)).toString(),
+        OptOutOfGrooveSoftBlock: (!(!args.options.OptOutOfGrooveSoftBlock)).toString(),
+        OrgNewsSiteUrl: (!(!args.options.OrgNewsSiteUrl)).toString(),
+        PermissiveBrowserFileHandlingOverride: (!(!args.options.PermissiveBrowserFileHandlingOverride)).toString(),
+        ShowNGSCDialogForSyncOnODB: (!(!args.options.ShowNGSCDialogForSyncOnODB)).toString(),
+        SpecialCharactersStateInFileFolderNames: (!(!args.options.SpecialCharactersStateInFileFolderNames)).toString(),
+        SyncPrivacyProfileProperties: (!(!args.options.SyncPrivacyProfileProperties)).toString(),
+        ExcludedFileExtensionsForSyncClient: (!(!args.options.ExcludedFileExtensionsForSyncClient)).toString(),
+        DisabledWebPartIds: (!(!args.options.DisabledWebPartIds)).toString(),
+        AllowedDomainListForSyncClient: (!(!args.options.AllowedDomainListForSyncClient)).toString(),
+        DisableCustomAppAuthentication: (!(!args.options.DisableCustomAppAuthentication)).toString(),
+        EnableAzureADB2BIntegration: typeof args.options.EnableAzureADB2BIntegration !== 'undefined',
+        SyncAadB2BManagementPolicy: typeof args.options.SyncAadB2BManagementPolicy !== 'undefined'
+      });
+    });
   }
 
-  public getAllEnumOptions(): string[] {
-    return ['SharingCapability', 'SharingDomainRestrictionMode', 'DefaultSharingLinkType', 'ODBMembersCanShare', 'ODBAccessRequests', 'FileAnonymousLinkType', 'FolderAnonymousLinkType', 'DefaultLinkPermission', 'ConditionalAccessPolicy', 'LimitedAccessFileType', 'SpecialCharactersStateInFileFolderNames'];
-  }
-
-  // all enums as get methods
-  private getSharingLinkType(): string[] { return ['None', 'Direct', 'Internal', 'AnonymousAccess']; }
-  private getSharingCapabilities(): string[] { return ['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly']; }
-  private getSharingDomainRestrictionModes(): string[] { return ['None', 'AllowList', 'BlockList']; }
-  private getSharingState(): string[] { return ['Unspecified', 'On', 'Off']; }
-  private getAnonymousLinkType(): string[] { return ['None', 'View', 'Edit']; }
-  private getSharingPermissionType(): string[] { return ['None', 'View', 'Edit']; }
-  private getSPOConditionalAccessPolicyType(): string[] { return ['AllowFullAccess', 'AllowLimitedAccess', 'BlockAccess']; }
-  private getSpecialCharactersState(): string[] { return ['NoPreference', 'Allowed', 'Disallowed']; }
-  private getSPOLimitedAccessFileType(): string[] { return ['OfficeOnlineFilesOnly', 'WebPreviewableFiles', 'OtherFiles']; }
-
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    let formDigestValue = '';
-    let spoAdminUrl: string = '';
-    let tenantId: string = '';
-
-    spo
-      .getTenantId(logger, this.debug)
-      .then((_tenantId: string): Promise<string> => {
-        tenantId = _tenantId;
-        return spo.getSpoAdminUrl(logger, this.debug);
-      })
-      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
-        spoAdminUrl = _spoAdminUrl;
-        return spo.getRequestDigest(spoAdminUrl);
-      })
-      .then((res: ContextInfo): Promise<string> => {
-        formDigestValue = res.FormDigestValue;
-
-        // map the args.options to XML Properties
-        let propsXml: string = '';
-        let id: number = 42; // geek's humor
-        for (const optionKey of Object.keys(args.options)) {
-          if (this.isExcludedOption(optionKey)) {
-            continue;
-          }
-
-          let optionValue = args.options[optionKey];
-          if (this.getAllEnumOptions().indexOf(optionKey) > -1) {
-            // map enum values to int
-            optionValue = this.mapEnumToInt(optionKey, args.options[optionKey]);
-          }
-
-          if (['AllowedDomainListForSyncClient', 'DisabledWebPartIds'].indexOf(optionKey) > -1) {
-            // the XML has to be represented as array of guids
-            let valuesXml: string = '';
-            optionValue.split(',').forEach((value: string) => {
-              valuesXml += `<Object Type="Guid">{${formatting.escapeXml(value)}}</Object>`;
-            });
-            propsXml += `<SetProperty Id="${id++}" ObjectPathId="7" Name="${optionKey}"><Parameter Type="Array">${valuesXml}</Parameter></SetProperty><Method Name="Update" Id="${id++}" ObjectPathId="7" />`;
-          }
-          else if (['ExcludedFileExtensionsForSyncClient'].indexOf(optionKey) > -1) {
-            // the XML has to be represented as array of strings
-            let valuesXml: string = '';
-            optionValue.split(',').forEach((value: string) => {
-              valuesXml += `<Object Type="String">${value}</Object>`;
-            });
-            propsXml += `<SetProperty Id="${id++}" ObjectPathId="7" Name="${optionKey}"><Parameter Type="Array">${valuesXml}</Parameter></SetProperty><Method Name="Update" Id="${id++}" ObjectPathId="7" />`;
-          }
-          else {
-            propsXml += `<SetProperty Id="${id++}" ObjectPathId="7" Name="${optionKey}"><Parameter Type="String">${optionValue}</Parameter></SetProperty>`;
-          }
-        }
-
-        const requestOptions: any = {
-          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'X-RequestDigest': formDigestValue
-          },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${propsXml}</Actions><ObjectPaths><Identity Id="7" Name="${tenantId}" /></ObjectPaths></Request>`
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          cb(new CommandError(response.ErrorInfo.ErrorMessage));
-          return;
-        }
-
-        if (args.options.EnableAzureADB2BIntegration === true) {
-          this.warn(logger, 'WARNING: Make sure to also enable the Azure AD one-time passcode authentication preview. If it is not enabled then SharePoint will not use Azure AD B2B even if EnableAzureADB2BIntegration is set to true. Learn more at http://aka.ms/spo-b2b-integration.');
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
+  #initOptions(): void {
+    this.options.unshift(
       {
         option: '--MinCompatibilityLevel [MinCompatibilityLevel]'
       },
@@ -622,39 +530,140 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         option: '--SyncAadB2BManagementPolicy [SyncAadB2BManagementPolicy]',
         autocomplete: ['true', 'false']
       }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
+    );
   }
 
-  public validate(args: CommandArgs): boolean | string {
-    const opts: any = args.options;
-    let hasAtLeastOneOption: boolean = false;
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const opts: any = args.options;
+        let hasAtLeastOneOption: boolean = false;
 
-    for (const propertyKey of Object.keys(opts)) {
-      if (this.isExcludedOption(propertyKey)) {
-        continue;
-      }
+        for (const propertyKey of Object.keys(opts)) {
+          if (this.isExcludedOption(propertyKey)) {
+            continue;
+          }
 
-      hasAtLeastOneOption = true;
-      const propertyValue = opts[propertyKey];
-      const commandOptions: CommandOption[] = this.options();
+          hasAtLeastOneOption = true;
+          const propertyValue = opts[propertyKey];
 
-      for (const item of commandOptions) {
-        if (item.option.indexOf(propertyKey) > -1 &&
-          item.autocomplete &&
-          item.autocomplete.indexOf(propertyValue.toString()) === -1) {
-          return `${propertyKey} option has invalid value of ${propertyValue}. Allowed values are ${JSON.stringify(item.autocomplete)}`;
+          for (const item of this.options) {
+            if (item.option.indexOf(propertyKey) > -1 &&
+              item.autocomplete &&
+              item.autocomplete.indexOf(propertyValue.toString()) === -1) {
+              return `${propertyKey} option has invalid value of ${propertyValue}. Allowed values are ${JSON.stringify(item.autocomplete)}`;
+            }
+          }
         }
+
+        if (!hasAtLeastOneOption) {
+          return `You must specify at least one option`;
+        }
+
+        return true;
       }
-    }
+    );
+  }
 
-    if (!hasAtLeastOneOption) {
-      return `You must specify at least one option`;
-    }
+  #initTypes(): void {
+    this.types.boolean.push(
+      'EnableAzureADB2BIntegration',
+      'SyncAadB2BManagementPolicy'
+    );
+  }
 
-    return true;
+  public getAllEnumOptions(): string[] {
+    return ['SharingCapability', 'SharingDomainRestrictionMode', 'DefaultSharingLinkType', 'ODBMembersCanShare', 'ODBAccessRequests', 'FileAnonymousLinkType', 'FolderAnonymousLinkType', 'DefaultLinkPermission', 'ConditionalAccessPolicy', 'LimitedAccessFileType', 'SpecialCharactersStateInFileFolderNames'];
+  }
+
+  // all enums as get methods
+  private getSharingLinkType(): string[] { return ['None', 'Direct', 'Internal', 'AnonymousAccess']; }
+  private getSharingCapabilities(): string[] { return ['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly']; }
+  private getSharingDomainRestrictionModes(): string[] { return ['None', 'AllowList', 'BlockList']; }
+  private getSharingState(): string[] { return ['Unspecified', 'On', 'Off']; }
+  private getAnonymousLinkType(): string[] { return ['None', 'View', 'Edit']; }
+  private getSharingPermissionType(): string[] { return ['None', 'View', 'Edit']; }
+  private getSPOConditionalAccessPolicyType(): string[] { return ['AllowFullAccess', 'AllowLimitedAccess', 'BlockAccess']; }
+  private getSpecialCharactersState(): string[] { return ['NoPreference', 'Allowed', 'Disallowed']; }
+  private getSPOLimitedAccessFileType(): string[] { return ['OfficeOnlineFilesOnly', 'WebPreviewableFiles', 'OtherFiles']; }
+
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+    let formDigestValue = '';
+    let spoAdminUrl: string = '';
+    let tenantId: string = '';
+
+    spo
+      .getTenantId(logger, this.debug)
+      .then((_tenantId: string): Promise<string> => {
+        tenantId = _tenantId;
+        return spo.getSpoAdminUrl(logger, this.debug);
+      })
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        spoAdminUrl = _spoAdminUrl;
+        return spo.getRequestDigest(spoAdminUrl);
+      })
+      .then((res: ContextInfo): Promise<string> => {
+        formDigestValue = res.FormDigestValue;
+
+        // map the args.options to XML Properties
+        let propsXml: string = '';
+        let id: number = 42; // geek's humor
+        for (const optionKey of Object.keys(args.options)) {
+          if (this.isExcludedOption(optionKey)) {
+            continue;
+          }
+
+          let optionValue = args.options[optionKey];
+          if (this.getAllEnumOptions().indexOf(optionKey) > -1) {
+            // map enum values to int
+            optionValue = this.mapEnumToInt(optionKey, args.options[optionKey]);
+          }
+
+          if (['AllowedDomainListForSyncClient', 'DisabledWebPartIds'].indexOf(optionKey) > -1) {
+            // the XML has to be represented as array of guids
+            let valuesXml: string = '';
+            optionValue.split(',').forEach((value: string) => {
+              valuesXml += `<Object Type="Guid">{${formatting.escapeXml(value)}}</Object>`;
+            });
+            propsXml += `<SetProperty Id="${id++}" ObjectPathId="7" Name="${optionKey}"><Parameter Type="Array">${valuesXml}</Parameter></SetProperty><Method Name="Update" Id="${id++}" ObjectPathId="7" />`;
+          }
+          else if (['ExcludedFileExtensionsForSyncClient'].indexOf(optionKey) > -1) {
+            // the XML has to be represented as array of strings
+            let valuesXml: string = '';
+            optionValue.split(',').forEach((value: string) => {
+              valuesXml += `<Object Type="String">${value}</Object>`;
+            });
+            propsXml += `<SetProperty Id="${id++}" ObjectPathId="7" Name="${optionKey}"><Parameter Type="Array">${valuesXml}</Parameter></SetProperty><Method Name="Update" Id="${id++}" ObjectPathId="7" />`;
+          }
+          else {
+            propsXml += `<SetProperty Id="${id++}" ObjectPathId="7" Name="${optionKey}"><Parameter Type="String">${optionValue}</Parameter></SetProperty>`;
+          }
+        }
+
+        const requestOptions: any = {
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'X-RequestDigest': formDigestValue
+          },
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${propsXml}</Actions><ObjectPaths><Identity Id="7" Name="${tenantId}" /></ObjectPaths></Request>`
+        };
+
+        return request.post(requestOptions);
+      })
+      .then((res: string): void => {
+        const json: ClientSvcResponse = JSON.parse(res);
+        const response: ClientSvcResponseContents = json[0];
+        if (response.ErrorInfo) {
+          cb(new CommandError(response.ErrorInfo.ErrorMessage));
+          return;
+        }
+
+        if (args.options.EnableAzureADB2BIntegration === true) {
+          this.warn(logger, 'WARNING: Make sure to also enable the Azure AD one-time passcode authentication preview. If it is not enabled then SharePoint will not use Azure AD B2B even if EnableAzureADB2BIntegration is set to true. Learn more at http://aka.ms/spo-b2b-integration.');
+        }
+
+        cb();
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public isExcludedOption(optionKey: string): boolean {

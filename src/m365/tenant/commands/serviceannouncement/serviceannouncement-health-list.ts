@@ -1,9 +1,8 @@
 import { ServiceHealth } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
-import GraphCommand from '../../../base/GraphCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -23,14 +22,29 @@ class TenantServiceAnnouncementHealthListCommand extends GraphCommand {
     return 'This operation provides the health report of all subscribed services for a tenant';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.issues = typeof args.options.issues !== 'undefined';
-    return telemetryProps;
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['id', 'status', 'service'];
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        issues: typeof args.options.issues !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '-i, --issues' }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -62,15 +76,6 @@ class TenantServiceAnnouncementHealthListCommand extends GraphCommand {
 
         return Promise.resolve(serviceHealthList);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '-i, --issues' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

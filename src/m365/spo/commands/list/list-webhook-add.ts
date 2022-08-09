@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -35,13 +32,86 @@ class SpoListWebhookAddCommand extends SpoCommand {
     return 'Adds a new webhook to the specified list';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listId = (!(!args.options.listId)).toString();
-    telemetryProps.listTitle = (!(!args.options.listTitle)).toString();
-    telemetryProps.expirationDateTime = (!(!args.options.expirationDateTime)).toString();
-    telemetryProps.clientState = (!(!args.options.clientState)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listId: (!(!args.options.listId)).toString(),
+        listTitle: (!(!args.options.listTitle)).toString(),
+        expirationDateTime: (!(!args.options.expirationDateTime)).toString(),
+        clientState: (!(!args.options.clientState)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-l, --listId [listId]'
+      },
+      {
+        option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '-n, --notificationUrl <notificationUrl>'
+      },
+      {
+        option: '-e, --expirationDateTime [expirationDateTime]'
+      },
+      {
+        option: '-c, --clientState [clientState]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.listId) {
+          if (!validation.isValidGuid(args.options.listId)) {
+            return `${args.options.listId} is not a valid GUID`;
+          }
+        }
+
+        if (args.options.listId && args.options.listTitle) {
+          return 'Specify listId or listTitle, but not both';
+        }
+
+        if (!args.options.listId && !args.options.listTitle) {
+          return 'Specify listId or listTitle, one is required';
+        }
+
+        const parsedDateTime = Date.parse(args.options.expirationDateTime as string);
+        if (args.options.expirationDateTime && !(!parsedDateTime) !== true) {
+          return `Provide the date in one of the following formats:
+          'YYYY-MM-DD'
+          'YYYY-MM-DDThh:mm'
+          'YYYY-MM-DDThh:mmZ'
+          'YYYY-MM-DDThh:mm±hh:mm'`;
+        }
+
+        if (parsedDateTime < Date.now() || new Date(parsedDateTime) >= maxExpirationDateTime) {
+          return `Provide an expiration date which is a date time in the future and within 6 months from now`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -89,68 +159,6 @@ class SpoListWebhookAddCommand extends SpoCommand {
       }, (err: any): void => {
         this.handleRejectedODataJsonPromise(err, logger, cb);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '-n, --notificationUrl <notificationUrl>'
-      },
-      {
-        option: '-e, --expirationDateTime [expirationDateTime]'
-      },
-      {
-        option: '-c, --clientState [clientState]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.listId) {
-      if (!validation.isValidGuid(args.options.listId)) {
-        return `${args.options.listId} is not a valid GUID`;
-      }
-    }
-
-    if (args.options.listId && args.options.listTitle) {
-      return 'Specify listId or listTitle, but not both';
-    }
-
-    if (!args.options.listId && !args.options.listTitle) {
-      return 'Specify listId or listTitle, one is required';
-    }
-
-    const parsedDateTime = Date.parse(args.options.expirationDateTime as string);
-    if (args.options.expirationDateTime && !(!parsedDateTime) !== true) {
-      return `Provide the date in one of the following formats:
-      'YYYY-MM-DD'
-      'YYYY-MM-DDThh:mm'
-      'YYYY-MM-DDThh:mmZ'
-      'YYYY-MM-DDThh:mm±hh:mm'`;
-    }
-
-    if (parsedDateTime < Date.now() || new Date(parsedDateTime) >= maxExpirationDateTime) {
-      return `Provide an expiration date which is a date time in the future and within 6 months from now`;
-    }
-
-    return true;
   }
 }
 

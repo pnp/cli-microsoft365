@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -28,6 +25,42 @@ class SpoFileListCommand extends SpoCommand {
 
   public get description(): string {
     return 'Lists all available files in the specified folder and site';
+  }
+
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        recursive: args.options.recursive
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-f, --folder <folder>'
+      },
+      {
+        option: '-r, --recursive'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -72,27 +105,6 @@ class SpoFileListCommand extends SpoCommand {
           return;
         }
       }).then(() => files);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-f, --folder <folder>'
-      },
-      {
-        option: '-r, --recursive'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

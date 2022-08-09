@@ -1,5 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -30,13 +29,65 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
     return 'Removes an application permission from the site';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.appId = typeof args.options.appId !== 'undefined';
-    telemetryProps.appDisplayName = typeof args.options.appDisplayName !== 'undefined';
-    telemetryProps.permissionId = typeof args.options.permissionId !== 'undefined';
-    telemetryProps.confirm = (!!args.options.confirm).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        appId: typeof args.options.appId !== 'undefined',
+        appDisplayName: typeof args.options.appDisplayName !== 'undefined',
+        permissionId: typeof args.options.permissionId !== 'undefined',
+        confirm: (!!args.options.confirm).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --siteUrl <siteUrl>'
+      },
+      {
+        option: '-i, --permissionId [permissionId]'
+      },
+      {
+        option: '--appId [appId]'
+      },
+      {
+        option: '-n, --appDisplayName [appDisplayName]'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.appId && !args.options.appDisplayName && !args.options.permissionId) {
+          return `Specify appId, appDisplayName, or permissionId. One is required`;
+        }
+
+        if ((args.options.appId && args.options.appDisplayName) ||
+          (args.options.appId && args.options.permissionId) ||
+          (args.options.permissionId && args.options.appDisplayName)) {
+          return 'Use either appId, appDisplayName, or permissionId, but not multiple';
+        }
+
+        if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
+          return `${args.options.appId} is not a valid GUID`;
+        }
+
+        return validation.isValidSharePointUrl(args.options.siteUrl);
+      }
+    );
   }
 
   private getSpoSiteId(args: CommandArgs): Promise<string> {
@@ -152,47 +203,6 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '-i, --permissionId [permissionId]'
-      },
-      {
-        option: '--appId [appId]'
-      },
-      {
-        option: '-n, --appDisplayName [appDisplayName]'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.appId && !args.options.appDisplayName && !args.options.permissionId) {
-      return `Specify appId, appDisplayName, or permissionId. One is required`;
-    }
-
-    if ((args.options.appId && args.options.appDisplayName) ||
-      (args.options.appId && args.options.permissionId) ||
-      (args.options.permissionId && args.options.appDisplayName)) {
-      return 'Use either appId, appDisplayName, or permissionId, but not multiple';
-    }
-
-    if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
-      return `${args.options.appId} is not a valid GUID`;
-    }
-
-    return validation.isValidSharePointUrl(args.options.siteUrl);
   }
 }
 

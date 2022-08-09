@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -33,12 +30,70 @@ class AadO365GroupUserAddCommand extends GraphCommand {
     return [teamsCommands.USER_ADD];
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.role = args.options.role;
-    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
-    telemetryProps.groupId = typeof args.options.groupId !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        role: args.options.role,
+        teamId: typeof args.options.teamId !== 'undefined',
+        groupId: typeof args.options.groupId !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --userName <userName>'
+      },
+      {
+        option: "-i, --groupId [groupId]"
+      },
+      {
+        option: "--teamId [teamId]"
+      },
+      {
+        option: '-r, --role [role]',
+        autocomplete: ['Owner', 'Member']
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.groupId && !args.options.teamId) {
+          return 'Please provide one of the following parameters: groupId or teamId';
+        }
+    
+        if (args.options.groupId && args.options.teamId) {
+          return 'You cannot provide both a groupId and teamId parameter, please provide only one';
+        }
+    
+        if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
+    
+        if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
+          return `${args.options.groupId} is not a valid GUID`;
+        }
+    
+        if (args.options.role) {
+          if (['owner', 'member'].indexOf(args.options.role.toLowerCase()) === -1) {
+            return `${args.options.role} is not a valid role value. Allowed values Owner|Member`;
+          }
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -69,53 +124,6 @@ class AadO365GroupUserAddCommand extends GraphCommand {
         return request.post(requestOptions);
       })
       .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --userName <userName>'
-      },
-      {
-        option: "-i, --groupId [groupId]"
-      },
-      {
-        option: "--teamId [teamId]"
-      },
-      {
-        option: '-r, --role [role]',
-        autocomplete: ['Owner', 'Member']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.groupId && !args.options.teamId) {
-      return 'Please provide one of the following parameters: groupId or teamId';
-    }
-
-    if (args.options.groupId && args.options.teamId) {
-      return 'You cannot provide both a groupId and teamId parameter, please provide only one';
-    }
-
-    if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
-      return `${args.options.groupId} is not a valid GUID`;
-    }
-
-    if (args.options.role) {
-      if (['owner', 'member'].indexOf(args.options.role.toLowerCase()) === -1) {
-        return `${args.options.role} is not a valid role value. Allowed values Owner|Member`;
-      }
-    }
-
-    return true;
   }
 }
 

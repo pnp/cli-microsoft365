@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -24,6 +21,27 @@ class SpoStorageEntityListCommand extends SpoCommand {
 
   public get description(): string {
     return 'Lists tenant properties stored on the specified SharePoint Online app catalog';
+  }
+
+  constructor() {
+    super();
+  
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --appCatalogUrl <appCatalogUrl>'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.appCatalogUrl)
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -76,25 +94,6 @@ class SpoStorageEntityListCommand extends SpoCommand {
           this.handleError(e, logger, cb);
         }
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [{
-      option: '-u, --appCatalogUrl <appCatalogUrl>'
-    }];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const result: boolean | string = validation.isValidSharePointUrl(args.options.appCatalogUrl);
-    if (result === false) {
-      return 'Missing required option appCatalogUrl';
-    }
-    else {
-      return result;
-    }
   }
 }
 

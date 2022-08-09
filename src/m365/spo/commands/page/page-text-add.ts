@@ -1,6 +1,5 @@
 import { isNumber } from 'util';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { ContextInfo, spo, urlUtil, validation } from '../../../../utils';
@@ -34,12 +33,61 @@ class SpoPageTextAddCommand extends SpoCommand {
     return 'Adds text to a modern page';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.section = typeof args.options.section !== 'undefined';
-    telemetryProps.column = typeof args.options.column !== 'undefined';
-    telemetryProps.order = typeof args.options.order !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        section: typeof args.options.section !== 'undefined',
+        column: typeof args.options.column !== 'undefined',
+        order: typeof args.options.order !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-n, --pageName <pageName>'
+      },
+      {
+        option: '-t, --text <text>'
+      },
+      {
+        option: '--section [section]'
+      },
+      {
+        option: '--column [column]'
+      },
+      {
+        option: '--order [order]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.section && (!isNumber(args.options.section) || args.options.section < 1)) {
+          return 'The value of parameter section must be 1 or higher';
+        }
+
+        if (args.options.column && (!isNumber(args.options.column) || args.options.column < 1)) {
+          return 'The value of parameter column must be 1 or higher';
+        }
+
+        return validation.isValidSharePointUrl(args.options.webUrl);
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -128,44 +176,6 @@ class SpoPageTextAddCommand extends SpoCommand {
     };
 
     return request.post(requestOptions);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-n, --pageName <pageName>'
-      },
-      {
-        option: '-t, --text <text>'
-      },
-      {
-        option: '--section [section]'
-      },
-      {
-        option: '--column [column]'
-      },
-      {
-        option: '--order [order]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.section && (!isNumber(args.options.section) || args.options.section < 1)) {
-      return 'The value of parameter section must be 1 or higher';
-    }
-
-    if (args.options.column && (!isNumber(args.options.column) || args.options.column < 1)) {
-      return 'The value of parameter column must be 1 or higher';
-    }
-
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

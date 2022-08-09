@@ -2,7 +2,7 @@ import * as chalk from 'chalk';
 import * as child_process from 'child_process';
 import { satisfies } from 'semver';
 import { Logger } from '../../../cli';
-import { CommandError, CommandOption, CommandTypes } from '../../../Command';
+import { CommandError } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import AnonymousCommand from '../../base/AnonymousCommand';
 import commands from '../commands';
@@ -434,6 +434,55 @@ class SpfxDoctorCommand extends AnonymousCommand {
     return 'Verifies environment configuration for using the specific version of the SharePoint Framework';
   }
 
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initTypes();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        env: args.options.env
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-e, --env [env]',
+        autocomplete: ['sp2016', 'sp2019', 'spo']
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.env) {
+          const sp: SharePointVersion | undefined = this.spVersionStringToEnum(args.options.env);
+          if (!sp) {
+            return `${args.options.env} is not a valid SharePoint version. Valid versions are sp2016, sp2019 or spo`;
+          }
+        }
+    
+        if (args.options.output && args.options.output !== 'text') {
+          return `The output option only accepts the type 'text'`;
+        }
+    
+        return true;
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('e', 'env');
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (!args.options.output) {
       args.options.output = 'text';
@@ -711,39 +760,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
     const success: string = primarySupported ? '✔' : '√';
     const failure: string = primarySupported ? '✖' : '×';
     return `${result === CheckStatus.Success ? chalk.green(success) : chalk.red(failure)} ${message}`;
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-e, --env [env]',
-        autocomplete: ['sp2016', 'sp2019', 'spo']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public types(): CommandTypes | undefined {
-    return {
-      string: ['e', 'env']
-    };
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.env) {
-      const sp: SharePointVersion | undefined = this.spVersionStringToEnum(args.options.env);
-      if (!sp) {
-        return `${args.options.env} is not a valid SharePoint version. Valid versions are sp2016, sp2019 or spo`;
-      }
-    }
-
-    if (args.options.output && args.options.output !== 'text') {
-      return `The output option only accepts the type 'text'`;
-    }
-
-    return true;
   }
 }
 

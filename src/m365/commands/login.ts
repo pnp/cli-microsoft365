@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import auth, { AuthType } from '../../Auth';
 import { Logger } from '../../cli';
 import Command, {
-  CommandError, CommandOption
+  CommandError
 } from '../../Command';
 import config from '../../config';
 import GlobalOptions from '../../GlobalOptions';
@@ -33,10 +33,93 @@ class LoginCommand extends Command {
     return 'Log in to Microsoft 365';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.authType = args.options.authType || 'deviceCode';
-    return telemetryProps;
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        authType: args.options.authType || 'deviceCode'
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-t, --authType [authType]',
+        autocomplete: ['certificate', 'deviceCode', 'password', 'identity', 'browser']
+      },
+      {
+        option: '-u, --userName [userName]'
+      },
+      {
+        option: '-p, --password [password]'
+      },
+      {
+        option: '-c, --certificateFile [certificateFile]'
+      },
+      {
+        option: '--certificateBase64Encoded [certificateBase64Encoded]'
+      },
+      {
+        option: '--thumbprint [thumbprint]'
+      },
+      {
+        option: '--appId [appId]'
+      },
+      {
+        option: '--tenant [tenant]'
+      },
+      {
+        option: '--secret [secret]'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.authType === 'password') {
+          if (!args.options.userName) {
+            return 'Required option userName missing';
+          }
+    
+          if (!args.options.password) {
+            return 'Required option password missing';
+          }
+        }
+    
+        if (args.options.authType === 'certificate') {
+          if (args.options.certificateFile && args.options.certificateBase64Encoded) {
+            return 'Specify either certificateFile or certificateBase64Encoded, but not both.';
+          }
+    
+          if (!args.options.certificateFile && !args.options.certificateBase64Encoded) {
+            return 'Specify either certificateFile or certificateBase64Encoded';
+          }
+    
+          if (args.options.certificateFile) {
+            if (!fs.existsSync(args.options.certificateFile)) {
+              return `File '${args.options.certificateFile}' does not exist`;
+            }
+          }
+        }
+    
+        if (args.options.authType === 'secret') {
+          if (!args.options.secret) {
+            return 'Required option secret missing';
+          }
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -120,78 +203,6 @@ class LoginCommand extends Command {
       }, (error: any): void => {
         cb(new CommandError(error));
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-t, --authType [authType]',
-        autocomplete: ['certificate', 'deviceCode', 'password', 'identity', 'browser']
-      },
-      {
-        option: '-u, --userName [userName]'
-      },
-      {
-        option: '-p, --password [password]'
-      },
-      {
-        option: '-c, --certificateFile [certificateFile]'
-      },
-      {
-        option: '--certificateBase64Encoded [certificateBase64Encoded]'
-      },
-      {
-        option: '--thumbprint [thumbprint]'
-      },
-      {
-        option: '--appId [appId]'
-      },
-      {
-        option: '--tenant [tenant]'
-      },
-      {
-        option: '--secret [secret]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.authType === 'password') {
-      if (!args.options.userName) {
-        return 'Required option userName missing';
-      }
-
-      if (!args.options.password) {
-        return 'Required option password missing';
-      }
-    }
-
-    if (args.options.authType === 'certificate') {
-      if (args.options.certificateFile && args.options.certificateBase64Encoded) {
-        return 'Specify either certificateFile or certificateBase64Encoded, but not both.';
-      }
-
-      if (!args.options.certificateFile && !args.options.certificateBase64Encoded) {
-        return 'Specify either certificateFile or certificateBase64Encoded';
-      }
-
-      if (args.options.certificateFile) {
-        if (!fs.existsSync(args.options.certificateFile)) {
-          return `File '${args.options.certificateFile}' does not exist`;
-        }
-      }
-    }
-
-    if (args.options.authType === 'secret') {
-      if (!args.options.secret) {
-        return 'Required option secret missing';
-      }
-    }
-
-    return true;
   }
 }
 

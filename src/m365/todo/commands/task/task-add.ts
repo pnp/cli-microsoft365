@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -26,11 +23,51 @@ class TodoTaskAddCommand extends GraphCommand {
     return 'Add a task to a Microsoft To Do task list';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listId = typeof args.options.listId !== 'undefined';
-    telemetryProps.listName = typeof args.options.listName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listId: typeof args.options.listId !== 'undefined',
+        listName: typeof args.options.listName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-t, --title <title>'
+      },
+      {
+        option: '--listName [listName]'
+      },
+      {
+        option: '--listId [listId]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.listId && args.options.listName) {
+          return 'Specify listId or listName but not both';
+        }
+
+        if (!args.options.listId && !args.options.listName) {
+          return 'Specify listId or listName';
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -82,35 +119,6 @@ class TodoTaskAddCommand extends GraphCommand {
 
         return Promise.resolve(taskList.id);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '--listName [listName]'
-      },
-      {
-        option: '--listId [listId]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.listId && args.options.listName) {
-      return 'Specify listId or listName but not both';
-    }
-
-    if (!args.options.listId && !args.options.listName) {
-      return 'Specify listId or listName';
-    }
-
-    return true;
   }
 }
 

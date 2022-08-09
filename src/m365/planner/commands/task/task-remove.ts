@@ -2,7 +2,6 @@ import { PlannerBucket, PlannerTask } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
 import * as os from 'os';
 import { Cli, Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { aadGroup, odata, validation } from '../../../../utils';
@@ -33,6 +32,97 @@ class PlannerTaskRemoveCommand extends GraphCommand {
 
   public get description(): string {
     return 'Removes the Microsoft Planner task from a plan';
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        title: typeof args.options.title !== 'undefined',
+        bucketId: typeof args.options.bucketId !== 'undefined',
+        bucketName: typeof args.options.bucketName !== 'undefined',
+        planId: typeof args.options.planId !== 'undefined',
+        planTitle: typeof args.options.planTitle !== 'undefined',
+        ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
+        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
+        confirm: !!args.options.confirm
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '-i, --id [id]' },
+      { option: '-t, --title [title]' },
+      { option: '--bucketId [bucketId]' },
+      { option: '--bucketName [bucketName]' },
+      { option: '--planId [planId]' },
+      { option: '--planTitle [planTitle]' },
+      { option: '--ownerGroupId [ownerGroupId]' },
+      { option: '--ownerGroupName [ownerGroupName]' },
+      { option: '--confirm' }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.id) {
+          if (args.options.bucketId || args.options.bucketName || args.options.planId || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName) {
+            return 'Don\'t specify bucketId,bucketName, planId, planTitle, ownerGroupId or ownerGroupName when using id';
+          }
+        }
+    
+        if (args.options.title) {
+          if (!args.options.bucketId && !args.options.bucketName) {
+            return 'Specify either bucketId or bucketName when using title';
+          }
+    
+          if (args.options.bucketId && args.options.bucketName) {
+            return 'Specify either bucketId or bucketName when using title but not both';
+          }
+    
+          if (args.options.bucketName) {
+            if (!args.options.planId && !args.options.planTitle) {
+              return 'Specify either planId or planTitle when using bucketName';
+            }
+    
+            if (args.options.planId && args.options.planTitle) {
+              return 'Specify either planId or planTitle when using bucketName but not both';
+            }
+          }
+    
+          if (args.options.planTitle) {
+            if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
+              return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
+            }
+            if (args.options.ownerGroupId && args.options.ownerGroupName) {
+              return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
+            }
+          }
+    
+          if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
+            return `${args.options.ownerGroupId} is not a valid GUID`;
+          }
+        }
+        return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['id', 'title']
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -91,7 +181,7 @@ class PlannerTaskRemoveCommand extends GraphCommand {
 
     return this
       .getBucketId(options)
-      .then(bucketId => {        
+      .then(bucketId => {
         // $filter is not working on the buckets/{bucketId}/tasks endpoint, hence it is not being used.
         return odata.getAllItems<PlannerTask>(`${this.resource}/v1.0/planner/buckets/${bucketId}/tasks?$select=title,id`, 'minimal');
       })
@@ -168,71 +258,6 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     return aadGroup
       .getGroupByDisplayName(ownerGroupName!)
       .then(group => group.id!);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '-i, --id [id]' },
-      { option: '-t, --title [title]' },
-      { option: '--bucketId [bucketId]' },
-      { option: '--bucketName [bucketName]' },
-      { option: '--planId [planId]' },
-      { option: '--planTitle [planTitle]' },
-      { option: '--ownerGroupId [ownerGroupId]' },
-      { option: '--ownerGroupName [ownerGroupName]' },
-      { option: '--confirm' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public optionSets(): string[][] | undefined {
-    return [
-      ['id', 'title']
-    ];
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.id) {
-      if (args.options.bucketId || args.options.bucketName || args.options.planId || args.options.planTitle || args.options.ownerGroupId || args.options.ownerGroupName) {
-        return 'Don\'t specify bucketId,bucketName, planId, planTitle, ownerGroupId or ownerGroupName when using id';
-      }
-    }
-
-    if (args.options.title) {
-      if (!args.options.bucketId && !args.options.bucketName) {
-        return 'Specify either bucketId or bucketName when using title';
-      }
-
-      if (args.options.bucketId && args.options.bucketName) {
-        return 'Specify either bucketId or bucketName when using title but not both';
-      }
-
-      if (args.options.bucketName) {
-        if (!args.options.planId && !args.options.planTitle) {
-          return 'Specify either planId or planTitle when using bucketName';
-        }
-
-        if (args.options.planId && args.options.planTitle) {
-          return 'Specify either planId or planTitle when using bucketName but not both';
-        }
-      }
-
-      if (args.options.planTitle) {
-        if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
-          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
-        }
-        if (args.options.ownerGroupId && args.options.ownerGroupName) {
-          return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
-        }
-      }
-      
-      if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-        return `${args.options.ownerGroupId} is not a valid GUID`;
-      }
-    }
-    return true;
   }
 }
 

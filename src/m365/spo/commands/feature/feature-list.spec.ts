@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.FEATURE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -442,7 +444,7 @@ describe(commands.FEATURE_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsVerboseOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -453,7 +455,7 @@ describe(commands.FEATURE_LIST, () => {
   });
 
   it('supports specifying scope', () => {
-    const options = command.options();
+    const options = command.options;
     let containsScopeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[scope]') > -1) {
@@ -461,13 +463,6 @@ describe(commands.FEATURE_LIST, () => {
       }
     });
     assert(containsScopeOption);
-  });
-
-  it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = command.options();
-    sinonUtil.restore(Command.prototype.options);
-    assert(options.length > 0);
   });
 
   it('retrieves all Web features', (done) => {
@@ -533,89 +528,89 @@ describe(commands.FEATURE_LIST, () => {
     });
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({
+  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({
       options:
       {
         url: 'foo'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the url options specified', () => {
-    const actual = command.validate({
+  it('passes validation when the url options specified', async () => {
+    const actual = await command.validate({
       options:
       {
         url: "https://contoso.sharepoint.com"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the url and scope options specified', () => {
-    const actual = command.validate({
+  it('passes validation when the url and scope options specified', async () => {
+    const actual = await command.validate({
       options:
       {
         url: "https://contoso.sharepoint.com",
         scope: "Site"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts scope to be Site', () => {
-    const actual = command.validate({
+  it('accepts scope to be Site', async () => {
+    const actual = await command.validate({
       options:
       {
         url: "https://contoso.sharepoint.com",
         scope: 'Site'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts scope to be Web', () => {
-    const actual = command.validate({
+  it('accepts scope to be Web', async () => {
+    const actual = await command.validate({
       options:
       {
         url: "https://contoso.sharepoint.com",
         scope: 'Web'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('rejects invalid string scope', () => {
+  it('rejects invalid string scope', async () => {
     const scope = 'foo';
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         url: "https://contoso.sharepoint.com",
         scope: scope
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, `${scope} is not a valid Feature scope. Allowed values are Site|Web`);
   });
 
-  it('rejects invalid scope value specified as number', () => {
+  it('rejects invalid scope value specified as number', async () => {
     const scope = 123;
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         url: "https://contoso.sharepoint.com",
         scope: scope
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, `${scope} is not a valid Feature scope. Allowed values are Site|Web`);
   });
 
-  it('doesn\'t fail validation if the optional scope option not specified', () => {
-    const actual = command.validate(
+  it('doesn\'t fail validation if the optional scope option not specified', async () => {
+    const actual = await command.validate(
       {
         options:
         {
           url: "https://contoso.sharepoint.com"
         }
-      });
+      }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

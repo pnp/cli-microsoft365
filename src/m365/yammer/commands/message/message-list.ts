@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
@@ -22,11 +21,6 @@ class YammerMessageListCommand extends YammerCommand {
   private items: any[];
   private static readonly feedTypes: string[] = ['All', 'Top', 'My', 'Following', 'Sent', 'Private', 'Received'];
 
-  constructor() {
-    super();
-    this.items = [];
-  }
-
   public get name(): string {
     return commands.MESSAGE_LIST;
   }
@@ -35,19 +29,90 @@ class YammerMessageListCommand extends YammerCommand {
     return 'Returns all accessible messages from the user\'s Yammer network';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.olderThanId = args.options.olderThanId !== undefined;
-    telemetryProps.threaded = args.options.threaded;
-    telemetryProps.limit = args.options.limit !== undefined;
-    telemetryProps.feedType = args.options.feedType !== undefined;
-    telemetryProps.threadId = args.options.threadId !== undefined;
-    telemetryProps.groupId = args.options.groupId !== undefined;
-    return telemetryProps;
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['id', 'replied_to_id', 'thread_id', 'group_id', 'shortBody'];
+  }
+
+  constructor() {
+    super();
+    this.items = [];
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        olderThanId: args.options.olderThanId !== undefined,
+        threaded: args.options.threaded,
+        limit: args.options.limit !== undefined,
+        feedType: args.options.feedType !== undefined,
+        threadId: args.options.threadId !== undefined,
+        groupId: args.options.groupId !== undefined
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--olderThanId [olderThanId]'
+      },
+      {
+        option: '-f, --feedType [feedType]',
+        autocomplete: YammerMessageListCommand.feedTypes
+      },
+      {
+        option: '--groupId [groupId]'
+      },
+      {
+        option: '--threadId [threadId]'
+      },
+      {
+        option: '--threaded'
+      },
+      {
+        option: '--limit [limit]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.groupId && args.options.threadId) {
+          return `You cannot specify groupId and threadId at the same time`;
+        }
+
+        if (args.options.feedType && (args.options.groupId || args.options.threadId)) {
+          return `You cannot specify the feedType with groupId or threadId at the same time`;
+        }
+
+        if (args.options.feedType && YammerMessageListCommand.feedTypes.indexOf(args.options.feedType) < 0) {
+          return `${args.options.feedType} is not a valid value for the feedType option. Allowed values are ${YammerMessageListCommand.feedTypes.join('|')}`;
+        }
+
+        if (args.options.olderThanId && typeof args.options.olderThanId !== 'number') {
+          return `${args.options.olderThanId} is not a number`;
+        }
+
+        if (args.options.groupId && typeof args.options.groupId !== 'number') {
+          return `${args.options.groupId} is not a number`;
+        }
+
+        if (args.options.threadId && typeof args.options.threadId !== 'number') {
+          return `${args.options.threadId} is not a number`;
+        }
+
+        if (args.options.limit && typeof args.options.limit !== 'number') {
+          return `${args.options.limit} is not a number`;
+        }
+
+        return true;
+      }
+    );
   }
 
   private getAllItems(logger: Logger, args: CommandArgs, messageId: number): Promise<void> {
@@ -172,65 +237,6 @@ class YammerMessageListCommand extends YammerCommand {
         logger.log(this.items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--olderThanId [olderThanId]'
-      },
-      {
-        option: '-f, --feedType [feedType]',
-        autocomplete: YammerMessageListCommand.feedTypes
-      },
-      {
-        option: '--groupId [groupId]'
-      },
-      {
-        option: '--threadId [threadId]'
-      },
-      {
-        option: '--threaded'
-      },
-      {
-        option: '--limit [limit]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.groupId && args.options.threadId) {
-      return `You cannot specify groupId and threadId at the same time`;
-    }
-
-    if (args.options.feedType && (args.options.groupId || args.options.threadId)) {
-      return `You cannot specify the feedType with groupId or threadId at the same time`;
-    }
-
-    if (args.options.feedType && YammerMessageListCommand.feedTypes.indexOf(args.options.feedType) < 0) {
-      return `${args.options.feedType} is not a valid value for the feedType option. Allowed values are ${YammerMessageListCommand.feedTypes.join('|')}`;
-    }
-
-    if (args.options.olderThanId && typeof args.options.olderThanId !== 'number') {
-      return `${args.options.olderThanId} is not a number`;
-    }
-
-    if (args.options.groupId && typeof args.options.groupId !== 'number') {
-      return `${args.options.groupId} is not a number`;
-    }
-
-    if (args.options.threadId && typeof args.options.threadId !== 'number') {
-      return `${args.options.threadId} is not a number`;
-    }
-
-    if (args.options.limit && typeof args.options.limit !== 'number') {
-      return `${args.options.limit} is not a number`;
-    }
-
-    return true;
   }
 }
 

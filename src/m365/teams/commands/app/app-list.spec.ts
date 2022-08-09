@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.APP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -63,15 +65,14 @@ describe(commands.APP_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'distributionMethod']);
   });
 
-  it('fails validation if both teamId and teamName options are passed', (done) => {
-    const actual = command.validate({
+  it('fails validation if both teamId and teamName options are passed', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         teamName: 'Team Name'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
   it('lists Microsoft Teams apps in the organization app catalog', (done) => {
@@ -429,34 +430,34 @@ describe(commands.APP_LIST, () => {
     });
   });
 
-  it('fails validation if the teamId is not a valid GUID', () => {
-    const actual = command.validate({
+  it('fails validation if the teamId is not a valid GUID', async () => {
+    const actual = await command.validate({
       options: {
         teamId: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the teamId is not specified', () => {
-    const actual = command.validate({
+  it('passes validation if the teamId is not specified', async () => {
+    const actual = await command.validate({
       options: {
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the teamId is a valid GUID', () => {
-    const actual = command.validate({
+  it('passes validation when the teamId is a valid GUID', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

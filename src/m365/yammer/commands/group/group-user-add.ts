@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
@@ -24,11 +23,51 @@ class YammerGroupUserAddCommand extends YammerCommand {
     return 'Adds a user to a Yammer Group';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.userId = typeof args.options.userId !== 'undefined';
-    telemetryProps.email = typeof args.options.email !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        userId: typeof args.options.userId !== 'undefined',
+        email: typeof args.options.email !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--id <id>'
+      },
+      {
+        option: '--userId [userId]'
+      },
+      {
+        option: '--email [email]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.id && typeof args.options.id !== 'number') {
+          return `${args.options.id} is not a number`;
+        }
+
+        if (args.options.userId && typeof args.options.userId !== 'number') {
+          return `${args.options.userId} is not a number`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -49,35 +88,6 @@ class YammerGroupUserAddCommand extends YammerCommand {
     request
       .post(requestOptions)
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--id <id>'
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--email [email]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.id && typeof args.options.id !== 'number') {
-      return `${args.options.id} is not a number`;
-    }
-
-    if (args.options.userId && typeof args.options.userId !== 'number') {
-      return `${args.options.userId} is not a number`;
-    }
-
-    return true;
   }
 }
 

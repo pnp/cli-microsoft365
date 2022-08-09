@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,12 +13,14 @@ describe(commands.APP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -3521,7 +3523,7 @@ describe(commands.APP_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -3531,18 +3533,18 @@ describe(commands.APP_LIST, () => {
     assert(containsOption);
   });
 
-  it('fails validation if asAdmin specified without environment', () => {
-    const actual = command.validate({ options: { asAdmin: true } });
+  it('fails validation if asAdmin specified without environment', async () => {
+    const actual = await command.validate({ options: { asAdmin: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if environment specified without admin', () => {
-    const actual = command.validate({ options: { environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } });
+  it('fails validation if environment specified without admin', async () => {
+    const actual = await command.validate({ options: { environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if asAdmin specified with environment', () => {
-    const actual = command.validate({ options: { asAdmin: true, environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } });
+  it('passes validation if asAdmin specified with environment', async () => {
+    const actual = await command.validate({ options: { asAdmin: true, environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,11 +12,13 @@ const command: Command = require('./funsettings-set');
 describe(commands.FUNSETTINGS_SET, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -325,87 +327,102 @@ describe(commands.FUNSETTINGS_SET, () => {
     });
   });
 
-  it('fails validation if teamId is not a valid GUID', () => {
-    const actual = command.validate({
+  it('fails validation if teamId is not a valid GUID', async () => {
+    const actual = await command.validate({
       options: { teamId: 'invalid' }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when teamId is a valid GUID', () => {
-    const actual = command.validate({
+  it('passes validation when teamId is a valid GUID', async () => {
+    const actual = await command.validate({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66' }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when allowGiphy is a valid boolean', () => {
-    const actualTrue = command.validate({
+  it('passes validation when allowGiphy is a valid boolean', async () => {
+    const actualTrue = await command.validate({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowGiphy: 'true' }
-    });
-    const actualFalse = command.validate({
+    }, commandInfo);
+
+    const actualFalse = await command.validate({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowGiphy: 'false' }
-    });
+    }, commandInfo);
+
     const actual = actualTrue && actualFalse;
     assert.strictEqual(actual, true);
   });
-  it('fails validation when allowGiphy is not a valid boolean', () => {
-    const actual = command.validate({
+
+  it('fails validation when allowGiphy is not a valid boolean', async () => {
+    const actual = await command.validate({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowGiphy: 'trueish' }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('passes validation when giphyContentRating is moderate or strict', () => {
-    const actualModerate = command.validate({
+
+  it('passes validation when giphyContentRating is moderate or strict', async () => {
+    const actualModerate = await command.validate({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', giphyContentRating: 'moderate' }
-    });
-    const actualStrict = command.validate({
+    }, commandInfo);
+
+    const actualStrict = await command.validate({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', giphyContentRating: 'strict' }
-    });
+    }, commandInfo);
+
     const actual = actualModerate && actualStrict;
     assert.strictEqual(actual, true);
   });
-  it('fails validation when giphyContentRating is not moderate or strict', () => {
-    const actual = command.validate({
+
+  it('fails validation when giphyContentRating is not moderate or strict', async () => {
+    const actual = await command.validate({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', giphyContentRating: 'somethingelse' }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('passes validation when allowStickersAndMemes is a valid boolean', () => {
-    const actualTrue = command.validate({
+
+  it('passes validation when allowStickersAndMemes is a valid boolean', async () => {
+    const actualTrue = await command.validate({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowStickersAndMemes: 'true' }
-    });
-    const actualFalse = command.validate({
+    }, commandInfo);
+
+    const actualFalse = await command.validate({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowStickersAndMemes: 'false' }
-    });
+    }, commandInfo);
+
     const actual = actualTrue && actualFalse;
     assert.strictEqual(actual, true);
   });
-  it('fails validation when allowStickersAndMemes is not a valid boolean', () => {
-    const actual = command.validate({
+
+  it('fails validation when allowStickersAndMemes is not a valid boolean', async () => {
+    const actual = await command.validate({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowStickersAndMemes: 'somethingelse' }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('passes validation when allowCustomMemes is a valid boolean', () => {
-    const actualTrue = command.validate({
+
+  it('passes validation when allowCustomMemes is a valid boolean', async () => {
+    const actualTrue = await command.validate({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowCustomMemes: 'true' }
-    });
-    const actualFalse = command.validate({
+    }, commandInfo);
+
+    const actualFalse = await command.validate({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowCustomMemes: 'false' }
-    });
+    }, commandInfo);
+
     const actual = actualTrue && actualFalse;
     assert.strictEqual(actual, true);
   });
-  it('fails validation when allowCustomMemes is not a valid boolean', () => {
-    const actual = command.validate({
+
+  it('fails validation when allowCustomMemes is not a valid boolean', async () => {
+    const actual = await command.validate({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowCustomMemes: 'somethingelse' }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

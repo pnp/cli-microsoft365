@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, {
   CommandError
 } from '../../../../Command';
@@ -16,6 +16,7 @@ describe(commands.SITE_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
@@ -23,6 +24,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -829,7 +831,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -840,7 +842,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site type', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--type') > -1) {
         assert(true);
@@ -851,7 +853,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('offers autocomplete for site type options', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--type') > -1) {
         assert(options[i].autocomplete);
@@ -862,7 +864,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site title', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--title') > -1) {
         assert(true);
@@ -873,7 +875,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site alias', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--alias') > -1) {
         assert(true);
@@ -884,7 +886,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site url', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--url') > -1) {
         assert(true);
@@ -895,7 +897,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site description', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--description') > -1) {
         assert(true);
@@ -906,7 +908,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site classification', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--classification') > -1) {
         assert(true);
@@ -917,7 +919,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying if the team site contains a public group', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--isPublic') > -1) {
         assert(true);
@@ -928,7 +930,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying if the communication site allows sharing files with guest users (deprecated)', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--allowFileSharingForGuestUsers') > -1) {
         assert(true);
@@ -939,7 +941,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying if the communication site allows sharing files with guest users', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--shareByEmailEnabled') > -1) {
         assert(true);
@@ -950,7 +952,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site design', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--siteDesign') > -1) {
         assert(true);
@@ -961,7 +963,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site design ID', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--siteDesignId') > -1) {
         assert(true);
@@ -972,7 +974,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site language', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--lcid') > -1) {
         assert(true);
@@ -982,236 +984,236 @@ describe(commands.SITE_ADD, () => {
     assert(false);
   });
 
-  it('passes validation if the type option not specified', () => {
-    const actual = command.validate({
+  it('passes validation if the type option not specified', async () => {
+    const actual = await command.validate({
       options: {
         title: 'Team 1',
         alias: 'team1'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the TeamSite type option specified', () => {
-    const actual = command.validate({
+  it('passes validation when the TeamSite type option specified', async () => {
+    const actual = await command.validate({
       options: {
         type: 'TeamSite',
         title: 'Team 1',
         alias: 'team1'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when single owner is specified for a TeamSite', () => {
-    const actual = command.validate({
+  it('passes validation when single owner is specified for a TeamSite', async () => {
+    const actual = await command.validate({
       options: {
         type: 'TeamSite',
         title: 'Team 1',
         alias: 'team1',
         owners: 'admin@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when \'owners\' is specified for a CommunicationSite', () => {
-    const actual = command.validate({
+  it('passes validation when \'owners\' is specified for a CommunicationSite', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com',
         type: 'CommunicationSite',
         title: 'Team 1',
         owners: 'admin@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when multiple owners are specified for a TeamSite', () => {
-    const actual = command.validate({
+  it('passes validation when multiple owners are specified for a TeamSite', async () => {
+    const actual = await command.validate({
       options: {
         type: 'TeamSite',
         title: 'Team 1',
         alias: 'team1',
         owners: 'admin@contoso.com,steve@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when multiple owners with a space in between are specified for a TeamSite', () => {
-    const actual = command.validate({
+  it('passes validation when multiple owners with a space in between are specified for a TeamSite', async () => {
+    const actual = await command.validate({
       options: {
         type: 'TeamSite',
         title: 'Team 1',
         alias: 'team1',
         owners: 'admin@contoso.com, steve@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the CommunicationSite type option specified', () => {
-    const actual = command.validate({
+  it('passes validation when the CommunicationSite type option specified', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
         url: 'https://contoso.sharepoint.com/sites/marketing'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when lcid is valid', () => {
-    const actual = command.validate({
+  it('passes validation when lcid is valid', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         lcid: 1033,
         title: 'Marketing',
         url: 'https://contoso.sharepoint.com/sites/marketing'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if an invalid type option specified', () => {
-    const actual = command.validate({
+  it('fails validation if an invalid type option specified', async () => {
+    const actual = await command.validate({
       options: {
         type: 'Invalid',
         title: 'Team 1',
         alias: 'team1'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if an parameter option specified for TeamSites', () => {
-    const actual = command.validate({
+  it('fails validation if an parameter option specified for TeamSites', async () => {
+    const actual = await command.validate({
       options: {
         type: 'TeamSite',
         title: 'Team 1',
         alias: 'team1',
         webTemplate: 'STS#3'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the type is TeamSite and alias option not specified', () => {
-    const actual = command.validate({
+  it('fails validation when the type is TeamSite and alias option not specified', async () => {
+    const actual = await command.validate({
       options: {
         title: 'Team 1'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the type is CommunicationSite and url option not specified', () => {
-    const actual = command.validate({
+  it('fails validation when the type is CommunicationSite and url option not specified', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Team 1'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the type is CommunicationSite and uses a wrong parameter', () => {
-    const actual = command.validate({
+  it('fails validation when the type is CommunicationSite and uses a wrong parameter', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Team 1',
         url: 'https://contoso.sharepoint.com/sites/team',
         alias: 'alias'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the type is CommunicationSite and the url option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({
+  it('fails validation when the type is CommunicationSite and the url option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
         url: 'foo'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the type is CommunicationSite and multiple owners specified', () => {
-    const actual = command.validate({
+  it('fails validation when the type is CommunicationSite and multiple owners specified', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
         url: 'https://contoso.sharepoint.com/sites/marketing',
         owners: 'admin@contoso.com,admin1@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the type is CommunicationSite and the url option is a valid SharePoint site URL', () => {
-    const actual = command.validate({
+  it('passes validation when the type is CommunicationSite and the url option is a valid SharePoint site URL', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
         url: 'https://contoso.sharepoint.com/sites/marketing'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the type is CommunicationSite and siteDesign is Topic', () => {
-    const actual = command.validate({
+  it('passes validation when the type is CommunicationSite and siteDesign is Topic', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
         url: 'https://contoso.sharepoint.com/sites/marketing',
         siteDesign: 'Topic'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the type is CommunicationSite and siteDesign is Showcase', () => {
-    const actual = command.validate({
+  it('passes validation when the type is CommunicationSite and siteDesign is Showcase', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
         url: 'https://contoso.sharepoint.com/sites/marketing',
         siteDesign: 'Showcase'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the type is CommunicationSite and siteDesign is Blank', () => {
-    const actual = command.validate({
+  it('passes validation when the type is CommunicationSite and siteDesign is Blank', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
         url: 'https://contoso.sharepoint.com/sites/marketing',
         siteDesign: 'Blank'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when the type is CommunicationSite and siteDesign is invalid', () => {
-    const actual = command.validate({
+  it('fails validation when the type is CommunicationSite and siteDesign is invalid', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
         url: 'https://contoso.sharepoint.com/sites/marketing',
         siteDesign: 'Invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the type is CommunicationSite and uses alias', () => {
-    const actual = command.validate({
+  it('fails validation when the type is CommunicationSite and uses alias', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1219,36 +1221,36 @@ describe(commands.SITE_ADD, () => {
         siteDesign: 'Blank',
         alias: 'test'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the type is CommunicationSite and siteDesignId is a valid GUID', () => {
-    const actual = command.validate({
+  it('passes validation when the type is CommunicationSite and siteDesignId is a valid GUID', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
         url: 'https://contoso.sharepoint.com/sites/marketing',
         siteDesignId: '92398ab7-45c7-486b-81fa-54da2ee0738a'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when the type is CommunicationSite and siteDesignId is not a valid GUID', () => {
-    const actual = command.validate({
+  it('fails validation when the type is CommunicationSite and siteDesignId is not a valid GUID', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
         url: 'https://contoso.sharepoint.com/sites/marketing',
         siteDesignId: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the type is CommunicationSite and both siteDesign and siteDesignId are specified', () => {
-    const actual = command.validate({
+  it('fails validation when the type is CommunicationSite and both siteDesign and siteDesignId are specified', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1256,43 +1258,43 @@ describe(commands.SITE_ADD, () => {
         siteDesign: 'Topic',
         siteDesignId: '92398ab7-45c7-486b-81fa-54da2ee0738a'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when lcid is not a number', () => {
-    const actual = command.validate({
+  it('fails validation when lcid is not a number', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
         url: 'https://contoso.sharepoint.com/sites/marketing',
         lcid: 'a'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when lcid is less than 0', () => {
-    const actual = command.validate({
+  it('fails validation when lcid is less than 0', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
         url: 'https://contoso.sharepoint.com/sites/marketing',
         lcid: -1
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when lcid is not valid', () => {
-    const actual = command.validate({
+  it('fails validation when lcid is not valid', async () => {
+    const actual = await command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
         url: 'https://contoso.sharepoint.com/sites/marketing',
         lcid: 3081
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -2851,200 +2853,200 @@ describe(commands.SITE_ADD, () => {
     });
   });
 
-  it('fails validation if the url is not specified', () => {
-    const actual = command.validate({
+  it('fails validation if the url is not specified', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", title: 'Team', timeZone: 4, owners: 'admin@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the url is not a valid url', () => {
-    const actual = command.validate({
+  it('fails validation if the url is not a valid url', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'abc', title: 'Team', timeZone: 4, owners: 'admin@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the url is not a valid SharePoint url', () => {
-    const actual = command.validate({
+  it('fails validation if the url is not a valid SharePoint url', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'http://contoso', title: 'Team', timeZone: 4, owners: 'admin@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the owner is not specified', () => {
-    const actual = command.validate({
+  it('fails validation if the owner is not specified', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the timeZone is not specified', () => {
-    const actual = command.validate({
+  it('fails validation if the timeZone is not specified', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', owners: 'admin@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the timeZone is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the timeZone is not a number', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 'a'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the lcid is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the lcid is not a number', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, lcid: 'a'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the resourceQuota is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the resourceQuota is not a number', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, resourceQuota: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the resourceQuotaWarningLevel is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the resourceQuotaWarningLevel is not a number', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the resourceQuotaWarningLevel is specified without resourceQuota', () => {
-    const actual = command.validate({
+  it('fails validation if the resourceQuotaWarningLevel is specified without resourceQuota', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 10
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the resourceQuotaWarningLevel is greater than resourceQuota', () => {
-    const actual = command.validate({
+  it('fails validation if the resourceQuotaWarningLevel is greater than resourceQuota', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 10, resourceQuota: 5
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the storageQuota is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the storageQuota is not a number', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, storageQuota: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the storageQuotaWarningLevel is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the storageQuotaWarningLevel is not a number', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the storageQuotaWarningLevel is specified without storageQuota', () => {
-    const actual = command.validate({
+  it('fails validation if the storageQuotaWarningLevel is specified without storageQuota', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if is using a wrong parameter (alias)', () => {
-    const actual = command.validate({
+  it('fails validation if is using a wrong parameter (alias)', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', alias: 'team',
         owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the storageQuotaWarningLevel is greater than storageQuota', () => {
-    const actual = command.validate({
+  it('fails validation if the storageQuotaWarningLevel is greater than storageQuota', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10, storageQuota: 5
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the required options are correct but a wrong parameter passed', () => {
-    const actual = command.validate({
+  it('fails validation if the required options are correct but a wrong parameter passed', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, alias: 'team'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the required options are correct', () => {
-    const actual = command.validate({
+  it('passes validation if the required options are correct', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the owner property passes two owners', () => {
-    const actual = command.validate({
+  it('fails validation if the owner property passes two owners', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com, admin2@contoso.com', timeZone: 4
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if all options are correct', () => {
-    const actual = command.validate({
+  it('passes validation if all options are correct', async () => {
+    const actual = await command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4,
         lcid: 1033, resourceQuota: 100, resourceQuotaWarningLevel: 90,
         storageQuota: 100, storageQuotaWarningLevel: 90
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });
