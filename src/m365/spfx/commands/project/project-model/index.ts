@@ -1,6 +1,7 @@
 export * from './ConfigJson';
 export * from './CopyAssetsJson';
 export * from './DeployAzureStorageJson';
+export * from './EsLintRcJs';
 export * from './Gitignore';
 export * from './GulpfileJs';
 export * from './JsonFile';
@@ -20,4 +21,3 @@ export * from './VsCodeLaunchJson';
 export * from './VsCodeSettingsJson';
 export * from './WriteManifestsJson';
 export * from './YoRcJson';
-

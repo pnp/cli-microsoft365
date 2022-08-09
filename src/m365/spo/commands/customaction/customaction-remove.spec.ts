@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
@@ -36,6 +37,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -88,7 +90,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   });
 
   it('defines correct option sets', () => {
-    assert.deepStrictEqual(command.optionSets(), [
+    assert.deepStrictEqual(command.optionSets, [
       ['id', 'title']
     ]);
   });
@@ -643,7 +645,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsVerboseOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -654,7 +656,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
   });
 
   it('supports specifying scope', () => {
-    const options = command.options();
+    const options = command.options;
     let containsScopeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[scope]') > -1) {
@@ -664,143 +666,141 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     assert(containsScopeOption);
   });
 
-  it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = command.options();
-    sinonUtil.restore(Command.prototype.options);
-    assert(options.length > 0);
-  });
-
-  it('should fail validation if the url option not specified', () => {
-    const actual = command.validate({ options: { id: "BC448D63-484F-49C5-AB8C-96B14AA68D50" } });
+  it('should fail validation if the id option not specified', async () => {
+    const actual = await command.validate({ options: { url: "https://contoso.sharepoint.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('should fail validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({
-      options:
-      {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        url: 'foo'
-      }
-    });
+  it('should fail validation if the url option not specified', async () => {
+    const actual = await command.validate({ options: { id: "BC448D63-484F-49C5-AB8C-96B14AA68D50" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('should fail validation if the id option is not a valid guid', () => {
-    const actual = command.validate({
+  it('should fail validation if the url option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({
       options:
-      {
-        id: "foo",
-        url: 'https://contoso.sharepoint.com'
-      }
-    });
+        {
+          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+          url: 'foo'
+        }
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('should pass validation when the id and url options specified', () => {
-    const actual = command.validate({
+  it('should fail validation if the id option is not a valid guid', async () => {
+    const actual = await command.validate({
       options:
-      {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        url: "https://contoso.sharepoint.com"
-      }
-    });
-    assert.strictEqual(actual, true);
+        {
+          id: "foo",
+          url: 'https://contoso.sharepoint.com'
+        }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
   });
 
-  it('should pass validation when the id, url and scope options specified', () => {
-    const actual = command.validate({
+  it('should pass validation when the id and url options specified', async () => {
+    const actual = await command.validate({
       options:
-      {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        url: "https://contoso.sharepoint.com",
-        scope: "Site"
-      }
-    });
-    assert.strictEqual(actual, true);
-  });
-
-  it('should pass validation when the id and url option specified', () => {
-    const actual = command.validate({
-      options:
-      {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        url: "https://contoso.sharepoint.com"
-      }
-    });
-    assert.strictEqual(actual, true);
-  });
-
-  it('should accept scope to be All', () => {
-    const actual = command.validate({
-      options:
-      {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        url: "https://contoso.sharepoint.com",
-        scope: 'All'
-      }
-    });
-    assert.strictEqual(actual, true);
-  });
-
-  it('should accept scope to be Site', () => {
-    const actual = command.validate({
-      options:
-      {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        url: "https://contoso.sharepoint.com",
-        scope: 'Site'
-      }
-    });
-    assert.strictEqual(actual, true);
-  });
-
-  it('should accept scope to be Web', () => {
-    const actual = command.validate({
-      options:
-      {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        url: "https://contoso.sharepoint.com",
-        scope: 'Web'
-      }
-    });
-    assert.strictEqual(actual, true);
-  });
-
-  it('should reject invalid string scope', () => {
-    const scope = 'foo';
-    const actual = command.validate({
-      options: {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        url: "https://contoso.sharepoint.com",
-        scope: scope
-      }
-    });
-    assert.strictEqual(actual, `${scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
-  });
-
-  it('should reject invalid scope value specified as number', () => {
-    const scope = 123;
-    const actual = command.validate({
-      options: {
-        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
-        url: "https://contoso.sharepoint.com",
-        scope: scope
-      }
-    });
-    assert.strictEqual(actual, `${scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
-  });
-
-  it('doesn\'t fail validation if the optional scope option not specified', () => {
-    const actual = command.validate(
-      {
-        options:
         {
           id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
           url: "https://contoso.sharepoint.com"
         }
-      });
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('should pass validation when the id, url and scope options specified', async () => {
+    const actual = await command.validate({
+      options:
+        {
+          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+          url: "https://contoso.sharepoint.com",
+          scope: "Site"
+        }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('should pass validation when the id and url option specified', async () => {
+    const actual = await command.validate({
+      options:
+        {
+          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+          url: "https://contoso.sharepoint.com"
+        }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('should accept scope to be All', async () => {
+    const actual = await command.validate({
+      options:
+        {
+          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+          url: "https://contoso.sharepoint.com",
+          scope: 'All'
+        }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('should accept scope to be Site', async () => {
+    const actual = await command.validate({
+      options:
+        {
+          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+          url: "https://contoso.sharepoint.com",
+          scope: 'Site'
+        }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('should accept scope to be Web', async () => {
+    const actual = await command.validate({
+      options:
+        {
+          id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+          url: "https://contoso.sharepoint.com",
+          scope: 'Web'
+        }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('should reject invalid string scope', async () => {
+    const scope = 'foo';
+    const actual = await command.validate({
+      options: {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        url: "https://contoso.sharepoint.com",
+        scope: scope
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, `${scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
+  });
+
+  it('should reject invalid scope value specified as number', async () => {
+    const scope = 123;
+    const actual = await command.validate({
+      options: {
+        id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+        url: "https://contoso.sharepoint.com",
+        scope: scope
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, `${scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
+  });
+
+  it('doesn\'t fail validation if the optional scope option not specified', async () => {
+    const actual = await command.validate(
+      {
+        options:
+          {
+            id: "BC448D63-484F-49C5-AB8C-96B14AA68D50",
+            url: "https://contoso.sharepoint.com"
+          }
+      }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

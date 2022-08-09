@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -506,41 +508,41 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       }
     });
   });
-  it('passes validation if the owner is a valid GUID', () => {
-    const actual = command.validate({ options: { owner: '68be84bf-a585-4776-80b3-30aa5207aa22' } });
+  it('passes validation if the owner is a valid GUID', async () => {
+    const actual = await command.validate({ options: { owner: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
-  it('fails validation if the owner is not a valid GUID', () => {
-    const actual = command.validate({ options: { owner: '123' } });
+  it('fails validation if the owner is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { owner: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('fails validation if the status is not a valid status', () => {
-    const actual = command.validate({ options: { status: 'test' } });
+  it('fails validation if the status is not a valid status', async () => {
+    const actual = await command.validate({ options: { status: 'test' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('passes validation if the status is a valid status', () => {
-    const actual = command.validate({ options: { status: 'InDevelopment' } });
+  it('passes validation if the status is a valid status', async () => {
+    const actual = await command.validate({ options: { status: 'InDevelopment' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
-  it('fails validation if the pageNumber is not positive number', () => {
-    const actual = command.validate({ options: { pageNumber: '-1' } });
+  it('fails validation if the pageNumber is not positive number', async () => {
+    const actual = await command.validate({ options: { pageNumber: '-1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('passes validation if the pageNumber is a positive number', () => {
-    const actual = command.validate({ options: { pageNumber: '2' } });
+  it('passes validation if the pageNumber is a positive number', async () => {
+    const actual = await command.validate({ options: { pageNumber: '2' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
-  it('fails validation if the pageSize is not positive number', () => {
-    const actual = command.validate({ options: { pageSize: '-1' } });
+  it('fails validation if the pageSize is not positive number', async () => {
+    const actual = await command.validate({ options: { pageSize: '-1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('passes validation if the pageSize is a positive number', () => {
-    const actual = command.validate({ options: { pageSize: '2' } });
+  it('passes validation if the pageSize is a positive number', async () => {
+    const actual = await command.validate({ options: { pageSize: '2' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
-import { Logger } from '../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../cli';
 import Command, { CommandError } from '../../../Command';
 import request from '../../../request';
 import { sinonUtil } from '../../../utils';
@@ -13,6 +13,7 @@ describe(commands.SEARCH, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   const messageTrimming: any = {
     "count": {
@@ -199,6 +200,7 @@ describe(commands.SEARCH, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -260,56 +262,56 @@ describe(commands.SEARCH, () => {
     });
   });
 
-  it('does not pass validation without parameters', () => {
-    const actual = command.validate({ options: {} });
+  it('does not pass validation without parameters', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, false);
   });
 
-  it('passes validation with one parameter', () => {
-    const actual = command.validate({ options: { queryText: '123123' } });
+  it('passes validation with one parameter', async () => {
+    const actual = await command.validate({ options: { queryText: '123123' } }, commandInfo);
     assert.notStrictEqual(actual, false);
   });
 
-  it('passes validation with parameters', () => {
-    const actual = command.validate({ options: { queryText: '123', limit: 10, output: 'json' } });
+  it('passes validation with parameters', async () => {
+    const actual = await command.validate({ options: { queryText: '123', limit: 10, output: 'json' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation with parameters', () => {
-    const actual = command.validate({ options: { queryText: '123', show: "summary", output: 'json' } });
+  it('fails validation with parameters', async () => {
+    const actual = await command.validate({ options: { queryText: '123', show: "summary", output: 'json' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails if a wrong option is passed', () => {
-    const actual = command.validate({ options: { queryText: '123', show: 'wrongOption' } });
+  it('fails if a wrong option is passed', async () => {
+    const actual = await command.validate({ options: { queryText: '123', show: 'wrongOption' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes if a correct option is passed', () => {
+  it('passes if a correct option is passed', async () => {
     const options = ['summary', 'messages', 'users', 'topics', 'groups'];
-    options.forEach((option) => {
-      const actual = command.validate({ options: { queryText: '123', show: option } });
+    options.forEach(async (option) => {
+      const actual = await command.validate({ options: { queryText: '123', show: option } }, commandInfo);
       assert.strictEqual(actual, true, option);
     });
   });
 
-  it('limit must be a number', () => {
-    const actual = command.validate({ options: { queryText: '123', limit: 'abc', output: 'json' } });
+  it('limit must be a number', async () => {
+    const actual = await command.validate({ options: { queryText: '123', limit: 'abc', output: 'json' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if queryText is a string', () => {
-    const actual = command.validate({ options: { queryText: 'abc' } });
+  it('passes validation if queryText is a string', async () => {
+    const actual = await command.validate({ options: { queryText: 'abc' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('does not pass validation if queryText is a number', () => {
-    const actual = command.validate({ options: { queryText: 123 } });
+  it('does not pass validation if queryText is a number', async () => {
+    const actual = await command.validate({ options: { queryText: 123 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

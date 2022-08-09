@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,6 +14,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
@@ -27,6 +28,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -275,7 +277,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -286,7 +288,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
   });
 
   it('supports specifying hub site url', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--url') > -1) {
@@ -297,7 +299,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
   });
 
   it('supports specifying principals', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--principals') > -1) {
@@ -308,7 +310,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
   });
 
   it('supports specifying rights', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--rights') > -1) {
@@ -318,23 +320,23 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
     assert(containsOption);
   });
 
-  it('fails validation if url is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { url: 'abc', principals: 'admin', rights: 'Join' } });
+  it('fails validation if url is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { url: 'abc', principals: 'admin', rights: 'Join' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if specified rights value is invalid', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Invalid' } });
+  it('fails validation if specified rights value is invalid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if all required parameters are valid', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Join' } });
+  it('passes validation if all required parameters are valid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Join' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if all required parameters are valid (multiple principals)', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF,AdeleV', rights: 'Join' } });
+  it('passes validation if all required parameters are valid (multiple principals)', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF,AdeleV', rights: 'Join' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

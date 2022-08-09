@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let defaultCommandOptions: any;
   const initDefaultPostStubs = (): sinon.SinonStub => {
@@ -31,8 +32,9 @@ describe(commands.CUSTOMACTION_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -362,7 +364,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('updateCustomAction called once when scope is Web', (done) => {
-    const postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {  
+    const postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve('abc');
       }
@@ -429,7 +431,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('updateCustomAction called once when scope is All, but item found on web level', (done) => {
-    const postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {  
+    const postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve('abc');
       }
@@ -691,7 +693,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('offers autocomplete for the registrationType option', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--registrationType') > -1) {
         assert(options[i].autocomplete);
@@ -702,7 +704,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('offers autocomplete for the rights option', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--rights') > -1) {
         assert(options[i].autocomplete);
@@ -713,7 +715,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('offers autocomplete for the scope option', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--scope') > -1) {
         assert(options[i].autocomplete);
@@ -748,14 +750,14 @@ describe(commands.CUSTOMACTION_SET, () => {
     assert(registrationType === 4);
   });
 
-  it('fails validation if no other fields specified than url, id, scope', () => {
-    const actual = command.validate({ options: { id: '058140e3-0e37-44fc-a1d3-79c487d371a3', url:'https://contoso.sharepoint.com'} });
+  it('fails validation if no other fields specified than url, id, scope', async () => {
+    const actual = await command.validate({ options: { id: '058140e3-0e37-44fc-a1d3-79c487d371a3', url: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, 'Please specify option to be updated');
   });
 
-  it('fails if the specified URL is invalid', () => {
+  it('fails if the specified URL is invalid', async () => {
     defaultCommandOptions.url = 'foo';
-    const actual = command.validate({ options: defaultCommandOptions });
+    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -765,77 +767,77 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('should map independently location', () => {
-    const result: number = (command as any)['mapRequestBody']({location: 'abc'});
+    const result: number = (command as any)['mapRequestBody']({ location: 'abc' });
     assert(JSON.stringify(result) === `{"Location":"abc"}`);
   });
 
   it('should map independently name', () => {
-    const result: number = (command as any)['mapRequestBody']({name: 'abc'});
+    const result: number = (command as any)['mapRequestBody']({ name: 'abc' });
     assert(JSON.stringify(result) === `{"Name":"abc"}`);
   });
 
   it('should map independently title', () => {
-    const result: number = (command as any)['mapRequestBody']({title: 'abc'});
+    const result: number = (command as any)['mapRequestBody']({ title: 'abc' });
     assert(JSON.stringify(result) === `{"Title":"abc"}`);
   });
 
   it('should map independently group', () => {
-    const result: number = (command as any)['mapRequestBody']({group: 'abc'});
+    const result: number = (command as any)['mapRequestBody']({ group: 'abc' });
     assert(JSON.stringify(result) === `{"Group":"abc"}`);
   });
 
-  it('fails validation if invalid id', () => {
-    const actual = command.validate({ options: { id: '1', url:'https://contoso.sharepoint.com'} });
+  it('fails validation if invalid id', async () => {
+    const actual = await command.validate({ options: { id: '1', url: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, '1 is not valid. Custom action id (Guid) expected');
   });
 
-  it('fails validation if undefined id', () => {
-    const actual = command.validate({ options: { url:'https://contoso.sharepoint.com'} });
-    assert.strictEqual(actual, 'undefined is not valid. Custom action id (Guid) expected');
+  it('fails validation if undefined id', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com' } }, commandInfo);
+    assert.strictEqual(actual, 'Required option id not specified');
   });
 
-  it('fails if non existing PermissionKind rights specified', () => {
+  it('fails if non existing PermissionKind rights specified', async () => {
     defaultCommandOptions.rights = 'abc';
-    const actual = command.validate({ options: defaultCommandOptions });
+    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
     assert.strictEqual(actual, `Rights option '${defaultCommandOptions.rights}' is not recognized as valid PermissionKind choice. Please note it is case-sensitive`);
   });
 
-  it('has correct PermissionKind rights specified', () => {
+  it('has correct PermissionKind rights specified', async () => {
     defaultCommandOptions.rights = 'FullMask';
-    const actual = command.validate({ options: defaultCommandOptions });
+    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
     assert(actual === true);
   });
 
-  it('fails if clientSideComponentId is not a valid GUID', () => {
+  it('fails if clientSideComponentId is not a valid GUID', async () => {
     defaultCommandOptions.clientSideComponentId = 'abc';
-    const actual = command.validate({ options: defaultCommandOptions });
+    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
     assert.strictEqual(actual, `ClientSideComponentId ${defaultCommandOptions.clientSideComponentId} is not a valid GUID`);
   });
 
-  it('fails if the sequence value less than 0', () => {
+  it('fails if the sequence value less than 0', async () => {
     defaultCommandOptions.sequence = -1;
-    const actual = command.validate({ options: defaultCommandOptions });
+    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
     assert.strictEqual(actual, `Invalid option sequence. Expected value in range from 0 to 65536`);
   });
 
-  it('fails if the sequence value is higher than 65536', () => {
+  it('fails if the sequence value is higher than 65536', async () => {
     defaultCommandOptions.sequence = 65537;
-    const actual = command.validate({ options: defaultCommandOptions });
+    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
     assert.strictEqual(actual, `Invalid option sequence. Expected value in range from 0 to 65536`);
   });
 
-  it('fails if both option scriptSrc and scriptBlock specified', () => {
+  it('fails if both option scriptSrc and scriptBlock specified', async () => {
     defaultCommandOptions.location = 'ScriptLink';
     defaultCommandOptions.scriptSrc = 'abc';
     defaultCommandOptions.scriptBlock = 'abc';
-    const actual = command.validate({ options: defaultCommandOptions });
+    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
     assert.strictEqual(actual, `Either option scriptSrc or scriptBlock can be specified, but not both`);
   });
 
-  it('success if location that requires group option is set, but group is also set', () => {
+  it('success if location that requires group option is set, but group is also set', async () => {
     defaultCommandOptions.location = 'Microsoft.SharePoint.StandardMenu';
     defaultCommandOptions.group = 'SiteActions';
-    const actual = command.validate({ options: defaultCommandOptions });
+    const actual = await command.validate({ options: defaultCommandOptions }, commandInfo);
     assert(actual === true);
   });
 
@@ -911,24 +913,24 @@ describe(commands.CUSTOMACTION_SET, () => {
     });
   });
 
-  it('rejects invalid string scope', () => {
+  it('rejects invalid string scope', async () => {
     defaultCommandOptions.scope = 'All1';
-    const actual = command.validate({
+    const actual = await command.validate({
       options: defaultCommandOptions
-    });
+    }, commandInfo);
     assert.strictEqual(actual, `${defaultCommandOptions.scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
   });
 
-  it('doesn\'t fail validation if the optional scope option not specified', () => {
-    const actual = command.validate(
+  it('doesn\'t fail validation if the optional scope option not specified', async () => {
+    const actual = await command.validate(
       {
         options: defaultCommandOptions
-      });
+      }, commandInfo);
     assert(actual === true);
   });
 
   it('supports specifying scope', () => {
-    const options = command.options();
+    const options = command.options;
     let containsScopeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[scope]') > -1) {
@@ -938,15 +940,8 @@ describe(commands.CUSTOMACTION_SET, () => {
     assert(containsScopeOption);
   });
 
-  it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = command.options();
-    sinonUtil.restore(Command.prototype.options);
-    assert(options.length > 0);
-  });
-
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

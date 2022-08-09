@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -40,12 +37,77 @@ class TeamsTeamSetCommand extends GraphCommand {
     return 'Updates settings of a Microsoft Teams team';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    TeamsTeamSetCommand.props.forEach((p: string) => {
-      telemetryProps[p] = typeof (args.options as any)[p] !== 'undefined';
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      TeamsTeamSetCommand.props.forEach((p: string) => {
+        this.telemetryProperties[p] = typeof (args.options as any)[p] !== 'undefined';
+      });
     });
-    return telemetryProps;
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '--teamId [teamId]'
+      },
+      {
+        option: '-n, --name [name]'
+      },
+      {
+        option: '--displayName [displayName]'
+      },
+      {
+        option: '--description [description]'
+      },
+      {
+        option: '--mailNickName [mailNickName]'
+      },
+      {
+        option: '--classification [classification]'
+      },
+      {
+        option: '--visibility [visibility]',
+        autocomplete: ['Private', 'Public']
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
+	      return `${args.options.teamId} is not a valid GUID`;
+	    }
+
+	    if (args.options.id && !validation.isValidGuid(args.options.id)) {
+	      return `${args.options.id} is not a valid GUID`;
+	    }
+
+	    if (args.options.visibility) {
+	      if (args.options.visibility.toLowerCase() !== 'private' && args.options.visibility.toLowerCase() !== 'public') {
+	        return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
+	      }
+	    }
+
+	    return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'teamId']);
   }
 
   private mapRequestBody(options: Options): any {
@@ -95,61 +157,6 @@ class TeamsTeamSetCommand extends GraphCommand {
     request
       .patch(requestOptions)
       .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public optionSets(): string[][] | undefined {
-    return [['id', 'teamId']];
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '--teamId [teamId]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '--displayName [displayName]'
-      },
-      {
-        option: '--description [description]'
-      },
-      {
-        option: '--mailNickName [mailNickName]'
-      },
-      {
-        option: '--classification [classification]'
-      },
-      {
-        option: '--visibility [visibility]',
-        autocomplete: ['Private', 'Public']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    if (args.options.id && !validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    if (args.options.visibility) {
-      if (args.options.visibility.toLowerCase() !== 'private' && args.options.visibility.toLowerCase() !== 'public') {
-        return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
-      }
-    }
-
-    return true;
   }
 }
 

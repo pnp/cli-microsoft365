@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -27,12 +24,60 @@ class AadSpGetCommand extends GraphCommand {
     return 'Gets information about the specific service principal';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.appId = (!(!args.options.appId)).toString();
-    telemetryProps.displayName = (!(!args.options.displayName)).toString();
-    telemetryProps.objectId = (!(!args.options.objectId)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        appId: (!(!args.options.appId)).toString(),
+        displayName: (!(!args.options.displayName)).toString(),
+        objectId: (!(!args.options.objectId)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --appId [appId]'
+      },
+      {
+        option: '-n, --displayName [displayName]'
+      },
+      {
+        option: '--objectId [objectId]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        let optionsSpecified: number = 0;
+        optionsSpecified += args.options.appId ? 1 : 0;
+        optionsSpecified += args.options.displayName ? 1 : 0;
+        optionsSpecified += args.options.objectId ? 1 : 0;
+        if (optionsSpecified !== 1) {
+          return 'Specify either appId, objectId or displayName';
+        }
+    
+        if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
+          return `${args.options.appId} is not a valid appId GUID`;
+        }
+    
+        if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
+          return `${args.options.objectId} is not a valid objectId GUID`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   private getSpId(args: CommandArgs): Promise<string> {
@@ -96,43 +141,6 @@ class AadSpGetCommand extends GraphCommand {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --appId [appId]'
-      },
-      {
-        option: '-n, --displayName [displayName]'
-      },
-      {
-        option: '--objectId [objectId]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    let optionsSpecified: number = 0;
-    optionsSpecified += args.options.appId ? 1 : 0;
-    optionsSpecified += args.options.displayName ? 1 : 0;
-    optionsSpecified += args.options.objectId ? 1 : 0;
-    if (optionsSpecified !== 1) {
-      return 'Specify either appId, objectId or displayName';
-    }
-
-    if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
-      return `${args.options.appId} is not a valid appId GUID`;
-    }
-
-    if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
-      return `${args.options.objectId} is not a valid objectId GUID`;
-    }
-
-    return true;
   }
 }
 

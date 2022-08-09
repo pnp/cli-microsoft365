@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -25,6 +22,23 @@ class AadOAuth2GrantSetCommand extends GraphCommand {
     return 'Update OAuth2 permissions for the service principal';
   }
 
+  constructor() {
+    super();
+  
+    this.#initOptions();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --grantId <grantId>'
+      },
+      {
+        option: '-s, --scope <scope>'
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
       logger.logToStderr(`Updating OAuth2 permissions...`);
@@ -44,20 +58,6 @@ class AadOAuth2GrantSetCommand extends GraphCommand {
     request
       .patch(requestOptions)
       .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --grantId <grantId>'
-      },
-      {
-        option: '-s, --scope <scope>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken, sinonUtil } from '../../../../utils';
@@ -160,11 +160,17 @@ describe(commands.TASK_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -208,6 +214,7 @@ describe(commands.TASK_ADD, () => {
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -218,44 +225,41 @@ describe(commands.TASK_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if neither the planId nor planTitle are provided.', (done) => {
-    const actual = command.validate({
+  it('fails validation if neither the planId nor planTitle are provided.', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both planId and planTitle are specified', (done) => {
-    const actual = command.validate({
+  it('fails validation when both planId and planTitle are specified', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         planTitle: 'My Planner',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when planTitle is specified without ownerGroupId or ownerGroupName', (done) => {
-    const actual = command.validate({
+  it('fails validation when planTitle is specified without ownerGroupId or ownerGroupName', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planTitle: 'My Planner Plan',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when planTitle is specified with both ownerGroupId and ownerGroupName', (done) => {
-    const actual = command.validate({
+  it('fails validation when planTitle is specified with both ownerGroupId and ownerGroupName', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planTitle: 'My Planner Plan',
@@ -263,153 +267,141 @@ describe(commands.TASK_ADD, () => {
         ownerGroupName: 'My Planner Group',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid title, planId, and bucketId specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid title, planId, and bucketId specified', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid title, planTitle, and ownerGroupId are specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid title, planTitle, and ownerGroupId are specified', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planTitle: 'My Planner Plan',
         ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid title, planTitle, ownerGroupName, and bucketId are specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid title, planTitle, ownerGroupName, and bucketId are specified', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planTitle: 'My Planner Plan',
         ownerGroupName: 'My Planner Group',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if the ownerGroupId is not a valid guid.', (done) => {
-    const actual = command.validate({
+  it('fails validation if the ownerGroupId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planTitle: 'My Planner Plan',
         ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if neither the bucketId nor bucketName are provided.', (done) => {
-    const actual = command.validate({
+  it('fails validation if neither the bucketId nor bucketName are provided.', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both bucketId and bucketName are specified', (done) => {
-    const actual = command.validate({
+  it('fails validation when both bucketId and bucketName are specified', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
         bucketName: 'My Bucket'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if startDateTime contains invalid format.', (done) => {
-    const actual = command.validate({
+  it('fails validation if startDateTime contains invalid format.', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
         startDateTime: '2021-99-99'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if dueDateTime contains invalid format.', (done) => {
-    const actual = command.validate({
+  it('fails validation if dueDateTime contains invalid format.', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
         dueDateTime: '2021-99-99'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if percentComplete contains invalid format.', (done) => {
-    const actual = command.validate({
+  it('fails validation if percentComplete contains invalid format.', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
         percentComplete: 'Not A Number'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if percentComplete is not between 0 and 100.', (done) => {
-    const actual = command.validate({
+  it('fails validation if percentComplete is not between 0 and 100.', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
         percentComplete: 599
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if assignedToUserIds contains invalid guid.', (done) => {
-    const actual = command.validate({
+  it('fails validation if assignedToUserIds contains invalid guid.', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
         assignedToUserIds: "2e42fe76-3f42-4884-b325-aefd7a905446,8d1ff29c-a6f4-4786-b316-test"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both assignedToUserIds and assignedToUserNames are specified', (done) => {
-    const actual = command.validate({
+  it('fails validation when both assignedToUserIds and assignedToUserNames are specified', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
@@ -417,87 +409,80 @@ describe(commands.TASK_ADD, () => {
         assignedToUserIds: "2e42fe76-3f42-4884-b325-aefd7a905446,8d1ff29c-a6f4-4786-b316-eb6030e1a09e",
         assignedToUserNames: "Allan.Carroll@contoso.onmicrosoft.com,Ida.Stevens@contoso.onmicrosoft.com"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if incorrect appliedCategory is specified.', (done) => {
-    const actual = command.validate({
+  it('fails validation if incorrect appliedCategory is specified.', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
         appliedCategories: "category1,category9"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if priority lower than 0 is specified.', (done) => {
-    const actual = command.validate({
+  it('fails validation if priority lower than 0 is specified.', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
         priority: -1
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if incorrect previewType is specified.', (done) => {
-    const actual = command.validate({
+  it('fails validation if incorrect previewType is specified.', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
         previewType: "test"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if priority higher than 10 is specified.', (done) => {
-    const actual = command.validate({
+  it('fails validation if priority higher than 10 is specified.', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
         priority: 11
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if priority is specified which is a number with decimals.', (done) => {
-    const actual = command.validate({
+  it('fails validation if priority is specified which is a number with decimals.', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
         priority: 5.6
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if unknown priority label is specified.', (done) => {
-    const actual = command.validate({
+  it('fails validation if unknown priority label is specified.', async () => {
+    const actual = await command.validate({
       options: {
         title: 'My Planner Task',
         planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
         bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
         priority: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
   it('correctly adds planner task with title, planId, and bucketId', (done) => {
@@ -1065,7 +1050,6 @@ describe(commands.TASK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-
     command.action(logger, {
       options: {
         title: 'My Planner Task',
@@ -1100,7 +1084,7 @@ describe(commands.TASK_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

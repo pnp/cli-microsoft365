@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -216,8 +218,8 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
     });
   });
 
-  it('fails validation if the owner is not a valid GUID', () => {
-    const actual = command.validate({
+  it('fails validation if the owner is not a valid GUID', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -226,12 +228,12 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if properties is not valid JSON string', () => {
-    const actual = command.validate({
+  it('fails validation if properties is not valid JSON string', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -240,12 +242,12 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: 'foobar'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if properties have no valid type', () => {
-    const actual = command.validate({
+  it('fails validation if properties have no valid type', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -254,12 +256,12 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Foo"},{"name":"MyString","type":"String"}]'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if a specified property has missing type', () => {
-    const actual = command.validate({
+  it('fails validation if a specified property has missing type', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -268,12 +270,12 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: '[{"name":"MyInt"},{"name":"MyString","type":"String"}]'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if a specified property has missing name', () => {
-    const actual = command.validate({
+  it('fails validation if a specified property has missing name', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -282,12 +284,12 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: '[{"type":"Integer"},{"name":"MyString","type":"String"}]'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if properties JSON string is not an array', () => {
-    const actual = command.validate({
+  it('fails validation if properties JSON string is not an array', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -296,12 +298,12 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: '{}'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the owner is a valid GUID', () => {
-    const actual = command.validate({
+  it('passes validation if the owner is a valid GUID', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -310,12 +312,12 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if the optional description is missing', () => {
-    const actual = command.validate({
+  it('passes validation if the optional description is missing', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -324,12 +326,12 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if the property type is Binary', () => {
-    const actual = command.validate({
+  it('passes validation if the property type is Binary', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -338,12 +340,12 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Binary"}]'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if the property type is Boolean', () => {
-    const actual = command.validate({
+  it('passes validation if the property type is Boolean', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -352,12 +354,12 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Boolean"}]'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if the property type is DateTime', () => {
-    const actual = command.validate({
+  it('passes validation if the property type is DateTime', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -366,12 +368,12 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"DateTime"}]'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if the property type is Integer', () => {
-    const actual = command.validate({
+  it('passes validation if the property type is Integer', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -380,12 +382,12 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"}]'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if the property type is String', () => {
-    const actual = command.validate({
+  it('passes validation if the property type is String', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -394,12 +396,12 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"String"}]'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

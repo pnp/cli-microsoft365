@@ -1,7 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError,
-  CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -29,11 +28,54 @@ class SpoTermSetListCommand extends SpoCommand {
     return 'Lists taxonomy term sets from the given term group';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.termGroupId = typeof args.options.termGroupId !== 'undefined';
-    telemetryProps.termGroupName = typeof args.options.termGroupName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        termGroupId: typeof args.options.termGroupId !== 'undefined',
+        termGroupName: typeof args.options.termGroupName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--termGroupId [termGroupId]'
+      },
+      {
+        option: '--termGroupName [termGroupName]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.termGroupId && !args.options.termGroupName) {
+          return 'Specify either termGroupId or termGroupName';
+        }
+
+        if (args.options.termGroupId && args.options.termGroupName) {
+          return 'Specify either termGroupId or termGroupName but not both';
+        }
+
+        if (args.options.termGroupId) {
+          if (!validation.isValidGuid(args.options.termGroupId)) {
+            return `${args.options.termGroupId} is not a valid GUID`;
+          }
+        }
+
+        return true;
+      }
+    );
   }
 
   public defaultProperties(): string[] | undefined {
@@ -86,38 +128,6 @@ class SpoTermSetListCommand extends SpoCommand {
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--termGroupId [termGroupId]'
-      },
-      {
-        option: '--termGroupName [termGroupName]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.termGroupId && !args.options.termGroupName) {
-      return 'Specify either termGroupId or termGroupName';
-    }
-
-    if (args.options.termGroupId && args.options.termGroupName) {
-      return 'Specify either termGroupId or termGroupName but not both';
-    }
-
-    if (args.options.termGroupId) {
-      if (!validation.isValidGuid(args.options.termGroupId)) {
-        return `${args.options.termGroupId} is not a valid GUID`;
-      }
-    }
-
-    return true;
   }
 }
 

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.WEB_ADD, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,6 +25,7 @@ describe(commands.WEB_ADD, () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     }));
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -637,7 +639,7 @@ describe(commands.WEB_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -647,53 +649,53 @@ describe(commands.WEB_ADD, () => {
     assert(containsDebugOption);
   });
 
-  it('passes validation if all required options are specified', () => {
-    const actual = command.validate({
+  it('passes validation if all required options are specified', async () => {
+    const actual = await command.validate({
       options: {
         title: "subsite", webUrl: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com", webTemplate: "STS#0"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if all required options and valid locale are specified', () => {
-    const actual = command.validate({
+  it('passes validation if all required options and valid locale are specified', async () => {
+    const actual = await command.validate({
       options: {
         title: "subsite", webUrl: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com", webTemplate: "STS#0", locale: 1033
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the parentWebUrl option not specified', () => {
-    const actual = command.validate({
+  it('fails validation if the parentWebUrl option not specified', async () => {
+    const actual = await command.validate({
       options: {
         title: "subsite",
         webUrl: "subsite", webTemplate: "STS#0", locale: 1033
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the parentWebUrl option is not a valid SharePoint URL', () => {
-    const actual = command.validate({
+  it('fails validation if the parentWebUrl option is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({
       options: {
         title: "subsite",
         webUrl: "subsite", webTemplate: "STS#0", locale: 1033,
         parentWebUrl: 'foo'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the specified locale is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the specified locale is not a number', async () => {
+    const actual = await command.validate({
       options: {
         title: "subsite", webUrl: "subsite", parentWebUrl: "https://contoso.sharepoint.com", webTemplate: 'STS#0', locale: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

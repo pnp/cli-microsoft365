@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,6 +14,7 @@ describe(commands.TERM_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,6 +27,7 @@ describe(commands.TERM_ADD, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -629,93 +631,93 @@ describe(commands.TERM_ADD, () => {
     });
   });
 
-  it('fails validation if id is not a valid GUID', () => {
-    const actual = command.validate({ options: { termGroupName: 'PnPTermSets', name: 'PnP-Organizations', id: 'invalid' } });
+  it('fails validation if id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { termGroupName: 'PnPTermSets', name: 'PnP-Organizations', id: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if neither termGroupId nor termGroupName specified', () => {
-    const actual = command.validate({ options: { name: 'PnP-Organizations' } });
+  it('fails validation if neither termGroupId nor termGroupName specified', async () => {
+    const actual = await command.validate({ options: { name: 'PnP-Organizations' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both termGroupId and termGroupName specified', () => {
-    const actual = command.validate({ options: { name: 'PnP-Organizations', termGroupName: 'PnPTermSets', termGroupId: 'aca21974-139c-44fd-813c-6bbe6f25e658' } });
+  it('fails validation if both termGroupId and termGroupName specified', async () => {
+    const actual = await command.validate({ options: { name: 'PnP-Organizations', termGroupName: 'PnPTermSets', termGroupId: 'aca21974-139c-44fd-813c-6bbe6f25e658' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if termGroupId is not a valid GUID', () => {
-    const actual = command.validate({ options: { name: 'IT', termGroupId: 'invalid', termSetName: 'Department' } });
+  it('fails validation if termGroupId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { name: 'IT', termGroupId: 'invalid', termSetName: 'Department' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if neither termSetId nor termSetName specified', () => {
-    const actual = command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27' } });
+  it('fails validation if neither termSetId nor termSetName specified', async () => {
+    const actual = await command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both termSetId and termSetName specified', () => {
-    const actual = command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termSetId: '9e54299e-208a-4000-8546-cc4139091b28', termSetName: 'Department' } });
+  it('fails validation if both termSetId and termSetName specified', async () => {
+    const actual = await command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termSetId: '9e54299e-208a-4000-8546-cc4139091b28', termSetName: 'Department' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both parentTermId and termSetName specified', () => {
-    const actual = command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', parentTermId: '9e54299e-208a-4000-8546-cc4139091b28', termSetName: 'Department' } });
+  it('fails validation if both parentTermId and termSetName specified', async () => {
+    const actual = await command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', parentTermId: '9e54299e-208a-4000-8546-cc4139091b28', termSetName: 'Department' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both parentTermId and termSetId specified', () => {
-    const actual = command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', parentTermId: '9e54299e-208a-4000-8546-cc4139091b28', termSetId: '9e54299e-208a-4000-8546-cc4139091b29' } });
+  it('fails validation if both parentTermId and termSetId specified', async () => {
+    const actual = await command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', parentTermId: '9e54299e-208a-4000-8546-cc4139091b28', termSetId: '9e54299e-208a-4000-8546-cc4139091b29' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both parentTermId is not a valid GUID', () => {
-    const actual = command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', parentTermId: 'invalid' } });
+  it('fails validation if both parentTermId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', parentTermId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if termSetId is not a valid GUID', () => {
-    const actual = command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termSetId: 'invalid' } });
+  it('fails validation if termSetId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termSetId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if custom properties is not a valid JSON string', () => {
-    const actual = command.validate({ options: { name: 'IT', termGroupName: 'People', termSetName: 'Department', customProperties: 'invalid' } });
+  it('fails validation if custom properties is not a valid JSON string', async () => {
+    const actual = await command.validate({ options: { name: 'IT', termGroupName: 'People', termSetName: 'Department', customProperties: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if local custom properties is not a valid JSON string', () => {
-    const actual = command.validate({ options: { name: 'IT', termGroupName: 'People', termSetName: 'Department', localCustomProperties: 'invalid' } });
+  it('fails validation if local custom properties is not a valid JSON string', async () => {
+    const actual = await command.validate({ options: { name: 'IT', termGroupName: 'People', termSetName: 'Department', localCustomProperties: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when id, termSetId and termGroupId specified', () => {
-    const actual = command.validate({ options: { name: 'IT', id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termSetId: '9e54299e-208a-4000-8546-cc4139091b28' } });
+  it('passes validation when id, termSetId and termGroupId specified', async () => {
+    const actual = await command.validate({ options: { name: 'IT', id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termSetId: '9e54299e-208a-4000-8546-cc4139091b28' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when id, termSetName and termGroupName specified', () => {
-    const actual = command.validate({ options: { name: 'IT', id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupName: 'People', termSetName: 'Department' } });
+  it('passes validation when id, termSetName and termGroupName specified', async () => {
+    const actual = await command.validate({ options: { name: 'IT', id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupName: 'People', termSetName: 'Department' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when id, parentTermId and termGroupName specified', () => {
-    const actual = command.validate({ options: { name: 'IT', id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupName: 'People', parentTermId: '9e54299e-208a-4000-8546-cc4139091b26' } });
+  it('passes validation when id, parentTermId and termGroupName specified', async () => {
+    const actual = await command.validate({ options: { name: 'IT', id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupName: 'People', parentTermId: '9e54299e-208a-4000-8546-cc4139091b26' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when custom properties is a valid JSON string', () => {
-    const actual = command.validate({ options: { name: 'IT', termGroupName: 'People', termSetName: 'Department', customProperties: '{}' } });
+  it('passes validation when custom properties is a valid JSON string', async () => {
+    const actual = await command.validate({ options: { name: 'IT', termGroupName: 'People', termSetName: 'Department', customProperties: '{}' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when local custom properties is a valid JSON string', () => {
-    const actual = command.validate({ options: { name: 'IT', termGroupName: 'People', termSetName: 'Department', localCustomProperties: '{}' } });
+  it('passes validation when local custom properties is a valid JSON string', async () => {
+    const actual = await command.validate({ options: { name: 'IT', termGroupName: 'People', termSetName: 'Department', localCustomProperties: '{}' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

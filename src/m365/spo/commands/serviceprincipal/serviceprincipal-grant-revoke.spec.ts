@@ -182,7 +182,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -193,7 +193,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
   });
 
   it('allows specifying grantId', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--grantId') > -1) {

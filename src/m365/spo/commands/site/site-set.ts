@@ -1,7 +1,6 @@
 import { Cli, Logger } from '../../../../cli';
 import Command, {
-  CommandError, CommandOption,
-  CommandTypes
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -57,28 +56,219 @@ class SpoSiteSetCommand extends SpoCommand {
     return 'Updates properties of the specified site';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.classification = typeof args.options.classification === 'string';
-    telemetryProps.disableFlows = args.options.disableFlows;
-    telemetryProps.isPublic = args.options.isPublic;
-    telemetryProps.owners = typeof args.options.owners !== 'undefined';
-    telemetryProps.shareByEmailEnabled = args.options.shareByEmailEnabled;
-    telemetryProps.title = typeof args.options.title === 'string';
-    telemetryProps.description = typeof args.options.description === 'string';
-    telemetryProps.siteDesignId = typeof args.options.siteDesignId !== undefined;
-    telemetryProps.sharingCapabilities = args.options.sharingCapability;
-    telemetryProps.siteLogoUrl = typeof args.options.siteLogoUrl !== 'undefined';
-    telemetryProps.resourceQuota = args.options.resourceQuota;
-    telemetryProps.resourceQuotaWarningLevel = args.options.resourceQuotaWarningLevel;
-    telemetryProps.storageQuota = args.options.storageQuota;
-    telemetryProps.storageQuotaWarningLevel = args.options.storageQuotaWarningLevel;
-    telemetryProps.allowSelfServiceUpgrade = args.options.allowSelfServiceUpgrade;
-    telemetryProps.lockState = args.options.lockState;
-    telemetryProps.noScriptSite = args.options.noScriptSite;
-    telemetryProps.wait = args.options.wait === true;
+  constructor() {
+    super();
 
-    return telemetryProps;
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initTypes();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        classification: typeof args.options.classification === 'string',
+        disableFlows: args.options.disableFlows,
+        isPublic: args.options.isPublic,
+        owners: typeof args.options.owners !== 'undefined',
+        shareByEmailEnabled: args.options.shareByEmailEnabled,
+        title: typeof args.options.title === 'string',
+        description: typeof args.options.description === 'string',
+        siteDesignId: typeof args.options.siteDesignId !== undefined,
+        sharingCapabilities: args.options.sharingCapability,
+        siteLogoUrl: typeof args.options.siteLogoUrl !== 'undefined',
+        resourceQuota: args.options.resourceQuota,
+        resourceQuotaWarningLevel: args.options.resourceQuotaWarningLevel,
+        storageQuota: args.options.storageQuota,
+        storageQuotaWarningLevel: args.options.storageQuotaWarningLevel,
+        allowSelfServiceUpgrade: args.options.allowSelfServiceUpgrade,
+        lockState: args.options.lockState,
+        noScriptSite: args.options.noScriptSite,
+        wait: args.options.wait === true
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '--classification [classification]'
+      },
+      {
+        option: '--disableFlows [disableFlows]'
+      },
+      {
+        option: '--isPublic [isPublic]'
+      },
+      {
+        option: '--owners [owners]'
+      },
+      {
+        option: '--shareByEmailEnabled [shareByEmailEnabled]'
+      },
+      {
+        option: '--siteDesignId [siteDesignId]'
+      },
+      {
+        option: '--title [title]'
+      },
+      {
+        option: '--description [description]'
+      },
+      {
+        option: '--siteLogoUrl [siteLogoUrl]'
+      },
+      {
+        option: '--sharingCapability [sharingCapability]',
+        autocomplete: this.sharingCapabilities
+      },
+      {
+        option: '--resourceQuota [resourceQuota]'
+      },
+      {
+        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
+      },
+      {
+        option: '--storageQuota [storageQuota]'
+      },
+      {
+        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
+      },
+      {
+        option: '--allowSelfServiceUpgrade [allowSelfServiceUpgrade]'
+      },
+      {
+        option: '--lockState [lockState]',
+        autocomplete: ['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess']
+      },
+      {
+        option: '--noScriptSite [noScriptSite]'
+      },
+      {
+        option: '--wait'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (typeof args.options.classification === 'undefined' &&
+          typeof args.options.disableFlows === 'undefined' &&
+          typeof args.options.title === 'undefined' &&
+          typeof args.options.description === 'undefined' &&
+          typeof args.options.isPublic === 'undefined' &&
+          typeof args.options.owners === 'undefined' &&
+          typeof args.options.shareByEmailEnabled === 'undefined' &&
+          typeof args.options.siteDesignId === 'undefined' &&
+          typeof args.options.sharingCapability === 'undefined' &&
+          typeof args.options.siteLogoUrl === 'undefined' &&
+          typeof args.options.resourceQuota === 'undefined' &&
+          typeof args.options.resourceQuotaWarningLevel === 'undefined' &&
+          typeof args.options.storageQuota === 'undefined' &&
+          typeof args.options.storageQuotaWarningLevel === 'undefined' &&
+          typeof args.options.noScriptSite === 'undefined' &&
+          typeof args.options.allowSelfServiceUpgrade === 'undefined' &&
+          typeof args.options.lockState === 'undefined') {
+          return 'Specify at least one property to update';
+        }
+
+        if (typeof args.options.siteLogoUrl !== 'undefined' && typeof args.options.siteLogoUrl !== 'string') {
+          return `${args.options.siteLogoUrl} is not a valid value for the siteLogoUrl option. Specify the logo URL or an empty string "" to unset the logo.`;
+        }
+
+        if (typeof args.options.disableFlows === 'string' &&
+          !validation.isValidBoolean(args.options.disableFlows)) {
+          return `${args.options.disableFlows} is not a valid value for the disableFlow option. Allowed values are true|false`;
+        }
+
+        if (typeof args.options.isPublic === 'string' &&
+          !validation.isValidBoolean(args.options.isPublic)) {
+          return `${args.options.isPublic} is not a valid value for the isPublic option. Allowed values are true|false`;
+        }
+
+        if (typeof args.options.shareByEmailEnabled === 'string' &&
+          !validation.isValidBoolean(args.options.shareByEmailEnabled)) {
+          return `${args.options.shareByEmailEnabled} is not a valid value for the shareByEmailEnabled option. Allowed values are true|false`;
+        }
+
+        if (args.options.siteDesignId) {
+          if (!validation.isValidGuid(args.options.siteDesignId)) {
+            return `${args.options.siteDesignId} is not a valid GUID`;
+          }
+        }
+
+        if (args.options.sharingCapability &&
+          this.sharingCapabilities.indexOf(args.options.sharingCapability) < 0) {
+          return `${args.options.sharingCapability} is not a valid value for the sharingCapability option. Allowed values are ${this.sharingCapabilities.join('|')}`;
+        }
+
+        if (args.options.resourceQuota &&
+          typeof args.options.resourceQuota !== 'number') {
+          return `${args.options.resourceQuota} is not a number`;
+        }
+
+        if (args.options.resourceQuotaWarningLevel &&
+          typeof args.options.resourceQuotaWarningLevel !== 'number') {
+          return `${args.options.resourceQuotaWarningLevel} is not a number`;
+        }
+
+        if (args.options.resourceQuota &&
+          args.options.resourceQuotaWarningLevel &&
+          args.options.resourceQuotaWarningLevel > args.options.resourceQuota) {
+          return `resourceQuotaWarningLevel must not exceed the resourceQuota`;
+        }
+
+        if (args.options.storageQuota &&
+          typeof args.options.storageQuota !== 'number') {
+          return `${args.options.storageQuota} is not a number`;
+        }
+
+        if (args.options.storageQuotaWarningLevel &&
+          typeof args.options.storageQuotaWarningLevel !== 'number') {
+          return `${args.options.storageQuotaWarningLevel} is not a number`;
+        }
+
+        if (args.options.storageQuota &&
+          args.options.storageQuotaWarningLevel &&
+          args.options.storageQuotaWarningLevel > args.options.storageQuota) {
+          return `storageQuotaWarningLevel must not exceed the storageQuota`;
+        }
+
+        if (args.options.allowSelfServiceUpgrade &&
+          !validation.isValidBoolean(args.options.allowSelfServiceUpgrade)) {
+          return `${args.options.allowSelfServiceUpgrade} is not a valid boolean value`;
+        }
+
+        if (args.options.lockState &&
+          ['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess'].indexOf(args.options.lockState) === -1) {
+          return `${args.options.lockState} is not a valid value for the lockState option. Allowed values Unlock|NoAdditions|ReadOnly|NoAccess`;
+        }
+
+        if (args.options.noScriptSite &&
+          !validation.isValidBoolean(args.options.noScriptSite)) {
+          return `${args.options.noScriptSite} is not a valid boolean value`;
+        }
+
+        return true;
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('classification');
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -552,189 +742,6 @@ class SpoSiteSetCommand extends SpoCommand {
     }
 
     return result;
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '--classification [classification]'
-      },
-      {
-        option: '--disableFlows [disableFlows]'
-      },
-      {
-        option: '--isPublic [isPublic]'
-      },
-      {
-        option: '--owners [owners]'
-      },
-      {
-        option: '--shareByEmailEnabled [shareByEmailEnabled]'
-      },
-      {
-        option: '--siteDesignId [siteDesignId]'
-      },
-      {
-        option: '--title [title]'
-      },
-      {
-        option: '--description [description]'
-      },
-      {
-        option: '--siteLogoUrl [siteLogoUrl]'
-      },
-      {
-        option: '--sharingCapability [sharingCapability]',
-        autocomplete: this.sharingCapabilities
-      },
-      {
-        option: '--resourceQuota [resourceQuota]'
-      },
-      {
-        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
-      },
-      {
-        option: '--storageQuota [storageQuota]'
-      },
-      {
-        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
-      },
-      {
-        option: '--allowSelfServiceUpgrade [allowSelfServiceUpgrade]'
-      },
-      {
-        option: '--lockState [lockState]',
-        autocomplete: ['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess']
-      },
-      {
-        option: '--noScriptSite [noScriptSite]'
-      },
-      {
-        option: '--wait'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (typeof args.options.classification === 'undefined' &&
-      typeof args.options.disableFlows === 'undefined' &&
-      typeof args.options.title === 'undefined' &&
-      typeof args.options.description === 'undefined' &&
-      typeof args.options.isPublic === 'undefined' &&
-      typeof args.options.owners === 'undefined' &&
-      typeof args.options.shareByEmailEnabled === 'undefined' &&
-      typeof args.options.siteDesignId === 'undefined' &&
-      typeof args.options.sharingCapability === 'undefined' &&
-      typeof args.options.siteLogoUrl === 'undefined' &&
-      typeof args.options.resourceQuota === 'undefined' &&
-      typeof args.options.resourceQuotaWarningLevel === 'undefined' &&
-      typeof args.options.storageQuota === 'undefined' &&
-      typeof args.options.storageQuotaWarningLevel === 'undefined' &&
-      typeof args.options.noScriptSite === 'undefined' &&
-      typeof args.options.allowSelfServiceUpgrade === 'undefined' &&
-      typeof args.options.lockState === 'undefined') {
-      return 'Specify at least one property to update';
-    }
-
-    if (typeof args.options.siteLogoUrl !== 'undefined' && typeof args.options.siteLogoUrl !== 'string') {
-      return `${args.options.siteLogoUrl} is not a valid value for the siteLogoUrl option. Specify the logo URL or an empty string "" to unset the logo.`;
-    }
-
-    if (typeof args.options.disableFlows === 'string' &&
-      !validation.isValidBoolean(args.options.disableFlows)) {
-      return `${args.options.disableFlows} is not a valid value for the disableFlow option. Allowed values are true|false`;
-    }
-
-    if (typeof args.options.isPublic === 'string' &&
-      !validation.isValidBoolean(args.options.isPublic)) {
-      return `${args.options.isPublic} is not a valid value for the isPublic option. Allowed values are true|false`;
-    }
-
-    if (typeof args.options.shareByEmailEnabled === 'string' &&
-      !validation.isValidBoolean(args.options.shareByEmailEnabled)) {
-      return `${args.options.shareByEmailEnabled} is not a valid value for the shareByEmailEnabled option. Allowed values are true|false`;
-    }
-
-    if (args.options.siteDesignId) {
-      if (!validation.isValidGuid(args.options.siteDesignId)) {
-        return `${args.options.siteDesignId} is not a valid GUID`;
-      }
-    }
-
-    if (args.options.sharingCapability &&
-      this.sharingCapabilities.indexOf(args.options.sharingCapability) < 0) {
-      return `${args.options.sharingCapability} is not a valid value for the sharingCapability option. Allowed values are ${this.sharingCapabilities.join('|')}`;
-    }
-
-    if (args.options.resourceQuota &&
-      typeof args.options.resourceQuota !== 'number') {
-      return `${args.options.resourceQuota} is not a number`;
-    }
-
-    if (args.options.resourceQuotaWarningLevel &&
-      typeof args.options.resourceQuotaWarningLevel !== 'number') {
-      return `${args.options.resourceQuotaWarningLevel} is not a number`;
-    }
-
-    if (args.options.resourceQuota &&
-      args.options.resourceQuotaWarningLevel &&
-      args.options.resourceQuotaWarningLevel > args.options.resourceQuota) {
-      return `resourceQuotaWarningLevel must not exceed the resourceQuota`;
-    }
-
-    if (args.options.storageQuota &&
-      typeof args.options.storageQuota !== 'number') {
-      return `${args.options.storageQuota} is not a number`;
-    }
-
-    if (args.options.storageQuotaWarningLevel &&
-      typeof args.options.storageQuotaWarningLevel !== 'number') {
-      return `${args.options.storageQuotaWarningLevel} is not a number`;
-    }
-
-    if (args.options.storageQuota &&
-      args.options.storageQuotaWarningLevel &&
-      args.options.storageQuotaWarningLevel > args.options.storageQuota) {
-      return `storageQuotaWarningLevel must not exceed the storageQuota`;
-    }
-
-    if (args.options.allowSelfServiceUpgrade &&
-      !validation.isValidBoolean(args.options.allowSelfServiceUpgrade)) {
-      return `${args.options.allowSelfServiceUpgrade} is not a valid boolean value`;
-    }
-
-    if (args.options.lockState &&
-      ['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess'].indexOf(args.options.lockState) === -1) {
-      return `${args.options.lockState} is not a valid value for the lockState option. Allowed values Unlock|NoAdditions|ReadOnly|NoAccess`;
-    }
-
-    if (args.options.noScriptSite &&
-      !validation.isValidBoolean(args.options.noScriptSite)) {
-      return `${args.options.noScriptSite} is not a valid boolean value`;
-    }
-
-    return true;
-  }
-
-  public types(): CommandTypes {
-    // required to support passing empty strings as valid values
-    return {
-      string: ['classification']
-    };
   }
 }
 

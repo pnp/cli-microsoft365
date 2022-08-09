@@ -6,8 +6,7 @@ import auth from './Auth';
 import { Cli } from './cli';
 import { Logger } from './cli/Logger';
 import Command, {
-  CommandError, CommandOption,
-  CommandTypes
+  CommandError
 } from './Command';
 import { sinonUtil } from './utils';
 
@@ -24,40 +23,15 @@ class MockCommand1 extends Command {
     return ['mc1'];
   }
 
-  public autocomplete(): string[] | undefined {
-    const autocomplete = ['param1', 'param2'];
-
-    const parentAutocomplete: string[] | undefined = super.autocomplete();
-    if (parentAutocomplete) {
-      return autocomplete.concat(parentAutocomplete);
-    }
-    else {
-      return autocomplete;
-    }
-  }
-
   public allowUnknownOptions(): boolean {
     return true;
   }
 
-  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
-    this.showDeprecationWarning(logger, 'mc1', this.name);
-
-    cb();
-  }
-
-  public validate(): boolean | string {
-    return true;
-  }
-
-  public types(): CommandTypes | undefined {
-    return {
-      string: ['option2']
-    };
-  }
-
-  public options(): CommandOption[] {
-    return [
+  constructor() {
+    super();
+    
+    this.types.string.push('option2');
+    this.options.push(
       {
         option: '--debug'
       },
@@ -67,7 +41,14 @@ class MockCommand1 extends Command {
       {
         option: '--option2 [option2]'
       }
-    ];
+    );
+    this.validators.push(() => Promise.resolve(true));
+  }
+
+  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
+    this.showDeprecationWarning(logger, 'mc1', this.name);
+
+    cb();
   }
 
   public trackUnknownOptionsPublic(telemetryProps: any, options: any) {
@@ -109,21 +90,38 @@ class MockCommand3 extends Command {
     return 'Mock command description';
   }
 
-  public commandAction(): void {
-  }
+  constructor() {
+    super();
 
-  public commandHelp(): void {
-  }
-
-  public options(): CommandOption[] {
-    return [
+    this.options.push(
       {
         option: '--debug'
       },
       {
         option: '--option1 [option1]'
       }
-    ];
+    );
+  }
+
+  public commandAction(): void {
+  }
+
+  public commandHelp(): void {
+  }
+}
+
+class MockCommand4 extends Command {
+  public get name(): string {
+    return 'mock-command';
+  }
+
+  public get description(): string {
+    return 'Mock command description';
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
+    throw 'Exception';
   }
 }
 
@@ -167,19 +165,9 @@ describe('Command', () => {
     ]);
   });
 
-  it('has no autocomplete by default', () => {
+  it('returns true by default', async () => {
     const cmd = new MockCommand2();
-    assert.strictEqual(typeof cmd.autocomplete(), 'undefined');
-  });
-
-  it('returns true by default', () => {
-    const cmd = new MockCommand2();
-    assert.strictEqual(cmd.validate({}), true);
-  });
-
-  it('does not define option types by default', () => {
-    const cmd = new MockCommand2();
-    assert.strictEqual(typeof cmd.types(), 'undefined');
+    assert.strictEqual(await cmd.validate({ options: {} }, Cli.getCommandInfo(cmd)), true);
   });
 
   it('removes optional arguments from command name', () => {
@@ -358,5 +346,18 @@ describe('Command', () => {
     });
     command.addUnknownOptionsToPayloadPublic(actual, { Prop2: false });
     assert.strictEqual(JSON.stringify(actual), expected);
+  });
+
+  it('catches exception thrown by commandAction', (done) => {
+    const command = new MockCommand4();
+    command.action(logger, { options: {} }, (err) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Exception')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 });

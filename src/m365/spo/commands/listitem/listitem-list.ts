@@ -1,8 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption,
-  CommandTypes
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { ContextInfo, formatting, spo, validation } from '../../../../utils';
@@ -36,18 +32,135 @@ class SpoListItemListCommand extends SpoCommand {
     return 'Gets a list of items from the specified list';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.listId = typeof args.options.listId !== 'undefined';
-    telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
-    telemetryProps.title = typeof args.options.title !== 'undefined';
-    telemetryProps.fields = typeof args.options.fields !== 'undefined';
-    telemetryProps.filter = typeof args.options.filter !== 'undefined';
-    telemetryProps.pageNumber = typeof args.options.pageNumber !== 'undefined';
-    telemetryProps.pageSize = typeof args.options.pageSize !== 'undefined';
-    telemetryProps.camlQuery = typeof args.options.camlQuery !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initTypes();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        title: typeof args.options.title !== 'undefined',
+        fields: typeof args.options.fields !== 'undefined',
+        filter: typeof args.options.filter !== 'undefined',
+        pageNumber: typeof args.options.pageNumber !== 'undefined',
+        pageSize: typeof args.options.pageSize !== 'undefined',
+        camlQuery: typeof args.options.camlQuery !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--id [id]'
+      },
+      {
+        option: '--title [title]'
+      },
+      {
+        option: '-i, --listId [listId]'
+      },
+      {
+        option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '-s, --pageSize [pageSize]'
+      },
+      {
+        option: '-n, --pageNumber [pageNumber]'
+      },
+      {
+        option: '-q, --camlQuery [camlQuery]'
+      },
+      {
+        option: '-f, --fields [fields]'
+      },
+      {
+        option: '-l, --filter [filter]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (!args.options.id && !args.options.title && !args.options.listId && !args.options.listTitle) {
+          return `Specify listId or listTitle`;
+        }
+
+        if (args.options.id && args.options.title) {
+          return `Specify list id or title but not both`;
+        }
+
+        // Check if only one of the 4 options is specified
+        if ([args.options.id, args.options.title, args.options.listId, args.options.listTitle].filter(o => o).length > 1) {
+          return 'Specify listId or listTitle but not both';
+        }
+
+        if (args.options.camlQuery && args.options.fields) {
+          return `Specify camlQuery or fields but not both`;
+        }
+
+        if (args.options.camlQuery && args.options.pageSize) {
+          return `Specify camlQuery or pageSize but not both`;
+        }
+
+        if (args.options.camlQuery && args.options.pageNumber) {
+          return `Specify camlQuery or pageNumber but not both`;
+        }
+
+        if (args.options.pageSize && isNaN(Number(args.options.pageSize))) {
+          return `pageSize must be numeric`;
+        }
+
+        if (args.options.pageNumber && !args.options.pageSize) {
+          return `pageSize must be specified if pageNumber is specified`;
+        }
+
+        if (args.options.pageNumber && isNaN(Number(args.options.pageNumber))) {
+          return `pageNumber must be numeric`;
+        }
+
+        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} is not a valid GUID`;
+        }
+
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} in option id is not a valid GUID`;
+        }
+
+        return true;
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push(
+      'webUrl',
+      'id',
+      'title',
+      'camlQuery',
+      'pageSize',
+      'pageNumber',
+      'fields',
+      'filter'
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -143,113 +256,6 @@ class SpoListItemListCommand extends SpoCommand {
         logger.log(listItemInstances.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--id [id]'
-      },
-      {
-        option: '--title [title]'
-      },
-      {
-        option: '-i, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '-s, --pageSize [pageSize]'
-      },
-      {
-        option: '-n, --pageNumber [pageNumber]'
-      },
-      {
-        option: '-q, --camlQuery [camlQuery]'
-      },
-      {
-        option: '-f, --fields [fields]'
-      },
-      {
-        option: '-l, --filter [filter]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public types(): CommandTypes {
-    return {
-      string: [
-        'webUrl',
-        'id',
-        'title',
-        'camlQuery',
-        'pageSize',
-        'pageNumber',
-        'fields',
-        'filter'
-      ]
-    };
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (!args.options.id && !args.options.title && !args.options.listId && !args.options.listTitle) {
-      return `Specify listId or listTitle`;
-    }
-
-    if (args.options.id && args.options.title) {
-      return `Specify list id or title but not both`;
-    }
-
-    // Check if only one of the 4 options is specified
-    if ([args.options.id, args.options.title, args.options.listId, args.options.listTitle].filter(o => o).length > 1) {
-      return 'Specify listId or listTitle but not both';
-    }
-
-    if (args.options.camlQuery && args.options.fields) {
-      return `Specify camlQuery or fields but not both`;
-    }
-
-    if (args.options.camlQuery && args.options.pageSize) {
-      return `Specify camlQuery or pageSize but not both`;
-    }
-
-    if (args.options.camlQuery && args.options.pageNumber) {
-      return `Specify camlQuery or pageNumber but not both`;
-    }
-
-    if (args.options.pageSize && isNaN(Number(args.options.pageSize))) {
-      return `pageSize must be numeric`;
-    }
-
-    if (args.options.pageNumber && !args.options.pageSize) {
-      return `pageSize must be specified if pageNumber is specified`;
-    }
-
-    if (args.options.pageNumber && isNaN(Number(args.options.pageNumber))) {
-      return `pageNumber must be numeric`;
-    }
-
-    if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-      return `${args.options.listId} is not a valid GUID`;
-    }
-
-    if (args.options.id && !validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} in option id is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

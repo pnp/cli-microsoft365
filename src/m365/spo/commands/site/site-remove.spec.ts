@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,6 +14,7 @@ describe(commands.SITE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let requests: any[];
 
@@ -22,6 +23,7 @@ describe(commands.SITE_REMOVE, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -161,30 +163,30 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('fails validation if the url is not a valid url', () => {
-    const actual = command.validate({
+  it('fails validation if the url is not a valid url', async () => {
+    const actual = await command.validate({
       options: {
         url: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the url is not a valid SharePoint url', () => {
-    const actual = command.validate({
+  it('fails validation if the url is not a valid SharePoint url', async () => {
+    const actual = await command.validate({
       options: {
         url: 'http://contoso'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the required options are correct', () => {
-    const actual = command.validate({
+  it('passes validation if the required options are correct', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/demosite'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -1624,7 +1626,7 @@ describe(commands.SITE_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

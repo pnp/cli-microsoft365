@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,14 +12,16 @@ const command: Command = require('./app-retract');
 describe(commands.APP_RETRACT, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let requests: any[];
   let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -435,38 +437,38 @@ describe(commands.APP_RETRACT, () => {
     });
   });
 
-  it('fails validation if the appCatalogUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'foo' } });
+  it('fails validation if the appCatalogUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the id is specified and the appCatalogUrl is not', () => {
-    const actual = command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+  it('passes validation when the id is specified and the appCatalogUrl is not', async () => {
+    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when the id is not a GUID', () => {
-    const actual = command.validate({ options: { id: '123' } });
+  it('fails validation when the id is not a GUID', async () => {
+    const actual = await command.validate({ options: { id: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when scope is \'sitecollection\', but no appCatalogUrl specified', () => {
-    const actual = command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection' } });
+  it('fails validation when scope is \'sitecollection\', but no appCatalogUrl specified', async () => {
+    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the scope is not \'tenant\' nor \'sitecollection\'', () => {
-    const actual = command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'abc' } });
+  it('fails validation when the scope is not \'tenant\' nor \'sitecollection\'', async () => {
+    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the id, appCatalogUrl and scope options are specified', () => {
-    const actual = command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'sitecollection' } });
+  it('passes validation when the id, appCatalogUrl and scope options are specified', async () => {
+    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'sitecollection' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

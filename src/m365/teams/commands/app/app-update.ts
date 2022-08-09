@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -27,11 +26,65 @@ class TeamsAppUpdateCommand extends GraphCommand {
     return 'Updates Teams app in the organization\'s app catalog';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.name = typeof args.options.name !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        name: typeof args.options.name !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --name [name]'
+      },
+      {
+        option: '-p, --filePath <filePath>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.id && !args.options.name) {
+          return 'Specify either id or name';
+        }
+
+        if (args.options.id && args.options.name) {
+          return 'Specify either id or name, but not both';
+        }
+
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        const fullPath: string = path.resolve(args.options.filePath);
+
+        if (!fs.existsSync(fullPath)) {
+          return `File '${fullPath}' not found`;
+        }
+
+        if (fs.lstatSync(fullPath).isDirectory()) {
+          return `Path '${fullPath}' points to a directory`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -86,49 +139,6 @@ class TeamsAppUpdateCommand extends GraphCommand {
 
         return Promise.resolve(app.id);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-p, --filePath <filePath>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.id && !args.options.name) {
-      return 'Specify either id or name';
-    }
-
-    if (args.options.id && args.options.name) {
-      return 'Specify either id or name, but not both';
-    }
-
-    if (args.options.id && !validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    const fullPath: string = path.resolve(args.options.filePath);
-
-    if (!fs.existsSync(fullPath)) {
-      return `File '${fullPath}' not found`;
-    }
-
-    if (fs.lstatSync(fullPath).isDirectory()) {
-      return `Path '${fullPath}' points to a directory`;
-    }
-
-    return true;
   }
 }
 

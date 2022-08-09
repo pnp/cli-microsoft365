@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -13,12 +13,13 @@ const command: Command = require('./cdn-origin-remove');
 describe(commands.CDN_ORIGIN_REMOVE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let requests: any[];
   let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'abc',
       FormDigestTimeoutSeconds: 1800,
@@ -43,6 +44,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -289,7 +291,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -300,7 +302,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('supports suppressing confirmation prompt', () => {
-    const options = command.options();
+    const options = command.options;
     let containsConfirmOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--confirm') > -1) {
@@ -311,7 +313,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('requires CDN origin name', () => {
-    const options = command.options();
+    const options = command.options;
     let requiresCdnOriginName = false;
     options.forEach(o => {
       if (o.option.indexOf('<origin>') > -1) {
@@ -321,31 +323,24 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     assert(requiresCdnOriginName);
   });
 
-  it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = command.options();
-    sinonUtil.restore(Command.prototype.options);
-    assert(options.length > 0);
-  });
-
-  it('accepts Public SharePoint Online CDN type', () => {
-    const actual = command.validate({ options: { type: 'Public' } });
+  it('accepts Public SharePoint Online CDN type', async () => {
+    const actual = await command.validate({ options: { type: 'Public', origin: '*/CDN' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts Private SharePoint Online CDN type', () => {
-    const actual = command.validate({ options: { type: 'Private' } });
+  it('accepts Private SharePoint Online CDN type', async () => {
+    const actual = await command.validate({ options: { type: 'Private', origin: '*/CDN' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('rejects invalid SharePoint Online CDN type', () => {
+  it('rejects invalid SharePoint Online CDN type', async () => {
     const type = 'foo';
-    const actual = command.validate({ options: { type: type } });
+    const actual = await command.validate({ options: { type: type, origin: '*/CDN' } }, commandInfo);
     assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
   });
 
-  it('doesn\'t fail validation if the optional type option not specified', () => {
-    const actual = command.validate({ options: {} });
+  it('doesn\'t fail validation if the optional type option not specified', async () => {
+    const actual = await command.validate({ options: { origin: '*/CDN' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

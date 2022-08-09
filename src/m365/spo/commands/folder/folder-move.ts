@@ -1,8 +1,5 @@
 import * as url from 'url';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo, urlUtil, validation } from '../../../../utils';
@@ -31,10 +28,43 @@ class SpoFolderMoveCommand extends SpoCommand {
     return 'Moves a folder to another location';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.allowSchemaMismatch = args.options.allowSchemaMismatch || false;
-    return telemetryProps;
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        allowSchemaMismatch: args.options.allowSchemaMismatch || false
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-s, --sourceUrl <sourceUrl>'
+      },
+      {
+        option: '-t, --targetUrl <targetUrl>'
+      },
+      {
+        option: '--allowSchemaMismatch'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+    );
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -91,30 +121,6 @@ class SpoFolderMoveCommand extends SpoCommand {
         });
       })
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-s, --sourceUrl <sourceUrl>'
-      },
-      {
-        option: '-t, --targetUrl <targetUrl>'
-      },
-      {
-        option: '--allowSchemaMismatch'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

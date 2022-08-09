@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
-import Command, { CommandError, CommandTypes } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -13,11 +13,13 @@ describe(commands.LIST_ADD, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -1501,7 +1503,7 @@ describe(commands.LIST_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -1512,7 +1514,7 @@ describe(commands.LIST_ADD, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -1523,7 +1525,7 @@ describe(commands.LIST_ADD, () => {
   });
 
   it('offers autocomplete for the baseTemplate option', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--baseTemplate') > -1) {
         assert(options[i].autocomplete);
@@ -1534,7 +1536,7 @@ describe(commands.LIST_ADD, () => {
   });
 
   it('offers autocomplete for the direction option', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--direction') > -1) {
         assert(options[i].autocomplete);
@@ -1545,553 +1547,553 @@ describe(commands.LIST_ADD, () => {
   });
 
   it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
+    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
+    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'foo', title: 'List 1', baseTemplate: 'GenericList' } });
+  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'foo', title: 'List 1', baseTemplate: 'GenericList' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList' } });
+  it('passes validation if the url option is a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList' } }, commandInfo);
     assert(actual);
   });
 
-  it('has correct baseTemplate specified', () => {
+  it('has correct baseTemplate specified', async () => {
     const baseTemplateValue = 'DocumentLibrary';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: baseTemplateValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: baseTemplateValue } }, commandInfo);
     assert(actual === true);
   });
 
-  it('fails if non existing baseTemplate specified', () => {
+  it('fails if non existing baseTemplate specified', async () => {
     const baseTemplateValue = 'foo';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: baseTemplateValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: baseTemplateValue } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the templateFeatureId option is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', templateFeatureId: 'foo' } });
+  it('fails validation if the templateFeatureId option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', templateFeatureId: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the templateFeatureId option is a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', templateFeatureId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+  it('passes validation if the templateFeatureId option is a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', templateFeatureId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the allowDeletion option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowDeletion: 'foo' } });
+  it('fails validation if the allowDeletion option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowDeletion: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the allowDeletion option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowDeletion: 'true' } });
+  it('passes validation if the allowDeletion option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowDeletion: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the allowEveryoneViewItems option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowEveryoneViewItems: 'foo' } });
+  it('fails validation if the allowEveryoneViewItems option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowEveryoneViewItems: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the allowEveryoneViewItems option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowEveryoneViewItems: 'true' } });
+  it('passes validation if the allowEveryoneViewItems option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowEveryoneViewItems: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the allowMultiResponses option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowMultiResponses: 'foo' } });
+  it('fails validation if the allowMultiResponses option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowMultiResponses: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the allowMultiResponses option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowMultiResponses: 'true' } });
+  it('passes validation if the allowMultiResponses option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', allowMultiResponses: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the contentTypesEnabled option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', contentTypesEnabled: 'foo' } });
+  it('fails validation if the contentTypesEnabled option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', contentTypesEnabled: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the contentTypesEnabled option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', contentTypesEnabled: 'true' } });
+  it('passes validation if the contentTypesEnabled option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', contentTypesEnabled: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the crawlNonDefaultViews option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', crawlNonDefaultViews: 'foo' } });
+  it('fails validation if the crawlNonDefaultViews option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', crawlNonDefaultViews: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the crawlNonDefaultViews option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', crawlNonDefaultViews: 'true' } });
+  it('passes validation if the crawlNonDefaultViews option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', crawlNonDefaultViews: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the disableGridEditing option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', disableGridEditing: 'foo' } });
+  it('fails validation if the disableGridEditing option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', disableGridEditing: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the disableGridEditing option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', disableGridEditing: 'true' } });
+  it('passes validation if the disableGridEditing option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', disableGridEditing: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableAssignToEmail option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableAssignToEmail: 'foo' } });
+  it('fails validation if the enableAssignToEmail option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableAssignToEmail: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableAssignToEmail option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableAssignToEmail: 'true' } });
+  it('passes validation if the enableAssignToEmail option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableAssignToEmail: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableAttachments option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableAttachments: 'foo' } });
+  it('fails validation if the enableAttachments option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableAttachments: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableAttachments option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableAttachments: 'true' } });
+  it('passes validation if the enableAttachments option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableAttachments: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableDeployWithDependentList option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableDeployWithDependentList: 'foo' } });
+  it('fails validation if the enableDeployWithDependentList option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableDeployWithDependentList: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableDeployWithDependentList option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableDeployWithDependentList: 'true' } });
+  it('passes validation if the enableDeployWithDependentList option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableDeployWithDependentList: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableFolderCreation option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableFolderCreation: 'foo' } });
+  it('fails validation if the enableFolderCreation option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableFolderCreation: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableFolderCreation option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableFolderCreation: 'true' } });
+  it('passes validation if the enableFolderCreation option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableFolderCreation: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableMinorVersions option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableMinorVersions: 'foo' } });
+  it('fails validation if the enableMinorVersions option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableMinorVersions: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableMinorVersions option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableMinorVersions: 'true' } });
+  it('passes validation if the enableMinorVersions option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableMinorVersions: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableModeration option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableModeration: 'foo' } });
+  it('fails validation if the enableModeration option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableModeration: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableModeration option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableModeration: 'true' } });
+  it('passes validation if the enableModeration option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableModeration: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enablePeopleSelector option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enablePeopleSelector: 'foo' } });
+  it('fails validation if the enablePeopleSelector option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enablePeopleSelector: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enablePeopleSelector option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enablePeopleSelector: 'true' } });
+  it('passes validation if the enablePeopleSelector option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enablePeopleSelector: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableResourceSelector option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableResourceSelector: 'foo' } });
+  it('fails validation if the enableResourceSelector option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableResourceSelector: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableResourceSelector option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableResourceSelector: 'true' } });
+  it('passes validation if the enableResourceSelector option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableResourceSelector: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableSchemaCaching option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableSchemaCaching: 'foo' } });
+  it('fails validation if the enableSchemaCaching option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableSchemaCaching: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableSchemaCaching option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableSchemaCaching: 'true' } });
+  it('passes validation if the enableSchemaCaching option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableSchemaCaching: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableSyndication option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableSyndication: 'foo' } });
+  it('fails validation if the enableSyndication option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableSyndication: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableSyndication option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableSyndication: 'true' } });
+  it('passes validation if the enableSyndication option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableSyndication: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableThrottling option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableThrottling: 'foo' } });
+  it('fails validation if the enableThrottling option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableThrottling: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableThrottling option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableThrottling: 'true' } });
+  it('passes validation if the enableThrottling option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableThrottling: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableVersioning option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableVersioning: 'foo' } });
+  it('fails validation if the enableVersioning option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableVersioning: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableVersioning option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableVersioning: 'true' } });
+  it('passes validation if the enableVersioning option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enableVersioning: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enforceDataValidation option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enforceDataValidation: 'foo' } });
+  it('fails validation if the enforceDataValidation option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enforceDataValidation: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enforceDataValidation option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enforceDataValidation: 'true' } });
+  it('passes validation if the enforceDataValidation option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', enforceDataValidation: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the excludeFromOfflineClient option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', excludeFromOfflineClient: 'foo' } });
+  it('fails validation if the excludeFromOfflineClient option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', excludeFromOfflineClient: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the excludeFromOfflineClient option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', excludeFromOfflineClient: 'true' } });
+  it('passes validation if the excludeFromOfflineClient option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', excludeFromOfflineClient: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the fetchPropertyBagForListView option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', fetchPropertyBagForListView: 'foo' } });
+  it('fails validation if the fetchPropertyBagForListView option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', fetchPropertyBagForListView: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the fetchPropertyBagForListView option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', fetchPropertyBagForListView: 'true' } });
+  it('passes validation if the fetchPropertyBagForListView option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', fetchPropertyBagForListView: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the followable option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', followable: 'foo' } });
+  it('fails validation if the followable option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', followable: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the followable option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', followable: 'true' } });
+  it('passes validation if the followable option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', followable: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the forceCheckout option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', forceCheckout: 'foo' } });
+  it('fails validation if the forceCheckout option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', forceCheckout: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the forceCheckout option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', forceCheckout: 'true' } });
+  it('passes validation if the forceCheckout option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', forceCheckout: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the forceDefaultContentType option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', forceDefaultContentType: 'foo' } });
+  it('fails validation if the forceDefaultContentType option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', forceDefaultContentType: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the forceDefaultContentType option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', forceDefaultContentType: 'true' } });
+  it('passes validation if the forceDefaultContentType option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', forceDefaultContentType: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the hidden option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', hidden: 'foo' } });
+  it('fails validation if the hidden option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', hidden: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the hidden option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', hidden: 'true' } });
+  it('passes validation if the hidden option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', hidden: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the includedInMyFilesScope option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', includedInMyFilesScope: 'foo' } });
+  it('fails validation if the includedInMyFilesScope option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', includedInMyFilesScope: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the includedInMyFilesScope option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', includedInMyFilesScope: 'true' } });
+  it('passes validation if the includedInMyFilesScope option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', includedInMyFilesScope: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the irmEnabled option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmEnabled: 'foo' } });
+  it('fails validation if the irmEnabled option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmEnabled: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the irmEnabled option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmEnabled: 'true' } });
+  it('passes validation if the irmEnabled option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmEnabled: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the irmExpire option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmExpire: 'foo' } });
+  it('fails validation if the irmExpire option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmExpire: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the irmExpire option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmExpire: 'true' } });
+  it('passes validation if the irmExpire option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmExpire: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the irmReject option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmReject: 'foo' } });
+  it('fails validation if the irmReject option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmReject: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the irmReject option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmReject: 'true' } });
+  it('passes validation if the irmReject option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', irmReject: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the isApplicationList option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', isApplicationList: 'foo' } });
+  it('fails validation if the isApplicationList option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', isApplicationList: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the isApplicationList option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', isApplicationList: 'true' } });
+  it('passes validation if the isApplicationList option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', isApplicationList: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the multipleDataList option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', multipleDataList: 'foo' } });
+  it('fails validation if the multipleDataList option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', multipleDataList: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the multipleDataList option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', multipleDataList: 'true' } });
+  it('passes validation if the multipleDataList option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', multipleDataList: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the navigateForFormsPages option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', navigateForFormsPages: 'foo' } });
+  it('fails validation if the navigateForFormsPages option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', navigateForFormsPages: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the navigateForFormsPages option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', navigateForFormsPages: 'true' } });
+  it('passes validation if the navigateForFormsPages option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', navigateForFormsPages: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the needUpdateSiteClientTag option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', needUpdateSiteClientTag: 'foo' } });
+  it('fails validation if the needUpdateSiteClientTag option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', needUpdateSiteClientTag: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the needUpdateSiteClientTag option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', needUpdateSiteClientTag: 'true' } });
+  it('passes validation if the needUpdateSiteClientTag option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', needUpdateSiteClientTag: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the noCrawl option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', noCrawl: 'foo' } });
+  it('fails validation if the noCrawl option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', noCrawl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the noCrawl option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', noCrawl: 'true' } });
+  it('passes validation if the noCrawl option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', noCrawl: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the onQuickLaunch option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', onQuickLaunch: 'foo' } });
+  it('fails validation if the onQuickLaunch option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', onQuickLaunch: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the onQuickLaunch option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', onQuickLaunch: 'true' } });
+  it('passes validation if the onQuickLaunch option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', onQuickLaunch: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the ordered option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', ordered: 'foo' } });
+  it('fails validation if the ordered option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', ordered: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the ordered option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', ordered: 'true' } });
+  it('passes validation if the ordered option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', ordered: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the parserDisabled option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', parserDisabled: 'foo' } });
+  it('fails validation if the parserDisabled option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', parserDisabled: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the parserDisabled option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', parserDisabled: 'true' } });
+  it('passes validation if the parserDisabled option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', parserDisabled: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the readOnlyUI option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readOnlyUI: 'foo' } });
+  it('fails validation if the readOnlyUI option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readOnlyUI: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the readOnlyUI option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readOnlyUI: 'true' } });
+  it('passes validation if the readOnlyUI option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readOnlyUI: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the requestAccessEnabled option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', requestAccessEnabled: 'foo' } });
+  it('fails validation if the requestAccessEnabled option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', requestAccessEnabled: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the requestAccessEnabled option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', requestAccessEnabled: 'true' } });
+  it('passes validation if the requestAccessEnabled option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', requestAccessEnabled: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the restrictUserUpdates option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', restrictUserUpdates: 'foo' } });
+  it('fails validation if the restrictUserUpdates option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', restrictUserUpdates: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the restrictUserUpdates option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', restrictUserUpdates: 'true' } });
+  it('passes validation if the restrictUserUpdates option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', restrictUserUpdates: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the showUser option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', showUser: 'foo' } });
+  it('fails validation if the showUser option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', showUser: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the showUser option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', showUser: 'true' } });
+  it('passes validation if the showUser option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', showUser: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the useFormsForDisplay option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', useFormsForDisplay: 'foo' } });
+  it('fails validation if the useFormsForDisplay option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', useFormsForDisplay: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the useFormsForDisplay option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', useFormsForDisplay: 'true' } });
+  it('passes validation if the useFormsForDisplay option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', useFormsForDisplay: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the defaultContentApprovalWorkflowId option is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', defaultContentApprovalWorkflowId: 'foo' } });
+  it('fails validation if the defaultContentApprovalWorkflowId option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', defaultContentApprovalWorkflowId: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the defaultContentApprovalWorkflowId option is a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', defaultContentApprovalWorkflowId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+  it('passes validation if the defaultContentApprovalWorkflowId option is a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', defaultContentApprovalWorkflowId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails if non existing draftVersionVisibility specified', () => {
+  it('fails if non existing draftVersionVisibility specified', async () => {
     const draftVersionValue = 'NonExistingDraftVersionVisibility';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: draftVersionValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: draftVersionValue } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('has correct draftVersionVisibility specified', () => {
+  it('has correct draftVersionVisibility specified', async () => {
     const draftVersionValue = 'Approver';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: draftVersionValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', draftVersionVisibility: draftVersionValue } }, commandInfo);
     assert(actual === true);
   });
 
-  it('fails if emailAlias specified, but enableAssignToEmail is not true', () => {
+  it('fails if emailAlias specified, but enableAssignToEmail is not true', async () => {
     const emailAliasValue = 'yourname@contoso.onmicrosoft.com';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', emailAlias: emailAliasValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', emailAlias: emailAliasValue } }, commandInfo);
     assert.strictEqual(actual, `emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.`);
   });
 
-  it('has correct emailAlias and enableAssignToEmail values specified', () => {
+  it('has correct emailAlias and enableAssignToEmail values specified', async () => {
     const emailAliasValue = 'yourname@contoso.onmicrosoft.com';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', emailAlias: emailAliasValue, enableAssignToEmail: 'true' } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', emailAlias: emailAliasValue, enableAssignToEmail: 'true' } }, commandInfo);
     assert(actual === true);
   });
 
-  it('fails if non existing direction specified', () => {
+  it('fails if non existing direction specified', async () => {
     const directionValue = 'abc';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', direction: directionValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', direction: directionValue } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('has correct direction value specified', () => {
+  it('has correct direction value specified', async () => {
     const directionValue = 'LTR';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', direction: directionValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', direction: directionValue } }, commandInfo);
     assert(actual === true);
   });
 
-  it('fails if majorVersionLimit specified, but enableVersioning is not true', () => {
+  it('fails if majorVersionLimit specified, but enableVersioning is not true', async () => {
     const majorVersionLimitValue = 20;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: majorVersionLimitValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: majorVersionLimitValue } }, commandInfo);
     assert.strictEqual(actual, `majorVersionLimit option is only valid in combination with enableVersioning.`);
   });
 
-  it('has correct majorVersionLimit and enableVersioning values specified', () => {
+  it('has correct majorVersionLimit and enableVersioning values specified', async () => {
     const majorVersionLimitValue = 20;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: majorVersionLimitValue, enableVersioning: 'true' } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorVersionLimit: majorVersionLimitValue, enableVersioning: 'true' } }, commandInfo);
     assert(actual === true);
   });
 
-  it('fails if majorWithMinorVersionsLimit specified, but enableModeration is not true', () => {
+  it('fails if majorWithMinorVersionsLimit specified, but enableModeration is not true', async () => {
     const majorWithMinorVersionLimitValue = 20;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorWithMinorVersionsLimit: majorWithMinorVersionLimitValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', majorWithMinorVersionsLimit: majorWithMinorVersionLimitValue } }, commandInfo);
     assert.strictEqual(actual, `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`);
   });
 
-  it('fails if non existing readSecurity specified', () => {
+  it('fails if non existing readSecurity specified', async () => {
     const readSecurityValue = 5;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readSecurity: readSecurityValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readSecurity: readSecurityValue } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails if non existing writeSecurity specified', () => {
+  it('fails if non existing writeSecurity specified', async () => {
     const writeSecurityValue = 5;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', writeSecurity: writeSecurityValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', writeSecurity: writeSecurityValue } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('has correct readSecurity specified', () => {
+  it('has correct readSecurity specified', async () => {
     const readSecurityValue = 2;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readSecurity: readSecurityValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', readSecurity: readSecurityValue } }, commandInfo);
     assert(actual === true);
   });
 
-  it('fails if non existing listExperienceOptions specified', () => {
+  it('fails if non existing listExperienceOptions specified', async () => {
     const listExperienceValue = 'NonExistingExperience';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: listExperienceValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: listExperienceValue } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('has correct listExperienceOptions specified', () => {
+  it('has correct listExperienceOptions specified', async () => {
     const listExperienceValue = 'NewExperience';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: listExperienceValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'List 1', baseTemplate: 'GenericList', listExperienceOptions: listExperienceValue } }, commandInfo);
     assert(actual === true);
   });
 

@@ -2,9 +2,6 @@ import { Application, KeyCredential, PublicClientApplication, SpaApplication, We
 import { AxiosRequestConfig } from 'axios';
 import * as fs from 'fs';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -38,19 +35,88 @@ class AadAppSetCommand extends GraphCommand {
     return 'Updates Azure AD app registration';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.appId = typeof args.options.appId !== 'undefined';
-    telemetryProps.objectId = typeof args.options.objectId !== 'undefined';
-    telemetryProps.name = typeof args.options.name !== 'undefined';
-    telemetryProps.platform = typeof args.options.platform !== 'undefined';
-    telemetryProps.redirectUris = typeof args.options.redirectUris !== 'undefined';
-    telemetryProps.redirectUrisToRemove = typeof args.options.redirectUrisToRemove !== 'undefined';
-    telemetryProps.uri = typeof args.options.uri !== 'undefined';
-    telemetryProps.certificateFile = typeof args.options.certificateFile !== 'undefined';
-    telemetryProps.certificateBase64Encoded = typeof args.options.certificateBase64Encoded !== 'undefined';
-    telemetryProps.certificateDisplayName = typeof args.options.certificateDisplayName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        appId: typeof args.options.appId !== 'undefined',
+        objectId: typeof args.options.objectId !== 'undefined',
+        name: typeof args.options.name !== 'undefined',
+        platform: typeof args.options.platform !== 'undefined',
+        redirectUris: typeof args.options.redirectUris !== 'undefined',
+        redirectUrisToRemove: typeof args.options.redirectUrisToRemove !== 'undefined',
+        uri: typeof args.options.uri !== 'undefined',
+        certificateFile: typeof args.options.certificateFile !== 'undefined',
+        certificateBase64Encoded: typeof args.options.certificateBase64Encoded !== 'undefined',
+        certificateDisplayName: typeof args.options.certificateDisplayName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '--appId [appId]' },
+      { option: '--objectId [objectId]' },
+      { option: '-n, --name [name]' },
+      { option: '-u, --uri [uri]' },
+      { option: '-r, --redirectUris [redirectUris]' },
+      { option: '--certificateFile [certificateFile]' },
+      { option: '--certificateBase64Encoded [certificateBase64Encoded]' },
+      { option: '--certificateDisplayName [certificateDisplayName]' },
+      {
+        option: '--platform [platform]',
+        autocomplete: AadAppSetCommand.aadApplicationPlatform
+      },
+      { option: '--redirectUrisToRemove [redirectUrisToRemove]' }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.appId &&
+          !args.options.objectId &&
+          !args.options.name) {
+          return 'Specify either appId, objectId or name';
+        }
+    
+        if ((args.options.appId && args.options.objectId) ||
+          (args.options.appId && args.options.name) ||
+          (args.options.objectId && args.options.name)) {
+          return 'Specify either appId, objectId or name but not both';
+        }
+    
+        if (args.options.certificateFile && args.options.certificateBase64Encoded) {
+          return 'Specify either certificateFile or certificateBase64Encoded but not both';
+        }
+    
+        if (args.options.certificateDisplayName && !args.options.certificateFile && !args.options.certificateBase64Encoded) {
+          return 'When you specify certificateDisplayName you also need to specify certificateFile or certificateBase64Encoded';
+        }
+    
+        if (args.options.certificateFile && !fs.existsSync(args.options.certificateFile as string)) {
+          return 'Certificate file not found';
+        }
+    
+        if (args.options.redirectUris && !args.options.platform) {
+          return `When you specify redirectUris you also need to specify platform`;
+        }
+    
+        if (args.options.platform &&
+          AadAppSetCommand.aadApplicationPlatform.indexOf(args.options.platform) < 0) {
+          return `${args.options.platform} is not a valid value for platform. Allowed values are ${AadAppSetCommand.aadApplicationPlatform.join(', ')}`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -307,64 +373,6 @@ class AadAppSetCommand extends GraphCommand {
     };
 
     return request.patch(requestOptions);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '--appId [appId]' },
-      { option: '--objectId [objectId]' },
-      { option: '-n, --name [name]' },
-      { option: '-u, --uri [uri]' },
-      { option: '-r, --redirectUris [redirectUris]' },
-      { option: '--certificateFile [certificateFile]' },
-      { option: '--certificateBase64Encoded [certificateBase64Encoded]' },
-      { option: '--certificateDisplayName [certificateDisplayName]' },
-      {
-        option: '--platform [platform]',
-        autocomplete: AadAppSetCommand.aadApplicationPlatform
-      },
-      { option: '--redirectUrisToRemove [redirectUrisToRemove]' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.appId &&
-      !args.options.objectId &&
-      !args.options.name) {
-      return 'Specify either appId, objectId or name';
-    }
-
-    if ((args.options.appId && args.options.objectId) ||
-      (args.options.appId && args.options.name) ||
-      (args.options.objectId && args.options.name)) {
-      return 'Specify either appId, objectId or name but not both';
-    }
-
-    if (args.options.certificateFile && args.options.certificateBase64Encoded) {
-      return 'Specify either certificateFile or certificateBase64Encoded but not both';
-    }
-
-    if (args.options.certificateDisplayName && !args.options.certificateFile && !args.options.certificateBase64Encoded) {
-      return 'When you specify certificateDisplayName you also need to specify certificateFile or certificateBase64Encoded';
-    }
-
-    if (args.options.certificateFile && !fs.existsSync(args.options.certificateFile as string)) {
-      return 'Certificate file not found';
-    }
-
-    if (args.options.redirectUris && !args.options.platform) {
-      return `When you specify redirectUris you also need to specify platform`;
-    }
-
-    if (args.options.platform &&
-      AadAppSetCommand.aadApplicationPlatform.indexOf(args.options.platform) < 0) {
-      return `${args.options.platform} is not a valid value for platform. Allowed values are ${AadAppSetCommand.aadApplicationPlatform.join(', ')}`;
-    }
-
-    return true;
   }
 }
 

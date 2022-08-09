@@ -1,5 +1,4 @@
 import { Cli, Logger } from "../../../../cli";
-import { CommandOption } from "../../../../Command";
 import GlobalOptions from "../../../../GlobalOptions";
 import { settingsNames } from "../../../../settingsNames";
 import AnonymousCommand from "../../../base/AnonymousCommand";
@@ -24,10 +23,43 @@ class CliConfigResetCommand extends AnonymousCommand {
     return 'Resets the specified CLI configuration option to its default value';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.key = args.options.key;
-    return telemetryProps;
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        key: args.options.key
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-k, --key [key]',
+        autocomplete: CliConfigResetCommand.optionNames
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.key) {
+          if (CliConfigResetCommand.optionNames.indexOf(args.options.key) < 0) {
+            return `${args.options.key} is not a valid setting. Allowed values: ${CliConfigResetCommand.optionNames.join(', ')}`;
+          }
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -39,28 +71,6 @@ class CliConfigResetCommand extends AnonymousCommand {
     }
 
     cb();
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-k, --key [key]',
-        autocomplete: CliConfigResetCommand.optionNames
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.key) {
-      if (CliConfigResetCommand.optionNames.indexOf(args.options.key) < 0) {
-        return `${args.options.key} is not a valid setting. Allowed values: ${CliConfigResetCommand.optionNames.join(', ')}`;
-      }
-    }
-
-    return true;
   }
 }
 

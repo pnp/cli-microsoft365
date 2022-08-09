@@ -1,9 +1,6 @@
 import { Drive, DriveItem, Site } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
 import { Logger } from '../../../cli';
-import {
-  CommandOption
-} from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
 import { odata, validation } from '../../../utils';
@@ -33,6 +30,36 @@ class FileListCommand extends GraphCommand {
 
   public defaultProperties(): string[] | undefined {
     return ['name', 'lastModifiedByUser'];
+  }
+
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        recursive: !!args.options.recursive
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '-u, --webUrl <webUrl>' },
+      { option: '-f, --folderUrl <folderUrl>' },
+      { option: '--recursive' }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (error?: any) => void): void {
@@ -203,21 +230,6 @@ class FileListCommand extends GraphCommand {
         files.forEach(file => (file as any).lastModifiedByUser = file.lastModifiedBy?.user?.displayName);
         return files;
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '-u, --webUrl <webUrl>' },
-      { option: '-f, --folderUrl <folderUrl>' },
-      { option: '--recursive' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

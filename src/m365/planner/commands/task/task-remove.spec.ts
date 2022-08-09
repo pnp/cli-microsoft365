@@ -3,7 +3,7 @@ import * as os from 'os';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ const command: Command = require('./task-remove');
 describe(commands.TASK_REMOVE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let promptOptions: any;
 
   const validTaskId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
@@ -112,6 +113,11 @@ describe(commands.TASK_REMOVE, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -148,6 +154,7 @@ describe(commands.TASK_REMOVE, () => {
       auth.restoreAuth
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -159,75 +166,75 @@ describe(commands.TASK_REMOVE, () => {
   });
 
   it('defines correct option sets', () => {
-    const optionSets = command.optionSets();
+    const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [['id', 'title']]);
   });
 
-  it('fails validation when title and id is used', () => {
-    const actual = command.validate({
+  it('fails validation when title and id is used', async () => {
+    const actual = await command.validate({
       options: {
         id: validTaskId,
         title: validTaskTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when title is used without bucket id', () => {
-    const actual = command.validate({
+  it('fails validation when title is used without bucket id', async () => {
+    const actual = await command.validate({
       options: {
         title: validTaskTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when title is used with both bucket id and bucketname', () => {
-    const actual = command.validate({
+  it('fails validation when title is used with both bucket id and bucketname', async () => {
+    const actual = await command.validate({
       options: {
         title: validTaskTitle,
         bucketId: validBucketId,
         bucketName: validBucketName
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when bucket name is used without plan name or plan id', () => {
-    const actual = command.validate({
+  it('fails validation when bucket name is used without plan name or plan id', async () => {
+    const actual = await command.validate({
       options: {
         title: validTaskTitle,
         bucketName: validBucketName
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when bucket name is used with both plan name and plan id', () => {
-    const actual = command.validate({
+  it('fails validation when bucket name is used with both plan name and plan id', async () => {
+    const actual = await command.validate({
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
         planId: validPlanId,
         planTitle: validPlanTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when plan name is used without owner group name or owner group id', () => {
-    const actual = command.validate({
+  it('fails validation when plan name is used without owner group name or owner group id', async () => {
+    const actual = await command.validate({
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
         planTitle: validPlanTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when plan name is used with both owner group name and owner group id', () => {
-    const actual = command.validate({
+  it('fails validation when plan name is used with both owner group name and owner group id', async () => {
+    const actual = await command.validate({
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
@@ -235,50 +242,50 @@ describe(commands.TASK_REMOVE, () => {
         ownerGroupName: validOwnerGroupName,
         ownerGroupId: validOwnerGroupId
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when owner group id is not a guid', () => {
-    const actual = command.validate({
+  it('fails validation when owner group id is not a guid', async () => {
+    const actual = await command.validate({
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupId: invalidOwnerGroupId
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when task id is used with bucket id', () => {
-    const actual = command.validate({
+  it('fails validation when task id is used with bucket id', async () => {
+    const actual = await command.validate({
       options: {
         id: validTaskId,
         bucketId: validBucketId
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('validates for a correct input with id', () => {
-    const actual = command.validate({
+  it('validates for a correct input with id', async () => {
+    const actual = await command.validate({
       options: {
         id: validTaskId
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct input with title', () => {
-    const actual = command.validate({
+  it('validates for a correct input with title', async () => {
+    const actual = await command.validate({
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -617,7 +624,7 @@ describe(commands.TASK_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

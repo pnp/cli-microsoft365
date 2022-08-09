@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -15,6 +15,7 @@ describe(commands.APP_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -27,6 +28,7 @@ describe(commands.APP_ADD, () => {
         accessToken: 'abc'
       };
     }
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -5604,131 +5606,131 @@ describe(commands.APP_ADD, () => {
     });
   });
 
-  it('fails validation if neither name nor manifest specified', () => {
-    const actual = command.validate({ options: {} });
+  it('fails validation if neither name nor manifest specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if specified platform value is not valid', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', platform: 'abc' } });
+  it('fails validation if specified platform value is not valid', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', platform: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if platform value is spa', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', platform: 'spa' } });
+  it('passes validation if platform value is spa', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', platform: 'spa' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if platform value is web', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', platform: 'web' } });
+  it('passes validation if platform value is web', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', platform: 'web' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if platform value is publicClient', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', platform: 'publicClient' } });
+  it('passes validation if platform value is publicClient', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', platform: 'publicClient' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if redirectUris specified without platform', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', redirectUris: 'http://localhost:8080' } });
+  it('fails validation if redirectUris specified without platform', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', redirectUris: 'http://localhost:8080' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if redirectUris specified with platform', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', redirectUris: 'http://localhost:8080', platform: 'spa' } });
+  it('passes validation if redirectUris specified with platform', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', redirectUris: 'http://localhost:8080', platform: 'spa' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if scopeName specified without uri', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', scopeName: 'access_as_user', scopeAdminConsentDescription: 'Access as user', scopeAdminConsentDisplayName: 'Access as user' } });
+  it('fails validation if scopeName specified without uri', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', scopeName: 'access_as_user', scopeAdminConsentDescription: 'Access as user', scopeAdminConsentDisplayName: 'Access as user' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if scopeName specified without scopeAdminConsentDescription', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDisplayName: 'Access as user' } });
+  it('fails validation if scopeName specified without scopeAdminConsentDescription', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDisplayName: 'Access as user' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if scopeName specified without scopeAdminConsentDisplayName', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDescription: 'Access as user' } });
+  it('fails validation if scopeName specified without scopeAdminConsentDisplayName', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDescription: 'Access as user' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if scopeName specified with uri, scopeAdminConsentDisplayName and scopeAdminConsentDescription', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDescription: 'Access as user', scopeAdminConsentDisplayName: 'Access as user' } });
+  it('passes validation if scopeName specified with uri, scopeAdminConsentDisplayName and scopeAdminConsentDescription', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', scopeName: 'access_as_user', uri: 'https://contoso.onmicrosoft.com/myapp', scopeAdminConsentDescription: 'Access as user', scopeAdminConsentDisplayName: 'Access as user' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if specified scopeConsentBy value is not valid', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', scopeConsentBy: 'abc' } });
+  it('fails validation if specified scopeConsentBy value is not valid', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', scopeConsentBy: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if scopeConsentBy is admins', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', scopeConsentBy: 'admins' } });
+  it('passes validation if scopeConsentBy is admins', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', scopeConsentBy: 'admins' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if scopeConsentBy is adminsAndUsers', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', scopeConsentBy: 'adminsAndUsers' } });
+  it('passes validation if scopeConsentBy is adminsAndUsers', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', scopeConsentBy: 'adminsAndUsers' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if specified manifest is not a valid JSON string', () => {
+  it('fails validation if specified manifest is not a valid JSON string', async () => {
     const manifest = '{';
-    const actual = command.validate({ options: { manifest: manifest } });
+    const actual = await command.validate({ options: { manifest: manifest } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`fails validation if manifest is valid JSON but it doesn't contain name and name option not specified`, () => {
+  it(`fails validation if manifest is valid JSON but it doesn't contain name and name option not specified`, async () => {
     const manifest = '{}';
-    const actual = command.validate({ options: { manifest: manifest } });
+    const actual = await command.validate({ options: { manifest: manifest } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if certificateDisplayName is specified without certificate', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', certificateDisplayName: 'Some certificate' } });
+  it('fails validation if certificateDisplayName is specified without certificate', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', certificateDisplayName: 'Some certificate' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both certificateBase64Encoded and certificateFile are specified', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', certificateFile: 'c:\\temp\\some-certificate.cer', certificateBase64Encoded: 'somebase64string' } });
+  it('fails validation if both certificateBase64Encoded and certificateFile are specified', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', certificateFile: 'c:\\temp\\some-certificate.cer', certificateBase64Encoded: 'somebase64string' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if certificateFile specified with certificateDisplayName', () => {
+  it('passes validation if certificateFile specified with certificateDisplayName', async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
 
-    const actual = command.validate({ options: { name: 'My AAD app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' } });
+    const actual = await command.validate({ options: { name: 'My AAD app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when certificate file is not found', () => {
+  it('fails validation when certificate file is not found', async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => false);
 
-    const actual = command.validate({ options: { debug: true, name: 'My AAD app', certificateDisplayName: 'some certificate', certificateFile: 'C:\\temp\\some-certificate.cer' } });
+    const actual = await command.validate({ options: { debug: true, name: 'My AAD app', certificateDisplayName: 'some certificate', certificateFile: 'C:\\temp\\some-certificate.cer' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if certificateBase64Encoded specified with certificateDisplayName', () => {
-    const actual = command.validate({ options: { name: 'My AAD app', certificateDisplayName: 'Some certificate', certificateBase64Encoded: 'somebase64string' } });
+  it('passes validation if certificateBase64Encoded specified with certificateDisplayName', async () => {
+    const actual = await command.validate({ options: { name: 'My AAD app', certificateDisplayName: 'Some certificate', certificateBase64Encoded: 'somebase64string' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if manifest is valid JSON with name and name not specified', () => {
+  it('passes validation if manifest is valid JSON with name and name not specified', async () => {
     const manifest = '{"name": "My app"}';
-    const actual = command.validate({ options: { manifest: manifest } });
+    const actual = await command.validate({ options: { manifest: manifest } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if manifest is valid JSON without name and name specified', () => {
+  it('passes validation if manifest is valid JSON without name and name specified', async () => {
     const manifest = '{}';
-    const actual = command.validate({ options: { manifest: manifest, name: 'My app' } });
+    const actual = await command.validate({ options: { manifest: manifest, name: 'My app' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

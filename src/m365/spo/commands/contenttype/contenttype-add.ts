@@ -1,5 +1,5 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
-import Command, { CommandError, CommandErrorWithOutput, CommandOption, CommandTypes } from '../../../../Command';
+import Command, { CommandError, CommandErrorWithOutput } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -31,10 +31,56 @@ class SpoContentTypeAddCommand extends SpoCommand {
     return 'Adds a new list or site content type';
   }
 
-  public types(): CommandTypes | undefined {
-    return {
-      string: ['id', 'i']
-    };
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initTypes();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        description: typeof args.options.description !== 'undefined',
+        group: typeof args.options.group !== 'undefined'
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-l, --listTitle [listTitle]'
+      },
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '-n, --name <name>'
+      },
+      {
+        option: '-d, --description [description]'
+      },
+      {
+        option: '-g, --group [group]'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('id', 'i');
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -165,36 +211,6 @@ class SpoContentTypeAddCommand extends SpoCommand {
           reject(error);
         });
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --listTitle [listTitle]'
-      },
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-g, --group [group]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

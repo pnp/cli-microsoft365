@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -28,11 +27,47 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
     return 'Lists application permissions for a site';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.appDisplayName = typeof args.options.appDisplayName !== 'undefined';
-    telemetryProps.appId = typeof args.options.appId !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        appDisplayName: typeof args.options.appDisplayName !== 'undefined',
+        appId: typeof args.options.appId !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --siteUrl <siteUrl>'
+      },
+      {
+        option: '-i, --appId [appId]'
+      },
+      {
+        option: '-n, --appDisplayName [appDisplayName]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.appId && args.options.appDisplayName) {
+          return `Provide either appId or appDisplayName, not both`;
+        }
+
+        return validation.isValidSharePointUrl(args.options.siteUrl);
+      }
+    );
   }
 
   private getSpoSiteId(args: CommandArgs): Promise<string> {
@@ -127,31 +162,6 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
         logger.log(this.getTransposed(res));
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '-i, --appId [appId]'
-      },
-      {
-        option: '-n, --appDisplayName [appDisplayName]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.appId && args.options.appDisplayName) {
-      return `Provide either appId or appDisplayName, not both`;
-    }
-
-    return validation.isValidSharePointUrl(args.options.siteUrl);
   }
 }
 

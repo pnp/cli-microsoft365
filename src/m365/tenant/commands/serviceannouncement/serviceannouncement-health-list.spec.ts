@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -98,11 +98,13 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -150,18 +152,14 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'status', 'service']);
   });
 
-  it('passes validation when command called', (done) => {
-    const actual = command.validate({});
+  it('passes validation when command called', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when command called with issues', (done) => {
-    const actual = command.validate({
-      issues: true
-    });
+  it('passes validation when command called with issues', async () => {
+    const actual = await command.validate({ options: { issues: true } }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('correctly returns list', (done) => {
@@ -179,7 +177,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
 
     const options: any = {};
 
-    command.action(logger, {options} as any, () => {
+    command.action(logger, { options } as any, () => {
       try {
         assert(loggerLogSpy.calledWith(serviceHealthResponse));
         done();
@@ -208,7 +206,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
       output: "csv"
     };
 
-    command.action(logger, {options} as any, () => {
+    command.action(logger, { options } as any, () => {
       try {
         assert(loggerLogSpy.calledWith(serviceHealthResponseCSV));
         done();
@@ -224,7 +222,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/healthOverviews?$expand=issues`) {
         return Promise.resolve(
           {
-            value: serviceHealthIssuesResponse 
+            value: serviceHealthIssuesResponse
           }
         );
       }
@@ -236,7 +234,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
       issues: true
     };
 
-    command.action(logger, {options} as any, () => {
+    command.action(logger, { options } as any, () => {
       try {
         assert(loggerLogSpy.calledWith(serviceHealthIssuesResponse));
         done();
@@ -258,7 +256,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
 
     const options: any = {};
 
-    command.action(logger, {options} as any, (err?: any) => {
+    command.action(logger, { options } as any, (err?: any) => {
       try {
         assert.strictEqual(err.message, "Error fetching service health");
         done();
@@ -285,7 +283,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

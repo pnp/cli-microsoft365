@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
-import Command, { CommandError, CommandTypes } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -16,6 +16,7 @@ describe(commands.SITE_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let executeCommandSpy: sinon.SinonSpy;
 
@@ -29,6 +30,7 @@ describe(commands.SITE_SET, () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     }));
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     auth.service.tenantId = 'a61d499e-50aa-5000-8242-7169ab88ce08|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;Tenant';
   });
@@ -80,299 +82,298 @@ describe(commands.SITE_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-
-  it('fails validation if the url is not a valid url', () => {
-    const actual = command.validate({
+  it('fails validation if the url is not a valid url', async () => {
+    const actual = await command.validate({
       options: {
         url: 'ABC', title: 'Team'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the url is not a valid SharePoint url', () => {
-    const actual = command.validate({
+  it('fails validation if the url is not a valid SharePoint url', async () => {
+    const actual = await command.validate({
       options: {
         url: 'http://contoso', title: 'Team'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the resourceQuota is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the resourceQuota is not a number', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', resourceQuota: 'ABC'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the resourceQuotaWarningLevel is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the resourceQuotaWarningLevel is not a number', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', resourceQuotaWarningLevel: 'ABC'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the resourceQuotaWarningLevel is greater than resourceQuota', () => {
-    const actual = command.validate({
+  it('fails validation if the resourceQuotaWarningLevel is greater than resourceQuota', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
-        owner: 'admin@contoso.com', resourceQuotaWarningLevel: 10, resourceQuota: 5
+        resourceQuotaWarningLevel: 10, resourceQuota: 5
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the storageQuota is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the storageQuota is not a number', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         storageQuota: 'ABC'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the storageQuotaWarningLevel is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the storageQuotaWarningLevel is not a number', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         storageQuotaWarningLevel: 'ABC'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the storageQuotaWarningLevel is greater than storageQuota', () => {
-    const actual = command.validate({
+  it('fails validation if the storageQuotaWarningLevel is greater than storageQuota', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         storageQuotaWarningLevel: 10, storageQuota: 5
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if sharing is invalid', () => {
-    const actual = command.validate({
+  it('fails validation if sharing is invalid', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', sharing: 'Invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
 
-  it('fails validation if allowSelfServiceUpgrade is invalid', () => {
-    const actual = command.validate({
+  it('fails validation if allowSelfServiceUpgrade is invalid', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'Invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if lockState is invalid', () => {
-    const actual = command.validate({
+  it('fails validation if lockState is invalid', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'Invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if noScriptSite is invalid', () => {
-    const actual = command.validate({
+  it('fails validation if noScriptSite is invalid', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'Invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if specified id is not a valid GUID', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', id: 'ABC' } });
+  it('fails validation if specified id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', id: 'ABC' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if no property to update specified (id specified)', () => {
-    const actual = command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com' } });
+  it('fails validation if no property to update specified (id specified)', async () => {
+    const actual = await command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if invalid value specified for disableFlows', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', disableFlows: 'Invalid' } });
+  it('fails validation if invalid value specified for disableFlows', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', disableFlows: 'Invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if siteLogoUrl is not a string', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: true } });
+  it('fails validation if siteLogoUrl is not a string', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if non-GUID value specified for siteDesignId', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', siteDesignId: 'Invalid' } });
+  it('fails validation if non-GUID value specified for siteDesignId', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', siteDesignId: 'Invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if invalid value specified for shareByEmailEnabled', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: 'Invalid' } });
+  it('fails validation if invalid value specified for shareByEmailEnabled', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: 'Invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if invalid value specified for isPublic', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', isPublic: 'Invalid' } });
+  it('fails validation if invalid value specified for isPublic', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', isPublic: 'Invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if allowSelfServiceUpgrade is set to true', () => {
-    const actual = command.validate({
+  it('passes validation if allowSelfServiceUpgrade is set to true', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'true'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if allowSelfServiceUpgrade is set to false', () => {
-    const actual = command.validate({
+  it('passes validation if allowSelfServiceUpgrade is set to false', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'false'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if lockState is set to Unlock', () => {
-    const actual = command.validate({
+  it('passes validation if lockState is set to Unlock', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'Unlock'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if lockState is set to NoAdditions', () => {
-    const actual = command.validate({
+  it('passes validation if lockState is set to NoAdditions', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAdditions'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if lockState is set to ReadOnly', () => {
-    const actual = command.validate({
+  it('passes validation if lockState is set to ReadOnly', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'ReadOnly'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if lockState is set to NoAccess', () => {
-    const actual = command.validate({
+  it('passes validation if lockState is set to NoAccess', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if noScriptSite is set to true', () => {
-    const actual = command.validate({
+  it('passes validation if noScriptSite is set to true', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'true'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if noScriptSite is set to false', () => {
-    const actual = command.validate({
+  it('passes validation if noScriptSite is set to false', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'false'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if all options are correct', () => {
-    const actual = command.validate({
+  it('passes validation if all options are correct', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         resourceQuota: 100, resourceQuotaWarningLevel: 90,
         storageQuota: 100, storageQuotaWarningLevel: 90,
-        sharing: 'Disabled', allowSelfServiceUpgrade: 'true',
+        sharingCapability: 'Disabled', allowSelfServiceUpgrade: 'true',
         owners: 'admin@contoso.com', lockState: 'Unlock', noScriptSite: 'true'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if url and classification specified', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', classification: 'HBI' } });
+  it('passes validation if url and classification specified', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', classification: 'HBI' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if url and empty classification specified', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', classification: '' } });
+  it('passes validation if url and empty classification specified', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', classification: '' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if url and disableFlows true specified', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', disableFlows: 'true' } });
+  it('passes validation if url and disableFlows true specified', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', disableFlows: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if url and disableFlows false specified', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', disableFlows: 'false' } });
+  it('passes validation if url and disableFlows false specified', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', disableFlows: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if url, id, classification and disableFlows specified', () => {
-    const actual = command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com', classification: 'HBI', disableFlows: 'true' } });
+  it('passes validation if url, id, classification and disableFlows specified', async () => {
+    const actual = await command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com', classification: 'HBI', disableFlows: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if true specified for isPublic', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', isPublic: 'true' } });
+  it('passes validation if true specified for isPublic', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', isPublic: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if false specified for isPublic', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', isPublic: 'false' } });
+  it('passes validation if false specified for isPublic', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', isPublic: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if true specified for shareByEmailEnabled', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: 'true' } });
+  it('passes validation if true specified for shareByEmailEnabled', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if false specified for shareByEmailEnabled', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: 'false' } });
+  it('passes validation if false specified for shareByEmailEnabled', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if a valid GUID specified for siteDesignId', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e' } });
+  it('passes validation if a valid GUID specified for siteDesignId', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if non existing sharingCapability specified', () => {
+  it('passes validation if non existing sharingCapability specified', async () => {
     const sharingCapabilityvalue = 'nonExistentSharingCapabilityValue';
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', sharingCapability: sharingCapabilityvalue } });
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', sharingCapability: sharingCapabilityvalue } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if correct sharingCapability specified', () => {
+  it('passes validation if correct sharingCapability specified', async () => {
     const sharingCapabilityvalue = 'ExternalUserSharingOnly';
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com', sharingCapability: sharingCapabilityvalue } });
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com', sharingCapability: sharingCapabilityvalue } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -2885,19 +2886,19 @@ describe(commands.SITE_SET, () => {
   });
 
   it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
+    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
+    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
   it('configures classification as string option', () => {
-    const types = (command.types() as CommandTypes);
+    const types = command.types;
     ['classification'].forEach(o => {
       assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
     });
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -2908,7 +2909,7 @@ describe(commands.SITE_SET, () => {
   });
 
   it('supports specifying site url', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--url') > -1) {
@@ -2919,7 +2920,7 @@ describe(commands.SITE_SET, () => {
   });
 
   it('supports specifying site classification', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--classification') > -1) {
@@ -2930,7 +2931,7 @@ describe(commands.SITE_SET, () => {
   });
 
   it('supports specifying disableFlows', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--disableFlows') > -1) {
@@ -2941,7 +2942,7 @@ describe(commands.SITE_SET, () => {
   });
 
   it('supports specifying site logo', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--siteLogoUrl') > -1) {

@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -30,15 +29,103 @@ class TeamsTeamCloneCommand extends GraphCommand {
     return 'Creates a clone of a Microsoft Teams team';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.description = typeof args.options.description !== 'undefined';
-    telemetryProps.classification = typeof args.options.classification !== 'undefined';
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
-    telemetryProps.name = typeof args.options.name !== 'undefined';
-    telemetryProps.displayName = typeof args.options.displayName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        description: typeof args.options.description !== 'undefined',
+        classification: typeof args.options.classification !== 'undefined',
+        visibility: typeof args.options.visibility !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
+        teamId: typeof args.options.teamId !== 'undefined',
+        name: typeof args.options.name !== 'undefined',
+        displayName: typeof args.options.displayName !== 'undefined'
+        
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id [teamId]'
+      },
+      {
+        option: '--teamId [teamId]'
+      },
+      {
+        option: '-n, --name [name]'
+      },
+      {
+        option: '--displayName [displayName]'
+      },
+      {
+        option: '-p, --partsToClone <partsToClone>',
+        autocomplete: ['apps', 'channels', 'members', 'settings', 'tabs']
+      },
+      {
+        option: '-d, --description [description]'
+      },
+      {
+        option: '-c, --classification [classification]'
+      },
+      {
+        option: '-v, --visibility [visibility]',
+        autocomplete: ['Private', 'Public']
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
+	      return `${args.options.teamId} is not a valid GUID`;
+	    }
+
+	    if (args.options.id && !validation.isValidGuid(args.options.id)) {
+	      return `${args.options.id} is not a valid GUID`;
+	    }
+
+	    const partsToClone: string[] = args.options.partsToClone.replace(/\s/g, '').split(',');
+	    for (const partToClone of partsToClone) {
+	      const part: string = partToClone.toLowerCase();
+	      if (part !== 'apps' &&
+	        part !== 'channels' &&
+	        part !== 'members' &&
+	        part !== 'settings' &&
+	        part !== 'tabs') {
+	        return `${part} is not a valid partsToClone. Allowed values are apps|channels|members|settings|tabs`;
+	      }
+	    }
+
+	    if (args.options.visibility) {
+	      const visibility: string = args.options.visibility.toLowerCase();
+
+	      if (visibility !== 'private' &&
+	        visibility !== 'public') {
+	        return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
+	      }
+	    }
+
+	    return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+  	this.optionSets.push(
+  	  ['id', 'teamId'],
+      ['name', 'displayName']
+  	);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -85,80 +172,6 @@ class TeamsTeamCloneCommand extends GraphCommand {
     request
       .post(requestOptions)
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public optionSets(): string[][] | undefined {
-    return [
-      ['id', 'teamId'],
-      ['name', 'displayName']
-    ];
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id [teamId]'
-      },
-      {
-        option: '--teamId [teamId]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '--displayName [displayName]'
-      },
-      {
-        option: '-p, --partsToClone <partsToClone>',
-        autocomplete: ['apps', 'channels', 'members', 'settings', 'tabs']
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-c, --classification [classification]'
-      },
-      {
-        option: '-v, --visibility [visibility]',
-        autocomplete: ['Private', 'Public']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    if (args.options.id && !validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    const partsToClone: string[] = args.options.partsToClone.replace(/\s/g, '').split(',');
-    for (const partToClone of partsToClone) {
-      const part: string = partToClone.toLowerCase();
-      if (part !== 'apps' &&
-        part !== 'channels' &&
-        part !== 'members' &&
-        part !== 'settings' &&
-        part !== 'tabs') {
-        return `${part} is not a valid partsToClone. Allowed values are apps|channels|members|settings|tabs`;
-      }
-    }
-
-    if (args.options.visibility) {
-      const visibility: string = args.options.visibility.toLowerCase();
-
-      if (visibility !== 'private' &&
-        visibility !== 'public') {
-        return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
-      }
-    }
-
-    return true;
   }
 
   /**

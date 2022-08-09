@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -30,11 +27,70 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
     return 'Adds a navigation node to the specified site navigation';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.isExternal = args.options.isExternal;
-    telemetryProps.parentNodeId = typeof args.options.parentNodeId !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        isExternal: args.options.isExternal,
+        parentNodeId: typeof args.options.parentNodeId !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-l, --location [location]',
+        autocomplete: ['QuickLaunch', 'TopNavigationBar']
+      },
+      {
+        option: '-t, --title <title>'
+      },
+      {
+        option: '--url <url>'
+      },
+      {
+        option: '--parentNodeId [parentNodeId]'
+      },
+      {
+        option: '--isExternal'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.parentNodeId) {
+          if (isNaN(args.options.parentNodeId)) {
+            return `${args.options.parentNodeId} is not a number`;
+          }
+        }
+        else {
+          if (args.options.location !== 'QuickLaunch' &&
+            args.options.location !== 'TopNavigationBar') {
+            return `${args.options.location} is not a valid value for the location option. Allowed values are QuickLaunch|TopNavigationBar`;
+          }
+        }
+
+        return true;
+      }
+    );
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -70,54 +126,6 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
         logger.log(res);
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --location <location>',
-        autocomplete: ['QuickLaunch', 'TopNavigationBar']
-      },
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '--url <url>'
-      },
-      {
-        option: '--parentNodeId [parentNodeId]'
-      },
-      {
-        option: '--isExternal'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.parentNodeId) {
-      if (isNaN(args.options.parentNodeId)) {
-        return `${args.options.parentNodeId} is not a number`;
-      }
-    }
-    else {
-      if (args.options.location !== 'QuickLaunch' &&
-        args.options.location !== 'TopNavigationBar') {
-        return `${args.options.location} is not a valid value for the location option. Allowed values are QuickLaunch|TopNavigationBar`;
-      }
-    }
-
-    return true;
   }
 }
 

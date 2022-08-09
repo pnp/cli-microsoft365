@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,11 +12,13 @@ const command: Command = require('./site-inplacerecordsmanagement-set');
 describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -189,7 +191,7 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -200,7 +202,7 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   });
 
   it('supports specifying siteUrl', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--siteUrl') > -1) {
@@ -211,7 +213,7 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
   });
 
   it('supports specifying enabled', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--enabled') > -1) {
@@ -221,23 +223,23 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
     assert(containsOption);
   });
 
-  it('fails validation if enabled option not "true" or "false"', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'abc' } });
+  it('fails validation if enabled option not "true" or "false"', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if siteUrl is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { siteUrl: 'abc', enabled: 'true' } });
+  it('fails validation if siteUrl is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'abc', enabled: 'true' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the siteUrl is a valid SharePoint URL and enabled set to "true"', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'true' } });
+  it('passes validation when the siteUrl is a valid SharePoint URL and enabled set to "true"', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the siteUrl is a valid SharePoint URL and enabled set to "false"', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'false' } });
+  it('passes validation when the siteUrl is a valid SharePoint URL and enabled set to "false"', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

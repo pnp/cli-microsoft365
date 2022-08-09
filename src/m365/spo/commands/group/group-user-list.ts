@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -29,6 +28,57 @@ class SpoGroupUserListCommand extends SpoCommand {
     return ['Title', 'UserPrincipalName', 'Id', 'Email'];
   }
 
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        groupId: typeof args.options.groupId !== 'undefined',
+        groupName: typeof args.options.groupName !== 'undefined'
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--groupId [groupId]'
+      },
+      {
+        option: '--groupName [groupName]'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.groupId && args.options.groupName) {
+          return 'Use either "groupName" or "groupId", but not both';
+        }
+    
+        if (!args.options.groupId && !args.options.groupName) {
+          return 'Either "groupName" or "groupId" is required';
+        }
+    
+        if (args.options.groupId && isNaN(args.options.groupId)) {
+          return `Specified "groupId" ${args.options.groupId} is not valid`;
+        }
+    
+        return validation.isValidSharePointUrl(args.options.webUrl);
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
       logger.logToStderr(`Retrieving the list of members from the SharePoint group :  ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
@@ -53,40 +103,6 @@ class SpoGroupUserListCommand extends SpoCommand {
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--groupId [groupId]'
-      },
-      {
-        option: '--groupName [groupName]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.groupId && args.options.groupName) {
-      return 'Use either "groupName" or "groupId", but not both';
-    }
-
-    if (!args.options.groupId && !args.options.groupName) {
-      return 'Either "groupName" or "groupId" is required';
-    }
-
-    if (args.options.groupId && isNaN(args.options.groupId)) {
-      return `Specified "groupId" ${args.options.groupId} is not valid`;
-    }
-
-    return validation.isValidSharePointUrl(args.options.webUrl);
-  }
-
 }
 
 module.exports = new SpoGroupUserListCommand();

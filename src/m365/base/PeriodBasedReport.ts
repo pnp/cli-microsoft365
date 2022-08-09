@@ -1,7 +1,4 @@
 import { Logger } from '../../cli';
-import {
-  CommandOption
-} from '../../Command';
 import GlobalOptions from '../../GlobalOptions';
 import request from '../../request';
 import GraphCommand from "./GraphCommand";
@@ -16,6 +13,28 @@ interface UsagePeriodOptions extends GlobalOptions {
 
 export default abstract class PeriodBasedReport extends GraphCommand {
   public abstract get usageEndpoint(): string;
+
+  constructor() {
+    super();
+    
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initOptions(): void {
+    this.options.push(
+      {
+        option: '-p, --period <period>',
+        autocomplete: ['D7', 'D30', 'D90', 'D180']
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      (args) => this.validatePeriod(args),
+    );
+  }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const endpoint: string = `${this.resource}/v1.0/reports/${this.usageEndpoint}(period='${encodeURIComponent(args.options.period)}')`;
@@ -74,23 +93,8 @@ export default abstract class PeriodBasedReport extends GraphCommand {
     return jsonObj;
   }
 
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-p, --period <period>',
-        autocomplete: ['D7', 'D30', 'D90', 'D180']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    return this.validatePeriod(args.options.period);
-  }
-
-  protected validatePeriod(period: string | undefined): boolean | string {
+  protected async validatePeriod(args: CommandArgs): Promise<boolean | string> {
+    const period = args.options.period;
     if (period &&
       ['D7', 'D30', 'D90', 'D180'].indexOf(period) < 0) {
       return `${period} is not a valid period type. The supported values are D7|D30|D90|D180`;

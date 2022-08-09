@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.MESSAGE_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   const firstMessage: any = {"sender_id":1496550646, "replied_to_id":1496550647,"id":10123190123123,"thread_id": "", group_id: 11231123123, created_at: "2019/09/09 07:53:18 +0000", "content_excerpt": "message1"};
   const secondMessage: any = {"sender_id":1496550640, "replied_to_id":"","id":10123190123124,"thread_id": "", group_id: "", created_at: "2019/09/08 07:53:18 +0000", "content_excerpt": "message2"};
 
@@ -20,7 +21,8 @@ describe(commands.MESSAGE_GET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
-  }); 
+    commandInfo = Cli.getCommandInfo(command);
+  });
 
   beforeEach(() => {
     log = [];
@@ -65,13 +67,13 @@ describe(commands.MESSAGE_GET, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'sender_id', 'replied_to_id', 'thread_id', 'group_id', 'created_at', 'direct_message', 'system_message', 'privacy', 'message_type', 'content_excerpt']);
   });
 
-  it('id must be a number', () => {
-    const actual = command.validate({ options: { id: 'nonumber' } });
+  it('id must be a number', async () => {
+    const actual = await command.validate({ options: { id: 'nonumber' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('id is required', () => {
-    const actual = command.validate({ options: { } });
+  it('id is required', async () => {
+    const actual = await command.validate({ options: { } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -131,13 +133,13 @@ describe(commands.MESSAGE_GET, () => {
     });
   });
 
-  it('passes validation with parameters', () => {
-    const actual = command.validate({ options: { id: 10123123 }});
+  it('passes validation with parameters', async () => {
+    const actual = await command.validate({ options: { id: 10123123 }}, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

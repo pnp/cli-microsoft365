@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { ContextInfo, spo, validation } from '../../../../utils';
@@ -25,6 +22,44 @@ class SpoSiteDesignRightsGrantCommand extends SpoCommand {
 
   public get description(): string {
     return 'Grants access to a site design for one or more principals';
+  }
+
+  constructor() {
+    super();
+
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '-p, --principals <principals>'
+      },
+      {
+        option: '-r, --rights <rights>',
+        autocomplete: ['View']
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        if (args.options.rights !== 'View') {
+          return `${args.options.rights} is not a valid rights value. Allowed values View`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -56,36 +91,6 @@ class SpoSiteDesignRightsGrantCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-p, --principals <principals>'
-      },
-      {
-        option: '-r, --rights <rights>',
-        autocomplete: ['View']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    if (args.options.rights !== 'View') {
-      return `${args.options.rights} is not a valid rights value. Allowed values View`;
-    }
-
-    return true;
   }
 }
 

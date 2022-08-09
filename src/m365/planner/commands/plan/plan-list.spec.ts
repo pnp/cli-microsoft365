@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken, sinonUtil } from '../../../../utils';
@@ -13,11 +13,17 @@ describe(commands.PLAN_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -51,6 +57,7 @@ describe(commands.PLAN_LIST, () => {
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -65,51 +72,46 @@ describe(commands.PLAN_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'createdDateTime', 'owner']);
   });
 
-  it('fails validation if the ownerGroupId is not a valid guid.', (done) => {
-    const actual = command.validate({
+  it('fails validation if the ownerGroupId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
         ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided.', (done) => {
-    const actual = command.validate({ options: {} });
+  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided.', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both ownerGroupId and ownerGroupName are specified', (done) => {
-    const actual = command.validate({
+  it('fails validation when both ownerGroupId and ownerGroupName are specified', async () => {
+    const actual = await command.validate({
       options: {
         ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4',
         ownerGroupName: 'spridermvp'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid ownerGroupId specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid ownerGroupId specified', async () => {
+    const actual = await command.validate({
       options: {
         ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid ownerGroupName specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid ownerGroupName specified', async () => {
+    const actual = await command.validate({
       options: {
         ownerGroupName: 'spridermvp'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('correctly list planner plans with given ownerGroupId', (done) => {
@@ -467,7 +469,7 @@ describe(commands.PLAN_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
