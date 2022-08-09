@@ -1,19 +1,25 @@
 # Release notes
 
+## [v5.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.7.0)
+
+### Changes
+
+- refactored command configuration [#3409](https://github.com/pnp/cli-microsoft365/issues/3409)
+
 ## [v5.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.6.0)
 
 ### New commands
 
 **SharePoint:**
 
-- [m365 spo file rename](../cmd/spo/file/file-rename.md) - adds spo file rename command. [#1763](https://github.com/pnp/cli-microsoft365/issues/1763)
+- [m365 spo file rename](../cmd/spo/file/file-rename.md) - renames a file [#1763](https://github.com/pnp/cli-microsoft365/issues/1763)
 
 ### Changes
 
-- fixes 'spo site apppermission add' and 'spo site apppermission set' permission option [#3353](https://github.com/pnp/cli-microsoft365/issues/3353)
-- extends 'spo group get' with support for returning associated groups [#3545](https://github.com/pnp/cli-microsoft365/issues/3545)
-- extends 'spfx project upgrade' with support for upgrading SPFx projects to v1.15.2 [#3556](https://github.com/pnp/cli-microsoft365/issues/3556)
-- extends 'spfx project doctor' with support for validating SPFx projects to v1.15.2 [#3560](https://github.com/pnp/cli-microsoft365/issues/3560)
+- fixed 'spo site apppermission add' and 'spo site apppermission set' permission option [#3353](https://github.com/pnp/cli-microsoft365/issues/3353)
+- extended 'spo group get' with support for returning associated groups [#3545](https://github.com/pnp/cli-microsoft365/issues/3545)
+- extended 'spfx project upgrade' with support for upgrading SPFx projects to v1.15.2 [#3556](https://github.com/pnp/cli-microsoft365/issues/3556)
+- extended 'spfx project doctor' with support for validating SPFx projects to v1.15.2 [#3560](https://github.com/pnp/cli-microsoft365/issues/3560)
 
 ## [v5.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.5.0)
 
@@ -26,13 +32,13 @@
 
 **Search:**
 
-- [search externalconnection get](../cmd/search/externalconnection/externalconnection-get.md) - adds search externalconnection get command. [#3169](https://github.com/pnp/cli-microsoft365/issues/3169)
+- [search externalconnection get](../cmd/search/externalconnection/externalconnection-get.md) - allows the administrator to get a specific external connection for use in Microsoft Search [#3169](https://github.com/pnp/cli-microsoft365/issues/3169)
 
 **SharePoint:**
 
-- [spo roledefinition get](../cmd/spo/roledefinition/roledefinition-get.md) - adds spo roledefinition get command. [#3270](https://github.com/pnp/cli-microsoft365/issues/3270)
-- [spo group set](../cmd/spo/group/group-set.md) - adds spo group set command. [#3499](https://github.com/pnp/cli-microsoft365/pull/3499)
-- [spo group add](../cmd/spo/group/group-add.md) - adds spo group add command. [#3493](https://github.com/pnp/cli-microsoft365/pull/3493)
+- [spo roledefinition get](../cmd/spo/roledefinition/roledefinition-get.md) - gets specified role definition from web [#3270](https://github.com/pnp/cli-microsoft365/issues/3270)
+- [spo group set](../cmd/spo/group/group-set.md) - updates a group in the specified site [#3499](https://github.com/pnp/cli-microsoft365/pull/3499)
+- [spo group add](../cmd/spo/group/group-add.md) - creates group in the specified site [#3493](https://github.com/pnp/cli-microsoft365/pull/3493)
 
 **Teams:**
 
@@ -58,21 +64,21 @@
 - fixed API issue for broken Power Apps commands [#3207](https://github.com/pnp/cli-microsoft365/issues/3207)
 - fixed 'spo listitem list' and 'spo listitem get' commands [#3391](https://github.com/pnp/cli-microsoft365/issues/3391)
 - extended `planner plan add` with more options [#3345](https://github.com/pnp/cli-microsoft365/issues/3345)
-- Updates 'planner task get docs' [#3495](https://github.com/pnp/cli-microsoft365/issues/3495)
-- Extends "teams team remove, archive, and unarchive" with extra options [#3483](https://github.com/pnp/cli-microsoft365/issues/3483)
-- Fixes spo field set command options inconsistency [#3418](https://github.com/pnp/cli-microsoft365/pull/3418)
-- Extends 'spo hubsite get' command. [#3454](https://github.com/pnp/cli-microsoft365/pull/3454)
-- consolidates spo site list and spo site classic list commands. [#3456](https://github.com/pnp/cli-microsoft365/pull/3456)
-- extends aad o365group recyclebinitem restore command with extra options. [#3428](https://github.com/pnp/cli-microsoft365/pull/3428)
+- updated 'planner task get docs' [#3495](https://github.com/pnp/cli-microsoft365/issues/3495)
+- extended "teams team remove, archive, and unarchive" with extra options [#3483](https://github.com/pnp/cli-microsoft365/issues/3483)
+- fixed spo field set command options inconsistency [#3418](https://github.com/pnp/cli-microsoft365/pull/3418)
+- extended 'spo hubsite get' command. [#3454](https://github.com/pnp/cli-microsoft365/pull/3454)
+- consolidated spo site list and spo site classic list commands. [#3456](https://github.com/pnp/cli-microsoft365/pull/3456)
+- extended aad o365group recyclebinitem restore command with extra options. [#3428](https://github.com/pnp/cli-microsoft365/pull/3428)
 - fixed samples contain an invalid condition check. [#3511](https://github.com/pnp/cli-microsoft365/pull/3511)
 - updated spo customaction to get by title or id. [#3463](https://github.com/pnp/cli-microsoft365/pull/3463)
 - updated spo customaction to remove by title or id. [#3464](https://github.com/pnp/cli-microsoft365/pull/3464)
-- consolidate spo site set and spo site classic set commands. [#3450](https://github.com/pnp/cli-microsoft365/pull/3450)
-- Updates spo tenant appcatalog add reference to deprecated spo site classic add command. [#3459](https://github.com/pnp/cli-microsoft365/pull/3459)
-- Updated the status command to show correct connection status. [#3260](https://github.com/pnp/cli-microsoft365/pull/3260)
-- Updated 'teams tab get' provide shorthand options. [#3509](https://github.com/pnp/cli-microsoft365/pull/3509)
-- Added sample script on listing external users in site groups across all site collections. [#3521](https://github.com/pnp/cli-microsoft365/pull/3521)
-- Fixed 'spo field get' and 'spo field remove' commands. [#3515](https://github.com/pnp/cli-microsoft365/pull/3515)
+- consolidated spo site set and spo site classic set commands. [#3450](https://github.com/pnp/cli-microsoft365/pull/3450)
+- updated spo tenant appcatalog add reference to deprecated spo site classic add command. [#3459](https://github.com/pnp/cli-microsoft365/pull/3459)
+- updated the status command to show correct connection status. [#3260](https://github.com/pnp/cli-microsoft365/pull/3260)
+- updated 'teams tab get' provide shorthand options. [#3509](https://github.com/pnp/cli-microsoft365/pull/3509)
+- added sample script on listing external users in site groups across all site collections. [#3521](https://github.com/pnp/cli-microsoft365/pull/3521)
+- fixed 'spo field get' and 'spo field remove' commands. [#3515](https://github.com/pnp/cli-microsoft365/pull/3515)
 
 ## [v5.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.4.0)
 
