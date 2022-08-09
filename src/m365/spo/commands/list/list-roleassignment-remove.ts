@@ -1,5 +1,5 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
-import Command, { CommandErrorWithOutput, CommandOption } from '../../../../Command';
+import Command, { CommandErrorWithOutput } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, urlUtil, validation } from '../../../../utils';
@@ -33,15 +33,82 @@ class SpoListRoleAssignmentRemoveCommand extends SpoCommand {
     return 'Removes a role assignment from list permissions';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listId = typeof args.options.listId !== 'undefined';
-    telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
-    telemetryProps.listUrl = typeof args.options.listUrl !== 'undefined';
-    telemetryProps.principalId = typeof args.options.principalId !== 'undefined';
-    telemetryProps.upn = typeof args.options.upn !== 'undefined';
-    telemetryProps.groupName = typeof args.options.groupName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
+        principalId: typeof args.options.principalId !== 'undefined',
+        upn: typeof args.options.upn !== 'undefined',
+        groupName: typeof args.options.groupName !== 'undefined'    
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-i, --listId [listId]'
+      },
+      {
+        option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '--listUrl [listUrl]'
+      },
+      {
+        option: '--principalId [principalId]'
+      },
+      {
+        option: '--upn [upn]'
+      },
+      {
+        option: '--groupName [groupName]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} is not a valid GUID`;
+        }
+
+        if (args.options.principalId && isNaN(args.options.principalId)) {
+          return `Specified principalId ${args.options.principalId} is not a number`;
+        }
+
+        const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
+        if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
+          return `Specify either list id or title or list url`;
+        }
+
+        const principalOptions: any[] = [args.options.principalId, args.options.upn, args.options.groupName];
+        if (principalOptions.some(item => item !== undefined) && principalOptions.filter(item => item !== undefined).length > 1) {
+          return `Specify either principalId id or upn or groupName`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -131,62 +198,6 @@ class SpoListRoleAssignmentRemoveCommand extends SpoCommand {
       }, (err: CommandErrorWithOutput) => {
         return Promise.reject(err);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '--principalId [principalId]'
-      },
-      {
-        option: '--upn [upn]'
-      },
-      {
-        option: '--groupName [groupName]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-      return `${args.options.listId} is not a valid GUID`;
-    }
-
-    if (args.options.principalId && isNaN(args.options.principalId)) {
-      return `Specified principalId ${args.options.principalId} is not a number`;
-    }
-
-    const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
-    if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
-      return `Specify either list id or title or list url`;
-    }
-
-    const principalOptions: any[] = [args.options.principalId, args.options.upn, args.options.groupName];
-    if (principalOptions.some(item => item !== undefined) && principalOptions.filter(item => item !== undefined).length > 1) {
-      return `Specify either principalId id or upn or groupName`;
-    }
-
-    return true;
   }
 }
 
