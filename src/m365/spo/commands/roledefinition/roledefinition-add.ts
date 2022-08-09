@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -36,12 +35,60 @@ class SpoRoleDefinitionAddCommand extends SpoCommand {
     }
     return result;
   }
+  
+  constructor() {
+    super();
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.rights = args.options.rights;
-    telemetryProps.description = (!(!args.options.description)).toString();
-    return telemetryProps;
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        rights: args.options.rights,
+        description: (!(!args.options.description)).toString() 
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-n, --name <name>'
+      },
+      {
+        option: '-d, --description [description]'
+      },
+      {
+        option: '--rights [rights]',
+        autocomplete: this.permissionsKindMap
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.rights) {
+          const rights = args.options.rights.split(',');
+    
+          for (const item of rights) {
+            const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
+    
+            if (!kind) {
+              return `Rights option '${item}' is not recognized as valid PermissionKind choice. Please note it is case sensitive`;
+            }
+          }
+        }
+    
+        return validation.isValidSharePointUrl(args.options.webUrl);
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -81,43 +128,6 @@ class SpoRoleDefinitionAddCommand extends SpoCommand {
     request
       .post(requestOptions)
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--rights [rights]',
-        autocomplete: this.permissionsKindMap
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.rights) {
-      const rights = args.options.rights.split(',');
-
-      for (const item of rights) {
-        const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
-
-        if (!kind) {
-          return `Rights option '${item}' is not recognized as valid PermissionKind choice. Please note it is case sensitive`;
-        }
-      }
-    }
-
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 
