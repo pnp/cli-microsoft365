@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -14,11 +14,13 @@ describe(commands.MESSAGE_LIKE_SET, () => {
   let logger: Logger;
   let promptOptions: any;
   let requests: any[];
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -85,33 +87,33 @@ describe(commands.MESSAGE_LIKE_SET, () => {
     });
   });
 
-  it('passes validation with parameters', () => {
-    const actual = command.validate({ options: { id: 10123123 } });
+  it('passes validation with parameters', async () => {
+    const actual = await command.validate({ options: { id: 10123123 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('id must be a number', () => {
-    const actual = command.validate({ options: { id: 'abc' } });
+  it('id must be a number', async () => {
+    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if enabled set to "true"', () => {
-    const actual = command.validate({ options: { id: 10123123, enable: 'true' } });
+  it('passes validation if enabled set to "true"', async () => {
+    const actual = await command.validate({ options: { id: 10123123, enable: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if enabled set to "true"', () => {
-    const actual = command.validate({ options: { id: 10123123, enable: 'false' } });
+  it('passes validation if enabled set to "true"', async () => {
+    const actual = await command.validate({ options: { id: 10123123, enable: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('does not pass validation if enable not set to either "true" or "false"', () => {
-    const actual = command.validate({ options: { id: 10123123, enable: 'fals' } });
+  it('does not pass validation if enable not set to either "true" or "false"', async () => {
+    const actual = await command.validate({ options: { id: 10123123, enable: 'fals' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

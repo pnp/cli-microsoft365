@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import { fsUtil, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -20,10 +20,13 @@ const admZipMock = {
 describe(commands.PACKAGE_GENERATE, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     (command as any).archive = admZipMock;
+    commandInfo = Cli.getCommandInfo(command);
+    Cli.getInstance().config;
   });
 
   beforeEach(() => {
@@ -407,56 +410,56 @@ describe(commands.PACKAGE_GENERATE, () => {
     });
   });
 
-  it(`fails validation if the enableForTeams option is invalid`, () => {
-    const actual = command.validate({
+  it(`fails validation if the enableForTeams option is invalid`, async () => {
+    const actual = await command.validate({
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam', packageName: 'amsterdam-weather',
         html: '@amsterdam-weather.html', allowTenantWideDeployment: true,
         enableForTeams: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`passes validation if the enableForTeams option is set to tab`, () => {
-    const actual = command.validate({
+  it(`passes validation if the enableForTeams option is set to tab`, async () => {
+    const actual = await command.validate({
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam', packageName: 'amsterdam-weather',
         html: '@amsterdam-weather.html', allowTenantWideDeployment: true,
         enableForTeams: 'tab'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it(`passes validation if the enableForTeams option is set to personalApp`, () => {
-    const actual = command.validate({
+  it(`passes validation if the enableForTeams option is set to personalApp`, async () => {
+    const actual = await command.validate({
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam', packageName: 'amsterdam-weather',
         html: '@amsterdam-weather.html', allowTenantWideDeployment: true,
         enableForTeams: 'personalApp'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it(`passes validation if the enableForTeams option is set to all`, () => {
-    const actual = command.validate({
+  it(`passes validation if the enableForTeams option is set to all`, async () => {
+    const actual = await command.validate({
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam', packageName: 'amsterdam-weather',
         html: '@amsterdam-weather.html', allowTenantWideDeployment: true,
         enableForTeams: 'all'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

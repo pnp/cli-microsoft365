@@ -75,7 +75,7 @@ export default abstract class SpoCommand extends Command {
     }
   }
 
-  protected validateUnknownOptions(options: any, csomObject: string, csomPropertyType: 'get' | 'set'): string | boolean {
+  protected validateUnknownCsomOptions(options: any, csomObject: string, csomPropertyType: 'get' | 'set'): string | boolean {
     const unknownOptions: any = this.getUnknownOptions(options);
     const optionNames: string[] = Object.getOwnPropertyNames(unknownOptions);
     if (optionNames.length === 0) {

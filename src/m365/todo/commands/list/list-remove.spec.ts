@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.LIST_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -22,6 +23,7 @@ describe(commands.LIST_REMOVE, () => {
       promptOptions = options;
       cb({ continue: true });
     });
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -322,42 +324,42 @@ describe(commands.LIST_REMOVE, () => {
     });
   });
 
-  it('fails validation if both name and id are not set', () => {
-    const actual = command.validate({
+  it('fails validation if both name and id are not set', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         name: null,
         id: null
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when all parameters are valid', () => {
-    const actual = command.validate({
+  it('passes validation when all parameters are valid', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         name: 'Foo'
       }
-    });
+    }, commandInfo);
 
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if both name and id are set', () => {
-    const actual = command.validate({
+  it('fails validation if both name and id are set', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         name: 'foo',
         id: 'bar'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

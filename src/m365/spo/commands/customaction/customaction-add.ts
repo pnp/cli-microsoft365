@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -44,89 +41,38 @@ class SpoCustomActionAddCommand extends SpoCommand {
     return 'Adds a user custom action for site or site collection';
   }
 
-  /**
-   * Maps the base PermissionsKind enum to string array so it can 
-   * more easily be used in validation or descriptions.
-   */
-  protected get permissionsKindMap(): string[] {
-    const result: string[] = [];
+  constructor() {
+    super();
 
-    for (const kind in PermissionKind) {
-      if (typeof PermissionKind[kind] === 'number') {
-        result.push(kind);
-      }
-    }
-    return result;
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.location = args.options.location;
-    telemetryProps.scope = args.options.scope || 'Web';
-    telemetryProps.group = (!(!args.options.group)).toString();
-    telemetryProps.description = (!(!args.options.description)).toString();
-    telemetryProps.sequence = (!(!args.options.sequence)).toString();
-    telemetryProps.actionUrl = (!(!args.options.actionUrl)).toString();
-    telemetryProps.imageUrl = (!(!args.options.imageUrl)).toString();
-    telemetryProps.commandUIExtension = (!(!args.options.commandUIExtension)).toString();
-    telemetryProps.registrationId = args.options.registrationId;
-    telemetryProps.registrationType = args.options.registrationType;
-    telemetryProps.rights = args.options.rights;
-    telemetryProps.scriptSrc = (!(!args.options.scriptSrc)).toString();
-    telemetryProps.scriptBlock = (!(!args.options.scriptBlock)).toString();
-    telemetryProps.clientSideComponentId = (!(!args.options.clientSideComponentId)).toString();
-    telemetryProps.clientSideComponentProperties = (!(!args.options.clientSideComponentProperties)).toString();
-    return telemetryProps;
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        location: args.options.location,
+        scope: args.options.scope || 'Web',
+        group: (!(!args.options.group)).toString(),
+        description: (!(!args.options.description)).toString(),
+        sequence: (!(!args.options.sequence)).toString(),
+        actionUrl: (!(!args.options.actionUrl)).toString(),
+        imageUrl: (!(!args.options.imageUrl)).toString(),
+        commandUIExtension: (!(!args.options.commandUIExtension)).toString(),
+        registrationId: args.options.registrationId,
+        registrationType: args.options.registrationType,
+        rights: args.options.rights,
+        scriptSrc: (!(!args.options.scriptSrc)).toString(),
+        scriptBlock: (!(!args.options.scriptBlock)).toString(),
+        clientSideComponentId: (!(!args.options.clientSideComponentId)).toString(),
+        clientSideComponentProperties: (!(!args.options.clientSideComponentProperties)).toString()
+      });
+    });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (!args.options.scope) {
-      args.options.scope = 'Web';
-    }
-
-    const requestBody: any = this.mapRequestBody(args.options);
-
-    const requestOptions: any = {
-      url: `${args.options.url}/_api/${args.options.scope}/UserCustomActions`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      data: requestBody,
-      responseType: 'json'
-    };
-
-    request
-      .post<CustomAction>(requestOptions)
-      .then((customAction: CustomAction): void => {
-        if (this.verbose) {
-          logger.logToStderr({
-            ClientSideComponentId: customAction.ClientSideComponentId,
-            ClientSideComponentProperties: customAction.ClientSideComponentProperties,
-            CommandUIExtension: customAction.CommandUIExtension,
-            Description: customAction.Description,
-            Group: customAction.Group,
-            Id: customAction.Id,
-            ImageUrl: customAction.ImageUrl,
-            Location: customAction.Location,
-            Name: customAction.Name,
-            RegistrationId: customAction.RegistrationId,
-            RegistrationType: customAction.RegistrationType,
-            Rights: JSON.stringify(customAction.Rights),
-            Scope: args.options.scope, // because it is more human readable
-            ScriptBlock: customAction.ScriptBlock,
-            ScriptSrc: customAction.ScriptSrc,
-            Sequence: customAction.Sequence,
-            Title: customAction.Title,
-            Url: customAction.Url,
-            VersionOfUserCustomAction: customAction.VersionOfUserCustomAction
-          });
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
+  #initOptions(): void {
+    this.options.unshift(
       {
         option: '-u, --url <url>'
       },
@@ -184,85 +130,148 @@ class SpoCustomActionAddCommand extends SpoCommand {
       {
         option: '-p, --clientSideComponentProperties [clientSideComponentProperties]'
       }
-    ];
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
+    );
   }
 
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.registrationId && !args.options.registrationType) {
-      return 'Option registrationId is specified, but registrationType is missing';
-    }
-
-    if (args.options.registrationType && !args.options.registrationId) {
-      return 'Option registrationType is specified, but registrationId is missing';
-    }
-
-    const location: string = args.options.location.toLowerCase();
-    const locationsRequireGroup: string[] = [
-      'microsoft.sharepoint.standardmenu', 'microsoft.sharepoint.contenttypesettings',
-      'microsoft.sharepoint.contenttypetemplatesettings', 'microsoft.sharepoint.create',
-      'microsoft.sharepoint.groupspage', 'microsoft.sharepoint.listedit',
-      'microsoft.sharepoint.listedit.documentlibrary', 'microsoft.sharepoint.peoplepage',
-      'microsoft.sharepoint.sitesettings'
-    ];
-
-    if (locationsRequireGroup.indexOf(location) > -1 && !args.options.group) {
-      return `The location specified requires the group option to be specified as well`;
-    }
-
-    if (location === 'scriptlink' &&
-      !args.options.scriptSrc &&
-      !args.options.scriptBlock
-    ) {
-      return 'Option scriptSrc or scriptBlock is required when the location is set to ScriptLink';
-    }
-
-    if ((args.options.scriptSrc || args.options.scriptBlock) && location !== 'scriptlink') {
-      return 'Option scriptSrc or scriptBlock is specified, but the location option is different than ScriptLink. Please use --actionUrl, if the location should be different than ScriptLink';
-    }
-
-    if (args.options.scriptSrc && args.options.scriptBlock) {
-      return 'Either option scriptSrc or scriptBlock can be specified, but not both';
-    }
-
-    if (args.options.sequence && (args.options.sequence < 0 || args.options.sequence > 65536)) {
-      return 'Invalid option sequence. Expected value in range from 0 to 65536';
-    }
-
-    if (args.options.clientSideComponentId && validation.isValidGuid(args.options.clientSideComponentId) === false) {
-      return `ClientSideComponentId ${args.options.clientSideComponentId} is not a valid GUID`;
-    }
-
-    if (args.options.clientSideComponentProperties && !args.options.clientSideComponentId) {
-      return `Option clientSideComponentProperties is specified, but the clientSideComponentId option is missing`;
-    }
-
-    if (args.options.scope &&
-      args.options.scope !== 'Site' &&
-      args.options.scope !== 'Web'
-    ) {
-      return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web`;
-    }
-
-    if (args.options.rights) {
-      const rights = args.options.rights.split(',');
-
-      for (const item of rights) {
-        const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
-
-        if (!kind) {
-          return `Rights option '${item}' is not recognized as valid PermissionKind choice. Please note it is case sensitive`;
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
         }
+    
+        if (args.options.registrationId && !args.options.registrationType) {
+          return 'Option registrationId is specified, but registrationType is missing';
+        }
+    
+        if (args.options.registrationType && !args.options.registrationId) {
+          return 'Option registrationType is specified, but registrationId is missing';
+        }
+    
+        const location: string = args.options.location.toLowerCase();
+        const locationsRequireGroup: string[] = [
+          'microsoft.sharepoint.standardmenu', 'microsoft.sharepoint.contenttypesettings',
+          'microsoft.sharepoint.contenttypetemplatesettings', 'microsoft.sharepoint.create',
+          'microsoft.sharepoint.groupspage', 'microsoft.sharepoint.listedit',
+          'microsoft.sharepoint.listedit.documentlibrary', 'microsoft.sharepoint.peoplepage',
+          'microsoft.sharepoint.sitesettings'
+        ];
+    
+        if (locationsRequireGroup.indexOf(location) > -1 && !args.options.group) {
+          return `The location specified requires the group option to be specified as well`;
+        }
+    
+        if (location === 'scriptlink' &&
+          !args.options.scriptSrc &&
+          !args.options.scriptBlock
+        ) {
+          return 'Option scriptSrc or scriptBlock is required when the location is set to ScriptLink';
+        }
+    
+        if ((args.options.scriptSrc || args.options.scriptBlock) && location !== 'scriptlink') {
+          return 'Option scriptSrc or scriptBlock is specified, but the location option is different than ScriptLink. Please use --actionUrl, if the location should be different than ScriptLink';
+        }
+    
+        if (args.options.scriptSrc && args.options.scriptBlock) {
+          return 'Either option scriptSrc or scriptBlock can be specified, but not both';
+        }
+    
+        if (args.options.sequence && (args.options.sequence < 0 || args.options.sequence > 65536)) {
+          return 'Invalid option sequence. Expected value in range from 0 to 65536';
+        }
+    
+        if (args.options.clientSideComponentId && validation.isValidGuid(args.options.clientSideComponentId) === false) {
+          return `ClientSideComponentId ${args.options.clientSideComponentId} is not a valid GUID`;
+        }
+    
+        if (args.options.clientSideComponentProperties && !args.options.clientSideComponentId) {
+          return `Option clientSideComponentProperties is specified, but the clientSideComponentId option is missing`;
+        }
+    
+        if (args.options.scope &&
+          args.options.scope !== 'Site' &&
+          args.options.scope !== 'Web'
+        ) {
+          return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web`;
+        }
+    
+        if (args.options.rights) {
+          const rights = args.options.rights.split(',');
+    
+          for (const item of rights) {
+            const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
+    
+            if (!kind) {
+              return `Rights option '${item}' is not recognized as valid PermissionKind choice. Please note it is case sensitive`;
+            }
+          }
+        }
+    
+        return true;
+      }
+    );
+  }
+
+  /**
+   * Maps the base PermissionsKind enum to string array so it can 
+   * more easily be used in validation or descriptions.
+   */
+  protected get permissionsKindMap(): string[] {
+    const result: string[] = [];
+
+    for (const kind in PermissionKind) {
+      if (typeof PermissionKind[kind] === 'number') {
+        result.push(kind);
       }
     }
+    return result;
+  }
 
-    return true;
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (!args.options.scope) {
+      args.options.scope = 'Web';
+    }
+
+    const requestBody: any = this.mapRequestBody(args.options);
+
+    const requestOptions: any = {
+      url: `${args.options.url}/_api/${args.options.scope}/UserCustomActions`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      data: requestBody,
+      responseType: 'json'
+    };
+
+    request
+      .post<CustomAction>(requestOptions)
+      .then((customAction: CustomAction): void => {
+        if (this.verbose) {
+          logger.logToStderr({
+            ClientSideComponentId: customAction.ClientSideComponentId,
+            ClientSideComponentProperties: customAction.ClientSideComponentProperties,
+            CommandUIExtension: customAction.CommandUIExtension,
+            Description: customAction.Description,
+            Group: customAction.Group,
+            Id: customAction.Id,
+            ImageUrl: customAction.ImageUrl,
+            Location: customAction.Location,
+            Name: customAction.Name,
+            RegistrationId: customAction.RegistrationId,
+            RegistrationType: customAction.RegistrationType,
+            Rights: JSON.stringify(customAction.Rights),
+            Scope: args.options.scope, // because it is more human readable
+            ScriptBlock: customAction.ScriptBlock,
+            ScriptSrc: customAction.ScriptSrc,
+            Sequence: customAction.Sequence,
+            Title: customAction.Title,
+            Url: customAction.Url,
+            VersionOfUserCustomAction: customAction.VersionOfUserCustomAction
+          });
+        }
+        cb();
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   private mapRequestBody(options: Options): any {

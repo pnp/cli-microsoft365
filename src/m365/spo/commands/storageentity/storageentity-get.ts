@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo } from '../../../../utils';
@@ -24,6 +21,20 @@ class SpoStorageEntityGetCommand extends SpoCommand {
 
   public get description(): string {
     return 'Get details for the specified tenant property';
+  }
+
+  constructor() {
+    super();
+  
+    this.#initOptions();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-k, --key <key>'
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -56,15 +67,6 @@ class SpoStorageEntityGetCommand extends SpoCommand {
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [{
-      option: '-k, --key <key>'
-    }];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

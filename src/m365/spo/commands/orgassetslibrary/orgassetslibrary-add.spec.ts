@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -13,6 +13,7 @@ const command: Command = require('./orgassetslibrary-add');
 describe(commands.ORGASSETSLIBRARY_ADD, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,6 +26,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -224,23 +226,23 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
     });
   });
 
-  it('fails validation if the libraryUrl is not valid', () => {
-    const actual = command.validate({ options: { libraryUrl: 'invalid' } });
+  it('fails validation if the libraryUrl is not valid', async () => {
+    const actual = await command.validate({ options: { libraryUrl: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the thumbnail is not valid', () => {
-    const actual = command.validate({ options: { libraryUrl: 'https://contoso.sharepoint.com/siteassets', thumbnailUrl: 'invalid' } });
+  it('fails validation if the thumbnail is not valid', async () => {
+    const actual = await command.validate({ options: { libraryUrl: 'https://contoso.sharepoint.com/siteassets', thumbnailUrl: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the libraryUrl option is a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { libraryUrl: 'https://contoso.sharepoint.com/siteassets' } });
+  it('passes validation if the libraryUrl option is a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { libraryUrl: 'https://contoso.sharepoint.com/siteassets' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { ContextInfo, spo } from '../../../../utils';
@@ -25,6 +22,26 @@ class SpoUserProfileSetCommand extends SpoCommand {
 
   public get description(): string {
     return 'Sets user profile property for a SharePoint user';
+  }
+
+  constructor() {
+    super();
+  
+    this.#initOptions();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --userName <userName>'
+      },
+      {
+        option: '-n, --propertyName <propertyName>'
+      },
+      {
+        option: '-v, --propertyValue <propertyValue>'
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -67,23 +84,6 @@ class SpoUserProfileSetCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --userName <userName>'
-      },
-      {
-        option: '-n, --propertyName <propertyName>'
-      },
-      {
-        option: '-v, --propertyValue <propertyValue>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

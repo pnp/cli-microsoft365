@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -28,6 +25,34 @@ class SpoAppInStanceListCommand extends SpoAppBaseCommand {
 
   public defaultProperties(): string[] | undefined {
     return [`Title`, `AppId`];
+  }
+
+  constructor() {
+    super();
+  
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --siteUrl <siteUrl>'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.siteUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -57,26 +82,6 @@ class SpoAppInStanceListCommand extends SpoAppBaseCommand {
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
 
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.siteUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    return true;
   }
 }
 

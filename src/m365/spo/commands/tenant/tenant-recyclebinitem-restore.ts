@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo, validation } from '../../../../utils';
@@ -24,10 +23,37 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
     return 'Restores the specified deleted site collection from tenant recycle bin';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.wait = args.options.wait;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        wait: args.options.wait
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '--wait'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -40,7 +66,7 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
             accept: 'application/json;odata=nometadata',
             'content-type': 'application/json;charset=utf-8'
           },
-          data: { 
+          data: {
             siteUrl: args.options.url
           }
         };
@@ -51,24 +77,6 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
         logger.log(JSON.parse(res));
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '--wait'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    return validation.isValidSharePointUrl(args.options.url);
   }
 }
 

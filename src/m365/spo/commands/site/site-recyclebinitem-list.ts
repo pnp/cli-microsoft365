@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -27,6 +26,56 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
 
   public defaultProperties(): string[] | undefined {
     return ['Id', 'Title', 'DirName'];
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        type: args.options.type,
+        secondary: args.options.secondary
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --siteUrl <siteUrl>'
+      },
+      {
+        option: '-t, --type [type]',
+        autocomplete: SpoSiteRecycleBinItemListCommand.recycleBinItemType.map(item => item.value)
+      },
+      {
+        option: '-s, --secondary'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.siteUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (typeof args.options.type !== 'undefined' &&
+          !SpoSiteRecycleBinItemListCommand.recycleBinItemType.some(item => item.value === args.options.type)) {
+          return `${args.options.type} is not a valid value. Allowed values are ${SpoSiteRecycleBinItemListCommand.recycleBinItemType.map(item => item.value).join(', ')}`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -59,38 +108,6 @@ class SpoSiteRecycleBinItemListCommand extends SpoCommand {
         logger.log(response.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '-t, --type [type]',
-        autocomplete: SpoSiteRecycleBinItemListCommand.recycleBinItemType.map(item => item.value)
-      },
-      {
-        option: '-s, --secondary'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.siteUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (typeof args.options.type !== 'undefined' &&
-      !SpoSiteRecycleBinItemListCommand.recycleBinItemType.some(item => item.value === args.options.type)) {
-      return `${args.options.type} is not a valid value. Allowed values are ${SpoSiteRecycleBinItemListCommand.recycleBinItemType.map(item => item.value).join(', ')}`;
-    }
-
-    return true;
   }
 
   private static recycleBinItemType: { id: number, value: string }[] = [

@@ -1,7 +1,6 @@
 import { Cli, Logger } from '../../../../cli';
 import Command, {
-  CommandError,
-  CommandOption
+  CommandError
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -50,16 +49,49 @@ class SpoFileRenameCommand extends SpoCommand {
     return 'Renames a file';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.force = !!args.options.force;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        force: !!args.options.force
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-s, --sourceUrl <sourceUrl>'
+      },
+      {
+        option: '-t, --targetFileName <targetFileName>'
+      },
+      {
+        option: '--force'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const webUrl = args.options.webUrl;
     const originalFileServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.sourceUrl);
-    
+
     this
       .getFile(originalFileServerRelativeUrl, webUrl)
       .then((_: FileProperties) => {
@@ -70,7 +102,7 @@ class SpoFileRenameCommand extends SpoCommand {
       })
       .then(_ => {
         const requestBody: any = {
-          formValues : [{
+          formValues: [{
             FieldName: 'FileLeafRef',
             FieldValue: args.options.targetFileName
           }]
@@ -87,7 +119,7 @@ class SpoFileRenameCommand extends SpoCommand {
 
         return request.post<RenameResponse>(requestOptions);
       })
-      .then((resp: RenameResponse) : void => {
+      .then((resp: RenameResponse): void => {
         logger.log(resp.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
@@ -106,7 +138,7 @@ class SpoFileRenameCommand extends SpoCommand {
   }
 
   private deleteFile(webUrl: string, sourceUrl: string, targetFileName: string): Promise<void> {
-    const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(webUrl,sourceUrl.substring(0, sourceUrl.lastIndexOf('/')))}/${targetFileName}`;
+    const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(webUrl, sourceUrl.substring(0, sourceUrl.lastIndexOf('/')))}/${targetFileName}`;
 
     const options: SpoFileRemoveOptions = {
       webUrl: webUrl,
@@ -125,30 +157,6 @@ class SpoFileRenameCommand extends SpoCommand {
         }
         return Promise.reject(err);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-s, --sourceUrl <sourceUrl>'
-      },
-      {
-        option: '-t, --targetFileName <targetFileName>'
-      },
-      {
-        option: '--force'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

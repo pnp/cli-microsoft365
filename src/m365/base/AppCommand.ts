@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { Cli, Logger } from '../../cli';
-import Command, { CommandError, CommandOption } from '../../Command';
+import Command, { CommandArgs, CommandError } from '../../Command';
 import GlobalOptions from '../../GlobalOptions';
 import { validation } from '../../utils';
 import { M365RcJson, M365RcJsonApp } from './M365RcJson';
@@ -19,6 +19,31 @@ export default abstract class AppCommand extends Command {
 
   protected get resource(): string {
     return 'https://graph.microsoft.com';
+  }
+
+  constructor() {
+    super();
+
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '--appId [appId]' }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
+          return `${args.options.appId} is not a valid GUID`;
+        }
+
+        return true;
+      },
+    );
   }
 
   public action(logger: Logger, args: AppCommandArgs, cb: (err?: any) => void): void {
@@ -76,24 +101,5 @@ export default abstract class AppCommand extends Command {
         super.action(logger, args, cb);
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--appId [appId]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: AppCommandArgs): boolean | string {
-    if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
-      return `${args.options.appId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }

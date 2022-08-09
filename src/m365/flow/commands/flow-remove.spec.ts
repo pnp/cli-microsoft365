@@ -3,7 +3,7 @@ import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
-import { Cli, Logger } from '../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../cli';
 import Command, { CommandError } from '../../../Command';
 import request from '../../../request';
 import { sinonUtil } from '../../../utils';
@@ -14,6 +14,7 @@ describe(commands.REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
@@ -21,6 +22,7 @@ describe(commands.REMOVE, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -68,23 +70,23 @@ describe(commands.REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the name is not valid GUID', () => {
-    const actual = command.validate({
+  it('fails validation if the name is not valid GUID', async () => {
+    const actual = await command.validate({
       options: {
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the name and environment specified', () => {
-    const actual = command.validate({
+  it('passes validation when the name and environment specified', async () => {
+    const actual = await command.validate({
       options: {
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -405,7 +407,7 @@ describe(commands.REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -416,7 +418,7 @@ describe(commands.REMOVE, () => {
   });
 
   it('supports specifying name', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--name') > -1) {
@@ -427,7 +429,7 @@ describe(commands.REMOVE, () => {
   });
 
   it('supports specifying environment', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--environment') > -1) {

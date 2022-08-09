@@ -1,7 +1,7 @@
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -13,7 +13,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  domainName: string;
+  domainName?: string;
 }
 
 class TenantIdGetCommand extends Command {
@@ -25,8 +25,31 @@ class TenantIdGetCommand extends Command {
     return 'Gets Microsoft 365 tenant ID for the specified domain';
   }
 
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        domainName: typeof args.options.domainName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-d, --domainName [domainName]'
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    let domainName: string = args.options.domainName;
+    let domainName: string | undefined = args.options.domainName;
     if (!domainName) {
       const userName: string = accessToken.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
       domainName = userName.split('@')[1];
@@ -56,17 +79,6 @@ class TenantIdGetCommand extends Command {
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-d, --domainName [domainName]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

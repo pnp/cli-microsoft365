@@ -543,7 +543,7 @@ describe(commands.RUN_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -554,7 +554,7 @@ describe(commands.RUN_LIST, () => {
   });
 
   it('supports specifying environment parameter', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--environment') > -1) {
@@ -565,7 +565,7 @@ describe(commands.RUN_LIST, () => {
   });
 
   it('supports specifying flow parameter', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--flow') > -1) {

@@ -1,7 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -29,13 +26,69 @@ class SpoFileRemoveCommand extends SpoCommand {
     return 'Removes the specified file';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = (!(!args.options.id)).toString();
-    telemetryProps.url = (!(!args.options.url)).toString();
-    telemetryProps.recycle = (!(!args.options.recycle)).toString();
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: (!(!args.options.id)).toString(),
+        url: (!(!args.options.url)).toString(),
+        recycle: (!(!args.options.recycle)).toString(),
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-w, --webUrl <webUrl>'
+      },
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-u, --url [url]'
+      },
+      {
+        option: '--recycle'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+    
+        if (args.options.id &&
+          !validation.isValidGuid(args.options.id as string)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+    
+        if (args.options.id && args.options.url) {
+          return 'Specify id or url, but not both';
+        }
+    
+        if (!args.options.id && !args.options.url) {
+          return 'Specify id or url';
+        }
+    
+        return true;
+      }
+    );
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -110,51 +163,6 @@ class SpoFileRemoveCommand extends SpoCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-w, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-u, --url [url]'
-      },
-      {
-        option: '--recycle'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.id &&
-      !validation.isValidGuid(args.options.id as string)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    if (args.options.id && args.options.url) {
-      return 'Specify id or url, but not both';
-    }
-
-    if (!args.options.id && !args.options.url) {
-      return 'Specify id or url';
-    }
-
-    return true;
   }
 }
 

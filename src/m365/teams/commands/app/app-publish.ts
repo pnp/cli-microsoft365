@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -22,6 +21,39 @@ class TeamsAppPublishCommand extends GraphCommand {
 
   public get description(): string {
     return 'Publishes Teams app to the organization\'s app catalog';
+  }
+
+  constructor() {
+    super();
+
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-p, --filePath <filePath>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const fullPath: string = path.resolve(args.options.filePath);
+
+        if (!fs.existsSync(fullPath)) {
+          return `File '${fullPath}' not found`;
+        }
+
+        if (fs.lstatSync(fullPath).isDirectory()) {
+          return `Path '${fullPath}' points to a directory`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -48,31 +80,6 @@ class TeamsAppPublishCommand extends GraphCommand {
 
         cb();
       }, (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-p, --filePath <filePath>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const fullPath: string = path.resolve(args.options.filePath);
-
-    if (!fs.existsSync(fullPath)) {
-      return `File '${fullPath}' not found`;
-    }
-
-    if (fs.lstatSync(fullPath).isDirectory()) {
-      return `Path '${fullPath}' points to a directory`;
-    }
-
-    return true;
   }
 }
 

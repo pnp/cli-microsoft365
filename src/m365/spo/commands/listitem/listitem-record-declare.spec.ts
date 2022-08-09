@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -12,6 +12,7 @@ const command: Command = require('./listitem-record-declare');
 describe(commands.LISTITEM_RECORD_DECLARE, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let declareItemAsRecordFakeCalled = false;
 
   const postFakes = (opts: any) => {
@@ -93,7 +94,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -101,6 +102,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     }));
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -307,7 +309,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -318,7 +320,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -328,53 +330,53 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if listTitle and listId option not specified', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+  it('fails validation if listTitle and listId option not specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if listTitle and listId are specified together', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+  it('fails validation if listTitle and listId are specified together', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'foo', listTitle: 'Test List', id: '1' } });
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'foo', listTitle: 'Test List', id: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the item ID is not a number', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: 'foo' } });
+  it('fails validation if the item ID is not a number', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the item ID is not a positive number', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: '-1' } });
+  it('fails validation if the item ID is not a positive number', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: '-1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL and numerical ID specified', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: '1' } });
+  it('passes validation if the webUrl option is a valid SharePoint site URL and numerical ID specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: '1' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the listId option is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo', id: '1' } });
+  it('fails validation if the listId option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo', id: '1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the listId option is a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', debug: true } });
+  it('passes validation if the listId option is a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', debug: true } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the date passed in is not in ISO format', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', date: 'foo', debug: true } });
+  it('fails validation if the date passed in is not in ISO format', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', date: 'foo', debug: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the date passed in is in ISO format', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', date: 'foo', debug: true } });
+  it('passes validation if the date passed in is in ISO format', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', date: 'foo', debug: true } }, commandInfo);
     assert(actual);
   });
 });

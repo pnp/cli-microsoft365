@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -22,6 +21,44 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
 
   public get description(): string {
     return 'Restores given items from the site recycle bin';
+  }
+
+  constructor() {
+    super();
+
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --siteUrl <siteUrl>'
+      },
+      {
+        option: '-i, --ids <ids>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.siteUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        const invalidIds = formatting
+          .splitAndTrim(args.options.ids)
+          .filter(id => !validation.isValidGuid(id));
+        if (invalidIds.length > 0) {
+          return `The following IDs are invalid: ${invalidIds.join(', ')}`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -55,36 +92,6 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
         return request.post(requestOptions);
       })
     ).then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '-i, --ids <ids>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.siteUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    const invalidIds = formatting
-      .splitAndTrim(args.options.ids)
-      .filter(id => !validation.isValidGuid(id));
-    if (invalidIds.length > 0) {
-      return `The following IDs are invalid: ${invalidIds.join(', ')}`;
-    }
-
-    return true;
   }
 }
 

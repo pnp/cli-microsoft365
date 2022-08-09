@@ -1,7 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -29,13 +26,74 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
     return 'Removes the specified webhook from the list';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listId = (!(!args.options.listId)).toString();
-    telemetryProps.listTitle = (!(!args.options.listTitle)).toString();
-    telemetryProps.id = (!(!args.options.id)).toString();
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listId: (!(!args.options.listId)).toString(),
+        listTitle: (!(!args.options.listTitle)).toString(),
+        id: (!(!args.options.id)).toString(),
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-l, --listId [listId]'
+      },
+      {
+        option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.listId) {
+          if (!validation.isValidGuid(args.options.listId)) {
+            return `${args.options.listId} is not a valid GUID`;
+          }
+        }
+
+        if (args.options.listId && args.options.listTitle) {
+          return 'Specify listId or listTitle, but not both';
+        }
+
+        if (!args.options.listId && !args.options.listTitle) {
+          return 'Specify listId or listTitle, one is required';
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -91,56 +149,6 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.listId) {
-      if (!validation.isValidGuid(args.options.listId)) {
-        return `${args.options.listId} is not a valid GUID`;
-      }
-    }
-
-    if (args.options.listId && args.options.listTitle) {
-      return 'Specify listId or listTitle, but not both';
-    }
-
-    if (!args.options.listId && !args.options.listTitle) {
-      return 'Specify listId or listTitle, one is required';
-    }
-
-    return true;
   }
 }
 

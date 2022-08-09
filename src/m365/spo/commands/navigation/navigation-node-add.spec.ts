@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -266,7 +268,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -276,43 +278,43 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { webUrl: 'invalid', location: 'TopNavigationBar', title: 'About', url: '/sites/team-s/sitepages/about.aspx' } });
+  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'invalid', location: 'TopNavigationBar', title: 'About', url: '/sites/team-s/sitepages/about.aspx' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the specified parentNodeId is not a number', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: 'About', url: '/sites/team-s/sitepages/about.aspx', parentNodeId: 'invalid' } });
+  it('fails validation if the specified parentNodeId is not a number', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: 'About', url: '/sites/team-s/sitepages/about.aspx', parentNodeId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if specified location is not valid', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'invalid', title: 'About', url: '/sites/team-s/sitepages/about.aspx' } });
+  it('fails validation if specified location is not valid', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'invalid', title: 'About', url: '/sites/team-s/sitepages/about.aspx' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when location is TopNavigationBar and all required properties are present', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } });
+  it('passes validation when location is TopNavigationBar and all required properties are present', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when location is QuickLaunch and all required properties are present', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } });
+  it('passes validation when location is QuickLaunch and all required properties are present', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when location is TopNavigationBar and the link is external', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx', isExternal: true } });
+  it('passes validation when location is TopNavigationBar and the link is external', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx', isExternal: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when location is QuickLaunch and the link is external', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch', title: 'About', url: '/sites/team-a/sitepages/about.aspx', isExternal: true } });
+  it('passes validation when location is QuickLaunch and the link is external', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch', title: 'About', url: '/sites/team-a/sitepages/about.aspx', isExternal: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when location is not specified but parentNodeId is', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', parentNodeId: 2000, title: 'About', url: '/sites/team-a/sitepages/about.aspx' } });
+  it('passes validation when location is not specified but parentNodeId is', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', parentNodeId: 2000, title: 'About', url: '/sites/team-a/sitepages/about.aspx' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

@@ -1,8 +1,5 @@
 import { Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -45,15 +42,92 @@ class TeamsTabGetCommand extends GraphCommand {
     return 'Gets information about the specified Microsoft Teams tab';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
-    telemetryProps.teamName = typeof args.options.teamName !== 'undefined';
-    telemetryProps.channelId = typeof args.options.channelId !== 'undefined';
-    telemetryProps.channelName = typeof args.options.channelName !== 'undefined';
-    telemetryProps.tabId = typeof args.options.tabId !== 'undefined';
-    telemetryProps.tabName = typeof args.options.tabName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        teamId: typeof args.options.teamId !== 'undefined',
+        teamName: typeof args.options.teamName !== 'undefined',
+        channelId: typeof args.options.channelId !== 'undefined',
+        channelName: typeof args.options.channelName !== 'undefined',
+        tabId: typeof args.options.tabId !== 'undefined',
+        tabName: typeof args.options.tabName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--teamId [teamId]'
+      },
+      {
+        option: '--teamName [teamName]'
+      },
+      {
+        option: '--channelId [channelId]'
+      },
+      {
+        option: '--channelName [channelName]'
+      },
+      {
+        option: '-i, --tabId [tabId]'
+      },
+      {
+        option: '-n, --tabName [tabName]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.teamId && args.options.teamName) {
+	      return 'Specify either teamId or teamName, but not both.';
+	    }
+
+	    if (!args.options.teamId && !args.options.teamName) {
+	      return 'Specify teamId or teamName, one is required';
+	    }
+
+	    if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
+	      return `${args.options.teamId} is not a valid GUID`;
+	    }
+
+	    if (args.options.channelId && args.options.channelName) {
+	      return 'Specify either channelId or channelName, but not both.';
+	    }
+
+	    if (!args.options.channelId && !args.options.channelName) {
+	      return 'Specify channelId or channelName, one is required';
+	    }
+
+	    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
+	      return `${args.options.channelId} is not a valid Teams ChannelId`;
+	    }
+
+	    if (args.options.tabId && args.options.tabName) {
+	      return 'Specify either tabId or tabName, but not both.';
+	    }
+
+	    if (!args.options.tabId && !args.options.tabName) {
+	      return 'Specify tabId or tabName, one is required';
+	    }
+
+	    if (args.options.tabId && !validation.isValidGuid(args.options.tabId as string)) {
+	      return `${args.options.tabId} is not a valid GUID`;
+	    }
+
+	    return true;
+      }
+    );
   }
 
   private getTeamId(args: CommandArgs): Promise<string> {
@@ -152,72 +226,6 @@ class TeamsTabGetCommand extends GraphCommand {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--teamId [teamId]'
-      },
-      {
-        option: '--teamName [teamName]'
-      },
-      {
-        option: '--channelId [channelId]'
-      },
-      {
-        option: '--channelName [channelName]'
-      },
-      {
-        option: '-i, --tabId [tabId]'
-      },
-      {
-        option: '-n, --tabName [tabName]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.teamId && args.options.teamName) {
-      return 'Specify either teamId or teamName, but not both.';
-    }
-
-    if (!args.options.teamId && !args.options.teamName) {
-      return 'Specify teamId or teamName, one is required';
-    }
-
-    if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    if (args.options.channelId && args.options.channelName) {
-      return 'Specify either channelId or channelName, but not both.';
-    }
-
-    if (!args.options.channelId && !args.options.channelName) {
-      return 'Specify channelId or channelName, one is required';
-    }
-
-    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
-      return `${args.options.channelId} is not a valid Teams ChannelId`;
-    }
-
-    if (args.options.tabId && args.options.tabName) {
-      return 'Specify either tabId or tabName, but not both.';
-    }
-
-    if (!args.options.tabId && !args.options.tabName) {
-      return 'Specify tabId or tabName, one is required';
-    }
-
-    if (args.options.tabId && !validation.isValidGuid(args.options.tabId as string)) {
-      return `${args.options.tabId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

@@ -1,9 +1,8 @@
 import { Alert } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
-import GraphCommand from '../../../base/GraphCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -23,14 +22,29 @@ class TenantSecurityAlertsListCommand extends GraphCommand {
     return 'Gets the security alerts for a tenant';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.vendor = typeof args.options.vendor !== 'undefined';
-    return telemetryProps;
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['id', 'title', 'severity'];
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        vendor: typeof args.options.vendor !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '--vendor [vendor]' }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -80,15 +94,6 @@ class TenantSecurityAlertsListCommand extends GraphCommand {
 
         return Promise.resolve(alertList);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '--vendor [vendor]' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

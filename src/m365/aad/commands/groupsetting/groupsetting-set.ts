@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -28,6 +25,33 @@ class AadGroupSettingSetCommand extends GraphCommand {
 
   public allowUnknownOptions(): boolean | undefined {
     return true;
+  }
+
+  constructor() {
+    super();
+  
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id <id>'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -93,25 +117,6 @@ class AadGroupSettingSetCommand extends GraphCommand {
     });
 
     return values;
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -12,12 +12,14 @@ const command: Command = require('./tenant-recyclebinitem-restore');
 describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -60,7 +62,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -70,13 +72,13 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { url: 'foo' } });
+  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { url: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/hr' } });
+  it('passes validation if the url option is a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/hr' } }, commandInfo);
     assert(actual);
   });
 

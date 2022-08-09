@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
-import Command, { CommandError, CommandTypes } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -12,12 +12,14 @@ const command: Command = require('./contenttype-remove');
 describe(commands.CONTENTTYPE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -358,19 +360,19 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
   });
 
   it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
+    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
+    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
   it('configures id as string option', () => {
-    const types = (command.types() as CommandTypes);
+    const types = command.types;
     ['i', 'id'].forEach(o => {
       assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
     });
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -381,7 +383,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
   });
 
   it('supports verbose mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--verbose') {
@@ -391,43 +393,43 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
     assert(containsOption);
   });
 
-  it('fails validation if the specified site URL is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { webUrl: 'site.com', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } });
+  it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'site.com', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if neither the content type ID nor content type Name parameters are specified', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales' } });
+  it('fails validation if neither the content type ID nor content type Name parameters are specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when contenttype id parameter is provided', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } });
+  it('passes validation when contenttype id parameter is provided', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when contenttype name parameter is provided', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'Test Content Type' } });
+  it('passes validation when contenttype name parameter is provided', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'Test Content Type' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when contenttype id and confirm parameters are provided', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', confirm: true } });
+  it('passes validation when contenttype id and confirm parameters are provided', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', confirm: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when contenttype name and confirm parameters are provided', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'Test Content Type', confirm: true } });
+  it('passes validation when contenttype name and confirm parameters are provided', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'Test Content Type', confirm: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when neither name nor id are provided, but confirm is', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', confirm: true } });
+  it('fails validation when neither name nor id are provided, but confirm is', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', confirm: true } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when both name and id are provided', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'Test Content Type', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } });
+  it('fails validation when both name and id are provided', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'Test Content Type', id: '0x0100558D85B7216F6A489A499DB361E1AE2F' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

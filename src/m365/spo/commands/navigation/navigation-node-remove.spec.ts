@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
@@ -26,6 +27,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     }));
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -210,7 +212,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -220,28 +222,28 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { webUrl: 'invalid', location: 'TopNavigationBar', id: '2003' } });
+  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'invalid', location: 'TopNavigationBar', id: '2003' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if specified location is not valid', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'invalid', id: '2003' } });
+  it('fails validation if specified location is not valid', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'invalid', id: '2003' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if id is not a number', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: 'abc' } });
+  it('fails validation if id is not a number', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when location is TopNavigationBar and all required properties are present', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003' } });
+  it('passes validation when location is TopNavigationBar and all required properties are present', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', id: '2003' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when location is QuickLaunch and all required properties are present', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch', id: '2003' } });
+  it('passes validation when location is QuickLaunch and all required properties are present', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch', id: '2003' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

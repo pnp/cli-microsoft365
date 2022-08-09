@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
@@ -28,6 +25,30 @@ class SpoPageSectionListCommand extends SpoCommand {
     return 'List sections in the specific modern page';
   }
 
+  constructor() {
+    super();
+
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-n, --name <name>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     Page
       .getPage(args.options.name, args.options.webUrl, logger, this.debug, this.verbose)
@@ -52,24 +73,6 @@ class SpoPageSectionListCommand extends SpoCommand {
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-n, --name <name>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

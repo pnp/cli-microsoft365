@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.MESSAGE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   const firstMessageBatch: any = {
     messages: [
@@ -38,6 +39,7 @@ describe(commands.MESSAGE_LIST, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -103,58 +105,58 @@ describe(commands.MESSAGE_LIST, () => {
     });
   });
 
-  it('passes validation without parameters', () => {
-    const actual = command.validate({ options: {} });
+  it('passes validation without parameters', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation with parameters', () => {
-    const actual = command.validate({ options: { limit: 10 } });
+  it('passes validation with parameters', async () => {
+    const actual = await command.validate({ options: { limit: 10 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('limit must be a number', () => {
-    const actual = command.validate({ options: { limit: 'abc' } });
+  it('limit must be a number', async () => {
+    const actual = await command.validate({ options: { limit: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('olderThanId must be a number', () => {
-    const actual = command.validate({ options: { olderThanId: 'abc' } });
+  it('olderThanId must be a number', async () => {
+    const actual = await command.validate({ options: { olderThanId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('groupId must be a number', () => {
-    const actual = command.validate({ options: { groupId: 'abc' } });
+  it('groupId must be a number', async () => {
+    const actual = await command.validate({ options: { groupId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('threadId must be a number', () => {
-    const actual = command.validate({ options: { threadId: 'abc' } });
+  it('threadId must be a number', async () => {
+    const actual = await command.validate({ options: { threadId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('you are not allowed to use groupId and threadId at the same time', () => {
-    const actual = command.validate({ options: { groupId: 123, threadId: 123 } });
+  it('you are not allowed to use groupId and threadId at the same time', async () => {
+    const actual = await command.validate({ options: { groupId: 123, threadId: 123 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('you cannot specify the feedType with groupId or threadId at the same time', () => {
-    const actual = command.validate({ options: { feedType: 'All', threadId: 123 } });
+  it('you cannot specify the feedType with groupId or threadId at the same time', async () => {
+    const actual = await command.validate({ options: { feedType: 'All', threadId: 123 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('Fails in case FeedType is not correct', () => {
-    const actual = command.validate({ options: { feedType: 'WrongValue' } });
+  it('Fails in case FeedType is not correct', async () => {
+    const actual = await command.validate({ options: { feedType: 'WrongValue' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('you are not allowed to use groupId and threadId and feedType at the same time', () => {
-    const actual = command.validate({ options: { feedType: 'Private', groupId: 123, threadId: 123 } });
+  it('you are not allowed to use groupId and threadId and feedType at the same time', async () => {
+    const actual = await command.validate({ options: { feedType: 'Private', groupId: 123, threadId: 123 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

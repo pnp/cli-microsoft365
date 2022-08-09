@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -14,11 +14,13 @@ const command: Command = require('./site-ensure');
 describe(commands.SITE_ENSURE, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -954,7 +956,7 @@ describe(commands.SITE_ENSURE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -964,21 +966,21 @@ describe(commands.SITE_ENSURE, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if the specified url is a single word', () => {
+  it('fails validation if the specified url is a single word', async () => {
     const options: any = { url: 'site', title: 'Site' };
-    const actual = command.validate({ options: options });
+    const actual = await command.validate({ options: options }, commandInfo);
     assert.strictEqual(typeof actual, 'string');
   });
 
-  it('fails validation if the specified url is a server-relative URL', () => {
+  it('fails validation if the specified url is a server-relative URL', async () => {
     const options: any = { url: '/sites/site', title: 'Site' };
-    const actual = command.validate({ options: options });
+    const actual = await command.validate({ options: options }, commandInfo);
     assert.strictEqual(typeof actual, 'string');
   });
 
-  it('passes validation when all options are specified and valid', () => {
+  it('passes validation when all options are specified and valid', async () => {
     const options: any = { url: 'https://contoso.sharepoint.com/sites/site', title: 'Site' };
-    const actual = command.validate({ options: options });
+    const actual = await command.validate({ options: options }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { v4 } from 'uuid';
 import { Logger } from '../../../../cli';
-import { CommandError, CommandOption } from '../../../../Command';
+import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import commands from '../../commands';
 import { BaseProjectCommand } from './base-project-command';
@@ -27,24 +27,30 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     return 'Renames SharePoint Framework project';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.generateNewId = args.options.generateNewId;
-    return telemetryProps;
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
   }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        generateNewId: args.options.generateNewId
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
       {
         option: '-n, --newName <newName>'
       },
       {
         option: '--generateNewId'
       }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {

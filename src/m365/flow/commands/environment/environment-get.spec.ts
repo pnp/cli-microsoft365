@@ -161,7 +161,7 @@ describe(commands.ENVIRONMENT_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -172,7 +172,7 @@ describe(commands.ENVIRONMENT_GET, () => {
   });
 
   it('supports specifying name', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--name') > -1) {

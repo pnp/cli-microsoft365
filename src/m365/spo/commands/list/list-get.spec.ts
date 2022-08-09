@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.LIST_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -1302,7 +1304,7 @@ describe(commands.LIST_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -1313,7 +1315,7 @@ describe(commands.LIST_GET, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -1324,7 +1326,7 @@ describe(commands.LIST_GET, () => {
   });
 
   it('supports specifying properties', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--properties') > -1) {
@@ -1335,33 +1337,33 @@ describe(commands.LIST_GET, () => {
   });
 
   
-  it('fails validation if both id and title options are not passed', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+  it('fails validation if both id and title options are not passed', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'foo' } });
+  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+  it('passes validation if the url option is a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the id option is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '12345' } });
+  it('fails validation if the id option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '12345' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the id option is a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+  it('passes validation if the id option is a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if both id and title options are passed', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', title: 'Documents' } });
+  it('fails validation if both id and title options are passed', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', title: 'Documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
-import { Logger } from '../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../cli';
 import Command from '../../../Command';
 import { sinonUtil } from '../../../utils';
 import commands from '../commands';
@@ -12,12 +12,14 @@ const command: Command = require('./cli-issue');
 describe(commands.ISSUE, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let openBrowserSpy: Sinon.SinonSpy;
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     (command as any).open = () => { };
     openBrowserSpy = sinon.spy(command as any, 'openBrowser');
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -53,24 +55,24 @@ describe(commands.ISSUE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('accepts Bug issue Type', () => {
-    const actual = command.validate({ options: { type: 'bug' } });
+  it('accepts Bug issue Type', async () => {
+    const actual = await command.validate({ options: { type: 'bug' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts Command issue Type', () => {
-    const actual = command.validate({ options: { type: 'command' } });
+  it('accepts Command issue Type', async () => {
+    const actual = await command.validate({ options: { type: 'command' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts Sample issue Type', () => {
-    const actual = command.validate({ options: { type: 'sample' } });
+  it('accepts Sample issue Type', async () => {
+    const actual = await command.validate({ options: { type: 'sample' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('rejects invalid issue type', () => {
+  it('rejects invalid issue type', async () => {
     const type = 'foo';
-    const actual = command.validate({ options: { type: type } });
+    const actual = await command.validate({ options: { type: type } }, commandInfo);
     assert.strictEqual(actual, `${type} is not a valid Issue type. Allowed values are bug, command, sample`);
   });
 
@@ -126,7 +128,7 @@ describe(commands.ISSUE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

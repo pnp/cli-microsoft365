@@ -14,6 +14,7 @@ export interface TsConfigJson extends JsonFile {
     inlineSources?: boolean;
     strictNullChecks?: boolean;
     noUnusedLocals?: boolean;
+    noImplicitAny?: boolean;
   };
   exclude?: string[];
   include?: string[];

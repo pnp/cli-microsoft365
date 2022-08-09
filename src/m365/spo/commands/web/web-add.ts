@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -37,13 +37,72 @@ class SpoWebAddCommand extends SpoCommand {
     return 'Create new subsite';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.description = (!(!args.options.description)).toString();
-    telemetryProps.locale = args.options.locale || '1033';
-    telemetryProps.breakInheritance = args.options.breakInheritance || false;
-    telemetryProps.inheritNavigation = args.options.inheritNavigation || false;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        description: (!(!args.options.description)).toString(),
+        locale: args.options.locale || '1033',
+        breakInheritance: args.options.breakInheritance || false,
+        inheritNavigation: args.options.inheritNavigation || false
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-t, --title <title>'
+      },
+      {
+        option: '-d, --description [description]'
+      },
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-w, --webTemplate <webTemplate>'
+      },
+      {
+        option: '-p, --parentWebUrl <parentWebUrl>'
+      },
+      {
+        option: '-l, --locale [locale]'
+      },
+      {
+        option: '--breakInheritance'
+      },
+      {
+        option: '--inheritNavigation'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.parentWebUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.locale) {
+          const locale: number = parseInt(args.options.locale);
+          if (isNaN(locale)) {
+            return `${args.options.locale} is not a valid locale number`;
+          }
+        }
+
+        return true;
+      }
+    );
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -147,7 +206,7 @@ class SpoWebAddCommand extends SpoCommand {
         else {
           logger.log(siteInfo);
         }
-        
+
         cb();
       }, (err: any): void => {
         if (err === SpoWebAddCommand.DONE) {
@@ -167,54 +226,6 @@ class SpoWebAddCommand extends SpoCommand {
           this.handleRejectedPromise(err, logger, cb);
         }
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-w, --webTemplate <webTemplate>'
-      },
-      {
-        option: '-p, --parentWebUrl <parentWebUrl>'
-      },
-      {
-        option: '-l, --locale [locale]'
-      },
-      {
-        option: '--breakInheritance'
-      },
-      {
-        option: '--inheritNavigation'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.parentWebUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.locale) {
-      const locale: number = parseInt(args.options.locale);
-      if (isNaN(locale)) {
-        return `${args.options.locale} is not a valid locale number`;
-      }
-    }
-
-    return true;
   }
 }
 

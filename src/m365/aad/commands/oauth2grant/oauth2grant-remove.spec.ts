@@ -240,7 +240,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -251,7 +251,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
   });
 
   it('supports specifying grantId', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--grantId') > -1) {
@@ -262,7 +262,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
   });
 
   it('supports specifying confirmation flag', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--confirm') > -1) {

@@ -2,9 +2,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { v4 } from 'uuid';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { fsUtil, spo, urlUtil, validation } from '../../../../utils';
@@ -74,16 +71,86 @@ class SpoFileAddCommand extends SpoCommand {
     return true;
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.contentType = (!(!args.options.contentType)).toString();
-    telemetryProps.checkOut = args.options.checkOut || false;
-    telemetryProps.checkInComment = (!(!args.options.checkInComment)).toString();
-    telemetryProps.approve = args.options.approve || false;
-    telemetryProps.approveComment = (!(!args.options.approveComment)).toString();
-    telemetryProps.publish = args.options.publish || false;
-    telemetryProps.publishComment = (!(!args.options.publishComment)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        contentType: (!(!args.options.contentType)).toString(),
+        checkOut: args.options.checkOut || false,
+        checkInComment: (!(!args.options.checkInComment)).toString(),
+        approve: args.options.approve || false,
+        approveComment: (!(!args.options.approveComment)).toString(),
+        publish: args.options.publish || false,
+        publishComment: (!(!args.options.publishComment)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-f, --folder <folder>'
+      },
+      {
+        option: '-p, --path <path>'
+      },
+      {
+        option: '-c, --contentType [contentType]'
+      },
+      {
+        option: '--checkOut'
+      },
+      {
+        option: '--checkInComment [checkInComment]'
+      },
+      {
+        option: '--approve'
+      },
+      {
+        option: '--approveComment [approveComment]'
+      },
+      {
+        option: '--publish'
+      },
+      {
+        option: '--publishComment [publishComment]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+    
+        if (args.options.path && !fs.existsSync(args.options.path)) {
+          return 'Specified path of the file to add does not exist';
+        }
+    
+        if (args.options.publishComment && !args.options.publish) {
+          return '--publishComment cannot be used without --publish';
+        }
+    
+        if (args.options.approveComment && !args.options.approve) {
+          return '--approveComment cannot be used without --approve';
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -336,65 +403,6 @@ class SpoFileAddCommand extends SpoCommand {
           this.handleRejectedODataJsonPromise(err, logger, cb);
         }
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-f, --folder <folder>'
-      },
-      {
-        option: '-p, --path <path>'
-      },
-      {
-        option: '-c, --contentType [contentType]'
-      },
-      {
-        option: '--checkOut'
-      },
-      {
-        option: '--checkInComment [checkInComment]'
-      },
-      {
-        option: '--approve'
-      },
-      {
-        option: '--approveComment [approveComment]'
-      },
-      {
-        option: '--publish'
-      },
-      {
-        option: '--publishComment [publishComment]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.path && !fs.existsSync(args.options.path)) {
-      return 'Specified path of the file to add does not exist';
-    }
-
-    if (args.options.publishComment && !args.options.publish) {
-      return '--publishComment cannot be used without --publish';
-    }
-
-    if (args.options.approveComment && !args.options.approve) {
-      return '--approveComment cannot be used without --approve';
-    }
-
-    return true;
   }
 
   private listHasContentType(contentType: string, webUrl: string, listSettings: ListSettings, logger: any): Promise<void> {

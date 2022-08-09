@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -28,11 +28,58 @@ class SpoCdnPolicySetCommand extends SpoCommand {
     return 'Sets CDN policy value for the current SharePoint Online tenant';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.cdnType = args.options.type || 'Public';
-    telemetryProps.policy = args.options.policy;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        cdnType: args.options.type || 'Public',
+        policy: args.options.policy
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-t, --type [type]',
+        autocomplete: ['Public', 'Private']
+      },
+      {
+        option: '-p, --policy <policy>',
+        autocomplete: ['IncludeFileExtensions', 'ExcludeRestrictedSiteClassifications']
+      },
+      {
+        option: '-v, --value <value>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.type) {
+          if (args.options.type !== 'Public' &&
+            args.options.type !== 'Private') {
+            return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private`;
+          }
+        }
+
+        if (!args.options.policy ||
+          (args.options.policy !== 'IncludeFileExtensions' &&
+            args.options.policy !== 'ExcludeRestrictedSiteClassifications')) {
+          return `${args.options.policy} is not a valid CDN policy. Allowed values are IncludeFileExtensions|ExcludeRestrictedSiteClassifications`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -83,45 +130,9 @@ class SpoCdnPolicySetCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        
+
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-t, --type [type]',
-        autocomplete: ['Public', 'Private']
-      },
-      {
-        option: '-p, --policy <policy>',
-        autocomplete: ['IncludeFileExtensions', 'ExcludeRestrictedSiteClassifications']
-      },
-      {
-        option: '-v, --value <value>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.type) {
-      if (args.options.type !== 'Public' &&
-        args.options.type !== 'Private') {
-        return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private`;
-      }
-    }
-
-    if (!args.options.policy ||
-      (args.options.policy !== 'IncludeFileExtensions' &&
-        args.options.policy !== 'ExcludeRestrictedSiteClassifications')) {
-      return `${args.options.policy} is not a valid CDN policy. Allowed values are IncludeFileExtensions|ExcludeRestrictedSiteClassifications`;
-    }
-
-    return true;
   }
 }
 

@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
-import Command, { CommandError, CommandTypes } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
@@ -22,6 +22,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let promptOptions: any;
 
   const getStubCalls = (opts: any) => {
@@ -139,6 +140,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -194,12 +196,12 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   });
 
   it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
+    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
+    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -210,7 +212,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   });
 
   it('configures contentTypeId as string option', () => {
-    const types = (command.types() as CommandTypes);
+    const types = command.types;
     ['i', 'contentTypeId'].forEach(o => {
       assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
     });
@@ -826,29 +828,29 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   });
 
   // Fails validation
-  it('fails validation if fieldLinkId is not passed', () => {
-    const actual = command.validate({ options: { webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID } });
+  it('fails validation if fieldLinkId is not passed', async () => {
+    const actual = await command.validate({ options: { webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if webUrl is not passed', () => {
-    const actual = command.validate({ options: { fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID } });
+  it('fails validation if webUrl is not passed', async () => {
+    const actual = await command.validate({ options: { fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if webUrl is not correct', () => {
-    const actual = command.validate({ options: { fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: "test" } });
+  it('fails validation if webUrl is not correct', async () => {
+    const actual = await command.validate({ options: { fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: "test" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if fieldLinkId is not valid GUID', () => {
-    const actual = command.validate({ options: { fieldLinkId: 'xxx', webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID } });
+  it('fails validation if fieldLinkId is not valid GUID', async () => {
+    const actual = await command.validate({ options: { fieldLinkId: 'xxx', webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   // Passes validation
-  it('passes validation', () => {
-    const actual = command.validate({ options: { listId: LIST_ID, fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, debug: true } });
+  it('passes validation', async () => {
+    const actual = await command.validate({ options: { listTitle: 'List', fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, debug: true } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

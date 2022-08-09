@@ -1,5 +1,5 @@
 import { Cli, Logger } from '../../../../cli';
-import { CommandError, CommandOption, CommandTypes } from '../../../../Command';
+import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, spo, validation } from '../../../../utils';
@@ -28,18 +28,62 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
     return 'Removes a column from a site- or list content type';
   }
 
-  public types(): CommandTypes | undefined {
-    return {
-      string: ['i', 'contentTypeId']
-    };
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initTypes();
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listTitle = (!(!args.options.listTitle)).toString();
-    telemetryProps.updateChildContentTypes = (!(!args.options.updateChildContentTypes)).toString();
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listTitle: (!(!args.options.listTitle)).toString(),
+        updateChildContentTypes: (!(!args.options.updateChildContentTypes)).toString(),
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-l, --listTitle [listTitle]'
+      },
+      {
+        option: '-i, --contentTypeId <contentTypeId>'
+      },
+      {
+        option: '-f, --fieldLinkId <fieldLinkId>'
+      },
+      {
+        option: '-c, --updateChildContentTypes'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.fieldLinkId)) {
+          return `${args.options.fieldLinkId} is not a valid GUID`;
+        }
+    
+        return validation.isValidSharePointUrl(args.options.webUrl);
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('i', 'contentTypeId');
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -177,40 +221,6 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --listTitle [listTitle]'
-      },
-      {
-        option: '-i, --contentTypeId <contentTypeId>'
-      },
-      {
-        option: '-f, --fieldLinkId <fieldLinkId>'
-      },
-      {
-        option: '-c, --updateChildContentTypes'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.fieldLinkId)) {
-      return `${args.options.fieldLinkId} is not a valid GUID`;
-    }
-
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

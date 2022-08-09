@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { ContextInfo, IdentityResponse, spo, validation } from '../../../../utils';
@@ -20,17 +17,34 @@ interface Options extends GlobalOptions {
 class SpoWebReindexCommand extends SpoCommand {
   private reindexedLists: boolean;
 
-  constructor() {
-    super();
-    this.reindexedLists = false;
-  }
-
   public get name(): string {
     return commands.WEB_REINDEX;
   }
 
   public get description(): string {
     return 'Requests reindexing the specified subsite';
+  }
+
+  constructor() {
+    super();
+    this.reindexedLists = false;
+
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -150,21 +164,6 @@ class SpoWebReindexCommand extends SpoCommand {
           resolve();
         }, (err: any) => reject(err));
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

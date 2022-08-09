@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,6 +14,7 @@ describe(commands.HOMESITE_SET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,6 +27,7 @@ describe(commands.HOMESITE_SET, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -150,18 +152,18 @@ describe(commands.HOMESITE_SET, () => {
     });
   });
 
-  it('fails validation if the siteUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { siteUrl: 'foo' } });
+  it('fails validation if the siteUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the siteUrl option is a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com' } });
+  it('passes validation if the siteUrl option is a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

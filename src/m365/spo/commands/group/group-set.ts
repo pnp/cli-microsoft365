@@ -1,11 +1,11 @@
-import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
-import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
 import { AxiosRequestConfig } from 'axios';
 import { Cli, CommandOutput, Logger } from '../../../../cli';
-import { validation } from '../../../../utils';
-import Command, { CommandOption } from '../../../../Command';
+import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { validation } from '../../../../utils';
+import * as AadUserGetCommand from '../../../aad/commands/user/user-get';
+import { Options as AadUserGetCommandOptions } from '../../../aad/commands/user/user-get';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -37,20 +37,107 @@ class SpoGroupSetCommand extends SpoCommand {
     return 'Updates a group in the specified site';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.name = typeof args.options.name !== 'undefined';
-    telemetryProps.newName = typeof args.options.newName !== 'undefined';
-    telemetryProps.description = typeof args.options.description !== 'undefined';
-    telemetryProps.allowMembersEditMembership = typeof args.options.allowMembersEditMembership !== 'undefined';
-    telemetryProps.onlyAllowMembersViewMembership = typeof args.options.onlyAllowMembersViewMembership !== 'undefined';
-    telemetryProps.allowRequestToJoinLeave = typeof args.options.allowRequestToJoinLeave !== 'undefined';
-    telemetryProps.autoAcceptRequestToJoinLeave = typeof args.options.autoAcceptRequestToJoinLeave !== 'undefined';
-    telemetryProps.requestToJoinLeaveEmailSetting = typeof args.options.requestToJoinLeaveEmailSetting !== 'undefined';
-    telemetryProps.ownerEmail = typeof args.options.ownerEmail !== 'undefined';
-    telemetryProps.ownerUserName = typeof args.options.ownerUserName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        name: typeof args.options.name !== 'undefined',
+        newName: typeof args.options.newName !== 'undefined',
+        description: typeof args.options.description !== 'undefined',
+        allowMembersEditMembership: typeof args.options.allowMembersEditMembership !== 'undefined',
+        onlyAllowMembersViewMembership: typeof args.options.onlyAllowMembersViewMembership !== 'undefined',
+        allowRequestToJoinLeave: typeof args.options.allowRequestToJoinLeave !== 'undefined',
+        autoAcceptRequestToJoinLeave: typeof args.options.autoAcceptRequestToJoinLeave !== 'undefined',
+        requestToJoinLeaveEmailSetting: typeof args.options.requestToJoinLeaveEmailSetting !== 'undefined',
+        ownerEmail: typeof args.options.ownerEmail !== 'undefined',
+        ownerUserName: typeof args.options.ownerUserName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --name [name]'
+      },
+      {
+        option: '--newName [newName]'
+      },
+      {
+        option: '--description [description]'
+      },
+      {
+        option: '--allowMembersEditMembership [allowMembersEditMembership]'
+      },
+      {
+        option: '--onlyAllowMembersViewMembership [onlyAllowMembersViewMembership]'
+      },
+      {
+        option: '--allowRequestToJoinLeave [allowRequestToJoinLeave]'
+      },
+      {
+        option: '--autoAcceptRequestToJoinLeave [autoAcceptRequestToJoinLeave]'
+      },
+      {
+        option: '--requestToJoinLeaveEmailSetting [requestToJoinLeaveEmailSetting]'
+      },
+      {
+        option: '--ownerEmail [ownerEmail]'
+      },
+      {
+        option: '--ownerUserName [ownerUserName]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.id && isNaN(args.options.id)) {
+          return `Specified id ${args.options.id} is not a number`;
+        }
+
+        if (args.options.ownerEmail && args.options.ownerUserName) {
+          return 'Specify either ownerEmail or ownerUserName but not both';
+        }
+
+        const booleanOptions = [
+          args.options.allowMembersEditMembership, args.options.onlyAllowMembersViewMembership,
+          args.options.allowRequestToJoinLeave, args.options.autoAcceptRequestToJoinLeave
+        ];
+        for (const option of booleanOptions) {
+          if (typeof option !== 'undefined' && !validation.isValidBoolean(option as any)) {
+            return `Value '${option}' is not a valid boolean`;
+          }
+        }
+
+        return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'name']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -94,7 +181,7 @@ class SpoGroupSetCommand extends SpoCommand {
           },
           responseType: 'json'
         };
-    
+
         return request.post(requestOptions);
       });
   }
@@ -124,84 +211,7 @@ class SpoGroupSetCommand extends SpoCommand {
 
         return request.post<{ Id: number }>(requestOptions);
       })
-      .then((response: { Id: number}): number => response.Id);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '--newName [newName]'
-      },
-      {
-        option: '--description [description]'
-      },
-      {
-        option: '--allowMembersEditMembership [allowMembersEditMembership]'
-      },
-      {
-        option: '--onlyAllowMembersViewMembership [onlyAllowMembersViewMembership]'
-      },
-      {
-        option: '--allowRequestToJoinLeave [allowRequestToJoinLeave]'
-      },
-      {
-        option: '--autoAcceptRequestToJoinLeave [autoAcceptRequestToJoinLeave]'
-      },
-      {
-        option: '--requestToJoinLeaveEmailSetting [requestToJoinLeaveEmailSetting]'
-      },
-      {
-        option: '--ownerEmail [ownerEmail]'
-      },
-      {
-        option: '--ownerUserName [ownerUserName]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public optionSets(): string[][] | undefined {
-    return [
-      ['id', 'name']
-    ];
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.id && isNaN(args.options.id)) {
-      return `Specified id ${args.options.id} is not a number`;
-    }
-
-    if (args.options.ownerEmail && args.options.ownerUserName) {
-      return 'Specify either ownerEmail or ownerUserName but not both';
-    }
-
-    const booleanOptions = [
-      args.options.allowMembersEditMembership, args.options.onlyAllowMembersViewMembership,
-      args.options.allowRequestToJoinLeave, args.options.autoAcceptRequestToJoinLeave
-    ];
-    for (const option of booleanOptions) {
-      if (typeof option !== 'undefined' && !validation.isValidBoolean(option as any)) {
-        return `Value '${option}' is not a valid boolean`;
-      }
-    }
-
-    return true;
+      .then((response: { Id: number }): number => response.Id);
   }
 }
 

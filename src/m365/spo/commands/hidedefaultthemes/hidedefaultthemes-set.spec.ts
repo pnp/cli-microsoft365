@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,13 +12,15 @@ const command: Command = require('./hidedefaultthemes-set');
 describe(commands.HIDEDEFAULTTHEMES_SET, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let requests: any[];
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -166,7 +168,7 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -176,23 +178,23 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if hideDefaultThemes is not set', () => {
-    const actual = command.validate({ options: { } });
+  it('fails validation if hideDefaultThemes is not set', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if hideDefaultThemes is not a valid boolean', () => {
-    const actual = command.validate({ options: { hideDefaultThemes: 'invalid' } });
+  it('fails validation if hideDefaultThemes is not a valid boolean', async () => {
+    const actual = await command.validate({ options: { hideDefaultThemes: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when hideDefaultThemes is true', () => {
-    const actual = command.validate({ options: { hideDefaultThemes: `true` } });
+  it('passes validation when hideDefaultThemes is true', async () => {
+    const actual = await command.validate({ options: { hideDefaultThemes: `true` } }, commandInfo);
     assert(actual);
   });
 
-  it('passes validation when hideDefaultThemes is false', () => {
-    const actual = command.validate({ options: { hideDefaultThemes: `false` } });
+  it('passes validation when hideDefaultThemes is false', async () => {
+    const actual = await command.validate({ options: { hideDefaultThemes: `false` } }, commandInfo);
     assert(actual);
   });
 });

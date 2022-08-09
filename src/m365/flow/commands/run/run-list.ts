@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { AzmgmtItemsListCommand } from '../../../base/AzmgmtItemsListCommand';
 import commands from '../../commands';
@@ -26,6 +23,23 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
 
   public defaultProperties(): string[] | undefined {
     return ['name', 'startTime', 'status'];
+  }
+
+  constructor() {
+    super();
+  
+    this.#initOptions();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-f, --flow <flow>'
+      },
+      {
+        option: '-e, --environment <environment>'
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -53,20 +67,6 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
         }
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-f, --flow <flow>'
-      },
-      {
-        option: '-e, --environment <environment>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

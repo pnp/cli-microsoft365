@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { v4 } from 'uuid';
 import { Cli, CommandOutput, Logger } from '../../../../cli';
-import Command, { CommandErrorWithOutput, CommandOption } from '../../../../Command';
+import Command, { CommandErrorWithOutput } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import * as spoWebGetCommand from '../../../spo/commands/web/web-get';
@@ -38,6 +38,67 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
 
   public get description(): string {
     return 'Creates Viva Connections app';
+  }
+
+  constructor() {
+    super();
+
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '--portalUrl <portalUrl>' },
+      { option: '--appName <appName>' },
+      { option: '--description <description>' },
+      { option: '--longDescription <longDescription>' },
+      { option: '--privacyPolicyUrl [privacyPolicyUrl]' },
+      { option: '--termsOfUseUrl [termsOfUseUrl]' },
+      { option: '--companyName <companyName>' },
+      { option: '--companyWebsiteUrl <companyWebsiteUrl>' },
+      { option: '--coloredIconPath <coloredIconPath>' },
+      { option: '--outlineIconPath <outlineIconPath>' },
+      { option: '--accentColor [accentColor]' },
+      { option: '--force' }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.appName.length > 30) {
+          return `App name must not exceed 30 characters`;
+        }
+
+        if (args.options.description &&
+          args.options.description.length > 80) {
+          return 'Description must not exceed 80 characters';
+        }
+
+        if (args.options.longDescription &&
+          args.options.longDescription.length > 4000) {
+          return 'Long description must not exceed 4000 characters';
+        }
+
+        const appFilePath = path.resolve(`${args.options.appName}.zip`);
+        if (fs.existsSync(appFilePath) && !args.options.force) {
+          return `File ${appFilePath} already exists. Delete the file or use the --force option to overwrite the existing file`;
+        }
+
+        const coloredIconPath = path.resolve(args.options.coloredIconPath);
+        if (!fs.existsSync(coloredIconPath)) {
+          return `File ${coloredIconPath} doesn't exist`;
+        }
+
+        const outlineIconPath = path.resolve(args.options.outlineIconPath);
+        if (!fs.existsSync(outlineIconPath)) {
+          return `File ${outlineIconPath} doesn't exist`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -176,59 +237,6 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
       verbose: this.verbose
     };
     return Cli.executeCommandWithOutput(spoWebGetCommand as Command, { options: { ...options, _: [] } });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '--portalUrl <portalUrl>' },
-      { option: '--appName <appName>' },
-      { option: '--description <description>' },
-      { option: '--longDescription <longDescription>' },
-      { option: '--privacyPolicyUrl [privacyPolicyUrl]' },
-      { option: '--termsOfUseUrl [termsOfUseUrl]' },
-      { option: '--companyName <companyName>' },
-      { option: '--companyWebsiteUrl <companyWebsiteUrl>' },
-      { option: '--coloredIconPath <coloredIconPath>' },
-      { option: '--outlineIconPath <outlineIconPath>' },
-      { option: '--accentColor [accentColor]' },
-      { option: '--force' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.appName.length > 30) {
-      return `App name must not exceed 30 characters`;
-    }
-
-    if (args.options.description &&
-      args.options.description.length > 80) {
-      return 'Description must not exceed 80 characters';
-    }
-
-    if (args.options.longDescription &&
-      args.options.longDescription.length > 4000) {
-      return 'Long description must not exceed 4000 characters';
-    }
-
-    const appFilePath = path.resolve(`${args.options.appName}.zip`);
-    if (fs.existsSync(appFilePath) && !args.options.force) {
-      return `File ${appFilePath} already exists. Delete the file or use the --force option to overwrite the existing file`;
-    }
-
-    const coloredIconPath = path.resolve(args.options.coloredIconPath);
-    if (!fs.existsSync(coloredIconPath)) {
-      return `File ${coloredIconPath} doesn't exist`;
-    }
-
-    const outlineIconPath = path.resolve(args.options.outlineIconPath);
-    if (!fs.existsSync(outlineIconPath)) {
-      return `File ${outlineIconPath} doesn't exist`;
-    }
-
-    return true;
   }
 }
 

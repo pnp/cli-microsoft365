@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,6 +14,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let promptOptions: any;
 
   before(() => {
@@ -27,6 +28,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -316,7 +318,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -327,7 +329,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
   });
 
   it('allows specifying the enabled option', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--enabled') > -1) {
@@ -337,18 +339,18 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     assert(containsOption);
   });
 
-  it('fails validation if the enabled option is not a valid boolean value', () => {
-    const actual = command.validate({ options: { enabled: '123' } });
+  it('fails validation if the enabled option is not a valid boolean value', async () => {
+    const actual = await command.validate({ options: { enabled: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the enabled option is true', () => {
-    const actual = command.validate({ options: { enabled: 'true' } });
+  it('passes validation when the enabled option is true', async () => {
+    const actual = await command.validate({ options: { enabled: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the enabled option is false', () => {
-    const actual = command.validate({ options: { enabled: 'false' } });
+  it('passes validation when the enabled option is false', async () => {
+    const actual = await command.validate({ options: { enabled: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

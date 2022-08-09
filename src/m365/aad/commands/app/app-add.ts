@@ -2,9 +2,6 @@ import * as fs from 'fs';
 import { v4 } from 'uuid';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { accessToken, odata } from '../../../../utils';
@@ -82,23 +79,158 @@ class AadAppAddCommand extends GraphCommand {
     return 'Creates new Azure AD app registration';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.apis = typeof args.options.apisDelegated !== 'undefined';
-    telemetryProps.implicitFlow = args.options.implicitFlow;
-    telemetryProps.multitenant = args.options.multitenant;
-    telemetryProps.platform = args.options.platform;
-    telemetryProps.redirectUris = typeof args.options.redirectUris !== 'undefined';
-    telemetryProps.scopeAdminConsentDescription = typeof args.options.scopeAdminConsentDescription !== 'undefined';
-    telemetryProps.scopeAdminConsentDisplayName = typeof args.options.scopeAdminConsentDisplayName !== 'undefined';
-    telemetryProps.scopeName = args.options.scopeConsentBy;
-    telemetryProps.scopeName = typeof args.options.scopeName !== 'undefined';
-    telemetryProps.uri = typeof args.options.uri !== 'undefined';
-    telemetryProps.withSecret = args.options.withSecret;
-    telemetryProps.certificateFile = typeof args.options.certificateFile !== 'undefined';
-    telemetryProps.certificateBase64Encoded = typeof args.options.certificateBase64Encoded !== 'undefined';
-    telemetryProps.certificateDisplayName = typeof args.options.certificateDisplayName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        apis: typeof args.options.apisDelegated !== 'undefined',
+        implicitFlow: args.options.implicitFlow,
+        multitenant: args.options.multitenant,
+        platform: args.options.platform,
+        redirectUris: typeof args.options.redirectUris !== 'undefined',
+        scopeAdminConsentDescription: typeof args.options.scopeAdminConsentDescription !== 'undefined',
+        scopeAdminConsentDisplayName: typeof args.options.scopeAdminConsentDisplayName !== 'undefined',
+        scopeConsentBy: args.options.scopeConsentBy,
+        scopeName: typeof args.options.scopeName !== 'undefined',
+        uri: typeof args.options.uri !== 'undefined',
+        withSecret: args.options.withSecret,
+        certificateFile: typeof args.options.certificateFile !== 'undefined',
+        certificateBase64Encoded: typeof args.options.certificateBase64Encoded !== 'undefined',
+        certificateDisplayName: typeof args.options.certificateDisplayName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --name [name]'
+      },
+      {
+        option: '--multitenant'
+      },
+      {
+        option: '-r, --redirectUris [redirectUris]'
+      },
+      {
+        option: '-p, --platform [platform]',
+        autocomplete: AadAppAddCommand.aadApplicationPlatform
+      },
+      {
+        option: '--implicitFlow'
+      },
+      {
+        option: '-s, --withSecret'
+      },
+      {
+        option: '--apisDelegated [apisDelegated]'
+      },
+      {
+        option: '--apisApplication [apisApplication]'
+      },
+      {
+        option: '-u, --uri [uri]'
+      },
+      {
+        option: '--scopeName [scopeName]'
+      },
+      {
+        option: '--scopeConsentBy [scopeConsentBy]',
+        autocomplete: AadAppAddCommand.aadAppScopeConsentBy
+      },
+      {
+        option: '--scopeAdminConsentDisplayName [scopeAdminConsentDisplayName]'
+      },
+      {
+        option: '--scopeAdminConsentDescription [scopeAdminConsentDescription]'
+      },
+      {
+        option: '--certificateFile [certificateFile]'
+      },
+      {
+        option: '--certificateBase64Encoded [certificateBase64Encoded]'
+      },
+      {
+        option: '--certificateDisplayName [certificateDisplayName]'
+      },
+      {
+        option: '--manifest [manifest]'
+      },
+      {
+        option: '--save'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.manifest && !args.options.name) {
+          return 'Specify either the name of the app to create or the manifest';
+        }
+
+        if (args.options.platform &&
+          AadAppAddCommand.aadApplicationPlatform.indexOf(args.options.platform) < 0) {
+          return `${args.options.platform} is not a valid value for platform. Allowed values are ${AadAppAddCommand.aadApplicationPlatform.join(', ')}`;
+        }
+
+        if (args.options.redirectUris && !args.options.platform) {
+          return `When you specify redirectUris you also need to specify platform`;
+        }
+
+        if (args.options.certificateFile && args.options.certificateBase64Encoded) {
+          return 'Specify either certificateFile or certificateBase64Encoded but not both';
+        }
+
+        if (args.options.certificateDisplayName && !args.options.certificateFile && !args.options.certificateBase64Encoded) {
+          return 'When you specify certificateDisplayName you also need to specify certificateFile or certificateBase64Encoded';
+        }
+
+        if (args.options.certificateFile && !fs.existsSync(args.options.certificateFile as string)) {
+          return 'Certificate file not found';
+        }
+
+        if (args.options.scopeName) {
+          if (!args.options.uri) {
+            return `When you specify scopeName you also need to specify uri`;
+          }
+
+          if (!args.options.scopeAdminConsentDescription) {
+            return `When you specify scopeName you also need to specify scopeAdminConsentDescription`;
+          }
+
+          if (!args.options.scopeAdminConsentDisplayName) {
+            return `When you specify scopeName you also need to specify scopeAdminConsentDisplayName`;
+          }
+        }
+
+        if (args.options.scopeConsentBy &&
+          AadAppAddCommand.aadAppScopeConsentBy.indexOf(args.options.scopeConsentBy) < 0) {
+          return `${args.options.scopeConsentBy} is not a valid value for scopeConsentBy. Allowed values are ${AadAppAddCommand.aadAppScopeConsentBy.join(', ')}`;
+        }
+
+        if (args.options.manifest) {
+          try {
+            this.manifest = JSON.parse(args.options.manifest);
+            if (!args.options.name && !this.manifest.name) {
+              return `Specify the name of the app to create either through the 'name' option or the 'name' property in the manifest`;
+            }
+          }
+          catch (e) {
+            return `Error while parsing the specified manifest: ${e}`;
+          }
+        }
+
+        return true;
+      },
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -650,130 +782,6 @@ class AadAppAddCommand extends GraphCommand {
     }
 
     return Promise.resolve(appInfo);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '--multitenant'
-      },
-      {
-        option: '-r, --redirectUris [redirectUris]'
-      },
-      {
-        option: '-p, --platform [platform]',
-        autocomplete: AadAppAddCommand.aadApplicationPlatform
-      },
-      {
-        option: '--implicitFlow'
-      },
-      {
-        option: '-s, --withSecret'
-      },
-      {
-        option: '--apisDelegated [apisDelegated]'
-      },
-      {
-        option: '--apisApplication [apisApplication]'
-      },
-      {
-        option: '-u, --uri [uri]'
-      },
-      {
-        option: '--scopeName [scopeName]'
-      },
-      {
-        option: '--scopeConsentBy [scopeConsentBy]',
-        autocomplete: AadAppAddCommand.aadAppScopeConsentBy
-      },
-      {
-        option: '--scopeAdminConsentDisplayName [scopeAdminConsentDisplayName]'
-      },
-      {
-        option: '--scopeAdminConsentDescription [scopeAdminConsentDescription]'
-      },
-      {
-        option: '--certificateFile [certificateFile]'
-      },
-      {
-        option: '--certificateBase64Encoded [certificateBase64Encoded]'
-      },
-      {
-        option: '--certificateDisplayName [certificateDisplayName]'
-      },
-      {
-        option: '--manifest [manifest]'
-      },
-      {
-        option: '--save'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.manifest && !args.options.name) {
-      return 'Specify either the name of the app to create or the manifest';
-    }
-
-    if (args.options.platform &&
-      AadAppAddCommand.aadApplicationPlatform.indexOf(args.options.platform) < 0) {
-      return `${args.options.platform} is not a valid value for platform. Allowed values are ${AadAppAddCommand.aadApplicationPlatform.join(', ')}`;
-    }
-
-    if (args.options.redirectUris && !args.options.platform) {
-      return `When you specify redirectUris you also need to specify platform`;
-    }
-
-    if (args.options.certificateFile && args.options.certificateBase64Encoded) {
-      return 'Specify either certificateFile or certificateBase64Encoded but not both';
-    }
-
-    if (args.options.certificateDisplayName && !args.options.certificateFile && !args.options.certificateBase64Encoded) {
-      return 'When you specify certificateDisplayName you also need to specify certificateFile or certificateBase64Encoded';
-    }
-
-    if (args.options.certificateFile && !fs.existsSync(args.options.certificateFile as string)) {
-      return 'Certificate file not found';
-    }
-
-    if (args.options.scopeName) {
-      if (!args.options.uri) {
-        return `When you specify scopeName you also need to specify uri`;
-      }
-
-      if (!args.options.scopeAdminConsentDescription) {
-        return `When you specify scopeName you also need to specify scopeAdminConsentDescription`;
-      }
-
-      if (!args.options.scopeAdminConsentDisplayName) {
-        return `When you specify scopeName you also need to specify scopeAdminConsentDisplayName`;
-      }
-    }
-
-    if (args.options.scopeConsentBy &&
-      AadAppAddCommand.aadAppScopeConsentBy.indexOf(args.options.scopeConsentBy) < 0) {
-      return `${args.options.scopeConsentBy} is not a valid value for scopeConsentBy. Allowed values are ${AadAppAddCommand.aadAppScopeConsentBy.join(', ')}`;
-    }
-
-    if (args.options.manifest) {
-      try {
-        this.manifest = JSON.parse(args.options.manifest);
-        if (!args.options.name && !this.manifest.name) {
-          return `Specify the name of the app to create either through the 'name' option or the 'name' property in the manifest`;
-        }
-      }
-      catch (e) {
-        return `Error while parsing the specified manifest: ${e}`;
-      }
-    }
-
-    return true;
   }
 }
 

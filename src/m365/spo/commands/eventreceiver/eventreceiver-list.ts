@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { urlUtil, validation } from '../../../../utils';
@@ -33,13 +30,74 @@ class SpoEventreceiverListCommand extends SpoCommand {
     return ['ReceiverId', 'ReceiverName'];
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listId = typeof args.options.listId !== 'undefined';
-    telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
-    telemetryProps.listUrl = typeof args.options.listUrl !== 'undefined';
-    telemetryProps.scope = typeof args.options.scope !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        listUrl: typeof args.options.listUrl !== 'undefined',
+        scope: typeof args.options.scope !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--listTitle [listTitle]'
+      },
+      {
+        option: '--listId  [listId]'
+      },
+      {
+        option: '--listUrl [listUrl]'
+      },
+      {
+        option: '-s, --scope [scope]',
+        autocomplete: ['web', 'site']
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+    
+        const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
+        if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
+          return `Specify either list id or title or list url`;
+        }
+    
+        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} is not a valid GUID`;
+        }
+    
+        if (args.options.scope && ['web', 'site'].indexOf(args.options.scope) === -1) {
+          return `${args.options.scope} is not a valid type value. Allowed values web|site.`;
+        }
+    
+        if (args.options.scope && args.options.scope === 'site' && (args.options.listId || args.options.listUrl || args.options.listTitle)) {
+          return 'Scope cannot be set to site when retrieving list event receivers.';
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -78,56 +136,6 @@ class SpoEventreceiverListCommand extends SpoCommand {
         logger.log(res.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--listTitle [listTitle]'
-      },
-      {
-        option: '--listId  [listId]'
-      },
-      {
-        option: '--listUrl [listUrl]'
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: ['web', 'site']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
-    if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
-      return `Specify either list id or title or list url`;
-    }
-
-    if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-      return `${args.options.listId} is not a valid GUID`;
-    }
-
-    if (args.options.scope && ['web', 'site'].indexOf(args.options.scope) === -1) {
-      return `${args.options.scope} is not a valid type value. Allowed values web|site.`;
-    }
-
-    if (args.options.scope && args.options.scope === 'site' && (args.options.listId || args.options.listUrl || args.options.listTitle)) {
-      return 'Scope cannot be set to site when retrieving list event receivers.';
-    }
-
-    return true;
   }
 }
 

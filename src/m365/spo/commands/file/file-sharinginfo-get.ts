@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -57,11 +54,62 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
     return 'Generates a sharing information report for the specified file';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = (!(!args.options.id)).toString();
-    telemetryProps.url = (!(!args.options.url)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: (!(!args.options.id)).toString(),
+        url: (!(!args.options.url)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-w, --webUrl <webUrl>'
+      },
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-u, --url [url]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+    
+        if (args.options.id) {
+          if (!validation.isValidGuid(args.options.id)) {
+            return `${args.options.id} is not a valid GUID`;
+          }
+        }
+    
+        if (args.options.id && args.options.url) {
+          return 'Specify id or url, but not both';
+        }
+    
+        if (!args.options.id && !args.options.url) {
+          return 'Specify id or url, one is required';
+        }
+    
+        return true;
+      }
+    );
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -146,46 +194,6 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
         fileItemId: parseInt(res.ListItemAllFields.Id),
         libraryName: res.ListItemAllFields.ParentList.Title
       }));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-w, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-u, --url [url]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.id) {
-      if (!validation.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
-      }
-    }
-
-    if (args.options.id && args.options.url) {
-      return 'Specify id or url, but not both';
-    }
-
-    if (!args.options.id && !args.options.url) {
-      return 'Specify id or url, one is required';
-    }
-
-    return true;
   }
 }
 

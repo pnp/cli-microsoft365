@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -36,10 +33,44 @@ class AadPolicyListCommand extends GraphCommand {
     return 'Returns policies from Azure AD';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.policyType = args.options.policyType || 'all';
-    return telemetryProps;
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        policyType: args.options.policyType || 'all'
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-p, --policyType [policyType]',
+        autocomplete: AadPolicyListCommand.supportedPolicyTypes
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.policyType) {
+          const policyType: string = args.options.policyType.toLowerCase();
+          if (!AadPolicyListCommand.supportedPolicyTypes.find(p => p.toLowerCase() === policyType)) {
+            return `${args.options.policyType} is not a valid policyType. Allowed values are ${AadPolicyListCommand.supportedPolicyTypes.join(', ')}`;
+          }
+        }
+    
+        return true;
+      }
+    );
   }
 
   public defaultProperties(): string[] | undefined {
@@ -94,29 +125,6 @@ class AadPolicyListCommand extends GraphCommand {
           return Promise.resolve(response.value);
         }
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-p, --policyType [policyType]',
-        autocomplete: AadPolicyListCommand.supportedPolicyTypes
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.policyType) {
-      const policyType: string = args.options.policyType.toLowerCase();
-      if (!AadPolicyListCommand.supportedPolicyTypes.find(p => p.toLowerCase() === policyType)) {
-        return `${args.options.policyType} is not a valid policyType. Allowed values are ${AadPolicyListCommand.supportedPolicyTypes.join(', ')}`;
-      }
-    }
-
-    return true;
   }
 }
 

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,11 +12,13 @@ const command: Command = require('./site-recyclebinitem-restore');
 describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -57,7 +59,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -67,38 +69,38 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if the siteUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { siteUrl: 'foo', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } });
+  it('fails validation if the siteUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'foo', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if ids option is not a valid GUID', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '9526' } });
+  it('fails validation if ids option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '9526' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the second id is not a valid GUID', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526, 9526' } });
+  it('fails validation if the second id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526, 9526' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the siteUrl and ids options are valid', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } });
+  it('passes validation if the siteUrl and ids options are valid', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if siteUrl and id are defined', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } });
+  it('passes validation if siteUrl and id are defined', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when multiple IDs are specified', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526,5fb84a1f-6ab5-4d07-a6aa-31bba6de9527' } });
+  it('passes validation when multiple IDs are specified', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526,5fb84a1f-6ab5-4d07-a6aa-31bba6de9527' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when multiple IDs with a space after the comma are specified', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526, 5fb84a1f-6ab5-4d07-a6aa-31bba6de9527' } });
+  it('passes validation when multiple IDs with a space after the comma are specified', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com', ids: '5fb84a1f-6ab5-4d07-a6aa-31bba6de9526, 5fb84a1f-6ab5-4d07-a6aa-31bba6de9527' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

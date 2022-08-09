@@ -1,7 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -29,16 +26,66 @@ class TeamsChannelRemoveCommand extends GraphCommand {
     return 'Removes the specified channel in the Microsoft Teams team';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.channelId = typeof args.options.channelId !== 'undefined';
-    telemetryProps.channelName = typeof args.options.channelName !== 'undefined';
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        channelId: typeof args.options.channelId !== 'undefined',
+        channelName: typeof args.options.channelName !== 'undefined',
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-c, --channelId [channelId]'
+      },
+      {
+        option: '-n, --channelName [channelName]'
+      },
+      {
+        option: '-i, --teamId <teamId>'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.channelId && args.options.channelName) {
+          return 'Specify channelId or channelName but not both';
+        }
+
+        if (!args.options.channelId && !args.options.channelName) {
+          return 'Specify channelId or channelName';
+        }
+
+        if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
+          return `${args.options.channelId} is not a valid Teams Channel Id`;
+        }
+
+        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-
     const removeChannel: () => void = (): void => {
       if (args.options.channelName) {
         const requestOptions: any = {
@@ -107,46 +154,6 @@ class TeamsChannelRemoveCommand extends GraphCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-c, --channelId [channelId]'
-      },
-      {
-        option: '-n, --channelName [channelName]'
-      },
-      {
-        option: '-i, --teamId <teamId>'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.channelId && args.options.channelName) {
-      return 'Specify channelId or channelName but not both';
-    }
-
-    if (!args.options.channelId && !args.options.channelName) {
-      return 'Specify channelId or channelName';
-    }
-
-    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
-      return `${args.options.channelId} is not a valid Teams Channel Id`;
-    }
-
-    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

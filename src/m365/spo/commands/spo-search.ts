@@ -1,8 +1,5 @@
 import { isNumber } from 'util';
 import { Logger } from '../../../cli';
-import {
-  CommandOption
-} from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
 import { spo, validation } from '../../../utils';
@@ -51,32 +48,150 @@ class SpoSearchCommand extends SpoCommand {
     return 'Executes a search query';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.selectproperties = typeof args.options.selectProperties !== 'undefined';
-    telemetryProps.allResults = args.options.allResults;
-    telemetryProps.rowLimit = args.options.rowLimit;
-    telemetryProps.sourceId = typeof args.options.sourceId !== 'undefined';
-    telemetryProps.trimDuplicates = args.options.trimDuplicates;
-    telemetryProps.enableStemming = args.options.enableStemming;
-    telemetryProps.culture = args.options.culture;
-    telemetryProps.refinementFilters = typeof args.options.refinementFilters !== 'undefined';
-    telemetryProps.queryTemplate = typeof args.options.queryTemplate !== 'undefined';
-    telemetryProps.sortList = typeof args.options.sortList !== 'undefined';
-    telemetryProps.rankingModelId = typeof args.options.rankingModelId !== 'undefined';
-    telemetryProps.startRow = typeof args.options.startRow !== 'undefined';
-    telemetryProps.properties = typeof args.options.properties !== 'undefined';
-    telemetryProps.sourceName = typeof args.options.sourceName !== 'undefined';
-    telemetryProps.refiners = typeof args.options.refiners !== 'undefined';
-    telemetryProps.webUrl = typeof args.options.webUrl !== 'undefined';
-    telemetryProps.hiddenConstraints = typeof args.options.hiddenConstraints !== 'undefined';
-    telemetryProps.clientType = typeof args.options.clientType !== 'undefined';
-    telemetryProps.enablePhonetic = args.options.enablePhonetic;
-    telemetryProps.processBestBets = args.options.processBestBets;
-    telemetryProps.enableQueryRules = args.options.enableQueryRules;
-    telemetryProps.processPersonalFavorites = args.options.processPersonalFavorites;
-    telemetryProps.rawOutput = args.options.rawOutput;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        selectproperties: typeof args.options.selectProperties !== 'undefined',
+        allResults: args.options.allResults,
+        rowLimit: args.options.rowLimit,
+        sourceId: typeof args.options.sourceId !== 'undefined',
+        trimDuplicates: args.options.trimDuplicates,
+        enableStemming: args.options.enableStemming,
+        culture: args.options.culture,
+        refinementFilters: typeof args.options.refinementFilters !== 'undefined',
+        queryTemplate: typeof args.options.queryTemplate !== 'undefined',
+        sortList: typeof args.options.sortList !== 'undefined',
+        rankingModelId: typeof args.options.rankingModelId !== 'undefined',
+        startRow: typeof args.options.startRow !== 'undefined',
+        properties: typeof args.options.properties !== 'undefined',
+        sourceName: typeof args.options.sourceName !== 'undefined',
+        refiners: typeof args.options.refiners !== 'undefined',
+        webUrl: typeof args.options.webUrl !== 'undefined',
+        hiddenConstraints: typeof args.options.hiddenConstraints !== 'undefined',
+        clientType: typeof args.options.clientType !== 'undefined',
+        enablePhonetic: args.options.enablePhonetic,
+        processBestBets: args.options.processBestBets,
+        enableQueryRules: args.options.enableQueryRules,
+        processPersonalFavorites: args.options.processPersonalFavorites,
+        rawOutput: args.options.rawOutput
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-q, --queryText <queryText>'
+      },
+      {
+        option: '-p, --selectProperties [selectProperties]'
+      },
+      {
+        option: '-u, --webUrl [webUrl]'
+      },
+      {
+        option: '--allResults'
+      },
+      {
+        option: '--rowLimit [rowLimit]'
+      },
+      {
+        option: '--sourceId [sourceId]'
+      },
+      {
+        option: '--trimDuplicates'
+      },
+      {
+        option: '--enableStemming'
+      },
+      {
+        option: '--culture [culture]'
+      },
+      {
+        option: '--refinementFilters [refinementFilters]'
+      },
+      {
+        option: '--queryTemplate [queryTemplate]'
+      },
+      {
+        option: '--sortList [sortList]'
+      },
+      {
+        option: '--rankingModelId [rankingModelId]'
+      },
+      {
+        option: '--startRow [startRow]'
+      },
+      {
+        option: '--properties [properties]'
+      },
+      {
+        option: '--sourceName [sourceName]'
+      },
+      {
+        option: '--refiners [refiners]'
+      },
+      {
+        option: '--hiddenConstraints [hiddenConstraints]'
+      },
+      {
+        option: '--clientType [clientType]'
+      },
+      {
+        option: '--enablePhonetic'
+      },
+      {
+        option: '--processBestBets'
+      },
+      {
+        option: '--enableQueryRules'
+      },
+      {
+        option: '--processPersonalFavorites'
+      },
+      {
+        option: '--rawOutput'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.sourceId && !validation.isValidGuid(args.options.sourceId)) {
+          return `${args.options.sourceId} is not a valid GUID`;
+        }
+
+        if (args.options.rankingModelId && !validation.isValidGuid(args.options.rankingModelId)) {
+          return `${args.options.rankingModelId} is not a valid GUID`;
+        }
+
+        if (args.options.sortList && !/^([a-z0-9_]+:(ascending|descending))(,([a-z0-9_]+:(ascending|descending)))*$/gi.test(args.options.sortList)) {
+          return `sortlist parameter value '${args.options.sortList}' does not match the required pattern (=comma-separated list of '<property>:(ascending|descending)'-pattern)`;
+        }
+        if (args.options.rowLimit && !isNumber(args.options.rowLimit)) {
+          return `${args.options.rowLimit} is not a valid number`;
+        }
+
+        if (args.options.startRow && !isNumber(args.options.startRow)) {
+          return `${args.options.startRow} is not a valid number`;
+        }
+
+        if (args.options.culture && !isNumber(args.options.culture)) {
+          return `${args.options.culture} is not a valid number`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -210,113 +325,6 @@ class SpoSearchCommand extends SpoCommand {
     return args.options.selectProperties
       ? args.options.selectProperties.split(",")
       : ["Title", "OriginalPath"];
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-q, --queryText <queryText>'
-      },
-      {
-        option: '-p, --selectProperties [selectProperties]'
-      },
-      {
-        option: '-u, --webUrl [webUrl]'
-      },
-      {
-        option: '--allResults'
-      },
-      {
-        option: '--rowLimit [rowLimit]'
-      },
-      {
-        option: '--sourceId [sourceId]'
-      },
-      {
-        option: '--trimDuplicates'
-      },
-      {
-        option: '--enableStemming'
-      },
-      {
-        option: '--culture [culture]'
-      },
-      {
-        option: '--refinementFilters [refinementFilters]'
-      },
-      {
-        option: '--queryTemplate [queryTemplate]'
-      },
-      {
-        option: '--sortList [sortList]'
-      },
-      {
-        option: '--rankingModelId [rankingModelId]'
-      },
-      {
-        option: '--startRow [startRow]'
-      },
-      {
-        option: '--properties [properties]'
-      },
-      {
-        option: '--sourceName [sourceName]'
-      },
-      {
-        option: '--refiners [refiners]'
-      },
-      {
-        option: '--hiddenConstraints [hiddenConstraints]'
-      },
-      {
-        option: '--clientType [clientType]'
-      },
-      {
-        option: '--enablePhonetic'
-      },
-      {
-        option: '--processBestBets'
-      },
-      {
-        option: '--enableQueryRules'
-      },
-      {
-        option: '--processPersonalFavorites'
-      },
-      {
-        option: '--rawOutput'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.sourceId && !validation.isValidGuid(args.options.sourceId)) {
-      return `${args.options.sourceId} is not a valid GUID`;
-    }
-
-    if (args.options.rankingModelId && !validation.isValidGuid(args.options.rankingModelId)) {
-      return `${args.options.rankingModelId} is not a valid GUID`;
-    }
-
-    if (args.options.sortList && !/^([a-z0-9_]+:(ascending|descending))(,([a-z0-9_]+:(ascending|descending)))*$/gi.test(args.options.sortList)) {
-      return `sortlist parameter value '${args.options.sortList}' does not match the required pattern (=comma-separated list of '<property>:(ascending|descending)'-pattern)`;
-    }
-    if (args.options.rowLimit && !isNumber(args.options.rowLimit)) {
-      return `${args.options.rowLimit} is not a valid number`;
-    }
-
-    if (args.options.startRow && !isNumber(args.options.startRow)) {
-      return `${args.options.startRow} is not a valid number`;
-    }
-
-    if (args.options.culture && !isNumber(args.options.culture)) {
-      return `${args.options.culture} is not a valid number`;
-    }
-
-    return true;
   }
 
   private printResults(logger: Logger, args: CommandArgs, results: SearchResult[]): void {

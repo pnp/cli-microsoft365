@@ -475,7 +475,7 @@ describe(commands.RUN_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -486,7 +486,7 @@ describe(commands.RUN_GET, () => {
   });
 
   it('supports specifying environment', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--environment') > -1) {
@@ -497,7 +497,7 @@ describe(commands.RUN_GET, () => {
   });
 
   it('supports specifying flow', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--flow') > -1) {
@@ -508,7 +508,7 @@ describe(commands.RUN_GET, () => {
   });
 
   it('supports specifying name', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--name') > -1) {

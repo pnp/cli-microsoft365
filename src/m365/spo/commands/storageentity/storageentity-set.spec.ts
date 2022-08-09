@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,6 +14,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,6 +27,7 @@ describe(commands.STORAGEENTITY_SET, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -220,7 +222,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -231,7 +233,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('requires app catalog URL', () => {
-    const options = command.options();
+    const options = command.options;
     let requiresAppCatalogUrl = false;
     options.forEach(o => {
       if (o.option.indexOf('<appCatalogUrl>') > -1) {
@@ -242,7 +244,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('requires tenant property name', () => {
-    const options = command.options();
+    const options = command.options;
     let requiresTenantPropertyName = false;
     options.forEach(o => {
       if (o.option.indexOf('<key>') > -1) {
@@ -253,7 +255,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('requires tenant property value', () => {
-    const options = command.options();
+    const options = command.options;
     let requiresTenantPropertyValue = false;
     options.forEach(o => {
       if (o.option.indexOf('<value>') > -1) {
@@ -264,7 +266,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('supports setting tenant property description', () => {
-    const options = command.options();
+    const options = command.options;
     let supportsTenantPropertyDescription = false;
     options.forEach(o => {
       if (o.option.indexOf('[description]') > -1) {
@@ -275,7 +277,7 @@ describe(commands.STORAGEENTITY_SET, () => {
   });
 
   it('supports setting tenant property comment', () => {
-    const options = command.options();
+    const options = command.options;
     let supportsTenantPropertyComment = false;
     options.forEach(o => {
       if (o.option.indexOf('[comment]') > -1) {
@@ -285,32 +287,20 @@ describe(commands.STORAGEENTITY_SET, () => {
     assert(supportsTenantPropertyComment);
   });
 
-  it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = command.options();
-    sinonUtil.restore(Command.prototype.options);
-    assert(options.length > 0);
-  });
-
-  it('accepts valid SharePoint Online app catalog URL', () => {
-    const actual = command.validate({ options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+  it('accepts valid SharePoint Online app catalog URL', async () => {
+    const actual = await command.validate({ options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog', key: 'prop', value: 'val' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts valid SharePoint Online site URL', () => {
-    const actual = command.validate({ options: { appCatalogUrl: 'https://contoso.sharepoint.com' } });
+  it('accepts valid SharePoint Online site URL', async () => {
+    const actual = await command.validate({ options: { appCatalogUrl: 'https://contoso.sharepoint.com', key: 'prop', value: 'val' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('rejects invalid SharePoint Online URL', () => {
+  it('rejects invalid SharePoint Online URL', async () => {
     const url = 'http://contoso';
-    const actual = command.validate({ options: { appCatalogUrl: url } });
+    const actual = await command.validate({ options: { appCatalogUrl: url, key: 'prop', value: 'val' } }, commandInfo);
     assert.strictEqual(actual, `${url} is not a valid SharePoint Online site URL`);
-  });
-
-  it('fails validation when no SharePoint Online app catalog URL specified', () => {
-    const actual = command.validate({ options: {} });
-    assert.strictEqual(actual, 'Missing required option appCatalogUrl');
   });
 
   it('handles promise rejection', (done) => {

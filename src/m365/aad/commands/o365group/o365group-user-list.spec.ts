@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.O365GROUP_USER_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -59,68 +61,62 @@ describe(commands.O365GROUP_USER_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the groupId is not a valid guid.', (done) => {
-    const actual = command.validate({
+  it('fails validation if the groupId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
         groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when invalid role specified', (done) => {
-    const actual = command.validate({
+  it('fails validation when invalid role specified', async () => {
+    const actual = await command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         role: 'Invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid groupId and no role specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid groupId and no role specified', async () => {
+    const actual = await command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid groupId and Owner role specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid groupId and Owner role specified', async () => {
+    const actual = await command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         role: 'Owner'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid groupId and Member role specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid groupId and Member role specified', async () => {
+    const actual = await command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         role: 'Member'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid groupId and Guest role specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid groupId and Guest role specified', async () => {
+    const actual = await command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         role: 'Guest'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('correctly lists all users in a Microsoft 365 group', (done) => {
@@ -309,7 +305,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

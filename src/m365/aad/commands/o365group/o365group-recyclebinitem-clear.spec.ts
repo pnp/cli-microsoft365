@@ -518,7 +518,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
 
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -529,7 +529,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
   });
 
   it('supports specifying confirmation flag', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--confirm') > -1) {

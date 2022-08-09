@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
-import Command, { CommandError, CommandTypes } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -14,6 +14,7 @@ describe(commands.HUBSITE_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,6 +27,7 @@ describe(commands.HUBSITE_SET, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -415,19 +417,19 @@ describe(commands.HUBSITE_SET, () => {
   });
 
   it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
+    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
+    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
   it('configures title as string option', () => {
-    const types = (command.types() as CommandTypes);
+    const types = command.types;
     ['t', 'title', 'd', 'description', 'l', 'logoUrl'].forEach(o => {
       assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
     });
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -438,7 +440,7 @@ describe(commands.HUBSITE_SET, () => {
   });
 
   it('supports specifying hub site ID', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {
@@ -449,7 +451,7 @@ describe(commands.HUBSITE_SET, () => {
   });
 
   it('supports specifying hub site title', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--title') > -1) {
@@ -460,7 +462,7 @@ describe(commands.HUBSITE_SET, () => {
   });
 
   it('supports specifying hub site description', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--description') > -1) {
@@ -471,7 +473,7 @@ describe(commands.HUBSITE_SET, () => {
   });
 
   it('supports specifying hub site logoUrl', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--logoUrl') > -1) {
@@ -481,33 +483,33 @@ describe(commands.HUBSITE_SET, () => {
     assert(containsOption);
   });
 
-  it('fails validation if id is not a valid GUID', () => {
-    const actual = command.validate({ options: { id: 'abc', title: 'Sales' } });
+  it('fails validation if id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: 'abc', title: 'Sales' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if no property to update specified', () => {
-    const actual = command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+  it('fails validation if no property to update specified', async () => {
+    const actual = await command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if id and title specified', () => {
-    const actual = command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', title: 'Sales' } });
+  it('passes validation if id and title specified', async () => {
+    const actual = await command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', title: 'Sales' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if id and description specified', () => {
-    const actual = command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', description: 'All things sales' } });
+  it('passes validation if id and description specified', async () => {
+    const actual = await command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', description: 'All things sales' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if id and logoUrl specified', () => {
-    const actual = command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', logoUrl: 'https://contoso.com/logo.png' } });
+  it('passes validation if id and logoUrl specified', async () => {
+    const actual = await command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', logoUrl: 'https://contoso.com/logo.png' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if all options specified', () => {
-    const actual = command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', title: 'Sales', description: 'All things sales', logoUrl: 'https://contoso.com/logo.png' } });
+  it('passes validation if all options specified', async () => {
+    const actual = await command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', title: 'Sales', description: 'All things sales', logoUrl: 'https://contoso.com/logo.png' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

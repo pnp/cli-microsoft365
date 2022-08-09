@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -29,6 +28,77 @@ class SpoPageControlSetCommand extends SpoCommand {
 
   public get description(): string {
     return 'Updates web part data or properties of a control on a modern page';
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        webPartData: typeof args.options.webPartData !== 'undefined',
+        webPartProperties: typeof args.options.webPartProperties !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '-n, --name <name>'
+      },
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--webPartData [webPartData]'
+      },
+      {
+        option: '--webPartProperties [webPartProperties]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        if (args.options.webPartData && args.options.webPartProperties) {
+          return 'Specify webPartProperties or webPartData but not both';
+        }
+
+        if (args.options.webPartProperties) {
+          try {
+            JSON.parse(args.options.webPartProperties);
+          }
+          catch (e) {
+            return `Specified webPartProperties is not a valid JSON string. Input: ${args.options.webPartData}. Error: ${e}`;
+          }
+        }
+
+        if (args.options.webPartData) {
+          try {
+            JSON.parse(args.options.webPartData);
+          }
+          catch (e) {
+            return `Specified webPartData is not a valid JSON string. Input: ${args.options.webPartData}. Error: ${e}`;
+          }
+        }
+
+        return validation.isValidSharePointUrl(args.options.webUrl);
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -160,59 +230,6 @@ class SpoPageControlSetCommand extends SpoCommand {
       })
       .then(_ => cb())
       .catch((err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--webPartData [webPartData]'
-      },
-      {
-        option: '--webPartProperties [webPartProperties]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    if (args.options.webPartData && args.options.webPartProperties) {
-      return 'Specify webPartProperties or webPartData but not both';
-    }
-
-    if (args.options.webPartProperties) {
-      try {
-        JSON.parse(args.options.webPartProperties);
-      }
-      catch (e) {
-        return `Specified webPartProperties is not a valid JSON string. Input: ${args.options.webPartData}. Error: ${e}`;
-      }
-    }
-
-    if (args.options.webPartData) {
-      try {
-        JSON.parse(args.options.webPartData);
-      }
-      catch (e) {
-        return `Specified webPartData is not a valid JSON string. Input: ${args.options.webPartData}. Error: ${e}`;
-      }
-    }
-
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

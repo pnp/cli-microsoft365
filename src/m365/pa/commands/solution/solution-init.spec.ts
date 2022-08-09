@@ -3,8 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import { Logger } from '../../../../cli';
-import Command, { CommandOption } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command from '../../../../Command';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 import TemplateInstantiator from '../../template-instantiator';
@@ -13,6 +13,7 @@ const command: Command = require('./solution-init');
 describe(commands.SOLUTION_INIT, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let trackEvent: any;
   let telemetry: any;
 
@@ -20,6 +21,7 @@ describe(commands.SOLUTION_INIT, () => {
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -74,7 +76,7 @@ describe(commands.SOLUTION_INIT, () => {
   });
 
   it('supports specifying publisher name', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--publisherName') > -1) {
@@ -85,7 +87,7 @@ describe(commands.SOLUTION_INIT, () => {
   });
 
   it('supports specifying publisher prefix', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--publisherPrefix') > -1) {
@@ -95,91 +97,91 @@ describe(commands.SOLUTION_INIT, () => {
     assert(containsOption);
   });
 
-  it('passes validation when valid publisherName and publisherPrefix are specified', () => {
-    const actual = command.validate({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
+  it('passes validation when valid publisherName and publisherPrefix are specified', async () => {
+    const actual = await command.validate({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when the project directory contains relative paths', () => {
+  it('fails validation when the project directory contains relative paths', async () => {
     sinon.stub(path, 'basename').callsFake(() => 'rootPath1\\.\\..\\rootPath2');
 
-    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'prefix' } });
+    const actual = await command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'prefix' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the project directory equals invalid text sequences (like COM1 or LPT6)', () => {
+  it('fails validation when the project directory equals invalid text sequences (like COM1 or LPT6)', async () => {
     sinon.stub(path, 'basename').callsFake(() => 'COM1');
 
-    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'prefix' } });
+    const actual = await command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'prefix' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails when the project directory name is emtpy', () => {
+  it('fails validation when the project directory name is emtpy', async () => {
     sinon.stub(path, 'basename').callsFake(() => '');
 
-    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'prefix' } });
+    const actual = await command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'prefix' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the publisherName option isn\'t specified', () => {
-    const actual = command.validate({ options: { publisherPrefix: 'prefix' } });
+  it('fails validation when the publisherName option isn\'t specified', async () => {
+    const actual = await command.validate({ options: { publisherPrefix: 'prefix' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the publisherPrefix option isn\'t specified', () => {
-    const actual = command.validate({ options: { publisherName: 'ExamplePublisher' } });
+  it('fails validation when the publisherPrefix option isn\'t specified', async () => {
+    const actual = await command.validate({ options: { publisherName: 'ExamplePublisher' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the length of publisherPrefix is less than 2', () => {
-    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'p' } });
+  it('fails validation when the length of publisherPrefix is less than 2', async () => {
+    const actual = await command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'p' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the length of publisherPrefix is more than 8', () => {
-    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'verylongprefix' } });
+  it('fails validation when the length of publisherPrefix is more than 8', async () => {
+    const actual = await command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'verylongprefix' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the length of publisherPrefix starts with a number', () => {
-    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: '1prefix' } });
+  it('fails validation when the length of publisherPrefix starts with a number', async () => {
+    const actual = await command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: '1prefix' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the length of publisherPrefix starts with an underscore', () => {
-    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: '_prefix' } });
+  it('fails validation when the length of publisherPrefix starts with an underscore', async () => {
+    const actual = await command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: '_prefix' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the length of publisherPrefix starts with \'mscrm\'', () => {
-    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'mscrmpr' } });
+  it('fails validation when the length of publisherPrefix starts with \'mscrm\'', async () => {
+    const actual = await command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'mscrmpr' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the length of publisherPrefix contains a special character', () => {
-    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'préfix' } });
+  it('fails validation when the length of publisherPrefix contains a special character', async () => {
+    const actual = await command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'préfix' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the length of publisherName starts with a number', () => {
-    const actual = command.validate({ options: { publisherName: '1ExamplePublisher', publisherPrefix: 'prefix' } });
+  it('fails validation when the length of publisherName starts with a number', async () => {
+    const actual = await command.validate({ options: { publisherName: '1ExamplePublisher', publisherPrefix: 'prefix' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the length of publisherName contains a special character', () => {
-    const actual = command.validate({ options: { publisherName: 'ExamplePùblisher', publisherPrefix: 'prefix' } });
+  it('fails validation when the length of publisherName contains a special character', async () => {
+    const actual = await command.validate({ options: { publisherName: 'ExamplePùblisher', publisherPrefix: 'prefix' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the current directory doesn\'t contain any files with extension proj', () => {
+  it('passes validation when the current directory doesn\'t contain any files with extension proj', async () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.xml', 'file3.json'] as any);
-    const actual = command.validate({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
+    const actual = await command.validate({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when the current directory contains files with extension proj', () => {
+  it('fails validation when the current directory contains files with extension proj', async () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.cdsproj', 'file3.json'] as any);
-    const actual = command.validate({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
+    const actual = await command.validate({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -256,7 +258,7 @@ describe(commands.SOLUTION_INIT, () => {
   });
 
   it('supports verbose mode', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option === '--verbose') {

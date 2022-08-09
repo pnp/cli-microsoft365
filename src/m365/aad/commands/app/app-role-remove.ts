@@ -1,8 +1,5 @@
 import { Application, AppRole } from "@microsoft/microsoft-graph-types";
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -36,15 +33,77 @@ class AadAppRoleRemoveCommand extends GraphCommand {
     return [commands.APP_ROLE_DELETE];
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.appId = typeof args.options.appId !== 'undefined';
-    telemetryProps.appObjectId = typeof args.options.appObjectId !== 'undefined';
-    telemetryProps.appName = typeof args.options.appName !== 'undefined';
-    telemetryProps.claim = typeof args.options.claim !== 'undefined';
-    telemetryProps.name = typeof args.options.name !== 'undefined';
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        appId: typeof args.options.appId !== 'undefined',
+        appObjectId: typeof args.options.appObjectId !== 'undefined',
+        appName: typeof args.options.appName !== 'undefined',
+        claim: typeof args.options.claim !== 'undefined',
+        name: typeof args.options.name !== 'undefined',
+        id: typeof args.options.id !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '--appId [appId]' },
+      { option: '--appObjectId [appObjectId]' },
+      { option: '--appName [appName]' },
+      { option: '-n, --name [name]' },
+      { option: '-i, --id [id]' },
+      { option: '-c, --claim [claim]' },
+      { option: '--confirm' }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const { appId, appObjectId, appName, name, id, claim } = args.options;
+
+        if ((appId && appObjectId) ||
+          (appId && appName) ||
+          (appObjectId && appName)) {
+          return `Specify either appId, appObjectId or appName but not multiple`;
+        }
+    
+        if ((name && claim) ||
+          (name && id) ||
+          (claim && id)) {
+          return `Specify either name, claim or id of the role but not multiple`;
+        }
+    
+        if (!appId &&
+          !appObjectId &&
+          !appName) {
+          return `Specify either appId, appObjectId or appName`;
+        }
+    
+        if (!name &&
+          !claim &&
+          !id) {
+          return `Specify either name, claim or id of the role`;
+        }
+    
+        if (args.options.id) {
+          if (!validation.isValidGuid(args.options.id)) {
+            return `${args.options.id} is not a valid GUID`;
+          }
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -210,57 +269,6 @@ class AadAppRoleRemoveCommand extends GraphCommand {
 
         return Promise.reject(`Multiple Azure AD application registration with name ${appName} found. Please disambiguate using app object IDs: ${res.value.map(a => a.id).join(', ')}`);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '--appId [appId]' },
-      { option: '--appObjectId [appObjectId]' },
-      { option: '--appName [appName]' },
-      { option: '-n, --name [name]' },
-      { option: '-i, --id [id]' },
-      { option: '-c, --claim [claim]' },
-      { option: '--confirm' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const { appId, appObjectId, appName, name, id, claim } = args.options;
-
-    if ((appId && appObjectId) ||
-      (appId && appName) ||
-      (appObjectId && appName)) {
-      return `Specify either appId, appObjectId or appName but not multiple`;
-    }
-
-    if ((name && claim) ||
-      (name && id) ||
-      (claim && id)) {
-      return `Specify either name, claim or id of the role but not multiple`;
-    }
-
-    if (!appId &&
-      !appObjectId &&
-      !appName) {
-      return `Specify either appId, appObjectId or appName`;
-    }
-
-    if (!name &&
-      !claim &&
-      !id) {
-      return `Specify either name, claim or id of the role`;
-    }
-
-    if (args.options.id) {
-      if (!validation.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
-      }
-    }
-
-    return true;
   }
 }
 

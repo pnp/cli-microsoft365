@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as sinon from 'sinon';
 import { SinonSandbox } from 'sinon';
 import { Cli, Logger } from './cli';
-import Command, { CommandOption } from './Command';
+import Command from './Command';
 import { sinonUtil } from './utils';
 
 class SimpleCommand extends Command {
@@ -28,15 +28,14 @@ class CommandWithOptions extends Command {
   public get description(): string {
     return 'Mock command 2';
   }
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
+  constructor() {
+    super();
+
+    this.options.push(
       {
         option: '-l, --longOption <longOption>'
       }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
+    );
   }
   public commandAction(logger: Logger, args: any, cb: () => void): void {
     cb();

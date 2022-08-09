@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
-import { Logger } from '../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../cli';
 import Command, { CommandError } from '../../../Command';
 import request from '../../../request';
 import { sinonUtil } from '../../../utils';
@@ -13,11 +13,13 @@ describe(commands.LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -9940,28 +9942,28 @@ describe(commands.LIST, () => {
     });
   });
 
-  it(`fails validation if the specified webUrl is invalid`, () => {
-    const actual = command.validate({
+  it(`fails validation if the specified webUrl is invalid`, async () => {
+    const actual = await command.validate({
       options: {
         folderUrl: '/Shared Documents',
         webUrl: '/'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`passes validation if the target file is a URL`, () => {
-    const actual = command.validate({
+  it(`passes validation if the target file is a URL`, async () => {
+    const actual = await command.validate({
       options: {
         folderUrl: 'Shared Documents',
         webUrl: 'https://contoso.sharepoint.com/Shared Documents'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

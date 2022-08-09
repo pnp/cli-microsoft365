@@ -1,8 +1,5 @@
 import { ItemBody, Message } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
@@ -31,6 +28,33 @@ class TeamsChatMessageListCommand extends GraphCommand {
 
   public defaultProperties(): string[] | undefined {
     return ['id', 'shortBody'];
+  }
+
+  constructor() {
+    super();
+
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --chatId <chatId>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidTeamsChatId(args.options.chatId)) {
+          return `${args.options.chatId} is not a valid Teams chat ID`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -65,25 +89,6 @@ class TeamsChatMessageListCommand extends GraphCommand {
         logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --chatId <chatId>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidTeamsChatId(args.options.chatId)) {
-      return `${args.options.chatId} is not a valid Teams chat ID`;
-    }
-
-    return true;
   }
 }
 

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken, formatting, sinonUtil } from '../../../../utils';
@@ -13,6 +13,8 @@ describe(commands.PLAN_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+
   const validId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validTitle = 'Plan name';
   const validOwnerGroupName = 'Group name';
@@ -74,10 +76,14 @@ describe(commands.PLAN_ADD, () => {
   };
 
   before(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -94,6 +100,7 @@ describe(commands.PLAN_ADD, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     (command as any).items = [];
   });
 
@@ -112,6 +119,7 @@ describe(commands.PLAN_ADD, () => {
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -126,99 +134,90 @@ describe(commands.PLAN_ADD, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'createdDateTime', 'owner']);
   });
 
-  it('fails validation if the ownerGroupId is not a valid guid.', (done) => {
-    const actual = command.validate({
+  it('fails validation if the ownerGroupId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
         title: validTitle,
         ownerGroupId: 'no guid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided.', (done) => {
-    const actual = command.validate({
+  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided.', async () => {
+    const actual = await command.validate({
       options: {
         title: validTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both ownerGroupId and ownerGroupName are specified', (done) => {
-    const actual = command.validate({
+  it('fails validation when both ownerGroupId and ownerGroupName are specified', async () => {
+    const actual = await command.validate({
       options: {
         title: validTitle,
         ownerGroupId: validOwnerGroupId,
         ownerGroupName: validOwnerGroupName
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if shareWithUserIds contains invalid guid.', (done) => {
-    const actual = command.validate({
+  it('fails validation if shareWithUserIds contains invalid guid.', async () => {
+    const actual = await command.validate({
       options: {
         title: validTitle,
         ownerGroupId: validOwnerGroupId,
         shareWithUserIds: "no guid"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both shareWithUserIds and shareWithUserNames are specified', (done) => {
-    const actual = command.validate({
+  it('fails validation when both shareWithUserIds and shareWithUserNames are specified', async () => {
+    const actual = await command.validate({
       options: {
         title: validTitle,
         ownerGroupId: validOwnerGroupId,
         shareWithUserIds: validShareWithUserIds,
         shareWithUserNames: validShareWithUserNames
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid title and ownerGroupId specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid title and ownerGroupId specified', async () => {
+    const actual = await command.validate({
       options: {
         title: validTitle,
         ownerGroupName: validOwnerGroupName
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid title, ownerGroupName, and shareWithUserIds specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid title, ownerGroupName, and shareWithUserIds specified', async () => {
+    const actual = await command.validate({
       options: {
         title: validTitle,
         ownerGroupId: validOwnerGroupId,
         shareWithUserIds: validShareWithUserIds
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid title, ownerGroupName, and validShareWithUserNames specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid title, ownerGroupName, and validShareWithUserNames specified', async () => {
+    const actual = await command.validate({
       options: {
         title: validTitle,
         ownerGroupId: validOwnerGroupId,
-        validShareWithUserNames: validShareWithUserNames
+        shareWithUserNames: validShareWithUserNames
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
-
 
   it('fails validation when using app only access token', (done) => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
@@ -241,7 +240,6 @@ describe(commands.PLAN_ADD, () => {
   });
 
   it('correctly adds planner plan with given title with available ownerGroupId', (done) => {
-
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
         return Promise.resolve(planResponse);
@@ -463,7 +461,7 @@ describe(commands.PLAN_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
