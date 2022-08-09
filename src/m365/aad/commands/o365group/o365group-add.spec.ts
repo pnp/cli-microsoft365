@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -14,12 +14,14 @@ describe(commands.O365GROUP_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -1273,79 +1275,79 @@ describe(commands.O365GROUP_ADD, () => {
     });
   });
 
-  it('passes validation when the displayName, description and mailNickname are specified', () => {
-    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } });
+  it('passes validation when the displayName, description and mailNickname are specified', async () => {
+    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if one of the owners is invalid', () => {
-    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user' } });
+  it('fails validation if one of the owners is invalid', async () => {
+    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the owner is valid', () => {
-    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user@contoso.onmicrosoft.com' } });
+  it('passes validation if the owner is valid', async () => {
+    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation with multiple owners, comma-separated', () => {
-    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
+  it('passes validation with multiple owners, comma-separated', async () => {
+    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation with multiple owners, comma-separated with an additional space', () => {
-    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } });
+  it('passes validation with multiple owners, comma-separated with an additional space', async () => {
+    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if one of the members is invalid', () => {
-    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user' } });
+  it('fails validation if one of the members is invalid', async () => {
+    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the member is valid', () => {
-    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user@contoso.onmicrosoft.com' } });
+  it('passes validation if the member is valid', async () => {
+    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation with multiple members, comma-separated', () => {
-    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
+  it('passes validation with multiple members, comma-separated', async () => {
+    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation with multiple members, comma-separated with an additional space', () => {
-    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } });
+  it('passes validation with multiple members, comma-separated with an additional space', async () => {
+    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if isPrivate is invalid boolean', () => {
-    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'invalid' } });
+  it('fails validation if isPrivate is invalid boolean', async () => {
+    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if isPrivate is true', () => {
-    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'true' } });
+  it('passes validation if isPrivate is true', async () => {
+    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if isPrivate is false', () => {
-    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'false' } });
+  it('passes validation if isPrivate is false', async () => {
+    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if logoPath points to a non-existent file', () => {
+  it('fails validation if logoPath points to a non-existent file', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'invalid' } });
+    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'invalid' } }, commandInfo);
     sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if logoPath points to a folder', () => {
+  it('fails validation if logoPath points to a folder', async () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => true);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'folder' } });
+    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'folder' } }, commandInfo);
     sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
@@ -1353,12 +1355,12 @@ describe(commands.O365GROUP_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if logoPath points to an existing file', () => {
+  it('passes validation if logoPath points to an existing file', async () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'folder' } });
+    const actual = await command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'folder' } }, commandInfo);
     sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
@@ -1367,7 +1369,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -1378,7 +1380,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports specifying displayName', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--displayName') > -1) {
@@ -1389,7 +1391,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports specifying description', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--description') > -1) {
@@ -1400,7 +1402,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports specifying mailNickname', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--mailNickname') > -1) {
@@ -1411,7 +1413,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports specifying owners', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--owners') > -1) {
@@ -1422,7 +1424,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports specifying members', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--members') > -1) {
@@ -1433,7 +1435,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports specifying group type', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--isPrivate') > -1) {
@@ -1444,7 +1446,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports specifying logo file path', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--logoPath') > -1) {

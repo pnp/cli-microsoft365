@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,6 +14,7 @@ describe(commands.THEME_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,6 +27,7 @@ describe(commands.THEME_SET, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -180,12 +182,12 @@ describe(commands.THEME_SET, () => {
     });
   });
 
-  it('fails validation if the specified theme is invalid', () => {
-    const actual = command.validate({ options: { name: 'abc', theme: '{ not valid }', isInverted: false } });
+  it('fails validation if the specified theme is invalid', async () => {
+    const actual = await command.validate({ options: { name: 'abc', theme: '{ not valid }', isInverted: false } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when specified theme is valid', () => {
+  it('passes validation when specified theme is valid', async () => {
     const theme = `{
       "themePrimary": "#d81e05",
       "themeLighterAlt": "#fdf5f4",
@@ -211,13 +213,13 @@ describe(commands.THEME_SET, () => {
       "white": "#f5f5f5"
     }`;
     sinon.stub(validation, 'isValidTheme').callsFake(() => true);
-    const actual = command.validate({ options: { name: 'contoso-blue', theme, isInverted: false } });
+    const actual = await command.validate({ options: { name: 'contoso-blue', theme, isInverted: false } }, commandInfo);
 
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

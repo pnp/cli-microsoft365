@@ -1,8 +1,5 @@
 import { AppRole } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { odata } from '../../../../utils';
@@ -28,12 +25,50 @@ class AadAppRoleListCommand extends GraphCommand {
     return 'Gets Azure AD app registration roles';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.appId = typeof args.options.appId !== 'undefined';
-    telemetryProps.appObjectId = typeof args.options.appObjectId !== 'undefined';
-    telemetryProps.appName = typeof args.options.appName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        appId: typeof args.options.appId !== 'undefined',
+        appObjectId: typeof args.options.appObjectId !== 'undefined',
+        appName: typeof args.options.appName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '--appId [appId]' },
+      { option: '--appObjectId [appObjectId]' },
+      { option: '--appName [appName]' }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const { appId, appObjectId, appName } = args.options;
+
+        if ((appId && appObjectId) ||
+          (appId && appName) ||
+          (appObjectId && appName)) {
+          return `Specify either appId, appObjectId or appName but not multiple`;
+        }
+    
+        if (!appId && !appObjectId && !appName) {
+          return `Specify either appId, appObjectId or appName`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public defaultProperties(): string[] | undefined {
@@ -87,33 +122,6 @@ class AadAppRoleListCommand extends GraphCommand {
 
         return Promise.reject(`Multiple Azure AD application registration with name ${appName} found. Please disambiguate (app object IDs): ${res.value.map(a => a.id).join(', ')}`);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '--appId [appId]' },
-      { option: '--appObjectId [appObjectId]' },
-      { option: '--appName [appName]' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const { appId, appObjectId, appName } = args.options;
-
-    if ((appId && appObjectId) ||
-      (appId && appName) ||
-      (appObjectId && appName)) {
-      return `Specify either appId, appObjectId or appName but not multiple`;
-    }
-
-    if (!appId && !appObjectId && !appName) {
-      return `Specify either appId, appObjectId or appName`;
-    }
-
-    return true;
   }
 }
 

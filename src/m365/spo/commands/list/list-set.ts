@@ -1,8 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption,
-  CommandTypes
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -165,86 +161,70 @@ class SpoListSetCommand extends SpoCommand {
     return result;
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
+  constructor() {
+    super();
 
-    // add properties with identifiable data
-    [
-      'title',
-      'description',
-      'templateFeatureId',
-      'schemaXml',
-      'defaultContentApprovalWorkflowId',
-      'defaultDisplayFormUrl',
-      'defaultEditFormUrl',
-      'emailAlias',
-      'sendToLocationName',
-      'sendToLocationUrl',
-      'validationFormula',
-      'validationMessage'
-    ].forEach(o => {
-      const value: any = (args.options as any)[o];
-      if (value) {
-        telemetryProps[o] = (typeof value !== 'undefined').toString();
-      }
-    });
-
-    // add boolean values
-    SpoListSetCommand.booleanOptions.forEach(o => {
-      const value: any = (args.options as any)[o];
-      if (value) {
-        telemetryProps[o] = (value === 'true').toString();
-      }
-    });
-
-    // add properties with non-identifiable data
-    [
-      'direction',
-      'draftVersionVisibility',
-      'listExperienceOptions',
-      'majorVersionLimit',
-      'majorWithMinorVersionsLimit',
-      'readSecurity',
-      'writeSecurity'
-    ].forEach(o => {
-      const value: any = (args.options as any)[o];
-      if (value) {
-        telemetryProps[o] = value.toString();
-      }
-    });
-
-    return telemetryProps;
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initTypes();
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (this.verbose) {
-      logger.logToStderr(`Updating list in site at ${args.options.webUrl}...`);
-    }
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      const telemetryProps: any = {};
 
-    const requestBody: any = this.mapRequestBody(args.options);
+      // add properties with identifiable data
+      [
+        'title',
+        'description',
+        'templateFeatureId',
+        'schemaXml',
+        'defaultContentApprovalWorkflowId',
+        'defaultDisplayFormUrl',
+        'defaultEditFormUrl',
+        'emailAlias',
+        'sendToLocationName',
+        'sendToLocationUrl',
+        'validationFormula',
+        'validationMessage'
+      ].forEach(o => {
+        const value: any = (args.options as any)[o];
+        if (value) {
+          telemetryProps[o] = (typeof value !== 'undefined').toString();
+        }
+      });
 
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.id)}')`,
-      method: 'POST',
-      headers: {
-        'X-HTTP-Method': 'MERGE',
-        'If-Match': '*',
-        'accept': 'application/json;odata=nometadata'
-      },
-      data: requestBody,
-      responseType: 'json'
-    };
+      // add boolean values
+      SpoListSetCommand.booleanOptions.forEach(o => {
+        const value: any = (args.options as any)[o];
+        if (value) {
+          telemetryProps[o] = (value === 'true').toString();
+        }
+      });
 
-    request
-      .post(requestOptions)
-      .then((): void => {
-        // REST post call doesn't return anything
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      // add properties with non-identifiable data
+      [
+        'direction',
+        'draftVersionVisibility',
+        'listExperienceOptions',
+        'majorVersionLimit',
+        'majorWithMinorVersionsLimit',
+        'readSecurity',
+        'writeSecurity'
+      ].forEach(o => {
+        const value: any = (args.options as any)[o];
+        if (value) {
+          telemetryProps[o] = value.toString();
+        }
+      });
+
+      Object.assign(this.telemetryProperties, telemetryProps);
+    });
   }
 
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
+  #initOptions(): void {
+    this.options.unshift(
       {
         option: '-i, --id <id>'
       },
@@ -481,101 +461,127 @@ class SpoListSetCommand extends SpoCommand {
         option: '--writeSecurity [writeSecurity]',
         autocomplete: ['1', '2', '4']
       }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
+    );
   }
 
-  public types(): CommandTypes {
-    return {
-      string: SpoListSetCommand.booleanOptions.concat([
-        'webUrl',
-        'templateFeatureId',
-        'defaultContentApprovalWorkflowId',
-        'draftVersionVisibility',
-        'listExperienceOptions'
-      ])
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        for (let i = 0; i < SpoListSetCommand.booleanOptions.length; i++) {
+          const option: string = SpoListSetCommand.booleanOptions[i];
+          const value: string | undefined = (args.options as any)[option];
+          if (value && !validation.isValidBoolean(value)) {
+            return `${value} in option ${option} is not a valid boolean value`;
+          }
+        }
+
+        if (args.options.templateFeatureId &&
+          !validation.isValidGuid(args.options.templateFeatureId)) {
+          return `${args.options.templateFeatureId} in option templateFeatureId is not a valid GUID`;
+        }
+
+        if (args.options.defaultContentApprovalWorkflowId &&
+          !validation.isValidGuid(args.options.defaultContentApprovalWorkflowId)) {
+          return `${args.options.defaultContentApprovalWorkflowId} in option defaultContentApprovalWorkflowId is not a valid GUID`;
+        }
+
+        if (args.options.direction &&
+          ['NONE', 'LTR', 'RTL'].indexOf(args.options.direction) === -1) {
+          return `${args.options.direction} is not a valid direction value. Allowed values are NONE|LTR|RTL`;
+        }
+
+        if (args.options.draftVersionVisibility) {
+          const draftType: DraftVisibilityType = DraftVisibilityType[(args.options.draftVersionVisibility.trim() as keyof typeof DraftVisibilityType)];
+
+          if (!draftType) {
+            return `${args.options.draftVersionVisibility} is not a valid draftVisibilityType value`;
+          }
+        }
+
+        if (args.options.emailAlias && args.options.enableAssignToEmail !== 'true') {
+          return `emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.`;
+        }
+
+        if (args.options.listExperienceOptions) {
+          const experience: ListExperience = ListExperience[(args.options.listExperienceOptions.trim() as keyof typeof ListExperience)];
+
+          if (!experience) {
+            return `${args.options.listExperienceOptions} is not a valid listExperienceOptions value`;
+          }
+        }
+
+        if (args.options.majorVersionLimit && args.options.enableVersioning !== 'true') {
+          return `majorVersionLimit option is only valid in combination with enableVersioning.`;
+        }
+
+        if (args.options.majorWithMinorVersionsLimit &&
+          args.options.enableMinorVersions !== 'true' &&
+          args.options.enableModeration !== 'true') {
+          return `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`;
+        }
+
+        if (args.options.readSecurity &&
+          args.options.readSecurity !== 1 &&
+          args.options.readSecurity !== 2) {
+          return `${args.options.readSecurity} is not a valid readSecurity value. Allowed values are 1|2`;
+        }
+
+        if (args.options.writeSecurity &&
+          args.options.writeSecurity !== 1 &&
+          args.options.writeSecurity !== 2 &&
+          args.options.writeSecurity !== 4) {
+          return `${args.options.writeSecurity} is not a valid writeSecurity value. Allowed values are 1|2|4`;
+        }
+
+        return true;
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push(...SpoListSetCommand.booleanOptions.concat([
+      'webUrl',
+      'templateFeatureId',
+      'defaultContentApprovalWorkflowId',
+      'draftVersionVisibility',
+      'listExperienceOptions'
+    ]));
+  }
+
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (this.verbose) {
+      logger.logToStderr(`Updating list in site at ${args.options.webUrl}...`);
+    }
+
+    const requestBody: any = this.mapRequestBody(args.options);
+
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.id)}')`,
+      method: 'POST',
+      headers: {
+        'X-HTTP-Method': 'MERGE',
+        'If-Match': '*',
+        'accept': 'application/json;odata=nometadata'
+      },
+      data: requestBody,
+      responseType: 'json'
     };
-  }
 
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (!validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    for (let i = 0; i < SpoListSetCommand.booleanOptions.length; i++) {
-      const option: string = SpoListSetCommand.booleanOptions[i];
-      const value: string | undefined = (args.options as any)[option];
-      if (value && !validation.isValidBoolean(value)) {
-        return `${value} in option ${option} is not a valid boolean value`;
-      }
-    }
-
-    if (args.options.templateFeatureId &&
-      !validation.isValidGuid(args.options.templateFeatureId)) {
-      return `${args.options.templateFeatureId} in option templateFeatureId is not a valid GUID`;
-    }
-
-    if (args.options.defaultContentApprovalWorkflowId &&
-      !validation.isValidGuid(args.options.defaultContentApprovalWorkflowId)) {
-      return `${args.options.defaultContentApprovalWorkflowId} in option defaultContentApprovalWorkflowId is not a valid GUID`;
-    }
-
-    if (args.options.direction &&
-      ['NONE', 'LTR', 'RTL'].indexOf(args.options.direction) === -1) {
-      return `${args.options.direction} is not a valid direction value. Allowed values are NONE|LTR|RTL`;
-    }
-
-    if (args.options.draftVersionVisibility) {
-      const draftType: DraftVisibilityType = DraftVisibilityType[(args.options.draftVersionVisibility.trim() as keyof typeof DraftVisibilityType)];
-
-      if (!draftType) {
-        return `${args.options.draftVersionVisibility} is not a valid draftVisibilityType value`;
-      }
-    }
-
-    if (args.options.emailAlias && args.options.enableAssignToEmail !== 'true') {
-      return `emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.`;
-    }
-
-    if (args.options.listExperienceOptions) {
-      const experience: ListExperience = ListExperience[(args.options.listExperienceOptions.trim() as keyof typeof ListExperience)];
-
-      if (!experience) {
-        return `${args.options.listExperienceOptions} is not a valid listExperienceOptions value`;
-      }
-    }
-
-    if (args.options.majorVersionLimit && args.options.enableVersioning !== 'true') {
-      return `majorVersionLimit option is only valid in combination with enableVersioning.`;
-    }
-
-    if (args.options.majorWithMinorVersionsLimit &&
-      args.options.enableMinorVersions !== 'true' &&
-      args.options.enableModeration !== 'true') {
-      return `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`;
-    }
-
-    if (args.options.readSecurity &&
-      args.options.readSecurity !== 1 &&
-      args.options.readSecurity !== 2) {
-      return `${args.options.readSecurity} is not a valid readSecurity value. Allowed values are 1|2`;
-    }
-
-    if (args.options.writeSecurity &&
-      args.options.writeSecurity !== 1 &&
-      args.options.writeSecurity !== 2 &&
-      args.options.writeSecurity !== 4) {
-      return `${args.options.writeSecurity} is not a valid writeSecurity value. Allowed values are 1|2|4`;
-    }
-
-    return true;
+    request
+      .post(requestOptions)
+      .then((): void => {
+        // REST post call doesn't return anything
+        cb();
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private mapRequestBody(options: Options): any {

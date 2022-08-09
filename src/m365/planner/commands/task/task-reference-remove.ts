@@ -1,6 +1,5 @@
 import { PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
 import { Cli, Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils';
@@ -27,12 +26,50 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
     return 'Removes the reference from the Planner task';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.url = typeof args.options.url !== 'undefined';
-    telemetryProps.alias = typeof args.options.alias !== 'undefined';
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        url: typeof args.options.url !== 'undefined',
+        alias: typeof args.options.alias !== 'undefined',
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '-u, --url [url]' },
+      { option: '--alias [alias]' },
+      { option: '-i, --taskId <taskId>' },
+      { option: '--confirm' }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.url && args.options.url.indexOf('https://') !== 0 && args.options.url.indexOf('http://') !== 0) {
+          return 'The url option should contain a valid URL. A valid URL starts with http(s)://';
+        }
+
+        return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['url', 'alias']
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -90,7 +127,7 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
       },
       responseType: 'json'
     };
-    
+
     let url: string = options.url!;
 
     return request
@@ -120,32 +157,6 @@ class PlannerTaskReferenceRemoveCommand extends GraphCommand {
 
         return Promise.resolve({ etag: (taskDetails as any)['@odata.etag'], url });
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '-u, --url [url]' },
-      { option: '--alias [alias]' },
-      { option: '-i, --taskId <taskId>' },
-      { option: '--confirm' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public optionSets(): string[][] | undefined {
-    return [
-      ['url', 'alias']
-    ];
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.url && args.options.url.indexOf('https://') !== 0 && args.options.url.indexOf('http://') !== 0) {
-      return 'The url option should contain a valid URL. A valid URL starts with http(s)://';
-    }
-
-    return true;
   }
 }
 

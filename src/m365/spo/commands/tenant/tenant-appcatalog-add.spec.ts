@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError, CommandErrorWithOutput } from '../../../../Command';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -15,11 +15,13 @@ const command: Command = require('./tenant-appcatalog-add');
 describe(commands.TENANT_APPCATALOG_ADD, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -1143,7 +1145,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -1153,21 +1155,21 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if the specified url is not a valid SharePoint URL', () => {
+  it('fails validation if the specified url is not a valid SharePoint URL', async () => {
     const options: any = { url: '/foo', owner: 'user@contoso.com', timeZone: 4 };
-    const actual = command.validate({ options: options });
+    const actual = await command.validate({ options: options }, commandInfo);
     assert.strictEqual(typeof actual, 'string');
   });
 
-  it('fails validation if timeZone is not a number', () => {
+  it('fails validation if timeZone is not a number', async () => {
     const options: any = { url: 'https://contoso.sharepoint.com/sites/apps', owner: 'user@contoso.com', timeZone: 'a' };
-    const actual = command.validate({ options: options });
+    const actual = await command.validate({ options: options }, commandInfo);
     assert.strictEqual(typeof actual, 'string');
   });
 
-  it('passes validation when all options are specified and valid', () => {
+  it('passes validation when all options are specified and valid', async () => {
     const options: any = { url: 'https://contoso.sharepoint.com/sites/apps', owner: 'user@contoso.com', timeZone: 4 };
-    const actual = command.validate({ options: options });
+    const actual = await command.validate({ options: options }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

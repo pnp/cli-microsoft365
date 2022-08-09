@@ -1,9 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -34,15 +31,98 @@ class SpoFileGetCommand extends SpoCommand {
     return 'Gets information about the specified file';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = (!(!args.options.id)).toString();
-    telemetryProps.url = (!(!args.options.url)).toString();
-    telemetryProps.asString = args.options.asString || false;
-    telemetryProps.asListItem = args.options.asListItem || false;
-    telemetryProps.asFile = args.options.asFile || false;
-    telemetryProps.path = (!(!args.options.path)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: (!(!args.options.id)).toString(),
+        url: (!(!args.options.url)).toString(),
+        asString: args.options.asString || false,
+        asListItem: args.options.asListItem || false,
+        asFile: args.options.asFile || false,
+        path: (!(!args.options.path)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-w, --webUrl <webUrl>'
+      },
+      {
+        option: '-u, --url [url]'
+      },
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '--asString'
+      },
+      {
+        option: '--asListItem'
+      },
+      {
+        option: '--asFile'
+      },
+      {
+        option: '-p, --path [path]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+    
+        if (args.options.id) {
+          if (!validation.isValidGuid(args.options.id)) {
+            return `${args.options.id} is not a valid GUID`;
+          }
+        }
+    
+        if (args.options.id && args.options.url) {
+          return 'Specify id or url, but not both';
+        }
+    
+        if (!args.options.id && !args.options.url) {
+          return 'Specify id or url, one is required';
+        }
+    
+        if (args.options.asFile && !args.options.path) {
+          return 'The path should be specified when the --asFile option is used';
+        }
+    
+        if (args.options.path && !fs.existsSync(path.dirname(args.options.path))) {
+          return 'Specified path where to save the file does not exits';
+        }
+    
+        if (args.options.asFile) {
+          if (args.options.asListItem || args.options.asString) {
+            return 'Specify to retrieve the file either as file, list item or string but not multiple';
+          }
+        }
+    
+        if (args.options.asListItem) {
+          if (args.options.asFile || args.options.asString) {
+            return 'Specify to retrieve the file either as file, list item or string but not multiple';
+          }
+        }
+    
+        return true;
+      }
+    );
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -132,78 +212,6 @@ class SpoFileGetCommand extends SpoCommand {
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
 
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-w, --webUrl <webUrl>'
-      },
-      {
-        option: '-u, --url [url]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '--asString'
-      },
-      {
-        option: '--asListItem'
-      },
-      {
-        option: '--asFile'
-      },
-      {
-        option: '-p, --path [path]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.id) {
-      if (!validation.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
-      }
-    }
-
-    if (args.options.id && args.options.url) {
-      return 'Specify id or url, but not both';
-    }
-
-    if (!args.options.id && !args.options.url) {
-      return 'Specify id or url, one is required';
-    }
-
-    if (args.options.asFile && !args.options.path) {
-      return 'The path should be specified when the --asFile option is used';
-    }
-
-    if (args.options.path && !fs.existsSync(path.dirname(args.options.path))) {
-      return 'Specified path where to save the file does not exits';
-    }
-
-    if (args.options.asFile) {
-      if (args.options.asListItem || args.options.asString) {
-        return 'Specify to retrieve the file either as file, list item or string but not multiple';
-      }
-    }
-
-    if (args.options.asListItem) {
-      if (args.options.asFile || args.options.asString) {
-        return 'Specify to retrieve the file either as file, list item or string but not multiple';
-      }
-    }
-
-    return true;
   }
 }
 

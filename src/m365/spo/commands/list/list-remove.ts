@@ -1,7 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -28,12 +25,65 @@ class SpoListRemoveCommand extends SpoCommand {
     return 'Removes the specified list';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = (!(!args.options.id)).toString();
-    telemetryProps.title = (!(!args.options.title)).toString();
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: (!(!args.options.id)).toString(),
+        title: (!(!args.options.title)).toString(),
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-t, --title [title]'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.id &&
+          !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        if (args.options.id && args.options.title) {
+          return 'Specify id or title, but not both';
+        }
+
+        if (!args.options.id && !args.options.title) {
+          return 'Specify id or title';
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -88,48 +138,6 @@ class SpoListRemoveCommand extends SpoCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.id &&
-      !validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    if (args.options.id && args.options.title) {
-      return 'Specify id or title, but not both';
-    }
-
-    if (!args.options.id && !args.options.title) {
-      return 'Specify id or title';
-    }
-
-    return true;
   }
 }
 

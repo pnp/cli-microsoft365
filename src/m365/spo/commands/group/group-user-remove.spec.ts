@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError} from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,6 +12,7 @@ const command: Command = require('./group-user-remove');
 describe(commands.GROUP_USER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   const UserRemovalJSONResponse =
   {
@@ -22,6 +23,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -228,33 +230,33 @@ describe(commands.GROUP_USER_REMOVE, () => {
     });
   });
 
-  it('fails validation if webURL is Invalid', () => {
-    const actual = command.validate({ options: { webUrl: "InvalidWEBURL", groupId: 4, userName: "Alex.Wilber@contoso.com" } });
+  it('fails validation if webURL is Invalid', async () => {
+    const actual = await command.validate({ options: { webUrl: "InvalidWEBURL", groupId: 4, userName: "Alex.Wilber@contoso.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if groupid and groupName is entered', () => {
-    const actual = command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "4", groupName: "Site A Visitors", userName: "Alex.Wilber@contoso.com" } });
+  it('fails validation if groupid and groupName is entered', async () => {
+    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "4", groupName: "Site A Visitors", userName: "Alex.Wilber@contoso.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if neither groupId nor groupName is entered', () => {
-    const actual = command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", userName: "Alex.Wilber@contoso.com" } });
+  it('fails validation if neither groupId nor groupName is entered', async () => {
+    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", userName: "Alex.Wilber@contoso.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if groupId is Invalid', () => {
-    const actual = command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "INVALIDGROUP", userName: "Alex.Wilber@contoso.com" } });
+  it('fails validation if groupId is Invalid', async () => {
+    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "INVALIDGROUP", userName: "Alex.Wilber@contoso.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if all the required options are specified', () => {
-    const actual = command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 3, userName: "Alex.Wilber@contoso.com" } });
+  it('passes validation if all the required options are specified', async () => {
+    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 3, userName: "Alex.Wilber@contoso.com" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

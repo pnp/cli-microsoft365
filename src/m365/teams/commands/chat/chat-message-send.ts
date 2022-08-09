@@ -1,11 +1,8 @@
 import { AadUserConversationMember, Chat, ConversationMember } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
 import * as os from 'os';
-import Auth from '../../../../Auth';
+import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { accessToken, validation } from '../../../../utils';
@@ -33,25 +30,26 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     return 'Sends a chat message to a Microsoft Teams chat conversation.';
   }
 
-  public getTelemetryProperties(args: any): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.chatId = typeof args.options.chatId !== 'undefined';
-    telemetryProps.userEmails = typeof args.options.userEmails !== 'undefined';
-    telemetryProps.chatName = typeof args.options.chatName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {    
-    this
-      .getChatId(logger, args)
-      .then(chatId => this.sendChatMessage(chatId as string, args))
-      .then(_ => {
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));   
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        chatId: typeof args.options.chatId !== 'undefined',
+        userEmails: typeof args.options.userEmails !== 'undefined',
+        chatName: typeof args.options.chatName !== 'undefined'
+      });
+    });
   }
 
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
+  #initOptions(): void {
+    this.options.unshift(
       {
         option: '--chatId [chatId]'
       },
@@ -64,59 +62,65 @@ class TeamsChatMessageSendCommand extends GraphCommand {
       {
         option: '-m, --message <message>'
       }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
+    );
   }
 
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.chatId && !args.options.userEmails && !args.options.chatName) {
-      return 'Specify chatId or userEmails or chatName, one is required.';
-    }
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.chatId && !args.options.userEmails && !args.options.chatName) {
+          return 'Specify chatId or userEmails or chatName, one is required.';
+        }
 
-    let nrOfMutuallyExclusiveOptionsInUse = 0;
-    if (args.options.chatId) { nrOfMutuallyExclusiveOptionsInUse++; }
-    if (args.options.userEmails) { nrOfMutuallyExclusiveOptionsInUse++; }
-    if (args.options.chatName) { nrOfMutuallyExclusiveOptionsInUse++; }
+        let nrOfMutuallyExclusiveOptionsInUse = 0;
+        if (args.options.chatId) { nrOfMutuallyExclusiveOptionsInUse++; }
+        if (args.options.userEmails) { nrOfMutuallyExclusiveOptionsInUse++; }
+        if (args.options.chatName) { nrOfMutuallyExclusiveOptionsInUse++; }
 
-    if (nrOfMutuallyExclusiveOptionsInUse > 1) {
-      return 'Specify either chatId or userEmails or chatName, but not multiple.';
-    }
+        if (nrOfMutuallyExclusiveOptionsInUse > 1) {
+          return 'Specify either chatId or userEmails or chatName, but not multiple.';
+        }
 
-    if (!args.options.message) {
-      return 'Specify a message to send.';
-    }
+        if (args.options.chatId && !validation.isValidTeamsChatId(args.options.chatId)) {
+          return `${args.options.chatId} is not a valid Teams ChatId.`;
+        }
 
-    if (args.options.chatId && !validation.isValidTeamsChatId(args.options.chatId)) {
-      return `${args.options.chatId} is not a valid Teams ChatId.`;
-    }
+        if (args.options.userEmails) {
+          const userEmails = chatUtil.convertParticipantStringToArray(args.options.userEmails);
+          if (!userEmails || userEmails.length === 0 || userEmails.some(e => !validation.isValidUserPrincipalName(e))) {
+            return `${args.options.userEmails} contains one or more invalid email addresses.`;
+          }
+        }
 
-    if (args.options.userEmails) {
-      const userEmails = chatUtil.convertParticipantStringToArray(args.options.userEmails);
-      if (!userEmails || userEmails.length === 0 || userEmails.some(e => !validation.isValidUserPrincipalName(e))) {
-        return `${args.options.userEmails} contains one or more invalid email addresses.`;
+        return true;
       }
-    }
+    );
+  }
 
-    return true;
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    this
+      .getChatId(logger, args)
+      .then(chatId => this.sendChatMessage(chatId as string, args))
+      .then(_ => {
+        cb();
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private async getChatId(logger: Logger, args: CommandArgs): Promise<string> {
     if (args.options.chatId) {
       return args.options.chatId;
-    }    
+    }
 
-    return args.options.userEmails 
+    return args.options.userEmails
       ? this.ensureChatIdByUserEmails(args.options.userEmails)
       : this.getChatIdByName(args.options.chatName as string);
   }
 
   private async ensureChatIdByUserEmails(userEmailsOption: string): Promise<string> {
     const userEmails = chatUtil.convertParticipantStringToArray(userEmailsOption);
-    const currentUserEmail = accessToken.getUserNameFromAccessToken(Auth.service.accessTokens[this.resource].accessToken).toLowerCase();
+    const currentUserEmail = accessToken.getUserNameFromAccessToken(auth.service.accessTokens[this.resource].accessToken).toLowerCase();
     const existingChats = await chatUtil.findExistingChatsByParticipants([currentUserEmail, ...userEmails]);
-    
+
     if (!existingChats || existingChats.length === 0) {
       const chat = await this.createConversation([currentUserEmail, ...userEmails]);
       return chat.id as string;

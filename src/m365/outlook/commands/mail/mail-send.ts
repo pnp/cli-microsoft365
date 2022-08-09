@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -32,12 +29,63 @@ class OutlookMailSendCommand extends GraphCommand {
     return [commands.SENDMAIL];
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.bodyContents = typeof args.options.bodyContents !== 'undefined';
-    telemetryProps.bodyContentType = args.options.bodyContentType;
-    telemetryProps.saveToSentItems = args.options.saveToSentItems;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        bodyContents: typeof args.options.bodyContents !== 'undefined',
+        bodyContentType: args.options.bodyContentType,
+        saveToSentItems: args.options.saveToSentItems
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-s, --subject <subject>'
+      },
+      {
+        option: '-t, --to <to>'
+      },
+      {
+        option: '--bodyContents <bodyContents>'
+      },
+      {
+        option: '--bodyContentType [bodyContentType]',
+        autocomplete: ['Text', 'HTML']
+      },
+      {
+        option: '--saveToSentItems [saveToSentItems]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.bodyContentType &&
+          args.options.bodyContentType !== 'Text' &&
+          args.options.bodyContentType !== 'HTML') {
+          return `${args.options.bodyContents} is not a valid value for the bodyContents option. Allowed values are Text|HTML`;
+        }
+    
+        if (args.options.saveToSentItems &&
+          args.options.saveToSentItems !== 'true' &&
+          args.options.saveToSentItems !== 'false') {
+          return `${args.options.saveToSentItems} is not a valid value for the saveToSentItems option. Allowed values are true|false`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -72,46 +120,6 @@ class OutlookMailSendCommand extends GraphCommand {
     request
       .post(requestOptions)
       .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-s, --subject <subject>'
-      },
-      {
-        option: '-t, --to <to>'
-      },
-      {
-        option: '--bodyContents <bodyContents>'
-      },
-      {
-        option: '--bodyContentType [bodyContentType]',
-        autocomplete: ['Text', 'HTML']
-      },
-      {
-        option: '--saveToSentItems [saveToSentItems]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.bodyContentType &&
-      args.options.bodyContentType !== 'Text' &&
-      args.options.bodyContentType !== 'HTML') {
-      return `${args.options.bodyContents} is not a valid value for the bodyContents option. Allowed values are Text|HTML`;
-    }
-
-    if (args.options.saveToSentItems &&
-      args.options.saveToSentItems !== 'true' &&
-      args.options.saveToSentItems !== 'false') {
-      return `${args.options.saveToSentItems} is not a valid value for the saveToSentItems option. Allowed values are true|false`;
-    }
-
-    return true;
   }
 }
 

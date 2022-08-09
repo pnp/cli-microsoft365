@@ -169,7 +169,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
   });
 
   it('Contains the correct options', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOutputOption = false;
     let containsVerboseOption = false;
     let containsDebugOption = false;

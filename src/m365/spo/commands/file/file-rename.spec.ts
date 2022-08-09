@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -15,6 +15,7 @@ describe(commands.FILE_RENAME, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   const renameResponseJson = [
     {
@@ -35,6 +36,7 @@ describe(commands.FILE_RENAME, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -78,13 +80,13 @@ describe(commands.FILE_RENAME, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'foo', sourceUrl: 'abc', targetUrl: 'abc' } });
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'foo', sourceUrl: 'abc', targetFileName: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', sourceUrl: 'abc', targetUrl: 'abc' } });
+  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', sourceUrl: 'abc', targetFileName: 'abc' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -254,7 +256,7 @@ describe(commands.FILE_RENAME, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

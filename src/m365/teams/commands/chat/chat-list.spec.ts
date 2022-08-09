@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.CHAT_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -63,7 +65,7 @@ describe(commands.CHAT_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -73,48 +75,47 @@ describe(commands.CHAT_LIST, () => {
     assert(containsOption);
   });
 
-  it('fails validation for an incorrect chatType.', (done) => {
-    const actual = command.validate({
+  it('fails validation for an incorrect chatType.', async () => {
+    const actual = await command.validate({
       options: {
         type: 'oneOn'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('validates for a correct input without chat type', () => {
-    const actual = command.validate({
+  it('validates for a correct input without chat type', async () => {
+    const actual = await command.validate({
       options: {
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct input for oneOnOne chat conversations', () => {
-    const actual = command.validate({
+  it('validates for a correct input for oneOnOne chat conversations', async () => {
+    const actual = await command.validate({
       options: {
         type: "oneOnOne"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct input for group chat conversations', () => {
-    const actual = command.validate({
+  it('validates for a correct input for group chat conversations', async () => {
+    const actual = await command.validate({
       options: {
         type: "group"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct input for meeting chat conversations', () => {
-    const actual = command.validate({
+  it('validates for a correct input for meeting chat conversations', async () => {
+    const actual = await command.validate({
       options: {
         type: "meeting"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

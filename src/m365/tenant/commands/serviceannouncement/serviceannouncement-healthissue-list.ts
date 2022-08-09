@@ -1,6 +1,5 @@
 import { ServiceHealthIssue } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
@@ -27,6 +26,20 @@ class TenantServiceAnnouncementHealthIssueListCommand extends GraphCommand {
     return ['id', 'title'];
   }
 
+  constructor() {
+    super();
+
+    this.#initOptions();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-s, --service [service]'
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let endpoint: string = `${this.resource}/v1.0/admin/serviceAnnouncement/issues`;
 
@@ -40,17 +53,6 @@ class TenantServiceAnnouncementHealthIssueListCommand extends GraphCommand {
         logger.log(items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-s, --service [service]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

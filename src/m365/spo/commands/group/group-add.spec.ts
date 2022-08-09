@@ -2,10 +2,10 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { sinonUtil } from '../../../../utils';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./group-add');
 
@@ -27,11 +27,13 @@ describe(commands.GROUP_ADD, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -72,18 +74,18 @@ describe(commands.GROUP_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'foo', name: validName } });
+  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'foo', name: validName } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when invalid boolean is passed as option', () => {
-    const actual = command.validate({ options: { webUrl: validSharePointUrl, name: validName, allowRequestToJoinLeave: 'invalid' } });
+  it('fails validation when invalid boolean is passed as option', async () => {
+    const actual = await command.validate({ options: { webUrl: validSharePointUrl, name: validName, allowRequestToJoinLeave: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the url is valid and name is passed', () => {
-    const actual = command.validate({ options: { webUrl: validSharePointUrl, name: validName } });
+  it('passes validation if the url is valid and name is passed', async () => {
+    const actual = await command.validate({ options: { webUrl: validSharePointUrl, name: validName } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -129,7 +131,7 @@ describe(commands.GROUP_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

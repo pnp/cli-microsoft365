@@ -1,7 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -32,16 +29,110 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
     return 'Removes the specified field from list view';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listId = typeof args.options.listId !== 'undefined';
-    telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
-    telemetryProps.viewId = typeof args.options.viewId !== 'undefined';
-    telemetryProps.viewTitle = typeof args.options.viewTitle !== 'undefined';
-    telemetryProps.fieldId = typeof args.options.fieldId !== 'undefined';
-    telemetryProps.fieldTitle = typeof args.options.fieldTitle !== 'undefined';
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        viewId: typeof args.options.viewId !== 'undefined',
+        viewTitle: typeof args.options.viewTitle !== 'undefined',
+        fieldId: typeof args.options.fieldId !== 'undefined',
+        fieldTitle: typeof args.options.fieldTitle !== 'undefined',
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--listId [listId]'
+      },
+      {
+        option: '--listTitle [listTitle]'
+      },
+      {
+        option: '--viewId [viewId]'
+      },
+      {
+        option: '--viewTitle [viewTitle]'
+      },
+      {
+        option: '--fieldId [fieldId]'
+      },
+      {
+        option: '--fieldTitle [fieldTitle]'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.listId) {
+          if (!validation.isValidGuid(args.options.listId)) {
+            return `${args.options.listId} is not a valid GUID`;
+          }
+        }
+
+        if (args.options.viewId) {
+          if (!validation.isValidGuid(args.options.viewId)) {
+            return `${args.options.viewId} is not a valid GUID`;
+          }
+        }
+
+        if (args.options.fieldId) {
+          if (!validation.isValidGuid(args.options.fieldId)) {
+            return `${args.options.viewId} is not a valid GUID`;
+          }
+        }
+
+        if (args.options.listId && args.options.listTitle) {
+          return 'Specify listId or listTitle, but not both';
+        }
+
+        if (!args.options.listId && !args.options.listTitle) {
+          return 'Specify listId or listTitle, one is required';
+        }
+
+        if (args.options.viewId && args.options.viewTitle) {
+          return 'Specify viewId or viewTitle, but not both';
+        }
+
+        if (!args.options.viewId && !args.options.viewTitle) {
+          return 'Specify viewId or viewTitle, one is required';
+        }
+
+        if (args.options.fieldId && args.options.fieldTitle) {
+          return 'Specify fieldId or fieldTitle, but not both';
+        }
+
+        if (!args.options.fieldId && !args.options.fieldTitle) {
+          return 'Specify fieldId or fieldTitle, one is required';
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -111,89 +202,6 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
     };
 
     return request.get(requestOptions);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--listId [listId]'
-      },
-      {
-        option: '--listTitle [listTitle]'
-      },
-      {
-        option: '--viewId [viewId]'
-      },
-      {
-        option: '--viewTitle [viewTitle]'
-      },
-      {
-        option: '--fieldId [fieldId]'
-      },
-      {
-        option: '--fieldTitle [fieldTitle]'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.listId) {
-      if (!validation.isValidGuid(args.options.listId)) {
-        return `${args.options.listId} is not a valid GUID`;
-      }
-    }
-
-    if (args.options.viewId) {
-      if (!validation.isValidGuid(args.options.viewId)) {
-        return `${args.options.viewId} is not a valid GUID`;
-      }
-    }
-
-    if (args.options.fieldId) {
-      if (!validation.isValidGuid(args.options.fieldId)) {
-        return `${args.options.viewId} is not a valid GUID`;
-      }
-    }
-
-    if (args.options.listId && args.options.listTitle) {
-      return 'Specify listId or listTitle, but not both';
-    }
-
-    if (!args.options.listId && !args.options.listTitle) {
-      return 'Specify listId or listTitle, one is required';
-    }
-
-    if (args.options.viewId && args.options.viewTitle) {
-      return 'Specify viewId or viewTitle, but not both';
-    }
-
-    if (!args.options.viewId && !args.options.viewTitle) {
-      return 'Specify viewId or viewTitle, one is required';
-    }
-
-    if (args.options.fieldId && args.options.fieldTitle) {
-      return 'Specify fieldId or fieldTitle, but not both';
-    }
-
-    if (!args.options.fieldId && !args.options.fieldTitle) {
-      return 'Specify fieldId or fieldTitle, one is required';
-    }
-
-    return true;
   }
 }
 

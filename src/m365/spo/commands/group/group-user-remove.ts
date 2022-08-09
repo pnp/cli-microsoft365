@@ -1,5 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -19,7 +18,6 @@ interface Options extends GlobalOptions {
 }
 
 class SpoGroupUserRemoveCommand extends SpoCommand {
-
   public get name(): string {
     return commands.GROUP_USER_REMOVE;
   }
@@ -28,12 +26,62 @@ class SpoGroupUserRemoveCommand extends SpoCommand {
     return 'Removes the specified user from a SharePoint group';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.groupId = (!(!args.options.groupId)).toString();
-    telemetryProps.groupName = (!(!args.options.groupName)).toString();
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        groupId: (!(!args.options.groupId)).toString(),
+        groupName: (!(!args.options.groupName)).toString(),
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--groupId [groupId]'
+      },
+      {
+        option: '--groupName [groupName]'
+      },
+      {
+        option: '--userName <userName>'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.groupId && args.options.groupName) {
+          return 'Use either "groupName" or "groupId", but not both';
+        }
+
+        if (!args.options.groupId && !args.options.groupName) {
+          return 'Either "groupName" or "groupId" is required';
+        }
+
+        if (args.options.groupId && isNaN(args.options.groupId)) {
+          return `Specified "groupId" ${args.options.groupId} is not valid`;
+        }
+
+        return validation.isValidSharePointUrl(args.options.webUrl);
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -42,7 +90,7 @@ class SpoGroupUserRemoveCommand extends SpoCommand {
         logger.logToStderr(`Removing User with Username ${args.options.userName} from Group: ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
       }
 
-      const loginName : string = `i:0#.f|membership|${args.options.userName}`;
+      const loginName: string = `i:0#.f|membership|${args.options.userName}`;
       const requestUrl: string = `${args.options.webUrl}/_api/web/sitegroups/${args.options.groupId
         ? `GetById('${encodeURIComponent(args.options.groupId)}')`
         : `GetByName('${encodeURIComponent(args.options.groupName as string)}')`}/users/removeByLoginName(@LoginName)?@LoginName='${encodeURIComponent(loginName)}'`;
@@ -83,45 +131,6 @@ class SpoGroupUserRemoveCommand extends SpoCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--groupId [groupId]'
-      },
-      {
-        option: '--groupName [groupName]'
-      },
-      {
-        option: '--userName <userName>'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.groupId && args.options.groupName) {
-      return 'Use either "groupName" or "groupId", but not both';
-    }
-
-    if (!args.options.groupId && !args.options.groupName) {
-      return 'Either "groupName" or "groupId" is required';
-    }
-
-    if (args.options.groupId && isNaN(args.options.groupId)) {
-      return `Specified "groupId" ${args.options.groupId} is not valid`;
-    }
-
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

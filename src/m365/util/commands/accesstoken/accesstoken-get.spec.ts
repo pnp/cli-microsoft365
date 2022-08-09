@@ -10,8 +10,8 @@ const command: Command = require('./accesstoken-get');
 
 describe(commands.ACCESSTOKEN_GET, () => {
   let log: any[];
-  let loggerLogSpy: sinon.SinonSpy;
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -131,7 +131,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

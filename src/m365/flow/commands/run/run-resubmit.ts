@@ -1,8 +1,5 @@
 import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -29,10 +26,49 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
     return 'Resubmits a specific flow run for the specified Microsoft Flow';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.confirm = args.options.confirm;
-    return telemetryProps;
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        confirm: args.options.confirm
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --name <name>'
+      },
+      {
+        option: '-f, --flow <flow>'
+      },
+      {
+        option: '-e, --environment <environment>'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.flow)) {
+          return `${args.options.flow} is not a valid GUID`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -93,34 +129,6 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
     return request
       .get<{ value: { name: string; }[]; }>(requestOptions)
       .then((res: { value: { name: string }[]; }): Promise<string> => Promise.resolve(res.value[0].name));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-f, --flow <flow>'
-      },
-      {
-        option: '-e, --environment <environment>'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.flow)) {
-      return `${args.options.flow} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

@@ -1,11 +1,10 @@
+import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { accessToken } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { accessToken } from '../../../../utils';
-import Auth from '../../../../Auth';
 
 interface CommandArgs {
   options: Options;
@@ -24,8 +23,22 @@ class PlannerTaskReferenceListCommand extends GraphCommand {
     return 'Retrieve the references of the specified planner task';
   }
 
+  constructor() {
+    super();
+  
+    this.#initOptions();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --taskId <taskId>'
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
     }
@@ -44,18 +57,6 @@ class PlannerTaskReferenceListCommand extends GraphCommand {
         logger.log(res.references);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --taskId <taskId>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

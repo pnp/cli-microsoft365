@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
@@ -30,6 +27,26 @@ class FlowRunGetCommand extends AzmgmtCommand {
     return ['name', 'startTime', 'endTime', 'status', 'triggerName'];
   }
 
+  constructor() {
+    super();
+  
+    this.#initOptions();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --name <name>'
+      },
+      {
+        option: '-f, --flow <flow>'
+      },
+      {
+        option: '-e, --environment <environment>'
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
       logger.logToStderr(`Retrieving information about run ${args.options.name} of Microsoft Flow ${args.options.flow}...`);
@@ -54,23 +71,6 @@ class FlowRunGetCommand extends AzmgmtCommand {
 
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-f, --flow <flow>'
-      },
-      {
-        option: '-e, --environment <environment>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

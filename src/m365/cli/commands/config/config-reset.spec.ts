@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import { settingsNames } from '../../../../settingsNames';
 import { sinonUtil } from '../../../../utils';
@@ -10,6 +10,11 @@ const command: Command = require('./config-reset');
 describe(commands.CONFIG_RESET, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+
+  before(() => {
+    commandInfo = Cli.getCommandInfo(command);
+  });
 
   beforeEach(() => {
     log = [];
@@ -106,18 +111,18 @@ describe(commands.CONFIG_RESET, () => {
     });
   });
 
-  it('fails validation if specified key is invalid', () => {
-    const actual = command.validate({ options: { key: 'invalid', value: false } });
+  it('fails validation if specified key is invalid', async () => {
+    const actual = await command.validate({ options: { key: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if key is not specified', () => {
-    const actual = command.validate({ options: {} });
+  it('passes validation if key is not specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports specifying key', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOptionKey = false;
     options.forEach(o => {
       if (o.option.indexOf('--key') > -1) {

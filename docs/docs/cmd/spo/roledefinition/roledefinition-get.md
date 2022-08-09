@@ -1,6 +1,6 @@
 # spo roledefinition get
 
-Gets specified role definition from web by id
+Gets specified role definition from web
 
 ## Usage
 

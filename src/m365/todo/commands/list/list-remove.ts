@@ -1,7 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -26,12 +23,52 @@ class TodoListRemoveCommand extends GraphCommand {
     return 'Removes a Microsoft To Do task list';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.name = typeof args.options.name !== 'undefined';
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.confirm = typeof args.options.confirm !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        name: typeof args.options.name !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
+        confirm: typeof args.options.confirm !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --name [name]'
+      },
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.name && !args.options.id) {
+          return 'Specify name or id of the list to remove';
+        }
+
+        if (args.options.name && args.options.id) {
+          return 'Specify either the name or the id of the list to remove but not both';
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -94,35 +131,6 @@ class TodoListRemoveCommand extends GraphCommand {
         }
       );
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.name && !args.options.id) {
-      return 'Specify name or id of the list to remove';
-    }
-
-    if (args.options.name && args.options.id) {
-      return 'Specify either the name or the id of the list to remove but not both';
-    }
-
-    return true;
   }
 }
 

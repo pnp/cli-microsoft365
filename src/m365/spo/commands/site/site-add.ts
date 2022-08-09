@@ -1,7 +1,7 @@
 import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -68,33 +68,262 @@ class SpoSiteAddCommand extends SpoCommand {
     return 'Creates new SharePoint Online site';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    const isClassicSite: boolean = args.options.type === 'ClassicSite';
-    const isCommunicationSite: boolean = args.options.type === 'CommunicationSite';
-    telemetryProps.siteType = args.options.type || 'TeamSite';
-    telemetryProps.description = (!(!args.options.description)).toString();
-    telemetryProps.classification = (!(!args.options.classification)).toString();
-    telemetryProps.isPublic = args.options.isPublic || false;
-    telemetryProps.lcid = args.options.lcid;
-    telemetryProps.owners = typeof args.options.owners !== 'undefined';
+  constructor() {
+    super();
 
-    if (isCommunicationSite) {
-      telemetryProps.allowFileSharingForGuestUsers = args.options.allowFileSharingForGuestUsers || false;
-      telemetryProps.shareByEmailEnabled = args.options.shareByEmailEnabled || false;
-      telemetryProps.siteDesign = args.options.siteDesign;
-      telemetryProps.siteDesignId = (!(!args.options.siteDesignId)).toString();
-    }
-    else if (isClassicSite) {
-      telemetryProps.webTemplate = typeof args.options.webTemplate !== 'undefined';
-      telemetryProps.resourceQuota = typeof args.options.resourceQuota !== 'undefined';
-      telemetryProps.resourceQuotaWarningLevel = typeof args.options.resourceQuotaWarningLevel !== 'undefined';
-      telemetryProps.storageQuota = typeof args.options.storageQuota !== 'undefined';
-      telemetryProps.storageQuotaWarningLevel = typeof args.options.storageQuotaWarningLevel !== 'undefined';
-      telemetryProps.removeDeletedSite = args.options.removeDeletedSite;
-      telemetryProps.wait = args.options.wait;
-    }
-    return telemetryProps;
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      const telemetryProps: any = {};
+      const isClassicSite: boolean = args.options.type === 'ClassicSite';
+      const isCommunicationSite: boolean = args.options.type === 'CommunicationSite';
+      telemetryProps.siteType = args.options.type || 'TeamSite';
+      telemetryProps.description = (!(!args.options.description)).toString();
+      telemetryProps.classification = (!(!args.options.classification)).toString();
+      telemetryProps.isPublic = args.options.isPublic || false;
+      telemetryProps.lcid = args.options.lcid;
+      telemetryProps.owners = typeof args.options.owners !== 'undefined';
+
+      if (isCommunicationSite) {
+        telemetryProps.allowFileSharingForGuestUsers = args.options.allowFileSharingForGuestUsers || false;
+        telemetryProps.shareByEmailEnabled = args.options.shareByEmailEnabled || false;
+        telemetryProps.siteDesign = args.options.siteDesign;
+        telemetryProps.siteDesignId = (!(!args.options.siteDesignId)).toString();
+      }
+      else if (isClassicSite) {
+        telemetryProps.webTemplate = typeof args.options.webTemplate !== 'undefined';
+        telemetryProps.resourceQuota = typeof args.options.resourceQuota !== 'undefined';
+        telemetryProps.resourceQuotaWarningLevel = typeof args.options.resourceQuotaWarningLevel !== 'undefined';
+        telemetryProps.storageQuota = typeof args.options.storageQuota !== 'undefined';
+        telemetryProps.storageQuotaWarningLevel = typeof args.options.storageQuotaWarningLevel !== 'undefined';
+        telemetryProps.removeDeletedSite = args.options.removeDeletedSite;
+        telemetryProps.wait = args.options.wait;
+      }
+
+      Object.assign(this.telemetryProperties, telemetryProps);
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--type [type]',
+        autocomplete: ['TeamSite', 'CommunicationSite', 'ClassicSite']
+      },
+      {
+        option: '-t, --title <title>'
+      },
+      {
+        option: '-a, --alias [alias]'
+      },
+      {
+        option: '-u, --url [url]'
+      },
+      {
+        option: '-z, --timeZone [timeZone]'
+      },
+      {
+        option: '-d, --description [description]'
+      },
+      {
+        option: '-l, --lcid [lcid]'
+      },
+      {
+        option: '--owners [owners]'
+      },
+      {
+        option: '--isPublic'
+      },
+      {
+        option: '-c, --classification [classification]'
+      },
+      {
+        option: '--siteDesign [siteDesign]',
+        autocomplete: ['Topic', 'Showcase', 'Blank']
+      },
+      {
+        option: '--siteDesignId [siteDesignId]'
+      },
+      {
+        option: '--allowFileSharingForGuestUsers'
+      },
+      {
+        option: '--shareByEmailEnabled'
+      },
+      {
+        option: '-w, --webTemplate [webTemplate]'
+      },
+      {
+        option: '--resourceQuota [resourceQuota]'
+      },
+      {
+        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
+      },
+      {
+        option: '--storageQuota [storageQuota]'
+      },
+      {
+        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
+      },
+      {
+        option: '--removeDeletedSite'
+      },
+      {
+        option: '--wait'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isClassicSite: boolean = args.options.type === 'ClassicSite';
+        const isCommunicationSite: boolean = args.options.type === 'CommunicationSite';
+        const isTeamSite: boolean = isCommunicationSite === false && isClassicSite === false;
+
+        if (args.options.type) {
+          if (args.options.type !== 'TeamSite' &&
+            args.options.type !== 'CommunicationSite' &&
+            args.options.type !== 'ClassicSite') {
+            return `${args.options.type} is not a valid site type. Allowed types are TeamSite, CommunicationSite, and ClassicSite`;
+          }
+        }
+
+        if (isTeamSite) {
+          if (!args.options.alias) {
+            return 'Required option alias missing';
+          }
+
+          if (args.options.url || args.options.siteDesign || args.options.removeDeletedSite || args.options.wait || args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers || args.options.siteDesignId || args.options.timeZone || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
+            return "Type TeamSite supports only the parameters title, lcid, alias, owners, classification, isPublic, and description";
+          }
+        }
+        else if (isCommunicationSite) {
+          if (!args.options.url) {
+            return 'Required option url missing';
+          }
+
+          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
+          if (isValidSharePointUrl !== true) {
+            return isValidSharePointUrl;
+          }
+
+          if (args.options.siteDesign) {
+            if (args.options.siteDesign !== 'Topic' &&
+              args.options.siteDesign !== 'Showcase' &&
+              args.options.siteDesign !== 'Blank') {
+              return `${args.options.siteDesign} is not a valid communication site type. Allowed types are Topic, Showcase and Blank`;
+            }
+          }
+
+          if (args.options.owners && args.options.owners.indexOf(",") > -1) {
+            return 'The CommunicationSite supports only one owner in the owners option';
+          }
+
+          if (args.options.siteDesignId) {
+            if (!validation.isValidGuid(args.options.siteDesignId)) {
+              return `${args.options.siteDesignId} is not a valid GUID`;
+            }
+          }
+
+          if (args.options.siteDesign && args.options.siteDesignId) {
+            return 'Specify siteDesign or siteDesignId but not both';
+          }
+
+          if (args.options.timeZone || args.options.isPublic || args.options.removeDeletedSite || args.options.wait || args.options.alias || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
+            return "Type CommunicationSite supports only the parameters url, title, lcid, classification, siteDesign, shareByEmailEnabled, allowFileSharingForGuestUsers, siteDesignId, owners, and description";
+          }
+        }
+        else {
+          if (!args.options.url) {
+            return 'Required option url missing';
+          }
+
+          const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
+          if (isValidSharePointUrl !== true) {
+            return isValidSharePointUrl;
+          }
+
+          if (!args.options.owners) {
+            return 'Required option owner missing';
+          }
+
+          if (args.options.owners.indexOf(",") > -1) {
+            return 'The ClassicSite supports only one owner in the owners options';
+          }
+
+          if (!args.options.timeZone) {
+            return 'Required option timeZone missing';
+          }
+
+          if (typeof args.options.timeZone !== 'number') {
+            return `${args.options.timeZone} is not a number`;
+          }
+
+          if (args.options.resourceQuota &&
+            typeof args.options.resourceQuota !== 'number') {
+            return `${args.options.resourceQuota} is not a number`;
+          }
+
+          if (args.options.resourceQuotaWarningLevel &&
+            typeof args.options.resourceQuotaWarningLevel !== 'number') {
+            return `${args.options.resourceQuotaWarningLevel} is not a number`;
+          }
+
+          if (args.options.resourceQuotaWarningLevel &&
+            !args.options.resourceQuota) {
+            return `You cannot specify resourceQuotaWarningLevel without specifying resourceQuota`;
+          }
+
+          if ((<number>args.options.resourceQuotaWarningLevel) > (<number>args.options.resourceQuota)) {
+            return `resourceQuotaWarningLevel cannot exceed resourceQuota`;
+          }
+
+          if (args.options.storageQuota &&
+            typeof args.options.storageQuota !== 'number') {
+            return `${args.options.storageQuota} is not a number`;
+          }
+
+          if (args.options.storageQuotaWarningLevel &&
+            typeof args.options.storageQuotaWarningLevel !== 'number') {
+            return `${args.options.storageQuotaWarningLevel} is not a number`;
+          }
+
+          if (args.options.storageQuotaWarningLevel &&
+            !args.options.storageQuota) {
+            return `You cannot specify storageQuotaWarningLevel without specifying storageQuota`;
+          }
+
+          if ((<number>args.options.storageQuotaWarningLevel) > (<number>args.options.storageQuota)) {
+            return `storageQuotaWarningLevel cannot exceed storageQuota`;
+          }
+
+          if (args.options.classification || args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers || args.options.siteDesignId || args.options.siteDesignId || args.options.alias || args.options.isPublic) {
+            return "Type ClassicSite supports only the parameters url, title, lcid, storageQuota, storageQuotaWarningLevel, resourceQuota, resourceQuotaWarningLevel, webTemplate, owners, and description";
+          }
+        }
+
+        if (args.options.lcid) {
+          if (isNaN(args.options.lcid)) {
+            return `${args.options.lcid} is not a number`;
+          }
+
+          if (args.options.lcid < 0) {
+            return `LCID must be greater than 0 (${args.options.lcid})`;
+          }
+
+          if (this.supportedLcids.indexOf(args.options.lcid) < 0) {
+            return `LCID ${args.options.lcid} is not valid. See https://support.microsoft.com/en-us/office/languages-supported-by-sharepoint-dfbf3652-2902-4809-be21-9080b6512fff for the languages supported by SharePoint.`;
+          }
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -474,223 +703,6 @@ class SpoSiteAddCommand extends SpoCommand {
           }
         });
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--type [type]',
-        autocomplete: ['TeamSite', 'CommunicationSite', 'ClassicSite']
-      },
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '-a, --alias [alias]'
-      },
-      {
-        option: '-u, --url [url]'
-      },
-      {
-        option: '-z, --timeZone [timeZone]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-l, --lcid [lcid]'
-      },
-      {
-        option: '--owners [owners]'
-      },
-      {
-        option: '--isPublic'
-      },
-      {
-        option: '-c, --classification [classification]'
-      },
-      {
-        option: '--siteDesign [siteDesign]',
-        autocomplete: ['Topic', 'Showcase', 'Blank']
-      },
-      {
-        option: '--siteDesignId [siteDesignId]'
-      },
-      {
-        option: '--allowFileSharingForGuestUsers'
-      },
-      {
-        option: '--shareByEmailEnabled'
-      },
-      {
-        option: '-w, --webTemplate [webTemplate]'
-      },
-      {
-        option: '--resourceQuota [resourceQuota]'
-      },
-      {
-        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
-      },
-      {
-        option: '--storageQuota [storageQuota]'
-      },
-      {
-        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
-      },
-      {
-        option: '--removeDeletedSite'
-      },
-      {
-        option: '--wait'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isClassicSite: boolean = args.options.type === 'ClassicSite';
-    const isCommunicationSite: boolean = args.options.type === 'CommunicationSite';
-    const isTeamSite: boolean = isCommunicationSite === false && isClassicSite === false;
-
-    if (args.options.type) {
-      if (args.options.type !== 'TeamSite' &&
-        args.options.type !== 'CommunicationSite' &&
-        args.options.type !== 'ClassicSite') {
-        return `${args.options.type} is not a valid site type. Allowed types are TeamSite, CommunicationSite, and ClassicSite`;
-      }
-    }
-
-    if (isTeamSite) {
-      if (!args.options.alias) {
-        return 'Required option alias missing';
-      }
-
-      if (args.options.url || args.options.siteDesign || args.options.removeDeletedSite || args.options.wait || args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers || args.options.siteDesignId || args.options.timeZone || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
-        return "Type TeamSite supports only the parameters title, lcid, alias, owners, classification, isPublic, and description";
-      }
-    }
-    else if (isCommunicationSite) {
-      if (!args.options.url) {
-        return 'Required option url missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      if (args.options.siteDesign) {
-        if (args.options.siteDesign !== 'Topic' &&
-          args.options.siteDesign !== 'Showcase' &&
-          args.options.siteDesign !== 'Blank') {
-          return `${args.options.siteDesign} is not a valid communication site type. Allowed types are Topic, Showcase and Blank`;
-        }
-      }
-
-      if (args.options.owners && args.options.owners.indexOf(",") > -1) {
-        return 'The CommunicationSite supports only one owner in the owners option';
-      }
-
-      if (args.options.siteDesignId) {
-        if (!validation.isValidGuid(args.options.siteDesignId)) {
-          return `${args.options.siteDesignId} is not a valid GUID`;
-        }
-      }
-
-      if (args.options.siteDesign && args.options.siteDesignId) {
-        return 'Specify siteDesign or siteDesignId but not both';
-      }
-
-      if (args.options.timeZone || args.options.isPublic || args.options.removeDeletedSite || args.options.wait || args.options.alias || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
-        return "Type CommunicationSite supports only the parameters url, title, lcid, classification, siteDesign, shareByEmailEnabled, allowFileSharingForGuestUsers, siteDesignId, owners, and description";
-      }
-    }
-    else {
-      if (!args.options.url) {
-        return 'Required option url missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      if (!args.options.owners) {
-        return 'Required option owner missing';
-      }
-
-      if (args.options.owners.indexOf(",") > -1) {
-        return 'The ClassicSite supports only one owner in the owners options';
-      }
-
-      if (!args.options.timeZone) {
-        return 'Required option timeZone missing';
-      }
-
-      if (typeof args.options.timeZone !== 'number') {
-        return `${args.options.timeZone} is not a number`;
-      }
-
-      if (args.options.resourceQuota &&
-        typeof args.options.resourceQuota !== 'number') {
-        return `${args.options.resourceQuota} is not a number`;
-      }
-
-      if (args.options.resourceQuotaWarningLevel &&
-        typeof args.options.resourceQuotaWarningLevel !== 'number') {
-        return `${args.options.resourceQuotaWarningLevel} is not a number`;
-      }
-
-      if (args.options.resourceQuotaWarningLevel &&
-        !args.options.resourceQuota) {
-        return `You cannot specify resourceQuotaWarningLevel without specifying resourceQuota`;
-      }
-
-      if ((<number>args.options.resourceQuotaWarningLevel) > (<number>args.options.resourceQuota)) {
-        return `resourceQuotaWarningLevel cannot exceed resourceQuota`;
-      }
-
-      if (args.options.storageQuota &&
-        typeof args.options.storageQuota !== 'number') {
-        return `${args.options.storageQuota} is not a number`;
-      }
-
-      if (args.options.storageQuotaWarningLevel &&
-        typeof args.options.storageQuotaWarningLevel !== 'number') {
-        return `${args.options.storageQuotaWarningLevel} is not a number`;
-      }
-
-      if (args.options.storageQuotaWarningLevel &&
-        !args.options.storageQuota) {
-        return `You cannot specify storageQuotaWarningLevel without specifying storageQuota`;
-      }
-
-      if ((<number>args.options.storageQuotaWarningLevel) > (<number>args.options.storageQuota)) {
-        return `storageQuotaWarningLevel cannot exceed storageQuota`;
-      }
-
-      if (args.options.classification || args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers || args.options.siteDesignId || args.options.siteDesignId || args.options.alias || args.options.isPublic) {
-        return "Type ClassicSite supports only the parameters url, title, lcid, storageQuota, storageQuotaWarningLevel, resourceQuota, resourceQuotaWarningLevel, webTemplate, owners, and description";
-      }
-    }
-
-    if (args.options.lcid) {
-      if (isNaN(args.options.lcid)) {
-        return `${args.options.lcid} is not a number`;
-      }
-
-      if (args.options.lcid < 0) {
-        return `LCID must be greater than 0 (${args.options.lcid})`;
-      }
-
-      if (this.supportedLcids.indexOf(args.options.lcid) < 0) {
-        return `LCID ${args.options.lcid} is not valid. See https://support.microsoft.com/en-us/office/languages-supported-by-sharepoint-dfbf3652-2902-4809-be21-9080b6512fff for the languages supported by SharePoint.`;
-      }
-    }
-
-    return true;
   }
 }
 

@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ const command: Command = require('./app-update');
 describe(commands.APP_UPDATE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -61,81 +63,75 @@ describe(commands.APP_UPDATE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both id and name options are passed', (done) => {
-    const actual = command.validate({
+  it('fails validation if both id and name options are passed', async () => {
+    const actual = await command.validate({
       options: {
         id: 'e3e29acb-8c79-412b-b746-e6c39ff4cd22',
         name: 'Test app',
         filePath: 'teamsapp.zip'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if both id and name options are not passed', (done) => {
-    const actual = command.validate({
+  it('fails validation if both id and name options are not passed', async () => {
+    const actual = await command.validate({
       options: {
         filePath: 'teamsapp.zip'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if the id is not a valid GUID.', (done) => {
-    const actual = command.validate({
+  it('fails validation if the id is not a valid GUID.', async () => {
+    const actual = await command.validate({
       options: {
         id: 'invalid',
         filePath: 'teamsapp.zip'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if the filePath does not exist', (done) => {
+  it('fails validation if the filePath does not exist', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = command.validate({
+    const actual = await command.validate({
       options: { id: "e3e29acb-8c79-412b-b746-e6c39ff4cd22", filePath: 'invalid.zip' }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if the filePath points to a directory', (done) => {
+  it('fails validation if the filePath points to a directory', async () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => true);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = command.validate({
+    const actual = await command.validate({
       options: { id: "e3e29acb-8c79-412b-b746-e6c39ff4cd22", filePath: './' }
-    });
+    }, commandInfo);
     sinonUtil.restore([
       fs.lstatSync
     ]);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('validates for a correct input.', (done) => {
+  it('validates for a correct input.', async () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         id: "e3e29acb-8c79-412b-b746-e6c39ff4cd22",
         filePath: 'teamsapp.zip'
       }
-    });
+    }, commandInfo);
     sinonUtil.restore([
       fs.lstatSync
     ]);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('fails to get Teams app when app does not exists', (done) => {
@@ -312,7 +308,7 @@ describe(commands.APP_UPDATE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

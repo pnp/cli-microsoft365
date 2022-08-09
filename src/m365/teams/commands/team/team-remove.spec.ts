@@ -3,7 +3,7 @@ import chalk = require('chalk');
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -15,11 +15,13 @@ describe(commands.TEAM_REMOVE, () => {
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -68,69 +70,69 @@ describe(commands.TEAM_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation when no option is specified', () => {
-    const actual = command.validate({
+  it('fails validation when no option is specified', async () => {
+    const actual = await command.validate({
       options: {
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when all options are specified', () => {
-    const actual = command.validate({
+  it('fails validation when all options are specified', async () => {
+    const actual = await command.validate({
       options: {
         name: 'Finance',
         id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when both id and name are specified', () => {
-    const actual = command.validate({
+  it('fails validation when both id and name are specified', async () => {
+    const actual = await command.validate({
       options: {
         name: 'Finance',
         id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when both teamId and name are specified', () => {
-    const actual = command.validate({
+  it('fails validation when both teamId and name are specified', async () => {
+    const actual = await command.validate({
       options: {
         name: 'Finance',
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the teamId is not a valid guid.', () => {
-    const actual = command.validate({
+  it('fails validation if the teamId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the id is not a valid guid.', () => {
-    const actual = command.validate({
+  it('fails validation if the id is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
         id: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when valid id is specified', () => {
-    const actual = command.validate({
+  it('passes validation when valid id is specified', async () => {
+    const actual = await command.validate({
       options: {
         id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -356,7 +358,7 @@ describe(commands.TEAM_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

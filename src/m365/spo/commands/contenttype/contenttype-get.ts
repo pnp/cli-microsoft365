@@ -1,5 +1,5 @@
 import { Logger } from '../../../../cli';
-import { CommandError, CommandOption, CommandTypes } from '../../../../Command';
+import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -26,10 +26,65 @@ class SpoContentTypeGetCommand extends SpoCommand {
     return 'Retrieves information about the specified list or site content type';
   }
 
-  public types(): CommandTypes | undefined {
-    return {
-      string: ['id', 'i']
-    };
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initTypes();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
+        name: typeof args.options.name !== 'undefined'
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-l, --listTitle [listTitle]'
+      },
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --name [name]'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+    
+        if (args.options.id && args.options.name) {
+          return 'Specify id or name, but not both';
+        }
+    
+        if (!args.options.id && !args.options.name) {
+          return 'Specify id or name, one is required';
+        }
+    
+        return true;
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('id', 'i');
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -76,43 +131,6 @@ class SpoContentTypeGetCommand extends SpoCommand {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-l, --listTitle [listTitle]'
-      },
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.id && args.options.name) {
-      return 'Specify id or name, but not both';
-    }
-
-    if (!args.options.id && !args.options.name) {
-      return 'Specify id or name, one is required';
-    }
-
-    return true;
   }
 }
 

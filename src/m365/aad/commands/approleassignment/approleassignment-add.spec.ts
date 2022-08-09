@@ -3,7 +3,7 @@ import * as os from 'os';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -14,6 +14,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   const getRequestStub = (): sinon.SinonStub => {
 
@@ -40,6 +41,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -298,43 +300,43 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     });
   });
 
-  it('fails validation if neither appId, objectId nor displayName are not specified', () => {
-    const actual = command.validate({ options: { resource: 'abc', scope: 'abc' } });
+  it('fails validation if neither appId, objectId nor displayName are not specified', async () => {
+    const actual = await command.validate({ options: { resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the appId is not a valid GUID', () => {
-    const actual = command.validate({ options: { appId: '123', resource: 'abc', scope: 'abc' } });
+  it('fails validation if the appId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { appId: '123', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the objectId is not a valid GUID', () => {
-    const actual = command.validate({ options: { objectId: '123', resource: 'abc', scope: 'abc' } });
+  it('fails validation if the objectId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { objectId: '123', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both appId and displayName are specified', () => {
-    const actual = command.validate({ options: { appId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } });
+  it('fails validation if both appId and displayName are specified', async () => {
+    const actual = await command.validate({ options: { appId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both objectId and displayName are specified', () => {
-    const actual = command.validate({ options: { objectId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } });
+  it('fails validation if both objectId and displayName are specified', async () => {
+    const actual = await command.validate({ options: { objectId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both objectId, appId and displayName are specified', () => {
-    const actual = command.validate({ options: { appId: '123', objectId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } });
+  it('fails validation if both objectId, appId and displayName are specified', async () => {
+    const actual = await command.validate({ options: { appId: '123', objectId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the appId option specified', () => {
-    const actual = command.validate({ options: { appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', resource: 'abc', scope: 'abc' } });
+  it('passes validation when the appId option specified', async () => {
+    const actual = await command.validate({ options: { appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', resource: 'abc', scope: 'abc' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -345,7 +347,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
   });
 
   it('supports specifying appId', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--appId') > -1) {
@@ -356,7 +358,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
   });
 
   it('supports specifying displayName', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--displayName') > -1) {

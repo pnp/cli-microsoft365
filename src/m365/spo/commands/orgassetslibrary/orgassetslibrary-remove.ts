@@ -1,11 +1,11 @@
 import { Cli, Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { spo, ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -25,6 +25,23 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
 
   public get description(): string {
     return 'Removes a library that was designated as a central location for organization assets across the tenant.';
+  }
+
+  constructor() {
+    super();
+
+    this.#initOptions();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--libraryUrl <libraryUrl>'
+      },
+      {
+        option: '--confirm'
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -59,7 +76,7 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
           else {
             logger.log(json[json.length - 1]);
           }
-          
+
           cb();
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     };
@@ -82,20 +99,6 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--libraryUrl <libraryUrl>'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.CHANNEL_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -60,41 +62,40 @@ describe(commands.CHANNEL_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('correctly validates the arguments', () => {
-    const actual = command.validate({
+  it('correctly validates the arguments', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         channelName: 'Reviews',
         newChannelName: 'Gen',
         description: 'this is a new description'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the teamId is not a valid guid.', () => {
-    const actual = command.validate({
+  it('fails validation if the teamId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: 'invalid',
         channelName: 'Reviews',
         newChannelName: 'Gen',
         description: 'this is a new description'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when channelName is General', (done) => {
-    const actual = command.validate({
+  it('fails validation when channelName is General', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         channelName: 'General',
         newChannelName: 'Reviews',
         description: 'this is a new description'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
   it('fails to patch channel updates for the Microsoft Teams team when channel does not exists', (done) => {
@@ -168,7 +169,7 @@ describe(commands.CHANNEL_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

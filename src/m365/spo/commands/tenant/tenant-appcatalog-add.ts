@@ -1,5 +1,5 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
-import Command, { CommandError, CommandErrorWithOutput, CommandOption } from '../../../../Command';
+import Command, { CommandError, CommandErrorWithOutput } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
@@ -28,6 +28,60 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
 
   public get description(): string {
     return 'Creates new tenant app catalog site';
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        wait: args.options.wait || false,
+        force: args.options.force || false
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '--owner <owner>'
+      },
+      {
+        option: '-z, --timeZone <timeZone>'
+      },
+      {
+        option: '--wait'
+      },
+      {
+        option: '--force'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (typeof args.options.timeZone !== 'number') {
+          return `${args.options.timeZone} is not a number`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -132,42 +186,6 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
       removeDeletedSite: false
     } as spoSiteAddCommand.Options;
     return Cli.executeCommand(spoSiteAddCommand as Command, { options: { ...siteAddOptions, _: [] } });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '--owner <owner>'
-      },
-      {
-        option: '-z, --timeZone <timeZone>'
-      },
-      {
-        option: '--wait'
-      },
-      {
-        option: '--force'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (typeof args.options.timeZone !== 'number') {
-      return `${args.options.timeZone} is not a number`;
-    }
-
-    return true;
   }
 }
 

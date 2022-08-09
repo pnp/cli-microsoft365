@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -29,12 +28,62 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
     return 'Updates a specific application permission for a site';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.permissionId = typeof args.options.permissionId !== 'undefined';
-    telemetryProps.appId = typeof args.options.appId !== 'undefined';
-    telemetryProps.appDisplayName = typeof args.options.appDisplayName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        permissionId: typeof args.options.permissionId !== 'undefined',
+        appId: typeof args.options.appId !== 'undefined',
+        appDisplayName: typeof args.options.appDisplayName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --siteUrl <siteUrl>'
+      },
+      {
+        option: '-i, --permissionId [permissionId]'
+      },
+      {
+        option: '--appId [appId]'
+      },
+      {
+        option: '-n, --appDisplayName [appDisplayName]'
+      },
+      {
+        option: '-p, --permission <permission>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.permissionId && !args.options.appId && !args.options.appDisplayName) {
+	      return `Specify permissionId, appId or appDisplayName, one is required`;
+	    }
+
+	    if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
+	      return `${args.options.appId} is not a valid GUID`;
+	    }
+
+	    if (['read', 'write', 'owner'].indexOf(args.options.permission) === -1) {
+	      return `${args.options.permission} is not a valid permission value. Allowed values are read|write|owner`;
+	    }
+
+	    return validation.isValidSharePointUrl(args.options.siteUrl);
+      }
+    );
   }
 
   private getSpoSiteId(args: CommandArgs): Promise<string> {
@@ -123,45 +172,6 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '-i, --permissionId [permissionId]'
-      },
-      {
-        option: '--appId [appId]'
-      },
-      {
-        option: '-n, --appDisplayName [appDisplayName]'
-      },
-      {
-        option: '-p, --permission <permission>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.permissionId && !args.options.appId && !args.options.appDisplayName) {
-      return `Specify permissionId, appId or appDisplayName, one is required`;
-    }
-
-    if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
-      return `${args.options.appId} is not a valid GUID`;
-    }
-
-    if (['read', 'write', 'owner'].indexOf(args.options.permission) === -1) {
-      return `${args.options.permission} is not a valid permission value. Allowed values are read|write|owner`;
-    }
-
-    return validation.isValidSharePointUrl(args.options.siteUrl);
   }
 }
 

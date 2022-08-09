@@ -1,11 +1,11 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { spo, ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { OrgAssets, OrgAssetsResponse } from './OrgAssets';
@@ -77,11 +77,6 @@ class SpoOrgAssetsLibraryListCommand extends SpoCommand {
           cb();
         }
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const parentOptions: CommandOption[] = super.options();
-    return parentOptions;
   }
 }
 

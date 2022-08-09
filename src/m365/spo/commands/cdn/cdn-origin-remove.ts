@@ -1,6 +1,6 @@
 import { Cli, Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -28,11 +28,51 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
     return 'Removes CDN origin for the current SharePoint Online tenant';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.cdnType = args.options.type || 'Public';
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        cdnType: args.options.type || 'Public',
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-t, --type [type]',
+        autocomplete: ['Public', 'Private']
+      },
+      {
+        option: '-r, --origin <origin>'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.type) {
+          if (args.options.type !== 'Public' &&
+            args.options.type !== 'Private') {
+            return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private`;
+          }
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -100,35 +140,6 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-t, --type [type]',
-        autocomplete: ['Public', 'Private']
-      },
-      {
-        option: '-r, --origin <origin>'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.type) {
-      if (args.options.type !== 'Public' &&
-        args.options.type !== 'Private') {
-        return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private`;
-      }
-    }
-
-    return true;
   }
 }
 

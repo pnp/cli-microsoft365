@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,11 +12,13 @@ const command: Command = require('./apppage-add');
 describe(commands.APPPAGE_ADD, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -386,7 +388,7 @@ describe(commands.APPPAGE_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -397,7 +399,7 @@ describe(commands.APPPAGE_ADD, () => {
   });
 
   it('supports specifying title', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--title') > -1) {
@@ -408,7 +410,7 @@ describe(commands.APPPAGE_ADD, () => {
   });
 
   it('supports specifying webUrl', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--webUrl') > -1) {
@@ -419,7 +421,7 @@ describe(commands.APPPAGE_ADD, () => {
   });
 
   it('supports specifying webPartData', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--webPartData') > -1) {
@@ -428,12 +430,12 @@ describe(commands.APPPAGE_ADD, () => {
     });
     assert(containsOption);
   });
-  it('fails validation if webPartData is not a valid JSON string', () => {
-    const actual = command.validate({ options: { title: 'Contoso', webUrl: 'https://contoso', webPartData: 'abc' } });
+  it('fails validation if webPartData is not a valid JSON string', async () => {
+    const actual = await command.validate({ options: { title: 'Contoso', webUrl: 'https://contoso', webPartData: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('validation passes on all required options', () => {
-    const actual = command.validate({ options: { title: 'Contoso', webPartData: '{}', webUrl: 'https://contoso.sharepoint.com' } });
+  it('validation passes on all required options', async () => {
+    const actual = await command.validate({ options: { title: 'Contoso', webPartData: '{}', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

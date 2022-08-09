@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -30,6 +30,23 @@ class SpoServicePrincipalGrantAddCommand extends SpoCommand {
 
   public alias(): string[] | undefined {
     return [commands.SP_GRANT_ADD];
+  }
+
+  constructor() {
+    super();
+
+    this.#initOptions();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-r, --resource <resource>'
+      },
+      {
+        option: '-s, --scope <scope>'
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -69,23 +86,9 @@ class SpoServicePrincipalGrantAddCommand extends SpoCommand {
           delete result._ObjectType_;
           logger.log(result);
         }
-        
+
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-r, --resource <resource>'
-      },
-      {
-        option: '-s, --scope <scope>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

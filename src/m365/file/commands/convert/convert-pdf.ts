@@ -7,8 +7,7 @@ import { v4 } from 'uuid';
 import auth, { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import {
-  CommandError,
-  CommandOption
+  CommandError
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -34,6 +33,44 @@ class FileConvertPdfCommand extends GraphCommand {
 
   public get description(): string {
     return 'Converts the specified file to PDF using Microsoft Graph';
+  }
+
+  constructor() {
+    super();
+
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-s, --sourceFile <sourceFile>'
+      },
+      {
+        option: '-t, --targetFile <targetFile>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.sourceFile.toLowerCase().startsWith('https://') &&
+          !fs.existsSync(args.options.sourceFile)) {
+          // assume local path
+          return `Specified source file ${args.options.sourceFile} doesn't exist`;
+        }
+
+        if (!args.options.targetFile.toLowerCase().startsWith('https://') &&
+          fs.existsSync(args.options.targetFile)) {
+          // assume local path
+          return `Another file found at ${args.options.targetFile}`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (error?: any) => void): void {
@@ -439,36 +476,6 @@ class FileConvertPdfCommand extends GraphCommand {
 
         return request.delete(requestOptions);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-s, --sourceFile <sourceFile>'
-      },
-      {
-        option: '-t, --targetFile <targetFile>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.sourceFile.toLowerCase().startsWith('https://') &&
-      !fs.existsSync(args.options.sourceFile)) {
-      // assume local path
-      return `Specified source file ${args.options.sourceFile} doesn't exist`;
-    }
-
-    if (!args.options.targetFile.toLowerCase().startsWith('https://') &&
-      fs.existsSync(args.options.targetFile)) {
-      // assume local path
-      return `Another file found at ${args.options.targetFile}`;
-    }
-
-    return true;
   }
 }
 

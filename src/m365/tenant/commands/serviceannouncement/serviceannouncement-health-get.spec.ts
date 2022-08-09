@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -58,11 +58,13 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -110,25 +112,23 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'status', 'service']);
   });
   
-  it('passes validation when command called', (done) => {
-    const actual = command.validate({
+  it('passes validation when command called', async () => {
+    const actual = await command.validate({
       options: {
         serviceName: "Exchange Online"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when command called with issues', (done) => {
-    const actual = command.validate({
+  it('passes validation when command called with issues', async () => {
+    const actual = await command.validate({
       options: {
         serviceName: "Exchange Online",
         issues: true
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('correctly returns service health', (done) => {
@@ -223,7 +223,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTH_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

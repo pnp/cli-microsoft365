@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -226,7 +226,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

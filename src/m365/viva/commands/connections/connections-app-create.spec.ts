@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as sinon from 'sinon';
 import * as Sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -23,10 +23,12 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogToStderrSpy: Sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     (command as any).archive = admZipMock;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -310,9 +312,9 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
     });
   });
 
-  it(`fails validation if the specified app name is longer than 30 chars`, () => {
+  it(`fails validation if the specified app name is longer than 30 chars`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
         appName: `Stay on top of what's happening at Contoso`,
@@ -323,13 +325,13 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`fails validation if the specified description is longer than 80 chars`, () => {
+  it(`fails validation if the specified description is longer than 80 chars`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
         appName: 'Contoso',
@@ -340,13 +342,13 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`fails validation if the specified long description is longer than 4000 chars`, () => {
+  it(`fails validation if the specified long description is longer than 4000 chars`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
         appName: 'Contoso',
@@ -373,13 +375,13 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`fails validation if a file with the app name already exists and no force flag specified`, () => {
+  it(`fails validation if a file with the app name already exists and no force flag specified`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
         appName: 'Contoso',
@@ -390,11 +392,11 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`fails validation if the specified colored icon doesn't exist`, () => {
+  it(`fails validation if the specified colored icon doesn't exist`, async () => {
     sinon.stub(fs, 'existsSync').callsFake((path) => {
       const p = path.toString();
       if (p.indexOf('.zip') > -1) {
@@ -402,7 +404,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
       }
       return p.indexOf('color') < 0;
     });
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
         appName: 'Contoso',
@@ -413,11 +415,11 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`fails validation if the specified outline icon doesn't exist`, () => {
+  it(`fails validation if the specified outline icon doesn't exist`, async () => {
     sinon.stub(fs, 'existsSync').callsFake((path) => {
       const p = path.toString();
       if (p.indexOf('.zip') > -1) {
@@ -425,7 +427,7 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
       }
       return p.indexOf('outline') < 0;
     });
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
         appName: 'Contoso',
@@ -436,13 +438,13 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`passes validation if a file with the app name already exists and force flag specified`, () => {
+  it(`passes validation if a file with the app name already exists and force flag specified`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
         appName: 'Contoso',
@@ -454,13 +456,13 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         outlineIconPath: 'icon-outline.png',
         force: true
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it(`passes validation if all arguments are correct`, () => {
+  it(`passes validation if all arguments are correct`, async () => {
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().indexOf('.zip') < 0);
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         portalUrl: 'https://contoso.sharepoint.com',
         appName: 'Contoso',
@@ -471,12 +473,12 @@ describe(commands.CONNECTIONS_APP_CREATE, () => {
         coloredIconPath: 'icon-color.png',
         outlineIconPath: 'icon-outline.png'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

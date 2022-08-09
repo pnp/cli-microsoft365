@@ -1,15 +1,14 @@
 import { PlannerBucket } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
+import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
-import { accessToken, validation } from '../../../../utils';
-import GraphCommand from '../../../base/GraphCommand';
-import Auth from '../../../../Auth';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { planner } from '../../../../utils/planner';
-import commands from '../../commands';
+import { accessToken, validation } from '../../../../utils';
 import { aadGroup } from '../../../../utils/aadGroup';
+import { planner } from '../../../../utils/planner';
+import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -36,18 +35,115 @@ class PlannerBucketSetCommand extends GraphCommand {
     return 'Updates a Microsoft Planner bucket';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.name = typeof args.options.name !== 'undefined';
-    telemetryProps.planId = typeof args.options.planId !== 'undefined';
-    telemetryProps.planName = typeof args.options.planName !== 'undefined';
-    telemetryProps.planTitle = typeof args.options.planTitle !== 'undefined';
-    telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
-    telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
-    telemetryProps.newName = typeof args.options.newName !== 'undefined';
-    telemetryProps.orderHint = typeof args.options.orderHint !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        name: typeof args.options.name !== 'undefined',
+        planId: typeof args.options.planId !== 'undefined',
+        planName: typeof args.options.planName !== 'undefined',
+        planTitle: typeof args.options.planTitle !== 'undefined',
+        ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
+        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
+        newName: typeof args.options.newName !== 'undefined',
+        orderHint: typeof args.options.orderHint !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --name [name]'
+      },
+      {
+        option: '--planId [planId]'
+      },
+      {
+        option: '--planName [planName]'
+      },
+      {
+        option: "--planTitle [planTitle]"
+      },
+      {
+        option: '--ownerGroupId [ownerGroupId]'
+      },
+      {
+        option: '--ownerGroupName [ownerGroupName]'
+      },
+      {
+        option: '--newName [newName]'
+      },
+      {
+        option: '--orderHint [orderHint]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.id) {
+	      if (args.options.planId || args.options.planName || args.options.planTitle  || args.options.ownerGroupId || args.options.ownerGroupName) {
+	        return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
+	      }
+	    }
+
+	    if (args.options.name) {
+	      if (!args.options.planId && !args.options.planName && !args.options.planTitle) {
+	        return 'Specify either planId or planTitle when using name';
+	      }
+
+	      if (args.options.planId && (args.options.planName || args.options.planTitle)) {
+	        return 'Specify either planId or planTitle when using name but not both';
+	      }
+
+	      if (args.options.planName || args.options.planTitle) {
+	        if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
+	          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
+	        }
+
+	        if (args.options.ownerGroupId && args.options.ownerGroupName) {
+	          return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
+	        }
+
+	        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
+	          return `${args.options.ownerGroupId} is not a valid GUID`;
+	        }
+	      }
+	      
+	      if (args.options.planId) {
+	        if (args.options.ownerGroupId || args.options.ownerGroupName) {
+	          return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
+	        }
+	      }
+	    }
+
+	    if (!args.options.newName && !args.options.orderHint) {
+	      return 'Specify either newName or orderHint';
+	    }
+
+	    return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['id', 'name']
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -57,11 +153,11 @@ class PlannerBucketSetCommand extends GraphCommand {
       this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
     }
 
-    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
     }
-    
+
     this
       .getBucket(args)
       .then(bucket => {
@@ -152,91 +248,6 @@ class PlannerBucketSetCommand extends GraphCommand {
     return aadGroup
       .getGroupByDisplayName(ownerGroupName!)
       .then(group => group.id!);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '--planId [planId]'
-      },
-      {
-        option: '--planName [planName]'
-      },
-      {
-        option: "--planTitle [planTitle]"
-      },
-      {
-        option: '--ownerGroupId [ownerGroupId]'
-      },
-      {
-        option: '--ownerGroupName [ownerGroupName]'
-      },
-      {
-        option: '--newName [newName]'
-      },
-      {
-        option: '--orderHint [orderHint]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public optionSets(): string[][] | undefined {
-    return [
-      ['id', 'name']
-    ];
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.id) {
-      if (args.options.planId || args.options.planName || args.options.planTitle  || args.options.ownerGroupId || args.options.ownerGroupName) {
-        return 'Don\'t specify planId, planTitle, ownerGroupId or ownerGroupName when using id';
-      }
-    }
-
-    if (args.options.name) {
-      if (!args.options.planId && !args.options.planName && !args.options.planTitle) {
-        return 'Specify either planId or planTitle when using name';
-      }
-
-      if (args.options.planId && (args.options.planName || args.options.planTitle)) {
-        return 'Specify either planId or planTitle when using name but not both';
-      }
-
-      if (args.options.planName || args.options.planTitle) {
-        if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
-          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
-        }
-
-        if (args.options.ownerGroupId && args.options.ownerGroupName) {
-          return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
-        }
-
-        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
-          return `${args.options.ownerGroupId} is not a valid GUID`;
-        }
-      }
-      
-      if (args.options.planId) {
-        if (args.options.ownerGroupId || args.options.ownerGroupName) {
-          return 'Don\'t specify ownerGroupId or ownerGroupName when using planId';
-        }
-      }
-    }
-
-    if (!args.options.newName && !args.options.orderHint) {
-      return 'Specify either newName or orderHint';
-    }
-
-    return true;
   }
 }
 

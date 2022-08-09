@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let promptOptions: any;
 
   before(() => {
@@ -26,6 +27,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -243,7 +245,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -254,7 +256,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   });
 
   it('supports specifying id', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {
@@ -265,7 +267,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   });
 
   it('supports specifying principals', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--principals') > -1) {
@@ -276,7 +278,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   });
 
   it('supports specifying confirmation flag', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--confirm') > -1) {
@@ -286,13 +288,13 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
     assert(containsOption);
   });
 
-  it('fails validation if the id is not a valid GUID', () => {
-    const actual = command.validate({ options: { id: 'abc' } });
+  it('fails validation if the id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: 'abc', principals: 'PattiF' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the all required parameters are specified', () => {
-    const actual = command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a', principals: 'PattiF' } });
+  it('passes validation when the all required parameters are specified', async () => {
+    const actual = await command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a', principals: 'PattiF' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

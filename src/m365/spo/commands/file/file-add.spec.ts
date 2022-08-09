@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -14,6 +14,7 @@ describe(commands.FILE_ADD, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let ensureFolderStub: sinon.SinonStub;
 
@@ -179,6 +180,7 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(Buffer, 'alloc').returns(Buffer.from('abc'));
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -1020,63 +1022,63 @@ describe(commands.FILE_ADD, () => {
     });
   });
 
-  it('fails validation if the webUrl option not valid url', () => {
-    const actual = command.validate({ options: { webUrl: 'abc' } });
+  it('fails validation if the webUrl option not valid url', async () => {
+    const actual = await command.validate({ options: { webUrl: 'abc', folder: 'abc', path: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the wrong path option specified', () => {
+  it('fails validation if the wrong path option specified', async () => {
     sinon.stub(fs, 'existsSync').returns(false);
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         folder: 'abc',
         path: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if --approveComment specified, but not --approve', () => {
+  it('fails validation if --approveComment specified, but not --approve', async () => {
     sinon.stub(fs, 'existsSync').returns(true);
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         folder: 'abc',
         path: 'abc',
         approveComment: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if --publishComment specified, but not --publish', () => {
+  it('fails validation if --publishComment specified, but not --publish', async () => {
     sinon.stub(fs, 'existsSync').returns(true);
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         folder: 'abc',
         path: 'abc',
         publishComment: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passed validation if options correct', () => {
+  it('passed validation if options correct', async () => {
     sinon.stub(fs, 'existsSync').returns(true);
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         folder: 'abc',
         path: 'abc'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -1087,7 +1089,7 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {

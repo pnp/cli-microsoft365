@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -62,48 +64,45 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'shortBody']);
   });
 
-  it('fails validation if chatId is not specified', () => {
-    const actual = command.validate({
+  it('fails validation if chatId is not specified', async () => {
+    const actual = await command.validate({
       options: {
         debug: false
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the chatId is not valid', () => {
-    const actual = command.validate({
+  it('fails validation if the chatId is not valid', async () => {
+    const actual = await command.validate({
       options: {
         chatId: "2da4c29f6d7041"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
 
-  it('fails validatation for an incorrect chatId missing leading 19:.', (done) => {
-    const actual = command.validate({
+  it('fails validation for an incorrect chatId missing leading 19:.', async () => {
+    const actual = await command.validate({
       options: {
         chatId: '2da4c29f6d7041eca70b638b43d45437@thread.v2'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation for an incorrect chatId missing trailing @thread.v2 or @unq.gbl.spaces', (done) => {
-    const actual = command.validate({
+  it('fails validation for an incorrect chatId missing trailing @thread.v2 or @unq.gbl.spaces', async () => {
+    const actual = await command.validate({
       options: {
         chatId: '19:2da4c29f6d7041eca70b638b43d45437'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -113,12 +112,12 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
     assert(containsOption);
   });
 
-  it('validates for a correct input', () => {
-    const actual = command.validate({
+  it('validates for a correct input', async () => {
+    const actual = await command.validate({
       options: {
         chatId: "19:2da4c29f6d7041eca70b638b43d45437@thread.v2"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 

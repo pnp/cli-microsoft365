@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken, sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.TASK_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   const validTaskId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validTaskTitle = 'Task name';
   const validBucketId = 'vncYUXCRBke28qMLB-d4xJcACtNz';
@@ -122,6 +123,11 @@ describe(commands.TASK_GET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -155,6 +161,7 @@ describe(commands.TASK_GET, () => {
       auth.restoreAuth
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -171,65 +178,65 @@ describe(commands.TASK_GET, () => {
   });
   
   it('defines correct option sets', () => {
-    const optionSets = command.optionSets();
+    const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [['id', 'title']]);
   });
 
-  it('fails validation when title is used without bucket id', () => {
-    const actual = command.validate({
+  it('fails validation when title is used without bucket id', async () => {
+    const actual = await command.validate({
       options: {
         title: validTaskTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when title is used with both bucket id and bucketname', () => {
-    const actual = command.validate({
+  it('fails validation when title is used with both bucket id and bucketname', async () => {
+    const actual = await command.validate({
       options: {
         title: validTaskTitle,
         bucketId: validBucketId,
         bucketName: validBucketName
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when bucket name is used without plan title or plan id', () => {
-    const actual = command.validate({
+  it('fails validation when bucket name is used without plan title or plan id', async () => {
+    const actual = await command.validate({
       options: {
         title: validTaskTitle,
         bucketName: validBucketName
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when bucket name is used with both plan title and plan id', () => {
-    const actual = command.validate({
+  it('fails validation when bucket name is used with both plan title and plan id', async () => {
+    const actual = await command.validate({
       options: {
-        name: validBucketName,
+        title: validTaskTitle,
         bucketName: validBucketName,
         planId: validPlanId,
         planTitle: validPlanTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when plan title is used without owner group name or owner group id', () => {
-    const actual = command.validate({
+  it('fails validation when plan title is used without owner group name or owner group id', async () => {
+    const actual = await command.validate({
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
         planTitle: validPlanTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when plan title is used with both owner group name and owner group id', () => {
-    const actual = command.validate({
+  it('fails validation when plan title is used with both owner group name and owner group id', async () => {
+    const actual = await command.validate({
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
@@ -237,40 +244,40 @@ describe(commands.TASK_GET, () => {
         ownerGroupName: validOwnerGroupName,
         ownerGroupId: validOwnerGroupId
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when owner group id is not a guid', () => {
-    const actual = command.validate({
+  it('fails validation when owner group id is not a guid', async () => {
+    const actual = await command.validate({
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupId: invalidOwnerGroupId
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('validates for a correct input with id', () => {
-    const actual = command.validate({
+  it('validates for a correct input with id', async () => {
+    const actual = await command.validate({
       options: {
         id: validTaskId
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct input with name', () => {
-    const actual = command.validate({
+  it('validates for a correct input with name', async () => {
+    const actual = await command.validate({
       options: {
         title: validTaskTitle,
         bucketName: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -658,7 +665,7 @@ describe(commands.TASK_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

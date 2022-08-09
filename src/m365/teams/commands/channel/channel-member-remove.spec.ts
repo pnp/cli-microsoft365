@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -24,11 +24,13 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -78,65 +80,60 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
   });
 
   it('defines correct option sets', () => {
-    assert.deepStrictEqual(command.optionSets(), [
+    assert.deepStrictEqual(command.optionSets, [
       ['teamId', 'teamName'],
       ['channelId', 'channelName'],
       ['userId', 'userName', 'id']
     ]);
   });
 
-
   it('defines correct alias', () => {
     const alias = command.alias();
     assert.strictEqual((alias && alias.indexOf(commands.CONVERSATIONMEMBER_REMOVE) !== -1), true);
   });
 
-  it('fails validation if the teamId is not a valid guid', (done) => {
-    const actual = command.validate({
+  it('fails validation if the teamId is not a valid guid', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '00000000-0000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if channelId is invalid', (done) => {
-    const actual = command.validate({
+  it('fails validation if channelId is invalid', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: 'Invalid',
         id: '00000'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if the userId is not a valid guid', (done) => {
-    const actual = command.validate({
+  it('fails validation if the userId is not a valid guid', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('validates for a correct input.', (done) => {
-    const actual = command.validate({
+  it('validates for a correct input.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('fails to get team when resourceprovisioning does not exist', (done) => {
@@ -721,7 +718,7 @@ describe(commands.CHANNEL_MEMBER_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -30,16 +29,39 @@ class SpoSiteClassicListCommand extends SpoCommand {
     return 'Lists sites of the given type';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.webTemplate = args.options.webTemplate;
-    telemetryProps.filter = (!(!args.options.filter)).toString();
-    telemetryProps.includeOneDriveSites = args.options.includeOneDriveSites;
-    return telemetryProps;
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['Title', 'Url'];
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        webTemplate: args.options.webTemplate,
+        filter: (!(!args.options.filter)).toString(),
+        includeOneDriveSites: args.options.includeOneDriveSites
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-t, --webTemplate [webTemplate]'
+      },
+      {
+        option: '-f, --filter [filter]'
+      },
+      {
+        option: '--includeOneDriveSites'
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -106,23 +128,6 @@ class SpoSiteClassicListCommand extends SpoCommand {
           }
         }, err => reject(err));
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-t, --webTemplate [webTemplate]'
-      },
-      {
-        option: '-f, --filter [filter]'
-      },
-      {
-        option: '--includeOneDriveSites'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

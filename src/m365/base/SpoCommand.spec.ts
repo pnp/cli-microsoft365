@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../appInsights';
 import auth from '../../Auth';
 import { Logger } from '../../cli';
-import { CommandError, CommandOption } from '../../Command';
+import { CommandError } from '../../Command';
 import request from '../../request';
 import { sinonUtil } from '../../utils';
 import SpoCommand from './SpoCommand';
@@ -17,22 +17,24 @@ class MockCommand extends SpoCommand {
     return 'Mock command';
   }
 
-  public commandAction(): void {
-  }
+  constructor() {
+    super();
 
-  public options(): CommandOption[] {
-    return [
+    this.options.unshift(
       {
         option: '--url [url]'
       },
       {
         option: '--nonProcessedUrl [nonProcessedUrl]'
       }
-    ];
+    );
   }
 
-  public validateUnknownOptionsPublic(options: any, csomObject: string, csomPropertyType: 'get' | 'set'): string | boolean {
-    return this.validateUnknownOptions(options, csomObject, csomPropertyType);
+  public commandAction(): void {
+  }
+
+  public validateUnknownCsomOptionsPublic(options: any, csomObject: string, csomPropertyType: 'get' | 'set'): string | boolean {
+    return this.validateUnknownCsomOptions(options, csomObject, csomPropertyType);
   }
 
   public getNamesOfOptionsWithUrlsPublic(): string[] {
@@ -129,24 +131,24 @@ describe('SpoCommand', () => {
     });
   });
 
-  it('passes validation of unknown properties when no unknown properties are set', () => {
+  it('passes validation of unknown properties when no unknown properties are set', async () => {
     const command = new MockCommand();
-    assert.strictEqual(command.validateUnknownOptionsPublic({}, 'web', 'set'), true);
+    assert.strictEqual(command.validateUnknownCsomOptionsPublic({}, 'web', 'set'), true);
   });
 
-  it('passes validation of unknown properties when valid unknown properties specified', () => {
+  it('passes validation of unknown properties when valid unknown properties specified', async () => {
     const command = new MockCommand();
-    assert.strictEqual(command.validateUnknownOptionsPublic({ AllowAutomaticASPXPageIndexing: true }, 'web', 'set'), true);
+    assert.strictEqual(command.validateUnknownCsomOptionsPublic({ AllowAutomaticASPXPageIndexing: true }, 'web', 'set'), true);
   });
 
-  it('fails validation of unknown properties when invalid unknown property specified', () => {
+  it('fails validation of unknown properties when invalid unknown property specified', async () => {
     const command = new MockCommand();
-    assert.notStrictEqual(command.validateUnknownOptionsPublic({ AllowCreateDeclarativeWorkflow: true }, 'web', 'set'), true);
+    assert.notStrictEqual(command.validateUnknownCsomOptionsPublic({ AllowCreateDeclarativeWorkflow: true }, 'web', 'set'), true);
   });
 
-  it('fails validation of unknown properties when unknown property of unsupported type specified', () => {
+  it('fails validation of unknown properties when unknown property of unsupported type specified', async () => {
     const command = new MockCommand();
-    assert.notStrictEqual(command.validateUnknownOptionsPublic({ AssociatedMemberGroup: {} }, 'web', 'set'), true);
+    assert.notStrictEqual(command.validateUnknownCsomOptionsPublic({ AssociatedMemberGroup: {} }, 'web', 'set'), true);
   });
 
   it('returns default list of names of options with URLs if no names to exclude defined', () => {

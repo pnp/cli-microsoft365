@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -29,12 +26,64 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
     return 'Lists app role assignments for the specified application registration';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.appId = typeof args.options.appId !== 'undefined';
-    telemetryProps.displayName = typeof args.options.displayName !== 'undefined';
-    telemetryProps.objectId = typeof args.options.objectId !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        appId: typeof args.options.appId !== 'undefined',
+        displayName: typeof args.options.displayName !== 'undefined',
+        objectId: typeof args.options.objectId !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --appId [appId]'
+      },
+      {
+        option: '-n, --displayName [displayName]'
+      },
+      {
+        option: '--objectId [objectId]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.appId && !args.options.displayName && !args.options.objectId) {
+          return 'Specify either appId, objectId or displayName';
+        }
+    
+        if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
+          return `${args.options.appId} is not a valid GUID`;
+        }
+    
+        if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
+          return `${args.options.objectId} is not a valid GUID`;
+        }
+    
+        let optionsSpecified: number = 0;
+        optionsSpecified += args.options.appId ? 1 : 0;
+        optionsSpecified += args.options.displayName ? 1 : 0;
+        optionsSpecified += args.options.objectId ? 1 : 0;
+        if (optionsSpecified > 1) {
+          return 'Specify either appId, objectId or displayName';
+        }
+    
+        return true;
+      }
+    );
   }
 
   public defaultProperties(): string[] | undefined {
@@ -92,7 +141,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
     return new Promise<AppRoleAssignment[]>((resolve: (approleAssignments: AppRoleAssignment[]) => void, reject: (err: any) => void) => {
       if (argOptions.objectId) {
         this.getSPAppRoleAssignments(argOptions.objectId)
-          .then(( spAppRoleAssignments: { value: AppRoleAssignment[] }) => {
+          .then((spAppRoleAssignments: { value: AppRoleAssignment[] }) => {
             if (!spAppRoleAssignments.value.length) {
               reject('no app role assignments found');
             }
@@ -111,14 +160,14 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
         }
         else {
           spMatchQuery = `displayName eq '${encodeURIComponent(argOptions.displayName as string)}'`;
-        } 
-  
+        }
+
         this.getServicePrincipalForApp(spMatchQuery)
           .then((resp: { value: ServicePrincipal[] }) => {
             if (!resp.value.length) {
               reject('app registration not found');
             }
-  
+
             resolve(resp.value[0].appRoleAssignments);
           })
           .catch((err: any) => {
@@ -162,47 +211,6 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
     };
 
     return request.get<ServicePrincipal>(spRequestOptions);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --appId [appId]'
-      },
-      {
-        option: '-n, --displayName [displayName]'
-      },
-      {
-        option: '--objectId [objectId]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.appId && !args.options.displayName && !args.options.objectId) {
-      return 'Specify either appId, objectId or displayName';
-    }
-
-    if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
-      return `${args.options.appId} is not a valid GUID`;
-    }
-
-    if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
-      return `${args.options.objectId} is not a valid GUID`;
-    }
-
-    let optionsSpecified: number = 0;
-    optionsSpecified += args.options.appId ? 1 : 0;
-    optionsSpecified += args.options.displayName ? 1 : 0;
-    optionsSpecified += args.options.objectId ? 1 : 0;
-    if (optionsSpecified > 1) {
-      return 'Specify either appId, objectId or displayName';
-    }
-
-    return true;
   }
 }
 

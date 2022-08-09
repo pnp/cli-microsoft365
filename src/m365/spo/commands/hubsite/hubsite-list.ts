@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo } from '../../../../utils';
@@ -28,19 +27,32 @@ class SpoHubSiteListCommand extends SpoCommand {
     return 'Lists hub sites in the current tenant';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['ID', 'SiteUrl', 'Title'];
+  }
+
   constructor() {
     super();
     this.batchSize = 30;
+
+    this.#initTelemetry();
+    this.#initOptions();
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.includeAssociatedSites = args.options.includeAssociatedSites === true;
-    return telemetryProps;
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        includeAssociatedSites: args.options.includeAssociatedSites === true
+      });
+    });
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['ID', 'SiteUrl', 'Title'];
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --includeAssociatedSites'
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -157,17 +169,6 @@ class SpoHubSiteListCommand extends SpoCommand {
           reject(err);
         });
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --includeAssociatedSites'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

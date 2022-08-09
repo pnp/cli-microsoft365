@@ -1,13 +1,13 @@
 import * as os from 'os';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
-import { CommandError, CommandOption } from '../../../../Command';
+import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import commands from '../../commands';
 import { BaseProjectCommand } from './base-project-command';
-import { External, ExternalConfiguration, Project } from './project-model';
 import { ExternalizeEntry, FileEdit } from './project-externalize/';
 import { BasicDependencyRule } from './project-externalize/rules';
+import { External, ExternalConfiguration, Project } from './project-model';
 import rules = require('./project-externalize/DefaultRules');
 
 interface CommandArgs {
@@ -15,10 +15,6 @@ interface CommandArgs {
 }
 
 class SpfxProjectExternalizeCommand extends BaseProjectCommand {
-  public constructor() {
-    super();
-  }
-
   private projectVersion: string | undefined;
   private supportedVersions: string[] = [
     '1.0.0',
@@ -58,6 +54,20 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
     return 'Externalizes SharePoint Framework project dependencies';
   }
 
+  constructor() {
+    super();
+  
+    this.#initOptions();
+  }
+  
+  #initOptions(): void {
+    this.options.forEach(o => {
+      if (o.option.indexOf('--output') > -1) {
+        o.autocomplete = ['json', 'text', 'md'];
+      }
+    });
+  }
+  
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (args.options.output !== 'json' || this.verbose) {
       logger.logToStderr(`This command is currently in preview. Feedback welcome at https://github.com/pnp/cli-microsoft365/issues${os.EOL}`);
@@ -196,16 +206,6 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
     ];
 
     return s.join('').trim();
-  }
-
-  public options(): CommandOption[] {
-    const parentOptions: CommandOption[] = super.options();
-    parentOptions.forEach(o => {
-      if (o.option.indexOf('--output') > -1) {
-        o.autocomplete = ['json', 'text', 'md'];
-      }
-    });
-    return parentOptions;
   }
 }
 

@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import { PassThrough } from 'stream';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -14,6 +14,7 @@ const command: Command = require('./convert-pdf');
 describe(commands.CONVERT_PDF, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let unlinkSyncStub: sinon.SinonStub;
   const mockPdfFile = 'pdf';
   let pdfConvertResponseStream: PassThrough;
@@ -24,6 +25,7 @@ describe(commands.CONVERT_PDF, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     unlinkSyncStub = sinon.stub(fs, 'unlinkSync').callsFake(_ => { });
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -1947,32 +1949,32 @@ describe(commands.CONVERT_PDF, () => {
     });
   });
 
-  it(`fails validation if the specified local source file doesn't exist`, () => {
+  it(`fails validation if the specified local source file doesn't exist`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = command.validate({ options: { sourceFile: 'file.docx', targetFile: 'file.pdf' } });
+    const actual = await command.validate({ options: { sourceFile: 'file.docx', targetFile: 'file.pdf' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`fails validation if another file exists at the path specified in the target file`, () => {
+  it(`fails validation if another file exists at the path specified in the target file`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = command.validate({ options: { sourceFile: 'file.docx', targetFile: 'file.pdf' } });
+    const actual = await command.validate({ options: { sourceFile: 'file.docx', targetFile: 'file.pdf' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`passes validation if the source file is a URL`, () => {
+  it(`passes validation if the source file is a URL`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = command.validate({ options: { sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx', targetFile: 'file.pdf' } });
+    const actual = await command.validate({ options: { sourceFile: 'https://contoso.sharepoint.com/Shared Documents/file.docx', targetFile: 'file.pdf' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it(`passes validation if the target file is a URL`, () => {
+  it(`passes validation if the target file is a URL`, async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = command.validate({ options: { sourceFile: 'file.docx', targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf' } });
+    const actual = await command.validate({ options: { sourceFile: 'file.docx', targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

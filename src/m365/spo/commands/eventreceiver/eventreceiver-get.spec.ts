@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   const eventReceiverResponseJson = [
     {
@@ -35,6 +36,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -77,67 +79,67 @@ describe(commands.EVENTRECEIVER_GET, () => {
   });
 
   it('defines correct option sets', () => {
-    const optionSets = command.optionSets();
+    const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [['name', 'id']]);
   });
 
-  it('fails validation if the specified site URL is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { webUrl: 'site.com' } });
+  it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'site.com', name: 'Event receiver' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if scope is set to site and one of the list properties is filled in', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', scope: 'site', listTitle: 'Documents'} });
+  it('fails validation if scope is set to site and one of the list properties is filled in', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', scope: 'site', listTitle: 'Documents'} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the list ID is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listId: 'abc'} });
+  it('fails validation if the list ID is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listId: 'abc'} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when all required parameters are valid with id', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: 'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec' } });
+  it('passes validation when all required parameters are valid with id', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', id: 'c5a6444a-9c7f-4a0d-9e29-fc6fe30e34ec' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when all required parameters are valid with name', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver' } });
+  it('passes validation when all required parameters are valid with name', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when all required parameters are valid and list id', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } });
+  it('passes validation when all required parameters are valid and list id', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when all required parameters are valid and list title', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listTitle: 'Demo List' } });
+  it('passes validation when all required parameters are valid and list title', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listTitle: 'Demo List' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when all required parameters are valid and list url', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listUrl: 'sites/hr-life/Lists/breakInheritance' } });
+  it('passes validation when all required parameters are valid and list url', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listUrl: 'sites/hr-life/Lists/breakInheritance' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if title and id are specified together', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listTitle: 'Demo List', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } });
+  it('fails validation if title and id are specified together', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listTitle: 'Demo List', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if title and id and url are specified together', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listTitle: 'Demo List', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f', listUrl: 'sites/hr-life/Lists/breakInheritance' } });
+  it('fails validation if title and id and url are specified together', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listTitle: 'Demo List', listId: '935c13a0-cc53-4103-8b48-c1d0828eaa7f', listUrl: 'sites/hr-life/Lists/breakInheritance' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if title and url are specified together', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listTitle: 'Demo List', listUrl: 'sites/hr-life/Lists/breakInheritance' } });
+  it('fails validation if title and url are specified together', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', listTitle: 'Demo List', listUrl: 'sites/hr-life/Lists/breakInheritance' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if scope is invalid value', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', scope: 'abc' } });
+  it('fails validation if scope is invalid value', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Test Receiver', scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -364,7 +366,7 @@ describe(commands.EVENTRECEIVER_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

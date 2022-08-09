@@ -1,7 +1,6 @@
 import { PlannerBucket, PlannerTask, PlannerTaskDetails, User } from '@microsoft/microsoft-graph-types';
-import Auth from '../../../../Auth';
+import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { accessToken, formatting, validation } from '../../../../utils';
@@ -52,27 +51,146 @@ class PlannerTaskAddCommand extends GraphCommand {
     return 'Adds a new Microsoft Planner Task';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.planId = typeof args.options.planId !== 'undefined';
-    telemetryProps.planName = typeof args.options.planName !== 'undefined';
-    telemetryProps.planTitle = typeof args.options.planTitle !== 'undefined';
-    telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
-    telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
-    telemetryProps.bucketId = typeof args.options.bucketId !== 'undefined';
-    telemetryProps.bucketName = typeof args.options.bucketName !== 'undefined';
-    telemetryProps.startDateTime = typeof args.options.startDateTime !== 'undefined';
-    telemetryProps.dueDateTime = typeof args.options.dueDateTime !== 'undefined';
-    telemetryProps.percentComplete = typeof args.options.percentComplete !== 'undefined';
-    telemetryProps.assignedToUserIds = typeof args.options.assignedToUserIds !== 'undefined';
-    telemetryProps.assignedToUserNames = typeof args.options.assignedToUserNames !== 'undefined';
-    telemetryProps.assigneePriority = typeof args.options.assigneePriority !== 'undefined';
-    telemetryProps.description = typeof args.options.description !== 'undefined';
-    telemetryProps.appliedCategories = typeof args.options.appliedCategories !== 'undefined';
-    telemetryProps.previewType = typeof args.options.previewType !== 'undefined';
-    telemetryProps.orderHint = typeof args.options.orderHint !== 'undefined';
-    telemetryProps.priority = typeof args.options.priority !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        planId: typeof args.options.planId !== 'undefined',
+        planName: typeof args.options.planName !== 'undefined',
+        planTitle: typeof args.options.planTitle !== 'undefined',
+        ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
+        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
+        bucketId: typeof args.options.bucketId !== 'undefined',
+        bucketName: typeof args.options.bucketName !== 'undefined',
+        startDateTime: typeof args.options.startDateTime !== 'undefined',
+        dueDateTime: typeof args.options.dueDateTime !== 'undefined',
+        percentComplete: typeof args.options.percentComplete !== 'undefined',
+        assignedToUserIds: typeof args.options.assignedToUserIds !== 'undefined',
+        assignedToUserNames: typeof args.options.assignedToUserNames !== 'undefined',
+        assigneePriority: typeof args.options.assigneePriority !== 'undefined',
+        description: typeof args.options.description !== 'undefined',
+        appliedCategories: typeof args.options.appliedCategories !== 'undefined',
+        previewType: typeof args.options.previewType !== 'undefined',
+        orderHint: typeof args.options.orderHint !== 'undefined',
+        priority: typeof args.options.priority !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '-t, --title <title>' },
+      { option: '--planId [planId]' },
+      { option: '--planName [planName]' },
+      { option: '--planTitle [planTitle]' },
+      { option: '--ownerGroupId [ownerGroupId]' },
+      { option: '--ownerGroupName [ownerGroupName]' },
+      { option: '--bucketId [bucketId]' },
+      { option: '--bucketName [bucketName]' },
+      { option: '--startDateTime [startDateTime]' },
+      { option: '--dueDateTime [dueDateTime]' },
+      { option: '--percentComplete [percentComplete]' },
+      { option: '--assignedToUserIds [assignedToUserIds]' },
+      { option: '--assignedToUserNames [assignedToUserNames]' },
+      { option: '--assigneePriority [assigneePriority]' },
+      { option: '--description [description]' },
+      {
+        option: '--appliedCategories [appliedCategories]',
+        autocomplete: this.allowedAppliedCategories
+      },
+      {
+        option: '--previewType [previewType]',
+        autocomplete: this.allowedPreviewTypes
+      },
+      { option: '--orderHint [orderHint]' },
+      { option: '--priority [priority]', autocomplete: taskPriority.priorityValues }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.planId && !args.options.planName && !args.options.planTitle) {
+	      return 'Specify either planId or planTitle';
+	    }
+
+	    if (args.options.planId && (args.options.planName || args.options.planTitle)) {
+	      return 'Specify either planId or planTitle but not both';
+	    }
+
+	    if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+	      return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
+	    }
+
+	    if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
+	      return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
+	    }
+
+	    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
+	      return `${args.options.ownerGroupId} is not a valid GUID`;
+	    }
+
+	    if (!args.options.bucketId && !args.options.bucketName) {
+	      return 'Specify either bucketId or bucketName';
+	    }
+
+	    if (args.options.bucketId && args.options.bucketName) {
+	      return 'Specify either bucketId or bucketName but not both';
+	    }
+
+	    if (args.options.startDateTime && !validation.isValidISODateTime(args.options.startDateTime)) {
+	      return 'The startDateTime is not a valid ISO date string';
+	    }
+
+	    if (args.options.dueDateTime && !validation.isValidISODateTime(args.options.dueDateTime)) {
+	      return 'The dueDateTime is not a valid ISO date string';
+	    }
+
+	    if (args.options.percentComplete && isNaN(args.options.percentComplete)) {
+	      return `percentComplete is not a number`;
+	    }
+
+	    if (args.options.percentComplete && (args.options.percentComplete < 0 || args.options.percentComplete > 100)) {
+	      return `percentComplete should be between 0 and 100`;
+	    }
+
+	    if (args.options.assignedToUserIds && !validation.isValidGuidArray(args.options.assignedToUserIds.split(','))) {
+	      return 'assignedToUserIds contains invalid GUID';
+	    }
+
+	    if (args.options.assignedToUserIds && args.options.assignedToUserNames) {
+	      return 'Specify either assignedToUserIds or assignedToUserNames but not both';
+	    }
+
+	    if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => this.allowedAppliedCategories.indexOf(category.toLocaleLowerCase()) < 0).length !== 0) {
+	      return `The appliedCategories contains invalid value. Specify either ${this.allowedAppliedCategories.join(', ')} as properties`;
+	    }
+
+	    if (args.options.previewType && this.allowedPreviewTypes.indexOf(args.options.previewType.toLocaleLowerCase()) === -1) {
+	      return `${args.options.previewType} is not a valid preview type value. Allowed values are ${this.allowedPreviewTypes.join(', ')}`;
+	    }
+
+	    if (args.options.priority !== undefined) {
+	      if (typeof args.options.priority === "number") {
+	        if (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10 || !Number.isInteger(args.options.priority)) {
+	          return 'priority should be an integer between 0 and 10.';
+	        }
+	      }
+	      else if (taskPriority.priorityValues.map(l => l.toLowerCase()).indexOf(args.options.priority.toString().toLowerCase()) === -1) {
+	        return `${args.options.priority} is not a valid priority value. Allowed values are ${taskPriority.priorityValues.join('|')}.`;
+	      }
+	    }
+
+	    return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -82,7 +200,7 @@ class PlannerTaskAddCommand extends GraphCommand {
       this.warn(logger, `Option 'planName' is deprecated. Please use 'planTitle' instead`);
     }
 
-    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
     }
@@ -290,114 +408,6 @@ class PlannerTaskAddCommand extends GraphCommand {
 
         return Promise.resolve(userIds);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '-t, --title <title>' },
-      { option: '--planId [planId]' },
-      { option: '--planName [planName]' },
-      { option: '--planTitle [planTitle]' },
-      { option: '--ownerGroupId [ownerGroupId]' },
-      { option: '--ownerGroupName [ownerGroupName]' },
-      { option: '--bucketId [bucketId]' },
-      { option: '--bucketName [bucketName]' },
-      { option: '--startDateTime [startDateTime]' },
-      { option: '--dueDateTime [dueDateTime]' },
-      { option: '--percentComplete [percentComplete]' },
-      { option: '--assignedToUserIds [assignedToUserIds]' },
-      { option: '--assignedToUserNames [assignedToUserNames]' },
-      { option: '--assigneePriority [assigneePriority]' },
-      { option: '--description [description]' },
-      {
-        option: '--appliedCategories [appliedCategories]',
-        autocomplete: this.allowedAppliedCategories
-      },
-      {
-        option: '--previewType [previewType]',
-        autocomplete: this.allowedPreviewTypes
-      },
-      { option: '--orderHint [orderHint]' },
-      { option: '--priority [priority]', autocomplete: taskPriority.priorityValues }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.planId && !args.options.planName && !args.options.planTitle) {
-      return 'Specify either planId or planTitle';
-    }
-
-    if (args.options.planId && (args.options.planName || args.options.planTitle)) {
-      return 'Specify either planId or planTitle but not both';
-    }
-
-    if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
-    }
-
-    if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
-      return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
-    }
-
-    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-      return `${args.options.ownerGroupId} is not a valid GUID`;
-    }
-
-    if (!args.options.bucketId && !args.options.bucketName) {
-      return 'Specify either bucketId or bucketName';
-    }
-
-    if (args.options.bucketId && args.options.bucketName) {
-      return 'Specify either bucketId or bucketName but not both';
-    }
-
-    if (args.options.startDateTime && !validation.isValidISODateTime(args.options.startDateTime)) {
-      return 'The startDateTime is not a valid ISO date string';
-    }
-
-    if (args.options.dueDateTime && !validation.isValidISODateTime(args.options.dueDateTime)) {
-      return 'The dueDateTime is not a valid ISO date string';
-    }
-
-    if (args.options.percentComplete && isNaN(args.options.percentComplete)) {
-      return `percentComplete is not a number`;
-    }
-
-    if (args.options.percentComplete && (args.options.percentComplete < 0 || args.options.percentComplete > 100)) {
-      return `percentComplete should be between 0 and 100`;
-    }
-
-    if (args.options.assignedToUserIds && !validation.isValidGuidArray(args.options.assignedToUserIds.split(','))) {
-      return 'assignedToUserIds contains invalid GUID';
-    }
-
-    if (args.options.assignedToUserIds && args.options.assignedToUserNames) {
-      return 'Specify either assignedToUserIds or assignedToUserNames but not both';
-    }
-
-    if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => this.allowedAppliedCategories.indexOf(category.toLocaleLowerCase()) < 0).length !== 0) {
-      return `The appliedCategories contains invalid value. Specify either ${this.allowedAppliedCategories.join(', ')} as properties`;
-    }
-
-    if (args.options.previewType && this.allowedPreviewTypes.indexOf(args.options.previewType.toLocaleLowerCase()) === -1) {
-      return `${args.options.previewType} is not a valid preview type value. Allowed values are ${this.allowedPreviewTypes.join(', ')}`;
-    }
-
-    if (args.options.priority !== undefined) {
-      if (typeof args.options.priority === "number") {
-        if (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10 || !Number.isInteger(args.options.priority)) {
-          return 'priority should be an integer between 0 and 10.';
-        }
-      }
-      else if (taskPriority.priorityValues.map(l => l.toLowerCase()).indexOf(args.options.priority.toString().toLowerCase()) === -1) {
-        return `${args.options.priority} is not a valid priority value. Allowed values are ${taskPriority.priorityValues.join('|')}.`;
-      }
-    }
-
-    return true;
   }
 }
 

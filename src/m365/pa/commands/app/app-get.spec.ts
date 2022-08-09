@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -14,12 +14,14 @@ describe(commands.APP_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -67,28 +69,28 @@ describe(commands.APP_GET, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['name', 'displayName', 'description', 'appVersion', 'owner']);
   });
 
-  it('fails validation if name or displayName not specified', () => {
-    const actual = command.validate({ options: {} });
+  it('fails validation if name or displayName not specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if name and displayName are both specified', () => {
-    const actual = command.validate({ options: { name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7", displayName: "Playwright" } });
+  it('fails validation if name and displayName are both specified', async () => {
+    const actual = await command.validate({ options: { name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7", displayName: "Playwright" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if name is not GUID', () => {
-    const actual = command.validate({ options: { name: "TestApp" } });
+  it('fails validation if name is not GUID', async () => {
+    const actual = await command.validate({ options: { name: "TestApp" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if name is specified', () => {
-    const actual = command.validate({ options: { name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7" } });
+  it('passes validation if name is specified', async () => {
+    const actual = await command.validate({ options: { name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if displayName is specified', () => {
-    const actual = command.validate({ options: { displayName: "Playwright" } });
+  it('passes validation if displayName is specified', async () => {
+    const actual = await command.validate({ options: { displayName: "Playwright" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -2018,7 +2020,7 @@ describe(commands.APP_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -2029,7 +2031,7 @@ describe(commands.APP_GET, () => {
   });
 
   it('supports specifying name', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--name') > -1) {
@@ -2040,7 +2042,7 @@ describe(commands.APP_GET, () => {
   });
 
   it('supports specifying displayName', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--displayName') > -1) {

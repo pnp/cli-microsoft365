@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -13,11 +13,13 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -348,67 +350,67 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     });
   });
 
-  it('fails validation if both list id and title options are not passed', () => {
-    const actual = command.validate({
+  it('fails validation if both list id and title options are not passed', async () => {
+    const actual = await command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, 'Specify listId or listTitle, one is required');
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({
+  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({
       options:
       {
         webUrl: 'foo',
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(typeof (actual), 'string');
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', () => {
-    const actual = command.validate({
+  it('passes validation if the url option is a valid SharePoint site URL', async () => {
+    const actual = await command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the list id option is not a valid GUID', () => {
-    const actual = command.validate({
+  it('fails validation if the list id option is not a valid GUID', async () => {
+    const actual = await command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '12345',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(typeof (actual), 'string');
   });
 
-  it('passes validation if the listid option is a valid GUID', () => {
-    const actual = command.validate({
+  it('passes validation if the listid option is a valid GUID', async () => {
+    const actual = await command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if both id and title options are passed', () => {
-    const actual = command.validate({
+  it('fails validation if both id and title options are passed', async () => {
+    const actual = await command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -416,16 +418,16 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, 'Specify listId or listTitle, but not both');
   });
 
-  it('fails validation if the expirationDateTime is in the past', () => {
+  it('fails validation if the expirationDateTime is in the past', async () => {
     const currentDate: Date = new Date();
     const currentMonth: number = currentDate.getMonth() + 1;
     const dateString: string = `${(currentDate.getFullYear() - 1)}-${currentMonth < 10 ? '0' : ''}${currentMonth}-01`;
 
-    const actual = command.validate({
+    const actual = await command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -433,16 +435,16 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: dateString
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, 'Provide an expiration date which is a date time in the future and within 6 months from now');
   });
 
-  it('fails validation if the expirationDateTime more than six months from now', () => {
+  it('fails validation if the expirationDateTime more than six months from now', async () => {
     const currentDate: Date = new Date();
     const currentMonth: number = currentDate.getMonth() + 1;
     const dateString: string = `${(currentDate.getFullYear() + 1)}-${currentMonth < 10 ? '0' : ''}${currentMonth}-01`;
 
-    const actual = command.validate({
+    const actual = await command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -450,17 +452,17 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: dateString
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, 'Provide an expiration date which is a date time in the future and within 6 months from now');
   });
 
-  it('passes validation if the expirationDateTime is in the future but no more than six months from now', () => {
+  it('passes validation if the expirationDateTime is in the future but no more than six months from now', async () => {
     const currentDate: Date = new Date();
     currentDate.setMonth(currentDate.getMonth() + 4);
     currentDate.setDate(1);
     const dateString: string = currentDate.toISOString().substr(0, 10);
 
-    const actual = command.validate({
+    const actual = await command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -468,12 +470,12 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: dateString
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the expirationDateTime option is not a valid date string', () => {
-    const actual = command.validate({
+  it('fails validation if the expirationDateTime option is not a valid date string', async () => {
+    const actual = await command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -481,12 +483,12 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2018-X-09'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(typeof (actual), 'string');
   });
 
-  it('fails validation if the expirationDateTime option is not a valid date string (json output)', () => {
-    const actual = command.validate({
+  it('fails validation if the expirationDateTime option is not a valid date string (json output)', async () => {
+    const actual = await command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -495,12 +497,12 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         expirationDateTime: '2018-X-09',
         output: 'json'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(typeof (actual), 'string');
   });
 
   it('supports verbose mode', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option === '--verbose') {

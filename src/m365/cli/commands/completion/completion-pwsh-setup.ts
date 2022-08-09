@@ -4,7 +4,7 @@ import * as path from 'path';
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import AnonymousCommand from '../../../base/AnonymousCommand';
@@ -27,6 +27,20 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
     return 'Sets up command completion for PowerShell';
   }
 
+  constructor() {
+    super();
+  
+    this.#initOptions();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-p, --profile <profile>'
+      }
+    );
+  }
+  
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.debug) {
       logger.logToStderr('Generating command completion...');
@@ -90,17 +104,6 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
     catch (e: any) {
       cb(new CommandError(e));
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-p, --profile <profile>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

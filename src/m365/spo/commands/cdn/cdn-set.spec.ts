@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -13,11 +13,12 @@ const command: Command = require('./cdn-set');
 describe(commands.CDN_SET, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let requests: any[];
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'ABC',
       FormDigestTimeoutSeconds: 1800,
@@ -41,6 +42,7 @@ describe(commands.CDN_SET, () => {
 
       return Promise.reject('Invalid request');
     });
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -606,7 +608,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -617,7 +619,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('requires tenant enabled state', () => {
-    const options = command.options();
+    const options = command.options;
     let requiresOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<enabled>') > -1) {
@@ -627,72 +629,65 @@ describe(commands.CDN_SET, () => {
     assert(requiresOption);
   });
 
-  it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = command.options();
-    sinonUtil.restore(Command.prototype.options);
-    assert(options.length > 0);
-  });
-
-  it('accepts Public SharePoint Online CDN type', () => {
-    const actual = command.validate({ options: { type: 'Public', enabled: 'true' } });
+  it('accepts Public SharePoint Online CDN type', async () => {
+    const actual = await command.validate({ options: { type: 'Public', enabled: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts Private SharePoint Online CDN type', () => {
-    const actual = command.validate({ options: { type: 'Private', enabled: 'true' } });
+  it('accepts Private SharePoint Online CDN type', async () => {
+    const actual = await command.validate({ options: { type: 'Private', enabled: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts Both SharePoint Online CDN type', () => {
-    const actual = command.validate({ options: { type: 'Both', enabled: 'true' } });
+  it('accepts Both SharePoint Online CDN type', async () => {
+    const actual = await command.validate({ options: { type: 'Both', enabled: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('rejects invalid SharePoint Online CDN type', () => {
+  it('rejects invalid SharePoint Online CDN type', async () => {
     const type = 'foo';
-    const actual = command.validate({ options: { type: type, enabled: 'true' } });
+    const actual = await command.validate({ options: { type: type, enabled: 'true' } }, commandInfo);
     assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private|Both`);
   });
 
-  it('doesn\'t fail validation if the optional type option not specified', () => {
-    const actual = command.validate({ options: { enabled: 'true' } });
+  it('doesn\'t fail validation if the optional type option not specified', async () => {
+    const actual = await command.validate({ options: { enabled: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts true SharePoint Online CDN enabled state', () => {
-    const actual = command.validate({ options: { enabled: 'true' } });
+  it('accepts true SharePoint Online CDN enabled state', async () => {
+    const actual = await command.validate({ options: { enabled: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('does not accept True SharePoint Online CDN enabled state', () => {
-    const actual = command.validate({ options: { enabled: 'True' } });
+  it('does not accept True SharePoint Online CDN enabled state', async () => {
+    const actual = await command.validate({ options: { enabled: 'True' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('does not accept TRUE SharePoint Online CDN enabled state', () => {
-    const actual = command.validate({ options: { enabled: 'TRUE' } });
+  it('does not accept TRUE SharePoint Online CDN enabled state', async () => {
+    const actual = await command.validate({ options: { enabled: 'TRUE' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('accepts false SharePoint Online CDN enabled state', () => {
-    const actual = command.validate({ options: { enabled: 'false' } });
+  it('accepts false SharePoint Online CDN enabled state', async () => {
+    const actual = await command.validate({ options: { enabled: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('does not accept False SharePoint Online CDN enabled state', () => {
-    const actual = command.validate({ options: { enabled: 'False' } });
+  it('does not accept False SharePoint Online CDN enabled state', async () => {
+    const actual = await command.validate({ options: { enabled: 'False' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('does not accept FALSE SharePoint Online CDN enabled state', () => {
-    const actual = command.validate({ options: { enabled: 'FALSE' } });
+  it('does not accept FALSE SharePoint Online CDN enabled state', async () => {
+    const actual = await command.validate({ options: { enabled: 'FALSE' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('rejects invalid SharePoint Online CDN enabled state', () => {
+  it('rejects invalid SharePoint Online CDN enabled state', async () => {
     const enabled = 'foo';
-    const actual = command.validate({ options: { enabled: enabled } });
+    const actual = await command.validate({ options: { enabled: enabled } }, commandInfo);
     assert.strictEqual(actual, `${enabled} is not a valid boolean value. Allowed values are true|false`);
   });
 });
