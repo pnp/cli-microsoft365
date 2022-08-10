@@ -83,7 +83,7 @@ class TeamsChatGetCommand extends GraphCommand {
         }
 
         if (args.options.participants) {
-          const participants = chatUtil.convertParticipantStringToArray(args.options.participants);
+          const participants = args.options.participants.trim().toLowerCase().split(',').filter(e => e && e !== '');
           if (!participants || participants.length === 0 || participants.some(e => !validation.isValidUserPrincipalName(e))) {
             return `${args.options.participants} contains one or more invalid email addresses.`;
           }
@@ -127,7 +127,7 @@ class TeamsChatGetCommand extends GraphCommand {
   }
 
   private async getChatIdByParticipants(participantsString: string): Promise<string> {
-    const participants = chatUtil.convertParticipantStringToArray(participantsString);
+    const participants = participantsString.trim().toLowerCase().split(',').filter(e => e && e !== '');
     const currentUserEmail = accessToken.getUserNameFromAccessToken(auth.service.accessTokens[this.resource].accessToken).toLowerCase();
     const existingChats = await chatUtil.findExistingChatsByParticipants([currentUserEmail, ...participants]);
 

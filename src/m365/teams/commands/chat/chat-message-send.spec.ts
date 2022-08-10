@@ -370,28 +370,6 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     });
   });
 
-  /*
-   * In PowerShell, when not using double quotes with your string array, the comma is interpreted by powershell.
-   * The string input is split and concatenated with a space. Hence we test the same participant string using a space.
-   */
-  it('sends chat message to existing conversation using userEmails (multiple) - PowerShell version', (done) => {
-    command.action(logger, {
-      options: {
-        userEmails: "AndrewK@M365x214355.onmicrosoft.com DaveK@M365x214355.onmicrosoft.com",
-        message: "Hello World"
-      }
-    }, (err?: any) => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('sends chat message to new conversation using userEmails (multiple)', (done) => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {

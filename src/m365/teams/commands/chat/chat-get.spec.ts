@@ -324,27 +324,6 @@ describe(commands.CHAT_GET, () => {
     });
   });
   
-  /*
-   * In PowerShell, when not using double quotes with your string array, the comma is interpreted by powershell.
-   * The string input is split and concatenated with a space. Hence we test the same participant string using a space.
-   */
-  it('gets chat conversation to existing conversation using participants (multiple) - PowerShell version', (done) => {
-    command.action(logger, {
-      options: {
-        participants: "AndrewK@M365x214355.onmicrosoft.com DaveK@M365x214355.onmicrosoft.com"
-      }
-    }, (err?: any) => {
-      try {
-        assert(loggerLogSpy.calledWith(singleChatResponse));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-  
   it('fails retrieving chat conversation with nonexistent name', (done) => {    
     command.action(logger, {
       options: {
