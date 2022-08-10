@@ -1,5 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -30,13 +29,60 @@ class AadAppRemoveCommand extends GraphCommand {
     return 'Removes an Azure AD app registration';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.appId = typeof args.options.appId !== 'undefined';
-    telemetryProps.objectId = typeof args.options.objectId !== 'undefined';
-    telemetryProps.name = typeof args.options.name !== 'undefined';
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        appId: typeof args.options.appId !== 'undefined',
+        objectId: typeof args.options.objectId !== 'undefined',
+        name: typeof args.options.name !== 'undefined',
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '--appId [appId]' },
+      { option: '--objectId [objectId]' },
+      { option: '--name [name]' },
+      { option: '--confirm' }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.appId &&
+          !args.options.objectId &&
+          !args.options.name) {
+          return 'Specify either appId, objectId, or name';
+        }
+
+        if ((args.options.appId && args.options.objectId) ||
+          (args.options.appId && args.options.name) ||
+          (args.options.objectId && args.options.name)) {
+          return 'Specify either appId, objectId, or name';
+        }
+
+        if (args.options.appId && !validation.isValidGuid(args.options.appId as string)) {
+          return `${args.options.appId} is not a valid GUID`;
+        }
+
+        if (args.options.objectId && !validation.isValidGuid(args.options.objectId as string)) {
+          return `${args.options.objectId} is not a valid GUID`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -120,42 +166,6 @@ class AadAppRemoveCommand extends GraphCommand {
 
         return Promise.reject(`Multiple Azure AD application registration with name ${name} found. Please choose one of the object IDs: ${res.value.map(a => a.id).join(', ')}`);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '--appId [appId]' },
-      { option: '--objectId [objectId]' },
-      { option: '--name [name]' },
-      { option: '--confirm' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.appId &&
-      !args.options.objectId &&
-      !args.options.name) {
-      return 'Specify either appId, objectId, or name';
-    }
-
-    if ((args.options.appId && args.options.objectId) ||
-      (args.options.appId && args.options.name) ||
-      (args.options.objectId && args.options.name)) {
-      return 'Specify either appId, objectId, or name';
-    }
-
-    if (args.options.appId && !validation.isValidGuid(args.options.appId as string)) {
-      return `${args.options.appId} is not a valid GUID`;
-    }
-
-    if (args.options.objectId && !validation.isValidGuid(args.options.objectId as string)) {
-      return `${args.options.objectId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

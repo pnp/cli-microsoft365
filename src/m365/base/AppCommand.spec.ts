@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
-import { Cli, Logger } from '../../cli';
+import { Cli, CommandInfo, Logger } from '../../cli';
 import { sinonUtil } from '../../utils';
 import AppCommand from './AppCommand';
 import sinon = require('sinon');
@@ -25,6 +25,11 @@ describe('AppCommand', () => {
   let cmd: MockCommand;
   let logger: Logger;
   let log: string[];
+  let commandInfo: CommandInfo;
+
+  before(() => {
+    commandInfo = Cli.getCommandInfo(new MockCommand());
+  });
 
   beforeEach(() => {
     cmd = new MockCommand();
@@ -234,13 +239,13 @@ describe('AppCommand', () => {
     });
   });
 
-  it('fails validation if the specified appId is not a valid GUID', () => {
-    const actual = cmd.validate({ options: { appId: 'e23d235c-fcdf-45d1-ac5f-24ab2ee0695' } });
+  it('fails validation if the specified appId is not a valid GUID', async () => {
+    const actual = await cmd.validate({ options: { appId: 'e23d235c-fcdf-45d1-ac5f-24ab2ee0695' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the specified appId is a valid GUID', () => {
-    const actual = cmd.validate({ options: { appId: 'e23d235c-fcdf-45d1-ac5f-24ab2ee0695d' } });
+  it('passes validation if the specified appId is a valid GUID', async () => {
+    const actual = await cmd.validate({ options: { appId: 'e23d235c-fcdf-45d1-ac5f-24ab2ee0695d' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

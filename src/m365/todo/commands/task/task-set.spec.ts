@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,6 +12,7 @@ const command: Command = require('./task-set');
 describe(commands.TASK_SET, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   const getRequestData = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('4cb2b035-ad76-406c-bdc4-6c72ad403a22')/todo/lists",
@@ -44,6 +45,7 @@ describe(commands.TASK_SET, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -194,38 +196,39 @@ describe(commands.TASK_SET, () => {
     });
   });
 
-  it('fails validation if both listId and listName options are passed', () => {
-    const actual = command.validate({
+  it('fails validation if both listId and listName options are passed', async () => {
+    const actual = await command.validate({
       options: {
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
         listName: 'Tasks List',
         title: 'New Task',
         id: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if neither listId nor listName options are passed', () => {
-    const actual = command.validate({
+  it('fails validation if neither listId nor listName options are passed', async () => {
+    const actual = await command.validate({
       options: {
         title: 'New Task',
         id: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('fails validation if id not passed', () => {
-    const actual = command.validate({
+
+  it('fails validation if id not passed', async () => {
+    const actual = await command.validate({
       options: {
         title: 'New Task',
         listName: 'Tasks List'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if status is not allowed value', () => {
+  it('fails validation if status is not allowed value', async () => {
     const options: any = {
       title: 'New Task',
       id: 'abc',
@@ -233,25 +236,25 @@ describe(commands.TASK_SET, () => {
       listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA=='
 
     };
-    const actual = command.validate({ options: options });
+    const actual = await command.validate({ options: options }, commandInfo);
     assert.strictEqual(actual, 'test is not a valid value. Allowed values are notStarted|inProgress|completed|waitingOnOthers|deferred');
   });
-  it('correctly validates the arguments', () => {
-    const actual = command.validate({
+
+  it('correctly validates the arguments', async () => {
+    const actual = await command.validate({
       options: {
         title: 'New Task',
         id: 'abc',
         status: "notStarted",
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA=='
-
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

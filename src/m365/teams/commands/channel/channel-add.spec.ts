@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.CHANNEL_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -60,92 +62,85 @@ describe(commands.CHANNEL_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both teamId and teamName options are passed', (done) => {
-    const actual = command.validate({
+  it('fails validation if both teamId and teamName options are passed', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         teamName: 'Team Name',
         name: 'Architecture Discussion',
         description: 'Architecture'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if both channelId and channelName options are not passed', (done) => {
-    const actual = command.validate({
+  it('fails validation if both channelId and channelName options are not passed', async () => {
+    const actual = await command.validate({
       options: {
         name: 'Architecture Discussion',
         description: 'Architecture'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if the teamId is not a valid guid.', (done) => {
-    const actual = command.validate({
+  it('fails validation if the teamId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: 'invalid GUID',
         name: 'Architecture Discussion',
         description: 'Architecture'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if unkown type is specified.', (done) => {
-    const actual = command.validate({
+  it('fails validation if unkown type is specified.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion',
         type: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if owner is not specified when creating private channel.', (done) => {
-    const actual = command.validate({
+  it('fails validation if owner is not specified when creating private channel.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion',
         type: 'private'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if owner is specified when not creating private channel.', (done) => {
-    const actual = command.validate({
+  it('fails validation if owner is specified when not creating private channel.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion',
         owner: 'John.Doe@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('validates for a correct general channel input.', (done) => {
-    const actual = command.validate({
+  it('validates for a correct general channel input.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture',
         description: 'Architecture meeting'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('validates for a correct private channel input.', (done) => {
-    const actual = command.validate({
+  it('validates for a correct private channel input.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture',
@@ -153,9 +148,8 @@ describe(commands.CHANNEL_ADD, () => {
         type: 'private',
         owner: 'john.doe@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('fails to get team when team does not exists', (done) => {
@@ -440,7 +434,7 @@ describe(commands.CHANNEL_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

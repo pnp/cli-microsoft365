@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.HUBSITE_CONNECT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,6 +25,7 @@ describe(commands.HUBSITE_CONNECT, () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     }));
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -114,7 +116,7 @@ describe(commands.HUBSITE_CONNECT, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -125,7 +127,7 @@ describe(commands.HUBSITE_CONNECT, () => {
   });
 
   it('supports specifying site collection URL', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--url') > -1) {
@@ -136,7 +138,7 @@ describe(commands.HUBSITE_CONNECT, () => {
   });
 
   it('supports specifying hub site ID', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--hubSiteId') > -1) {
@@ -146,18 +148,18 @@ describe(commands.HUBSITE_CONNECT, () => {
     assert(containsOption);
   });
 
-  it('fails validation if the specified site collection URL is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { url: 'site.com', hubSiteId: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+  it('fails validation if the specified site collection URL is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { url: 'site.com', hubSiteId: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the hub site ID is not a valid GUID', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: 'abc' } });
+  it('fails validation if the hub site ID is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when all required parameters are valid', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+  it('passes validation when all required parameters are valid', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

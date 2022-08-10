@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -27,10 +27,44 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
     return 'Enables communication site features on the specified site';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.designPackageId = typeof args.options.designPackageId !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        designPackageId: typeof args.options.designPackageId !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '-i, --designPackageId [designPackageId]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.designPackageId &&
+          !validation.isValidGuid(args.options.designPackageId)) {
+          return `${args.options.designPackageId} is not a valid GUID`;
+        }
+
+        return validation.isValidSharePointUrl(args.options.url);
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -66,32 +100,9 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        
+
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-i, --designPackageId [designPackageId]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.designPackageId &&
-      !validation.isValidGuid(args.options.designPackageId)) {
-      return `${args.options.designPackageId} is not a valid GUID`;
-    }
-
-    return validation.isValidSharePointUrl(args.options.url);
   }
 }
 

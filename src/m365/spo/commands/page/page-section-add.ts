@@ -1,8 +1,5 @@
 import { isNumber } from 'util';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -29,6 +26,57 @@ class SpoPageSectionAddCommand extends SpoCommand {
 
   public get description(): string {
     return 'Adds section to modern page';
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        order: typeof args.options.order !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --name <name>'
+      },
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-t, --sectionTemplate <sectionTemplate>'
+      },
+      {
+        option: '--order [order]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!(args.options.sectionTemplate in CanvasSectionTemplate)) {
+          return `${args.options.sectionTemplate} is not a valid section template. Allowed values are OneColumn|OneColumnFullWidth|TwoColumn|ThreeColumn|TwoColumnLeft|TwoColumnRight`;
+        }
+
+        if (typeof args.options.order !== 'undefined') {
+          if (!isNumber(args.options.order) || args.options.order < 1) {
+            return 'The value of parameter order must be 1 or higher';
+          }
+        }
+
+        return validation.isValidSharePointUrl(args.options.webUrl);
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -175,40 +223,6 @@ class SpoPageSectionAddCommand extends SpoCommand {
       },
       emphasis: {}
     };
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-t, --sectionTemplate <sectionTemplate>'
-      },
-      {
-        option: '--order [order]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!(args.options.sectionTemplate in CanvasSectionTemplate)) {
-      return `${args.options.sectionTemplate} is not a valid section template. Allowed values are OneColumn|OneColumnFullWidth|TwoColumn|ThreeColumn|TwoColumnLeft|TwoColumnRight`;
-    }
-
-    if (typeof args.options.order !== 'undefined') {
-      if (!isNumber(args.options.order) || args.options.order < 1) {
-        return 'The value of parameter order must be 1 or higher';
-      }
-    }
-
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { AzmgmtItemsListCommand } from '../../../base/AzmgmtItemsListCommand';
+import { odata } from '../../../../utils';
+import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -13,7 +13,7 @@ interface Options extends GlobalOptions {
   asAdmin: boolean;
 }
 
-class PaAppListCommand extends AzmgmtItemsListCommand<{ name: string; displayName: string; properties: { displayName: string } }> {
+class PaAppListCommand extends PowerAppsCommand {
   public get name(): string {
     return commands.APP_LIST;
   }
@@ -26,25 +26,62 @@ class PaAppListCommand extends AzmgmtItemsListCommand<{ name: string; displayNam
     return ['name', 'displayName'];
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.asAdmin = args.options.asAdmin === true;
-    telemetryProps.environment = typeof args.options.environment !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        asAdmin: args.options.asAdmin === true,
+        environment: typeof args.options.environment !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-e, --environment [environment]'
+      },
+      {
+        option: '--asAdmin'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.asAdmin && !args.options.environment) {
+          return 'When specifying the asAdmin option the environment option is required as well';
+        }
+    
+        if (args.options.environment && !args.options.asAdmin) {
+          return 'When specifying the environment option the asAdmin option is required as well';
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const url: string = `${this.resource}providers/Microsoft.PowerApps${args.options.asAdmin ? '/scopes/admin' : ''}${args.options.environment ? '/environments/' + encodeURIComponent(args.options.environment) : ''}/apps?api-version=2017-08-01`;
+    const url = `${this.resource}/providers/Microsoft.PowerApps${args.options.asAdmin ? '/scopes/admin' : ''}${args.options.environment ? '/environments/' + encodeURIComponent(args.options.environment) : ''}/apps?api-version=2017-08-01`;
 
-    this
-      .getAllItems(url, logger, true)
-      .then((): void => {
-        if (this.items.length > 0) {
-          this.items.forEach(a => {
+    odata
+      .getAllItems<{ name: string; displayName: string; properties: { displayName: string } }>(url)
+      .then((apps: { name: string; displayName: string; properties: { displayName: string } }[]): void => {
+        if (apps.length > 0) {
+          apps.forEach(a => {
             a.displayName = a.properties.displayName;
           });
 
-          logger.log(this.items);
+          logger.log(apps);
         }
         else {
           if (this.verbose) {
@@ -55,33 +92,6 @@ class PaAppListCommand extends AzmgmtItemsListCommand<{ name: string; displayNam
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-e, --environment [environment]'
-      },
-      {
-        option: '--asAdmin'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.asAdmin && !args.options.environment) {
-      return 'When specifying the asAdmin option the environment option is required as well';
-    }
-
-    if (args.options.environment && !args.options.asAdmin) {
-      return 'When specifying the environment option the asAdmin option is required as well';
-    }
-
-    return true;
-  }
-
 }
 
 module.exports = new PaAppListCommand();

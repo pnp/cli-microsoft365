@@ -3,7 +3,7 @@ import * as os from 'os';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -177,11 +177,13 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -255,113 +257,111 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
   });
 
   it('defines correct option sets', () => {
-    const optionSets = command.optionSets();
+    const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [[ 'teamId', 'teamName' ], [ 'channelId', 'channelName' ], [ 'userId', 'userDisplayName' ]]);
   });
 
-  it('fails validation if the teamId is not a valid guid', () => {
-    const actual = command.validate({
+  it('fails validation if the teamId is not a valid guid', async () => {
+    const actual = await command.validate({
       options: {
         teamId: "fce9e580-8bba-",
         channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
         userId: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validatation for a incorrect channelId missing leading 19:.', (done) => {
-    const actual = command.validate({
+  it('fails validation for a incorrect channelId missing leading 19:.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '586a8b9e36c4479bbbd378e439a96df2@thread.skype',
         userId: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation for a incorrect channelId missing trailing @thread.skpye.', (done) => {
-    const actual = command.validate({
+  it('fails validation for a incorrect channelId missing trailing @thread.skype.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:586a8b9e36c4479bbbd378e439a96df2',
         userId: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('validates for a correct teamId, channelId, and userId input', () => {
-    const actual = command.validate({
+  it('validates for a correct teamId, channelId, and userId input', async () => {
+    const actual = await command.validate({
       options: {
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
         userId: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct teamId, channelName, and userId input', () => {
-    const actual = command.validate({
+  it('validates for a correct teamId, channelName, and userId input', async () => {
+    const actual = await command.validate({
       options: {
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelName: "Private Channel",
         userId: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct teamName, channelName, and userId input', () => {
-    const actual = command.validate({
+  it('validates for a correct teamName, channelName, and userId input', async () => {
+    const actual = await command.validate({
       options: {
         teamName: "Human Resources",
         channelName: "Private Channel",
         userId: "f410f714-29e3-43f7-874d-d7d35c33eaf1"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct teamId, channelId, and userDisplayName input', () => {
-    const actual = command.validate({
+  it('validates for a correct teamId, channelId, and userDisplayName input', async () => {
+    const actual = await command.validate({
       options: {
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
         userDisplayName: "admin.contoso.com"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct teamId, channelName, and userDisplayName input', () => {
-    const actual = command.validate({
+  it('validates for a correct teamId, channelName, and userDisplayName input', async () => {
+    const actual = await command.validate({
       options: {
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelName: "Private Channel",
         userDisplayName: "admin.contoso.com"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct teamName, channelName, and userDisplayName input', () => {
-    const actual = command.validate({
+  it('validates for a correct teamName, channelName, and userDisplayName input', async () => {
+    const actual = await command.validate({
       options: {
         teamName: "Human Resources",
         channelName: "Private Channel",
         userDisplayName: "admin.contoso.com"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

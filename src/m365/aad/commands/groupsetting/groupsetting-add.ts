@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -26,10 +23,31 @@ class AadGroupSettingAddCommand extends GraphCommand {
     return 'Creates a group setting';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.templateId = args.options.templateId;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --templateId <templateId>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.templateId)) {
+          return `${args.options.templateId} is not a valid GUID`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public allowUnknownOptions(): boolean | undefined {
@@ -101,25 +119,6 @@ class AadGroupSettingAddCommand extends GraphCommand {
     });
 
     return values;
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --templateId <templateId>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.templateId)) {
-      return `${args.options.templateId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

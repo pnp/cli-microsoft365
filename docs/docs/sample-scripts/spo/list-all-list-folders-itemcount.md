@@ -10,7 +10,7 @@ List all Lists, the folders and sub folders in a given site, and output the item
     $siteUrl = "<PUTYOURURLHERE>"
     $fileExportPath = "<PUTYOURPATHHERE.csv>"
 
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
 
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365

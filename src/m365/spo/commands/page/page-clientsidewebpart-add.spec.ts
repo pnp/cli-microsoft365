@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -12,6 +12,7 @@ const command: Command = require('./page-clientsidewebpart-add');
 describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   const clientSideWebParts = {
     value: [
       {
@@ -42,8 +43,9 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -319,7 +321,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -414,7 +416,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -510,7 +512,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -606,7 +608,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -742,7 +744,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -879,7 +881,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -1016,7 +1018,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: true,
@@ -1192,7 +1194,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -1369,7 +1371,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -1546,7 +1548,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -1723,7 +1725,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -1859,7 +1861,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -1944,7 +1946,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: true,
@@ -2065,7 +2067,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -2102,7 +2104,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -2143,7 +2145,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -2190,7 +2192,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -2325,7 +2327,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -2365,7 +2367,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -2402,7 +2404,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -2440,7 +2442,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -2489,7 +2491,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -2562,9 +2564,9 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
                   "description": "Display a key location on a map",
                   "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
                   "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {"pushPins": [{"location": {"latitude": 47.6405250000244,"longitude": -122.129415000122,"altitude": 0,"altitudeReference": -1,"name": "Microsoft Way, Redmond, WA 98052"},"defaultTitle": "One Microsoft Way, Building 32","defaultAddress": "Microsoft Way, Redmond, WA 98052","title": "One Microsoft Way, Building 32","address": "Microsoft Way, Redmond, WA 98052"}],"maxNumberOfPushPins": 1,"shouldShowPushPinTitle": true,"zoomLevel": 12,"mapType": "road","center": {"latitude": 47.6405250000244,"longitude": -122.129415000122,"altitude": 0,"altitudeReference": -1}},
+                  "properties": { "pushPins": [{ "location": { "latitude": 47.6405250000244, "longitude": -122.129415000122, "altitude": 0, "altitudeReference": -1, "name": "Microsoft Way, Redmond, WA 98052" }, "defaultTitle": "One Microsoft Way, Building 32", "defaultAddress": "Microsoft Way, Redmond, WA 98052", "title": "One Microsoft Way, Building 32", "address": "Microsoft Way, Redmond, WA 98052" }], "maxNumberOfPushPins": 1, "shouldShowPushPinTitle": true, "zoomLevel": 12, "mapType": "road", "center": { "latitude": 47.6405250000244, "longitude": -122.129415000122, "altitude": 0, "altitudeReference": -1 } },
                   "title": "Bing Maps",
-                  "serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}}
+                  "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": {}, "imageSources": {}, "links": {} }
                 }
               },
               {
@@ -2621,7 +2623,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: true,
@@ -2694,9 +2696,9 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
                   "description": "Display a key location on a map",
                   "id": "e377ea37-9047-43b9-8cdb-a761be2f8e09",
                   "instanceId": "89c644b3-f69c-4e84-85d7-dfa04c6163b5",
-                  "properties": {"pushPins": [{"location": {"latitude": 47.6405250000244,"longitude": -122.129415000122,"altitude": 0,"altitudeReference": -1,"name": "Microsoft Way, Redmond, WA 98052"},"defaultTitle": "One Microsoft Way, Building 32","defaultAddress": "Microsoft Way, Redmond, WA 98052","title": "One Microsoft Way, Building 32","address": "Microsoft Way, Redmond, WA 98052"}],"maxNumberOfPushPins": 1,"shouldShowPushPinTitle": true,"zoomLevel": 12,"mapType": "road","center": {"latitude": 47.6405250000244,"longitude": -122.129415000122,"altitude": 0,"altitudeReference": -1}},
+                  "properties": { "pushPins": [{ "location": { "latitude": 47.6405250000244, "longitude": -122.129415000122, "altitude": 0, "altitudeReference": -1, "name": "Microsoft Way, Redmond, WA 98052" }, "defaultTitle": "One Microsoft Way, Building 32", "defaultAddress": "Microsoft Way, Redmond, WA 98052", "title": "One Microsoft Way, Building 32", "address": "Microsoft Way, Redmond, WA 98052" }], "maxNumberOfPushPins": 1, "shouldShowPushPinTitle": true, "zoomLevel": 12, "mapType": "road", "center": { "latitude": 47.6405250000244, "longitude": -122.129415000122, "altitude": 0, "altitudeReference": -1 } },
                   "title": "Bing Maps",
-                  "serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}}
+                  "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": {}, "imageSources": {}, "links": {} }
                 }
               },
               {
@@ -2753,7 +2755,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    command.action(logger,
       {
         options: {
           debug: true,
@@ -2834,7 +2836,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
                     "mapType": "road"
                   },
                   "title": "Bing Maps",
-                  "dynamicDataPaths":{"dynamicProperty0":"WebPart.2bacb933-9f9d-457f-bfa5-b00bfc9cd625.69800bc3-0d7c-495c-a5b6-3423f226d5c5:queryText"},"dynamicDataValues":{"dynamicProperty1":""}
+                  "dynamicDataPaths": { "dynamicProperty0": "WebPart.2bacb933-9f9d-457f-bfa5-b00bfc9cd625.69800bc3-0d7c-495c-a5b6-3423f226d5c5:queryText" }, "dynamicDataValues": { "dynamicProperty1": "" }
                 }
               },
               {
@@ -2891,8 +2893,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    
-    command.action(logger, 
+
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -2982,7 +2984,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option === '--debug') {
@@ -2993,7 +2995,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('supports verbose mode', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option === '--verbose') {
@@ -3004,7 +3006,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('supports specifying page name', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--pageName') > -1) {
@@ -3015,7 +3017,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('supports specifying webUrl', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--webUrl') > -1) {
@@ -3026,7 +3028,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('supports specifying webPartId', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--webPartId') > -1) {
@@ -3037,7 +3039,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('supports specifying standardWebPart', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--standardWebPart') > -1) {
@@ -3048,7 +3050,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('supports specifying webPartProperties', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--webPartProperties') > -1) {
@@ -3059,7 +3061,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('supports specifying section', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--section') > -1) {
@@ -3070,7 +3072,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('supports specifying column', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--column') > -1) {
@@ -3081,7 +3083,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('supports specifying order', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--order') > -1) {
@@ -3091,56 +3093,56 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     assert(containsOption);
   });
 
-  it('fails validation if webUrl is not an absolute URL', () => {
-    const actual = command.validate({
+  it('fails validation if webUrl is not an absolute URL', async () => {
+    const actual = await command.validate({
       options: { pageName: 'page.aspx', webUrl: 'foo', webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1' }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', () => {
-    const actual = command.validate({
+  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'http://foo',
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if either webPartId or standardWebPart parameters are not specified', () => {
-    const actual = command.validate({
+  it('fails validation if either webPartId or standardWebPart parameters are not specified', async () => {
+    const actual = await command.validate({
       options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if webPartId and standardWebPart parameters are both specified', () => {
-    const actual = command.validate({
+  it('fails validation if webPartId and standardWebPart parameters are both specified', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
         standardWebPart: 'BingMap'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if webPartId value is not valid GUID', () => {
-    const actual = command.validate({
+  it('fails validation if webPartId value is not valid GUID', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         webPartId: 'FooBar'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if webPartProperties and webPartData are specified', () => {
-    const actual = command.validate({
+  it('fails validation if webPartProperties and webPartData are specified', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
@@ -3148,146 +3150,146 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         webPartProperties: '{}',
         webPartData: '{}'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if webPartProperties value is not valid JSON', () => {
-    const actual = command.validate({
+  it('fails validation if webPartProperties value is not valid JSON', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
         webPartProperties: '{Foo:bar'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when webPartProperties value is valid JSON', () => {
-    const actual = command.validate({
+  it('passes validation when webPartProperties value is valid JSON', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
         webPartProperties: '{}'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if webPartData value is not valid JSON', () => {
-    const actual = command.validate({
+  it('fails validation if webPartData value is not valid JSON', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
         webPartData: '{Foo:bar'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when webPartData value is valid JSON', () => {
-    const actual = command.validate({
+  it('passes validation when webPartData value is valid JSON', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
         webPartData: '{}'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if standardWebPart is not valid', () => {
-    const actual = command.validate({
+  it('fails validation if standardWebPart is not valid', async () => {
+    const actual = await command.validate({
       options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', standardWebPart: 'Foo' }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when name and webURL specified, webUrl is a valid SharePoint URL and webPartId is specified', () => {
-    const actual = command.validate({
+  it('passes validation when name and webURL specified, webUrl is a valid SharePoint URL and webPartId is specified', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when name and webURL specified, webUrl is a valid SharePoint URL and standardWebPart is specified instead of webPartId', () => {
-    const actual = command.validate({
+  it('passes validation when name and webURL specified, webUrl is a valid SharePoint URL and standardWebPart is specified instead of webPartId', async () => {
+    const actual = await command.validate({
       options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', standardWebPart: 'BingMap' }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when name has no extension', () => {
-    const actual = command.validate({
+  it('passes validation when name has no extension', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page',
         webUrl: 'https://contoso.sharepoint.com',
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if standardWebPart is valid', () => {
-    const actual = command.validate({
+  it('passes validation if standardWebPart is valid', async () => {
+    const actual = await command.validate({
       options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', standardWebPart: 'BingMap' }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if section has invalid (negative) value', () => {
-    const actual = command.validate({
+  it('fails validation if section has invalid (negative) value', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
         section: -1
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if section has invalid (non number) value', () => {
-    const actual = command.validate({
+  it('fails validation if section has invalid (non number) value', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
         section: 'foobar'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if column has invalid (negative) value', () => {
-    const actual = command.validate({
+  it('fails validation if column has invalid (negative) value', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
         column: -1
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if column has invalid (non number) value', () => {
-    const actual = command.validate({
+  it('fails validation if column has invalid (non number) value', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1',
         column: 'foobar'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

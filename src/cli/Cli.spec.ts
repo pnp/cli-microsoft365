@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as sinon from 'sinon';
 import { Cli, CommandOutput } from '.';
 import appInsights from '../appInsights';
-import Command, { CommandArgs, CommandError, CommandOption, CommandTypes } from '../Command';
+import Command, { CommandArgs, CommandError } from '../Command';
 import AnonymousCommand from '../m365/base/AnonymousCommand';
 import { settingsNames } from '../settingsNames';
 import { md, sinonUtil } from '../utils';
@@ -22,23 +22,19 @@ class MockCommand extends AnonymousCommand {
   public get description(): string {
     return 'Mock command';
   }
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
+  constructor() {
+    super();
+
+    this.options.push(
       {
         option: '-x, --parameterX <parameterX>'
       },
       {
         option: '-y, --parameterY [parameterY]'
       }
-    ];
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-  public types(): CommandTypes {
-    return {
-      string: ['x'],
-      boolean: ['y']
-    };
+    );
+    this.types.string.push('x');
+    this.types.boolean.push('y');
   }
   public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     logger.log(args.options.parameterX);
@@ -53,20 +49,18 @@ class MockCommandWithOptionSets extends AnonymousCommand {
   public get description(): string {
     return 'Mock command with option sets';
   }
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
+  constructor() {
+    super();
+
+    this.options.push(
       {
         option: '--opt1 [name]'
       },
       {
         option: '--opt2 [name]'
       }
-    ];
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-  public optionSets(): string[][] | undefined {
-    return [['opt1', 'opt2']];
+    );
+    this.optionSets.push(['opt1', 'opt2']);
   }
   public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     cb();
@@ -95,17 +89,17 @@ class MockCommandWithValidation extends AnonymousCommand {
   public get description(): string {
     return 'Mock command with validation';
   }
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
+  constructor() {
+    super();
+
+    this.options.push(
       {
         option: '-x, --parameterX <parameterX>'
       },
       {
         option: '-y, --parameterY [parameterY]'
       }
-    ];
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
+    );
   }
   public commandAction(logger: Logger, args: any, cb: () => void): void {
     cb();
@@ -412,10 +406,10 @@ describe('Cli', () => {
 
   it(`fails options validation if the command doesn't allow unknown options and specified options match command options`, (done) => {
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '123', '-z'])
+      .execute(rootFolder, ['cli', 'mock', '-x', '123', '--paramZ'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
-          assert(cliErrorStub.calledWith(chalk.red(`Error: Invalid option: 'z'${os.EOL}`)));
+          assert(cliErrorStub.calledWith(chalk.red(`Error: Invalid option: 'paramZ'${os.EOL}`)));
           done();
         }
         catch (e) {
@@ -426,7 +420,7 @@ describe('Cli', () => {
 
   it(`doesn't execute command action when option validation failed`, (done) => {
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '123', '-z'])
+      .execute(rootFolder, ['cli', 'mock', '-x', '123', '--paramZ'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(mockCommandActionSpy.notCalled);
@@ -440,7 +434,7 @@ describe('Cli', () => {
 
   it(`exits with exit code 1 when option validation failed`, (done) => {
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '123', '-z'])
+      .execute(rootFolder, ['cli', 'mock', '-x', '123', '--paramZ'])
       .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(processExitStub.calledWith(1));
@@ -539,7 +533,7 @@ describe('Cli', () => {
   });
 
   it(`passes validation when the command's validate method returns true`, (done) => {
-    sinon.stub(mockCommandWithValidation, 'validate').callsFake(() => true);
+    sinon.stub(mockCommandWithValidation, 'validate').callsFake(() => Promise.resolve(true));
     const mockCommandWithValidationActionSpy: sinon.SinonSpy = sinon.spy(mockCommandWithValidation, 'action');
 
     cli
@@ -556,7 +550,7 @@ describe('Cli', () => {
   });
 
   it(`fails validation when the command's validate method returns a string`, (done) => {
-    sinon.stub(mockCommandWithValidation, 'validate').callsFake(() => 'Error');
+    sinon.stub(mockCommandWithValidation, 'validate').callsFake(() => Promise.resolve('Error'));
     const mockCommandWithValidationActionSpy: sinon.SinonSpy = sinon.spy(mockCommandWithValidation, 'action');
 
     cli

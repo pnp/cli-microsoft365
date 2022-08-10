@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -39,20 +36,114 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     return 'Sets modern page header';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.altText = typeof args.options.altText !== 'undefined';
-    telemetryProps.authors = typeof args.options.authors !== 'undefined';
-    telemetryProps.imageUrl = typeof args.options.imageUrl !== 'undefined';
-    telemetryProps.topicHeader = typeof args.options.topicHeader !== 'undefined';
-    telemetryProps.layout = args.options.layout;
-    telemetryProps.showTopicHeader = args.options.showTopicHeader;
-    telemetryProps.showPublishDate = args.options.showPublishDate;
-    telemetryProps.textAlignment = args.options.textAlignment;
-    telemetryProps.translateX = typeof args.options.translateX !== 'undefined';
-    telemetryProps.translateY = typeof args.options.translateY !== 'undefined';
-    telemetryProps.type = args.options.type;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        altText: typeof args.options.altText !== 'undefined',
+        authors: typeof args.options.authors !== 'undefined',
+        imageUrl: typeof args.options.imageUrl !== 'undefined',
+        topicHeader: typeof args.options.topicHeader !== 'undefined',
+        layout: args.options.layout,
+        showTopicHeader: args.options.showTopicHeader,
+        showPublishDate: args.options.showPublishDate,
+        textAlignment: args.options.textAlignment,
+        translateX: typeof args.options.translateX !== 'undefined',
+        translateY: typeof args.options.translateY !== 'undefined',
+        type: args.options.type
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --pageName <pageName>'
+      },
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-t, --type [type]',
+        autocomplete: ['None', 'Default', 'Custom']
+      },
+      {
+        option: '--imageUrl [imageUrl]'
+      },
+      {
+        option: '--altText [altText]'
+      },
+      {
+        option: '-x, --translateX [translateX]'
+      },
+      {
+        option: '-y, --translateY [translateY]'
+      },
+      {
+        option: '--layout [layout]',
+        autocomplete: ['FullWidthImage', 'NoImage', 'ColorBlock', 'CutInShape']
+      },
+      {
+        option: '--textAlignment [textAlignment]',
+        autocomplete: ['Left', 'Center']
+      },
+      {
+        option: '--showTopicHeader'
+      },
+      {
+        option: '--showPublishDate'
+      },
+      {
+        option: '--topicHeader [topicHeader]'
+      },
+      {
+        option: '--authors [authors]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.type &&
+          args.options.type !== 'None' &&
+          args.options.type !== 'Default' &&
+          args.options.type !== 'Custom') {
+          return `${args.options.type} is not a valid type value. Allowed values None|Default|Custom`;
+        }
+
+        if (args.options.translateX && isNaN(args.options.translateX)) {
+          return `${args.options.translateX} is not a valid number`;
+        }
+
+        if (args.options.translateY && isNaN(args.options.translateY)) {
+          return `${args.options.translateY} is not a valid number`;
+        }
+
+        if (args.options.layout &&
+          args.options.layout !== 'FullWidthImage' &&
+          args.options.layout !== 'NoImage' &&
+          args.options.layout !== 'ColorBlock' &&
+          args.options.layout !== 'CutInShape') {
+          return `${args.options.layout} is not a valid layout value. Allowed values FullWidthImage|NoImage|ColorBlock|CutInShape`;
+        }
+
+        if (args.options.textAlignment &&
+          args.options.textAlignment !== 'Left' &&
+          args.options.textAlignment !== 'Center') {
+          return `${args.options.textAlignment} is not a valid textAlignment value. Allowed values Left|Center`;
+        }
+
+        return validation.isValidSharePointUrl(args.options.webUrl);
+      }
+    );
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -373,89 +464,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     };
 
     return request.get(requestOptions);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --pageName <pageName>'
-      },
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-t, --type [type]',
-        autocomplete: ['None', 'Default', 'Custom']
-      },
-      {
-        option: '--imageUrl [imageUrl]'
-      },
-      {
-        option: '--altText [altText]'
-      },
-      {
-        option: '-x, --translateX [translateX]'
-      },
-      {
-        option: '-y, --translateY [translateY]'
-      },
-      {
-        option: '--layout [layout]',
-        autocomplete: ['FullWidthImage', 'NoImage', 'ColorBlock', 'CutInShape']
-      },
-      {
-        option: '--textAlignment [textAlignment]',
-        autocomplete: ['Left', 'Center']
-      },
-      {
-        option: '--showTopicHeader'
-      },
-      {
-        option: '--showPublishDate'
-      },
-      {
-        option: '--topicHeader [topicHeader]'
-      },
-      {
-        option: '--authors [authors]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.type &&
-      args.options.type !== 'None' &&
-      args.options.type !== 'Default' &&
-      args.options.type !== 'Custom') {
-      return `${args.options.type} is not a valid type value. Allowed values None|Default|Custom`;
-    }
-
-    if (args.options.translateX && isNaN(args.options.translateX)) {
-      return `${args.options.translateX} is not a valid number`;
-    }
-
-    if (args.options.translateY && isNaN(args.options.translateY)) {
-      return `${args.options.translateY} is not a valid number`;
-    }
-
-    if (args.options.layout &&
-      args.options.layout !== 'FullWidthImage' &&
-      args.options.layout !== 'NoImage' &&
-      args.options.layout !== 'ColorBlock' &&
-      args.options.layout !== 'CutInShape') {
-      return `${args.options.layout} is not a valid layout value. Allowed values FullWidthImage|NoImage|ColorBlock|CutInShape`;
-    }
-
-    if (args.options.textAlignment &&
-      args.options.textAlignment !== 'Left' &&
-      args.options.textAlignment !== 'Center') {
-      return `${args.options.textAlignment} is not a valid textAlignment value. Allowed values Left|Center`;
-    }
-
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

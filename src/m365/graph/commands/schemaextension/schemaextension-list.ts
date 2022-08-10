@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -27,14 +24,69 @@ class GraphSchemaExtensionListCommand extends GraphCommand {
   public get description(): string {
     return 'Get a list of schemaExtension objects created in the current tenant, that can be InDevelopment, Available, or Deprecated.';
   }
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.status = typeof args.options.status !== 'undefined';
-    telemetryProps.owner = typeof args.options.owner !== 'undefined';
-    telemetryProps.pageNumber = typeof args.options.pageNumber !== 'undefined';
-    telemetryProps.pageSize = typeof args.options.pageSize !== 'undefined';
-    return telemetryProps;
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
   }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        status: typeof args.options.status !== 'undefined',
+        owner: typeof args.options.owner !== 'undefined',
+        pageNumber: typeof args.options.pageNumber !== 'undefined',
+        pageSize: typeof args.options.pageSize !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-s, --status [status]',
+        autocomplete: ['Available', 'InDevelopment', 'Deprecated']
+      },
+      {
+        option: '--owner [owner]'
+      },
+      {
+        option: '-p, --pageSize [pageSize]'
+      },
+      {
+        option: '-n, --pageNumber [pageNumber]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.owner && !validation.isValidGuid(args.options.owner)) {
+          return `${args.options.owner} is not a valid GUID`;
+        }
+
+        if (args.options.pageNumber && parseInt(args.options.pageNumber) < 1) {
+          return 'pageNumber must be a positive number';
+        }
+
+        if (args.options.pageSize && parseInt(args.options.pageSize) < 1) {
+          return 'pageSize must be a positive number';
+        }
+
+        if (args.options.status &&
+          ['Available', 'InDevelopment', 'Deprecated'].indexOf(args.options.status) === -1) {
+          return `${args.options.status} is not a valid status value. Allowed values are Available|InDevelopment|Deprecated`;
+        }
+        
+        return true;
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const filter: string = this.getFilter(args.options);
     let url = `${this.resource}/v1.0/schemaExtensions?$select=*${(filter.length > 0 ? '&' + filter : '')}`;
@@ -93,44 +145,6 @@ class GraphSchemaExtensionListCommand extends GraphCommand {
     }
 
     return filter;
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-s, --status [status]',
-        autocomplete: ['Available', 'InDevelopment', 'Deprecated']
-      },
-      {
-        option: '--owner [owner]'
-      },
-      {
-        option: '-p, --pageSize [pageSize]'
-      },
-      {
-        option: '-n, --pageNumber [pageNumber]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.owner && !validation.isValidGuid(args.options.owner)) {
-      return `${args.options.owner} is not a valid GUID`;
-    }
-    if (args.options.pageNumber && parseInt(args.options.pageNumber) < 1) {
-      return 'pageNumber must be a positive number';
-    }
-    if (args.options.pageSize && parseInt(args.options.pageSize) < 1) {
-      return 'pageSize must be a positive number';
-    }
-    if (args.options.status &&
-      ['Available', 'InDevelopment', 'Deprecated'].indexOf(args.options.status) === -1) {
-      return `${args.options.status} is not a valid status value. Allowed values are Available|InDevelopment|Deprecated`;
-    }
-    return true;
   }
 }
 module.exports = new GraphSchemaExtensionListCommand();

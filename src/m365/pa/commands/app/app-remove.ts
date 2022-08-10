@@ -1,12 +1,10 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
-import AzmgmtCommand from '../../../base/AzmgmtCommand';
+import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
+
 interface CommandArgs {
   options: Options;
 }
@@ -16,7 +14,7 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class PaAppRemoveCommand extends AzmgmtCommand {
+class PaAppRemoveCommand extends PowerAppsCommand {
   public get name(): string {
     return commands.APP_REMOVE;
   }
@@ -25,10 +23,43 @@ class PaAppRemoveCommand extends AzmgmtCommand {
     return 'Removes the specified Microsoft Power App';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.confirm = typeof args.options.confirm !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        confirm: typeof args.options.confirm !== 'undefined'
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --name <name>'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.name)) {
+          return `${args.options.name} is not a valid GUID`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -38,7 +69,7 @@ class PaAppRemoveCommand extends AzmgmtCommand {
 
     const removePaApp: () => void = (): void => {
       const requestOptions: any = {
-        url: `${this.resource}providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2017-08-01`,
+        url: `${this.resource}/providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2017-08-01`,
         resolveWithFullResponse: true,
         headers: {
           accept: 'application/json'
@@ -76,28 +107,6 @@ class PaAppRemoveCommand extends AzmgmtCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.name)) {
-      return `${args.options.name} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

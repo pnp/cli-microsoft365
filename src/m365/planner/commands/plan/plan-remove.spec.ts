@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken, sinonUtil } from '../../../../utils';
@@ -10,7 +10,6 @@ import commands from '../../commands';
 const command: Command = require('./plan-remove');
 
 describe(commands.PLAN_REMOVE, () => {
-
   const validPlanTitle = 'My Plan';
   const validPlanId = 'opb7bchfZUiFbVWEPL7jPGUABW7f';
   const validOwnerGroupId = '00000000-0000-0000-0000-000000000000';
@@ -46,12 +45,17 @@ describe(commands.PLAN_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
+  let commandInfo: CommandInfo;
 
   before(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -68,6 +72,7 @@ describe(commands.PLAN_REMOVE, () => {
       }
     };
     promptOptions = undefined;
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -88,6 +93,8 @@ describe(commands.PLAN_REMOVE, () => {
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
+    auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -99,66 +106,66 @@ describe(commands.PLAN_REMOVE, () => {
   });
 
   it('defines correct option sets', () => {
-    const optionSets = command.optionSets();
+    const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [['id', 'title']]);
   });
 
-  it('fails validation when id and ownerGroupId is specified', () => {
-    const actual = command.validate({
+  it('fails validation when id and ownerGroupId is specified', async () => {
+    const actual = await command.validate({
       options: {
         id: validPlanId,
         ownerGroupId: validOwnerGroupId
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when title is specified with both ownerGroupName and ownerGroupId', () => {
-    const actual = command.validate({
+  it('fails validation when title is specified with both ownerGroupName and ownerGroupId', async () => {
+    const actual = await command.validate({
       options: {
         title: validPlanTitle,
         ownerGroupId: validOwnerGroupId,
         ownerGroupName: validOwnerGroupName
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when title is specified without ownerGroupName or ownerGroupId', () => {
-    const actual = command.validate({
+  it('fails validation when title is specified without ownerGroupName or ownerGroupId', async () => {
+    const actual = await command.validate({
       options: {
         title: validPlanTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when title is specified with invalid ownerGroupId', () => {
-    const actual = command.validate({
+  it('fails validation when title is specified with invalid ownerGroupId', async () => {
+    const actual = await command.validate({
       options: {
         title: validPlanTitle,
         ownerGroupId: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('validates for a correct input with id', () => {
-    const actual = command.validate({
+  it('validates for a correct input with id', async () => {
+    const actual = await command.validate({
       options: {
         id: validPlanId
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct input with title', () => {
-    const actual = command.validate({
+  it('validates for a correct input with title', async () => {
+    const actual = await command.validate({
       options: {
         title: validPlanTitle,
         ownerGroupName: validOwnerGroupName
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -348,7 +355,7 @@ describe(commands.PLAN_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -49,12 +46,67 @@ class GraphSubscriptionAddCommand extends GraphCommand {
     return 'Creates a Microsoft Graph subscription';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.changeType = args.options.changeType;
-    telemetryProps.expirationDateTime = typeof args.options.expirationDateTime !== 'undefined';
-    telemetryProps.clientState = typeof args.options.clientState !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        changeType: args.options.changeType,
+        expirationDateTime: typeof args.options.expirationDateTime !== 'undefined',
+        clientState: typeof args.options.clientState !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-r, --resource <resource>'
+      },
+      {
+        option: '-u, --notificationUrl <notificationUrl>'
+      },
+      {
+        option: '-c, --changeType <changeType>',
+        autocomplete: ['created', 'updated', 'deleted']
+      },
+      {
+        option: '-e, --expirationDateTime [expirationDateTime]'
+      },
+      {
+        option: '-s, --clientState [clientState]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.notificationUrl.indexOf('https://') !== 0) {
+          return `The specified notification URL '${args.options.notificationUrl}' does not start with 'https://'`;
+        }
+    
+        if (!this.isValidChangeTypes(args.options.changeType)) {
+          return `The specified changeType is invalid. Valid options are 'created', 'updated' and 'deleted'`;
+        }
+    
+        if (args.options.expirationDateTime && !validation.isValidISODateTime(args.options.expirationDateTime)) {
+          return 'The expirationDateTime is not a valid ISO date string';
+        }
+    
+        if (args.options.clientState && args.options.clientState.length > 128) {
+          return 'The clientState value exceeds the maximum length of 128 characters';
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -145,51 +197,6 @@ class GraphSubscriptionAddCommand extends GraphCommand {
 
     return actualExpirationIsoString;
   }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-r, --resource <resource>'
-      },
-      {
-        option: '-u, --notificationUrl <notificationUrl>'
-      },
-      {
-        option: '-c, --changeType <changeType>',
-        autocomplete: ['created', 'updated', 'deleted']
-      },
-      {
-        option: '-e, --expirationDateTime [expirationDateTime]'
-      },
-      {
-        option: '-s, --clientState [clientState]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.notificationUrl.indexOf('https://') !== 0) {
-      return `The specified notification URL '${args.options.notificationUrl}' does not start with 'https://'`;
-    }
-
-    if (!this.isValidChangeTypes(args.options.changeType)) {
-      return `The specified changeType is invalid. Valid options are 'created', 'updated' and 'deleted'`;
-    }
-
-    if (args.options.expirationDateTime && !validation.isValidISODateTime(args.options.expirationDateTime)) {
-      return 'The expirationDateTime is not a valid ISO date string';
-    }
-
-    if (args.options.clientState && args.options.clientState.length > 128) {
-      return 'The clientState value exceeds the maximum length of 128 characters';
-    }
-
-    return true;
-  }
-
 
   private isValidChangeTypes(changeTypes: string): boolean {
     const validChangeTypes = ["created", "updated", "deleted"];

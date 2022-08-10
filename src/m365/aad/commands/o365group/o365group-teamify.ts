@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -24,6 +21,54 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
 
   public get description(): string {
     return 'Creates a new Microsoft Teams team under existing Microsoft 365 group';
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        groupId: typeof args.options.groupId !== 'undefined',
+        mailNickname: typeof args.options.mailNickname !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --groupId [groupId]'
+      },
+      {
+        option: '--mailNickname [mailNickname]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.groupId && args.options.mailNickname) {
+          return 'Specify either groupId or mailNickname, but not both.';
+        }
+
+        if (!args.options.groupId && !args.options.mailNickname) {
+          return 'Specify groupId or mailNickname, one is required';
+        }
+
+        if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
+          return `${args.options.groupId} is not a valid GUID`;
+        }
+
+        return true;
+      }
+    );
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {
@@ -87,36 +132,6 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
         return request.put(requestOptions);
       })
       .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --groupId [groupId]'
-      },
-      {
-        option: '--mailNickname [mailNickname]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.groupId && args.options.mailNickname) {
-      return 'Specify either groupId or mailNickname, but not both.';
-    }
-
-    if (!args.options.groupId && !args.options.mailNickname) {
-      return 'Specify groupId or mailNickname, one is required';
-    }
-
-    if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
-      return `${args.options.groupId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

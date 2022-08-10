@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.GROUP_USER_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   const jsonSingleUser =
   {
@@ -101,6 +102,7 @@ describe(commands.GROUP_USER_ADD, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -143,66 +145,62 @@ describe(commands.GROUP_USER_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both groupId and groupName options are passed', (done) => {
-    const actual = command.validate({
+  it('fails validation if both groupId and groupName options are passed', async () => {
+    const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
         groupName: "Contoso Site Owners",
         userName: "Alex.Wilber@contoso.com"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if both groupId and groupName options are not passed', (done) => {
-    const actual = command.validate({
+  it('fails validation if both groupId and groupName options are not passed', async () => {
+    const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         userName: "Alex.Wilber@contoso.com"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if both userName and email options are passed', (done) => {
-    const actual = command.validate({
+  it('fails validation if both userName and email options are passed', async () => {
+    const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
         email: "Alex.Wilber@contoso.com",
         userName: "Alex.Wilber@contoso.com"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if both userName and email options are not passed', (done) => {
-    const actual = command.validate({
+  it('fails validation if both userName and email options are not passed', async () => {
+    const actual = await command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32
       }
-    });
-    assert.notStrictEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if webURL is Invalid', () => {
-    const actual = command.validate({ options: { webUrl: "InvalidWEBURL", groupId: 32, userName: "Alex.Wilber@contoso.com" } });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if groupID is Invalid', () => {
-    const actual = command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "NOGROUP", userName: "Alex.Wilber@contoso.com" } });
+  it('fails validation if webURL is Invalid', async () => {
+    const actual = await command.validate({ options: { webUrl: "InvalidWEBURL", groupId: 32, userName: "Alex.Wilber@contoso.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if all the required options are specified', () => {
-    const actual = command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, userName: "Alex.Wilber@contoso.com" } });
+  it('fails validation if groupID is Invalid', async () => {
+    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: "NOGROUP", userName: "Alex.Wilber@contoso.com" } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if all the required options are specified', async () => {
+    const actual = await command.validate({ options: { webUrl: "https://contoso.sharepoint.com/sites/SiteA", groupId: 32, userName: "Alex.Wilber@contoso.com" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -476,7 +474,7 @@ describe(commands.GROUP_USER_ADD, () => {
 
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

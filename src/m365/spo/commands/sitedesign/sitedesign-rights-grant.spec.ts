@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,6 +26,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -192,7 +194,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -203,7 +205,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
   });
 
   it('supports specifying id', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {
@@ -214,7 +216,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
   });
 
   it('supports specifying principals', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--principals') > -1) {
@@ -225,7 +227,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
   });
 
   it('supports specifying rights', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--rights') > -1) {
@@ -235,23 +237,23 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
     assert(containsOption);
   });
 
-  it('fails validation if id is not a valid GUID', () => {
-    const actual = command.validate({ options: { id: 'abc' } });
+  it('fails validation if id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: 'abc', principals: 'PattiF', rights: 'View' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if specified rights value is invalid', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'Invalid' } });
+  it('fails validation if specified rights value is invalid', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'Invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if all required parameters are valid', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View' } });
+  it('passes validation if all required parameters are valid', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if all required parameters are valid (multiple principals)', () => {
-    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF,AdeleV', rights: 'View' } });
+  it('passes validation if all required parameters are valid (multiple principals)', async () => {
+    const actual = await command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF,AdeleV', rights: 'View' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

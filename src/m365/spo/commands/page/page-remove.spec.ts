@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
@@ -13,6 +13,7 @@ describe(commands.PAGE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
@@ -38,6 +39,7 @@ describe(commands.PAGE_REMOVE, () => {
         WebFullUrl: 'https://contoso.sharepoint.com'
       }));
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -327,7 +329,7 @@ describe(commands.PAGE_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option === '--debug') {
@@ -338,7 +340,7 @@ describe(commands.PAGE_REMOVE, () => {
   });
 
   it('supports specifying name', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--name') > -1) {
@@ -349,7 +351,7 @@ describe(commands.PAGE_REMOVE, () => {
   });
 
   it('supports specifying webUrl', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--webUrl') > -1) {
@@ -360,7 +362,7 @@ describe(commands.PAGE_REMOVE, () => {
   });
 
   it('supports specifying confirm', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--confirm') > -1) {
@@ -370,29 +372,29 @@ describe(commands.PAGE_REMOVE, () => {
     assert(containsOption);
   });
 
-  it('fails validation if webUrl is not an absolute URL', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'foo' } });
+  it('fails validation if webUrl is not an absolute URL', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', () => {
-    const actual = command.validate({
+  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({
       options: { name: 'page.aspx', webUrl: 'http://foo' }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when name and webURL specified and webUrl is a valid SharePoint URL', () => {
-    const actual = command.validate({
+  it('passes validation when name and webURL specified and webUrl is a valid SharePoint URL', async () => {
+    const actual = await command.validate({
       options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when name has no extension', () => {
-    const actual = command.validate({
+  it('passes validation when name has no extension', async () => {
+    const actual = await command.validate({
       options: { name: 'page', webUrl: 'https://contoso.sharepoint.com' }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

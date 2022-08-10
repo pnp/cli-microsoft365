@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.USER_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -381,48 +383,48 @@ describe(commands.USER_LIST, () => {
     });
   });
 
-  it('passes validation without parameters', () => {
-    const actual = command.validate({ options: {} });
+  it('passes validation without parameters', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation with parameters', () => {
-    const actual = command.validate({ options: { letter: "A" } });
+  it('passes validation with parameters', async () => {
+    const actual = await command.validate({ options: { letter: "A" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('letter does not allow numbers', () => {
-    const actual = command.validate({ options: { letter: "1" } });
+  it('letter does not allow numbers', async () => {
+    const actual = await command.validate({ options: { letter: "1" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('groupId must be a number', () => {
-    const actual = command.validate({ options: { groupId: "aasdf" } });
+  it('groupId must be a number', async () => {
+    const actual = await command.validate({ options: { groupId: "aasdf" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('limit must be a number', () => {
-    const actual = command.validate({ options: { limit: "aasdf" } });
+  it('limit must be a number', async () => {
+    const actual = await command.validate({ options: { limit: "aasdf" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('sortBy validation check', () => {
-    const actual = command.validate({ options: { sortBy: "aasdf" } });
+  it('sortBy validation check', async () => {
+    const actual = await command.validate({ options: { sortBy: "aasdf" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if letter is set to a single character', () => {
-    const actual = command.validate({ options: { letter: "a" } });
+  it('passes validation if letter is set to a single character', async () => {
+    const actual = await command.validate({ options: { letter: "a" } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('does not pass validation if letter is set to a multiple characters', () => {
-    const actual = command.validate({ options: { letter: "ab" } });
+  it('does not pass validation if letter is set to a multiple characters', async () => {
+    const actual = await command.validate({ options: { letter: "ab" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

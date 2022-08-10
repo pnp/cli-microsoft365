@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -10,7 +10,6 @@ import commands from '../../commands';
 const command: Command = require('./tenant-settings-set');
 
 describe(commands.TENANT_SETTINGS_SET, () => {
-
   const successResponse = {
     id: '1',
     isPlannerAllowed: true,
@@ -24,11 +23,13 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -69,34 +70,31 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation no options are specified', (done) => {
-    const actual = command.validate({
-      options: { }
-    });
+  it('fails validation no options are specified', async () => {
+    const actual = await command.validate({
+      options: {}
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when invalid boolean is passed as option', (done) => {
-    const actual = command.validate({
+  it('fails validation when invalid boolean is passed as option', async () => {
+    const actual = await command.validate({
       options: {
         isPlannerAllowed: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid options specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid options specified', async () => {
+    const actual = await command.validate({
       options: {
         isPlannerAllowed: 'true',
         allowCalendarSharing: 'false',
         allowPlannerMobilePushNotifications: 'false'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('successfully updates tenant planner settings', (done) => {
@@ -148,7 +146,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

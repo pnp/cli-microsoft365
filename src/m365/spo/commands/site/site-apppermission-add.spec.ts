@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,12 +13,14 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -62,64 +64,62 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation with an incorrect URL', (done) => {
-    const actual = command.validate({
+  it('fails validation with an incorrect URL', async () => {
+    const actual = await command.validate({
       options: {
         siteUrl: 'https;//contoso,sharepoint:com/sites/sitecollection-name',
         permission: "write",
         appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
         appDisplayName: "Foo App"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if the appId is not a valid GUID', () => {
-    const actual = command.validate({
+  it('fails validation if the appId is not a valid GUID', async () => {
+    const actual = await command.validate({
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
         permission: "write",
         appId: "123",
         appDisplayName: "Foo App"
       }
-    });
+    }, commandInfo);
 
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both appId and appDisplayName options are not specified', () => {
-    const actual = command.validate({
+  it('fails validation if both appId and appDisplayName options are not specified', async () => {
+    const actual = await command.validate({
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
         permission: "write"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation with a correct URL', (done) => {
-    const actual = command.validate({
+  it('passes validation with a correct URL', async () => {
+    const actual = await command.validate({
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         permission: "write",
         appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
         appDisplayName: "Foo App"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if invalid value specified for permission', () => {
-    const actual = command.validate({
+  it('fails validation if invalid value specified for permission', async () => {
+    const actual = await command.validate({
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         permission: "Invalid",
         appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
         appDisplayName: "Foo App"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -798,7 +798,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

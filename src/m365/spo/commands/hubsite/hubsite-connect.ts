@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { ContextInfo, spo, validation } from '../../../../utils';
@@ -26,6 +23,41 @@ class SpoHubSiteConnectCommand extends SpoCommand {
     return 'Connects the specified site collection to the given hub site';
   }
 
+  constructor() {
+    super();
+  
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '-i, --hubSiteId <hubSiteId>'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+    
+        if (!validation.isValidGuid(args.options.hubSiteId)) {
+          return `${args.options.hubSiteId} is not a valid GUID`;
+        }
+    
+        return true;
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     spo
       .getRequestDigest(args.options.url)
@@ -42,33 +74,6 @@ class SpoHubSiteConnectCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-i, --hubSiteId <hubSiteId>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (!validation.isValidGuid(args.options.hubSiteId)) {
-      return `${args.options.hubSiteId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

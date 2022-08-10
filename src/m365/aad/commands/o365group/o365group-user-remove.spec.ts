@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,12 +13,14 @@ const command: Command = require('./o365group-user-remove');
 describe(commands.O365GROUP_USER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -76,56 +78,54 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     assert.strictEqual((alias && alias.indexOf(teamsCommands.USER_REMOVE) > -1), true);
   });
 
-  it('fails validation if the groupId is not a valid guid.', (done) => {
-    const actual = command.validate({
+  it('fails validation if the groupId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
-        groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
+        groupId: 'not-c49b-4fd4-8223-28f0ac3a6402',
+        userName: 'anne.matthews@contoso.onmicrosoft.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if the teamId is not a valid guid.', (done) => {
-    const actual = command.validate({
+  it('fails validation if the teamId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
-        teamId: 'not-c49b-4fd4-8223-28f0ac3a6402'
+        teamId: 'not-c49b-4fd4-8223-28f0ac3a6402',
+        userName: 'anne.matthews@contoso.onmicrosoft.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if neither the groupId nor the teamID are provided.', (done) => {
-    const actual = command.validate({
+  it('fails validation if neither the groupId nor the teamID are provided.', async () => {
+    const actual = await command.validate({
       options: {
         userName: 'anne.matthews@contoso.onmicrosoft.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both groupId and teamId are specified', (done) => {
-    const actual = command.validate({
+  it('fails validation when both groupId and teamId are specified', async () => {
+    const actual = await command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        userName: 'anne.matthews@contoso.onmicrosoft.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid groupId and userName are specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid groupId and userName are specified', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         userName: 'anne.matthews@contoso.onmicrosoft.com'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('prompts before removing the specified user from the specified Microsoft 365 Group when confirm option not passed', (done) => {
@@ -677,7 +677,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

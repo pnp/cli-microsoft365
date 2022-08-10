@@ -1,8 +1,9 @@
 import * as assert from 'assert';
+import chalk = require('chalk');
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +14,14 @@ describe(commands.TEAM_ARCHIVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -34,11 +38,13 @@ describe(commands.TEAM_ARCHIVE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
   afterEach(() => {
     sinonUtil.restore([
+      request.get,
       request.post
     ]);
   });
@@ -59,25 +65,128 @@ describe(commands.TEAM_ARCHIVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the teamId is not a valid guid.', () => {
-    const actual = command.validate({
+  it('fails validation if the teamId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the input is correct', () => {
-    const actual = command.validate({
+  it('fails validation if the id is not a valid guid.', async () => {
+    const actual = await command.validate({
+      options: {
+        id: 'invalid'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation when the input is correct', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('archives a Microsoft Team', (done) => {
+  it('fails validation when no option is specified', async () => {
+    const actual = await command.validate({
+      options: {
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when all options are specified', async () => {
+    const actual = await command.validate({
+      options: {
+        name: 'Finance',
+        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when both id and name are specified', async () => {
+    const actual = await command.validate({
+      options: {
+        name: 'Finance',
+        id: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when both teamId and name are specified', async () => {
+    const actual = await command.validate({
+      options: {
+        name: 'Finance',
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('logs deprecation warning when option teamId is specified', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/archive`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000" } }, () => {
+      try {
+        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails when team name does not exist', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Finance'`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
+          "@odata.count": 1,
+          "value": [
+            {
+              "id": "00000000-0000-0000-0000-000000000000",
+              "resourceProvisioningOptions": []
+            }
+          ]
+        }
+        );
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        name: 'Finance',
+        confirm: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('archives a Microsoft Team by id', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/archive`) {
         return Promise.resolve();
@@ -88,7 +197,45 @@ describe(commands.TEAM_ARCHIVE, () => {
 
     command.action(logger, {
       options: {
-        teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
+        id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
+      }
+    } as any, () => {
+      try {
+        assert(loggerLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('archives a Microsoft Team by name', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Finance'`) {
+        return Promise.resolve({
+          "value": [
+            {
+              "id": "00000000-0000-0000-0000-000000000000",
+              "resourceProvisioningOptions": ["Team"]
+            }
+          ]
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/archive`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        name: 'Finance'
       }
     } as any, () => {
       try {
@@ -112,7 +259,7 @@ describe(commands.TEAM_ARCHIVE, () => {
 
     command.action(logger, {
       options: {
-        teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6',
+        id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6',
         shouldSetSpoSiteReadOnlyForMembers: true
       }
     } as any, () => {
@@ -137,7 +284,7 @@ describe(commands.TEAM_ARCHIVE, () => {
 
     command.action(logger, {
       options: {
-        teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
+        id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
       }
     } as any, () => {
       try {
@@ -171,7 +318,7 @@ describe(commands.TEAM_ARCHIVE, () => {
 
     command.action(logger, {
       options: {
-        teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
+        id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
       }
     } as any, (err?: any) => {
       try {
@@ -191,7 +338,7 @@ describe(commands.TEAM_ARCHIVE, () => {
 
     command.action(logger, {
       options: {
-        teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6',
+        id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6',
         debug: false
       }
     } as any, (err?: any) => {
@@ -206,7 +353,7 @@ describe(commands.TEAM_ARCHIVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

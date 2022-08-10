@@ -1,7 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -25,6 +22,42 @@ class FlowRunCancelCommand extends AzmgmtCommand {
 
   public get description(): string {
     return 'Cancels a specific run of the specified Microsoft Flow';
+  }
+
+  constructor() {
+    super();
+  
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --name <name>'
+      },
+      {
+        option: '-f, --flow <flow>'
+      },
+      {
+        option: '-e, --environment <environment>'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.flow)) {
+          return `${args.options.flow} is not a valid GUID`;
+        }
+        
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -64,34 +97,6 @@ class FlowRunCancelCommand extends AzmgmtCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-f, --flow <flow>'
-      },
-      {
-        option: '-e, --environment <environment>'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.flow)) {
-      return `${args.options.flow} is not a valid GUID`;
-    }
-    
-    return true;
   }
 }
 

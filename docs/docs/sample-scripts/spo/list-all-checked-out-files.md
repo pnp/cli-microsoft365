@@ -9,7 +9,7 @@ This script will retrieve all the checked out files in a particular site.
 === "PowerShell"
 
     ```powershell
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365
       m365 login
@@ -43,7 +43,7 @@ This script will retrieve all the checked out files in a specific document libra
 === "PowerShell"
 
     ```powershell
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365
       m365 login
@@ -84,7 +84,7 @@ This script will loop through each site from your CSV file, and retrieve all the
 === "PowerShell"
 
     ```powershell
-    $m365Status = m365 status
+    $m365Status = m365 status --output text
     if ($m365Status -eq "Logged Out") {
       # Connection to Microsoft 365
       m365 login

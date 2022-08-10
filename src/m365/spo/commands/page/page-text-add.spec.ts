@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
@@ -13,6 +13,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
@@ -27,6 +28,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
         WebFullUrl: 'https://contoso.sharepoint.com'
       }));
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -1137,7 +1139,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option === '--debug') {
@@ -1148,7 +1150,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('supports verbose mode', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option === '--verbose') {
@@ -1159,7 +1161,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('supports specifying page name', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--pageName') > -1) {
@@ -1170,7 +1172,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('supports specifying webUrl', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--webUrl') > -1) {
@@ -1181,7 +1183,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('supports specifying section', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--section') > -1) {
@@ -1192,7 +1194,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('supports specifying column', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--column') > -1) {
@@ -1203,7 +1205,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
   });
 
   it('supports specifying order', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--order') > -1) {
@@ -1213,91 +1215,91 @@ describe(commands.PAGE_TEXT_ADD, () => {
     assert(containsOption);
   });
 
-  it('fails validation if webUrl is not an absolute URL', () => {
-    const actual = command.validate({
+  it('fails validation if webUrl is not an absolute URL', async () => {
+    const actual = await command.validate({
       options: { pageName: 'page.aspx', webUrl: 'foo', text: 'Hello world' }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', () => {
-    const actual = command.validate({
+  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'http://foo',
         text: 'Hello world'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when name and webUrl specified, webUrl is a valid SharePoint URL and text is specified', () => {
-    const actual = command.validate({
+  it('passes validation when name and webUrl specified, webUrl is a valid SharePoint URL and text is specified', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         text: 'Hello world'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when name has no extension', () => {
-    const actual = command.validate({
+  it('passes validation when name has no extension', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page',
         webUrl: 'https://contoso.sharepoint.com',
         text: 'Hello world'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if section has invalid (negative) value', () => {
-    const actual = command.validate({
+  it('fails validation if section has invalid (negative) value', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         text: 'Hello world',
         section: -1
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if section has invalid (non number) value', () => {
-    const actual = command.validate({
+  it('fails validation if section has invalid (non number) value', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         text: 'Hello world',
         section: 'foobar'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if column has invalid (negative) value', () => {
-    const actual = command.validate({
+  it('fails validation if column has invalid (negative) value', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         text: 'Hello world',
         column: -1
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if column has invalid (non number) value', () => {
-    const actual = command.validate({
+  it('fails validation if column has invalid (non number) value', async () => {
+    const actual = await command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         text: 'Hello world',
         column: 'foobar'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

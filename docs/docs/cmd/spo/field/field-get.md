@@ -23,10 +23,13 @@ m365 spo field get [options]
 : Server- or web-relative URL of the list where the field is located. Specify only one of listTitle, listId or listUrl
 
 `-i, --id [id]`
-: The ID of the field to retrieve. Specify id or fieldTitle but not both
+: The ID of the field to retrieve. Specify id or title but not both
 
 `--fieldTitle [fieldTitle]`
-: The display name (case-sensitive) of the field to retrieve. Specify id or fieldTitle but not both
+: (deprecated. Use `title` instead) The display name (case-sensitive) of the field to retrieve. Specify id or fieldTitle but not both
+
+`-t, --title [title]`
+: The display name (case-sensitive) of the field to remove. Specify id or title, or group but not both
 
 --8<-- "docs/cmd/_global.md"
 
@@ -47,5 +50,5 @@ m365 spo field get --webUrl https://contoso.sharepoint.com/sites/contoso-sales -
 Retrieves list column by display name located in site _https://contoso.sharepoint.com/sites/contoso-sales_. Retrieves the list by its url
 
 ```sh
-m365 spo field get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl 'Lists/Events' --fieldTitle 'Title'
+m365 spo field get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl "Lists/Events" --title "Title"
 ```

@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -29,13 +26,54 @@ class AadSiteClassificationSetCommand extends GraphCommand {
     return 'Updates site classification configuration';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.classifications = typeof args.options.classifications !== 'undefined';
-    telemetryProps.defaultClassification = typeof args.options.defaultClassification !== 'undefined';
-    telemetryProps.usageGuidelinesUrl = typeof args.options.usageGuidelinesUrl !== 'undefined';
-    telemetryProps.guestUsageGuidelinesUrl = typeof args.options.guestUsageGuidelinesUrl !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        classifications: typeof args.options.classifications !== 'undefined',
+        defaultClassification: typeof args.options.defaultClassification !== 'undefined',
+        usageGuidelinesUrl: typeof args.options.usageGuidelinesUrl !== 'undefined',
+        guestUsageGuidelinesUrl: typeof args.options.guestUsageGuidelinesUrl !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-c, --classifications [classifications]'
+      },
+      {
+        option: '-d, --defaultClassification [defaultClassification]'
+      },
+      {
+        option: '-u, --usageGuidelinesUrl [usageGuidelinesUrl]'
+      },
+      {
+        option: '-g, --guestUsageGuidelinesUrl [guestUsageGuidelinesUrl]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.classifications &&
+          !args.options.defaultClassification &&
+          !args.options.usageGuidelinesUrl &&
+          !args.options.guestUsageGuidelinesUrl) {
+          return 'Specify at least one property to update';
+        }
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -141,36 +179,6 @@ class AadSiteClassificationSetCommand extends GraphCommand {
         return request.patch(requestOptions);
       })
       .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-c, --classifications [classifications]'
-      },
-      {
-        option: '-d, --defaultClassification [defaultClassification]'
-      },
-      {
-        option: '-u, --usageGuidelinesUrl [usageGuidelinesUrl]'
-      },
-      {
-        option: '-g, --guestUsageGuidelinesUrl [guestUsageGuidelinesUrl]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.classifications &&
-      !args.options.defaultClassification &&
-      !args.options.usageGuidelinesUrl &&
-      !args.options.guestUsageGuidelinesUrl) {
-      return 'Specify at least one property to update';
-    }
-    return true;
   }
 }
 

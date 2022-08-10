@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import Axios from 'axios';
 import appInsights from '../../appInsights';
 import auth, { AuthType } from '../../Auth';
-import { Logger } from '../../cli';
+import { Cli, CommandInfo, Logger } from '../../cli';
 import Command, { CommandError } from '../../Command';
 import { sinonUtil } from '../../utils';
 import commands from './commands';
@@ -13,12 +13,14 @@ const command: Command = require('./login');
 describe(commands.LOGIN, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -199,7 +201,7 @@ describe(commands.LOGIN, () => {
 
 
   it('supports specifying authType', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--authType') > -1) {
@@ -210,7 +212,7 @@ describe(commands.LOGIN, () => {
   });
 
   it('supports specifying userName', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--userName') > -1) {
@@ -221,7 +223,7 @@ describe(commands.LOGIN, () => {
   });
 
   it('supports specifying password', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--password') > -1) {
@@ -231,61 +233,61 @@ describe(commands.LOGIN, () => {
     assert(containsOption);
   });
 
-  it('fails validation if authType is set to password and userName and password not specified', () => {
-    const actual = command.validate({ options: { authType: 'password' } });
+  it('fails validation if authType is set to password and userName and password not specified', async () => {
+    const actual = await command.validate({ options: { authType: 'password' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if authType is set to password and userName not specified', () => {
-    const actual = command.validate({ options: { authType: 'password', password: 'password' } });
+  it('fails validation if authType is set to password and userName not specified', async () => {
+    const actual = await command.validate({ options: { authType: 'password', password: 'password' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if authType is set to password and password not specified', () => {
-    const actual = command.validate({ options: { authType: 'password', userName: 'user' } });
+  it('fails validation if authType is set to password and password not specified', async () => {
+    const actual = await command.validate({ options: { authType: 'password', userName: 'user' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if authType is set to certificate and both certificateFile and certificateBase64Encoded are specified', () => {
-    const actual = command.validate({ options: { authType: 'certificate', certificateFile: 'certificate', certificateBase64Encoded: 'certificateB64', thumbprint: 'thumbprint' } });
+  it('fails validation if authType is set to certificate and both certificateFile and certificateBase64Encoded are specified', async () => {
+    const actual = await command.validate({ options: { authType: 'certificate', certificateFile: 'certificate', certificateBase64Encoded: 'certificateB64', thumbprint: 'thumbprint' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if authType is set to certificate and neither certificateFile nor certificateBase64Encoded are specified', () => {
-    const actual = command.validate({ options: { authType: 'certificate' } });
+  it('fails validation if authType is set to certificate and neither certificateFile nor certificateBase64Encoded are specified', async () => {
+    const actual = await command.validate({ options: { authType: 'certificate' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if authType is set to certificate and certificateFile does not exist', () => {
+  it('fails validation if authType is set to certificate and certificateFile does not exist', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = command.validate({ options: { authType: 'certificate', certificateFile: 'certificate' } });
+    const actual = await command.validate({ options: { authType: 'certificate', certificateFile: 'certificate' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if authType is set to certificate and certificateFile and thumbprint are specified', () => {
+  it('passes validation if authType is set to certificate and certificateFile and thumbprint are specified', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = command.validate({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } });
+    const actual = await command.validate({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if authType is set to certificate and certificateFile are specified', () => {
+  it('passes validation if authType is set to certificate and certificateFile are specified', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = command.validate({ options: { authType: 'certificate', certificateFile: 'certificate' } });
+    const actual = await command.validate({ options: { authType: 'certificate', certificateFile: 'certificate' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if authType is set to password and userName and password specified', () => {
-    const actual = command.validate({ options: { authType: 'password', userName: 'user', password: 'password' } });
+  it('passes validation if authType is set to password and userName and password specified', async () => {
+    const actual = await command.validate({ options: { authType: 'password', userName: 'user', password: 'password' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if authType is set to deviceCode and userName and password not specified', () => {
-    const actual = command.validate({ options: { authType: 'deviceCode' } });
+  it('passes validation if authType is set to deviceCode and userName and password not specified', async () => {
+    const actual = await command.validate({ options: { authType: 'deviceCode' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if authType is not set and userName and password not specified', () => {
-    const actual = command.validate({ options: {} });
+  it('passes validation if authType is not set and userName and password not specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -386,8 +388,8 @@ describe(commands.LOGIN, () => {
     });
   });
 
-  it('fails validation if authType is set to secret and secret option is not specified', () => {
-    const actual = command.validate({ options: { authType: 'secret' } });
+  it('fails validation if authType is set to secret and secret option is not specified', async () => {
+    const actual = await command.validate({ options: { authType: 'secret' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

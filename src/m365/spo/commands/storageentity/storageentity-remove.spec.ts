@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,6 +14,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,6 +27,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -187,7 +189,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -198,7 +200,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('requires app catalog URL', () => {
-    const options = command.options();
+    const options = command.options;
     let requiresAppCatalogUrl = false;
     options.forEach(o => {
       if (o.option.indexOf('<appCatalogUrl>') > -1) {
@@ -209,7 +211,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('supports suppressing confirmation prompt', () => {
-    const options = command.options();
+    const options = command.options;
     let containsConfirmOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--confirm') > -1) {
@@ -220,7 +222,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('requires tenant property name', () => {
-    const options = command.options();
+    const options = command.options;
     let requiresTenantPropertyName = false;
     options.forEach(o => {
       if (o.option.indexOf('<key>') > -1) {
@@ -230,34 +232,26 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     assert(requiresTenantPropertyName);
   });
 
-  it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = command.options();
-    sinonUtil.restore(Command.prototype.options);
-    assert(options.length > 0);
-  });
-
-  it('accepts valid SharePoint Online app catalog URL', () => {
-    const actual = command.validate({ options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+  it('accepts valid SharePoint Online app catalog URL', async () => {
+    const actual = await command.validate({ options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog', key: 'prop' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('accepts valid SharePoint Online site URL', () => {
-    const actual = command.validate({ options: { appCatalogUrl: 'https://contoso.sharepoint.com' } });
+  it('accepts valid SharePoint Online site URL', async () => {
+    const actual = await command.validate({ options: { appCatalogUrl: 'https://contoso.sharepoint.com', key: 'prop' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('rejects invalid SharePoint Online URL', () => {
+  it('rejects invalid SharePoint Online URL', async () => {
     const url = 'http://contoso';
-    const actual = command.validate({ options: { appCatalogUrl: url } });
+    const actual = await command.validate({ options: { appCatalogUrl: url, key: 'prop' } }, commandInfo);
     assert.strictEqual(actual, `${url} is not a valid SharePoint Online site URL`);
   });
 
-  it('fails validation when no SharePoint Online app catalog URL specified', () => {
-    const actual = command.validate({ options: {} });
-    assert.strictEqual(actual, 'Missing required option appCatalogUrl');
+  it('fails validation when no SharePoint Online app catalog URL specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
+    assert.strictEqual(actual, 'Required option appCatalogUrl not specified');
   });
-
 
   it('handles promise rejection', (done) => {
     sinonUtil.restore(spo.getRequestDigest);

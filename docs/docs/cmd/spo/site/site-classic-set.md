@@ -54,6 +54,9 @@ m365 spo site classic set [options]
 !!! important
     To use this command you have to have permissions to access the tenant admin site.
 
+!!! important
+    This command is deprecated. Please use [spo site set](./site-set.md) instead.
+
 ## Remarks
 
 The value of the `--resourceQuota` option must not exceed the company's aggregate available Sandboxed Solutions quota. For more information, see Resource Usage Limits on Sandboxed Solutions in SharePoint 2010: [http://msdn.microsoft.com/en-us/library/gg615462.aspx](http://msdn.microsoft.com/en-us/library/gg615462.aspx).

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   const jsonOutput = {
     "value": [
@@ -72,6 +73,7 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -115,20 +117,20 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['receivedDateTime', 'id']);
   });
-  it('fails validation if groupId and groupDisplayName specified', () => {
-    const actual = command.validate({ options: { groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', groupDisplayName: 'MyGroup' } });
+  it('fails validation if groupId and groupDisplayName specified', async () => {
+    const actual = await command.validate({ options: { groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', groupDisplayName: 'MyGroup', threadId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('fails validation if neither groupId nor groupDisplayName specified', () => {
-    const actual = command.validate({ options: {} });
+  it('fails validation if neither groupId nor groupDisplayName specified', async () => {
+    const actual = await command.validate({ options: { threadId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('fails validation if the groupId is not a valid GUID', () => {
-    const actual = command.validate({ options: { groupId: 'not-c49b-4fd4-8223-28f0ac3a6402' } });
+  it('fails validation if the groupId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { groupId: 'not-c49b-4fd4-8223-28f0ac3a6402', threadId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('passes validation if the groupId is a valid GUID', () => {
-    const actual = command.validate({ options: { groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
+  it('passes validation if the groupId is a valid GUID', async () => {
+    const actual = await command.validate({ options: { groupId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', threadId: '123' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -221,7 +223,7 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
     });
   });
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

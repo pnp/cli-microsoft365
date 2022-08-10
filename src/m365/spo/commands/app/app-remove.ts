@@ -1,7 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo, validation } from '../../../../utils';
@@ -28,12 +25,68 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
     return 'Removes the specified app from the specified app catalog';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.appCatalogUrl = (!(!args.options.appCatalogUrl)).toString();
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    telemetryProps.scope = args.options.scope || 'tenant';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        appCatalogUrl: (!(!args.options.appCatalogUrl)).toString(),
+        confirm: (!(!args.options.confirm)).toString(),
+        scope: args.options.scope || 'tenant'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '-u, --appCatalogUrl [appCatalogUrl]'
+      },
+      {
+        option: '-s, --scope [scope]',
+        autocomplete: ['tenant', 'sitecollection']
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        // verify either 'tenant' or 'sitecollection' specified if scope provided
+        if (args.options.scope) {
+          const testScope: string = args.options.scope.toLowerCase();
+          if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+            return `Scope must be either 'tenant' or 'sitecollection' if specified`;
+          }
+
+          if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
+            return `You must specify appCatalogUrl when the scope is sitecollection`;
+          }
+        }
+
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        if (args.options.appCatalogUrl) {
+          return validation.isValidSharePointUrl(args.options.appCatalogUrl);
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -80,51 +133,6 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-u, --appCatalogUrl [appCatalogUrl]'
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: ['tenant', 'sitecollection']
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    // verify either 'tenant' or 'sitecollection' specified if scope provided
-    if (args.options.scope) {
-      const testScope: string = args.options.scope.toLowerCase();
-      if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-        return `Scope must be either 'tenant' or 'sitecollection' if specified`;
-      }
-
-      if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-        return `You must specify appCatalogUrl when the scope is sitecollection`;
-      }
-    }
-
-    if (!validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    if (args.options.appCatalogUrl) {
-      return validation.isValidSharePointUrl(args.options.appCatalogUrl);
-    }
-
-    return true;
   }
 }
 

@@ -11,13 +11,16 @@ m365 spo group get [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the site where the group is located
+: URL of the site where the group is located.
 
 `-i, --id [id]`
-: ID of the site group to get. Use either `id` or `name`, but not all. e.g `7`
+: ID of the site group to get. Use either `id`, `name` or `associatedGroup` but not multiple.
 
 `--name [name]`
-: Name of the site group to get. Specify either `id` or `name` but not both e.g `Team Site Members`
+: Name of the site group to get. Use either `id`, `name` or `associatedGroup` but not multiple.
+
+`--associatedGroup [associatedGroup]`
+: Type of the associated group to get. Available values: `Owner`, `Member`, `Visitor`. Use either `id`, `name` or `associatedGroup` but not multiple.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -33,4 +36,10 @@ Get group with name _Team Site Members_ for web _https://contoso.sharepoint.com/
 
 ```sh
 m365 spo group get --webUrl https://contoso.sharepoint.com/sites/project-x --name "Team Site Members"
+```
+
+Get the associated owner group of a specified site
+
+```sh
+m365 spo group get --webUrl https://contoso.sharepoint.com/sites/project-x --associatedGroup Owner
 ```

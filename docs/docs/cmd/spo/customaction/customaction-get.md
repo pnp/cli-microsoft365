@@ -10,8 +10,11 @@ m365 spo customaction get [options]
 
 ## Options
 
-`-i, --id <id>`
-: ID of the user custom action to retrieve information for
+`-i, --id [id]`
+: ID of the user custom action to retrieve information for. Specify either `id` or `title`
+
+`-t, --title [title]`
+: Title of the user custom action to retrieve information for. Specify either `id` or `title`
 
 `-u, --url <url>`
 : Url of the site or site collection to retrieve the custom action from
@@ -21,12 +24,22 @@ m365 spo customaction get [options]
 
 --8<-- "docs/cmd/_global.md"
 
+## Remarks
+
+If the command finds multiple user custom actions with the specified title, it will prompt you to disambiguate which user custom action it should use, listing the discovered IDs.
+
 ## Examples
 
 Return details about the user custom action with ID _058140e3-0e37-44fc-a1d3-79c487d371a3_ located in site or site collection _https://contoso.sharepoint.com/sites/test_
 
 ```sh
 m365 spo customaction get --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test
+```
+
+Return details about the user custom action with Title _YourAppCustomizer_ located in site or site collection _https://contoso.sharepoint.com/sites/test_
+
+```sh
+m365 spo customaction get --title "YourAppCustomizer" --url https://contoso.sharepoint.com/sites/test
 ```
 
 Return details about the user custom action with ID _058140e3-0e37-44fc-a1d3-79c487d371a3_ located in site collection _https://contoso.sharepoint.com/sites/test_

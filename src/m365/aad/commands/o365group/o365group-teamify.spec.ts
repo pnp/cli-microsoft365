@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,11 +12,13 @@ const command: Command = require('./o365group-teamify');
 describe(commands.O365GROUP_TEAMIFY, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -58,34 +60,31 @@ describe(commands.O365GROUP_TEAMIFY, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if both groupId and mailNickname options are not passed', (done) => {
-    const actual = command.validate({
+  it('fails validation if both groupId and mailNickname options are not passed', async () => {
+    const actual = await command.validate({
       options: {
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if both groupId and mailNickname options are passed', (done) => {
-    const actual = command.validate({
+  it('fails validation if both groupId and mailNickname options are passed', async () => {
+    const actual = await command.validate({
       options: {
         groupId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
         mailNickname: 'GroupName'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('validates for a correct groupId', (done) => {
-    const actual = command.validate({
+  it('validates for a correct groupId', async () => {
+    const actual = await command.validate({
       options: {
         groupId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('fails to get o365 group when it does not exists', (done) => {
@@ -432,18 +431,18 @@ describe(commands.O365GROUP_TEAMIFY, () => {
     });
   });
 
-  it('fails validation if the groupId is not a valid GUID', () => {
-    const actual = command.validate({ options: { groupId: 'invalid' } });
+  it('fails validation if the groupId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { groupId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the groupId is a valid GUID', () => {
-    const actual = command.validate({ options: { groupId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } });
+  it('passes validation if the groupId is a valid GUID', async () => {
+    const actual = await command.validate({ options: { groupId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

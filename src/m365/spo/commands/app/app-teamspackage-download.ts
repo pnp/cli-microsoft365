@@ -2,13 +2,10 @@ import { AxiosRequestConfig } from 'axios';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { urlUtil } from '../../../../utils/urlUtil';
 import { spo } from '../../../../utils/spo';
+import { urlUtil } from '../../../../utils/urlUtil';
 import { validation } from '../../../../utils/validation';
 import commands from '../../commands';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
@@ -43,14 +40,73 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
     return 'Downloads Teams app package for an SPFx solution deployed to tenant app catalog';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.appCatalogUrl = typeof args.options.appCatalogUrl !== 'undefined';
-    telemetryProps.appItemUniqueId = typeof args.options.appItemUniqueId !== 'undefined';
-    telemetryProps.appItemId = typeof args.options.appItemId !== 'undefined';
-    telemetryProps.appName = typeof args.options.appName !== 'undefined';
-    telemetryProps.fileName = typeof args.options.fileName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        appCatalogUrl: typeof args.options.appCatalogUrl !== 'undefined',
+        appItemUniqueId: typeof args.options.appItemUniqueId !== 'undefined',
+        appItemId: typeof args.options.appItemId !== 'undefined',
+        appName: typeof args.options.appName !== 'undefined',
+        fileName: typeof args.options.fileName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '--appItemId [appItemId]' },
+      { option: '--appItemUniqueId [appItemUniqueId]' },
+      { option: '--appName [appName]' },
+      { option: '--fileName [fileName]' },
+      { option: '-u, --appCatalogUrl [appCatalogUrl]' }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.appItemUniqueId &&
+          !args.options.appItemId &&
+          !args.options.appName) {
+          return `Specify appItemUniqueId, appItemId or appName`;
+        }
+    
+        if ((args.options.appItemUniqueId && args.options.appItemId) ||
+          (args.options.appItemUniqueId && args.options.appName) ||
+          (args.options.appItemId && args.options.appName)) {
+          return `Specify appItemUniqueId, appItemId or appName but not multiple`;
+        }
+    
+        if (args.options.appItemUniqueId &&
+          !validation.isValidGuid(args.options.appItemUniqueId)) {
+          return `${args.options.appItemUniqueId} is not a valid GUID`;
+        }
+    
+        if (args.options.appItemId &&
+          isNaN(args.options.appItemId)) {
+          return `${args.options.appItemId} is not a number`;
+        }
+    
+        if (args.options.fileName &&
+          fs.existsSync(args.options.fileName)) {
+          return `File ${args.options.fileName} already exists`;
+        }
+    
+        if (args.options.appCatalogUrl) {
+          return validation.isValidSharePointUrl(args.options.appCatalogUrl);
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -145,14 +201,14 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
         if (args.options.appItemUniqueId) {
           appInfo.id = parseInt(res.Id as string);
           if (!appInfo.packageFileName) {
-            appInfo.packageFileName = this.getPackageNameFromFileName((res.File as { Name: string}).Name as string);
+            appInfo.packageFileName = this.getPackageNameFromFileName((res.File as { Name: string }).Name as string);
           }
           return Promise.resolve();
         }
 
         if (args.options.appItemId) {
           if (!appInfo.packageFileName) {
-            appInfo.packageFileName = this.getPackageNameFromFileName((res.File as { Name: string}).Name as string);
+            appInfo.packageFileName = this.getPackageNameFromFileName((res.File as { Name: string }).Name as string);
           }
           return Promise.resolve();
         }
@@ -179,54 +235,6 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
       .then(appCatalogUrl => {
         this.appCatalogUrl = appCatalogUrl;
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '--appItemId [appItemId]' },
-      { option: '--appItemUniqueId [appItemUniqueId]' },
-      { option: '--appName [appName]' },
-      { option: '--fileName [fileName]' },
-      { option: '-u, --appCatalogUrl [appCatalogUrl]' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.appItemUniqueId &&
-      !args.options.appItemId &&
-      !args.options.appName) {
-      return `Specify appItemUniqueId, appItemId or appName`;
-    }
-
-    if ((args.options.appItemUniqueId && args.options.appItemId) ||
-      (args.options.appItemUniqueId && args.options.appName) ||
-      (args.options.appItemId && args.options.appName)) {
-      return `Specify appItemUniqueId, appItemId or appName but not multiple`;
-    }
-
-    if (args.options.appItemUniqueId &&
-      !validation.isValidGuid(args.options.appItemUniqueId)) {
-      return `${args.options.appItemUniqueId} is not a valid GUID`;
-    }
-
-    if (args.options.appItemId &&
-      isNaN(args.options.appItemId)) {
-      return `${args.options.appItemId} is not a number`;
-    }
-
-    if (args.options.fileName &&
-      fs.existsSync(args.options.fileName)) {
-      return `File ${args.options.fileName} already exists`;
-    }
-
-    if (args.options.appCatalogUrl) {
-      return validation.isValidSharePointUrl(args.options.appCatalogUrl);
-    }
-
-    return true;
   }
 }
 

@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
-import { Logger } from '../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../cli';
 import Command from '../../../Command';
 import config from '../../../config';
 import { sinonUtil } from '../../../utils';
@@ -12,6 +12,7 @@ describe(commands.CONSENT, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: any;
+  let commandInfo: CommandInfo;
   let originalTenant: string;
   let originalAadAppId: string;
 
@@ -19,6 +20,7 @@ describe(commands.CONSENT, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     originalTenant = config.tenant;
     originalAadAppId = config.cliAadAppId;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -83,7 +85,7 @@ describe(commands.CONSENT, () => {
   });
 
   it('supports specifying service', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--service') > -1) {
@@ -93,13 +95,13 @@ describe(commands.CONSENT, () => {
     assert(containsOption);
   });
 
-  it('fails validation if specified service is invalid ', () => {
-    const actual = command.validate({ options: { service: 'invalid' } });
+  it('fails validation if specified service is invalid ', async () => {
+    const actual = await command.validate({ options: { service: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if service is set to yammer ', () => {
-    const actual = command.validate({ options: { service: 'yammer' } });
+  it('passes validation if service is set to yammer ', async () => {
+    const actual = await command.validate({ options: { service: 'yammer' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

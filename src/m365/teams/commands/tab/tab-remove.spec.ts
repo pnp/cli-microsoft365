@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.TAB_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -63,57 +65,55 @@ describe(commands.TAB_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when valid channelId, teamId and tabId is specified', () => {
-    const actual = command.validate({
+  it('passes validation when valid channelId, teamId and tabId is specified', async () => {
+    const actual = await command.validate({
       options: {
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
         tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the teamId , channelId and tabId are not provided', (done) => {
-    const actual = command.validate({
+  it('fails validation if the teamId , channelId and tabId are not provided', async () => {
+    const actual = await command.validate({
       options: {
 
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if the channelId is not valid channelId', (done) => {
-    const actual = command.validate({
+  it('fails validation if the channelId is not valid channelId', async () => {
+    const actual = await command.validate({
       options: {
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
         channelId: 'invalid',
         tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if the teamId is not a valid guid', () => {
-    const actual = command.validate({
+  it('fails validation if the teamId is not a valid guid', async () => {
+    const actual = await command.validate({
       options: {
         teamId: 'invalid',
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('fails validation if the tabId is not a valid guid', () => {
-    const actual = command.validate({
+  it('fails validation if the tabId is not a valid guid', async () => {
+    const actual = await command.validate({
       options: {
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         tabId: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -265,7 +265,7 @@ describe(commands.TAB_REMOVE, () => {
 
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

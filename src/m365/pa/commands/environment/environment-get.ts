@@ -1,10 +1,7 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import AzmgmtCommand from '../../../base/AzmgmtCommand';
+import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -15,7 +12,7 @@ interface Options extends GlobalOptions {
   name: string;
 }
 
-class PaEnvironmentGetCommand extends AzmgmtCommand {
+class PaEnvironmentGetCommand extends PowerAppsCommand {
   public get name(): string {
     return commands.ENVIRONMENT_GET;
   }
@@ -28,13 +25,27 @@ class PaEnvironmentGetCommand extends AzmgmtCommand {
     return ['name', 'id', 'location', 'displayName', 'provisioningState', 'environmentSku', 'azureRegionHint', 'isDefault'];
   }
 
+  constructor() {
+    super();
+  
+    this.#initOptions();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --name <name>'
+      }
+    );
+  }
+  
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
       logger.logToStderr(`Retrieving information about Microsoft Power Apps environment ${args.options.name}...`);
     }
 
     const requestOptions: any = {
-      url: `${this.resource}providers/Microsoft.PowerApps/environments/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+      url: `${this.resource}/providers/Microsoft.PowerApps/environments/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },
@@ -53,17 +64,6 @@ class PaEnvironmentGetCommand extends AzmgmtCommand {
         logger.log(res);
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --name <name>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

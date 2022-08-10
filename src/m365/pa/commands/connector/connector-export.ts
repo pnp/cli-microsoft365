@@ -1,12 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import AzmgmtCommand from '../../../base/AzmgmtCommand';
+import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import flowCommands from '../../../flow/commands';
 import commands from '../../commands';
 import { Connector } from './Connector';
@@ -21,7 +18,7 @@ interface Options extends GlobalOptions {
   outputFolder?: string;
 }
 
-class PaConnectorExportCommand extends AzmgmtCommand {
+class PaConnectorExportCommand extends PowerAppsCommand {
   public get name(): string {
     return commands.CONNECTOR_EXPORT;
   }
@@ -34,11 +31,59 @@ class PaConnectorExportCommand extends AzmgmtCommand {
     return [flowCommands.CONNECTOR_EXPORT];
   }
 
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        outputFolder: typeof args.options.outputFolder !== 'undefined'
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-e, --environment <environment>'
+      },
+      {
+        option: '-c, --connector <connector>'
+      },
+      {
+        option: '--outputFolder [outputFolder]'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.outputFolder &&
+          !fs.existsSync(path.resolve(args.options.outputFolder))) {
+          return `Specified output folder ${args.options.outputFolder} doesn't exist`;
+        }
+    
+        const outputFolder = path.resolve(args.options.outputFolder || '.', args.options.connector);
+        if (fs.existsSync(outputFolder)) {
+          return `Connector output folder ${outputFolder} already exists`;
+        }
+    
+        return true;
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const outputFolder = path.resolve(args.options.outputFolder || '.', args.options.connector);
 
     const requestOptions: any = {
-      url: `${this.resource}providers/Microsoft.PowerApps/apis/${encodeURIComponent(args.options.connector)}?api-version=2016-11-01&$filter=environment%20eq%20%27${encodeURIComponent(args.options.environment)}%27%20and%20IsCustomApi%20eq%20%27True%27`,
+      url: `${this.resource}/providers/Microsoft.PowerApps/apis/${encodeURIComponent(args.options.connector)}?api-version=2016-11-01&$filter=environment%20eq%20%27${encodeURIComponent(args.options.environment)}%27%20and%20IsCustomApi%20eq%20%27True%27`,
       headers: {
         accept: 'application/json'
       },
@@ -165,37 +210,6 @@ class PaConnectorExportCommand extends AzmgmtCommand {
         }
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-e, --environment <environment>'
-      },
-      {
-        option: '-c, --connector <connector>'
-      },
-      {
-        option: '--outputFolder [outputFolder]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.outputFolder &&
-      !fs.existsSync(path.resolve(args.options.outputFolder))) {
-      return `Specified output folder ${args.options.outputFolder} doesn't exist`;
-    }
-
-    const outputFolder = path.resolve(args.options.outputFolder || '.', args.options.connector);
-    if (fs.existsSync(outputFolder)) {
-      return `Connector output folder ${outputFolder} already exists`;
-    }
-
-    return true;
   }
 }
 

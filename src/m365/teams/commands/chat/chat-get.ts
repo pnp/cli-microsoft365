@@ -1,17 +1,14 @@
 import { AadUserConversationMember, Chat, ConversationMember } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
-import Auth from '../../../../Auth';
 import * as os from 'os';
-import request from '../../../../request';
+import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import { accessToken } from '../../../../utils/accessToken';
+import { validation } from '../../../../utils/validation';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { validation } from '../../../../utils/validation';
-import { accessToken } from '../../../../utils/accessToken';
 import { chatUtil } from './chatUtil';
 
 interface CommandArgs {
@@ -33,26 +30,26 @@ class TeamsChatGetCommand extends GraphCommand {
     return 'Get a Microsoft Teams chat conversation by id, participants or chat name.';
   }
 
-  public getTelemetryProperties(args: any): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.participants = typeof args.options.participants !== 'undefined';
-    telemetryProps.name = typeof args.options.name !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getChatId(args)
-      .then(chatId => this.getChatDetailsById(chatId as string))
-      .then((chat: Chat) => {
-        logger.log(chat);
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));    
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        participants: typeof args.options.participants !== 'undefined',
+        name: typeof args.options.name !== 'undefined'
+      });
+    });
   }
 
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
+  #initOptions(): void {
+    this.options.unshift(
       {
         option: '-i, --id [id]'
       },
@@ -62,67 +59,78 @@ class TeamsChatGetCommand extends GraphCommand {
       {
         option: '-n, --name [name]'
       }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
+    );
   }
 
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.id && !args.options.participants && !args.options.name) {
-      return 'Specify id or participants or name, one is required.';
-    }
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.id && !args.options.participants && !args.options.name) {
+          return 'Specify id or participants or name, one is required.';
+        }
 
-    let nrOfMutuallyExclusiveOptionsInUse = 0;
-    if (args.options.id) { nrOfMutuallyExclusiveOptionsInUse++; }
-    if (args.options.participants) { nrOfMutuallyExclusiveOptionsInUse++; }
-    if (args.options.name) { nrOfMutuallyExclusiveOptionsInUse++; }
+        let nrOfMutuallyExclusiveOptionsInUse = 0;
+        if (args.options.id) { nrOfMutuallyExclusiveOptionsInUse++; }
+        if (args.options.participants) { nrOfMutuallyExclusiveOptionsInUse++; }
+        if (args.options.name) { nrOfMutuallyExclusiveOptionsInUse++; }
 
-    if (nrOfMutuallyExclusiveOptionsInUse > 1) {
-      return 'Specify either id or participants or name, but not multiple.';
-    }
+        if (nrOfMutuallyExclusiveOptionsInUse > 1) {
+          return 'Specify either id or participants or name, but not multiple.';
+        }
 
-    if (args.options.id && !validation.isValidTeamsChatId(args.options.id)) {
-      return `${args.options.id} is not a valid Teams ChatId.`;
-    }
+        if (args.options.id && !validation.isValidTeamsChatId(args.options.id)) {
+          return `${args.options.id} is not a valid Teams ChatId.`;
+        }
 
-    if (args.options.participants) {
-      const participants = chatUtil.convertParticipantStringToArray(args.options.participants);
-      if (!participants || participants.length === 0 || participants.some(e => !validation.isValidUserPrincipalName(e))) {
-        return `${args.options.participants} contains one or more invalid email addresses.`;
+        if (args.options.participants) {
+          const participants = chatUtil.convertParticipantStringToArray(args.options.participants);
+          if (!participants || participants.length === 0 || participants.some(e => !validation.isValidUserPrincipalName(e))) {
+            return `${args.options.participants} contains one or more invalid email addresses.`;
+          }
+        }
+
+        return true;
       }
-    }
+    );
+  }
 
-    return true;
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    this
+      .getChatId(args)
+      .then(chatId => this.getChatDetailsById(chatId as string))
+      .then((chat: Chat) => {
+        logger.log(chat);
+        cb();
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private async getChatId(args: CommandArgs): Promise<string> {
     if (args.options.id) {
       return args.options.id;
-    }    
-    
-    return args.options.participants 
+    }
+
+    return args.options.participants
       ? this.getChatIdByParticipants(args.options.participants)
       : this.getChatIdByName(args.options.name as string);
   }
-  
+
   private async getChatDetailsById(id: string): Promise<Chat> {
     const requestOptions: AxiosRequestConfig = {
       url: `${this.resource}/v1.0/chats/${encodeURIComponent(id)}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
-      responseType: 'json'      
+      responseType: 'json'
     };
 
-    return request.get<Chat>(requestOptions);    
+    return request.get<Chat>(requestOptions);
   }
 
   private async getChatIdByParticipants(participantsString: string): Promise<string> {
     const participants = chatUtil.convertParticipantStringToArray(participantsString);
-    const currentUserEmail = accessToken.getUserNameFromAccessToken(Auth.service.accessTokens[this.resource].accessToken).toLowerCase();
+    const currentUserEmail = accessToken.getUserNameFromAccessToken(auth.service.accessTokens[this.resource].accessToken).toLowerCase();
     const existingChats = await chatUtil.findExistingChatsByParticipants([currentUserEmail, ...participants]);
-    
+
     if (!existingChats || existingChats.length === 0) {
       throw new Error('No chat conversation was found with these participants.');
     }
@@ -137,7 +145,7 @@ class TeamsChatGetCommand extends GraphCommand {
 
     throw new Error(`Multiple chat conversations with these participants found. Please disambiguate:${os.EOL}${disambiguationText}`);
   }
-  
+
   private async getChatIdByName(name: string): Promise<string> {
     const existingChats = await chatUtil.findExistingGroupChatsByName(name);
 
@@ -156,7 +164,7 @@ class TeamsChatGetCommand extends GraphCommand {
 
     throw new Error(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${disambiguationText}`);
   }
-  
+
 }
 
 module.exports = new TeamsChatGetCommand();

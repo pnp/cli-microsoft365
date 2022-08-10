@@ -1,5 +1,5 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
-import Command, { CommandError, CommandErrorWithOutput, CommandOption } from '../../../../Command';
+import Command, { CommandError, CommandErrorWithOutput } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -32,6 +32,78 @@ class SpoGroupUserAddCommand extends SpoCommand {
 
   public defaultProperties(): string[] | undefined {
     return ['DisplayName', 'Email'];
+  }
+
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        groupId: typeof args.options.groupId !== 'undefined',
+        groupName: typeof args.options.groupName !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined',
+        email: typeof args.options.email !== 'undefined'
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--groupId [groupId]'
+      },
+      {
+        option: '--groupName [groupName]'
+      },
+      {
+        option: '--userName [userName]'
+      },
+      {
+        option: '--email [email]'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+    
+        if (!args.options.groupId && !args.options.groupName) {
+          return 'Specify either groupId or groupName';
+        }
+    
+        if (args.options.groupId && args.options.groupName) {
+          return 'Specify either groupId or groupName but not both';
+        }
+    
+        if (!args.options.userName && !args.options.email) {
+          return 'Specify either userName or email';
+        }
+    
+        if (args.options.userName && args.options.email) {
+          return 'Specify either userName or email but not both';
+        }
+    
+        if (args.options.groupId && isNaN(args.options.groupId)) {
+          return `Specified groupId ${args.options.groupId} is not a number`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -157,58 +229,6 @@ class SpoGroupUserAddCommand extends SpoCommand {
     }));
 
     return generatedPeoplePicker;
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--groupId [groupId]'
-      },
-      {
-        option: '--groupName [groupName]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '--email [email]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (!args.options.groupId && !args.options.groupName) {
-      return 'Specify either groupId or groupName';
-    }
-
-    if (args.options.groupId && args.options.groupName) {
-      return 'Specify either groupId or groupName but not both';
-    }
-
-    if (!args.options.userName && !args.options.email) {
-      return 'Specify either userName or email';
-    }
-
-    if (args.options.userName && args.options.email) {
-      return 'Specify either userName or email but not both';
-    }
-
-    if (args.options.groupId && isNaN(args.options.groupId)) {
-      return `Specified groupId ${args.options.groupId} is not a number`;
-    }
-
-    return true;
   }
 }
 

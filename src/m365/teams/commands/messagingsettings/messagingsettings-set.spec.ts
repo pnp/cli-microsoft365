@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,11 +12,13 @@ const command: Command = require('./messagingsettings-set');
 describe(commands.MESSAGINGSETTINGS_SET, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -57,14 +59,13 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('validates for a correct input.', (done) => {
-    const actual = command.validate({
+  it('validates for a correct input.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('sets the allowUserEditMessages setting to true', (done) => {
@@ -154,48 +155,48 @@ describe(commands.MESSAGINGSETTINGS_SET, () => {
     });
   });
 
-  it('fails validation if the teamId is not a valid GUID', () => {
-    const actual = command.validate({ options: { teamId: 'invalid' } });
+  it('fails validation if the teamId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { teamId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the teamId is a valid GUID', () => {
-    const actual = command.validate({ options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } });
+  it('passes validation if the teamId is a valid GUID', async () => {
+    const actual = await command.validate({ options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if allowUserEditMessages is not a valid boolean', () => {
-    const actual = command.validate({
+  it('fails validation if allowUserEditMessages is not a valid boolean', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
         allowUserEditMessages: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if allowUserEditMessages is doublicated', () => {
-    const actual = command.validate({
+  it('fails validation if allowUserEditMessages is doublicated', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
         allowUserEditMessages: ['true', 'false']
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if allowUserEditMessages is false', () => {
-    const actual = command.validate({
+  it('passes validation if allowUserEditMessages is false', async () => {
+    const actual = await command.validate({
       options: {
         teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee',
         allowUserEditMessages: 'false'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

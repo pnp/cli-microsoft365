@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.USER_APP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -59,57 +61,57 @@ describe(commands.USER_APP_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the userId is not a valid guid.', () => {
-    const actual = command.validate({
+  it('fails validation if the userId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
         userId: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both userId and userName are not provided.', () => {
-    const actual = command.validate({
+  it('fails validation if both userId and userName are not provided.', async () => {
+    const actual = await command.validate({
       options: {
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the userName is not a valid UPN.', () => {
-    const actual = command.validate({
+  it('fails validation if the userName is not a valid UPN.', async () => {
+    const actual = await command.validate({
       options: {
         userName: "no-an-email"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the both userId and userName are provided.', () => {
-    const actual = command.validate({
+  it('fails validation if the both userId and userName are provided.', async () => {
+    const actual = await command.validate({
       options: {
         userId: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
         userName: "admin@contoso.com"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the input is correct (userId)', () => {
-    const actual = command.validate({
+  it('passes validation when the input is correct (userId)', async () => {
+    const actual = await command.validate({
       options: {
         userId: '15d7a78e-fd77-4599-97a5-dbb6372846c6'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the input is correct (userName)', () => {
-    const actual = command.validate({
+  it('passes validation when the input is correct (userName)', async () => {
+    const actual = await command.validate({
       options: {
         userName: "admin@contoso.com"
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -431,7 +433,7 @@ describe(commands.USER_APP_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

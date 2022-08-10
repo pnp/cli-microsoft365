@@ -10,11 +10,17 @@ m365 spo site list [options]
 
 ## Options
 
-`--type [type]`
-: type of modern sites to list. Allowed values `TeamSite,CommunicationSite`, default `TeamSite`
+`-t, --type [type]`
+: type of sites to list. Allowed values are `TeamSite,CommunicationSite,All`. The default value is `TeamSite`. 
+
+`--webTemplate [webTemplate]`
+: types of sites to list. To be used with values like `GROUP#0` and `SITEPAGEPUBLISHING#0`. Specify either `type` or `webTemplate`, but not both.  
 
 `-f, --filter [filter]`
 : filter to apply when retrieving sites
+
+`--includeOneDriveSites`
+: use this switch to include OneDrive sites in the result when retrieving sites. Can only be used in combination with `type` All.
 
 `--deleted`
 : use this switch to only return deleted sites
@@ -32,28 +38,34 @@ When using the text output type (default), the command lists only the values of 
 
 ## Examples
 
-List all modern team sites in the currently connected tenant
+List all sites in the currently connected tenant
 
 ```sh
-m365 spo site list
+m365 spo site list --type All
 ```
 
-List all modern team sites in the currently connected tenant
+List all group connected team sites in the currently connected tenant
 
 ```sh
 m365 spo site list --type TeamSite
 ```
 
-List all modern communication sites in the currently connected tenant
+List all communication sites in the currently connected tenant
 
 ```sh
 m365 spo site list --type CommunicationSite
 ```
 
-List all modern team sites that contain _project_ in the URL
+List all group connected team sites that contain _project_ in the URL
 
 ```sh
 m365 spo site list --type TeamSite --filter "Url -like 'project'"
+```
+
+List all sites in the currently connected tenant including OneDrive sites
+
+```sh
+m365 spo site list --type All --includeOneDriveSites
 ```
 
 List all deleted sites in the tenant you're logged in to

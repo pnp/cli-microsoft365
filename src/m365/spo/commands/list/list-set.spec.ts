@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
-import Command, { CommandError, CommandTypes } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -12,11 +12,13 @@ const command: Command = require('./list-set');
 describe(commands.LIST_SET, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -1477,7 +1479,7 @@ describe(commands.LIST_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -1488,7 +1490,7 @@ describe(commands.LIST_SET, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -1499,7 +1501,7 @@ describe(commands.LIST_SET, () => {
   });
 
   it('offers autocomplete for the direction option', () => {
-    const options = command.options();
+    const options = command.options;
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--direction') > -1) {
         assert(options[i].autocomplete);
@@ -1510,564 +1512,558 @@ describe(commands.LIST_SET, () => {
   });
 
   it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
+    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
+    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
-  it('fails validation if the id option is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'foo' } });
+  it('fails validation if the id option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the id option is a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F' } });
+  it('passes validation if the id option is a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'foo', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', contentTypesEnabled: 'true' } });
+  it('fails validation if the url option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'foo', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', contentTypesEnabled: 'true' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the url option is a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F' } });
+  it('passes validation if the url option is a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F' } }, commandInfo);
     assert(actual);
   });
 
-  it('has correct baseTemplate specified', () => {
-    const baseTemplateValue = 'DocumentLibrary';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', baseTemplate: baseTemplateValue } });
-    assert(actual === true);
-  });
-
-  it('fails validation if the templateFeatureId option is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', templateFeatureId: 'foo' } });
+  it('fails validation if the templateFeatureId option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', templateFeatureId: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the templateFeatureId option is a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', templateFeatureId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+  it('passes validation if the templateFeatureId option is a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', templateFeatureId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the allowDeletion option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowDeletion: 'foo' } });
+  it('fails validation if the allowDeletion option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowDeletion: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the allowDeletion option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowDeletion: 'true' } });
+  it('passes validation if the allowDeletion option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowDeletion: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the allowEveryoneViewItems option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowEveryoneViewItems: 'foo' } });
+  it('fails validation if the allowEveryoneViewItems option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowEveryoneViewItems: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the allowEveryoneViewItems option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowEveryoneViewItems: 'true' } });
+  it('passes validation if the allowEveryoneViewItems option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowEveryoneViewItems: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the allowMultiResponses option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowMultiResponses: 'foo' } });
+  it('fails validation if the allowMultiResponses option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowMultiResponses: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the allowMultiResponses option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowMultiResponses: 'true' } });
+  it('passes validation if the allowMultiResponses option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowMultiResponses: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the contentTypesEnabled option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', contentTypesEnabled: 'foo' } });
+  it('fails validation if the contentTypesEnabled option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', contentTypesEnabled: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the contentTypesEnabled option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', contentTypesEnabled: 'true' } });
+  it('passes validation if the contentTypesEnabled option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', contentTypesEnabled: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the crawlNonDefaultViews option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', crawlNonDefaultViews: 'foo' } });
+  it('fails validation if the crawlNonDefaultViews option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', crawlNonDefaultViews: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the crawlNonDefaultViews option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', crawlNonDefaultViews: 'true' } });
+  it('passes validation if the crawlNonDefaultViews option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', crawlNonDefaultViews: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the disableGridEditing option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', disableGridEditing: 'foo' } });
+  it('fails validation if the disableGridEditing option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', disableGridEditing: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the disableGridEditing option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', disableGridEditing: 'true' } });
+  it('passes validation if the disableGridEditing option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', disableGridEditing: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableAssignToEmail option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAssignToEmail: 'foo' } });
+  it('fails validation if the enableAssignToEmail option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAssignToEmail: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableAssignToEmail option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAssignToEmail: 'true' } });
+  it('passes validation if the enableAssignToEmail option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAssignToEmail: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableAttachments option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAttachments: 'foo' } });
+  it('fails validation if the enableAttachments option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAttachments: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableAttachments option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAttachments: 'true' } });
+  it('passes validation if the enableAttachments option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAttachments: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableDeployWithDependentList option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableDeployWithDependentList: 'foo' } });
+  it('fails validation if the enableDeployWithDependentList option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableDeployWithDependentList: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableDeployWithDependentList option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableDeployWithDependentList: 'true' } });
+  it('passes validation if the enableDeployWithDependentList option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableDeployWithDependentList: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableFolderCreation option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableFolderCreation: 'foo' } });
+  it('fails validation if the enableFolderCreation option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableFolderCreation: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableFolderCreation option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableFolderCreation: 'true' } });
+  it('passes validation if the enableFolderCreation option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableFolderCreation: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableMinorVersions option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableMinorVersions: 'foo' } });
+  it('fails validation if the enableMinorVersions option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableMinorVersions: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableMinorVersions option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableMinorVersions: 'true' } });
+  it('passes validation if the enableMinorVersions option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableMinorVersions: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableModeration option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableModeration: 'foo' } });
+  it('fails validation if the enableModeration option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableModeration: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableModeration option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableModeration: 'true' } });
+  it('passes validation if the enableModeration option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableModeration: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enablePeopleSelector option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enablePeopleSelector: 'foo' } });
+  it('fails validation if the enablePeopleSelector option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enablePeopleSelector: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enablePeopleSelector option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enablePeopleSelector: 'true' } });
+  it('passes validation if the enablePeopleSelector option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enablePeopleSelector: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableResourceSelector option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableResourceSelector: 'foo' } });
+  it('fails validation if the enableResourceSelector option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableResourceSelector: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableResourceSelector option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableResourceSelector: 'true' } });
+  it('passes validation if the enableResourceSelector option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableResourceSelector: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableSchemaCaching option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSchemaCaching: 'foo' } });
+  it('fails validation if the enableSchemaCaching option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSchemaCaching: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableSchemaCaching option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSchemaCaching: 'true' } });
+  it('passes validation if the enableSchemaCaching option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSchemaCaching: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableSyndication option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSyndication: 'foo' } });
+  it('fails validation if the enableSyndication option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSyndication: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableSyndication option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSyndication: 'true' } });
+  it('passes validation if the enableSyndication option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSyndication: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableThrottling option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableThrottling: 'foo' } });
+  it('fails validation if the enableThrottling option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableThrottling: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableThrottling option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableThrottling: 'true' } });
+  it('passes validation if the enableThrottling option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableThrottling: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enableVersioning option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableVersioning: 'foo' } });
+  it('fails validation if the enableVersioning option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableVersioning: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enableVersioning option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableVersioning: 'true' } });
+  it('passes validation if the enableVersioning option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableVersioning: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the enforceDataValidation option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enforceDataValidation: 'foo' } });
+  it('fails validation if the enforceDataValidation option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enforceDataValidation: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the enforceDataValidation option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enforceDataValidation: 'true' } });
+  it('passes validation if the enforceDataValidation option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enforceDataValidation: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the excludeFromOfflineClient option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', excludeFromOfflineClient: 'foo' } });
+  it('fails validation if the excludeFromOfflineClient option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', excludeFromOfflineClient: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the excludeFromOfflineClient option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', excludeFromOfflineClient: 'true' } });
+  it('passes validation if the excludeFromOfflineClient option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', excludeFromOfflineClient: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the fetchPropertyBagForListView option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', fetchPropertyBagForListView: 'foo' } });
+  it('fails validation if the fetchPropertyBagForListView option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', fetchPropertyBagForListView: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the fetchPropertyBagForListView option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', fetchPropertyBagForListView: 'true' } });
+  it('passes validation if the fetchPropertyBagForListView option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', fetchPropertyBagForListView: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the followable option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', followable: 'foo' } });
+  it('fails validation if the followable option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', followable: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the followable option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', followable: 'true' } });
+  it('passes validation if the followable option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', followable: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the forceCheckout option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceCheckout: 'foo' } });
+  it('fails validation if the forceCheckout option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceCheckout: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the forceCheckout option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceCheckout: 'true' } });
+  it('passes validation if the forceCheckout option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceCheckout: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the forceDefaultContentType option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceDefaultContentType: 'foo' } });
+  it('fails validation if the forceDefaultContentType option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceDefaultContentType: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the forceDefaultContentType option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceDefaultContentType: 'true' } });
+  it('passes validation if the forceDefaultContentType option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceDefaultContentType: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the hidden option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', hidden: 'foo' } });
+  it('fails validation if the hidden option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', hidden: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the hidden option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', hidden: 'true' } });
+  it('passes validation if the hidden option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', hidden: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the includedInMyFilesScope option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', includedInMyFilesScope: 'foo' } });
+  it('fails validation if the includedInMyFilesScope option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', includedInMyFilesScope: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the includedInMyFilesScope option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', includedInMyFilesScope: 'true' } });
+  it('passes validation if the includedInMyFilesScope option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', includedInMyFilesScope: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the irmEnabled option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmEnabled: 'foo' } });
+  it('fails validation if the irmEnabled option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmEnabled: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the irmEnabled option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmEnabled: 'true' } });
+  it('passes validation if the irmEnabled option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmEnabled: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the irmExpire option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmExpire: 'foo' } });
+  it('fails validation if the irmExpire option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmExpire: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the irmExpire option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmExpire: 'true' } });
+  it('passes validation if the irmExpire option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmExpire: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the irmReject option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmReject: 'foo' } });
+  it('fails validation if the irmReject option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmReject: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the irmReject option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmReject: 'true' } });
+  it('passes validation if the irmReject option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmReject: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the isApplicationList option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', isApplicationList: 'foo' } });
+  it('fails validation if the isApplicationList option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', isApplicationList: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the isApplicationList option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', isApplicationList: 'true' } });
+  it('passes validation if the isApplicationList option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', isApplicationList: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the multipleDataList option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', multipleDataList: 'foo' } });
+  it('fails validation if the multipleDataList option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', multipleDataList: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the multipleDataList option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', multipleDataList: 'true' } });
+  it('passes validation if the multipleDataList option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', multipleDataList: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the navigateForFormsPages option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', navigateForFormsPages: 'foo' } });
+  it('fails validation if the navigateForFormsPages option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', navigateForFormsPages: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the navigateForFormsPages option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', navigateForFormsPages: 'true' } });
+  it('passes validation if the navigateForFormsPages option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', navigateForFormsPages: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the needUpdateSiteClientTag option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', needUpdateSiteClientTag: 'foo' } });
+  it('fails validation if the needUpdateSiteClientTag option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', needUpdateSiteClientTag: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the needUpdateSiteClientTag option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', needUpdateSiteClientTag: 'true' } });
+  it('passes validation if the needUpdateSiteClientTag option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', needUpdateSiteClientTag: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the noCrawl option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', noCrawl: 'foo' } });
+  it('fails validation if the noCrawl option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', noCrawl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the noCrawl option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', noCrawl: 'true' } });
+  it('passes validation if the noCrawl option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', noCrawl: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the onQuickLaunch option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', onQuickLaunch: 'foo' } });
+  it('fails validation if the onQuickLaunch option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', onQuickLaunch: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the onQuickLaunch option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', onQuickLaunch: 'true' } });
+  it('passes validation if the onQuickLaunch option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', onQuickLaunch: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the ordered option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', ordered: 'foo' } });
+  it('fails validation if the ordered option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', ordered: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the ordered option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', ordered: 'true' } });
+  it('passes validation if the ordered option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', ordered: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the parserDisabled option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', parserDisabled: 'foo' } });
+  it('fails validation if the parserDisabled option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', parserDisabled: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the parserDisabled option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', parserDisabled: 'true' } });
+  it('passes validation if the parserDisabled option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', parserDisabled: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the readOnlyUI option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readOnlyUI: 'foo' } });
+  it('fails validation if the readOnlyUI option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readOnlyUI: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the readOnlyUI option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readOnlyUI: 'true' } });
+  it('passes validation if the readOnlyUI option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readOnlyUI: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the requestAccessEnabled option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', requestAccessEnabled: 'foo' } });
+  it('fails validation if the requestAccessEnabled option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', requestAccessEnabled: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the requestAccessEnabled option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', requestAccessEnabled: 'true' } });
+  it('passes validation if the requestAccessEnabled option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', requestAccessEnabled: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the restrictUserUpdates option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', restrictUserUpdates: 'foo' } });
+  it('fails validation if the restrictUserUpdates option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', restrictUserUpdates: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the restrictUserUpdates option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', restrictUserUpdates: 'true' } });
+  it('passes validation if the restrictUserUpdates option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', restrictUserUpdates: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the showUser option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', showUser: 'foo' } });
+  it('fails validation if the showUser option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', showUser: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the showUser option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', showUser: 'true' } });
+  it('passes validation if the showUser option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', showUser: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the useFormsForDisplay option is not a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', useFormsForDisplay: 'foo' } });
+  it('fails validation if the useFormsForDisplay option is not a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', useFormsForDisplay: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the useFormsForDisplay option is a valid Boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', useFormsForDisplay: 'true' } });
+  it('passes validation if the useFormsForDisplay option is a valid Boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', useFormsForDisplay: 'true' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the defaultContentApprovalWorkflowId option is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultContentApprovalWorkflowId: 'foo' } });
+  it('fails validation if the defaultContentApprovalWorkflowId option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultContentApprovalWorkflowId: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the defaultContentApprovalWorkflowId option is a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultContentApprovalWorkflowId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+  it('passes validation if the defaultContentApprovalWorkflowId option is a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultContentApprovalWorkflowId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails if non existing draftVersionVisibility specified', () => {
+  it('fails if non existing draftVersionVisibility specified', async () => {
     const draftVersionValue = 'NonExistingDraftVersionVisibility';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', draftVersionVisibility: draftVersionValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', draftVersionVisibility: draftVersionValue } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('has correct draftVersionVisibility specified', () => {
+  it('has correct draftVersionVisibility specified', async () => {
     const draftVersionValue = 'Approver';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', draftVersionVisibility: draftVersionValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', draftVersionVisibility: draftVersionValue } }, commandInfo);
     assert(actual === true);
   });
 
-  it('fails if emailAlias specified, but enableAssignToEmail is not true', () => {
+  it('fails if emailAlias specified, but enableAssignToEmail is not true', async () => {
     const emailAliasValue = 'yourname@contoso.onmicrosoft.com';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', emailAlias: emailAliasValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', emailAlias: emailAliasValue } }, commandInfo);
     assert.strictEqual(actual, `emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.`);
   });
 
-  it('has correct emailAlias and enableAssignToEmail values specified', () => {
+  it('has correct emailAlias and enableAssignToEmail values specified', async () => {
     const emailAliasValue = 'yourname@contoso.onmicrosoft.com';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', emailAlias: emailAliasValue, enableAssignToEmail: 'true' } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', emailAlias: emailAliasValue, enableAssignToEmail: 'true' } }, commandInfo);
     assert(actual === true);
   });
 
-  it('fails if non existing direction specified', () => {
+  it('fails if non existing direction specified', async () => {
     const directionValue = 'abc';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', direction: directionValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', direction: directionValue } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('has correct direction specified', () => {
+  it('has correct direction specified', async () => {
     const directionValue = 'LTR';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', direction: directionValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', direction: directionValue } }, commandInfo);
     assert(actual === true);
   });
 
-  it('fails if majorVersionLimit specified, but enableVersioning is not true', () => {
+  it('fails if majorVersionLimit specified, but enableVersioning is not true', async () => {
     const majorVersionLimitValue = 20;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorVersionLimit: majorVersionLimitValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorVersionLimit: majorVersionLimitValue } }, commandInfo);
     assert.strictEqual(actual, `majorVersionLimit option is only valid in combination with enableVersioning.`);
   });
 
-  it('has correct majorVersionLimit and enableVersioning values specified', () => {
+  it('has correct majorVersionLimit and enableVersioning values specified', async () => {
     const majorVersionLimitValue = 20;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorVersionLimit: majorVersionLimitValue, enableVersioning: 'true' } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorVersionLimit: majorVersionLimitValue, enableVersioning: 'true' } }, commandInfo);
     assert(actual === true);
   });
 
-  it('fails if majorWithMinorVersionsLimit specified, but enableModeration is not true', () => {
+  it('fails if majorWithMinorVersionsLimit specified, but enableModeration is not true', async () => {
     const majorWithMinorVersionLimitValue = 20;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorWithMinorVersionsLimit: majorWithMinorVersionLimitValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorWithMinorVersionsLimit: majorWithMinorVersionLimitValue } }, commandInfo);
     assert.strictEqual(actual, `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`);
   });
 
 
-  it('fails if non existing readSecurity specified', () => {
+  it('fails if non existing readSecurity specified', async () => {
     const readSecurityValue = 5;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readSecurity: readSecurityValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readSecurity: readSecurityValue } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('has correct readSecurity specified', () => {
+  it('has correct readSecurity specified', async () => {
     const readSecurityValue = 2;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readSecurity: readSecurityValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readSecurity: readSecurityValue } }, commandInfo);
     assert(actual === true);
   });
 
-  it('fails if non existing listExperienceOptions specified', () => {
+  it('fails if non existing listExperienceOptions specified', async () => {
     const listExperienceValue = 'NonExistingExperience';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', listExperienceOptions: listExperienceValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', listExperienceOptions: listExperienceValue } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('has correct listExperienceOptions specified', () => {
+  it('has correct listExperienceOptions specified', async () => {
     const listExperienceValue = 'NewExperience';
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', listExperienceOptions: listExperienceValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', listExperienceOptions: listExperienceValue } }, commandInfo);
     assert(actual === true);
   });
 
-  it('fails if non existing writeSecurity specified', () => {
+  it('fails if non existing writeSecurity specified', async () => {
     const writeSecurityValue = 5;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', writeSecurity: writeSecurityValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', writeSecurity: writeSecurityValue } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('has correct writeSecurity specified', () => {
+  it('has correct writeSecurity specified', async () => {
     const writeSecurityValue = 4;
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', writeSecurity: writeSecurityValue } });
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', writeSecurity: writeSecurityValue } }, commandInfo);
     assert(actual === true);
   });
 });

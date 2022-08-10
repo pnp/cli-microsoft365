@@ -1,11 +1,8 @@
 import * as url from 'url';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { urlUtil, spo, ContextInfo, validation } from '../../../../utils';
+import { ContextInfo, spo, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -32,11 +29,47 @@ class SpoFileMoveCommand extends SpoCommand {
     return 'Moves a file to another location';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.deleteIfAlreadyExists = args.options.deleteIfAlreadyExists || false;
-    telemetryProps.allowSchemaMismatch = args.options.allowSchemaMismatch || false;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        deleteIfAlreadyExists: args.options.deleteIfAlreadyExists || false,
+        allowSchemaMismatch: args.options.allowSchemaMismatch || false
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-s, --sourceUrl <sourceUrl>'
+      },
+      {
+        option: '-t, --targetUrl <targetUrl>'
+      },
+      {
+        option: '--deleteIfAlreadyExists'
+      },
+      {
+        option: '--allowSchemaMismatch'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+    );
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {
@@ -189,33 +222,6 @@ class SpoFileMoveCommand extends SpoCommand {
             });
         }, (e: any) => reject(e));
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-s, --sourceUrl <sourceUrl>'
-      },
-      {
-        option: '-t, --targetUrl <targetUrl>'
-      },
-      {
-        option: '--deleteIfAlreadyExists'
-      },
-      {
-        option: '--allowSchemaMismatch'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

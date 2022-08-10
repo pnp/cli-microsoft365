@@ -1,7 +1,7 @@
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import commands from '../../commands';
@@ -24,6 +24,32 @@ class UtilAccessTokenGetCommand extends Command {
     return 'Gets access token for the specified resource';
   }
 
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        new: args.options.new
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-r, --resource <resource>'
+      },
+      {
+        option: '--new'
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let resource: string = args.options.resource;
     if (resource.toLowerCase() === 'sharepoint') {
@@ -41,20 +67,6 @@ class UtilAccessTokenGetCommand extends Command {
         logger.log(accessToken);
         cb();
       }, (err: any): void => cb(new CommandError(err)));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-r, --resource <resource>'
-      },
-      {
-        option: '--new'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,12 +13,14 @@ describe(commands.SITEDESIGN_TASK_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -147,7 +149,7 @@ describe(commands.SITEDESIGN_TASK_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -157,13 +159,13 @@ describe(commands.SITEDESIGN_TASK_GET, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if taskId is not a valid GUID', () => {
-    const actual = command.validate({ options: { taskId: 'invalid' } });
+  it('fails validation if taskId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { taskId: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if taskId is valid', () => {
-    const actual = command.validate({ options: { taskId: '6ec3ca5b-d04b-4381-b169-61378556d76e' } });
+  it('passes validation if taskId is valid', async () => {
+    const actual = await command.validate({ options: { taskId: '6ec3ca5b-d04b-4381-b169-61378556d76e' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

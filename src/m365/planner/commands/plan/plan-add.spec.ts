@@ -2,10 +2,10 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
-import { accessToken, sinonUtil } from '../../../../utils';
+import { accessToken, formatting, sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 const command: Command = require('./plan-add');
 
@@ -13,12 +13,77 @@ describe(commands.PLAN_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+
+  const validId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
+  const validTitle = 'Plan name';
+  const validOwnerGroupName = 'Group name';
+  const validOwnerGroupId = '00000000-0000-0000-0000-000000000002';
+  const user = 'user@contoso.com';
+  const userId = '00000000-0000-0000-0000-000000000000';
+  const user1 = 'user1@contoso.com';
+  const user1Id = '00000000-0000-0000-0000-000000000001';
+  const validShareWithUserNames = `${user},${user1}`;
+  const validShareWithUserIds = `${userId},${user1Id}`;
+
+  const singleGroupResponse = {
+    "value": [
+      {
+        "id": validOwnerGroupId,
+        "displayName": validOwnerGroupName
+      }
+    ]
+  };
+
+  const planResponse = {
+    "id": validId,
+    "title": validTitle
+  };
+
+  const userResponse = {
+    "value": [
+      {
+        "id": userId,
+        "userPrincipalName": user
+      }
+    ]
+  };
+
+  const user1Response = {
+    "value": [
+      {
+        "id": user1Id,
+        "userPrincipalName": user1
+      }
+    ]
+  };
+
+  const planDetailsEtagResponse = {
+    "@odata.etag": "TestEtag"
+  };
+
+  const planDetailsResponse = {
+    "sharedWith": {
+      "00000000-0000-0000-0000-000000000000": true,
+      "00000000-0000-0000-0000-000000000001": true
+    },
+    "categoryDescriptions": {}
+  };
+
+  const outputResponse = {
+    ...planResponse,
+    ...planDetailsResponse
+  };
 
   before(() => {
-    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -35,6 +100,7 @@ describe(commands.PLAN_ADD, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(false);
     (command as any).items = [];
   });
 
@@ -42,6 +108,7 @@ describe(commands.PLAN_ADD, () => {
     sinonUtil.restore([
       request.get,
       request.post,
+      request.patch,
       accessToken.isAppOnlyAccessToken
     ]);
   });
@@ -52,6 +119,7 @@ describe(commands.PLAN_ADD, () => {
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -66,59 +134,89 @@ describe(commands.PLAN_ADD, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'createdDateTime', 'owner']);
   });
 
-  it('fails validation if the ownerGroupId is not a valid guid.', (done) => {
-    const actual = command.validate({
+  it('fails validation if the ownerGroupId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
-        title: 'My Planner Plan',
-        ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
+        title: validTitle,
+        ownerGroupId: 'no guid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided.', (done) => {
-    const actual = command.validate({
+  it('fails validation if neither the ownerGroupId nor ownerGroupName are provided.', async () => {
+    const actual = await command.validate({
       options: {
-        title: 'My Planner Plan'
+        title: validTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation when both ownerGroupId and ownerGroupName are specified', (done) => {
-    const actual = command.validate({
+  it('fails validation when both ownerGroupId and ownerGroupName are specified', async () => {
+    const actual = await command.validate({
       options: {
-        title: 'My Planner Plan',
-        ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4',
-        ownerGroupName: 'spridermvp'
+        title: validTitle,
+        ownerGroupId: validOwnerGroupId,
+        ownerGroupName: validOwnerGroupName
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid title and ownerGroupId specified', (done) => {
-    const actual = command.validate({
+  it('fails validation if shareWithUserIds contains invalid guid.', async () => {
+    const actual = await command.validate({
       options: {
-        title: 'My Planner Plan',
-        ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
+        title: validTitle,
+        ownerGroupId: validOwnerGroupId,
+        shareWithUserIds: "no guid"
       }
-    });
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when both shareWithUserIds and shareWithUserNames are specified', async () => {
+    const actual = await command.validate({
+      options: {
+        title: validTitle,
+        ownerGroupId: validOwnerGroupId,
+        shareWithUserIds: validShareWithUserIds,
+        shareWithUserNames: validShareWithUserNames
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation when valid title and ownerGroupId specified', async () => {
+    const actual = await command.validate({
+      options: {
+        title: validTitle,
+        ownerGroupName: validOwnerGroupName
+      }
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid title and ownerGroupName specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid title, ownerGroupName, and shareWithUserIds specified', async () => {
+    const actual = await command.validate({
       options: {
-        title: 'My Planner Plan',
-        ownerGroupName: 'spridermvp'
+        title: validTitle,
+        ownerGroupId: validOwnerGroupId,
+        shareWithUserIds: validShareWithUserIds
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
+  });
+
+  it('passes validation when valid title, ownerGroupName, and validShareWithUserNames specified', async () => {
+    const actual = await command.validate({
+      options: {
+        title: validTitle,
+        ownerGroupId: validOwnerGroupId,
+        shareWithUserNames: validShareWithUserNames
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation when using app only access token', (done) => {
@@ -127,8 +225,8 @@ describe(commands.PLAN_ADD, () => {
 
     command.action(logger, {
       options: {
-        title: 'My Planner Plan',
-        ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
+        title: validTitle,
+        ownerGroupId: validOwnerGroupId
       }
     }, (err?: any) => {
       try {
@@ -142,114 +240,23 @@ describe(commands.PLAN_ADD, () => {
   });
 
   it('correctly adds planner plan with given title with available ownerGroupId', (done) => {
-    const getFakeOneGroupFound = (opts: any) => {
-      if ((opts.url as string).indexOf('/groups?$filter=ID') > -1) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
-          "value": [
-            {
-              "id": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
-              "deletedDateTime": null,
-              "classification": null,
-              "createdDateTime": "2021-01-23T17:58:03Z",
-              "creationOptions": [
-                "Team",
-                "ExchangeProvisioningFlags:3552"
-              ],
-              "description": "Check here for organization announcements and important info.",
-              "displayName": "spridermvp",
-              "expirationDateTime": null,
-              "groupTypes": [
-                "Unified"
-              ],
-              "isAssignableToRole": null,
-              "mail": "spridermvp@spridermvp.onmicrosoft.com",
-              "mailEnabled": true,
-              "mailNickname": "spridermvp",
-              "membershipRule": null,
-              "membershipRuleProcessingState": null,
-              "onPremisesDomainName": null,
-              "onPremisesLastSyncDateTime": null,
-              "onPremisesNetBiosName": null,
-              "onPremisesSamAccountName": null,
-              "onPremisesSecurityIdentifier": null,
-              "onPremisesSyncEnabled": null,
-              "preferredDataLocation": null,
-              "preferredLanguage": null,
-              "proxyAddresses": [
-                "SPO:SPO_fe66856a-ca60-457c-9215-cef02b57bf01@SPO_b30f2eac-f6b4-4f87-9dcb-cdf7ae1f8923",
-                "SMTP:spridermvp@spridermvp.onmicrosoft.com"
-              ],
-              "renewedDateTime": "2021-01-23T17:58:03Z",
-              "resourceBehaviorOptions": [
-                "HideGroupInOutlook",
-                "SubscribeMembersToCalendarEventsDisabled",
-                "WelcomeEmailDisabled"
-              ],
-              "resourceProvisioningOptions": [
-                "Team"
-              ],
-              "securityEnabled": false,
-              "securityIdentifier": "S-1-12-1-591283152-1211030634-3876408987-3035217063",
-              "theme": null,
-              "visibility": "Public",
-              "onPremisesProvisioningErrors": []
-            }
-          ]
-        });
-      }
-      return Promise.reject('Invalid request');
-    };
-
-    const postFakeAddPlannerPlan = (opts: any) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
-        return Promise.resolve({
-          "createdDateTime": "2021-03-10T17:39:43.1045549Z",
-          "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
-          "title": "My Planner Plan",
-          "id": "opb7bchfZUiFbVWEPL7jPGUABW7f",
-          "createdBy": {
-            "user": {
-              "displayName": null,
-              "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
-            },
-            "application": {
-              "displayName": null,
-              "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
-            }
-          }
-        });
+        return Promise.resolve(planResponse);
       }
-      return Promise.reject('Invalid request');
-    };
 
-    sinon.stub(request, 'get').callsFake(getFakeOneGroupFound);
-    sinon.stub(request, 'post').callsFake(postFakeAddPlannerPlan);
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
 
     const options: any = {
       debug: false,
-      title: 'My Planner Plan',
-      ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
+      title: validTitle,
+      ownerGroupId: validOwnerGroupId
     };
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith({
-          "createdDateTime": "2021-03-10T17:39:43.1045549Z",
-          "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
-          "title": "My Planner Plan",
-          "id": "opb7bchfZUiFbVWEPL7jPGUABW7f",
-          "createdBy": {
-            "user": {
-              "displayName": null,
-              "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
-            },
-            "application": {
-              "displayName": null,
-              "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
-            }
-          }
-        }));
+        assert(loggerLogSpy.calledWith(planResponse));
         done();
       }
       catch (e) {
@@ -259,102 +266,176 @@ describe(commands.PLAN_ADD, () => {
   });
 
   it('correctly adds planner plan with given title with available ownerGroupName', (done) => {
-    const getFakeOneGroupFound = (opts: any) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
-          "value": [
-            {
-              "id": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
-              "deletedDateTime": null,
-              "classification": null,
-              "createdDateTime": "2021-01-23T17:58:03Z",
-              "creationOptions": [
-                "Team",
-                "ExchangeProvisioningFlags:3552"
-              ],
-              "description": "Check here for organization announcements and important info.",
-              "displayName": "spridermvp",
-              "expirationDateTime": null,
-              "groupTypes": [
-                "Unified"
-              ],
-              "isAssignableToRole": null,
-              "mail": "spridermvp@spridermvp.onmicrosoft.com",
-              "mailEnabled": true,
-              "mailNickname": "spridermvp",
-              "membershipRule": null,
-              "membershipRuleProcessingState": null,
-              "onPremisesDomainName": null,
-              "onPremisesLastSyncDateTime": null,
-              "onPremisesNetBiosName": null,
-              "onPremisesSamAccountName": null,
-              "onPremisesSecurityIdentifier": null,
-              "onPremisesSyncEnabled": null,
-              "preferredDataLocation": null,
-              "preferredLanguage": null,
-              "proxyAddresses": [
-                "SPO:SPO_fe66856a-ca60-457c-9215-cef02b57bf01@SPO_b30f2eac-f6b4-4f87-9dcb-cdf7ae1f8923",
-                "SMTP:spridermvp@spridermvp.onmicrosoft.com"
-              ],
-              "renewedDateTime": "2021-01-23T17:58:03Z",
-              "resourceBehaviorOptions": [
-                "HideGroupInOutlook",
-                "SubscribeMembersToCalendarEventsDisabled",
-                "WelcomeEmailDisabled"
-              ],
-              "resourceProvisioningOptions": [
-                "Team"
-              ],
-              "securityEnabled": false,
-              "securityIdentifier": "S-1-12-1-591283152-1211030634-3876408987-3035217063",
-              "theme": null,
-              "visibility": "Public",
-              "onPremisesProvisioningErrors": []
-            }
-          ]
-        });
+        return Promise.resolve(singleGroupResponse);
       }
-      return Promise.reject('Invalid request');
-    };
 
-    const postFakeAddPlannerPlan = (opts: any) => {
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
-        return Promise.resolve({
-          createdDateTime: '2021-03-15T13:58:51.2580774Z',
-          owner: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4',
-          title: 'My Planner Plan',
-          id: 'oVDjUOY_CkWLi7okcKxGwWUABFaL',
-          createdBy: {
-            user: { displayName: null, id: 'eded3a2a-8f01-40aa-998a-e4f02ec693ba' },
-            application: { displayName: null, id: '31359c7f-bd7e-475c-86db-fdb8c937548e' }
-          }
-        });
+        return Promise.resolve(planResponse);
       }
-      return Promise.reject('Invalid request');
-    };
 
-    sinon.stub(request, 'get').callsFake(getFakeOneGroupFound);
-    sinon.stub(request, 'post').callsFake(postFakeAddPlannerPlan);
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
 
     const options: any = {
       debug: false,
-      title: 'My Planner Plan',
-      ownerGroupName: 'spridermvp'
+      title: validTitle,
+      ownerGroupName: validOwnerGroupName
     };
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith({
-          createdDateTime: '2021-03-15T13:58:51.2580774Z',
-          owner: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4',
-          title: 'My Planner Plan',
-          id: 'oVDjUOY_CkWLi7okcKxGwWUABFaL',
-          createdBy: {
-            user: { displayName: null, id: 'eded3a2a-8f01-40aa-998a-e4f02ec693ba' },
-            application: { displayName: null, id: '31359c7f-bd7e-475c-86db-fdb8c937548e' }
-          }
-        }));
+        assert(loggerLogSpy.calledWith(planResponse));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly adds planner plan with given title with ownerGroupId and shareWithUserIds', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}/details`) {
+        return Promise.resolve(planDetailsEtagResponse);
+      }
+
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
+        return Promise.resolve(planResponse);
+      }
+
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}/details`) {
+        return Promise.resolve(planDetailsResponse);
+      }
+
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    const options: any = {
+      debug: false,
+      title: validTitle,
+      ownerGroupId: validOwnerGroupId,
+      shareWithUserIds: validShareWithUserIds
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert(loggerLogSpy.calledWith(outputResponse));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly adds planner plan with given title with ownerGroupId and shareWithUserNames', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}/details`) {
+        return Promise.resolve(planDetailsEtagResponse);
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(user)}'&$select=id,userPrincipalName`) {
+        return Promise.resolve(userResponse);
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(user1)}'&$select=id,userPrincipalName`) {
+        return Promise.resolve(user1Response);
+      }
+
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
+        return Promise.resolve(planResponse);
+      }
+
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}/details`) {
+        return Promise.resolve(planDetailsResponse);
+      }
+
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    const options: any = {
+      debug: false,
+      title: validTitle,
+      ownerGroupId: validOwnerGroupId,
+      shareWithUserNames: validShareWithUserNames
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert(loggerLogSpy.calledWith(outputResponse));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails when an invalid user is specified', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}/details`) {
+        return Promise.resolve(planDetailsEtagResponse);
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(user)}'&$select=id,userPrincipalName`) {
+        return Promise.resolve(userResponse);
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq '${formatting.encodeQueryParameter(user1)}'&$select=id,userPrincipalName`) {
+        return Promise.resolve({ value: [] });
+      }
+
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
+        return Promise.resolve(planResponse);
+      }
+
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}/details`) {
+        return Promise.resolve(planDetailsResponse);
+      }
+
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    const options: any = {
+      debug: false,
+      title: validTitle,
+      ownerGroupId: validOwnerGroupId,
+      shareWithUserNames: validShareWithUserNames
+    };
+
+    command.action(logger, { options: options } as any, (err: any) => {
+      try {
+        assert.strictEqual(err.message, `Cannot proceed with planner plan creation. The following users provided are invalid : ${user1}`);
         done();
       }
       catch (e) {
@@ -380,7 +461,7 @@ describe(commands.PLAN_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

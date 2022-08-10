@@ -1,9 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo, validation } from '../../../../utils';
@@ -30,12 +27,74 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
     return 'Adds an app to the specified SharePoint Online app catalog';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.overwrite = (!(!args.options.overwrite)).toString();
-    telemetryProps.scope = args.options.scope || 'tenant';
-    telemetryProps.appCatalogUrl = (!(!args.options.appCatalogUrl)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        overwrite: (!(!args.options.overwrite)).toString(),
+        scope: args.options.scope || 'tenant',
+        appCatalogUrl: (!(!args.options.appCatalogUrl)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-p, --filePath <filePath>'
+      },
+      {
+        option: '-s, --scope [scope]',
+        autocomplete: ['tenant', 'sitecollection']
+      },
+      {
+        option: '-u, --appCatalogUrl [appCatalogUrl]'
+      },
+      {
+        option: '--overwrite [overwrite]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        // verify either 'tenant' or 'sitecollection' specified if scope provided
+        if (args.options.scope) {
+          const testScope: string = args.options.scope.toLowerCase();
+          if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+            return `Scope must be either 'tenant' or 'sitecollection'`;
+          }
+
+          if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
+            return `You must specify appCatalogUrl when the scope is sitecollection`;
+          }
+        }
+
+        const fullPath: string = path.resolve(args.options.filePath);
+
+        if (!fs.existsSync(fullPath)) {
+          return `File '${fullPath}' not found`;
+        }
+
+        if (fs.lstatSync(fullPath).isDirectory()) {
+          return `Path '${fullPath}' points to a directory`;
+        }
+
+        if (args.options.appCatalogUrl) {
+          return validation.isValidSharePointUrl(args.options.appCatalogUrl);
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -76,57 +135,6 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
 
         cb();
       }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-p, --filePath <filePath>'
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: ['tenant', 'sitecollection']
-      },
-      {
-        option: '-u, --appCatalogUrl [appCatalogUrl]'
-      },
-      {
-        option: '--overwrite [overwrite]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    // verify either 'tenant' or 'sitecollection' specified if scope provided
-    if (args.options.scope) {
-      const testScope: string = args.options.scope.toLowerCase();
-      if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-        return `Scope must be either 'tenant' or 'sitecollection'`;
-      }
-
-      if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-        return `You must specify appCatalogUrl when the scope is sitecollection`;
-      }
-    }
-
-    const fullPath: string = path.resolve(args.options.filePath);
-
-    if (!fs.existsSync(fullPath)) {
-      return `File '${fullPath}' not found`;
-    }
-
-    if (fs.lstatSync(fullPath).isDirectory()) {
-      return `Path '${fullPath}' points to a directory`;
-    }
-
-    if (args.options.appCatalogUrl) {
-      return validation.isValidSharePointUrl(args.options.appCatalogUrl);
-    }
-
-    return true;
   }
 }
 

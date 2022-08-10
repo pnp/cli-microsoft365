@@ -1,10 +1,13 @@
-import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
+import { Cli, CommandOutput, Logger } from '../../../../cli';
+import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import * as SpoListItemListCommand from '../listitem/listitem-list';
+import { Options as SpoListItemListCommandOptions } from '../listitem/listitem-list';
+import { AssociatedSite } from './AssociatedSite';
 import { HubSite } from './HubSite';
 
 interface CommandArgs {
@@ -15,6 +18,7 @@ interface Options extends GlobalOptions {
   id?: string;
   title?: string;
   url?: string;
+  includeAssociatedSites?: boolean;
 }
 
 class SpoHubSiteGetCommand extends SpoCommand {
@@ -26,15 +30,58 @@ class SpoHubSiteGetCommand extends SpoCommand {
     return 'Gets information about the specified hub site';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.title = typeof args.options.title !== 'undefined';
-    telemetryProps.url = typeof args.options.url !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+  	this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+  	this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+	    title: typeof args.options.title !== 'undefined',
+	    url: typeof args.options.url !== 'undefined',
+	    includeAssociatedSites: args.options.includeAssociatedSites === true
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '-i, --id [id]' },
+      { option: '-t, --title [title]' },
+      { option: '-u, --url [url]' },
+      { option: '--includeAssociatedSites' }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.id && !validation.isValidGuid(args.options.id)) {
+	      return `${args.options.id} is not a valid GUID`;
+	    }
+
+	    if (args.options.url) {
+	      return validation.isValidSharePointUrl(args.options.url);
+	    }
+
+	    return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+  	this.optionSets.push(['id', 'title', 'url']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    let hubSite: HubSite;
+
     spo
       .getSpoUrl(logger, this.debug)
       .then((spoUrl: string): Promise<any> => {
@@ -45,10 +92,47 @@ class SpoHubSiteGetCommand extends SpoCommand {
           return this.getHubSite(spoUrl, args.options);
         }
       })
-      .then((res: any): void => {
-        logger.log(res);
+      .then((res: HubSite): Promise<CommandOutput | void> => {
+        hubSite = res;
+
+        if (args.options.includeAssociatedSites && (args.options.output && args.options.output !== 'json')) {
+          throw Error('includeAssociatedSites option is only allowed with json output mode');
+        }
+
+        if (args.options.includeAssociatedSites !== true || args.options.output && args.options.output !== 'json') {
+          return Promise.resolve();
+        }
+
+        return spo
+          .getSpoAdminUrl(logger, this.debug)
+          .then((spoAdminUrl: string): Promise<CommandOutput> => {
+            return this.getAssociatedSites(spoAdminUrl, hubSite.SiteId, logger, args);
+          });
+      })
+      .then((associatedSitesCommandOutput: CommandOutput | void): void => {
+        if (args.options.includeAssociatedSites) {
+          const associatedSites: AssociatedSite[] = JSON.parse((associatedSitesCommandOutput as CommandOutput).stdout) as AssociatedSite[];
+          hubSite.AssociatedSites = associatedSites.filter(s => s.SiteId !== hubSite.SiteId);
+        }
+
+        logger.log(hubSite);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  }
+
+  private getAssociatedSites(spoAdminUrl: string, hubSiteId: string, logger: Logger, args: CommandArgs): Promise<CommandOutput> {
+    const options: SpoListItemListCommandOptions = {
+      output: 'json',
+      debug: args.options.debug,
+      verbose: args.options.verbose,
+      listTitle: 'DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS',
+      webUrl: spoAdminUrl,
+      filter: `HubSiteId eq '${hubSiteId}'`,
+      fields: 'Title,SiteUrl,SiteId'
+    };
+
+    return Cli
+      .executeCommandWithOutput(SpoListItemListCommand as Command, { options: { ...options, _: [] } });
   }
 
   private getHubSiteById(spoUrl: string, options: Options): Promise<HubSite> {
@@ -59,7 +143,6 @@ class SpoHubSiteGetCommand extends SpoCommand {
       },
       responseType: 'json'
     };
-    
     return request.get(requestOptions);
   }
 
@@ -94,35 +177,6 @@ class SpoHubSiteGetCommand extends SpoCommand {
 
         return hubSites[0];
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '-i, --id [id]' },
-      { option: '-t, --title [title]' },
-      { option: '-u, --url [url]' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public optionSets(): string[][] | undefined {
-    return [
-      ['id', 'title', 'url']
-    ];
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.id && !validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    if (args.options.url) {
-      return validation.isValidSharePointUrl(args.options.url);
-    }
-
-    return true;
   }
 }
 

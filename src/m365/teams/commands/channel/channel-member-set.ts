@@ -1,13 +1,12 @@
 import { Channel, Group } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
-import { validation } from '../../../../utils';
 import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import { validation } from '../../../../utils';
+import { aadGroup } from '../../../../utils/aadGroup';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import request from '../../../../request';
 import { ConversationMember } from '../../ConversationMember';
-import { aadGroup } from '../../../../utils/aadGroup';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -40,16 +39,106 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
     return 'Updates the role of the specified member in the specified Microsoft Teams private team channel';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
-    telemetryProps.teamName = typeof args.options.teamName !== 'undefined';
-    telemetryProps.channelId = typeof args.options.channelId !== 'undefined';
-    telemetryProps.channelName = typeof args.options.channelName !== 'undefined';
-    telemetryProps.userName = typeof args.options.userName !== 'undefined';
-    telemetryProps.userId = typeof args.options.userId !== 'undefined';
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        teamId: typeof args.options.teamId !== 'undefined',
+        teamName: typeof args.options.teamName !== 'undefined',
+        channelId: typeof args.options.channelId !== 'undefined',
+        channelName: typeof args.options.channelName !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined',
+        userId: typeof args.options.userId !== 'undefined',
+        id: typeof args.options.id !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--teamId [teamId]'
+      },
+      {
+        option: '--teamName [teamName]'
+      },
+      {
+        option: '--channelId [channelId]'
+      },
+      {
+        option: '--channelName [channelName]'
+      },
+      {
+        option: '--userName [userName]'
+      },
+      {
+        option: '--userId [userId]'
+      },
+      {
+        option: '--id [id]'
+      },
+      {
+        option: '-r, --role <role>',
+        autocomplete: ['owner', 'member']
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.teamId && args.options.teamName) {
+          return 'Specify either teamId or teamName, but not both';
+        }
+
+        if (!args.options.teamId && !args.options.teamName) {
+          return 'Specify teamId or teamName, one is required';
+        }
+
+        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
+
+        if (args.options.channelId && args.options.channelName) {
+          return 'Specify either channelId or channelName, but not both';
+        }
+
+        if (!args.options.channelId && !args.options.channelName) {
+          return 'Specify channelId or channelName, one is required';
+        }
+
+        if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
+          return `${args.options.channelId} is not a valid Teams Channel ID`;
+        }
+
+        if ((args.options.userName && args.options.userId) ||
+          (args.options.userName && args.options.id) ||
+          (args.options.userId && args.options.id)) {
+          return 'Specify either userName, userId or id, but not multiple.';
+        }
+
+        if (!args.options.userName && !args.options.userId && !args.options.id) {
+          return 'Specify either userName, userId or id, one is required';
+        }
+
+        if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
+          return `${args.options.userId} is not a valid GUID`;
+        }
+
+        if (['owner', 'member'].indexOf(args.options.role) === -1) {
+          return `${args.options.role} is not a valid role value. Allowed values owner|member`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -84,7 +173,7 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
-  
+
   private getTeamId(args: CommandArgs): Promise<string> {
     if (args.options.teamId) {
       return Promise.resolve(args.options.teamId);
@@ -147,7 +236,7 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
     return request
       .get<{ value: ConversationMember[] }>(requestOptions)
       .then(response => {
-        const conversationMembers = response.value.filter(x => 
+        const conversationMembers = response.value.filter(x =>
           args.options.userId && x.userId?.toLocaleLowerCase() === args.options.userId.toLocaleLowerCase() ||
           args.options.userName && x.email?.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase()
         );
@@ -164,85 +253,6 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
 
         return Promise.resolve(conversationMember.id);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--teamId [teamId]'
-      },
-      {
-        option: '--teamName [teamName]'
-      },
-      {
-        option: '--channelId [channelId]'
-      },
-      {
-        option: '--channelName [channelName]'
-      },
-      {
-        option: '--userName [userName]'
-      },
-      {
-        option: '--userId [userId]'
-      },
-      {
-        option: '--id [id]'
-      },
-      {
-        option: '-r, --role <role>',
-        autocomplete: ['owner', 'member']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.teamId && args.options.teamName) {
-      return 'Specify either teamId or teamName, but not both';
-    }
-
-    if (!args.options.teamId && !args.options.teamName) {
-      return 'Specify teamId or teamName, one is required';
-    }
-
-    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    if (args.options.channelId && args.options.channelName) {
-      return 'Specify either channelId or channelName, but not both';
-    }
-
-    if (!args.options.channelId && !args.options.channelName) {
-      return 'Specify channelId or channelName, one is required';
-    }
-
-    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
-      return `${args.options.channelId} is not a valid Teams Channel ID`;
-    }
-
-    if ((args.options.userName && args.options.userId) || 
-      (args.options.userName && args.options.id) || 
-      (args.options.userId && args.options.id)) {
-      return 'Specify either userName, userId or id, but not multiple.';
-    }
-
-    if (!args.options.userName && !args.options.userId && !args.options.id) {
-      return 'Specify either userName, userId or id, one is required';
-    }
-
-    if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
-      return `${args.options.userId} is not a valid GUID`;
-    }
-
-    if (['owner', 'member'].indexOf(args.options.role) === -1) {
-      return `${args.options.role} is not a valid role value. Allowed values owner|member`;
-    } 
-
-    return true;
   }
 }
 

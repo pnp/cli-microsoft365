@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
@@ -23,15 +22,48 @@ class YammerUserGetCommand extends YammerCommand {
     return 'Retrieves the current user or searches for a user by ID or e-mail';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.userId = args.options.userId !== undefined;
-    telemetryProps.email = args.options.email !== undefined;
-    return telemetryProps;
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['id', 'full_name', 'email', 'job_title', 'state', 'url'];
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        userId: args.options.userId !== undefined,
+        email: args.options.email !== undefined
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --userId [userId]'
+      },
+      {
+        option: '--email [email]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.userId !== undefined && args.options.email !== undefined) {
+          return `You are only allowed to search by ID or e-mail but not both`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -59,28 +91,6 @@ class YammerUserGetCommand extends YammerCommand {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --userId [userId]'
-      },
-      {
-        option: '--email [email]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.userId !== undefined && args.options.email !== undefined) {
-      return `You are only allowed to search by ID or e-mail but not both`;
-    }
-
-    return true;
   }
 }
 

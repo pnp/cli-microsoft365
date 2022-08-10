@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -14,7 +11,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id: string;
+  id?: string;
+  title?: string;
   url: string;
   scope?: string;
 }
@@ -28,10 +26,67 @@ class SpoCustomActionGetCommand extends SpoCommand {
     return 'Gets details for the specified custom action';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.scope = args.options.scope || 'All';
-    return telemetryProps;
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        scope: args.options.scope || 'All'
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-t, --title [title]'
+      },
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '-s, --scope [scope]',
+        autocomplete: ['Site', 'Web', 'All']
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.id && validation.isValidGuid(args.options.id) === false) {
+	      return `${args.options.id} is not valid. Custom action id (Guid) expected.`;
+	    }
+
+	    if (validation.isValidSharePointUrl(args.options.url) !== true) {
+	      return 'Missing required option url';
+	    }
+
+	    if (args.options.scope) {
+	      if (args.options.scope !== 'Site' &&
+	        args.options.scope !== 'Web' &&
+	        args.options.scope !== 'All') {
+	        return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
+	      }
+	    }
+
+	    return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+  	this.optionSets.push(['id', 'title']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -76,15 +131,39 @@ class SpoCustomActionGetCommand extends SpoCommand {
   }
 
   private getCustomAction(options: Options): Promise<CustomAction> {
+    const filter: string = options.id ?
+      `('${encodeURIComponent(options.id as string)}')` :
+      `?$filter=Title eq '${encodeURIComponent(options.title as string)}'`;
+
     const requestOptions: any = {
-      url: `${options.url}/_api/${options.scope}/UserCustomActions('${encodeURIComponent(options.id)}')`,
+      url: `${options.url}/_api/${options.scope}/UserCustomActions${filter}`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };
 
-    return request.get(requestOptions);
+    if (options.id) {
+      return request
+        .get<CustomAction>(requestOptions)
+        .then((res: CustomAction): Promise<CustomAction> => {
+          return Promise.resolve(res);
+        });
+    }
+
+    return request
+      .get<{ value: CustomAction[] }>(requestOptions)
+      .then((res: { value: CustomAction[] }): Promise<CustomAction> => {
+        if (res.value.length === 1) {
+          return Promise.resolve(res.value[0]);
+        }
+
+        if (res.value.length === 0) {
+          return Promise.reject(`No user custom action with title '${options.title}' found`);
+        }
+
+        return Promise.reject(`Multiple user custom actions with title '${options.title}' found. Please disambiguate using IDs: ${res.value.map(a => a.Id).join(', ')}`);
+      });
   }
 
   /**
@@ -126,44 +205,6 @@ class SpoCustomActionGetCommand extends SpoCommand {
     }
 
     return `${scope}`;
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: ['Site', 'Web', 'All']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (validation.isValidGuid(args.options.id) === false) {
-      return `${args.options.id} is not valid. Custom action id (Guid) expected.`;
-    }
-
-    if (validation.isValidSharePointUrl(args.options.url) !== true) {
-      return 'Missing required option url';
-    }
-
-    if (args.options.scope) {
-      if (args.options.scope !== 'Site' &&
-        args.options.scope !== 'Web' &&
-        args.options.scope !== 'All') {
-        return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
-      }
-    }
-
-    return true;
   }
 }
 
