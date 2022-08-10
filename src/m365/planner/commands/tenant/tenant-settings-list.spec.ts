@@ -72,7 +72,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['isPlannerAllowed', 'allowCalendarSharing', 'allowTenantMoveWithDataLoss', 'allowTenantMoveWithDataMigration', 'allowRosterCreation', 'allowPlannerMobilePushNotifications']);
   });
 
-  it('successfully lists tenant planner settings', (done) => {
+  it('successfully lists tenant planner settings', async (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://tasks.office.com/taskAPI/tenantAdminSettings/Settings') {
         return Promise.resolve(successReponse);
@@ -81,18 +81,17 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: {} } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(successReponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await command.action(logger, { options: {} } as any);
+      assert(loggerLogSpy.calledWith(successReponse));
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://tasks.office.com/taskAPI/tenantAdminSettings/Settings') {
         return Promise.reject('An error has occurred');
@@ -101,15 +100,14 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await command.action(logger, { options: {} } as any);
+      done('No exception was thrown.');
+    }
+    catch (err: any) {
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+      done();
+    }
   });
 
   it('supports debug mode', () => {

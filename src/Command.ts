@@ -223,29 +223,29 @@ export default abstract class Command {
   public async processOptions(options: any): Promise<void> {
   }
 
-  public abstract commandAction(logger: Logger, args: any, cb: () => void): void;
+  public abstract commandAction(logger: Logger, args: any): Promise<void>;
 
-  public action(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    auth
-      .restoreAuth()
-      .then((): void => {
-        this.initAction(args, logger);
+  public async action(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      await auth.restoreAuth();
+    }
+    catch (error: any) {
+      throw new CommandError(error);
+    }
 
-        if (!auth.service.connected) {
-          cb(new CommandError('Log in to Microsoft 365 first'));
-          return;
-        }
+    this.initAction(args, logger);
 
-        try {
-          this.loadValuesFromAccessToken(args);
-          this.commandAction(logger, args, cb);
-        }
-        catch (ex) {
-          cb(new CommandError(ex as any));
-        }
-      }, (error: any): void => {
-        cb(new CommandError(error));
-      });
+    if (!auth.service.connected) {
+      throw new CommandError('Log in to Microsoft 365 first');
+    }
+
+    try {
+      this.loadValuesFromAccessToken(args);
+      await this.commandAction(logger, args);
+    }
+    catch (ex) {
+      throw new CommandError(ex as any);
+    }
   }
 
   public async validate(args: CommandArgs, command: CommandInfo): Promise<boolean | string> {
@@ -279,65 +279,65 @@ export default abstract class Command {
     return commandName;
   }
 
-  protected handleRejectedODataPromise(rawResponse: any, logger: Logger, callback: (err?: any) => void): void {
+  protected handleRejectedODataPromise(rawResponse: any): void {
     const res: any = JSON.parse(JSON.stringify(rawResponse));
     if (res.error) {
       try {
         const err: ODataError = JSON.parse(res.error);
-        callback(new CommandError(err['odata.error'].message.value));
+        throw new CommandError(err['odata.error'].message.value);
       }
       catch {
         try {
           const graphResponseError: GraphResponseError = res.error;
           if (graphResponseError.error.code) {
-            callback(new CommandError(graphResponseError.error.code + " - " + graphResponseError.error.message));
+            throw new CommandError(graphResponseError.error.code + " - " + graphResponseError.error.message);
           }
           else {
-            callback(new CommandError(graphResponseError.error.message));
+            throw new CommandError(graphResponseError.error.message);
           }
         }
         catch {
-          callback(new CommandError(res.error));
+          throw new CommandError(res.error);
         }
       }
     }
     else {
       if (rawResponse instanceof Error) {
-        callback(new CommandError(rawResponse.message));
+        throw new CommandError(rawResponse.message);
       }
       else {
-        callback(new CommandError(rawResponse));
+        throw new CommandError(rawResponse);
       }
     }
   }
 
-  protected handleRejectedODataJsonPromise(response: any, logger: Logger, callback: (err?: any) => void): void {
+  protected handleRejectedODataJsonPromise(response: any): void {
     if (response.error &&
       response.error['odata.error'] &&
       response.error['odata.error'].message) {
-      return callback(new CommandError(response.error['odata.error'].message.value));
+      throw new CommandError(response.error['odata.error'].message.value);
     }
 
     if (!response.error) {
       if (response instanceof Error) {
-        return callback(new CommandError(response.message));
+        throw new CommandError(response.message);
       }
       else {
-        return callback(new CommandError(response));
+        throw new CommandError(response);
       }
     }
 
     if (response.error.error &&
       response.error.error.message) {
-      return callback(new CommandError(response.error.error.message));
+      throw new CommandError(response.error.error.message);
     }
 
     if (response.error.message) {
-      return callback(new CommandError(response.error.message));
+      throw new CommandError(response.error.message);
     }
 
     if (response.error.error_description) {
-      return callback(new CommandError(response.error.error_description));
+      throw new CommandError(response.error.error_description);
     }
 
     try {
@@ -345,28 +345,28 @@ export default abstract class Command {
       if (error &&
         error.error &&
         error.error.message) {
-        callback(new CommandError(error.error.message));
+        throw new CommandError(error.error.message);
       }
       else {
-        callback(new CommandError(response.error));
+        throw new CommandError(response.error);
       }
     }
     catch {
-      callback(new CommandError(response.error));
+      throw new CommandError(response.error);
     }
   }
 
-  protected handleError(rawResponse: any, logger: Logger, callback: (err?: any) => void): void {
+  protected handleError(rawResponse: any): void {
     if (rawResponse instanceof Error) {
-      callback(new CommandError(rawResponse.message));
+      throw new CommandError(rawResponse.message);
     }
     else {
-      callback(new CommandError(rawResponse));
+      throw new CommandError(rawResponse);
     }
   }
 
-  protected handleRejectedPromise(rawResponse: any, logger: Logger, callback: (err?: any) => void): void {
-    this.handleError(rawResponse, logger, callback);
+  protected handleRejectedPromise(rawResponse: any): void {
+    this.handleError(rawResponse);
   }
 
   protected initAction(args: CommandArgs, logger: Logger): void {

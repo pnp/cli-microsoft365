@@ -36,12 +36,12 @@ export default abstract class PeriodBasedReport extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const endpoint: string = `${this.resource}/v1.0/reports/${this.usageEndpoint}(period='${encodeURIComponent(args.options.period)}')`;
-    this.executeReport(endpoint, logger, args.options.output, cb);
+    await this.executeReport(endpoint, logger, args.options.output);
   }
 
-  protected executeReport(endPoint: string, logger: Logger, output: string | undefined, cb: () => void): void {
+  protected async executeReport(endPoint: string, logger: Logger, output: string | undefined): Promise<void> {
     const requestOptions: any = {
       url: endPoint,
       headers: {
@@ -50,24 +50,27 @@ export default abstract class PeriodBasedReport extends GraphCommand {
       responseType: 'json'
     };
 
-    request
-      .get(requestOptions)
-      .then((res: any): void => {
-        let content: string = '';
-        const cleanResponse = this.removeEmptyLines(res);
+    let res: any;
+    try {
+      res = await request.get(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+      return;
+    }
 
-        if (output && output.toLowerCase() === 'json') {
-          const reportData: any = this.getReport(cleanResponse);
-          content = reportData;
-        }
-        else {
-          content = cleanResponse;
-        }
+    let content: string = '';
+    const cleanResponse = this.removeEmptyLines(res);
 
-        logger.log(content);
+    if (output && output.toLowerCase() === 'json') {
+      const reportData: any = this.getReport(cleanResponse);
+      content = reportData;
+    }
+    else {
+      content = cleanResponse;
+    }
 
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    logger.log(content);
   }
 
   private removeEmptyLines(input: string): string {

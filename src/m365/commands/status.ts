@@ -13,7 +13,7 @@ class StatusCommand extends Command {
     return 'Shows Microsoft 365 login status';
   }
 
-  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger): Promise<void> {
     if (auth.service.connected) {
       if (this.debug) {
         logger.logToStderr({
@@ -36,18 +36,18 @@ class StatusCommand extends Command {
         logger.log('Logged out');
       }
     }
-    cb();
   }
 
-  public action(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    auth
-      .restoreAuth()
-      .then((): void => {
-        this.initAction(args, logger);
-        this.commandAction(logger, args, cb);
-      }, (error: any): void => {
-        cb(new CommandError(error));
-      });
+  public async action(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      await auth.restoreAuth();
+    }
+    catch (error: any) {
+      throw new CommandError(error);
+    }
+
+    this.initAction(args, logger);
+    this.commandAction(logger);
   }
 }
 

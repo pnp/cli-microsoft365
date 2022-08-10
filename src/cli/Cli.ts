@@ -2,6 +2,7 @@ import type * as Chalk from 'chalk';
 import type * as Configstore from 'configstore';
 import * as fs from 'fs';
 import type { Inquirer } from 'inquirer';
+import inquirer = require('inquirer');
 import type * as JMESPath from 'jmespath';
 import * as minimist from 'minimist';
 import * as os from 'os';
@@ -158,109 +159,107 @@ export class Cli {
       .then(_ => process.exit(0), err => this.closeWithError(err, optionsWithoutShorts));
   }
 
-  public static executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      const logger: Logger = {
-        log: (message: any): void => {
-          const output: any = Cli.formatOutput(message, args.options);
-          Cli.log(output);
-        },
-        logRaw: (message: any): void => Cli.log(message),
-        logToStderr: (message: any): void => Cli.error(message)
-      };
+  public static async executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
+    const logger: Logger = {
+      log: (message: any): void => {
+        const output: any = Cli.formatOutput(message, args.options);
+        Cli.log(output);
+      },
+      logRaw: (message: any): void => Cli.log(message),
+      logToStderr: (message: any): void => Cli.error(message)
+    };
 
-      if (args.options.debug) {
-        logger.logToStderr(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
-      }
+    if (args.options.debug) {
+      logger.logToStderr(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
+    }
 
-      // store the current command name, if any and set the name to the name of
-      // the command to execute
-      const cli = Cli.getInstance();
-      const parentCommandName: string | undefined = cli.currentCommandName;
-      cli.currentCommandName = command.getCommandName(cli.currentCommandName);
+    // store the current command name, if any and set the name to the name of
+    // the command to execute
+    const cli = Cli.getInstance();
+    const parentCommandName: string | undefined = cli.currentCommandName;
+    cli.currentCommandName = command.getCommandName(cli.currentCommandName);
 
-      command.action(logger, args as any, (err: any): void => {
-        // restore the original command name
-        cli.currentCommandName = parentCommandName;
+    try {
+      await command.action(logger, args as any);
+    }
+    catch (err: any) {
+      throw err;
+    }
+    finally {
+      // restore the original command name
+      cli.currentCommandName = parentCommandName;
+    }
 
-        if (err) {
-          return reject(err);
-        }
-
-        if (args.options.debug || args.options.verbose) {
-          const chalk: typeof Chalk = require('chalk');
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        resolve();
-      });
-    });
+    if (args.options.debug || args.options.verbose) {
+      const chalk: typeof Chalk = require('chalk');
+      logger.logToStderr(chalk.green('DONE'));
+    }
   }
 
-  public static executeCommandWithOutput(command: Command, args: { options: minimist.ParsedArgs }, listener?: {
+  public static async executeCommandWithOutput(command: Command, args: { options: minimist.ParsedArgs }, listener?: {
     stdout?: (message: any) => void,
     stderr?: (message: any) => void
   }): Promise<CommandOutput> {
-    return new Promise((resolve: (result: CommandOutput) => void, reject: (error: any) => void): void => {
-      const log: string[] = [];
-      const logErr: string[] = [];
-      const logger: Logger = {
-        log: (message: any): void => {
-          const formattedMessage = Cli.formatOutput(message, args.options);
-          if (listener && listener.stdout) {
-            listener.stdout(formattedMessage);
-          }
-          log.push(formattedMessage);
-        },
-        logRaw: (message: any): void => {
-          const formattedMessage = Cli.formatOutput(message, args.options);
-          if (listener && listener.stdout) {
-            listener.stdout(formattedMessage);
-          }
-          log.push(formattedMessage);
-        },
-        logToStderr: (message: any): void => {
-          if (listener && listener.stderr) {
-            listener.stderr(message);
-          }
-          logErr.push(message);
+    const log: string[] = [];
+    const logErr: string[] = [];
+    const logger: Logger = {
+      log: (message: any): void => {
+        const formattedMessage = Cli.formatOutput(message, args.options);
+        if (listener && listener.stdout) {
+          listener.stdout(formattedMessage);
         }
-      };
-
-      if (args.options.debug) {
-        const message = `Executing command ${command.name} with options ${JSON.stringify(args)}`;
+        log.push(formattedMessage);
+      },
+      logRaw: (message: any): void => {
+        const formattedMessage = Cli.formatOutput(message, args.options);
+        if (listener && listener.stdout) {
+          listener.stdout(formattedMessage);
+        }
+        log.push(formattedMessage);
+      },
+      logToStderr: (message: any): void => {
         if (listener && listener.stderr) {
           listener.stderr(message);
         }
         logErr.push(message);
       }
+    };
 
-      // store the current command name, if any and set the name to the name of
-      // the command to execute
-      const cli = Cli.getInstance();
-      const parentCommandName: string | undefined = cli.currentCommandName;
-      cli.currentCommandName = command.getCommandName();
-      // store the current logger if any
-      const currentLogger: Logger | undefined = request.logger;
+    if (args.options.debug) {
+      const message = `Executing command ${command.name} with options ${JSON.stringify(args)}`;
+      if (listener && listener.stderr) {
+        listener.stderr(message);
+      }
+      logErr.push(message);
+    }
 
-      command.action(logger, args as any, (err: any): void => {
-        // restore the original command name
-        cli.currentCommandName = parentCommandName;
-        // restore the original logger
-        request.logger = currentLogger;
+    // store the current command name, if any and set the name to the name of
+    // the command to execute
+    const cli = Cli.getInstance();
+    const parentCommandName: string | undefined = cli.currentCommandName;
+    cli.currentCommandName = command.getCommandName();
+    // store the current logger if any
+    const currentLogger: Logger | undefined = request.logger;
 
-        if (err) {
-          return reject({
-            error: err,
-            stderr: logErr.join(os.EOL)
-          });
-        }
+    try {
+      await command.action(logger, args as any);
+    }
+    catch (err: any) {
+      throw {
+        error: err,
+        stderr: logErr.join(os.EOL)
+      };
+    }
+    finally {
+      // restore the original command name
+      cli.currentCommandName = parentCommandName;
+      // restore the original logger
+      request.logger = currentLogger;
+    }
 
-        resolve({
-          stdout: log.join(os.EOL),
-          stderr: logErr.join(os.EOL)
-        });
-      });
+    return ({
+      stdout: log.join(os.EOL),
+      stderr: logErr.join(os.EOL)
     });
   }
 
@@ -787,11 +786,11 @@ export class Cli {
     }
   }
 
-  public static prompt(options: any, cb: (result: any) => void): void {
+  public static async prompt(options: any): Promise<inquirer.Answers> {
     const inquirer: Inquirer = require('inquirer');
-    inquirer
-      .prompt(options)
-      .then(result => cb(result));
+    const result = await inquirer.prompt(options);
+
+    return result;
   }
 
   private static removeShortOptions(args: { options: minimist.ParsedArgs }): { options: minimist.ParsedArgs } {

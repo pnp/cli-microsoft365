@@ -101,7 +101,7 @@ class PlannerTenantSettingsSetCommand extends PlannerCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const requestOptions: AxiosRequestConfig = {
       url: `${this.resource}/taskAPI/tenantAdminSettings/Settings`,
       headers: {
@@ -119,12 +119,13 @@ class PlannerTenantSettingsSetCommand extends PlannerCommand {
       }
     };
 
-    request
-      .patch(requestOptions)
-      .then((result): void => {
-        logger.log(result);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const result = await request.patch(requestOptions);
+      logger.log(result);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

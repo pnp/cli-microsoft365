@@ -98,18 +98,18 @@ export default abstract class SpoCommand extends Command {
     return true;
   }
 
-  public action(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    auth
-      .restoreAuth()
-      .then((): void => {
-        if (auth.service.connected && AuthType[auth.service.authType] === AuthType[AuthType.Secret]) {
-          cb(new CommandError(`SharePoint does not support authentication using client ID and secret. Please use a different login type to use SharePoint commands.`));
-          return;
-        }
+  public async action(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      await auth.restoreAuth();
+    }
+    catch (error: any) {
+      throw new CommandError(error);
+    }
 
-        super.action(logger, args, cb);
-      }, (error: any): void => {
-        cb(new CommandError(error));
-      });
+    if (auth.service.connected && AuthType[auth.service.authType] === AuthType[AuthType.Secret]) {
+      throw new CommandError(`SharePoint does not support authentication using client ID and secret. Please use a different login type to use SharePoint commands.`);
+    }
+
+    super.action(logger, args);
   }
 }
