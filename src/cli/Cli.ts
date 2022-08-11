@@ -2,7 +2,6 @@ import type * as Chalk from 'chalk';
 import type * as Configstore from 'configstore';
 import * as fs from 'fs';
 import type { Inquirer } from 'inquirer';
-import inquirer = require('inquirer');
 import type * as JMESPath from 'jmespath';
 import * as minimist from 'minimist';
 import * as os from 'os';
@@ -786,11 +785,10 @@ export class Cli {
     }
   }
 
-  public static async prompt(options: any): Promise<inquirer.Answers> {
+  public static async prompt(options: any): Promise<{ continue: boolean }> {
     const inquirer: Inquirer = require('inquirer');
     const result = await inquirer.prompt(options);
-
-    return result;
+    return result as { continue: boolean };
   }
 
   private static removeShortOptions(args: { options: minimist.ParsedArgs }): { options: minimist.ParsedArgs } {

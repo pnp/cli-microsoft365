@@ -260,7 +260,7 @@ describe(commands.BUCKET_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when no groups found', (done) => {
+  it('fails validation when no groups found', async (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
         return Promise.resolve({ "value": [] });
@@ -269,24 +269,23 @@ describe(commands.BUCKET_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
-      options: {
-        name: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified group '${validOwnerGroupName}' does not exist.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await command.action(logger, {
+        options: {
+          name: validBucketName,
+          planTitle: validPlanTitle,
+          ownerGroupName: validOwnerGroupName
+        }
+      });
+      done('No exception was thrown.');
+    }
+    catch (err) {
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified group '${validOwnerGroupName}' does not exist.`)));
+      done();
+    }
   });
 
-  it('fails validation when multiple groups found', (done) => {
+  it('fails validation when multiple groups found', async (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
         return Promise.resolve(multipleGroupResponse);
@@ -295,24 +294,23 @@ describe(commands.BUCKET_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
-      options: {
-        name: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple groups with name '${validOwnerGroupName}' found: ${multipleGroupResponse.value.map(x => x.id)}.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await command.action(logger, {
+        options: {
+          name: validBucketName,
+          planTitle: validPlanTitle,
+          ownerGroupName: validOwnerGroupName
+        }
+      });
+      done('No exception was thrown.');
+    }
+    catch (err) {
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple groups with name '${validOwnerGroupName}' found: ${multipleGroupResponse.value.map(x => x.id)}.`)));
+      done();
+    }
   });
 
-  it('fails validation when no buckets found', (done) => {
+  it('fails validation when no buckets found', async (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
         return Promise.resolve({ "value": [] });
@@ -321,23 +319,22 @@ describe(commands.BUCKET_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
-      options: {
-        name: validBucketName,
-        planId: validPlanId
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified bucket ${validBucketName} does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await command.action(logger, {
+        options: {
+          name: validBucketName,
+          planId: validPlanId
+        }
+      });
+      done('No exception was thrown.');
+    }
+    catch (err) {
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified bucket ${validBucketName} does not exist`)));
+      done();
+    }
   });
 
-  it('fails validation when multiple buckets found', (done) => {
+  it('fails validation when multiple buckets found', async (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
         return Promise.resolve(multipleBucketByNameResponse);
@@ -346,42 +343,40 @@ describe(commands.BUCKET_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
-      options: {
-        name: validBucketName,
-        planId: validPlanId
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple buckets with name ${validBucketName} found: ${multipleBucketByNameResponse.value.map(x => x.id)}`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await command.action(logger, {
+        options: {
+          name: validBucketName,
+          planId: validPlanId
+        }
+      });
+      done('No exception was thrown.');
+    }
+    catch (err) {
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple buckets with name ${validBucketName} found: ${multipleBucketByNameResponse.value.map(x => x.id)}`)));
+      done();
+    }
   });
 
-  it('fails validation when using app only access token', (done) => {
+  it('fails validation when using app only access token', async (done) => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    command.action(logger, {
-      options: {
-        id: validBucketId
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await command.action(logger, {
+        options: {
+          id: validBucketId
+        }
+      });
+      done('No exception was thrown.');
+    }
+    catch (err) {
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
+      done();
+    }
   });
 
-  it('Correctly gets bucket by id', (done) => {
+  it('Correctly gets bucket by id', async (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/${validBucketId}`) {
         return Promise.resolve(singleBucketByIdResponse);
@@ -390,22 +385,20 @@ describe(commands.BUCKET_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
-      options: {
-        id: validBucketId
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await command.action(logger, {
+        options: {
+          id: validBucketId
+        }
+      });
+      done();
+    }
+    catch (err) {
+      done(err);
+    }
   });
 
-  it('Correctly gets bucket by name', (done) => {
+  it('Correctly gets bucket by name', async (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
         return Promise.resolve(singleGroupResponse);
@@ -423,24 +416,22 @@ describe(commands.BUCKET_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
-      options: {
-        name: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupName: validOwnerGroupName
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await command.action(logger, {
+        options: {
+          name: validBucketName,
+          planTitle: validPlanTitle,
+          ownerGroupName: validOwnerGroupName
+        }
+      });
+      done();
+    }
+    catch (err) {
+      done(err);
+    }
   });
 
-  it('Correctly gets bucket by plan title and owner group ID', (done) => {
+  it('Correctly gets bucket by plan title and owner group ID', async (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return Promise.resolve(singlePlanResponse);
@@ -455,24 +446,22 @@ describe(commands.BUCKET_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
-      options: {
-        name: validBucketName,
-        planTitle: validPlanTitle,
-        ownerGroupId: validOwnerGroupId
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await command.action(logger, {
+        options: {
+          name: validBucketName,
+          planTitle: validPlanTitle,
+          ownerGroupId: validOwnerGroupId
+        }
+      });
+      done();
+    }
+    catch (err) {
+      done(err);
+    }
   });
 
-  it('Correctly gets bucket by deprecated plan name and owner group ID', (done) => {
+  it('Correctly gets bucket by deprecated plan name and owner group ID', async (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return Promise.resolve(singlePlanResponse);
@@ -487,22 +476,20 @@ describe(commands.BUCKET_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
-      options: {
-        name: validBucketName,
-        planName: validPlanTitle,
-        ownerGroupId: validOwnerGroupId,
-        verbose: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    try {
+      await command.action(logger, {
+        options: {
+          name: validBucketName,
+          planName: validPlanTitle,
+          ownerGroupId: validOwnerGroupId,
+          verbose: true
+        }
+      });
+      done();
+    }
+    catch (err) {
+      done(err);
+    }
   });
 
   it('supports debug mode', () => {

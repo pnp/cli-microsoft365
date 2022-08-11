@@ -244,6 +244,9 @@ export default abstract class Command {
       await this.commandAction(logger, args);
     }
     catch (ex) {
+      if (ex instanceof CommandError) {
+        throw ex;
+      }
       throw new CommandError(ex as any);
     }
   }
