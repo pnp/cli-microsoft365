@@ -716,16 +716,16 @@ describe(commands.APP_ADD, () => {
 
   it('creates AAD app reg for a deamon app with specified Microsoft Graph application permissions', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
         });
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
         return Promise.resolve({
           value: mocks.aadSp
         });
@@ -876,16 +876,16 @@ describe(commands.APP_ADD, () => {
 
   it('creates AAD app reg for a deamon app with specified Microsoft Graph application and delegated permissions', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
         });
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
         return Promise.resolve({
           value: mocks.aadSp
         });
@@ -1045,16 +1045,16 @@ describe(commands.APP_ADD, () => {
 
   it('creates AAD app reg for a single-page app with specified Microsoft Graph delegated permissions', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
         });
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
         return Promise.resolve({
           value: mocks.aadSp
         });
@@ -1208,16 +1208,16 @@ describe(commands.APP_ADD, () => {
 
   it('creates AAD app reg for a single-page app with specified Microsoft Graph delegated permissions (debug)', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
         });
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
         return Promise.resolve({
           value: mocks.aadSp
         });
@@ -2059,6 +2059,175 @@ describe(commands.APP_ADD, () => {
     });
   });
 
+  it('creates AAD app reg for a deamon app with specified Microsoft Graph permissions, including admin consent', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.microsoftGraphSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                  "type": "Role"
+                }
+              ]
+            }
+          ]
+        })) {
+        return Promise.resolve({
+          "id": "b63c4be1-9c78-40b7-8619-de7172eed8de",
+          "deletedDateTime": null,
+          "appId": "dbfdad7a-5105-45fc-8290-eb0b0b24ac58",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T15:02:42.8048505Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "M365x271534.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                  "type": "Role"
+                }
+              ]
+            }
+          ],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals') {
+        return Promise.resolve({
+          "id": "59e617e5-e447-4adc-8b88-00af644d7c92",
+          "appId": "dbfdad7a-5105-45fc-8290-eb0b0b24ac58",
+          "displayName": "My AAD app",
+          "appRoles": [],
+          "oauth2PermissionScopes": [],
+          "servicePrincipalNames": [
+            "f1bd758f-4a1a-4b71-aa20-a248a22a8928"
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/oauth2PermissionGrants') {
+        return Promise.resolve();
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals/59e617e5-e447-4adc-8b88-00af644d7c92/appRoleAssignments') {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals('59e617e5-e447-4adc-8b88-00af644d7c92')/appRoleAssignments/$entity",
+          "id": "vAolND43WUinlI9oBu_ynaoJXWsFy9tInKpeHJBShh4",
+          "deletedDateTime": null,
+          "appRoleId": "62a82d76-70ea-41e2-9197-370581804d09",
+          "createdDateTime": "2022-06-08T16:09:29.4885458Z",
+          "principalDisplayName": "myapp",
+          "principalId": "24448e9c-d0fa-43d1-a1dd-e279720969a0",
+          "principalType": "ServicePrincipal",
+          "resourceDisplayName": "Microsoft Graph",
+          "resourceId": "f75121cb-5156-42f0-916e-341ea2ecaa22"
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+
+    command.action(logger, {
+      options: {
+        name: 'My AAD app',
+        apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All',
+        grantAdminConsent: true,
+        debug: true
+      }
+    }, (err: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', `Error: ${JSON.stringify(err)}`);
+        assert(loggerLogSpy.calledWith({
+          appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
+          objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('returns error when retrieving information about service principals failed', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject({
       error: {
@@ -2088,16 +2257,16 @@ describe(commands.APP_ADD, () => {
 
   it('returns error when non-existent service principal specified in the APIs', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
         });
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
         return Promise.resolve({
           value: mocks.aadSp
         });
@@ -2245,16 +2414,16 @@ describe(commands.APP_ADD, () => {
 
   it('returns error when non-existent permission scope specified in the APIs', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
         });
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
         return Promise.resolve({
           value: mocks.aadSp
         });
@@ -2649,16 +2818,16 @@ describe(commands.APP_ADD, () => {
 
   it('creates AAD app reg for a web app with service principal name with trailing slash', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.mockCrmSp
           ]
         });
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
         return Promise.resolve({
           value: mocks.aadSp
         });
@@ -2795,7 +2964,24 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest', (done) => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.mockCrmSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/3a0388de-2988-4a97-a068-ff4e2b218752' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -2865,7 +3051,18 @@ describe(commands.APP_ADD, () => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
-          "signInAudience": "AzureADMyOrg"
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000007-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "78ce3f0f-a1ce-49c2-8cde-64b5c0896db4",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
         })) {
         return Promise.resolve({
           "id": "3a0388de-2988-4a97-a068-ff4e2b218752",
@@ -3023,7 +3220,24 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest without info URLs', (done) => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.mockCrmSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/3a0388de-2988-4a97-a068-ff4e2b218752' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -3087,7 +3301,18 @@ describe(commands.APP_ADD, () => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
-          "signInAudience": "AzureADMyOrg"
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000007-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "78ce3f0f-a1ce-49c2-8cde-64b5c0896db4",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
         })) {
         return Promise.resolve({
           "id": "3a0388de-2988-4a97-a068-ff4e2b218752",
@@ -3238,7 +3463,24 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest with pre-authorized apps', (done) => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.mockCrmSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -3346,7 +3588,18 @@ describe(commands.APP_ADD, () => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
-          "signInAudience": "AzureADMyOrg"
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
         })) {
         return Promise.resolve({
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
@@ -3539,7 +3792,24 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest with public client flows enabled', (done) => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.mockCrmSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -3647,7 +3917,18 @@ describe(commands.APP_ADD, () => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
-          "signInAudience": "AzureADMyOrg"
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
         })) {
         return Promise.resolve({
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
@@ -3840,7 +4121,24 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest with public client flows disabled', (done) => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.mockCrmSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -3948,7 +4246,18 @@ describe(commands.APP_ADD, () => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
-          "signInAudience": "AzureADMyOrg"
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
         })) {
         return Promise.resolve({
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
@@ -4141,7 +4450,24 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest with secrets', (done) => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.mockCrmSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -4227,7 +4553,18 @@ describe(commands.APP_ADD, () => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
-          "signInAudience": "AzureADMyOrg"
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
         })) {
         return Promise.resolve({
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
@@ -4435,7 +4772,24 @@ describe(commands.APP_ADD, () => {
   });
 
   it('creates AAD app reg for a web app from a manifest with app roles', (done) => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.mockCrmSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -4555,7 +4909,18 @@ describe(commands.APP_ADD, () => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
-          "signInAudience": "AzureADMyOrg"
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
         })) {
         return Promise.resolve({
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
@@ -4743,6 +5108,403 @@ describe(commands.APP_ADD, () => {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest)
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('creates AAD app reg for a web app from a manifest with app roles and specified Microsoft Graph application permissions', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.microsoftGraphSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
+    sinon.stub(request, 'patch').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "addIns": [],
+          "appRoles": [
+            {
+              "allowedMemberTypes": [
+                "User"
+              ],
+              "description": "myAppRole",
+              "displayName": "myAppRole",
+              "id": "d212e66a-8927-469d-be76-f121e287ffb0",
+              "isEnabled": true,
+              "origin": "Application",
+              "value": "123"
+            }
+          ],
+          "createdDateTime": "2022-02-07T08:51:18Z",
+          "description": null,
+          "certification": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [
+            "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+          ],
+          "keyCredentials": [],
+          "notes": null,
+          "optionalClaims": null,
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                  "type": "Role"
+                },
+                {
+                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                  "type": "Role"
+                },
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "oauth2PermissionScopes": [
+              {
+                "adminConsentDescription": "Access as a user",
+                "adminConsentDisplayName": "Access as a user",
+                "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+                "isEnabled": true,
+                "type": "User",
+                "userConsentDescription": null,
+                "userConsentDisplayName": null,
+                "value": "access_as_user"
+              }
+            ]
+          },
+          "info": {
+            "termsOfServiceUrl": null,
+            "supportUrl": null,
+            "privacyStatementUrl": null,
+            "marketingUrl": null,
+            "logoUrl": null
+          },
+          "web": {
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            },
+            "redirectUris": [],
+            "logoutUrl": null,
+            "homePageUrl": null
+          },
+          "spa": {
+            "redirectUris": [
+              "http://localhost/auth",
+              "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
+            ]
+          },
+          "isFallbackPublicClient": null,
+          "displayName": "My app"
+        })) {
+          return Promise.resolve();
+        }
+
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "api": {
+            "preAuthorizedApplications": [
+              {
+                "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              },
+              {
+                "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              }
+            ]
+          }
+        })) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My app",
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                  "type": "Role"
+                },
+                {
+                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                  "type": "Role"
+                },
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
+        })) {
+        return Promise.resolve({
+          "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
+          "deletedDateTime": null,
+          "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
+          "applicationTemplateId": null,
+          "disabledByMicrosoftStatus": null,
+          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
+          "displayName": "Angular Teams app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "publisherDomain": "M365x61791022.onmicrosoft.com",
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "defaultRedirectUri": null,
+          "certification": null,
+          "optionalClaims": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                  "type": "Role"
+                },
+                {
+                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                  "type": "Role"
+                },
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          },
+          "spa": {
+            "redirectUris": []
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+
+    const manifest = {
+      "id": "95cfe30d-ed44-4f9d-b73d-c66560f72e83",
+      "acceptMappedClaims": null,
+      "accessTokenAcceptedVersion": null,
+      "addIns": [],
+      "allowPublicClient": null,
+      "appId": "ff254847-12c7-44cf-921e-8883dbd622a7",
+      "appRoles": [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "myAppRole",
+          "displayName": "myAppRole",
+          "id": "d212e66a-8927-469d-be76-f121e287ffb0",
+          "isEnabled": true,
+          "lang": null,
+          "origin": "Application",
+          "value": "123"
+        }
+      ],
+      "oauth2AllowUrlPathMatching": false,
+      "createdDateTime": "2022-02-07T08:51:18Z",
+      "description": null,
+      "certification": null,
+      "disabledByMicrosoftStatus": null,
+      "groupMembershipClaims": null,
+      "identifierUris": [
+        "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+      ],
+      "informationalUrls": {
+        "termsOfService": null,
+        "support": null,
+        "privacy": null,
+        "marketing": null
+      },
+      "keyCredentials": [],
+      "knownClientApplications": [],
+      "logoUrl": null,
+      "logoutUrl": null,
+      "name": "My app",
+      "notes": null,
+      "oauth2AllowIdTokenImplicitFlow": false,
+      "oauth2AllowImplicitFlow": false,
+      "oauth2Permissions": [
+        {
+          "adminConsentDescription": "Access as a user",
+          "adminConsentDisplayName": "Access as a user",
+          "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+          "isEnabled": true,
+          "lang": null,
+          "origin": "Application",
+          "type": "User",
+          "userConsentDescription": null,
+          "userConsentDisplayName": null,
+          "value": "access_as_user"
+        }
+      ],
+      "oauth2RequirePostResponse": false,
+      "optionalClaims": null,
+      "orgRestrictions": [],
+      "parentalControlSettings": {
+        "countriesBlockedForMinors": [],
+        "legalAgeGroupRule": "Allow"
+      },
+      "passwordCredentials": [],
+      "preAuthorizedApplications": [
+        {
+          "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+          "permissionIds": [
+            "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+          ]
+        },
+        {
+          "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+          "permissionIds": [
+            "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+          ]
+        }
+      ],
+      "publisherDomain": "contoso.onmicrosoft.com",
+      "replyUrlsWithType": [
+        {
+          "url": "http://localhost/auth",
+          "type": "Spa"
+        },
+        {
+          "url": "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth",
+          "type": "Spa"
+        }
+      ],
+      "requiredResourceAccess": [
+        {
+          "resourceAppId": "00000003-0000-0000-c000-000000000000",
+          "resourceAccess": [
+            {
+              "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+              "type": "Scope"
+            },
+            {
+              "id": "62a82d76-70ea-41e2-9197-370581804d09",
+              "type": "Role"
+            },
+            {
+              "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+              "type": "Role"
+            }
+          ]
+        }
+      ],
+      "samlMetadataUrl": null,
+      "serviceManagementReference": null,
+      "signInUrl": null,
+      "signInAudience": "AzureADMyOrg",
+      "tags": [],
+      "tokenEncryptionKeyId": null
+    };
+
+    (command as any).manifest = manifest;
+    command.action(logger, {
+      options: {
+        debug: false,
+        manifest: JSON.stringify(manifest),
+        apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
       }
     }, (err?: any) => {
       try {
