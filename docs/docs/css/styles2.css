@@ -49,6 +49,7 @@
   background-color: #fff;
   padding: 10px;
   box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.02);
+  height: 100%;
 }
 
 #cli-grid-item-template {
@@ -62,6 +63,10 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
+}
+
+.cli-grid-item-align-center:last-of-type {      
+  margin-top: auto;
 }
 
 .cli-grid-item-img {  
