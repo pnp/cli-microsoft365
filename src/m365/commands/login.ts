@@ -186,13 +186,11 @@ class LoginCommand extends Command {
       if (this.debug) {
         logger.logToStderr(new CommandError(error));
       }
-
+    }
+    finally {
       logout();
       await login();
     }
-
-    logout();
-    await login();
   }
 
   public async action(logger: Logger, args: CommandArgs): Promise<void> {

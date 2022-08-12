@@ -181,9 +181,6 @@ export class Cli {
     try {
       await command.action(logger, args as any);
     }
-    catch (err: any) {
-      throw err;
-    }
     finally {
       // restore the original command name
       cli.currentCommandName = parentCommandName;
@@ -242,6 +239,11 @@ export class Cli {
 
     try {
       await command.action(logger, args as any);
+
+      return ({
+        stdout: log.join(os.EOL),
+        stderr: logErr.join(os.EOL)
+      });
     }
     catch (err: any) {
       throw {
@@ -255,11 +257,6 @@ export class Cli {
       // restore the original logger
       request.logger = currentLogger;
     }
-
-    return ({
-      stdout: log.join(os.EOL),
-      stderr: logErr.join(os.EOL)
-    });
   }
 
   public loadAllCommands(): void {
