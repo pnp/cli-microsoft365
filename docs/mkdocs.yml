@@ -23,6 +23,7 @@ nav:
   - Commands:
     - login: 'cmd/login.md'
     - logout: 'cmd/logout.md'
+    - request: 'cmd/request.md'
     - status: 'cmd/status.md'
     - version: 'cmd/version.md'
     - Azure Active Directory (aad):

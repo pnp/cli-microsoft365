@@ -145,7 +145,7 @@ class Request {
     return this.execute(options);
   }
 
-  private execute<TResponse>(options: AxiosRequestConfig, resolve?: (res: TResponse) => void, reject?: (error: any) => void): Promise<TResponse> {
+  public execute<TResponse>(options: AxiosRequestConfig, resolve?: (res: TResponse) => void, reject?: (error: any) => void): Promise<TResponse> {
     if (!this._logger) {
       return Promise.reject('Logger not set on the request object');
     }
@@ -156,7 +156,8 @@ class Request {
           return Promise.resolve('');
         }
         else {
-          const resource: string = Auth.getResourceFromUrl(options.url as string);
+          const url = options.headers && options.headers['x-resource'] ? options.headers['x-resource'] : options.url;
+          const resource: string = Auth.getResourceFromUrl(url as string);
           return auth.ensureAccessToken(resource, this._logger as Logger, this._debug);
         }
       })()
@@ -165,7 +166,10 @@ class Request {
             if (options.headers['x-anonymous']) {
               delete options.headers['x-anonymous'];
             }
-            else {
+            if (options.headers['x-resource']) {
+              delete options.headers['x-resource'];
+            }
+            if (accessToken !== '') {
               options.headers.authorization = `Bearer ${accessToken}`;
             }
           }
