@@ -313,6 +313,25 @@ describe('Request', () => {
       });
   });
 
+  it('fails when wrong HTTP verb is used', (done) => {
+    sinon.stub(_request as any, 'req').callsFake((options) => {
+      _options = options;
+      return Promise.resolve({ data: {} });
+    });
+
+    _request
+      .execute({
+        url: 'https://contoso.sharepoint.com/',
+        method: 'GETT'
+      })
+      .then(() => {
+        done('Error expected');
+      }, (err) => {
+        assert.strictEqual(err, 'No valid method set in the request options');
+        done();
+      });
+  });
+
   it('returns response of a successful GET request', (done) => {
     sinon.stub(_request as any, 'req').callsFake((options) => {
       _options = options;
@@ -322,6 +341,26 @@ describe('Request', () => {
     _request
       .get({
         url: 'https://contoso.sharepoint.com/'
+      })
+      .then(() => {
+        done();
+      }, (err) => {
+        done(err);
+      });
+  });
+
+  it('returns response of a successful GET request, with overridden authorization', (done) => {
+    sinon.stub(_request as any, 'req').callsFake((options) => {
+      _options = options;
+      return Promise.resolve({ data: {} });
+    });
+
+    _request
+      .get({
+        url: 'https://contoso.sharepoint.com/',
+        headers: {
+          authorization: 'Bearer 123'
+        }
       })
       .then(() => {
         done();

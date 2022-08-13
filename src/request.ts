@@ -145,14 +145,22 @@ class Request {
     return this.execute(options);
   }
 
-  private execute<TResponse>(options: AxiosRequestConfig, resolve?: (res: TResponse) => void, reject?: (error: any) => void): Promise<TResponse> {
+  public execute<TResponse>(options: AxiosRequestConfig, resolve?: (res: TResponse) => void, reject?: (error: any) => void): Promise<TResponse> {
     if (!this._logger) {
       return Promise.reject('Logger not set on the request object');
+    }
+
+    const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
+    if (!options.method || methods.indexOf(options.method) === -1 ) {
+      return Promise.reject('No valid method set in the request options');
     }
 
     return new Promise<TResponse>((_resolve: (res: TResponse) => void, _reject: (error: any) => void): void => {
       ((): Promise<string> => {
         if (options.headers && options.headers['x-anonymous']) {
+          return Promise.resolve('');
+        }
+        else if (options.headers?.authorization) {
           return Promise.resolve('');
         }
         else {
@@ -165,7 +173,7 @@ class Request {
             if (options.headers['x-anonymous']) {
               delete options.headers['x-anonymous'];
             }
-            else {
+            else if(accessToken !== '') {
               options.headers.authorization = `Bearer ${accessToken}`;
             }
           }
