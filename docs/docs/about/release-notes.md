@@ -2,9 +2,17 @@
 
 ## [v5.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.7.0)
 
+**SharePoint:**
+
+- [spo list roleassignment add](../cmd/spo/list/list-roleassignment-add.md) - adds 'spo list roleassignment add' command [#3300](https://github.com/pnp/cli-microsoft365/issues/3300)
+- [spo list roleassignment remove](../cmd/spo/list/list-roleassignment-remove.md) - adds 'spo list roleassignment remove' command [#3542](https://github.com/pnp/cli-microsoft365/issues/3542)
+- [spo web roleinheritance reset](../cmd/spo/web/web-roleinheritance-reset.md) - adds 'spo web roleinheritance reset' command [#3548](https://github.com/pnp/cli-microsoft365/issues/3548)
+
 ### Changes
 
 - refactored command configuration [#3409](https://github.com/pnp/cli-microsoft365/issues/3409)
+- extends docs with a Team page [#2166](https://github.com/pnp/cli-microsoft365/issues/2166)
+- removes chatUtil.convertParticipantStringToArray from code. Only split by comma [#3340](https://github.com/pnp/cli-microsoft365/issues/3340)
 
 ## [v5.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.6.0)
 
@@ -12,7 +20,7 @@
 
 **SharePoint:**
 
-- [m365 spo file rename](../cmd/spo/file/file-rename.md) - renames a file [#1763](https://github.com/pnp/cli-microsoft365/issues/1763)
+- [spo file rename](../cmd/spo/file/file-rename.md) - renames a file [#1763](https://github.com/pnp/cli-microsoft365/issues/1763)
 
 ### Changes
 
