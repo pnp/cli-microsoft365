@@ -283,13 +283,8 @@ describe(commands.BUCKET_ADD, () => {
       planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
     };
 
-    try {
-      await command.action(logger, { options: options } as any);
-      assert(loggerLogSpy.calledWith(bucketAddResponse));
-    }
-    catch (e: any) {
-      assert.fail(e);
-    }
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(bucketAddResponse));
   });
 
   it('correctly adds planner bucket with name, planTitle, and ownerGroupName', async () => {
@@ -300,13 +295,8 @@ describe(commands.BUCKET_ADD, () => {
       ownerGroupName: 'My Planner Group'
     };
 
-    try {
-      await command.action(logger, { options: options } as any);
-      assert(loggerLogSpy.calledWith(bucketAddResponse));
-    }
-    catch (e: any) {
-      assert.fail(e);
-    }
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(bucketAddResponse));
   });
 
   it('correctly adds planner bucket with name, deprecated planName, and ownerGroupId', async () => {
@@ -318,13 +308,8 @@ describe(commands.BUCKET_ADD, () => {
       verbose: true
     };
 
-    try {
-      await command.action(logger, { options: options } as any);
-      assert(loggerLogSpy.calledWith(bucketAddResponse));
-    }
-    catch (e: any) {
-      assert.fail(e);
-    }
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(bucketAddResponse));
   });
 
   it('correctly adds planner bucket with name, planTitle, and ownerGroupId', async () => {
@@ -336,13 +321,8 @@ describe(commands.BUCKET_ADD, () => {
       verbose: true
     };
 
-    try {
-      await command.action(logger, { options: options } as any);
-      assert(loggerLogSpy.calledWith(bucketAddResponse));
-    }
-    catch (e: any) {
-      assert.fail(e);
-    }
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(bucketAddResponse));
   });
 
   it('fails validation when ownerGroupName not found', async () => {
