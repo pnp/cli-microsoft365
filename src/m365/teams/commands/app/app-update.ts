@@ -32,6 +32,7 @@ class TeamsAppUpdateCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -60,14 +61,6 @@ class TeamsAppUpdateCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.id && !args.options.name) {
-          return 'Specify either id or name';
-        }
-
-        if (args.options.id && args.options.name) {
-          return 'Specify either id or name, but not both';
-        }
-
         if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
@@ -85,6 +78,10 @@ class TeamsAppUpdateCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'name']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

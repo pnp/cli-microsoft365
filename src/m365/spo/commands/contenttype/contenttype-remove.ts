@@ -33,6 +33,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initTypes();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -64,27 +65,16 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {
-        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-    
-        if (!args.options.id && !args.options.name) {
-          return 'Specify either the id or the name';
-        }
-    
-        if (args.options.id && args.options.name) {
-          return 'Specify either the id or the name but not both';
-        }
-    
-        return true;
-      }
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
     );
   }
 
   #initTypes(): void {
     this.types.string.push('id', 'i');
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'name']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {

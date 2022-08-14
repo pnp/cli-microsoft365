@@ -34,6 +34,7 @@ class SpoListGetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -81,17 +82,13 @@ class SpoListGetCommand extends SpoCommand {
           }
         }
 
-        if (args.options.id && args.options.title) {
-          return 'Specify id or title, but not both';
-        }
-
-        if (!args.options.id && !args.options.title) {
-          return 'Specify id or title, one is required';
-        }
-
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'title']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

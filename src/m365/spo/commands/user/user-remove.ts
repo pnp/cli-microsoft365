@@ -31,6 +31,7 @@ class SpoUserRemoveCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -63,17 +64,13 @@ class SpoUserRemoveCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.id && !args.options.loginName) {
-          return 'Required option id or loginName missing, one is required';
-        }
-
-        if (args.options.id && args.options.loginName) {
-          return 'Use either id or loginName, but not both';
-        }
-
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'loginName']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

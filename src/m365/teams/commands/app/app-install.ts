@@ -34,6 +34,7 @@ class TeamsAppInstallCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -62,18 +63,6 @@ class TeamsAppInstallCommand extends GraphCommand {
           return `${args.options.appId} is not a valid GUID`;
         }
 
-        if (!args.options.teamId &&
-          !args.options.userId &&
-          !args.options.userName) {
-          return `Specify either teamId, userId or userName`;
-        }
-
-        if ((args.options.teamId && args.options.userId) ||
-          (args.options.teamId && args.options.userName) ||
-          (args.options.userId && args.options.userName)) {
-          return `Specify either teamId, userId or userName but not multiple`;
-        }
-
         if (args.options.teamId &&
           !validation.isValidGuid(args.options.teamId)) {
           return `${args.options.teamId} is not a valid GUID`;
@@ -87,6 +76,10 @@ class TeamsAppInstallCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['teamId', 'userId', 'userName']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

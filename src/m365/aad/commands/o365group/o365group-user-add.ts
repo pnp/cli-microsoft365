@@ -36,6 +36,7 @@ class AadO365GroupUserAddCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -68,15 +69,7 @@ class AadO365GroupUserAddCommand extends GraphCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {
-        if (!args.options.groupId && !args.options.teamId) {
-          return 'Please provide one of the following parameters: groupId or teamId';
-        }
-    
-        if (args.options.groupId && args.options.teamId) {
-          return 'You cannot provide both a groupId and teamId parameter, please provide only one';
-        }
-    
+      async (args: CommandArgs) => {    
         if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
           return `${args.options.teamId} is not a valid GUID`;
         }
@@ -94,6 +87,10 @@ class AadO365GroupUserAddCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['groupId', 'teamId']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

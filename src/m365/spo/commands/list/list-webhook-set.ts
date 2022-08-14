@@ -34,6 +34,7 @@ class SpoListWebhookSetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -88,14 +89,6 @@ class SpoListWebhookSetCommand extends SpoCommand {
           }
         }
 
-        if (args.options.listId && args.options.listTitle) {
-          return 'Specify listId or listTitle, but not both';
-        }
-
-        if (!args.options.listId && !args.options.listTitle) {
-          return 'Specify listId or listTitle, one is required';
-        }
-
         if (!args.options.notificationUrl && !args.options.expirationDateTime) {
           return 'Specify notificationUrl, expirationDateTime or both, at least one is required';
         }
@@ -112,6 +105,10 @@ class SpoListWebhookSetCommand extends SpoCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['listId', 'listTitle']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

@@ -36,6 +36,7 @@ class SpoListLabelSetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -83,10 +84,6 @@ class SpoListLabelSetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.listId && !args.options.listTitle && !args.options.listUrl) {
-          return `Specify listId or listTitle or listUrl.`;
-        }
-
         if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
           return `${args.options.listId} is not a valid GUID`;
         }
@@ -94,6 +91,10 @@ class SpoListLabelSetCommand extends SpoCommand {
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

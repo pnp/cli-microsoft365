@@ -28,7 +28,7 @@ class TodoListSetCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
-    this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -54,20 +54,8 @@ class TodoListSetCommand extends GraphCommand {
     );
   }
 
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!args.options.name && !args.options.id) {
-          return 'Specify name or id of the list to update';
-        }
-
-        if (args.options.name && args.options.id) {
-          return 'Specify either the name or the id of the list to update but not both';
-        }
-
-        return true;
-      }
-    );
+  #initOptionSets(): void {
+    this.optionSets.push(['name', 'id']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
