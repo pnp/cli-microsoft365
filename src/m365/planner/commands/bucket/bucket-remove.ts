@@ -171,7 +171,7 @@ class PlannerBucketRemoveCommand extends GraphCommand {
       await removeBucket();
     }
     else {
-      const result = await Cli.prompt({
+      const result = await Cli.prompt<{continue: boolean}>({
         type: 'confirm',
         name: 'continue',
         default: false,

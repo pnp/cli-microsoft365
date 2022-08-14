@@ -782,10 +782,9 @@ export class Cli {
     }
   }
 
-  public static async prompt(options: any): Promise<{ continue: boolean }> {
+  public static async prompt<T>(options: any): Promise<T> {
     const inquirer: Inquirer = require('inquirer');
-    const result = await inquirer.prompt(options);
-    return result as { continue: boolean };
+    return await inquirer.prompt(options) as T;
   }
 
   private static removeShortOptions(args: { options: minimist.ParsedArgs }): { options: minimist.ParsedArgs } {
