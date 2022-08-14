@@ -34,6 +34,7 @@ class AadUserSetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -62,15 +63,7 @@ class AadUserSetCommand extends GraphCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {
-        if (!args.options.objectId && !args.options.userPrincipalName) {
-          return 'Specify either objectId or userPrincipalName';
-        }
-    
-        if (args.options.objectId && args.options.userPrincipalName) {
-          return 'Specify either objectId or userPrincipalName but not both';
-        }
-    
+      async (args: CommandArgs) => {    
         if (args.options.objectId &&
           !validation.isValidGuid(args.options.objectId)) {
           return `${args.options.objectId} is not a valid GUID`;
@@ -79,6 +72,10 @@ class AadUserSetCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['objectId', 'userPrincipalName']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

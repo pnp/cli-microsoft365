@@ -238,7 +238,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', id: 1 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', id: 1, listTitle: 'Documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -268,7 +268,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   });
 
   it('fails validation if id is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'abc', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

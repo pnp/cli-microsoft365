@@ -86,7 +86,8 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
   it('fails validation if the teamId is not a valid guid', async () => {
     const actual = await command.validate({
       options: {
-        teamId: '00000000-0000'
+        teamId: '00000000-0000',
+        channelName: 'Channel Name'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);

@@ -35,6 +35,7 @@ class PaAppGetCommand extends PowerAppsCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -59,15 +60,7 @@ class PaAppGetCommand extends PowerAppsCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {
-        if (!args.options.name && !args.options.displayName) {
-          return 'Specify either name or displayName';
-        }
-    
-        if (args.options.name && args.options.displayName) {
-          return 'Specify either name or displayName but not both';
-        }
-    
+      async (args: CommandArgs) => {    
         if (args.options.name && !validation.isValidGuid(args.options.name)) {
           return `${args.options.name} is not a valid GUID`;
         }
@@ -75,6 +68,10 @@ class PaAppGetCommand extends PowerAppsCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['name', 'displayName']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

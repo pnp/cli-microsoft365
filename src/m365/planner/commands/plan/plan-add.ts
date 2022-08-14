@@ -38,6 +38,7 @@ class PlannerPlanAddCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -74,14 +75,6 @@ class PlannerPlanAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
-          return 'Specify either ownerGroupId or ownerGroupName';
-        }
-
-        if (args.options.ownerGroupId && args.options.ownerGroupName) {
-          return 'Specify either ownerGroupId or ownerGroupName but not both';
-        }
-
         if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
           return `${args.options.ownerGroupId} is not a valid GUID`;
         }
@@ -97,6 +90,10 @@ class PlannerPlanAddCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['ownerGroupId', 'ownerGroupName']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

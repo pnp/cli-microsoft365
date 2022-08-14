@@ -314,7 +314,7 @@ describe(commands.LISTITEM_REMOVE, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', id: 1 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', id: 1, listTitle: 'Documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -344,7 +344,7 @@ describe(commands.LISTITEM_REMOVE, () => {
   });
 
   it('fails validation if id is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'abc', listTitle: 'Documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

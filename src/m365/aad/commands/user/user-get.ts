@@ -32,6 +32,7 @@ class AadUserGetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -64,16 +65,6 @@ class AadUserGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.id && !args.options.userName && !args.options.email) {
-          return 'Specify id, userName or email, one is required';
-        }
-
-        if ((args.options.id && args.options.email) ||
-          (args.options.id && args.options.userName) ||
-          (args.options.userName && args.options.email)) {
-          return 'Use either id, userName or email, but not all';
-        }
-
         if (args.options.id &&
           !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
@@ -82,6 +73,10 @@ class AadUserGetCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'userName', 'email']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

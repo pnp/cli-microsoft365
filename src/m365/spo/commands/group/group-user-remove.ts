@@ -32,6 +32,7 @@ class SpoGroupUserRemoveCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -67,14 +68,6 @@ class SpoGroupUserRemoveCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.groupId && args.options.groupName) {
-          return 'Use either "groupName" or "groupId", but not both';
-        }
-
-        if (!args.options.groupId && !args.options.groupName) {
-          return 'Either "groupName" or "groupId" is required';
-        }
-
         if (args.options.groupId && isNaN(args.options.groupId)) {
           return `Specified "groupId" ${args.options.groupId} is not valid`;
         }
@@ -82,6 +75,10 @@ class SpoGroupUserRemoveCommand extends SpoCommand {
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['groupName', 'groupId']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {

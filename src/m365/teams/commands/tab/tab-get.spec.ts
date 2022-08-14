@@ -161,7 +161,8 @@ describe(commands.TAB_GET, () => {
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00000000000000000000000000000000@thread.skype'
+        channelId: '00000000000000000000000000000000@thread.skype',
+        tabName: 'Tab'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -171,7 +172,8 @@ describe(commands.TAB_GET, () => {
     const actual = await command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread'
+        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
+        tabName: 'Tab'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);

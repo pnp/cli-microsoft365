@@ -28,7 +28,7 @@ class TodoListRemoveCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
-    this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -55,20 +55,8 @@ class TodoListRemoveCommand extends GraphCommand {
     );
   }
 
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!args.options.name && !args.options.id) {
-          return 'Specify name or id of the list to remove';
-        }
-
-        if (args.options.name && args.options.id) {
-          return 'Specify either the name or the id of the list to remove but not both';
-        }
-
-        return true;
-      }
-    );
+  #initOptionSets(): void {
+    this.optionSets.push(['name', 'id']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {

@@ -358,7 +358,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
     }, commandInfo);
-    assert.strictEqual(actual, 'Specify listId or listTitle, one is required');
+    assert.strictEqual(actual, 'Specify one of the following options: listId, listTitle.');
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
@@ -419,7 +419,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
     }, commandInfo);
-    assert.strictEqual(actual, 'Specify listId or listTitle, but not both');
+    assert.strictEqual(actual, 'Specify one of the following options: listId, listTitle, but not multiple.');
   });
 
   it('fails validation if the expirationDateTime is in the past', async () => {

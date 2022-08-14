@@ -30,6 +30,7 @@ class SpoFileCheckoutCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -69,17 +70,13 @@ class SpoFileCheckoutCommand extends SpoCommand {
           }
         }
     
-        if (args.options.id && args.options.fileUrl) {
-          return 'Specify either id or fileUrl but not both';
-        }
-    
-        if (!args.options.id && !args.options.fileUrl) {
-          return 'Specify id or fileUrl, one is required';
-        }
-    
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'fileUrl']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

@@ -31,6 +31,7 @@ class TodoTaskSetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -68,14 +69,6 @@ class TodoTaskSetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.listId && args.options.listName) {
-          return 'Specify listId or listName but not both';
-        }
-
-        if (!args.options.listId && !args.options.listName) {
-          return 'Specify listId or listName';
-        }
-
         if (args.options.status &&
           args.options.status !== 'notStarted' &&
           args.options.status !== 'inProgress' &&
@@ -88,6 +81,10 @@ class TodoTaskSetCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['listId', 'listName']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

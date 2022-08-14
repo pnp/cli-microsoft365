@@ -60,6 +60,7 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -99,17 +100,13 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
           }
         }
     
-        if (args.options.id && args.options.url) {
-          return 'Specify id or url, but not both';
-        }
-    
-        if (!args.options.id && !args.options.url) {
-          return 'Specify id or url, one is required';
-        }
-    
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'url']);
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

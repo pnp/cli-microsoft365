@@ -33,6 +33,7 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initTypes();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -79,14 +80,6 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
           }
         }
     
-        if (args.options.listId && args.options.listTitle) {
-          return 'Specify listId or listTitle, but not both';
-        }
-    
-        if (!args.options.listId && !args.options.listTitle) {
-          return 'Specify listId or listTitle, one is required';
-        }
-    
         return true;
       }
     );
@@ -94,6 +87,10 @@ class SpoListContentTypeRemoveCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('contentTypeId', 'c');
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['listId', 'listTitle']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

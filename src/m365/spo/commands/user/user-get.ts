@@ -31,6 +31,7 @@ class SpoUserGetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -63,16 +64,6 @@ class SpoUserGetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.id && !args.options.email && !args.options.loginName) {
-          return 'Specify id, email or loginName, one is required';
-        }
-
-        if ((args.options.id && args.options.email) ||
-          (args.options.id && args.options.loginName) ||
-          (args.options.loginName && args.options.email)) {
-          return 'Use either email, id or loginName, but not all';
-        }
-
         if (args.options.id &&
           typeof args.options.id !== 'number') {
           return `Specified id ${args.options.id} is not a number`;
@@ -81,6 +72,10 @@ class SpoUserGetCommand extends SpoCommand {
         return validation.isValidSharePointUrl(args.options.webUrl);
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'email', 'loginName']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

@@ -39,6 +39,7 @@ class TeamsChannelListCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -68,14 +69,6 @@ class TeamsChannelListCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.teamId && args.options.teamName) {
-          return 'Specify either teamId or teamName, but not both';
-        }
-
-        if (!args.options.teamId && !args.options.teamName) {
-          return 'Specify teamId or teamName, one is required';
-        }
-
         if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
           return `${args.options.teamId} is not a valid GUID`;
         }
@@ -87,6 +80,10 @@ class TeamsChannelListCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['teamId', 'teamName']);
   }
 
   private getTeamId(args: CommandArgs): Promise<string> {
