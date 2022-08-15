@@ -381,7 +381,7 @@ describe(commands.TASK_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('correctly updates planner task with title', (done) => {
+  it('correctly updates planner task with title', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
@@ -408,38 +408,23 @@ describe(commands.TASK_SET, () => {
       title: 'My Planner Task'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskResponse));
   });
 
-  it('fails validation when using app only access token', (done) => {
+  it('fails validation when using app only access token', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
         title: 'My Planner Task'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('This command does not support application permissions.'));
   });
 
-  it('uses correct value for urgent priority', (done) => {
+  it('uses correct value for urgent priority', async () => {
     const requestPatchStub = sinon.stub(request, 'patch');
     requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
 
@@ -458,18 +443,11 @@ describe(commands.TASK_SET, () => {
       priority: 'Urgent'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 1);
   });
 
-  it('uses correct value for important priority', (done) => {
+  it('uses correct value for important priority', async () => {
     const requestPatchStub = sinon.stub(request, 'patch');
     requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
 
@@ -488,18 +466,11 @@ describe(commands.TASK_SET, () => {
       priority: 'Important'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 3);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 3);
   });
 
-  it('uses correct value for medium priority', (done) => {
+  it('uses correct value for medium priority', async () => {
     const requestPatchStub = sinon.stub(request, 'patch');
     requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
 
@@ -518,18 +489,11 @@ describe(commands.TASK_SET, () => {
       priority: 'Medium'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 5);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 5);
   });
 
-  it('uses correct value for low priority', (done) => {
+  it('uses correct value for low priority', async () => {
     const requestPatchStub = sinon.stub(request, 'patch');
     requestPatchStub.callsFake(() => Promise.resolve(taskResponse));
 
@@ -548,18 +512,11 @@ describe(commands.TASK_SET, () => {
       priority: 'Low'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 9);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(requestPatchStub.lastCall.args[0].data.priority, 9);
   });
 
-  it('correctly updates planner task to bucket with bucketName, planTitle, and ownerGroupName', (done) => {
+  it('correctly updates planner task to bucket with bucketName, planTitle, and ownerGroupName', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
@@ -614,18 +571,11 @@ describe(commands.TASK_SET, () => {
       ownerGroupName: 'My Planner Group'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskResponse));
   });
 
-  it('correctly updates planner task  to bucket with bucketName, planTitle, and ownerGroupId', (done) => {
+  it('correctly updates planner task  to bucket with bucketName, planTitle, and ownerGroupId', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
@@ -676,18 +626,11 @@ describe(commands.TASK_SET, () => {
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskResponse));
   });
 
-  it('correctly updates planner task  to bucket with bucketName, deprecated planName, and ownerGroupId', (done) => {
+  it('correctly updates planner task  to bucket with bucketName, deprecated planName, and ownerGroupId', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
@@ -739,18 +682,11 @@ describe(commands.TASK_SET, () => {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskResponse));
   });
 
-  it('correctly updates planner task  to bucket with bucketName, planId', (done) => {
+  it('correctly updates planner task  to bucket with bucketName, planId', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
@@ -789,18 +725,11 @@ describe(commands.TASK_SET, () => {
       planId: '8QZEH7b3wkS_bGQobscsM5gADCBb'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskResponse));
   });
 
-  it('correctly updates planner task with assignedToUserIds', (done) => {
+  it('correctly updates planner task with assignedToUserIds', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponseWithAssignments);
@@ -827,18 +756,11 @@ describe(commands.TASK_SET, () => {
       assignedToUserIds: '949b16c1-a032-453e-a8ae-89a52bfc1d8a'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskResponseWithAssignments));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskResponseWithAssignments));
   });
 
-  it('correctly updates planner task with assignedToUserNames', (done) => {
+  it('correctly updates planner task with assignedToUserNames', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponseWithAssignments);
@@ -876,18 +798,11 @@ describe(commands.TASK_SET, () => {
       assignedToUserNames: 'user@contoso.onmicrosoft.com'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskResponseWithAssignments));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskResponseWithAssignments));
   });
 
-  it('correctly updates planner task with description', (done) => {
+  it('correctly updates planner task with description', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}/details` &&
         JSON.stringify(opts.headers) === JSON.stringify({
@@ -935,18 +850,11 @@ describe(commands.TASK_SET, () => {
       description: 'My Task Description'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskResponseWithDetails));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskResponseWithDetails));
   });
 
-  it('correctly updates planner task with appliedCategories, bucketId, startDateTime, dueDateTime, percentComplete, assigneePriority, orderHint and priority', (done) => {
+  it('correctly updates planner task with appliedCategories, bucketId, startDateTime, dueDateTime, percentComplete, assigneePriority, orderHint and priority', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
@@ -980,18 +888,11 @@ describe(commands.TASK_SET, () => {
       priority: 3
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(taskResponse));
   });
 
-  it('fails when no bucket is found', (done) => {
+  it('fails when no bucket is found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${encodeURIComponent('8QZEH7b3wkS_bGQobscsM5gADCBb')}/buckets?$select=id,name`) {
         return Promise.resolve({
@@ -1008,18 +909,10 @@ describe(commands.TASK_SET, () => {
       planId: '8QZEH7b3wkS_bGQobscsM5gADCBb'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, "The specified bucket does not exist");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('The specified bucket does not exist'));
   });
 
-  it('fails when an invalid user is specified', (done) => {
+  it('fails when an invalid user is specified', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
@@ -1046,18 +939,11 @@ describe(commands.TASK_SET, () => {
       assignedToUserNames: 'user@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, "Cannot proceed with planner task update. The following users provided are invalid : user2@contoso.onmicrosoft.com");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any)
+      , new CommandError('Cannot proceed with planner task update. The following users provided are invalid : user2@contoso.onmicrosoft.com'));
   });
 
-  it('fails validation when ownerGroupName not found', (done) => {
+  it('fails validation when ownerGroupName not found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
         return Promise.resolve({ value: [] });
@@ -1065,7 +951,7 @@ describe(commands.TASK_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
@@ -1073,18 +959,10 @@ describe(commands.TASK_SET, () => {
         planTitle: 'My Planner Plan',
         ownerGroupName: 'foo'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified group 'foo' does not exist.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`The specified group 'foo' does not exist.`));
   });
 
-  it('fails validation when task endpoint fails', (done) => {
+  it('fails validation when task endpoint fails', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
@@ -1109,23 +987,15 @@ describe(commands.TASK_SET, () => {
     });
 
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
         title: 'My Planner Task'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Error fetching task`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Error fetching task`));
   });
 
-  it('fails validation when task details endpoint fails', (done) => {
+  it('fails validation when task details endpoint fails', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent('Z-RLQGfppU6H3663DBzfs5gAMD3o')}`) {
         return Promise.resolve(taskResponse);
@@ -1152,35 +1022,19 @@ describe(commands.TASK_SET, () => {
     });
 
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         id: 'Z-RLQGfppU6H3663DBzfs5gAMD3o',
         description: 'My Task Description'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Error fetching task details`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Error fetching task details`));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

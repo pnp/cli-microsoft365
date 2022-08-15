@@ -89,7 +89,7 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'isChecked']);
   });
 
-  it('correctly adds checklist item', (done) => {
+  it('correctly adds checklist item', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsResponse);
@@ -105,24 +105,17 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         taskId: validTaskId,
         title: validTitle,
         output: 'json'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(taskDetailsWithChecklistResponse.checklist));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(taskDetailsWithChecklistResponse.checklist));
   });
 
-  it('correctly adds checklist item with text output', (done) => {
+  it('correctly adds checklist item with text output', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsResponse);
@@ -138,24 +131,17 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         taskId: validTaskId,
         title: validTitle,
         output: 'text'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{ id: '00000000-0000-0000-0000-000000000000', title: validTitle, isChecked: false }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([{ id: '00000000-0000-0000-0000-000000000000', title: validTitle, isChecked: false }]));
   });
 
-  it('fails when unexpected API error was thrown', (done) => {
+  it('fails when unexpected API error was thrown', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
         return Promise.resolve(taskDetailsResponse);
@@ -171,23 +157,15 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         taskId: validTaskId,
         title: validTitle
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Something went wrong.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('Something went wrong.'));
   });
 
-  it('fails when Planner task does not exist', (done) => {
+  it('fails when Planner task does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
         return Promise.reject('The request item is not found.');
@@ -196,40 +174,24 @@ describe(commands.TASK_CHECKLISTITEM_ADD, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         taskId: validTaskId,
         title: validTitle
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Planner task was not found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('Planner task was not found.'));
   });
 
-  it('fails validation when using app only access token', (done) => {
+  it('fails validation when using app only access token', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         name: 'My Planner Bucket',
         planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('This command does not support application permissions.'));
   });
 
   it('supports debug mode', () => {

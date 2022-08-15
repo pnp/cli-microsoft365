@@ -120,7 +120,7 @@ class PlannerTaskGetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.showDeprecationWarning(logger, commands.TASK_DETAILS_GET, commands.TASK_GET);
     
     if (args.options.planName) {
@@ -130,7 +130,7 @@ class PlannerTaskGetCommand extends GraphCommand {
     }
 
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.', logger, cb);
+      this.handleError('This command does not support application permissions.');
       return;
     }
 
@@ -139,14 +139,15 @@ class PlannerTaskGetCommand extends GraphCommand {
       args.options.id = args.options.taskId;
     }
 
-    this
-      .getTaskId(args.options)
-      .then(taskId => this.getTask(taskId))
-      .then(task => this.getTaskDetails(task))
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const taskId = await this.getTaskId(args.options);
+      const task = await this.getTask(taskId);
+      const res = await this.getTaskDetails(task);
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getTask(taskId: string): Promise<PlannerTask> {

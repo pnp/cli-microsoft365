@@ -101,9 +101,9 @@ class PlannerPlanRemoveCommand extends GraphCommand {
     this.optionSets.push(['id', 'title']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.', logger, cb);
+      this.handleError('This command does not support application permissions.');
       return;
     }
 
@@ -121,30 +121,25 @@ class PlannerPlanRemoveCommand extends GraphCommand {
         };
 
         await request.delete(requestOptions);
-        cb();
       }
       catch (err: any) {
-        this.handleRejectedODataJsonPromise(err, logger, cb);
+        this.handleRejectedODataJsonPromise(err);
       }
     };
 
     if (args.options.confirm) {
-      removePlan();
+      await removePlan();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the plan ${args.options.id || args.options.title}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removePlan();
-        }
       });
+      if (result.continue) {
+        await removePlan();
+      }
     }
   }
 

@@ -128,26 +128,18 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'isChecked']);
   });
 
-  it('fails validation when using app only access token', (done) => {
+  it('fails validation when using app only access token', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         taskId: 'vzCcZoOv-U27PwydxHB8opcADJo-'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('This command does not support application permissions.'));
   });
 
-  it('successfully handles item found(JSON)', (done) => {
+  it('successfully handles item found(JSON)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/vzCcZoOv-U27PwydxHB8opcADJo-/details?$select=checklist`) {
         return Promise.resolve(jsonOutput
@@ -157,23 +149,15 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         taskId: 'vzCcZoOv-U27PwydxHB8opcADJo-', debug: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          jsonOutput.checklist
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(jsonOutput.checklist));
   });
-  it('successfully handles item found(TEXT)', (done) => {
+
+  it('successfully handles item found(TEXT)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/vzCcZoOv-U27PwydxHB8opcADJo-/details?$select=checklist`) {
         return Promise.resolve(jsonOutput
@@ -183,51 +167,26 @@ describe(commands.TASK_CHECKLISTITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         taskId: 'vzCcZoOv-U27PwydxHB8opcADJo-', debug: true, output: 'text'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          textOutput.checklist
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(textOutput.checklist));
   });
 
-  it('correctly handles item not found', (done) => {
+  it('correctly handles item not found', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('The requested item is not found.'));
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The requested item is not found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('The requested item is not found.'));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {
