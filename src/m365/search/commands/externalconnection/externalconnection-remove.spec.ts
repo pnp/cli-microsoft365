@@ -70,10 +70,32 @@ describe(commands.EXTERNALCONNECTION_REMOVE, () => {
     assert.deepStrictEqual(optionSets, [['id', 'name']]);
   });
 
-  it('prompts before removing the specified external connection when confirm option not passed', (done) => {
+  it('prompts before removing the specified external connection by id when confirm option not passed', (done) => {
     command.action(logger, {
       options: {
         id: "contosohr"
+      }
+    }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('prompts before removing the specified external connection by name when confirm option not passed', (done) => {
+    command.action(logger, {
+      options: {
+        name: "Contoso HR"
       }
     }, () => {
       let promptIssued = false;
