@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,12 +13,14 @@ describe(commands.WEB_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -471,7 +473,7 @@ describe(commands.WEB_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -482,7 +484,7 @@ describe(commands.WEB_SET, () => {
   });
 
   it('supports specifying webUrl', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--webUrl') > -1) {
@@ -492,98 +494,98 @@ describe(commands.WEB_SET, () => {
     assert(containsOption);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { webUrl: 'abc' } });
+  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the webUrl is a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+  it('passes validation when the webUrl is a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if quickLaunchEnabled is not a valid boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: 'invalid' } });
+  it('fails validation if quickLaunchEnabled is not a valid boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the webUrl is a valid SharePoint URL and quickLaunch set to "true"', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: 'true' } });
+  it('passes validation when the webUrl is a valid SharePoint URL and quickLaunch set to "true"', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if headerLayout is invalid', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'invalid' } });
+  it('fails validation if headerLayout is invalid', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if headerLayout is set to standard', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'standard' } });
+  it('passes validation if headerLayout is set to standard', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'standard' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if headerLayout is set to compact', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'compact' } });
+  it('passes validation if headerLayout is set to compact', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'compact' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if headerEmphasis is not a number', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 'abc' } });
+  it('fails validation if headerEmphasis is not a number', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if headerEmphasis is out of bounds', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 4 } });
+  it('fails validation if headerEmphasis is out of bounds', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 4 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if headerEmphasis is 0', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 0 } });
+  it('passes validation if headerEmphasis is 0', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 0 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if headerEmphasis is 1', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 1 } });
+  it('passes validation if headerEmphasis is 1', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 1 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if headerEmphasis is 2', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 2 } });
+  it('passes validation if headerEmphasis is 2', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 2 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if headerEmphasis is 3', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 3 } });
+  it('passes validation if headerEmphasis is 3', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 3 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if megaMenuEnabled is not a valid boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'invalid' } });
+  it('fails validation if megaMenuEnabled is not a valid boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if megaMenuEnabled is set to true', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'true' } });
+  it('passes validation if megaMenuEnabled is set to true', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if megaMenuEnabled is set to false', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'false' } });
+  it('passes validation if megaMenuEnabled is set to false', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if footerEnabled is not a valid boolean', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'invalid' } });
+  it('fails validation if footerEnabled is not a valid boolean', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if footerEnabled is set to true', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'true' } });
+  it('passes validation if footerEnabled is set to true', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if footerEnabled is set to false', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'false' } });
+  it('passes validation if footerEnabled is set to false', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -631,38 +633,38 @@ describe(commands.WEB_SET, () => {
     });
   });
 
-  it('fails validation if search scope is not valid', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'invalid' } });
+  it('fails validation if search scope is not valid', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if search scope is set to defaultscope', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'defaultscope' } });
+  it('passes validation if search scope is set to defaultscope', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'defaultscope' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if search scope is set to tenant', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'tenant' } });
+  it('passes validation if search scope is set to tenant', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'tenant' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if search scope is set to hub', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'hub' } });
+  it('passes validation if search scope is set to hub', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'hub' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if search scope is set to site', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'site' } });
+  it('passes validation if search scope is set to site', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'site' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation even if search scope is not all lower case', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'DefaultScope' } });
+  it('passes validation even if search scope is not all lower case', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'DefaultScope' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if search scope passed is a number', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 2 } });
+  it('fails validation if search scope passed is a number', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 2 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
-import { Logger } from '../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../cli';
 import Command, { CommandError } from '../../../Command';
 import { sinonUtil } from '../../../utils';
 import commands from '../commands';
@@ -11,12 +11,14 @@ const command: Command = require('./spo-set');
 describe(commands.SET, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -115,7 +117,7 @@ describe(commands.SET, () => {
   });
 
   it('supports specifying url', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--url') > -1) {
@@ -125,13 +127,13 @@ describe(commands.SET, () => {
     assert(containsOption);
   });
 
-  it('fails validation if url is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { url: 'abc' } });
+  it('fails validation if url is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { url: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the url is a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a' } });
+  it('passes validation when the url is a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

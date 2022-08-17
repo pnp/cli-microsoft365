@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken, sinonUtil } from '../../../../utils';
@@ -10,7 +10,6 @@ import commands from '../../commands';
 const command: Command = require('./bucket-get');
 
 describe(commands.BUCKET_GET, () => {
-
   const validBucketId = 'vncYUXCRBke28qMLB-d4xJcACtNz';
   const validBucketName = 'Bucket name';
   const validPlanId = 'oUHpnKBFekqfGE_PS6GGUZcAFY7b';
@@ -83,11 +82,17 @@ describe(commands.BUCKET_GET, () => {
 
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -120,6 +125,8 @@ describe(commands.BUCKET_GET, () => {
       auth.restoreAuth,
       appInsights.trackEvent
     ]);
+    auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -130,133 +137,133 @@ describe(commands.BUCKET_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation when no option is specified', () => {
-    const actual = command.validate({
+  it('fails validation when no option is specified', async () => {
+    const actual = await command.validate({
       options: {
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when id and name are specified', () => {
-    const actual = command.validate({
+  it('fails validation when id and name are specified', async () => {
+    const actual = await command.validate({
       options: {
         id: validBucketId,
         name: validBucketName
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when id and plan details are specified', () => {
-    const actual = command.validate({
+  it('fails validation when id and plan details are specified', async () => {
+    const actual = await command.validate({
       options: {
         id: validBucketId,
         planId: validPlanId
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when name is used without plan id or planTitle', () => {
-    const actual = command.validate({
+  it('fails validation when name is used without plan id or planTitle', async () => {
+    const actual = await command.validate({
       options: {
         name: validBucketName
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when name is used with both plan id and planTitle', () => {
-    const actual = command.validate({
+  it('fails validation when name is used with both plan id and planTitle', async () => {
+    const actual = await command.validate({
       options: {
         name: validBucketName,
         planId: validPlanId,
         planTitle: validPlanTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when plan title is used without owner group name or owner group id', () => {
-    const actual = command.validate({
+  it('fails validation when plan title is used without owner group name or owner group id', async () => {
+    const actual = await command.validate({
       options: {
         name: validBucketName,
         planTitle: validPlanTitle
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when name is used with both owner group name and owner group id', () => {
-    const actual = command.validate({
+  it('fails validation when name is used with both owner group name and owner group id', async () => {
+    const actual = await command.validate({
       options: {
         name: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName,
         ownerGroupId: validOwnerGroupId
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when owner group id is not a guid', () => {
-    const actual = command.validate({
+  it('fails validation when owner group id is not a guid', async () => {
+    const actual = await command.validate({
       options: {
         name: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupId: invalidOwnerGroupId
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when plan id is used with owner group name', () => {
-    const actual = command.validate({
+  it('fails validation when plan id is used with owner group name', async () => {
+    const actual = await command.validate({
       options: {
         name: validBucketName,
         planId: validPlanId,
         ownerGroupName: validOwnerGroupName
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when plan id is used with owner group id', () => {
-    const actual = command.validate({
+  it('fails validation when plan id is used with owner group id', async () => {
+    const actual = await command.validate({
       options: {
         name: validBucketName,
         planId: validPlanId,
         ownerGroupId: validOwnerGroupId
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('validates for a correct input with id', () => {
-    const actual = command.validate({
+  it('validates for a correct input with id', async () => {
+    const actual = await command.validate({
       options: {
         id: validBucketId
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('validates for a correct input with name', () => {
-    const actual = command.validate({
+  it('validates for a correct input with name', async () => {
+    const actual = await command.validate({
       options: {
         name: validBucketName,
         planTitle: validPlanTitle,
         ownerGroupName: validOwnerGroupName
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('fails validation when no groups found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(validOwnerGroupName)}'`) {
-        return Promise.resolve({"value": []});
+        return Promise.resolve({ "value": [] });
       }
 
       return Promise.reject('Invalid Request');
@@ -308,7 +315,7 @@ describe(commands.BUCKET_GET, () => {
   it('fails validation when no buckets found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validPlanId}/buckets`) {
-        return Promise.resolve({"value": [] });
+        return Promise.resolve({ "value": [] });
       }
 
       return Promise.reject('Invalid Request');
@@ -415,7 +422,7 @@ describe(commands.BUCKET_GET, () => {
 
       return Promise.reject('Invalid Request');
     });
-    
+
     command.action(logger, {
       options: {
         name: validBucketName,
@@ -447,7 +454,7 @@ describe(commands.BUCKET_GET, () => {
 
       return Promise.reject('Invalid Request');
     });
-    
+
     command.action(logger, {
       options: {
         name: validBucketName,
@@ -479,7 +486,7 @@ describe(commands.BUCKET_GET, () => {
 
       return Promise.reject('Invalid Request');
     });
-    
+
     command.action(logger, {
       options: {
         name: validBucketName,
@@ -499,7 +506,7 @@ describe(commands.BUCKET_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.APP_INSTANCE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
@@ -20,6 +21,7 @@ describe(commands.APP_INSTANCE_LIST, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -66,13 +68,13 @@ describe(commands.APP_INSTANCE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), [`Title`, `AppId`]);
   });
 
-  it('fails validation when siteUrl is not a valid url', () => {
-    const actual = command.validate({ options: { siteUrl: 'abc' } });
+  it('fails validation when siteUrl is not a valid url', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the siteUrl is a valid url', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/testsite' } });
+  it('passes validation when the siteUrl is a valid url', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/testsite' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -192,7 +194,7 @@ describe(commands.APP_INSTANCE_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

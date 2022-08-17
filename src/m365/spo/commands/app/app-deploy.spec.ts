@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.APP_DEPLOY, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let requests: any[];
 
   before(() => {
@@ -20,6 +21,7 @@ describe(commands.APP_DEPLOY, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -931,80 +933,78 @@ describe(commands.APP_DEPLOY, () => {
     });
   });
 
-  it('fails validation if neither the id nor the name are specified', () => {
-    const actual = command.validate({ options: {} });
+  it('fails validation if neither the id nor the name are specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both the id and the name are specified', () => {
-    const actual = command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', name: 'solution.sppkg' } });
+  it('fails validation if both the id and the name are specified', async () => {
+    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', name: 'solution.sppkg' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the id is not a valid GUID', () => {
-    const actual = command.validate({ options: { id: 'invalid' } });
+  it('fails validation if the id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the appCatalogUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'foo' } });
+  it('fails validation if the appCatalogUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the scope is specified invalid option', () => {
-    const actual = command.validate({ options: { name: 'solution', scope: 'foo' } });
+  it('fails validation when the scope is specified invalid option', async () => {
+    const actual = await command.validate({ options: { name: 'solution', scope: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', () => {
-
-    const actual = command.validate({ options: { name: 'solution', filePath: 'abc', scope: 'sitecollection' } });
+  it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', async () => {
+    const actual = await command.validate({ options: { name: 'solution', scope: 'sitecollection' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('should pass when \'tenant\' scope and also appCatalogUrl specified', () => {
-    const actual = command.validate({ options: { name: 'solution', filePath: 'abc', scope: 'tenant', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+  it('should pass when \'tenant\' scope and also appCatalogUrl specified', async () => {
+    const actual = await command.validate({ options: { name: 'solution', scope: 'tenant', appCatalogUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('should fail when \'sitecollection\' scope, but  bad appCatalogUrl format specified', () => {
-
-    const actual = command.validate({ options: { name: 'solution', filePath: 'abc', scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } });
+  it('should fail when \'sitecollection\' scope, but  bad appCatalogUrl format specified', async () => {
+    const actual = await command.validate({ options: { name: 'solution', scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the id is specified and the appCatalogUrl is not', () => {
-    const actual = command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+  it('passes validation when the id is specified and the appCatalogUrl is not', async () => {
+    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the id and appCatalogUrl options are specified', () => {
-    const actual = command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'tenant' } });
+  it('passes validation when the id and appCatalogUrl options are specified', async () => {
+    const actual = await command.validate({ options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'tenant' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the name is specified and the appCatalogUrl is not', () => {
-    const actual = command.validate({ options: { name: 'solution.sppkg' } });
+  it('passes validation when the name is specified and the appCatalogUrl is not', async () => {
+    const actual = await command.validate({ options: { name: 'solution.sppkg' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the name and appCatalogUrl options are specified', () => {
-    const actual = command.validate({ options: { name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'tenant' } });
+  it('passes validation when the name and appCatalogUrl options are specified', async () => {
+    const actual = await command.validate({ options: { name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'tenant' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the name is specified without the extension', () => {
-    const actual = command.validate({ options: { name: 'solution' } });
+  it('passes validation when the name is specified without the extension', async () => {
+    const actual = await command.validate({ options: { name: 'solution' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the scope is specified with \'sitecollection\'', () => {
-    const actual = command.validate({ options: { name: 'solution', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+  it('passes validation when the scope is specified with \'sitecollection\'', async () => {
+    const actual = await command.validate({ options: { name: 'solution', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

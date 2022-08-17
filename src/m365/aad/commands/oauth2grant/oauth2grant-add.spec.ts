@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,12 +13,14 @@ describe(commands.OAUTH2GRANT_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -141,23 +143,23 @@ describe(commands.OAUTH2GRANT_ADD, () => {
     });
   });
 
-  it('fails validation if the clientId is not a valid GUID', () => {
-    const actual = command.validate({ options: { clientId: '123' } });
+  it('fails validation if the clientId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { clientId: '123', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the resourceId is not a valid GUID', () => {
-    const actual = command.validate({ options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '123' } });
+  it('fails validation if the resourceId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '123', scope: 'user_impersonation' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when clientId, resourceId and scope are specified', () => {
-    const actual = command.validate({ options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } });
+  it('passes validation when clientId, resourceId and scope are specified', async () => {
+    const actual = await command.validate({ options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -168,7 +170,7 @@ describe(commands.OAUTH2GRANT_ADD, () => {
   });
 
   it('supports specifying clientId', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--clientId') > -1) {
@@ -179,7 +181,7 @@ describe(commands.OAUTH2GRANT_ADD, () => {
   });
 
   it('supports specifying resourceId', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--resourceId') > -1) {
@@ -190,7 +192,7 @@ describe(commands.OAUTH2GRANT_ADD, () => {
   });
 
   it('supports specifying scope', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--scope') > -1) {

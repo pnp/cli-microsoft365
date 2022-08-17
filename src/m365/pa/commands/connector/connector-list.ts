@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
@@ -34,6 +31,20 @@ class PaConnectorListCommand extends PowerAppsCommand {
     return ['name', 'displayName'];
   }
 
+  constructor() {
+    super();
+  
+    this.#initOptions();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-e, --environment <environment>'
+      }
+    );
+  }
+  
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const url = `${this.resource}/providers/Microsoft.PowerApps/apis?api-version=2016-11-01&$filter=environment%20eq%20%27${encodeURIComponent(args.options.environment)}%27%20and%20IsCustomApi%20eq%20%27True%27`;
 
@@ -55,17 +66,6 @@ class PaConnectorListCommand extends PowerAppsCommand {
 
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-e, --environment <environment>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

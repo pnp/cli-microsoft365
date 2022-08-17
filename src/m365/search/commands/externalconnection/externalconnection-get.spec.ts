@@ -76,7 +76,7 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   });
   
   it('defines correct option sets', () => {
-    const optionSets = command.optionSets();
+    const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [['id', 'name']]);
   });
   
@@ -189,7 +189,7 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

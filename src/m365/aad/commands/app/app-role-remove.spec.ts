@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,12 +12,14 @@ const command: Command = require('./app-role-remove');
 describe(commands.APP_ROLE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -2160,98 +2162,98 @@ describe(commands.APP_ROLE_REMOVE, () => {
     });
   });
 
-  it('fails validation if appId and appObjectId specified', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appObjectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8' } });
+  it('fails validation if appId and appObjectId specified', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appObjectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if appId and appName specified', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app' } });
+  it('fails validation if appId and appName specified', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if appObjectId and appName specified', () => {
-    const actual = command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app' } });
+  it('fails validation if appObjectId and appName specified', async () => {
+    const actual = await command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if neither appId, appObjectId nor appName specified', () => {
-    const actual = command.validate({ options: {} });
+  it('fails validation if neither appId, appObjectId nor appName specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if role name and id is specified', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: "Product read", id: "c4352a0a-494f-46f9-b843-479855c173a7" } });
+  it('fails validation if role name and id is specified', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: "Product read", id: "c4352a0a-494f-46f9-b843-479855c173a7" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation role name and claim is specified', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: "Product read", claim: "Product.Read" } });
+  it('fails validation role name and claim is specified', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: "Product read", claim: "Product.Read" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if role id and claim is specified', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', claim: "Product.Read", id: "c4352a0a-494f-46f9-b843-479855c173a7" } });
+  it('fails validation if role id and claim is specified', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', claim: "Product.Read", id: "c4352a0a-494f-46f9-b843-479855c173a7" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if neither role name, id or claim specified', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } });
+  it('fails validation if neither role name, id or claim specified', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if specified role id is not a valid guid', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', id: '77355bee' } });
+  it('fails validation if specified role id is not a valid guid', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', id: '77355bee' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if required options specified - appId,name', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'ProductRead' } });
+  it('passes validation if required options specified - appId,name', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'ProductRead' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if required options specified - appId,claim', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', claim: 'Product.Read' } });
+  it('passes validation if required options specified - appId,claim', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', claim: 'Product.Read' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if required options specified - appId,id', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', id: '4e241a08-3a95-4c47-8c68-8c0df7d62ce2' } });
+  it('passes validation if required options specified - appId,id', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', id: '4e241a08-3a95-4c47-8c68-8c0df7d62ce2' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if required options specified - appObjectId,name', () => {
-    const actual = command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'ProductRead' } });
+  it('passes validation if required options specified - appObjectId,name', async () => {
+    const actual = await command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'ProductRead' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if required options specified - appObjectId,claim', () => {
-    const actual = command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', claim: 'Product.Read' } });
+  it('passes validation if required options specified - appObjectId,claim', async () => {
+    const actual = await command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', claim: 'Product.Read' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if required options specified - appObjectId,id', () => {
-    const actual = command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', id: '4e241a08-3a95-4c47-8c68-8c0df7d62ce2' } });
+  it('passes validation if required options specified - appObjectId,id', async () => {
+    const actual = await command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', id: '4e241a08-3a95-4c47-8c68-8c0df7d62ce2' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if required options specified - appName,name', () => {
-    const actual = command.validate({ options: { appName: 'My App', name: 'ProductRead' } });
+  it('passes validation if required options specified - appName,name', async () => {
+    const actual = await command.validate({ options: { appName: 'My App', name: 'ProductRead' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if required options specified - appName,claim', () => {
-    const actual = command.validate({ options: { appName: 'My App', claim: 'Product.Read' } });
+  it('passes validation if required options specified - appName,claim', async () => {
+    const actual = await command.validate({ options: { appName: 'My App', claim: 'Product.Read' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if required options specified - appName,id', () => {
-    const actual = command.validate({ options: { appName: 'My App', id: '4e241a08-3a95-4c47-8c68-8c0df7d62ce2' } });
+  it('passes validation if required options specified - appName,id', async () => {
+    const actual = await command.validate({ options: { appName: 'My App', id: '4e241a08-3a95-4c47-8c68-8c0df7d62ce2' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

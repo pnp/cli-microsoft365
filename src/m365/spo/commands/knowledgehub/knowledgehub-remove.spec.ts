@@ -247,7 +247,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -258,7 +258,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('supports suppressing confirmation prompt', () => {
-    const options = command.options();
+    const options = command.options;
     let containsConfirmOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--confirm') > -1) {
@@ -266,12 +266,5 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
       }
     });
     assert(containsConfirmOption);
-  });
-
-  it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = command.options();
-    sinonUtil.restore(Command.prototype.options);
-    assert(options.length > 0);
   });
 });

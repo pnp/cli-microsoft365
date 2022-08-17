@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,6 +12,7 @@ const command: Command = require('./report-pstncalls');
 describe(commands.REPORT_PSTNCALLS, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   const jsonOutput = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.callRecords.pstnCallLogRow)",
@@ -46,6 +47,7 @@ describe(commands.REPORT_PSTNCALLS, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -90,54 +92,54 @@ describe(commands.REPORT_PSTNCALLS, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'calleeNumber', 'callerNumber', 'startDateTime']);
   });
 
-  it('fails validation on invalid fromDateTime', () => {
-    const actual = command.validate({
+  it('fails validation on invalid fromDateTime', async () => {
+    const actual = await command.validate({
       options: {
         fromDateTime: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation on invalid toDateTime', () => {
-    const actual = command.validate({
+  it('fails validation on invalid toDateTime', async () => {
+    const actual = await command.validate({
       options: {
         fromDateTime: '2020-12-01',
         toDateTime: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation on number of days between fromDateTime and toDateTme exceeding 90', () => {
-    const actual = command.validate({
+  it('fails validation on number of days between fromDateTime and toDateTme exceeding 90', async () => {
+    const actual = await command.validate({
       options: {
         fromDateTime: '2020-08-01',
         toDateTime: '2020-12-01'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation on valid fromDateTime', () => {
+  it('passes validation on valid fromDateTime', async () => {
     const validfromDateTime: any = new Date();
     //fromDateTime should be less than 90 days ago for passing validation
     validfromDateTime.setDate(validfromDateTime.getDate() - 70);
-    const actual = command.validate({
+    const actual = await command.validate({
       options: {
         fromDateTime: validfromDateTime.toISOString().substr(0, 10)
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation on valid fromDateTime and toDateTime', () => {
-    const actual = command.validate({
+  it('passes validation on valid fromDateTime and toDateTime', async () => {
+    const actual = await command.validate({
       options: {
         fromDateTime: '2020-11-01',
         toDateTime: '2020-12-01'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -205,7 +207,7 @@ describe(commands.REPORT_PSTNCALLS, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach((o: any) => {
       if (o.option === '--debug') {

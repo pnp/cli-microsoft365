@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -12,11 +9,11 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  id:string;  
+  id: string;
   listName?: string;
   listId?: string;
   title?: string;
-  status?: string; 
+  status?: string;
 }
 
 class TodoTaskSetCommand extends GraphCommand {
@@ -28,13 +25,69 @@ class TodoTaskSetCommand extends GraphCommand {
     return 'Update a task in a Microsoft To Do task list';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listId = typeof args.options.listId !== 'undefined';
-    telemetryProps.listName = typeof args.options.listName !== 'undefined';
-    telemetryProps.status = typeof args.options.status !== 'undefined';
-    telemetryProps.title = typeof args.options.title !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listId: typeof args.options.listId !== 'undefined',
+        listName: typeof args.options.listName !== 'undefined',
+        status: typeof args.options.status !== 'undefined',
+        title: typeof args.options.title !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '-t, --title [title]'
+      },
+      {
+        option: '-s, --status [status]',
+        autocomplete: ['notStarted', 'inProgress', 'completed', 'waitingOnOthers', 'deferred']
+      },
+      {
+        option: '--listName [listName]'
+      },
+      {
+        option: '--listId [listId]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.listId && args.options.listName) {
+          return 'Specify listId or listName but not both';
+        }
+
+        if (!args.options.listId && !args.options.listName) {
+          return 'Specify listId or listName';
+        }
+
+        if (args.options.status &&
+          args.options.status !== 'notStarted' &&
+          args.options.status !== 'inProgress' &&
+          args.options.status !== 'completed' &&
+          args.options.status !== 'waitingOnOthers' &&
+          args.options.status !== 'deferred') {
+          return `${args.options.status} is not a valid value. Allowed values are notStarted|inProgress|completed|waitingOnOthers|deferred`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -86,53 +139,6 @@ class TodoTaskSetCommand extends GraphCommand {
       });
   }
 
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-s, --status [status]',
-        autocomplete: ['notStarted', 'inProgress', 'completed', 'waitingOnOthers', 'deferred']
-      },
-      {
-        option: '--listName [listName]'
-      },
-      {
-        option: '--listId [listId]'
-      }    
-      
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.id) {
-      return 'Specify the id of the task to update';
-    }
-    if (args.options.listId && args.options.listName) {
-      return 'Specify listId or listName but not both';
-    }
-    if (!args.options.listId && !args.options.listName) {
-      return 'Specify listId or listName';
-    }
-    
-    if (args.options.status &&
-      args.options.status !== 'notStarted' &&
-      args.options.status !== 'inProgress' &&
-      args.options.status !== 'completed' &&
-      args.options.status !== 'waitingOnOthers' &&
-      args.options.status !== 'deferred') {
-      return `${args.options.status} is not a valid value. Allowed values are notStarted|inProgress|completed|waitingOnOthers|deferred`;
-    }
-
-    return true;
-  }
   private mapRequestBody(options: Options): any {
     const requestBody: any = {};
 

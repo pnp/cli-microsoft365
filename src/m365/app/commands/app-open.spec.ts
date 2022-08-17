@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import * as fs from 'fs';
 import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
-import { Cli, Logger } from '../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../cli';
 import Command, { CommandError } from '../../../Command';
 import { sinonUtil } from '../../../utils';
 import * as open from 'open';
@@ -17,6 +17,7 @@ describe(commands.OPEN, () => {
   let openStub: sinon.SinonStub;
   let getSettingWithDefaultValueStub: sinon.SinonStub;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -31,6 +32,7 @@ describe(commands.OPEN, () => {
         }
       ]
     }));
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -76,64 +78,18 @@ describe(commands.OPEN, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the appId is not a valid guid', () => {
-    const actual = command.validate({ options: { appId: 'abc' } });
+  it('fails validation if the appId is not a valid guid', async () => {
+    const actual = await command.validate({ options: { appId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if valid appId-guid is specified', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } });
+  it('passes validation if valid appId-guid is specified', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  // it('handles error when the app specified with the appId not found', (done) => {
-  //   sinonUtil.restore([ request.get ]);
-  //   sinon.stub(request, 'get').callsFake(opts => {
-  //     if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
-  //       return Promise.resolve({ value: [] });
-  //     }
-
-  //     return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
-  //   });
-
-  //   command.action(logger, {
-  //     options: {
-  //       debug: false,
-  //       appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
-  //     }
-  //   }, (err?: any) => {
-  //     try {
-  //       assert.strictEqual(err.message, `No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`);
-  //       done();
-  //     }
-  //     catch (e) {
-  //       done(e);
-  //     }
-  //   });
-  // });
-
-  // it('handles error when retrieving information about app through appId failed', (done) => {
-  //   sinonUtil.restore([ request.get ]);
-  //   sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
-
-  //   command.action(logger, {
-  //     options: {
-  //       debug: false,
-  //       appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
-  //     }
-  //   }, (err?: any) => {
-  //     try {
-  //       assert.strictEqual(err.message, `An error has occurred`);
-  //       done();
-  //     }
-  //     catch (e) {
-  //       done(e);
-  //     }
-  //   });
-  // });
-
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

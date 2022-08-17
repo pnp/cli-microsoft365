@@ -684,7 +684,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
   });
 
   it('supports specifying displayName', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--displayName') > -1) {
@@ -695,7 +695,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_LIST, () => {
   });
 
   it('supports specifying mailNickname', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--mailNickname') > -1) {

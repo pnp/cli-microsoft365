@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.USER_SIGNIN_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   const jsonOutput = {
     "value": [
@@ -145,6 +146,7 @@ describe(commands.USER_SIGNIN_LIST, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -345,32 +347,32 @@ describe(commands.USER_SIGNIN_LIST, () => {
       }
     });
   });
-  it('fails validation if userId and userName specified', () => {
-    const actual = command.validate({ options: { userId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064', userName: 'Graph explorer' } });
+  it('fails validation if userId and userName specified', async () => {
+    const actual = await command.validate({ options: { userId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064', userName: 'Graph explorer' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('fails validation if the userId is not a valid GUID', () => {
-    const actual = command.validate({ options: { userId: 'not-c49b-4fd4-8223-28f0ac3a6402' } });
+  it('fails validation if the userId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { userId: 'not-c49b-4fd4-8223-28f0ac3a6402' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('passes validation if the userId is a valid GUID', () => {
-    const actual = command.validate({ options: { userId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } });
+  it('passes validation if the userId is a valid GUID', async () => {
+    const actual = await command.validate({ options: { userId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
-  it('fails validation if appId and appDisplayName specified', () => {
-    const actual = command.validate({ options: { appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064', appDisplayName: 'Graph explorer' } });
+  it('fails validation if appId and appDisplayName specified', async () => {
+    const actual = await command.validate({ options: { appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064', appDisplayName: 'Graph explorer' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('fails validation if the appId is not a valid GUID', () => {
-    const actual = command.validate({ options: { appId: 'not-c49b-4fd4-8223-28f0ac3a6402' } });
+  it('fails validation if the appId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { appId: 'not-c49b-4fd4-8223-28f0ac3a6402' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-  it('passes validation if the appId is a valid GUID', () => {
-    const actual = command.validate({ options: { appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } });
+  it('passes validation if the appId is a valid GUID', async () => {
+    const actual = await command.validate({ options: { appId: 'de8bc8b5-d9f9-48b1-a8ad-b748da725064' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

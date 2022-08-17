@@ -2,8 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -12,11 +12,13 @@ const command: Command = require('./page-section-add');
 describe(commands.PAGE_SECTION_ADD, () => {
   let log: string[];
   let logger: Logger;
-  
+  let commandInfo: CommandInfo;
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -572,79 +574,79 @@ describe(commands.PAGE_SECTION_ADD, () => {
     });
   });
 
-  it('fails validation if order has invalid (negative) value', () => {
-    const actual = command.validate({
+  it('fails validation if order has invalid (negative) value', async () => {
+    const actual = await command.validate({
       options: {
         name: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         order: -1,
         sectionTemplate: 'OneColumn'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if order has invalid (non number) value', () => {
-    const actual = command.validate({
+  it('fails validation if order has invalid (non number) value', async () => {
+    const actual = await command.validate({
       options: {
         name: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         order: 'abc',
         sectionTemplate: 'OneColumn'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if sectionTemplate is not valid', () => {
-    const actual = command.validate({
+  it('fails validation if sectionTemplate is not valid', async () => {
+    const actual = await command.validate({
       options: {
         name: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
         order: 'abc',
         sectionTemplate: 'OneColumnInvalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if webUrl is not valid', () => {
-    const actual = command.validate({
+  it('fails validation if webUrl is not valid', async () => {
+    const actual = await command.validate({
       options: {
         name: 'page.aspx',
         order: 1,
         sectionTemplate: 'OneColumn',
         webUrl: 'http://notasharepointurl'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if all the parameters are specified', () => {
-    const actual = command.validate({
+  it('passes validation if all the parameters are specified', async () => {
+    const actual = await command.validate({
       options: {
         order: 1,
         sectionTemplate: 'OneColumn',
         webUrl: 'https://contoso.sharepoint.com',
         name: 'Home.aspx'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if order is not specified', () => {
-    const actual = command.validate({
+  it('passes validation if order is not specified', async () => {
+    const actual = await command.validate({
       options: {
         sectionTemplate: 'OneColumn',
         webUrl: 'https://contoso.sharepoint.com',
         name: 'Home.aspx'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports specifying page name', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--name') > -1) {
@@ -655,7 +657,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
   });
 
   it('supports specifying webUrl', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--webUrl') > -1) {
@@ -666,7 +668,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
   });
 
   it('supports specifying sectionTemplate', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--sectionTemplate') > -1) {
@@ -677,7 +679,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
   });
 
   it('supports specifying order', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option.indexOf('--order') > -1) {

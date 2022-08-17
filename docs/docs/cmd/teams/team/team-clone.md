@@ -10,11 +10,17 @@ m365 teams team clone [options]
 
 ## Options
 
-`-i, --teamId <teamId>`
+`-i, --id [id]`
 : The ID of the Microsoft Teams team to clone
 
-`-n, --displayName <displayName>`
-: The display name for the new Microsoft Teams Team
+`--teamId [teamId]`
+: (deprecated. Use `id` instead) The ID of the Microsoft Teams team to clone
+
+`-n, --name [name]`
+: The display name for the new Microsoft Teams Team to clone
+
+`--displayName [displayName]`
+: (deprecated. Use `name` instead) The display name for the new Microsoft Teams Team to clone
 
 `-p, --partsToClone <partsToClone>`
 : A comma-separated list of the parts to clone. Allowed values are `apps,channels,members,settings,tabs`
@@ -41,11 +47,11 @@ When tabs are cloned, they are put into an unconfigured state. The first time yo
 Creates a clone of a Microsoft Teams team with mandatory parameters
 
 ```sh
-m365 teams team clone --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members"
+m365 teams team clone --id 15d7a78e-fd77-4599-97a5-dbb6372846c5 --name "Library Assist" --partsToClone "apps,tabs,settings,channels,members"
 ```
 
 Creates a clone of a Microsoft Teams team with mandatory and optional parameters
 
 ```sh
-m365 teams team clone --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public"
+m365 teams team clone --id 15d7a78e-fd77-4599-97a5-dbb6372846c5 --name "Library Assist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public"
 ```

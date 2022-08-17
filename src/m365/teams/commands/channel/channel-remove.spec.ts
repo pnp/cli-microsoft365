@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.CHANNEL_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -64,75 +66,63 @@ describe(commands.CHANNEL_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation when valid channelId & teamId is specified', () => {
-    const actual = command.validate({
+  it('passes validation when valid channelId & teamId is specified', async () => {
+    const actual = await command.validate({
       options: {
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when channelName & teamId is specified', () => {
-    const actual = command.validate({
+  it('passes validation when channelName & teamId is specified', async () => {
+    const actual = await command.validate({
       options: {
         channelName: 'Channel Name',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the teamId & channelId are not provided', (done) => {
-    const actual = command.validate({
+  it('fails validation if the channelId and channelName are not provided', async () => {
+    const actual = await command.validate({
       options: {
-
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if the teamId & channelName are not provided', (done) => {
-    const actual = command.validate({
-      options: {
-
-      }
-    });
-    assert.notStrictEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if the channelId is not valid channelId', (done) => {
-    const actual = command.validate({
+  it('fails validation if the channelId is not valid channelId', async () => {
+    const actual = await command.validate({
       options: {
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
         channelId: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if the teamId is not a valid guid', () => {
-    const actual = command.validate({
+  it('fails validation if the teamId is not a valid guid', async () => {
+    const actual = await command.validate({
       options: {
         teamId: 'invalid',
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both channelName and channelId are provided', () => {
-    const actual = command.validate({
+  it('fails validation if both channelName and channelId are provided', async () => {
+    const actual = await command.validate({
       options: {
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         channelName: 'channelname'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -333,7 +323,7 @@ describe(commands.CHANNEL_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

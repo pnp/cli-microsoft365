@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,6 +14,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   
   before(() => {
@@ -21,6 +22,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -1626,7 +1628,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -1636,143 +1638,143 @@ describe(commands.SITE_CLASSIC_ADD, () => {
     assert(containsdebugOption);
   });
 
-  it('fails validation if the url is not a valid url', () => {
-    const actual = command.validate({
+  it('fails validation if the url is not a valid url', async () => {
+    const actual = await command.validate({
       options: {
         url: 'abc', title: 'Team', timeZone: 4, owner: 'admin@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the url is not a valid SharePoint url', () => {
-    const actual = command.validate({
+  it('fails validation if the url is not a valid SharePoint url', async () => {
+    const actual = await command.validate({
       options: {
         url: 'http://contoso', title: 'Team', timeZone: 4, owner: 'admin@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the timeZone is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the timeZone is not a number', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owner: 'admin@contoso.com', timeZone: 'a'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the lcid is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the lcid is not a number', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owner: 'admin@contoso.com', timeZone: 4, lcid: 'a'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the resourceQuota is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the resourceQuota is not a number', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owner: 'admin@contoso.com', timeZone: 4, resourceQuota: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the resourceQuotaWarningLevel is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the resourceQuotaWarningLevel is not a number', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owner: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the resourceQuotaWarningLevel is specified without resourceQuota', () => {
-    const actual = command.validate({
+  it('fails validation if the resourceQuotaWarningLevel is specified without resourceQuota', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owner: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 10
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the resourceQuotaWarningLevel is greater than resourceQuota', () => {
-    const actual = command.validate({
+  it('fails validation if the resourceQuotaWarningLevel is greater than resourceQuota', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owner: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 10, resourceQuota: 5
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the storageQuota is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the storageQuota is not a number', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owner: 'admin@contoso.com', timeZone: 4, storageQuota: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the storageQuotaWarningLevel is not a number', () => {
-    const actual = command.validate({
+  it('fails validation if the storageQuotaWarningLevel is not a number', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owner: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 'abc'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the storageQuotaWarningLevel is specified without storageQuota', () => {
-    const actual = command.validate({
+  it('fails validation if the storageQuotaWarningLevel is specified without storageQuota', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owner: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the storageQuotaWarningLevel is greater than storageQuota', () => {
-    const actual = command.validate({
+  it('fails validation if the storageQuotaWarningLevel is greater than storageQuota', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owner: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10, storageQuota: 5
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the required options are correct', () => {
-    const actual = command.validate({
+  it('passes validation if the required options are correct', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owner: 'admin@contoso.com', timeZone: 4
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if all options are correct', () => {
-    const actual = command.validate({
+  it('passes validation if all options are correct', async () => {
+    const actual = await command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owner: 'admin@contoso.com', timeZone: 4,
         lcid: 1033, resourceQuota: 100, resourceQuotaWarningLevel: 90,
         storageQuota: 100, storageQuotaWarningLevel: 90
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

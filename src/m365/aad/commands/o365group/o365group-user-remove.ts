@@ -1,7 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -37,12 +34,63 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
     return [teamsCommands.USER_REMOVE];
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
-    telemetryProps.groupId = typeof args.options.groupId !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        confirm: (!(!args.options.confirm)).toString(),
+        teamId: typeof args.options.teamId !== 'undefined',
+        groupId: typeof args.options.groupId !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: "-i, --groupId [groupId]"
+      },
+      {
+        option: "--teamId [teamId]"
+      },
+      {
+        option: '-n, --userName <userName>'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.groupId && !args.options.teamId) {
+          return 'Please provide one of the following parameters: groupId or teamId';
+        }
+    
+        if (args.options.groupId && args.options.teamId) {
+          return 'You cannot provide both a groupId and teamId parameter, please provide only one';
+        }
+    
+        if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
+    
+        if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
+          return `${args.options.groupId} is not a valid GUID`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -82,7 +130,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
             throw err.response.data;
           }
         }
-        
+
         // try to delete the user from the members. Accepted error is 404
         try {
           await request.delete({
@@ -124,46 +172,6 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
         }
       });
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: "-i, --groupId [groupId]"
-      },
-      {
-        option: "--teamId [teamId]"
-      },
-      {
-        option: '-n, --userName <userName>'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.groupId && !args.options.teamId) {
-      return 'Please provide one of the following parameters: groupId or teamId';
-    }
-
-    if (args.options.groupId && args.options.teamId) {
-      return 'You cannot provide both a groupId and teamId parameter, please provide only one';
-    }
-
-    if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
-      return `${args.options.groupId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -38,12 +35,79 @@ class TeamsMessagingSettingsSetCommand extends GraphCommand {
     return 'Updates messaging settings of a Microsoft Teams team';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    TeamsMessagingSettingsSetCommand.props.forEach((p: string) => {
-      telemetryProps[p] = typeof (args.options as any)[p] !== 'undefined';
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      TeamsMessagingSettingsSetCommand.props.forEach((p: string) => {
+        this.telemetryProperties[p] = typeof (args.options as any)[p] !== 'undefined';
+      });
     });
-    return telemetryProps;
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --teamId <teamId>'
+      },
+      {
+        option: '--allowUserEditMessages [allowUserEditMessages]'
+      },
+      {
+        option: '--allowUserDeleteMessages [allowUserDeleteMessages]'
+      },
+      {
+        option: '--allowOwnerDeleteMessages [allowOwnerDeleteMessages]'
+      },
+      {
+        option: '--allowTeamMentions [allowTeamMentions]'
+      },
+      {
+        option: '--allowChannelMentions [allowChannelMentions]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.teamId)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
+
+        let hasDuplicate: boolean = false;
+        let property: string = '';
+        TeamsMessagingSettingsSetCommand.props.forEach((prop: string) => {
+          if ((args.options as any)[prop] instanceof Array) {
+            property = prop;
+            hasDuplicate = true;
+          }
+        });
+        if (hasDuplicate) {
+          return `Duplicate option ${property} specified. Specify only one`;
+        }
+
+        let isValid: boolean = true;
+        let value: string = '';
+        TeamsMessagingSettingsSetCommand.props.every((p: string) => {
+          property = p;
+          value = (args.options as any)[p];
+          isValid = typeof value === 'undefined' || validation.isValidBoolean(value);
+          return isValid;
+        });
+        if (!isValid) {
+          return `Value ${value} for option ${property} is not a valid boolean`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -68,64 +132,6 @@ class TeamsMessagingSettingsSetCommand extends GraphCommand {
     request
       .patch(requestOptions)
       .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --teamId <teamId>'
-      },
-      {
-        option: '--allowUserEditMessages [allowUserEditMessages]'
-      },
-      {
-        option: '--allowUserDeleteMessages [allowUserDeleteMessages]'
-      },
-      {
-        option: '--allowOwnerDeleteMessages [allowOwnerDeleteMessages]'
-      },
-      {
-        option: '--allowTeamMentions [allowTeamMentions]'
-      },
-      {
-        option: '--allowChannelMentions [allowChannelMentions]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.teamId)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    let hasDuplicate: boolean = false;
-    let property: string = '';
-    TeamsMessagingSettingsSetCommand.props.forEach((prop: string) => {
-      if ((args.options as any)[prop] instanceof Array) {
-        property = prop;
-        hasDuplicate = true;
-      }
-    });
-    if (hasDuplicate) {
-      return `Duplicate option ${property} specified. Specify only one`;
-    }
-
-    let isValid: boolean = true;
-    let value: string = '';
-    TeamsMessagingSettingsSetCommand.props.every((p: string) => {
-      property = p;
-      value = (args.options as any)[p];
-      isValid = typeof value === 'undefined' || validation.isValidBoolean(value);
-      return isValid;
-    });
-    if (!isValid) {
-      return `Value ${value} for option ${property} is not a valid boolean`;
-    }
-
-    return true;
   }
 }
 

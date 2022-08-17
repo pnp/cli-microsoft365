@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -30,13 +27,71 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
     return 'Updates a Microsoft Graph schema extension';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.description = typeof args.options.description !== 'undefined';
-    telemetryProps.properties = typeof args.options.properties !== 'undefined';
-    telemetryProps.targetTypes = typeof args.options.targetTypes !== 'undefined';
-    telemetryProps.status = args.options.status;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        description: typeof args.options.description !== 'undefined',
+        properties: typeof args.options.properties !== 'undefined',
+        targetTypes: typeof args.options.targetTypes !== 'undefined',
+        status: args.options.status
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '--owner <owner>'
+      },
+      {
+        option: '-d, --description [description]'
+      },
+      {
+        option: '-s, --status [status]'
+      },
+      {
+        option: '-t, --targetTypes [targetTypes]'
+      },
+      {
+        option: '-p, --properties [properties]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.owner)) {
+          return `The specified owner '${args.options.owner}' is not a valid App Id`;
+        }
+    
+        if (!args.options.status && !args.options.properties && !args.options.targetTypes && !args.options.description) {
+          return `No updates were specified. Please specify at least one argument among --status, --targetTypes, --description or --properties`;
+        }
+    
+        const validStatusValues = ['Available', 'Deprecated'];
+        if (args.options.status && validStatusValues.indexOf(args.options.status) < 0) {
+          return `Status option is invalid. Valid statuses are: Available or Deprecated`;
+        }
+    
+        if (args.options.properties) {
+          return this.validateProperties(args.options.properties);
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -112,53 +167,6 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
 
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '--owner <owner>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '-s, --status [status]'
-      },
-      {
-        option: '-t, --targetTypes [targetTypes]'
-      },
-      {
-        option: '-p, --properties [properties]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.owner)) {
-      return `The specified owner '${args.options.owner}' is not a valid App Id`;
-    }
-
-    if (!args.options.status && !args.options.properties && !args.options.targetTypes && !args.options.description) {
-      return `No updates were specified. Please specify at least one argument among --status, --targetTypes, --description or --properties`;
-    }
-
-    const validStatusValues = ['Available', 'Deprecated'];
-    if (args.options.status && validStatusValues.indexOf(args.options.status) < 0) {
-      return `Status option is invalid. Valid statuses are: Available or Deprecated`;
-    }
-
-    if (args.options.properties) {
-      return this.validateProperties(args.options.properties);
-    }
-
-    return true;
   }
 
   private validateProperties(propertiesString: string): boolean | string {

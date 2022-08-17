@@ -1,9 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../cli';
-import {
-  CommandOption
-} from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
 import { validation } from '../../../utils';
@@ -34,15 +31,94 @@ class FlowExportCommand extends AzmgmtCommand {
     return 'Exports the specified Microsoft Flow as a file';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.packageDisplayName = typeof args.options.packageDisplayName !== 'undefined';
-    telemetryProps.packageDescription = typeof args.options.packageDescription !== 'undefined';
-    telemetryProps.packageCreatedBy = typeof args.options.packageCreatedBy !== 'undefined';
-    telemetryProps.packageSourceEnvironment = typeof args.options.packageSourceEnvironment !== 'undefined';
-    telemetryProps.format = args.options.format;
-    telemetryProps.path = typeof args.options.path !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        packageDisplayName: typeof args.options.packageDisplayName !== 'undefined',
+        packageDescription: typeof args.options.packageDescription !== 'undefined',
+        packageCreatedBy: typeof args.options.packageCreatedBy !== 'undefined',
+        packageSourceEnvironment: typeof args.options.packageSourceEnvironment !== 'undefined',
+        format: args.options.format,
+        path: typeof args.options.path !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '-e, --environment <environment>'
+      },
+      {
+        option: '-n, --packageDisplayName [packageDisplayName]'
+      },
+      {
+        option: '-d, --packageDescription [packageDescription]'
+      },
+      {
+        option: '-c, --packageCreatedBy [packageCreatedBy]'
+      },
+      {
+        option: '-s, --packageSourceEnvironment [packageSourceEnvironment]'
+      },
+      {
+        option: '-f, --format [format]'
+      },
+      {
+        option: '-p, --path [path]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const lowerCaseFormat = args.options.format ? args.options.format.toLowerCase() : '';
+
+        if (!validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+    
+        if (args.options.format && (lowerCaseFormat !== 'json' && lowerCaseFormat !== 'zip')) {
+          return 'Option format must be json or zip. Default is zip';
+        }
+    
+        if (lowerCaseFormat === 'json') {
+          if (args.options.packageCreatedBy) {
+            return 'packageCreatedBy cannot be specified with output of json';
+          }
+    
+          if (args.options.packageDescription) {
+            return 'packageDescription cannot be specified with output of json';
+          }
+    
+          if (args.options.packageDisplayName) {
+            return 'packageDisplayName cannot be specified with output of json';
+          }
+    
+          if (args.options.packageSourceEnvironment) {
+            return 'packageSourceEnvironment cannot be specified with output of json';
+          }
+        }
+    
+        if (args.options.path && !fs.existsSync(path.dirname(args.options.path))) {
+          return 'Specified path where to save the file does not exist';
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -172,74 +248,6 @@ class FlowExportCommand extends AzmgmtCommand {
 
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-e, --environment <environment>'
-      },
-      {
-        option: '-n, --packageDisplayName [packageDisplayName]'
-      },
-      {
-        option: '-d, --packageDescription [packageDescription]'
-      },
-      {
-        option: '-c, --packageCreatedBy [packageCreatedBy]'
-      },
-      {
-        option: '-s, --packageSourceEnvironment [packageSourceEnvironment]'
-      },
-      {
-        option: '-f, --format [format]'
-      },
-      {
-        option: '-p, --path [path]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const lowerCaseFormat = args.options.format ? args.options.format.toLowerCase() : '';
-
-    if (!validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    if (args.options.format && (lowerCaseFormat !== 'json' && lowerCaseFormat !== 'zip')) {
-      return 'Option format must be json or zip. Default is zip';
-    }
-
-    if (lowerCaseFormat === 'json') {
-      if (args.options.packageCreatedBy) {
-        return 'packageCreatedBy cannot be specified with output of json';
-      }
-
-      if (args.options.packageDescription) {
-        return 'packageDescription cannot be specified with output of json';
-      }
-
-      if (args.options.packageDisplayName) {
-        return 'packageDisplayName cannot be specified with output of json';
-      }
-
-      if (args.options.packageSourceEnvironment) {
-        return 'packageSourceEnvironment cannot be specified with output of json';
-      }
-    }
-
-    if (args.options.path && !fs.existsSync(path.dirname(args.options.path))) {
-      return 'Specified path where to save the file does not exist';
-    }
-
-    return true;
   }
 }
 

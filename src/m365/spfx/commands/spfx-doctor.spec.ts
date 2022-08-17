@@ -3,8 +3,8 @@ import * as child_process from 'child_process';
 import * as sinon from 'sinon';
 import { SinonSandbox } from 'sinon';
 import appInsights from '../../../appInsights';
-import { Logger } from '../../../cli';
-import Command, { CommandError, CommandTypes } from '../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../cli';
+import Command, { CommandError } from '../../../Command';
 import { sinonUtil } from '../../../utils';
 import commands from '../commands';
 const command: Command = require('./spfx-doctor');
@@ -14,6 +14,8 @@ describe(commands.DOCTOR, () => {
   let sandbox: SinonSandbox;
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+  
   const packageVersionResponse = (name: string, version: string): string => {
     return `{
       "dependencies": {
@@ -29,6 +31,7 @@ describe(commands.DOCTOR, () => {
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -614,15 +617,14 @@ describe(commands.DOCTOR, () => {
     });
   });
 
-  it('fails validation if output does not equal text.', (done) => {
-    const actual = command.validate({
+  it('fails validation if output does not equal text.', async () => {
+    const actual = await command.validate({
       options: {
         output: 'json'
       }
-    });
+    }, commandInfo);
 
     assert.notStrictEqual(actual, true);
-    done();
   });
 
   it('fails SP2019 compatibility check for SPFx v1.5.0', (done) => {
@@ -1057,7 +1059,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('supports specifying environment', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '-e, --env [env]') {
@@ -1068,39 +1070,39 @@ describe(commands.DOCTOR, () => {
   });
 
   it('configures command types', () => {
-    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
+    assert.notStrictEqual(typeof command.types, 'undefined', 'command types undefined');
+    assert.notStrictEqual(command.types.string, 'undefined', 'command string types undefined');
   });
 
   it('configures env as string option', () => {
-    const types = (command.types() as CommandTypes);
+    const types = command.types;
     ['e', 'env'].forEach(o => {
       assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
     });
   });
 
-  it('passes validation when no options specified', () => {
-    const actual = command.validate({ options: {} });
+  it('passes validation when no options specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when sp2016 env specified', () => {
-    const actual = command.validate({ options: { env: 'sp2016' } });
+  it('passes validation when sp2016 env specified', async () => {
+    const actual = await command.validate({ options: { env: 'sp2016' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when sp2019 env specified', () => {
-    const actual = command.validate({ options: { env: 'sp2019' } });
+  it('passes validation when sp2019 env specified', async () => {
+    const actual = await command.validate({ options: { env: 'sp2019' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when spo env specified', () => {
-    const actual = command.validate({ options: { env: 'spo' } });
+  it('passes validation when spo env specified', async () => {
+    const actual = await command.validate({ options: { env: 'spo' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when 2016 env specified', () => {
-    const actual = command.validate({ options: { env: '2016' } });
+  it('fails validation when 2016 env specified', async () => {
+    const actual = await command.validate({ options: { env: '2016' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

@@ -1,8 +1,5 @@
 import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -29,12 +26,62 @@ class AadUserGetCommand extends GraphCommand {
     return 'Gets information about the specified user';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.userName = typeof args.options.userName !== 'undefined';
-    telemetryProps.properties = args.options.properties;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        userName: typeof args.options.userName !== 'undefined',
+        properties: args.options.properties
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --userName [userName]'
+      },
+      {
+        option: '--email [email]'
+      },
+      {
+        option: '-p, --properties [properties]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.id && !args.options.userName && !args.options.email) {
+          return 'Specify id, userName or email, one is required';
+        }
+
+        if ((args.options.id && args.options.email) ||
+          (args.options.id && args.options.userName) ||
+          (args.options.userName && args.options.email)) {
+          return 'Use either id, userName or email, but not all';
+        }
+
+        if (args.options.id &&
+          !validation.isValidGuid(args.options.id)) {
+          return `${args.options.id} is not a valid GUID`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -83,45 +130,6 @@ class AadUserGetCommand extends GraphCommand {
         logger.log(res);
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --userName [userName]'
-      },
-      {
-        option: '--email [email]'
-      },
-      {
-        option: '-p, --properties [properties]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.id && !args.options.userName && !args.options.email) {
-      return 'Specify id, userName or email, one is required';
-    }
-
-    if ((args.options.id && args.options.email) ||
-      (args.options.id && args.options.userName) ||
-      (args.options.userName && args.options.email)) {
-      return 'Use either id, userName or email, but not all';
-    }
-
-    if (args.options.id &&
-      !validation.isValidGuid(args.options.id)) {
-      return `${args.options.id} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

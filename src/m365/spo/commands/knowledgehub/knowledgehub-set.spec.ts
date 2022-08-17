@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -13,6 +13,7 @@ const command: Command = require('./knowledgehub-set');
 describe(commands.KNOWLEDGEHUB_SET, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let requests: any[];
 
   before(() => {
@@ -41,6 +42,7 @@ describe(commands.KNOWLEDGEHUB_SET, () => {
 
       return Promise.reject('Invalid request');
     });
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -165,18 +167,18 @@ describe(commands.KNOWLEDGEHUB_SET, () => {
     });
   });
 
-  it('passes validation when the url is a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/knowledgesite' } });
+  it('passes validation when the url is a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/knowledgesite' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the specified site URL is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { url: 'site.com' } });
+  it('fails validation if the specified site URL is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { url: 'site.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -184,12 +186,5 @@ describe(commands.KNOWLEDGEHUB_SET, () => {
       }
     });
     assert(containsdebugOption);
-  });
-
-  it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = command.options();
-    sinonUtil.restore(Command.prototype.options);
-    assert(options.length > 0);
   });
 });

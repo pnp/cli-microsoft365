@@ -53,6 +53,7 @@ export default {
   FILE_LIST: `${prefix} file list`,
   FILE_MOVE: `${prefix} file move`,
   FILE_REMOVE: `${prefix} file remove`,
+  FILE_RENAME: `${prefix} file rename`,
   FILE_SHARINGINFO_GET: `${prefix} file sharinginfo get`,
   FOLDER_ADD: `${prefix} folder add`,
   FOLDER_COPY: `${prefix} folder copy`,
@@ -99,6 +100,8 @@ export default {
   LIST_LABEL_SET: `${prefix} list label set`,
   LIST_LIST: `${prefix} list list`,
   LIST_REMOVE: `${prefix} list remove`,
+  LIST_ROLEASSIGNMENT_REMOVE: `${prefix} list roleassignment remove`,
+  LIST_ROLEASSIGNMENT_ADD: `${prefix} list roleassignment add`,
   LIST_ROLEINHERITANCE_BREAK: `${prefix} list roleinheritance break`,
   LIST_ROLEINHERITANCE_RESET: `${prefix} list roleinheritance reset`,
   LIST_SET: `${prefix} list set`,
@@ -266,5 +269,6 @@ export default {
   WEB_LIST: `${prefix} web list`,
   WEB_REINDEX: `${prefix} web reindex`,
   WEB_REMOVE: `${prefix} web remove`,
+  WEB_ROLEINHERITANCE_RESET: `${prefix} web roleinheritance reset`,
   WEB_SET: `${prefix} web set`
 };

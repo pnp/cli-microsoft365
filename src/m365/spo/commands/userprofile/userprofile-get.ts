@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo, validation } from '../../../../utils';
@@ -23,6 +20,33 @@ class SpoUserProfileGetCommand extends SpoCommand {
 
   public get description(): string {
     return 'Sets user profile property for a SharePoint user';
+  }
+
+  constructor() {
+    super();
+
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --userName <userName>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidUserPrincipalName(args.options.userName)) {
+          return `${args.options.userName} is not a valid user principal name`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -50,23 +74,6 @@ class SpoUserProfileGetCommand extends SpoCommand {
 
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --userName <userName>'
-      }
-    ];
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidUserPrincipalName(args.options.userName)) {
-      return `${args.options.userName} is not a valid user principal name`;
-    }
-
-    return true;
   }
 }
 module.exports = new SpoUserProfileGetCommand();

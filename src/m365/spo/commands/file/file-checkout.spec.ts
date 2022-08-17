@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,6 +12,7 @@ const command: Command = require('./file-checkout');
 describe(commands.FILE_CHECKOUT, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   const stubPostResponses: any = (getFileByServerRelativeUrlResp: any = null, getFileByIdResp: any = null) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
       if (getFileByServerRelativeUrlResp) {
@@ -38,8 +39,9 @@ describe(commands.FILE_CHECKOUT, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -106,8 +108,8 @@ describe(commands.FILE_CHECKOUT, () => {
     });
   });
 
-  it('should handle checked out by someone else file',  (done) => {
-    const expectedError: any = JSON.stringify({"odata.error":{"code":"-2130575306, Microsoft.SharePoint.SPFileCheckOutException","message":{"lang":"en-US","value":"The file \"https://contoso.sharepoint.com/sites/xx/Shared Documents/abc.txt\" is checked out for editing by i:0#.f|membership|xx"}}});
+  it('should handle checked out by someone else file', (done) => {
+    const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575306, Microsoft.SharePoint.SPFileCheckOutException", "message": { "lang": "en-US", "value": "The file \"https://contoso.sharepoint.com/sites/xx/Shared Documents/abc.txt\" is checked out for editing by i:0#.f|membership|xx" } } });
     const getFileByServerRelativeUrlResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
     });
@@ -132,8 +134,8 @@ describe(commands.FILE_CHECKOUT, () => {
     });
   });
 
-  it('should handle file does not exist',  (done) => {
-    const expectedError: any = JSON.stringify({"odata.error":{"code":"-2130575338, Microsoft.SharePoint.SPException","message":{"lang":"en-US","value":"Error: File Not Found."}}});
+  it('should handle file does not exist', (done) => {
+    const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File Not Found." } } });
     const getFileByIdResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
     });
@@ -221,7 +223,7 @@ describe(commands.FILE_CHECKOUT, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -232,7 +234,7 @@ describe(commands.FILE_CHECKOUT, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -242,33 +244,33 @@ describe(commands.FILE_CHECKOUT, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'foo', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b' } });
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'foo', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b' } });
+  it('passes validation if the webUrl option is a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the id option is not a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '12345' } });
+  it('fails validation if the id option is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '12345' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the id option is a valid GUID', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b' } });
+  it('passes validation if the id option is a valid GUID', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b' } }, commandInfo);
     assert(actual);
   });
 
-  it('fails validation if the id or url option not specified', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+  it('fails validation if the id or url option not specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both id and fileUrl options are specified', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b', fileUrl: '/sites/project-x/documents' } });
+  it('fails validation if both id and fileUrl options are specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b', fileUrl: '/sites/project-x/documents' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 });

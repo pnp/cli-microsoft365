@@ -3,8 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import { Logger } from '../../../../cli';
-import Command, { CommandOption } from '../../../../Command';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
+import Command from '../../../../Command';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
 import TemplateInstantiator from '../../template-instantiator';
@@ -13,6 +13,7 @@ const command: Command = require('./pcf-init');
 describe(commands.PCF_INIT, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let trackEvent: any;
   let telemetry: any;
 
@@ -20,6 +21,7 @@ describe(commands.PCF_INIT, () => {
     trackEvent = sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -74,7 +76,7 @@ describe(commands.PCF_INIT, () => {
   });
 
   it('supports specifying namespace', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--namespace') > -1) {
@@ -85,7 +87,7 @@ describe(commands.PCF_INIT, () => {
   });
 
   it('supports specifying name', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--name') > -1) {
@@ -96,7 +98,7 @@ describe(commands.PCF_INIT, () => {
   });
 
   it('supports specifying template', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--template') > -1) {
@@ -106,126 +108,126 @@ describe(commands.PCF_INIT, () => {
     assert(containsOption);
   });
 
-  it('fails validation when the project directory contains relative paths', () => {
+  it('fails validation when the project directory contains relative paths', async () => {
     sinon.stub(path, 'basename').callsFake(() => 'rootPath1\\.\\..\\rootPath2');
 
-    const actual = command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } });
+    const actual = await command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the project directory equals invalid text sequences (like COM1 or LPT6)', () => {
+  it('fails validation when the project directory equals invalid text sequences (like COM1 or LPT6)', async () => {
     sinon.stub(path, 'basename').callsFake(() => 'COM1');
 
-    const actual = command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } });
+    const actual = await command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails when the project directory name is emtpy', () => {
+  it('fails validation when the project directory name is emtpy', async () => {
     sinon.stub(path, 'basename').callsFake(() => '');
 
-    const actual = command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } });
+    const actual = await command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the name option isn\'t specified', () => {
-    const actual = command.validate({ options: { namespace: 'Example.Namespace', template: 'Field' } });
+  it('fails validation when the name option isn\'t specified', async () => {
+    const actual = await command.validate({ options: { namespace: 'Example.Namespace', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the namespace option isn\'t specified', () => {
-    const actual = command.validate({ options: { name: 'Example1Name', template: 'Field' } });
+  it('fails validation when the namespace option isn\'t specified', async () => {
+    const actual = await command.validate({ options: { name: 'Example1Name', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the template option isn\'t specified', () => {
-    const actual = command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace' } });
+  it('fails validation when the template option isn\'t specified', async () => {
+    const actual = await command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when unsupported template specified', () => {
-    const actual = command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'abc' } });
+  it('fails validation when unsupported template specified', async () => {
+    const actual = await command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when name, namespace and Field template are specified', () => {
-    const actual = command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } });
+  it('passes validation when name, namespace and Field template are specified', async () => {
+    const actual = await command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when name, namespace and Dataset template are specified', () => {
-    const actual = command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Dataset' } });
+  it('passes validation when name, namespace and Dataset template are specified', async () => {
+    const actual = await command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Dataset' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when unsupported name specified (eg. containing a dot)', () => {
-    const actual = command.validate({ options: { name: 'Example1.Name', namespace: 'Example1.Namespace', template: 'Field' } });
+  it('fails validation when unsupported name specified (eg. containing a dot)', async () => {
+    const actual = await command.validate({ options: { name: 'Example1.Name', namespace: 'Example1.Namespace', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when unsupported name specified (eg. containing special character è)', () => {
-    const actual = command.validate({ options: { name: 'Examplè1Name', namespace: 'Example1.Namespace', template: 'Field' } });
+  it('fails validation when unsupported name specified (eg. containing special character è)', async () => {
+    const actual = await command.validate({ options: { name: 'Examplè1Name', namespace: 'Example1.Namespace', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when unsupported name specified (eg. starting with a number)', () => {
-    const actual = command.validate({ options: { name: '1ExampleName', namespace: 'Example1.Namespace', template: 'Field' } });
+  it('fails validation when unsupported name specified (eg. starting with a number)', async () => {
+    const actual = await command.validate({ options: { name: '1ExampleName', namespace: 'Example1.Namespace', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when unsupported name specified (eg. a javascript reserved word like \'innerHeight\')', () => {
-    const actual = command.validate({ options: { name: 'innerHeight', namespace: 'Example1.Namespace', template: 'Field' } });
+  it('fails validation when unsupported name specified (eg. a javascript reserved word like \'innerHeight\')', async () => {
+    const actual = await command.validate({ options: { name: 'innerHeight', namespace: 'Example1.Namespace', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when unsupported namespace specified (eg. first character is a dot)', () => {
-    const actual = command.validate({ options: { name: 'Example1Name', namespace: '.Example1.Namespace', template: 'Field' } });
+  it('fails validation when unsupported namespace specified (eg. first character is a dot)', async () => {
+    const actual = await command.validate({ options: { name: 'Example1Name', namespace: '.Example1.Namespace', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when unsupported namespace specified (eg. last character is a dot)', () => {
-    const actual = command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace.', template: 'Field' } });
+  it('fails validation when unsupported namespace specified (eg. last character is a dot)', async () => {
+    const actual = await command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace.', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when unsupported namespace specified (eg. containing consecutive dots)', () => {
-    const actual = command.validate({ options: { name: 'Example1Name', namespace: 'Example1...Namespace', template: 'Field' } });
+  it('fails validation when unsupported namespace specified (eg. containing consecutive dots)', async () => {
+    const actual = await command.validate({ options: { name: 'Example1Name', namespace: 'Example1...Namespace', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when unsupported namespace specified (eg. starting with a number)', () => {
-    const actual = command.validate({ options: { name: 'Example1Name', namespace: '2Example1.Namespace', template: 'Field' } });
+  it('fails validation when unsupported namespace specified (eg. starting with a number)', async () => {
+    const actual = await command.validate({ options: { name: 'Example1Name', namespace: '2Example1.Namespace', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when unsupported namespace specified (eg. starting with a number after a dot)', () => {
-    const actual = command.validate({ options: { name: 'Example1Name', namespace: 'Example1.2Namespace', template: 'Field' } });
+  it('fails validation when unsupported namespace specified (eg. starting with a number after a dot)', async () => {
+    const actual = await command.validate({ options: { name: 'Example1Name', namespace: 'Example1.2Namespace', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when unsupported namespace specified (eg. containing a javascript reserved word like \'innerHeight\')', () => {
-    const actual = command.validate({ options: { name: 'Example1Name', namespace: 'Example1.innerHeight.Namespace', template: 'Field' } });
+  it('fails validation when unsupported namespace specified (eg. containing a javascript reserved word like \'innerHeight\')', async () => {
+    const actual = await command.validate({ options: { name: 'Example1Name', namespace: 'Example1.innerHeight.Namespace', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the combined lengths of name and namespace exceeds 75 characters', () => {
-    const actual = command.validate({ options: { name: 'ynnsnaclwrjxtnyzaotlrtxizfxnfyjmlzwwnetwmyxgregqzcmmwwqitoexhfftxnwbrvadhj', namespace: 'NS', template: 'Field' } });
+  it('fails validation when the combined lengths of name and namespace exceeds 75 characters', async () => {
+    const actual = await command.validate({ options: { name: 'ynnsnaclwrjxtnyzaotlrtxizfxnfyjmlzwwnetwmyxgregqzcmmwwqitoexhfftxnwbrvadhj', namespace: 'NS', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the combined lengths of name and namespace are exactly 75 characters', () => {
-    const actual = command.validate({ options: { name: 'ynnsnaclwrjxtnyzaotlrtxizfxnfyjmlzwwnetwmyxgregqzcmmwwqitoexhfftxnwbrvadh', namespace: 'NS', template: 'Field' } });
+  it('passes validation when the combined lengths of name and namespace are exactly 75 characters', async () => {
+    const actual = await command.validate({ options: { name: 'ynnsnaclwrjxtnyzaotlrtxizfxnfyjmlzwwnetwmyxgregqzcmmwwqitoexhfftxnwbrvadh', namespace: 'NS', template: 'Field' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the current directory doesn\'t contain any files with extension proj', () => {
+  it('passes validation when the current directory doesn\'t contain any files with extension proj', async () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.xml', 'file3.json'] as any);
-    const actual = command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } });
+    const actual = await command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when the current directory contains files with extension proj', () => {
+  it('fails validation when the current directory contains files with extension proj', async () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.proj', 'file3.json'] as any);
-    const actual = command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } });
+    const actual = await command.validate({ options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -250,7 +252,7 @@ describe(commands.PCF_INIT, () => {
   });
 
   it('supports verbose mode', () => {
-    const options = command.options() as CommandOption[];
+    const options = command.options;
     let containsOption = false;
     options.forEach((o) => {
       if (o.option === '--verbose') {

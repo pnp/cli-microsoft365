@@ -1,8 +1,5 @@
 import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
@@ -26,10 +23,50 @@ class AadO365GroupUserListCommand extends GraphCommand {
     return "Lists users for the specified Microsoft 365 group";
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.role = args.options.role;
-    return telemetryProps;
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        role: args.options.role
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: "-i, --groupId <groupId>"
+      },
+      {
+        option: "-r, --role [type]",
+        autocomplete: ["Owner", "Member", "Guest"]
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.groupId as string)) {
+          return `${args.options.groupId} is not a valid GUID`;
+        }
+    
+        if (args.options.role) {
+          if (['Owner', 'Member', 'Guest'].indexOf(args.options.role) === -1) {
+            return `${args.options.role} is not a valid role value. Allowed values Owner|Member|Guest`;
+          }
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -77,35 +114,6 @@ class AadO365GroupUserListCommand extends GraphCommand {
   private getMembersAndGuests(logger: Logger, groupId: string): Promise<User[]> {
     const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/members?$select=id,displayName,userPrincipalName,userType`;
     return odata.getAllItems<User>(endpoint);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: "-i, --groupId <groupId>"
-      },
-      {
-        option: "-r, --role [type]",
-        autocomplete: ["Owner", "Member", "Guest"]
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.groupId as string)) {
-      return `${args.options.groupId} is not a valid GUID`;
-    }
-
-    if (args.options.role) {
-      if (['Owner', 'Member', 'Guest'].indexOf(args.options.role) === -1) {
-        return `${args.options.role} is not a valid role value. Allowed values Owner|Member|Guest`;
-      }
-    }
-
-    return true;
   }
 }
 

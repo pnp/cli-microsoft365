@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.PAGE_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,6 +25,7 @@ describe(commands.PAGE_SET, () => {
       WebFullUrl: 'https://contoso.sharepoint.com'
     }));
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -544,7 +546,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -555,7 +557,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('supports specifying name', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--name') > -1) {
@@ -566,7 +568,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('supports specifying webUrl', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--webUrl') > -1) {
@@ -577,7 +579,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('supports specifying page layout', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--layoutType') > -1) {
@@ -588,7 +590,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('supports specifying page promote option', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--promoteAs') > -1) {
@@ -599,7 +601,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('supports specifying if comments should be enabled', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--commentsEnabled') > -1) {
@@ -610,7 +612,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('supports specifying if page should be published', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--publish') > -1) {
@@ -621,7 +623,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('supports specifying page publish message', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--publishMessage') > -1) {
@@ -631,108 +633,108 @@ describe(commands.PAGE_SET, () => {
     assert(containsOption);
   });
 
-  it('fails validation if webUrl is not an absolute URL', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'foo' } });
+  it('fails validation if webUrl is not an absolute URL', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if webUrl is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'http://foo' } });
+  it('fails validation if webUrl is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'http://foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when name and webURL specified and webUrl is a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' } });
+  it('passes validation when name and webURL specified and webUrl is a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when name has no extension', () => {
-    const actual = command.validate({ options: { name: 'page', webUrl: 'https://contoso.sharepoint.com' } });
+  it('passes validation when name has no extension', async () => {
+    const actual = await command.validate({ options: { name: 'page', webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if layout type is invalid', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'invalid' } });
+  it('fails validation if layout type is invalid', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if layout type is Home', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Home' } });
+  it('passes validation if layout type is Home', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Home' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if layout type is Article', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Article' } });
+  it('passes validation if layout type is Article', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Article' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if layout type is SingleWebPartAppPage', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'SingleWebPartAppPage' } });
+  it('passes validation if layout type is SingleWebPartAppPage', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'SingleWebPartAppPage' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if layout type is RepostPage', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'RepostPage' } });
+  it('passes validation if layout type is RepostPage', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'RepostPage' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if layout type is HeaderlessSearchResults', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'HeaderlessSearchResults' } });
+  it('passes validation if layout type is HeaderlessSearchResults', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'HeaderlessSearchResults' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if layout type is Spaces', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Spaces' } });
+  it('passes validation if layout type is Spaces', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Spaces' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if layout type is Topic', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Topic' } });
+  it('passes validation if layout type is Topic', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Topic' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if promote type is invalid', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'invalid' } });
+  it('fails validation if promote type is invalid', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if promote type is HomePage', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'HomePage', layoutType: 'Home' } });
+  it('passes validation if promote type is HomePage', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'HomePage', layoutType: 'Home' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if promote type is NewsPage', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'NewsPage' } });
+  it('passes validation if promote type is NewsPage', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'NewsPage' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if promote type is Template', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'Template' } });
+  it('passes validation if promote type is Template', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'Template' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if promote type is HomePage but layout type is not Home', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'HomePage', layoutType: 'Article' } });
+  it('fails validation if promote type is HomePage but layout type is not Home', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'HomePage', layoutType: 'Article' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if promote type is NewsPage but layout type is not Article', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'NewsPage', layoutType: 'Home' } });
+  it('fails validation if promote type is NewsPage but layout type is not Article', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'NewsPage', layoutType: 'Home' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if commentsEnabled is invalid', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', commentsEnabled: 'invalid' } });
+  it('fails validation if commentsEnabled is invalid', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', commentsEnabled: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if commentsEnabled is true', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', commentsEnabled: 'true' } });
+  it('passes validation if commentsEnabled is true', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', commentsEnabled: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if commentsEnabled is false', () => {
-    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', commentsEnabled: 'false' } });
+  it('passes validation if commentsEnabled is false', async () => {
+    const actual = await command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', commentsEnabled: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

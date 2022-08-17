@@ -3,7 +3,7 @@ import * as os from 'os';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -14,6 +14,7 @@ describe(commands.MESSAGE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   // #region emailResponse
   const emailResponse: any = {
     "value": [
@@ -347,6 +348,7 @@ describe(commands.MESSAGE_LIST, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -586,33 +588,33 @@ describe(commands.MESSAGE_LIST, () => {
     });
   });
 
-  it('fails validation if neither folderId nor folderName are specified', () => {
-    const actual = command.validate({ options: {} });
+  it('fails validation if neither folderId nor folderName are specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both folderId nor folderName are specified', () => {
-    const actual = command.validate({ options: { folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', folderName: 'Inbox' } });
+  it('fails validation if both folderId nor folderName are specified', async () => {
+    const actual = await command.validate({ options: { folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', folderName: 'Inbox' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if folderId is specified', () => {
-    const actual = command.validate({ options: { folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } });
+  it('passes validation if folderId is specified', async () => {
+    const actual = await command.validate({ options: { folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if folderName is specified', () => {
-    const actual = command.validate({ options: { folderName: 'Inbox' } });
+  it('passes validation if folderName is specified', async () => {
+    const actual = await command.validate({ options: { folderName: 'Inbox' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if a well-known-name is specified as folderId', () => {
-    const actual = command.validate({ options: { folderId: 'inbox' } });
+  it('passes validation if a well-known-name is specified as folderId', async () => {
+    const actual = await command.validate({ options: { folderId: 'inbox' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

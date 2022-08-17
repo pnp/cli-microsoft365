@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
@@ -27,11 +26,48 @@ class PaAppListCommand extends PowerAppsCommand {
     return ['name', 'displayName'];
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.asAdmin = args.options.asAdmin === true;
-    telemetryProps.environment = typeof args.options.environment !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        asAdmin: args.options.asAdmin === true,
+        environment: typeof args.options.environment !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-e, --environment [environment]'
+      },
+      {
+        option: '--asAdmin'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.asAdmin && !args.options.environment) {
+          return 'When specifying the asAdmin option the environment option is required as well';
+        }
+    
+        if (args.options.environment && !args.options.asAdmin) {
+          return 'When specifying the environment option the asAdmin option is required as well';
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -56,33 +92,6 @@ class PaAppListCommand extends PowerAppsCommand {
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-e, --environment [environment]'
-      },
-      {
-        option: '--asAdmin'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.asAdmin && !args.options.environment) {
-      return 'When specifying the asAdmin option the environment option is required as well';
-    }
-
-    if (args.options.environment && !args.options.asAdmin) {
-      return 'When specifying the environment option the asAdmin option is required as well';
-    }
-
-    return true;
-  }
-
 }
 
 module.exports = new PaAppListCommand();

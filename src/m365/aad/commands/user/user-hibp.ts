@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -27,10 +24,46 @@ class AadUserHibpCommand extends AnonymousCommand {
     return 'Allows you to retrieve all accounts that have been pwned with the specified username';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.domain = args.options.domain;
-    return telemetryProps;
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        domain: args.options.domain
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --userName <userName>'
+      },
+      {
+        option: '--apiKey, <apiKey>'
+      },
+      {
+        option: '--domain, [domain]'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidUserPrincipalName(args.options.userName)) {
+          return 'Specify valid userName';
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -58,30 +91,6 @@ class AadUserHibpCommand extends AnonymousCommand {
         }
         return this.handleRejectedODataJsonPromise(err, logger, cb);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --userName <userName>'
-      },
-      {
-        option: '--apiKey, <apiKey>'
-      },
-      {
-        option: '--domain, [domain]'
-      }
-    ];
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidUserPrincipalName(args.options.userName)) {
-      return 'Specify valid userName';
-    }
-
-    return true;
   }
 }
 

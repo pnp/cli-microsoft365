@@ -58,6 +58,9 @@ m365 aad app add [options]
 `--certificateDisplayName [certificateDisplayName]`
 : Display name for the certificate. If not given, the displayName will be set to the certificate subject. When specified, also specify either `certificateFile` or `certificateBase64Encoded`
 
+`--grantAdminConsent`
+: When specified, grants application & delegated permissions through admin consent
+
 `--manifest [manifest]`
 : Azure AD app manifest as retrieved from the Azure Portal to create the app registration from
 
@@ -93,6 +96,8 @@ When using the `withSecret` option, this command will automatically generate a s
 After creating the Azure AD app registration, this command returns the app ID and object ID of the created app registration. If you used the `withSecret` option, it will also return the generated secret.
 
 If you want to store the information about the created Azure AD app registration, use the `--save` option. This is useful when you build solutions connected to Microsoft 365 and want to easily manage app registrations used with your solution. When you use the `--save` option, after you create the app registration, the command will write its ID and name to the `.m365rc.json` file in the current directory. If the file already exists, it will add the information about the to it, allowing you to track multiple apps. If the file doesn't exist, the command will create it.
+
+When specifying `--grantAdminConsent` option, a service principal will be created for the app registration.
 
 ## Examples
 
@@ -154,6 +159,12 @@ Create new Azure AD app registration with Application ID URI set to a value that
 
 ```sh
 m365 aad app add --name 'My AAD app' --uri api://caf406b91cd4.ngrok.io/_appId_ --scopeName access_as_user --scopeAdminConsentDescription 'Access as a user' --scopeAdminConsentDisplayName 'Access as a user' --scopeConsentBy adminsAndUsers
+```
+
+Create new Azure AD app registration for a deamon app with specified Microsoft Graph application permissions, including admin consent
+
+```sh
+ m365 aad app add --name 'My AAD app' --apisApplication 'https://graph.microsoft.com/Group.ReadWrite.All' --grantAdminConsent
 ```
 
 Create new Azure AD app registration with the specified name. Store information about the created app registration in the _.m365rc.json_ file in the current directory.

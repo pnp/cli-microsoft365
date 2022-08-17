@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { accessToken, sinonUtil } from '../../../../utils';
@@ -17,11 +17,13 @@ describe(commands.USER_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -336,53 +338,53 @@ describe(commands.USER_GET, () => {
     });
   });
 
-  it('fails validation if id or email or userName options are not passed', () => {
-    const actual = command.validate({ options: {} });
+  it('fails validation if id or email or userName options are not passed', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if id, email, and userName options are passed (multiple options)', () => {
-    const actual = command.validate({ options: { id: "1caf7dcd-7e83-4c3a-94f7-932a1299c844", email: "john.doe@contoso.onmicrosoft.com", userName: "i:0#.f|membership|john.doe@contoso.onmicrosoft.com" } });
+  it('fails validation if id, email, and userName options are passed (multiple options)', async () => {
+    const actual = await command.validate({ options: { id: "1caf7dcd-7e83-4c3a-94f7-932a1299c844", email: "john.doe@contoso.onmicrosoft.com", userName: "i:0#.f|membership|john.doe@contoso.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both id and email options are passed (multiple options)', () => {
-    const actual = command.validate({ options: { id: "1caf7dcd-7e83-4c3a-94f7-932a1299c844", email: "john.doe@contoso.onmicrosoft.com" } });
+  it('fails validation if both id and email options are passed (multiple options)', async () => {
+    const actual = await command.validate({ options: { id: "1caf7dcd-7e83-4c3a-94f7-932a1299c844", email: "john.doe@contoso.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both id and userName options are passed (multiple options)', () => {
-    const actual = command.validate({ options: { id: "1caf7dcd-7e83-4c3a-94f7-932a1299c844", userName: "john.doe@contoso.onmicrosoft.com" } });
+  it('fails validation if both id and userName options are passed (multiple options)', async () => {
+    const actual = await command.validate({ options: { id: "1caf7dcd-7e83-4c3a-94f7-932a1299c844", userName: "john.doe@contoso.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both email and userName options are passed (multiple options)', () => {
-    const actual = command.validate({ options: { email: "jonh.deo@contoso.com", userName: "john.doe@contoso.onmicrosoft.com" } });
+  it('fails validation if both email and userName options are passed (multiple options)', async () => {
+    const actual = await command.validate({ options: { email: "jonh.deo@contoso.com", userName: "john.doe@contoso.onmicrosoft.com" } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the id is not a valid GUID', () => {
-    const actual = command.validate({ options: { id: 'invalid' } });
+  it('fails validation if the id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the id is a valid GUID', () => {
-    const actual = command.validate({ options: { id: '68be84bf-a585-4776-80b3-30aa5207aa22' } });
+  it('passes validation if the id is a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if the userName is specified', () => {
-    const actual = command.validate({ options: { userName: 'john.doe@contoso.onmicrosoft.com' } });
+  it('passes validation if the userName is specified', async () => {
+    const actual = await command.validate({ options: { userName: 'john.doe@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if the email is specified', () => {
-    const actual = command.validate({ options: { email: 'john.doe@contoso.onmicrosoft.com' } });
+  it('passes validation if the email is specified', async () => {
+    const actual = await command.validate({ options: { email: 'john.doe@contoso.onmicrosoft.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

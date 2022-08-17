@@ -1,6 +1,4 @@
-
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -12,8 +10,10 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  teamId: string;
-  displayName: string;
+  id?: string;
+  teamId?: string;
+  name?: string;
+  displayName?: string;
   partsToClone: string;
   description?: string;
   classification?: string;
@@ -29,52 +29,43 @@ class TeamsTeamCloneCommand extends GraphCommand {
     return 'Creates a clone of a Microsoft Teams team';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.description = typeof args.options.description !== 'undefined';
-    telemetryProps.classification = typeof args.options.classification !== 'undefined';
-    telemetryProps.visibility = typeof args.options.visibility !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const data: any = {
-      displayName: args.options.displayName,
-      mailNickname: this.generateMailNickname(args.options.displayName),
-      partsToClone: args.options.partsToClone
-    };
-    if (args.options.description) {
-      data.description = args.options.description;
-    }
-    if (args.options.classification) {
-      data.classification = args.options.classification;
-    }
-    if (args.options.visibility) {
-      data.visibility = args.options.visibility;
-    }
-
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/clone`,
-      headers: {
-        "content-type": "application/json",
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json',
-      data: data
-    };
-
-    request
-      .post(requestOptions)
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        description: typeof args.options.description !== 'undefined',
+        classification: typeof args.options.classification !== 'undefined',
+        visibility: typeof args.options.visibility !== 'undefined',
+        id: typeof args.options.id !== 'undefined',
+        teamId: typeof args.options.teamId !== 'undefined',
+        name: typeof args.options.name !== 'undefined',
+        displayName: typeof args.options.displayName !== 'undefined'
+        
+      });
+    });
   }
 
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
+  #initOptions(): void {
+    this.options.unshift(
       {
-        option: '-i, --teamId <teamId>'
+        option: '-i, --id [teamId]'
       },
       {
-        option: '-n, --displayName <displayName>'
+        option: '--teamId [teamId]'
+      },
+      {
+        option: '-n, --name [name]'
+      },
+      {
+        option: '--displayName [displayName]'
       },
       {
         option: '-p, --partsToClone <partsToClone>',
@@ -90,39 +81,97 @@ class TeamsTeamCloneCommand extends GraphCommand {
         option: '-v, --visibility [visibility]',
         autocomplete: ['Private', 'Public']
       }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
+    );
   }
 
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.teamId)) {
-      return `${args.options.teamId} is not a valid GUID`;
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
+	      return `${args.options.teamId} is not a valid GUID`;
+	    }
+
+	    if (args.options.id && !validation.isValidGuid(args.options.id)) {
+	      return `${args.options.id} is not a valid GUID`;
+	    }
+
+	    const partsToClone: string[] = args.options.partsToClone.replace(/\s/g, '').split(',');
+	    for (const partToClone of partsToClone) {
+	      const part: string = partToClone.toLowerCase();
+	      if (part !== 'apps' &&
+	        part !== 'channels' &&
+	        part !== 'members' &&
+	        part !== 'settings' &&
+	        part !== 'tabs') {
+	        return `${part} is not a valid partsToClone. Allowed values are apps|channels|members|settings|tabs`;
+	      }
+	    }
+
+	    if (args.options.visibility) {
+	      const visibility: string = args.options.visibility.toLowerCase();
+
+	      if (visibility !== 'private' &&
+	        visibility !== 'public') {
+	        return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
+	      }
+	    }
+
+	    return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+  	this.optionSets.push(
+  	  ['id', 'teamId'],
+      ['name', 'displayName']
+  	);
+  }
+
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    if (args.options.teamId) {
+      args.options.id = args.options.teamId;
+
+      this.warn(logger, `Option 'teamId' is deprecated. Please use 'id' instead.`);
     }
 
-    const partsToClone: string[] = args.options.partsToClone.replace(/\s/g, '').split(',');
-    for (const partToClone of partsToClone) {
-      const part: string = partToClone.toLowerCase();
-      if (part !== 'apps' &&
-        part !== 'channels' &&
-        part !== 'members' &&
-        part !== 'settings' &&
-        part !== 'tabs') {
-        return `${part} is not a valid partsToClone. Allowed values are apps|channels|members|settings|tabs`;
-      }
+    if (args.options.displayName) {
+      args.options.name = args.options.displayName;
+
+      this.warn(logger, `Option 'displayName' is deprecated. Please use 'name' instead.`);
+    }
+
+    const data: any = {
+      displayName: args.options.name,
+      mailNickname: this.generateMailNickname(args.options.name as string),
+      partsToClone: args.options.partsToClone
+    };
+
+    if (args.options.description) {
+      data.description = args.options.description;
+    }
+
+    if (args.options.classification) {
+      data.classification = args.options.classification;
     }
 
     if (args.options.visibility) {
-      const visibility: string = args.options.visibility.toLowerCase();
-
-      if (visibility !== 'private' &&
-        visibility !== 'public') {
-        return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
-      }
+      data.visibility = args.options.visibility;
     }
 
-    return true;
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.id as string)}/clone`,
+      headers: {
+        "content-type": "application/json",
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json',
+      data: data
+    };
+
+    request
+      .post(requestOptions)
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   /**

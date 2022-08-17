@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -27,6 +24,45 @@ class GraphSchemaExtensionAddCommand extends GraphCommand {
 
   public get description(): string {
     return 'Creates a Microsoft Graph schema extension';
+  }
+
+  constructor() {
+    super();
+  
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '-d, --description [description]'
+      },
+      {
+        option: '--owner <owner>'
+      },
+      {
+        option: '-t, --targetTypes <targetTypes>'
+      },
+      {
+        option: '-p, --properties <properties>'
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.owner && !validation.isValidGuid(args.options.owner)) {
+          return `The specified owner '${args.options.owner}' is not a valid App Id`;
+        }
+    
+        return this.validateProperties(args.options.properties);
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -59,37 +95,6 @@ class GraphSchemaExtensionAddCommand extends GraphCommand {
         logger.log(res);
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--owner <owner>'
-      },
-      {
-        option: '-t, --targetTypes <targetTypes>'
-      },
-      {
-        option: '-p, --properties <properties>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.owner && !validation.isValidGuid(args.options.owner)) {
-      return `The specified owner '${args.options.owner}' is not a valid App Id`;
-    }
-
-    return this.validateProperties(args.options.properties);
   }
 
   private validateProperties(propertiesString: string): boolean | string {

@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -14,6 +14,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,6 +27,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -691,7 +693,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -702,7 +704,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
   });
 
   it('supports specifying page size', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--pageSize') > -1) {
@@ -713,7 +715,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
   });
 
   it('supports specifying page number', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--position') > -1) {
@@ -724,7 +726,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
   });
 
   it('supports specifying filter', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--filter') > -1) {
@@ -735,7 +737,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
   });
 
   it('supports specifying sort order', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--sortOrder') > -1) {
@@ -746,7 +748,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
   });
 
   it('supports specifying site URL', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--siteUrl') > -1) {
@@ -756,73 +758,73 @@ describe(commands.EXTERNALUSER_LIST, () => {
     assert(containsOption);
   });
 
-  it('passes validation when no options have been specified', () => {
-    const actual = command.validate({ options: {} });
+  it('passes validation when no options have been specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when page size is not a number', () => {
-    const actual = command.validate({ options: { pageSize: 'a' } });
+  it('fails validation when page size is not a number', async () => {
+    const actual = await command.validate({ options: { pageSize: 'a' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when page size is a negative number', () => {
-    const actual = command.validate({ options: { pageSize: '-10' } });
+  it('fails validation when page size is a negative number', async () => {
+    const actual = await command.validate({ options: { pageSize: '-10' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when page size is > 50', () => {
-    const actual = command.validate({ options: { pageSize: '51' } });
+  it('fails validation when page size is > 50', async () => {
+    const actual = await command.validate({ options: { pageSize: '51' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when page size is 0 < x <= 50 (min)', () => {
-    const actual = command.validate({ options: { pageSize: '1' } });
+  it('passes validation when page size is 0 < x <= 50 (min)', async () => {
+    const actual = await command.validate({ options: { pageSize: '1' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when page size is 0 < x <= 50 (max)', () => {
-    const actual = command.validate({ options: { pageSize: '50' } });
+  it('passes validation when page size is 0 < x <= 50 (max)', async () => {
+    const actual = await command.validate({ options: { pageSize: '50' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when page number is not a number', () => {
-    const actual = command.validate({ options: { position: 'a' } });
+  it('fails validation when page number is not a number', async () => {
+    const actual = await command.validate({ options: { position: 'a' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when page number is a negative number', () => {
-    const actual = command.validate({ options: { position: '-1' } });
+  it('fails validation when page number is a negative number', async () => {
+    const actual = await command.validate({ options: { position: '-1' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when page number is a positive number', () => {
-    const actual = command.validate({ options: { position: '1' } });
+  it('passes validation when page number is a positive number', async () => {
+    const actual = await command.validate({ options: { position: '1' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when sort order contains invalid value', () => {
-    const actual = command.validate({ options: { sortOrder: 'invalid' } });
+  it('fails validation when sort order contains invalid value', async () => {
+    const actual = await command.validate({ options: { sortOrder: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when sort order is set to asc', () => {
-    const actual = command.validate({ options: { sortOrder: 'asc' } });
+  it('passes validation when sort order is set to asc', async () => {
+    const actual = await command.validate({ options: { sortOrder: 'asc' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when sort order is set to desc', () => {
-    const actual = command.validate({ options: { sortOrder: 'desc' } });
+  it('passes validation when sort order is set to desc', async () => {
+    const actual = await command.validate({ options: { sortOrder: 'desc' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when site URL is not a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { siteUrl: 'invalid' } });
+  it('fails validation when site URL is not a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when site URL is a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com' } });
+  it('passes validation when site URL is a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

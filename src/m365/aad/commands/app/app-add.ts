@@ -2,9 +2,6 @@ import * as fs from 'fs';
 import { v4 } from 'uuid';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { accessToken, odata } from '../../../../utils';
@@ -15,6 +12,7 @@ import commands from '../../commands';
 interface ServicePrincipalInfo {
   appId: string;
   appRoles: { id: string; value: string; }[];
+  id: string;
   oauth2PermissionScopes: { id: string; value: string; }[];
   servicePrincipalNames: string[];
 }
@@ -41,6 +39,7 @@ interface AppInfo {
     displayName: string;
     value: string;
   }[];
+  requiredResourceAccess: RequiredResourceAccess[];
 }
 
 interface CommandArgs {
@@ -50,6 +49,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   apisApplication?: string;
   apisDelegated?: string;
+  grantAdminConsent?: boolean;
   implicitFlow: boolean;
   manifest?: string;
   multitenant: boolean;
@@ -68,11 +68,18 @@ interface Options extends GlobalOptions {
   certificateDisplayName?: string;
 }
 
+interface AppPermissions {
+  resourceId: string;
+  resourceAccess: ResourceAccess[];
+  scope: string[];
+}
+
 class AadAppAddCommand extends GraphCommand {
   private static aadApplicationPlatform: string[] = ['spa', 'web', 'publicClient'];
   private static aadAppScopeConsentBy: string[] = ['admins', 'adminsAndUsers'];
   private manifest: any;
   private appName: string = '';
+  private appPermissions: AppPermissions[] = [];
 
   public get name(): string {
     return commands.APP_ADD;
@@ -82,23 +89,162 @@ class AadAppAddCommand extends GraphCommand {
     return 'Creates new Azure AD app registration';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.apis = typeof args.options.apisDelegated !== 'undefined';
-    telemetryProps.implicitFlow = args.options.implicitFlow;
-    telemetryProps.multitenant = args.options.multitenant;
-    telemetryProps.platform = args.options.platform;
-    telemetryProps.redirectUris = typeof args.options.redirectUris !== 'undefined';
-    telemetryProps.scopeAdminConsentDescription = typeof args.options.scopeAdminConsentDescription !== 'undefined';
-    telemetryProps.scopeAdminConsentDisplayName = typeof args.options.scopeAdminConsentDisplayName !== 'undefined';
-    telemetryProps.scopeName = args.options.scopeConsentBy;
-    telemetryProps.scopeName = typeof args.options.scopeName !== 'undefined';
-    telemetryProps.uri = typeof args.options.uri !== 'undefined';
-    telemetryProps.withSecret = args.options.withSecret;
-    telemetryProps.certificateFile = typeof args.options.certificateFile !== 'undefined';
-    telemetryProps.certificateBase64Encoded = typeof args.options.certificateBase64Encoded !== 'undefined';
-    telemetryProps.certificateDisplayName = typeof args.options.certificateDisplayName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        apis: typeof args.options.apisDelegated !== 'undefined',
+        implicitFlow: args.options.implicitFlow,
+        multitenant: args.options.multitenant,
+        platform: args.options.platform,
+        redirectUris: typeof args.options.redirectUris !== 'undefined',
+        scopeAdminConsentDescription: typeof args.options.scopeAdminConsentDescription !== 'undefined',
+        scopeAdminConsentDisplayName: typeof args.options.scopeAdminConsentDisplayName !== 'undefined',
+        scopeConsentBy: args.options.scopeConsentBy,
+        scopeName: typeof args.options.scopeName !== 'undefined',
+        uri: typeof args.options.uri !== 'undefined',
+        withSecret: args.options.withSecret,
+        certificateFile: typeof args.options.certificateFile !== 'undefined',
+        certificateBase64Encoded: typeof args.options.certificateBase64Encoded !== 'undefined',
+        certificateDisplayName: typeof args.options.certificateDisplayName !== 'undefined',
+        grantAdminConsent: typeof args.options.grantAdminConsent !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --name [name]'
+      },
+      {
+        option: '--multitenant'
+      },
+      {
+        option: '-r, --redirectUris [redirectUris]'
+      },
+      {
+        option: '-p, --platform [platform]',
+        autocomplete: AadAppAddCommand.aadApplicationPlatform
+      },
+      {
+        option: '--implicitFlow'
+      },
+      {
+        option: '-s, --withSecret'
+      },
+      {
+        option: '--apisDelegated [apisDelegated]'
+      },
+      {
+        option: '--apisApplication [apisApplication]'
+      },
+      {
+        option: '-u, --uri [uri]'
+      },
+      {
+        option: '--scopeName [scopeName]'
+      },
+      {
+        option: '--scopeConsentBy [scopeConsentBy]',
+        autocomplete: AadAppAddCommand.aadAppScopeConsentBy
+      },
+      {
+        option: '--scopeAdminConsentDisplayName [scopeAdminConsentDisplayName]'
+      },
+      {
+        option: '--scopeAdminConsentDescription [scopeAdminConsentDescription]'
+      },
+      {
+        option: '--certificateFile [certificateFile]'
+      },
+      {
+        option: '--certificateBase64Encoded [certificateBase64Encoded]'
+      },
+      {
+        option: '--certificateDisplayName [certificateDisplayName]'
+      },
+      {
+        option: '--manifest [manifest]'
+      },
+      {
+        option: '--save'
+      },
+      {
+        option: '--grantAdminConsent'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.manifest && !args.options.name) {
+          return 'Specify either the name of the app to create or the manifest';
+        }
+
+        if (args.options.platform &&
+          AadAppAddCommand.aadApplicationPlatform.indexOf(args.options.platform) < 0) {
+          return `${args.options.platform} is not a valid value for platform. Allowed values are ${AadAppAddCommand.aadApplicationPlatform.join(', ')}`;
+        }
+
+        if (args.options.redirectUris && !args.options.platform) {
+          return `When you specify redirectUris you also need to specify platform`;
+        }
+
+        if (args.options.certificateFile && args.options.certificateBase64Encoded) {
+          return 'Specify either certificateFile or certificateBase64Encoded but not both';
+        }
+
+        if (args.options.certificateDisplayName && !args.options.certificateFile && !args.options.certificateBase64Encoded) {
+          return 'When you specify certificateDisplayName you also need to specify certificateFile or certificateBase64Encoded';
+        }
+
+        if (args.options.certificateFile && !fs.existsSync(args.options.certificateFile as string)) {
+          return 'Certificate file not found';
+        }
+
+        if (args.options.scopeName) {
+          if (!args.options.uri) {
+            return `When you specify scopeName you also need to specify uri`;
+          }
+
+          if (!args.options.scopeAdminConsentDescription) {
+            return `When you specify scopeName you also need to specify scopeAdminConsentDescription`;
+          }
+
+          if (!args.options.scopeAdminConsentDisplayName) {
+            return `When you specify scopeName you also need to specify scopeAdminConsentDisplayName`;
+          }
+        }
+
+        if (args.options.scopeConsentBy &&
+          AadAppAddCommand.aadAppScopeConsentBy.indexOf(args.options.scopeConsentBy) < 0) {
+          return `${args.options.scopeConsentBy} is not a valid value for scopeConsentBy. Allowed values are ${AadAppAddCommand.aadAppScopeConsentBy.join(', ')}`;
+        }
+
+        if (args.options.manifest) {
+          try {
+            this.manifest = JSON.parse(args.options.manifest);
+            if (!args.options.name && !this.manifest.name) {
+              return `Specify the name of the app to create either through the 'name' option or the 'name' property in the manifest`;
+            }
+          }
+          catch (e) {
+            return `Error while parsing the specified manifest: ${e}`;
+          }
+        }
+
+        return true;
+      },
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -114,6 +260,7 @@ class AadAppAddCommand extends GraphCommand {
         return Promise.resolve(appInfo);
       })
       .then(appInfo => this.updateAppFromManifest(args, appInfo))
+      .then(appInfo => this.grantAdminConsent(appInfo, args.options.grantAdminConsent, logger))
       .then(appInfo => this.configureUri(args, appInfo, logger))
       .then(appInfo => this.configureSecret(args, appInfo, logger))
       .then(appInfo => this.saveAppInfo(args, appInfo, logger))
@@ -195,6 +342,95 @@ class AadAppAddCommand extends GraphCommand {
     return request.post<AppInfo>(createApplicationRequestOptions);
   }
 
+  private grantAdminConsent(appInfo: AppInfo, adminConsent: boolean | undefined, logger: Logger): Promise<AppInfo> {
+    if (!adminConsent || this.appPermissions.length === 0) {
+      return Promise.resolve(appInfo);
+    }
+
+    return this.createServicePrincipal(appInfo.appId)
+      .then((sp: ServicePrincipalInfo) => {
+        if (this.debug) {
+          logger.logToStderr("Service principal created, returned object id: " + sp.id);
+        }
+
+        const tasks: Promise<void>[] = [];
+
+        this.appPermissions.forEach(permission => {
+          if (permission.scope.length > 0) {
+            tasks.push(this.grantOAuth2Permission(sp.id, permission.resourceId, permission.scope.join(' ')));
+
+            if (this.debug) {
+              logger.logToStderr(`Admin consent granted for following resource ${permission.resourceId}, with delegated permissions: ${permission.scope.join(',')}`);
+            }
+          }
+
+          permission.resourceAccess.filter(access => access.type === "Role").forEach((access: ResourceAccess) => {
+            tasks.push(this.addRoleToServicePrincipal(sp.id, permission.resourceId, access.id));
+
+            if (this.debug) {
+              logger.logToStderr(`Admin consent granted for following resource ${permission.resourceId}, with application permission: ${access.id}`);
+            }
+          });
+        });
+
+        return Promise.all(tasks)
+          .then(_ => {
+            return appInfo;
+          });
+      });
+  }
+
+  private addRoleToServicePrincipal(objectId: string, resourceId: string, appRoleId: string): Promise<void> {
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/myorganization/servicePrincipals/${objectId}/appRoleAssignments`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      responseType: 'json',
+      data: {
+        appRoleId: appRoleId,
+        principalId: objectId,
+        resourceId: resourceId
+      }
+    };
+
+    return request.post<void>(requestOptions);
+  }
+
+  private grantOAuth2Permission(appId: string, resourceId: string, scopeName: string): Promise<void> {
+    const grantAdminConsentApplicationRequestOptions: any = {
+      url: `${this.resource}/v1.0/myorganization/oauth2PermissionGrants`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json',
+      data: {
+        clientId: appId,
+        consentType: "AllPrincipals",
+        principalId: null,
+        resourceId: resourceId,
+        scope: scopeName
+      }
+    };
+
+    return request.post<void>(grantAdminConsentApplicationRequestOptions);
+  }
+
+  private createServicePrincipal(appId: string): Promise<ServicePrincipalInfo> {
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/myorganization/servicePrincipals`,
+      headers: {
+        'content-type': 'application/json'
+      },
+      data: {
+        appId: appId
+      },
+      responseType: 'json'
+    };
+
+    return request.post<ServicePrincipalInfo>(requestOptions);
+  }
+
   private updateAppFromManifest(args: CommandArgs, appInfo: AppInfo): Promise<AppInfo> {
     if (!args.options.manifest) {
       return Promise.resolve(appInfo);
@@ -211,6 +447,13 @@ class AadAppAddCommand extends GraphCommand {
     // separately
     const secrets: { name: string, expirationDate: Date }[] = this.getSecretsFromManifest(v2Manifest);
     // Azure Portal returns v2 manifest whereas the Graph API expects a v1.6
+
+    if (args.options.apisApplication || args.options.apisDelegated) {
+      // take submitted delegated / application permissions as options
+      // otherwise, they will be skipped in the app update
+      v2Manifest.requiredResourceAccess = appInfo.requiredResourceAccess;
+    }
+    
     const graphManifest = this.transformManifest(v2Manifest);
 
     const updateAppRequestOptions: any = {
@@ -449,7 +692,8 @@ class AadAppAddCommand extends GraphCommand {
   }
 
   private resolveApis(args: CommandArgs, logger: Logger): Promise<RequiredResourceAccess[]> {
-    if (!args.options.apisDelegated && !args.options.apisApplication) {
+    if (!args.options.apisDelegated && !args.options.apisApplication 
+      && (typeof this.manifest?.requiredResourceAccess === 'undefined' || this.manifest.requiredResourceAccess.length === 0)) {
       return Promise.resolve([]);
     }
 
@@ -458,30 +702,65 @@ class AadAppAddCommand extends GraphCommand {
     }
 
     return odata
-      .getAllItems<ServicePrincipalInfo>(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles`)
+      .getAllItems<ServicePrincipalInfo>(`${this.resource}/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames`)
       .then(servicePrincipals => {
-        try {
-          const resolvedApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisDelegated, 'Scope', logger);
-          if (this.debug) {
-            logger.logToStderr(`Resolved delegated permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
-          }
-          const resolvedApplicationApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisApplication, 'Role', logger);
-          if (this.debug) {
-            logger.logToStderr(`Resolved application permissions: ${JSON.stringify(resolvedApplicationApis, null, 2)}`);
-          }
-          // merge resolved application APIs onto resolved delegated APIs
-          resolvedApplicationApis.forEach(resolvedRequiredResource => {
-            const requiredResource = resolvedApis.find(api => api.resourceAppId === resolvedRequiredResource.resourceAppId);
-            if (requiredResource) {
-              requiredResource.resourceAccess.push(...resolvedRequiredResource.resourceAccess);
-            }
-            else {
-              resolvedApis.push(resolvedRequiredResource);
-            }
-          });
+        let resolvedApis: RequiredResourceAccess[] = [];
 
-          if (this.debug) {
+        try {
+          if (args.options.apisDelegated || args.options.apisApplication) {
+            resolvedApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisDelegated, 'Scope', logger);
+            if (this.verbose) {
+              logger.logToStderr(`Resolved delegated permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
+            }
+            const resolvedApplicationApis = this.getRequiredResourceAccessForApis(servicePrincipals, args.options.apisApplication, 'Role', logger);
+            if (this.verbose) {
+              logger.logToStderr(`Resolved application permissions: ${JSON.stringify(resolvedApplicationApis, null, 2)}`);
+            }
+            // merge resolved application APIs onto resolved delegated APIs
+            resolvedApplicationApis.forEach(resolvedRequiredResource => {
+              const requiredResource = resolvedApis.find(api => api.resourceAppId === resolvedRequiredResource.resourceAppId);
+              if (requiredResource) {
+                requiredResource.resourceAccess.push(...resolvedRequiredResource.resourceAccess);
+              }
+              else {
+                resolvedApis.push(resolvedRequiredResource);
+              }
+            });
+          }
+          
+          if (typeof this.manifest?.requiredResourceAccess !== 'undefined' && this.manifest.requiredResourceAccess.length > 0) {
+            const manifestApis = (this.manifest.requiredResourceAccess as RequiredResourceAccess[]);
+
+            manifestApis.forEach(manifestApi => {
+              const requiredResource = resolvedApis.find(api => api.resourceAppId === manifestApi.resourceAppId);
+              if (requiredResource) {
+                // exclude if any duplicate required resources in both manifest and submitted options
+                requiredResource.resourceAccess.push(...manifestApi.resourceAccess.filter(manRes => !requiredResource.resourceAccess.some(res => res.id === manRes.id)));
+              }
+              else {
+                resolvedApis.push(manifestApi);
+              }
+
+              const app = servicePrincipals.find(servicePrincipals => servicePrincipals.appId === manifestApi.resourceAppId);
+
+              if (app) {
+                manifestApi.resourceAccess.forEach((res => {
+                  const resourceAccessPermission = {
+                    id: res.id,
+                    type: res.type
+                  };
+
+                  const oAuthValue = app.oauth2PermissionScopes.find(scp => scp.id === res.id)?.value;
+                  this.updateAppPermissions(app.id, resourceAccessPermission, oAuthValue);
+                }));
+              }
+            });
+          }
+
+          if (this.verbose) {
             logger.logToStderr(`Merged delegated and application permissions: ${JSON.stringify(resolvedApis, null, 2)}`);
+            logger.logToStderr(`App role assignments: ${JSON.stringify(this.appPermissions.flatMap(permission => permission.resourceAccess.filter(access => access.type === "Role")), null, 2)}`);
+            logger.logToStderr(`OAuth2 permissions: ${JSON.stringify(this.appPermissions.flatMap(permission => permission.scope), null, 2)}`);
           }
 
           return Promise.resolve(resolvedApis);
@@ -530,13 +809,40 @@ class AadAppAddCommand extends GraphCommand {
         resolvedApis.push(resolvedApi);
       }
 
-      resolvedApi.resourceAccess.push({
+      const resourceAccessPermission = {
         id: permission.id,
         type: scopeType
-      });
+      };
+
+      resolvedApi.resourceAccess.push(resourceAccessPermission);
+
+      this.updateAppPermissions(servicePrincipal.id, resourceAccessPermission, permission.value);
     });
 
     return resolvedApis;
+  }
+
+  private updateAppPermissions(spId: string, resourceAccessPermission: ResourceAccess, oAuth2PermissionValue?: string) {
+    // During API resolution, we store globally both app role assignments and oauth2permissions
+    // So that we'll be able to parse them during the admin consent process
+    let existingPermission = this.appPermissions.find(oauth => oauth.resourceId === spId);
+    if (!existingPermission) {
+      existingPermission = {
+        resourceId: spId,
+        resourceAccess: [],
+        scope: []
+      };
+
+      this.appPermissions.push(existingPermission);
+    }
+
+    if (resourceAccessPermission.type === 'Scope' && oAuth2PermissionValue && !existingPermission.scope.find(scp => scp === oAuth2PermissionValue)) {
+      existingPermission.scope.push(oAuth2PermissionValue);
+    }
+
+    if (!existingPermission.resourceAccess.find(res => res.id === resourceAccessPermission.id)) {
+      existingPermission.resourceAccess.push(resourceAccessPermission);
+    }
   }
 
   private configureSecret(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
@@ -650,130 +956,6 @@ class AadAppAddCommand extends GraphCommand {
     }
 
     return Promise.resolve(appInfo);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '--multitenant'
-      },
-      {
-        option: '-r, --redirectUris [redirectUris]'
-      },
-      {
-        option: '-p, --platform [platform]',
-        autocomplete: AadAppAddCommand.aadApplicationPlatform
-      },
-      {
-        option: '--implicitFlow'
-      },
-      {
-        option: '-s, --withSecret'
-      },
-      {
-        option: '--apisDelegated [apisDelegated]'
-      },
-      {
-        option: '--apisApplication [apisApplication]'
-      },
-      {
-        option: '-u, --uri [uri]'
-      },
-      {
-        option: '--scopeName [scopeName]'
-      },
-      {
-        option: '--scopeConsentBy [scopeConsentBy]',
-        autocomplete: AadAppAddCommand.aadAppScopeConsentBy
-      },
-      {
-        option: '--scopeAdminConsentDisplayName [scopeAdminConsentDisplayName]'
-      },
-      {
-        option: '--scopeAdminConsentDescription [scopeAdminConsentDescription]'
-      },
-      {
-        option: '--certificateFile [certificateFile]'
-      },
-      {
-        option: '--certificateBase64Encoded [certificateBase64Encoded]'
-      },
-      {
-        option: '--certificateDisplayName [certificateDisplayName]'
-      },
-      {
-        option: '--manifest [manifest]'
-      },
-      {
-        option: '--save'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.manifest && !args.options.name) {
-      return 'Specify either the name of the app to create or the manifest';
-    }
-
-    if (args.options.platform &&
-      AadAppAddCommand.aadApplicationPlatform.indexOf(args.options.platform) < 0) {
-      return `${args.options.platform} is not a valid value for platform. Allowed values are ${AadAppAddCommand.aadApplicationPlatform.join(', ')}`;
-    }
-
-    if (args.options.redirectUris && !args.options.platform) {
-      return `When you specify redirectUris you also need to specify platform`;
-    }
-
-    if (args.options.certificateFile && args.options.certificateBase64Encoded) {
-      return 'Specify either certificateFile or certificateBase64Encoded but not both';
-    }
-
-    if (args.options.certificateDisplayName && !args.options.certificateFile && !args.options.certificateBase64Encoded) {
-      return 'When you specify certificateDisplayName you also need to specify certificateFile or certificateBase64Encoded';
-    }
-
-    if (args.options.certificateFile && !fs.existsSync(args.options.certificateFile as string)) {
-      return 'Certificate file not found';
-    }
-
-    if (args.options.scopeName) {
-      if (!args.options.uri) {
-        return `When you specify scopeName you also need to specify uri`;
-      }
-
-      if (!args.options.scopeAdminConsentDescription) {
-        return `When you specify scopeName you also need to specify scopeAdminConsentDescription`;
-      }
-
-      if (!args.options.scopeAdminConsentDisplayName) {
-        return `When you specify scopeName you also need to specify scopeAdminConsentDisplayName`;
-      }
-    }
-
-    if (args.options.scopeConsentBy &&
-      AadAppAddCommand.aadAppScopeConsentBy.indexOf(args.options.scopeConsentBy) < 0) {
-      return `${args.options.scopeConsentBy} is not a valid value for scopeConsentBy. Allowed values are ${AadAppAddCommand.aadAppScopeConsentBy.join(', ')}`;
-    }
-
-    if (args.options.manifest) {
-      try {
-        this.manifest = JSON.parse(args.options.manifest);
-        if (!args.options.name && !this.manifest.name) {
-          return `Specify the name of the app to create either through the 'name' option or the 'name' property in the manifest`;
-        }
-      }
-      catch (e) {
-        return `Error while parsing the specified manifest: ${e}`;
-      }
-    }
-
-    return true;
   }
 }
 

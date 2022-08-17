@@ -1,10 +1,10 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
-import Command, { CommandError, CommandErrorWithOutput, CommandOption } from '../../../../Command';
+import Command, { CommandError, CommandErrorWithOutput } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import * as spoSiteClassicAddCommand from '../site/site-classic-add';
+import * as spoSiteAddCommand from '../site/site-add';
 import * as spoSiteGetCommand from '../site/site-get';
 import * as spoSiteRemoveCommand from '../site/site-remove';
 import * as spoTenantAppCatalogUrlGetCommand from './tenant-appcatalogurl-get';
@@ -30,13 +30,67 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
     return 'Creates new tenant app catalog site';
   }
 
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        wait: args.options.wait || false,
+        force: args.options.force || false
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '--owner <owner>'
+      },
+      {
+        option: '-z, --timeZone <timeZone>'
+      },
+      {
+        option: '--wait'
+      },
+      {
+        option: '--force'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (typeof args.options.timeZone !== 'number') {
+          return `${args.options.timeZone} is not a number`;
+        }
+
+        return true;
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
       logger.logToStderr('Checking for existing app catalog URL...');
     }
 
     Cli
-      .executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { _: [] } })
+      .executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { output: 'text', _: [] } })
       .then((spoTenantAppCatalogUrlGetCommandOutput: CommandOutput): Promise<void> => {
         const appCatalogUrl: string | undefined = spoTenantAppCatalogUrlGetCommandOutput.stdout;
         if (!appCatalogUrl) {
@@ -51,6 +105,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
           logger.logToStderr(`Found app catalog URL ${appCatalogUrl}`);
         }
 
+        //Using JSON.parse
         return this.ensureNoExistingSite(appCatalogUrl, args.options.force, logger);
       })
       .then(() => this.ensureNoExistingSite(args.options.url, args.options.force, logger))
@@ -118,53 +173,19 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
       logger.logToStderr(`Creating app catalog at ${options.url}...`);
     }
 
-    const siteClassicAddOptions = {
+    const siteAddOptions = {
       webTemplate: 'APPCATALOG#0',
       title: 'App catalog',
+      type: 'ClassicSite',
       url: options.url,
       timeZone: options.timeZone,
-      owner: options.owner,
+      owners: options.owner,
       wait: options.wait,
       verbose: this.verbose,
-      debug: this.debug
-    };
-    return Cli.executeCommand(spoSiteClassicAddCommand as Command, { options: { ...siteClassicAddOptions, _: [] } });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '--owner <owner>'
-      },
-      {
-        option: '-z, --timeZone <timeZone>'
-      },
-      {
-        option: '--wait'
-      },
-      {
-        option: '--force'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (typeof args.options.timeZone !== 'number') {
-      return `${args.options.timeZone} is not a number`;
-    }
-
-    return true;
+      debug: this.debug,
+      removeDeletedSite: false
+    } as spoSiteAddCommand.Options;
+    return Cli.executeCommand(spoSiteAddCommand as Command, { options: { ...siteAddOptions, _: [] } });
   }
 }
 

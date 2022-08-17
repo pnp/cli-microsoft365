@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -24,6 +21,20 @@ class SpoThemeGetCommand extends SpoCommand {
 
   public get description(): string {
     return 'Gets custom theme information';
+  }
+
+  constructor() {
+    super();
+
+    this.#initOptions();
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --name <name>'
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -65,15 +76,6 @@ class SpoThemeGetCommand extends SpoCommand {
         logger.log(theme);
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [{
-      option: '-n, --name <name>'
-    }];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

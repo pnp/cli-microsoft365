@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -31,14 +31,85 @@ class SpoExternalUserListCommand extends SpoCommand {
     return 'Lists external users in the tenant';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.filter = (!(!args.options.filter)).toString();
-    telemetryProps.pageSize = (!(!args.options.pageSize)).toString();
-    telemetryProps.position = (!(!args.options.position)).toString();
-    telemetryProps.sortOrder = (!(!args.options.sortOrder)).toString();
-    telemetryProps.siteUrl = (!(!args.options.siteUrl)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        filter: (!(!args.options.filter)).toString(),
+        pageSize: (!(!args.options.pageSize)).toString(),
+        position: (!(!args.options.position)).toString(),
+        sortOrder: (!(!args.options.sortOrder)).toString(),
+        siteUrl: (!(!args.options.siteUrl)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-f, --filter [filter]'
+      },
+      {
+        option: '-p, --pageSize [pageSize]'
+      },
+      {
+        option: '-i, --position [position]'
+      },
+      {
+        option: '-s, --sortOrder [sortOrder]',
+        autocomplete: ['asc', 'desc']
+      },
+      {
+        option: '-u, --siteUrl [siteUrl]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.pageSize) {
+          const pageSize: number = parseInt(args.options.pageSize);
+          if (isNaN(pageSize)) {
+            return `${args.options.pageSize} is not a valid number`;
+          }
+    
+          if (pageSize < 1 || pageSize > 50) {
+            return 'pageSize must be between 1 and 50';
+          }
+        }
+    
+        if (args.options.position) {
+          const position: number = parseInt(args.options.position);
+          if (isNaN(position)) {
+            return `${args.options.position} is not a valid number`;
+          }
+    
+          if (position < 0) {
+            return 'position must be greater than or 0';
+          }
+        }
+    
+        if (args.options.sortOrder &&
+          args.options.sortOrder !== 'asc' &&
+          args.options.sortOrder !== 'desc') {
+          return `${args.options.sortOrder} is not a valid sortOrder value. Allowed values asc|desc`;
+        }
+    
+        if (args.options.siteUrl) {
+          return validation.isValidSharePointUrl(args.options.siteUrl);
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -106,66 +177,6 @@ class SpoExternalUserListCommand extends SpoCommand {
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-f, --filter [filter]'
-      },
-      {
-        option: '-p, --pageSize [pageSize]'
-      },
-      {
-        option: '-i, --position [position]'
-      },
-      {
-        option: '-s, --sortOrder [sortOrder]',
-        autocomplete: ['asc', 'desc']
-      },
-      {
-        option: '-u, --siteUrl [siteUrl]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.pageSize) {
-      const pageSize: number = parseInt(args.options.pageSize);
-      if (isNaN(pageSize)) {
-        return `${args.options.pageSize} is not a valid number`;
-      }
-
-      if (pageSize < 1 || pageSize > 50) {
-        return 'pageSize must be between 1 and 50';
-      }
-    }
-
-    if (args.options.position) {
-      const position: number = parseInt(args.options.position);
-      if (isNaN(position)) {
-        return `${args.options.position} is not a valid number`;
-      }
-
-      if (position < 0) {
-        return 'position must be greater than or 0';
-      }
-    }
-
-    if (args.options.sortOrder &&
-      args.options.sortOrder !== 'asc' &&
-      args.options.sortOrder !== 'desc') {
-      return `${args.options.sortOrder} is not a valid sortOrder value. Allowed values asc|desc`;
-    }
-
-    if (args.options.siteUrl) {
-      return validation.isValidSharePointUrl(args.options.siteUrl);
-    }
-
-    return true;
   }
 }
 

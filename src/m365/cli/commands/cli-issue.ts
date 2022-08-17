@@ -1,9 +1,6 @@
 import { ChildProcess } from 'child_process';
 import * as open from 'open';
 import { Logger } from '../../../cli';
-import {
-  CommandOption
-} from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import AnonymousCommand from '../../base/AnonymousCommand';
 import commands from '../commands';
@@ -17,10 +14,6 @@ interface Options extends GlobalOptions {
 }
 
 class CliIssueCommand extends AnonymousCommand {
-  constructor(private open: any) {
-    super();
-  }
-
   public get name(): string {
     return commands.ISSUE;
   }
@@ -29,10 +22,41 @@ class CliIssueCommand extends AnonymousCommand {
     return 'Returns, or opens a URL that takes the user to the right place in the CLI GitHub repo to create a new issue reporting bug, feedback, ideas, etc.';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.type = args.options.type;
-    return telemetryProps;
+  constructor(private open: any) {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        type: args.options.type
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-t, --type <type>',
+        autocomplete: CliIssueCommand.issueType
+      }
+    );
+  }
+  
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (CliIssueCommand.issueType.indexOf(args.options.type) < 0) {
+          return `${args.options.type} is not a valid Issue type. Allowed values are ${CliIssueCommand.issueType.join(', ')}`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -65,26 +89,6 @@ class CliIssueCommand extends AnonymousCommand {
     'command',
     'sample'
   ];
-
-  public validate(args: CommandArgs): boolean | string {
-    if (CliIssueCommand.issueType.indexOf(args.options.type) < 0) {
-      return `${args.options.type} is not a valid Issue type. Allowed values are ${CliIssueCommand.issueType.join(', ')}`;
-    }
-
-    return true;
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-t, --type <type>',
-        autocomplete: CliIssueCommand.issueType
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
 }
 
 module.exports = new CliIssueCommand(open);

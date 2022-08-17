@@ -341,6 +341,7 @@ nav:
         - file list: 'cmd/spo/file/file-list.md'
         - file move: 'cmd/spo/file/file-move.md'
         - file remove: 'cmd/spo/file/file-remove.md'
+        - file rename: 'cmd/spo/file/file-rename.md'
         - file sharinginfo get: 'cmd/spo/file/file-sharinginfo-get.md'
       - folder:
         - folder add: 'cmd/spo/folder/folder-add.md'
@@ -387,6 +388,8 @@ nav:
         - list get: 'cmd/spo/list/list-get.md'
         - list list: 'cmd/spo/list/list-list.md'
         - list remove: 'cmd/spo/list/list-remove.md'
+        - list roleassignment remove: 'cmd/spo/list/list-roleassignment-remove.md'
+        - list roleassignment add: 'cmd/spo/list/list-roleassignment-add.md'
         - list roleinheritance break: 'cmd/spo/list/list-roleinheritance-break.md'
         - list roleinheritance reset: 'cmd/spo/list/list-roleinheritance-reset.md'
         - list set: 'cmd/spo/list/list-set.md'
@@ -571,6 +574,7 @@ nav:
         - web list: 'cmd/spo/web/web-list.md'
         - web reindex: 'cmd/spo/web/web-reindex.md'
         - web remove: 'cmd/spo/web/web-remove.md'
+        - web roleinheritance reset: 'cmd/spo/web/web-roleinheritance-reset.md'
         - web set: 'cmd/spo/web/web-set.md'
     - Teams (teams):
       - app:
@@ -746,6 +750,7 @@ nav:
       - 'List all checked out files': 'sample-scripts/spo/list-all-checked-out-files.md'
       - 'List all documents with a specific name within a SharePoint site': 'sample-scripts/spo/list-all-files-specific-name.md'
       - 'Lists all external users in all site collections': 'sample-scripts/spo/list-site-externalusers.md'
+      - 'List all external users in site groups across all site collections': 'sample-scripts/spo/list-externalusers-in-sitegroups.md'
       - 'Lists all failed site designs': 'sample-scripts/spo/list-failed-sitedesigns.md'
       - 'List all items with unique permissions': 'sample-scripts/spo/list-all-items-with-unique-permissions.md'
       - 'List all large files within a SharePoint Site': 'sample-scripts/spo/list-large-files-within-a-site.md'
@@ -790,11 +795,24 @@ nav:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Comparison to SharePoint and Microsoft 365 PowerShell': 'about/comparison-powershell.md'
     - 'Release notes': 'about/release-notes.md'
+    - 'Team': 'about/team.md'
     - License: 'about/license.md'
 theme:
     name: 'material'
-    palette:
-        primary: 'red'
+    palette:        
+        - media: "(prefers-color-scheme: light)"
+          scheme: default
+          primary: 'red'
+          accent: 'indigo'
+          toggle:
+            icon: material/weather-sunny
+            name: Switch to dark mode
+        - media: "(prefers-color-scheme: dark)"
+          scheme: slate 
+          primary: 'red'
+          toggle:
+            icon: material/weather-night
+            name: Switch to light mode
     logo: 'images/pnp-cli-microsoft365-white.svg'
     features:
         - navigation.tabs
@@ -805,12 +823,18 @@ extra_css:
     - 'css/styles2.css'
 markdown_extensions:
     - admonition
+    - meta
     - toc:
           permalink: true
     - pymdownx.highlight
     - pymdownx.snippets
     - pymdownx.superfences
+    - pymdownx.tabbed:
+        alternate_style: true 
     - pymdownx.tabbed
+    - pymdownx.emoji:
+          emoji_index: !!python/name:materialx.emoji.twemoji
+          emoji_generator: !!python/name:materialx.emoji.to_svg
     - def_list
 extra:
     social:
@@ -824,3 +848,7 @@ extra:
           link: 'https://aka.ms/sppnp'
 repo_url: http://github.com/pnp/cli-microsoft365
 edit_uri: blob/main/docs/docs
+plugins:
+    - search
+    - tags:
+        tags_file: doc-tags.md

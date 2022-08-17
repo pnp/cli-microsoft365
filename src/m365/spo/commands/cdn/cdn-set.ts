@@ -1,11 +1,11 @@
 import { Logger } from '../../../../cli';
 import {
-  CommandError, CommandOption
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { spo, ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -28,12 +28,58 @@ class SpoCdnSetCommand extends SpoCommand {
     return 'Enable or disable the specified Microsoft 365 CDN';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.cdnType = args.options.type || 'Public';
-    telemetryProps.enabled = args.options.enabled === 'true';
-    telemetryProps.noDefaultOrigins = (!(!args.options.noDefaultOrigins)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        cdnType: args.options.type || 'Public',
+        enabled: args.options.enabled === 'true',
+        noDefaultOrigins: (!(!args.options.noDefaultOrigins)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-e, --enabled <enabled>',
+        autocomplete: ['true', 'false']
+      },
+      {
+        option: '-t, --type [type]',
+        autocomplete: ['Public', 'Private', 'Both']
+      },
+      {
+        option: '--noDefaultOrigins'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.type) {
+          if (args.options.type !== 'Public' && args.options.type !== 'Both' &&
+            args.options.type !== 'Private') {
+            return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private|Both`;
+          }
+        }
+
+        if (args.options.enabled !== 'true' &&
+          args.options.enabled !== 'false') {
+          return `${args.options.enabled} is not a valid boolean value. Allowed values are true|false`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -122,44 +168,9 @@ class SpoCdnSetCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        
+
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.type) {
-      if (args.options.type !== 'Public' && args.options.type !== 'Both' &&
-        args.options.type !== 'Private') {
-        return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private|Both`;
-      }
-    }
-
-    if (args.options.enabled !== 'true' &&
-      args.options.enabled !== 'false') {
-      return `${args.options.enabled} is not a valid boolean value. Allowed values are true|false`;
-    }
-
-    return true;
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-e, --enabled <enabled>',
-        autocomplete: ['true', 'false']
-      },
-      {
-        option: '-t, --type [type]',
-        autocomplete: ['Public', 'Private', 'Both']
-      },
-      {
-        option: '--noDefaultOrigins'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

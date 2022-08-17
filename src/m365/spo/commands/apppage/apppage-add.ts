@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { urlUtil } from '../../../../utils';
@@ -24,14 +21,56 @@ class SpoAppPageAddCommand extends SpoCommand {
     return commands.APPPAGE_ADD;
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.addToQuickLaunch = args.options.addToQuickLaunch;
-    return telemetryProps;
-  }
-
   public get description(): string {
     return 'Creates a single-part app page';
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        addToQuickLaunch: args.options.addToQuickLaunch
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-t, --title <title>'
+      },
+      {
+        option: '-d, --webPartData <webPartData>'
+      },
+      {
+        option: '--addToQuickLaunch'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        try {
+          JSON.parse(args.options.webPartData);
+        }
+        catch (e) {
+          return `Specified webPartData is not a valid JSON string. Error: ${e}`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -85,37 +124,6 @@ class SpoAppPageAddCommand extends SpoCommand {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-t, --title <title>'
-      },
-      {
-        option: '-d, --webPartData <webPartData>'
-      },
-      {
-        option: '--addToQuickLaunch'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    try {
-      JSON.parse(args.options.webPartData);
-    }
-    catch (e) {
-      return `Specified webPartData is not a valid JSON string. Error: ${e}`;
-    }
-
-    return true;
   }
 }
 

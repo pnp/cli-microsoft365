@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -32,13 +29,58 @@ class SpoMailSendCommand extends SpoCommand {
     return 'Sends an e-mail from SharePoint';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.from = typeof args.options.from !== 'undefined';
-    telemetryProps.cc = typeof args.options.cc !== 'undefined';
-    telemetryProps.bcc = typeof args.options.bcc !== 'undefined';
-    telemetryProps.additionalHeaders = typeof args.options.additionalHeaders !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        from: typeof args.options.from !== 'undefined',
+        cc: typeof args.options.cc !== 'undefined',
+        bcc: typeof args.options.bcc !== 'undefined',
+        additionalHeaders: typeof args.options.additionalHeaders !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--to <to>'
+      },
+      {
+        option: '--subject <subject>'
+      },
+      {
+        option: '--body <body>'
+      },
+      {
+        option: '--from [from]'
+      },
+      {
+        option: '--cc [cc]'
+      },
+      {
+        option: '--bcc [bcc]'
+      },
+      {
+        option: '--additionalHeaders [additionalHeaders]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -92,42 +134,6 @@ class SpoMailSendCommand extends SpoCommand {
     request
       .post(requestOptions)
       .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '--to <to>'
-      },
-      {
-        option: '--subject <subject>'
-      },
-      {
-        option: '--body <body>'
-      },
-      {
-        option: '--from [from]'
-      },
-      {
-        option: '--cc [cc]'
-      },
-      {
-        option: '--bcc [bcc]'
-      },
-      {
-        option: '--additionalHeaders [additionalHeaders]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    return validation.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

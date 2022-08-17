@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { FormDigestInfo, spo } from '../../../../utils';
@@ -37,13 +36,58 @@ class SpoSiteRenameCommand extends SpoCommand {
     return 'Renames the URL and title of a site collection';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.newSiteTitle = args.options.newSiteTitle ? true : false;
-    telemetryProps.suppressMarketplaceAppCheck = args.options.suppressMarketplaceAppCheck;
-    telemetryProps.suppressWorkflow2013Check = args.options.suppressWorkflow2013Check;
-    telemetryProps.wait = args.options.wait;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        newSiteTitle: args.options.newSiteTitle ? true : false,
+        suppressMarketplaceAppCheck: args.options.suppressMarketplaceAppCheck,
+        suppressWorkflow2013Check: args.options.suppressWorkflow2013Check,
+        wait: args.options.wait
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --siteUrl <siteUrl>'
+      },
+      {
+        option: '--newSiteUrl <newSiteUrl>'
+      },
+      {
+        option: '--newSiteTitle [newSiteTitle]'
+      },
+      {
+        option: '--suppressMarketplaceAppCheck'
+      },
+      {
+        option: '--suppressWorkflow2013Check'
+      },
+      {
+        option: '--wait'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.siteUrl.toLowerCase() === args.options.newSiteUrl.toLowerCase()) {
+          return 'The new URL cannot be the same as the target URL.';
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -160,44 +204,6 @@ class SpoSiteRenameCommand extends SpoCommand {
       .catch((ex: any) => {
         reject(ex);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --siteUrl <siteUrl>'
-      },
-      {
-        option: '--newSiteUrl <newSiteUrl>'
-      },
-      {
-        option: '--newSiteTitle [newSiteTitle]'
-      },
-      {
-        option: '--suppressMarketplaceAppCheck'
-      },
-      {
-        option: '--suppressWorkflow2013Check'
-      },
-      {
-        option: '--wait'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.newSiteUrl) {
-      return 'A new url must be provided.';
-    }
-
-    if (args.options.siteUrl.toLowerCase() === args.options.newSiteUrl.toLowerCase()) {
-      return 'The new URL cannot be the same as the target URL.';
-    }
-
-    return true;
   }
 }
 

@@ -1,8 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption,
-  CommandTypes
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -35,11 +31,82 @@ class SpoListItemGetCommand extends SpoCommand {
     return 'Gets a list item from the specified list';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.listId = typeof args.options.listId !== 'undefined';
-    telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initTypes();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        listId: typeof args.options.listId !== 'undefined',
+        listTitle: typeof args.options.listTitle !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-i, --id <id>'
+      },
+      {
+        option: '-l, --listId [listId]'
+      },
+      {
+        option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '-p, --properties [properties]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (!args.options.listId && !args.options.listTitle) {
+          return `Specify listId or listTitle`;
+        }
+
+        if (args.options.listId && args.options.listTitle) {
+          return `Specify listId or listTitle but not both`;
+        }
+
+        if (args.options.listId &&
+          !validation.isValidGuid(args.options.listId)) {
+          return `${args.options.listId} in option listId is not a valid GUID`;
+        }
+
+        if (isNaN(parseInt(args.options.id))) {
+          return `${args.options.id} is not a number`;
+        }
+
+        return true;
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push(
+      'webUrl',
+      'listId',
+      'listTitle',
+      'id',
+      'properties'
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -70,67 +137,6 @@ class SpoListItemGetCommand extends SpoCommand {
         logger.log(<ListItemInstance>response);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --id <id>'
-      },
-      {
-        option: '-l, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '-p, --properties [properties]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public types(): CommandTypes {
-    return {
-      string: [
-        'webUrl',
-        'listId',
-        'listTitle',
-        'id',
-        'properties'
-      ]
-    };
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (!args.options.listId && !args.options.listTitle) {
-      return `Specify listId or listTitle`;
-    }
-
-    if (args.options.listId && args.options.listTitle) {
-      return `Specify listId or listTitle but not both`;
-    }
-
-    if (args.options.listId &&
-      !validation.isValidGuid(args.options.listId)) {
-      return `${args.options.listId} in option listId is not a valid GUID`;
-    }
-
-    if (isNaN(parseInt(args.options.id))) {
-      return `${args.options.id} is not a number`;
-    }
-
-    return true;
   }
 }
 
