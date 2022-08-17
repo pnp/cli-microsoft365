@@ -4,9 +4,9 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import commands from '../../commands';
-import * as Parser from 'rss-parser';
+import request from '../../../../request';
 const command: Command = require('./changelog-list');
 
 describe(commands.CHANGELOG_LIST, () => {
@@ -19,42 +19,34 @@ describe(commands.CHANGELOG_LIST, () => {
   const validStartDate = '2018-12-01';
   const validEndDate = '2019-03-01';
 
-  const validRSSResponse = {
-    feedUrl: 'https://graph.office.net/en-us/graph/changelog/rss',
-    paginationLinks: {
-      self: 'https://graph.office.net/en-us/graph/changelog/rss'
-    },
-    title: 'Microsoft Graph Changelog',
-    description: 'Microsoft Graph Changelog Rss Feed',
-    link: 'https://graph.office.net/en-us/graph/changelog/rss',
-    lastBuildDate: 'Tue, 12 Jul 2022 09:58:42 Z',
-    items: [
-      {
-        title: 'Groups',
-        pubDate: '2019-01-01T00:00:00.000Z',
-        content: 'Added something.\r\\\n',
-        contentSnippet: 'Added something.',
-        guid: '7f1afeea-1c73-4e84-af08-8c9cd0fe27d5v1.0',
-        categories: [
-          'prd',
-          'v1.0'
-        ],
-        isoDate: '2019-01-01T00:00:00.000Z'
-      },
-      {
-        title: 'Security',
-        pubDate: '2019-01-01T00:00:00.000Z',
-        content: 'Added something.\r\\\n',
-        contentSnippet: 'Added something.',
-        guid: '7f1afeea-1c73-4e84-af08-8c9cd0fe27d5beta',
-        categories: [
-          'prd',
-          'beta'
-        ],
-        isoDate: '2019-02-01T00:00:00.000Z'
-      }
-    ]
-  };
+  const validRSSResponse = `
+    <rss version="2.0">
+      <channel
+        xmlns:atom="http://www.w3.org/2005/Atom">
+        <title>Microsoft Graph Changelog</title>
+        <link>https://graph.office.net/en-us/graph/changelog/rss</link>
+        <description>Microsoft Graph Changelog Rss Feed</description>
+        <lastBuildDate>Tue, 12 Jul 2022 09:58:42 Z</lastBuildDate>
+        <atom:link href="https://graph.office.net/en-us/graph/changelog/rss/?search=&amp;filterBy=Financials" rel="self" type="application/rss+xml" />
+        <item>
+          <guid isPermaLink="false">7f1afeea-1c73-4e84-af08-8c9cd0fe27d5v1.0</guid>
+          <category>prd</category>
+          <category>v1.0</category>
+          <title>Groups</title>
+          <description>Added something.</description>
+          <pubDate>2019-01-01T00:00:00.000Z</pubDate>
+        </item>
+        <item>
+          <guid isPermaLink="false">7f1afeea-1c73-4e84-af08-8c9cd0fe27d5beta</guid>
+          <category>prd</category>
+          <category>beta</category>
+          <title>Security</title>
+          <description>Added something.</description>
+          <pubDate>2019-02-01T00:00:00.000Z</pubDate>
+        </item>
+      </channel>
+    </rss>
+  `;
 
   const validChangelog = [
     {
@@ -93,17 +85,20 @@ describe(commands.CHANGELOG_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    
-    sinon
-      .stub(Parser.prototype, 'parseURL')
-      .withArgs('https://developer.microsoft.com/en-us/graph/changelog/rss')
-      .returns(Promise.resolve(validRSSResponse));
 
     (command as any).items = [];
   });
 
   afterEach(() => {
-    sinon.restore();
+    sinonUtil.restore([request.get]);
+  });
+
+  after(() => {
+    sinonUtil.restore([
+      auth.restoreAuth,
+      appInsights.trackEvent
+    ]);
+    auth.service.connected = false;
   });
 
   it('has correct name', () => {
@@ -219,6 +214,14 @@ describe(commands.CHANGELOG_LIST, () => {
   });
 
   it('retrieves changelog list', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://developer.microsoft.com/en-us/graph/changelog/rss') {
+        return Promise.resolve(validRSSResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
     command.action(logger, {
       options: { }
     }, () => {
@@ -233,11 +236,13 @@ describe(commands.CHANGELOG_LIST, () => {
   });
 
   it('retrieves changelog list based on changeType', (done) => {
-    sinonUtil.restore(Parser.prototype.parseURL);
-    sinon
-      .stub(Parser.prototype, 'parseURL')
-      .withArgs('https://developer.microsoft.com/en-us/graph/changelog/rss/?filterBy=Addition')
-      .returns(Promise.resolve(validRSSResponse));
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://developer.microsoft.com/en-us/graph/changelog/rss/?filterBy=Addition') {
+        return Promise.resolve(validRSSResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
 
     command.action(logger, {
       options: { 
@@ -255,6 +260,14 @@ describe(commands.CHANGELOG_LIST, () => {
   });
 
   it('retrieves changelog list based on versions, services, startDate and endDate', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://developer.microsoft.com/en-us/graph/changelog/rss') {
+        return Promise.resolve(validRSSResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
     command.action(logger, {
       options: { 
         versions: validVersions,
@@ -273,8 +286,6 @@ describe(commands.CHANGELOG_LIST, () => {
     });
   });
 
-
-
   it('supports debug mode', () => {
     const options = command.options();
     let containsOption = false;
@@ -284,5 +295,20 @@ describe(commands.CHANGELOG_LIST, () => {
       }
     });
     assert(containsOption);
+  });
+
+  it('correctly handles random API error', (done) => {
+    sinonUtil.restore(request.get);
+    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
+
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 });

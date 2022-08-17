@@ -5,7 +5,8 @@ import { validation } from '../../../../utils';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import { Changelog, ChangelogItem } from '../../Changelog';
 import commands from '../../commands';
-import * as Parser from 'rss-parser';
+import request from '../../../../request';
+import { DOMParser } from '@xmldom/xmldom';
 
 interface CommandArgs {
   options: Options;
@@ -55,18 +56,28 @@ class GraphChangelogListCommand extends AnonymousCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const parser = new Parser();
     const allowedChangeType = args.options.changeType && this.allowedChangeTypes.find(x => x.toLocaleLowerCase() === args.options.changeType!.toLocaleLowerCase());
     const searchParam = args.options.changeType ? `/?filterBy=${allowedChangeType}` : '';
 
-    parser
-      .parseURL(`https://developer.microsoft.com/en-us/graph/changelog/rss${searchParam}`)
+    const requestOptions: any = {
+      url: `https://developer.microsoft.com/en-us/graph/changelog/rss${searchParam}`,
+      headers: {
+        'accept': 'text/xml',
+        'x-anonymous': 'true'
+      }
+    };
+
+    request
+      .get(requestOptions)
       .then((output: any) => {
-        const changelog: Changelog = this.filterThroughOptions(args.options, this.mapChangelog(output));
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(output.toString(), "text/xml");
+
+        const changelog = this.filterThroughOptions(args.options, this.mapChangelog(xmlDoc));
         
         logger.log(changelog.items);
         cb();
-      });
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private filterThroughOptions(options: Options, changelog: Changelog): Changelog {
@@ -107,21 +118,27 @@ class GraphChangelogListCommand extends AnonymousCommand {
     return changelog;
   }
 
-  private mapChangelog(output: any): Changelog {
-    const changelogItems: ChangelogItem[] = output['items'].map((item: any) => ({
-      guid: item['guid'],
-      category: item['categories'][1],
-      title: item['title'],
-      description: item['contentSnippet'],
-      pubDate: new Date(item['isoDate'])
-    }) as ChangelogItem);
+  private mapChangelog(xmlDoc: any): Changelog {
+    const channel = xmlDoc.getElementsByTagName('channel').item(0);
+    
+    const changelog: Changelog = {
+      title: channel.getElementsByTagName('title').item(0).textContent,
+      description: channel.getElementsByTagName('description').item(0).textContent,
+      url: channel.getElementsByTagName('link').item(0).textContent,
+      items: []
+    } as Changelog;
 
-    return ({
-      title: output['title'],
-      url: output['link'],
-      description: output['description'],
-      items: changelogItems
-    }) as Changelog;
+    Array.from(xmlDoc.getElementsByTagName('item')).forEach((item: any) => {
+      changelog.items.push({
+        guid: item.getElementsByTagName('guid').item(0).textContent,
+        category: item.getElementsByTagName('category').item(1).textContent,
+        title: item.getElementsByTagName('title').item(0).textContent,
+        description: item.getElementsByTagName('description').item(0).textContent,
+        pubDate: new Date(item.getElementsByTagName('pubDate').item(0).textContent)
+      } as ChangelogItem);
+    });
+
+    return changelog;
   }
 
   public options(): CommandOption[] {
