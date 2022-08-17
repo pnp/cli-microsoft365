@@ -258,6 +258,7 @@ nav:
         - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
         - externalconnection get: 'cmd/search/externalconnection/externalconnection-get.md'
         - externalconnection list: 'cmd/search/externalconnection/externalconnection-list.md'
+        - externalconnection remove: 'cmd/search/externalconnection/externalconnection-remove.md'
     - Skype (skype):
       - report:
         - report activitycounts: 'cmd/skype/report/report-activitycounts.md'
