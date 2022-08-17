@@ -1,7 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -29,11 +26,44 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
     return 'Removes specified property from the property bag';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.folder = (!(!args.options.folder)).toString();
-    telemetryProps.confirm = args.options.confirm === true;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        folder: (!(!args.options.folder)).toString(),
+        confirm: args.options.confirm === true
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '-k, --key <key>'
+      },
+      {
+        option: '-f, --folder [folder]'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -105,38 +135,6 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
         }
       }, (err: any): void => { reject(err); });
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-k, --key <key>'
-      },
-      {
-        option: '-f, --folder [folder]'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (validation.isValidSharePointUrl(args.options.webUrl) !== true) {
-      return 'Missing required option url';
-    }
-
-    if (!args.options.key) {
-      return 'Missing required option key';
-    }
-
-    return true;
   }
 }
 

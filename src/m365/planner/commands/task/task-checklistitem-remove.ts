@@ -1,6 +1,5 @@
 import { PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
 import { Cli, Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -25,10 +24,27 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
     return 'Removes the checklist item from the planner task';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+  
+    this.#initTelemetry();
+    this.#initOptions();
+  }
+  
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '-i, --id <id>' },
+      { option: '--taskId <taskId>' },
+      { option: '--confirm' }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -90,17 +106,6 @@ class PlannerTaskChecklistItemRemoveCommand extends GraphCommand {
     };
 
     return request.get(requestOptions);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '-i, --id <id>' },
-      { option: '--taskId <taskId>' },
-      { option: '--confirm' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

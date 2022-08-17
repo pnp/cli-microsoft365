@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../appInsights';
 import auth from '../../Auth';
-import { Logger } from '../../cli';
+import { Cli, CommandInfo, Logger } from '../../cli';
 import { CommandError } from '../../Command';
 import request from '../../request';
 import { sinonUtil } from '../../utils';
@@ -30,11 +30,13 @@ describe('PeriodBasedReport', () => {
   const mockCommand = new MockCommand();
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(mockCommand);
   });
 
   beforeEach(() => {
@@ -76,47 +78,46 @@ describe('PeriodBasedReport', () => {
     assert.notStrictEqual(mockCommand.description, null);
   });
 
-  it('fails validation on invalid period', () => {
-    const actual = mockCommand.validate({ options: { period: 'abc' } });
+  it('fails validation on invalid period', async () => {
+    const actual = await mockCommand.validate({ options: { period: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation on valid \'D7\' period', () => {
-    const actual = mockCommand.validate({
+  it('passes validation on valid \'D7\' period', async () => {
+    const actual = await mockCommand.validate({
       options: {
         period: 'D7'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation on valid \'D30\' period', () => {
-    const actual = mockCommand.validate({
+  it('passes validation on valid \'D30\' period', async () => {
+    const actual = await mockCommand.validate({
       options: {
         period: 'D30'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation on valid \'D90\' period', () => {
-    const actual = mockCommand.validate({
+  it('passes validation on valid \'D90\' period', async () => {
+    const actual = await mockCommand.validate({
       options: {
         period: 'D90'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation on valid \'180\' period', () => {
-    const actual = mockCommand.validate({
+  it('passes validation on valid \'180\' period', async () => {
+    const actual = await mockCommand.validate({
       options: {
         period: 'D90'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
-
 
   it('get unique device type in teams and export it in a period', (done) => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
@@ -271,11 +272,9 @@ describe('PeriodBasedReport', () => {
       }
     });
   });
-
-
-
+  
   it('supports debug mode', () => {
-    const options = mockCommand.options();
+    const options = mockCommand.options;
     let containsOption = false;
     options.forEach((o: any) => {
       if (o.option === '--debug') {

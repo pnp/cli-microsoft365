@@ -1,5 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
@@ -16,10 +15,6 @@ interface Options extends GlobalOptions {
 }
 
 class YammerMessageLikeSetCommand extends YammerCommand {
-  constructor() {
-    super();
-  }
-
   public get name(): string {
     return commands.MESSAGE_LIKE_SET;
   }
@@ -28,11 +23,53 @@ class YammerMessageLikeSetCommand extends YammerCommand {
     return 'Likes or unlikes a Yammer message';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.enable = args.options.enable !== undefined;
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        enable: args.options.enable !== undefined,
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--id <id>'
+      },
+      {
+        option: '--enable [enable]'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.id && typeof args.options.id !== 'number') {
+          return `${args.options.id} is not a number`;
+        }
+
+        if (args.options.enable &&
+          args.options.enable !== 'true' &&
+          args.options.enable !== 'false') {
+          return `${args.options.enable} is not a valid value for the enable option. Allowed values are true|false`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -89,37 +126,6 @@ class YammerMessageLikeSetCommand extends YammerCommand {
     else {
       executeLikeAction();
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--id <id>'
-      },
-      {
-        option: '--enable [enable]'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.id && typeof args.options.id !== 'number') {
-      return `${args.options.id} is not a number`;
-    }
-
-    if (args.options.enable &&
-      args.options.enable !== 'true' &&
-      args.options.enable !== 'false') {
-      return `${args.options.enable} is not a valid value for the enable option. Allowed values are true|false`;
-    }
-
-    return true;
   }
 }
 

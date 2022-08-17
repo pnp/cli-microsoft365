@@ -1,13 +1,12 @@
-import { Channel } from '../../Channel';
-import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
-import { odata, validation } from '../../../../utils';
 import { ConversationMember, Group } from '@microsoft/microsoft-graph-types';
+import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
-import GraphCommand from '../../../base/GraphCommand';
-import commands from '../../commands';
 import request from '../../../../request';
+import { odata, validation } from '../../../../utils';
 import { aadGroup } from '../../../../utils/aadGroup';
+import GraphCommand from '../../../base/GraphCommand';
+import { Channel } from '../../Channel';
+import commands from '../../commands';
 
 interface ExtendedGroup extends Group {
   resourceProvisioningOptions: string[];
@@ -44,14 +43,83 @@ class TeamsChannelMemberListCommand extends GraphCommand {
     return ['id', 'roles', 'displayName', 'userId', 'email'];
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
-    telemetryProps.teamName = typeof args.options.teamName !== 'undefined';
-    telemetryProps.channelId = typeof args.options.channelId !== 'undefined';
-    telemetryProps.channelName = typeof args.options.channelName !== 'undefined';
-    telemetryProps.role = typeof args.options.role;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        teamId: typeof args.options.teamId !== 'undefined',
+        teamName: typeof args.options.teamName !== 'undefined',
+        channelId: typeof args.options.channelId !== 'undefined',
+        channelName: typeof args.options.channelName !== 'undefined',
+        role: typeof args.options.role
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --teamId [teamId]'
+      },
+      {
+        option: '--teamName [teamName]'
+      },
+      {
+        option: '-c, --channelId [channelId]'
+      },
+      {
+        option: '--channelName [channelName]'
+      },
+      {
+        option: '-r, --role [role]',
+        autocomplete: ['owner', 'member', 'guest']
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.teamId && args.options.teamName) {
+          return 'Specify either teamId or teamName, but not both';
+        }
+
+        if (!args.options.teamId && !args.options.teamName) {
+          return 'Specify teamId or teamName, one is required';
+        }
+
+        if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
+
+        if (args.options.channelId && args.options.channelName) {
+          return 'Specify either channelId or channelName, but not both';
+        }
+
+        if (!args.options.channelId && !args.options.channelName) {
+          return 'Specify channelId or channelName, one is required';
+        }
+
+        if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
+          return `${args.options.channelId} is not a valid Teams Channel ID`;
+        }
+
+        if (args.options.role) {
+          if (['owner', 'member', 'guest'].indexOf(args.options.role) === -1) {
+            return `${args.options.role} is not a valid role value. Allowed values owner|member|guest`;
+          }
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -82,7 +150,7 @@ class TeamsChannelMemberListCommand extends GraphCommand {
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
-  
+
   private getTeamId(args: CommandArgs): Promise<string> {
     if (args.options.teamId) {
       return Promise.resolve(args.options.teamId);
@@ -123,64 +191,6 @@ class TeamsChannelMemberListCommand extends GraphCommand {
 
         return Promise.resolve(channelItem.id);
       });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --teamId [teamId]'
-      },
-      {
-        option: '--teamName [teamName]'
-      },
-      {
-        option: '-c, --channelId [channelId]'
-      },
-      {
-        option: '--channelName [channelName]'
-      },
-      {
-        option: '-r, --role [role]',
-        autocomplete: ['owner', 'member', 'guest']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.teamId && args.options.teamName) {
-      return 'Specify either teamId or teamName, but not both';
-    }
-
-    if (!args.options.teamId && !args.options.teamName) {
-      return 'Specify teamId or teamName, one is required';
-    }
-
-    if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    if (args.options.channelId && args.options.channelName) {
-      return 'Specify either channelId or channelName, but not both';
-    }
-
-    if (!args.options.channelId && !args.options.channelName) {
-      return 'Specify channelId or channelName, one is required';
-    }
-
-    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
-      return `${args.options.channelId} is not a valid Teams Channel ID`;
-    }
-
-    if (args.options.role) {
-      if (['owner', 'member', 'guest'].indexOf(args.options.role) === -1) {
-        return `${args.options.role} is not a valid role value. Allowed values owner|member|guest`;
-      }
-    }
-
-    return true;
   }
 }
 

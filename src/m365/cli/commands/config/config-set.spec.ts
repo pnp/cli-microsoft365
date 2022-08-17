@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import { settingsNames } from '../../../../settingsNames';
 import { sinonUtil } from '../../../../utils';
@@ -10,6 +10,11 @@ const command: Command = require('./config-set');
 describe(commands.CONFIG_SET, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+
+  before(() => {
+    commandInfo = Cli.getCommandInfo(command);
+  });
 
   beforeEach(() => {
     log = [];
@@ -220,7 +225,7 @@ describe(commands.CONFIG_SET, () => {
 
 
   it('supports specifying key and value', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOptionKey = false;
     let containsOptionValue = false;
     options.forEach(o => {
@@ -235,53 +240,53 @@ describe(commands.CONFIG_SET, () => {
     assert(containsOptionKey && containsOptionValue);
   });
 
-  it('fails validation if specified key is invalid ', () => {
-    const actual = command.validate({ options: { key: 'invalid', value: false } });
+  it('fails validation if specified key is invalid ', async () => {
+    const actual = await command.validate({ options: { key: 'invalid', value: false } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`passes validation if setting is set to ${settingsNames.showHelpOnFailure} and value to true`, () => {
-    const actual = command.validate({ options: { key: settingsNames.showHelpOnFailure, value: 'true' } });
+  it(`passes validation if setting is set to ${settingsNames.showHelpOnFailure} and value to true`, async () => {
+    const actual = await command.validate({ options: { key: settingsNames.showHelpOnFailure, value: 'true' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it(`passes validation if setting is set to ${settingsNames.showHelpOnFailure} and value to false`, () => {
-    const actual = command.validate({ options: { key: settingsNames.showHelpOnFailure, value: 'false' } });
+  it(`passes validation if setting is set to ${settingsNames.showHelpOnFailure} and value to false`, async () => {
+    const actual = await command.validate({ options: { key: settingsNames.showHelpOnFailure, value: 'false' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if specified output type is invalid', () => {
-    const actual = command.validate({ options: { key: settingsNames.output, value: 'invalid' } });
+  it('fails validation if specified output type is invalid', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.output, value: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation for output type text', () => {
-    const actual = command.validate({ options: { key: settingsNames.output, value: 'text' } });
+  it('passes validation for output type text', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.output, value: 'text' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation for output type json', () => {
-    const actual = command.validate({ options: { key: settingsNames.output, value: 'json' } });
+  it('passes validation for output type json', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.output, value: 'json' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation for output type csv', () => {
-    const actual = command.validate({ options: { key: settingsNames.output, value: 'csv' } });
+  it('passes validation for output type csv', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.output, value: 'csv' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if specified error output type is invalid', () => {
-    const actual = command.validate({ options: { key: settingsNames.errorOutput, value: 'invalid' } });
+  it('fails validation if specified error output type is invalid', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.errorOutput, value: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation for error output stdout', () => {
-    const actual = command.validate({ options: { key: settingsNames.errorOutput, value: 'stdout' } });
+  it('passes validation for error output stdout', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.errorOutput, value: 'stdout' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation for error output stderr', () => {
-    const actual = command.validate({ options: { key: settingsNames.errorOutput, value: 'stderr' } });
+  it('passes validation for error output stderr', async () => {
+    const actual = await command.validate({ options: { key: settingsNames.errorOutput, value: 'stderr' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

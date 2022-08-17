@@ -1,6 +1,5 @@
 import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -34,13 +33,49 @@ class SpoSiteRemoveCommand extends SpoCommand {
     return 'Removes the specified site';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.skipRecycleBin = (!(!args.options.skipRecycleBin)).toString();
-    telemetryProps.fromRecycleBin = (!(!args.options.fromRecycleBin)).toString();
-    telemetryProps.wait = args.options.wait;
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        skipRecycleBin: (!(!args.options.skipRecycleBin)).toString(),
+        fromRecycleBin: (!(!args.options.fromRecycleBin)).toString(),
+        wait: args.options.wait,
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '--skipRecycleBin'
+      },
+      {
+        option: '--fromRecycleBin'
+      },
+      {
+        option: '--wait'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.url)
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -346,33 +381,6 @@ class SpoSiteRemoveCommand extends SpoCommand {
     };
 
     return request.delete(requestOptions);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '--skipRecycleBin'
-      },
-      {
-        option: '--fromRecycleBin'
-      },
-      {
-        option: '--wait'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    return validation.isValidSharePointUrl(args.options.url);
   }
 }
 

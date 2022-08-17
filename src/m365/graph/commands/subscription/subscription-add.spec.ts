@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,12 +13,14 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   const mockNowNumber = Date.parse("2019-01-01T00:00:00.000Z");
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -374,8 +376,8 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     });
   });
 
-  it('fails validation if expirationDateTime is not valid', () => {
-    const actual = command.validate({
+  it('fails validation if expirationDateTime is not valid', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         resource: "me/mailFolders('Inbox')/messages",
@@ -384,12 +386,12 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: 'foo'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if notificationUrl is not valid', () => {
-    const actual = command.validate({
+  it('fails validation if notificationUrl is not valid', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         resource: "me/mailFolders('Inbox')/messages",
@@ -398,12 +400,12 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         notificationUrl: "foo",
         expirationDateTime: '2016-11-20T18:23:45.935Z'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if changeType is not valid', () => {
-    const actual = command.validate({
+  it('fails validation if changeType is not valid', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         resource: "me/mailFolders('Inbox')/messages",
@@ -412,12 +414,12 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: '2016-11-20T18:23:45.935Z'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the clientState exceeds maximum allowed length', () => {
-    const actual = command.validate({
+  it('fails validation if the clientState exceeds maximum allowed length', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         resource: "me/mailFolders('Inbox')/messages",
@@ -426,12 +428,12 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: null
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the expirationDateTime is not specified', () => {
-    const actual = command.validate({
+  it('passes validation if the expirationDateTime is not specified', async () => {
+    const actual = await command.validate({
       options: {
         debug: false,
         resource: "me/mailFolders('Inbox')/messages",
@@ -440,12 +442,12 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: null
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

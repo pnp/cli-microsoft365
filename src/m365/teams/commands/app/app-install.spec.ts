@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,11 +12,13 @@ const command: Command = require('./app-install');
 describe(commands.APP_INSTALL, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -58,105 +60,105 @@ describe(commands.APP_INSTALL, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation when neither teamId, userId nor userName are specified', () => {
-    const actual = command.validate({
+  it('fails validation when neither teamId, userId nor userName are specified', async () => {
+    const actual = await command.validate({
       options: {
         appId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when teamId and userId are specified', () => {
-    const actual = command.validate({
+  it('fails validation when teamId and userId are specified', async () => {
+    const actual = await command.validate({
       options: {
         appId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         teamId: '00000000-0000-0000-0000-000000000000',
         userId: '00000000-0000-0000-0000-000000000000'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when teamId and userName are specified', () => {
-    const actual = command.validate({
+  it('fails validation when teamId and userName are specified', async () => {
+    const actual = await command.validate({
       options: {
         appId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         teamId: '00000000-0000-0000-0000-000000000000',
         userName: 'steve@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when userId and userName are specified', () => {
-    const actual = command.validate({
+  it('fails validation when userId and userName are specified', async () => {
+    const actual = await command.validate({
       options: {
         appId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         userId: '00000000-0000-0000-0000-000000000000',
         userName: 'steve@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the teamId is not a valid guid.', () => {
-    const actual = command.validate({
+  it('fails validation if the teamId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
         teamId: 'invalid',
         appId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the appId is not a valid guid.', () => {
-    const actual = command.validate({
+  it('fails validation if the appId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
         appId: 'not-c49b-4fd4-8223-28f0ac3a6402',
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the userId is not a valid guid.', () => {
-    const actual = command.validate({
+  it('fails validation if the userId is not a valid guid.', async () => {
+    const actual = await command.validate({
       options: {
         userId: 'not-c49b-4fd4-8223-28f0ac3a6402',
         appId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the appId and teamId are correct', () => {
-    const actual = command.validate({
+  it('passes validation when the appId and teamId are correct', async () => {
+    const actual = await command.validate({
       options: {
         appId: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the appId and userId are correct', () => {
-    const actual = command.validate({
+  it('passes validation when the appId and userId are correct', async () => {
+    const actual = await command.validate({
       options: {
         appId: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
         userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the appId and userName are correct', () => {
-    const actual = command.validate({
+  it('passes validation when the appId and userName are correct', async () => {
+    const actual = await command.validate({
       options: {
         appId: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
         userName: 'steve@contoso.com'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -441,7 +443,7 @@ describe(commands.APP_INSTALL, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

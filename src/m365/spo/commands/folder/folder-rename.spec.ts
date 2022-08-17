@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -15,6 +15,7 @@ describe(commands.FOLDER_RENAME, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let stubAllPostRequests: any;
 
   before(() => {
@@ -91,6 +92,7 @@ describe(commands.FOLDER_RENAME, () => {
         return Promise.reject('Invalid request');
       });
     };
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -353,7 +355,7 @@ describe(commands.FOLDER_RENAME, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsVerboseOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -363,27 +365,20 @@ describe(commands.FOLDER_RENAME, () => {
     assert(containsVerboseOption);
   });
 
-  it('doesn\'t fail if the parent doesn\'t define options', () => {
-    sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = command.options();
-    sinonUtil.restore(Command.prototype.options);
-    assert(options.length > 0);
-  });
-
-  it('fails validation if the webUrl option is not valid', () => {
-    const actual = command.validate({ options: { webUrl: 'abc' } });
+  it('fails validation if the webUrl option is not valid', async () => {
+    const actual = await command.validate({ options: { webUrl: 'abc', folderUrl: '/Shared Documents/test', name: 'abc' } }, commandInfo);
     assert.strictEqual(actual, "abc is not a valid SharePoint Online site URL");
   });
 
-  it('passes validation when the url option specified', () => {
-    const actual = command.validate({
+  it('passes validation when the url option specified', async () => {
+    const actual = await command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents/test',
         name: 'abc'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

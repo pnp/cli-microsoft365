@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -14,11 +14,13 @@ describe(commands.USER_REMOVE, () => {
   let requests: any[];
   let logger: Logger;
   let promptOptions: any;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -66,7 +68,7 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -76,34 +78,34 @@ describe(commands.USER_REMOVE, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if id or loginName options are not passed', () => {
-    const actual = command.validate({
+  it('fails validation if id or loginName options are not passed', async () => {
+    const actual = await command.validate({
       options: {
         webUrl: 'https://contoso.sharepoint.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails valiation if id or loginname oprions are passed', () => {
-    const actual = command.validate({
+  it('fails validation if id or loginname options are passed', async () => {
+    const actual = await command.validate({
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         id: 10,
         loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('should fail validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({
+  it('should fail validation if the webUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({
       options:
       {
         webUrl: 'foo',
         id: 10
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

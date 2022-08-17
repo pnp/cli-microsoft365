@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
@@ -13,6 +13,7 @@ describe(commands.SITESCRIPT_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,6 +26,7 @@ describe(commands.SITESCRIPT_SET, () => {
     }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -315,7 +317,7 @@ describe(commands.SITESCRIPT_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -326,7 +328,7 @@ describe(commands.SITESCRIPT_SET, () => {
   });
 
   it('supports specifying id', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {
@@ -337,7 +339,7 @@ describe(commands.SITESCRIPT_SET, () => {
   });
 
   it('supports specifying title', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--title') > -1) {
@@ -348,7 +350,7 @@ describe(commands.SITESCRIPT_SET, () => {
   });
 
   it('supports specifying description', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--description') > -1) {
@@ -359,7 +361,7 @@ describe(commands.SITESCRIPT_SET, () => {
   });
 
   it('supports specifying script content', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--content') > -1) {
@@ -370,7 +372,7 @@ describe(commands.SITESCRIPT_SET, () => {
   });
 
   it('supports specifying version', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--version') > -1) {
@@ -380,33 +382,33 @@ describe(commands.SITESCRIPT_SET, () => {
     assert(containsOption);
   });
 
-  it('fails validation if id is not a valid GUID', () => {
-    const actual = command.validate({ options: { id: 'abc' } });
+  it('fails validation if id is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { id: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if version is not a valid number', () => {
-    const actual = command.validate({ options: { id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24', version: 'abc' } });
+  it('fails validation if version is not a valid number', async () => {
+    const actual = await command.validate({ options: { id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24', version: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if script content is not a valid JSON string', () => {
-    const actual = command.validate({ options: { id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24', content: 'abc' } });
+  it('fails validation if script content is not a valid JSON string', async () => {
+    const actual = await command.validate({ options: { id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24', content: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when id specified and valid GUID', () => {
-    const actual = command.validate({ options: { id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } });
+  it('passes validation when id specified and valid GUID', async () => {
+    const actual = await command.validate({ options: { id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when id and version specified and version is a number', () => {
-    const actual = command.validate({ options: { id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24', version: 1 } });
+  it('passes validation when id and version specified and version is a number', async () => {
+    const actual = await command.validate({ options: { id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24', version: 1 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when id and content specified and content is valid JSON', () => {
-    const actual = command.validate({ options: { id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24', content: JSON.stringify({}) } });
+  it('passes validation when id and content specified and content is valid JSON', async () => {
+    const actual = await command.validate({ options: { id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24', content: JSON.stringify({}) } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

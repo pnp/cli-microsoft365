@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import { PassThrough } from 'stream';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import commands from '../../commands';
@@ -14,12 +14,14 @@ const command: Command = require('./app-teamspackage-download');
 describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -683,75 +685,75 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
     });
   });
 
-  it('fails validation if the appCatalogUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { appItemId: 1, appCatalogUrl: 'foo' } });
+  it('fails validation if the appCatalogUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { appItemId: 1, appCatalogUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the appCatalogUrl is a valid SharePoint URL', () => {
-    const actual = command.validate({ options: { appItemId: 1, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+  it('passes validation when the appCatalogUrl is a valid SharePoint URL', async () => {
+    const actual = await command.validate({ options: { appItemId: 1, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the appCatalogUrl is not specified', () => {
-    const actual = command.validate({ options: { appItemId: 1 } });
+  it('passes validation when the appCatalogUrl is not specified', async () => {
+    const actual = await command.validate({ options: { appItemId: 1 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when the appItemId is not a number', () => {
-    const actual = command.validate({ options: { appItemId: 'a' } });
+  it('fails validation when the appItemId is not a number', async () => {
+    const actual = await command.validate({ options: { appItemId: 'a' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the appItemId is a number', () => {
-    const actual = command.validate({ options: { appItemId: 1 } });
+  it('passes validation when the appItemId is a number', async () => {
+    const actual = await command.validate({ options: { appItemId: 1 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when the appItemUniqueId is not a GUID', () => {
-    const actual = command.validate({ options: { appItemUniqueId: 'a' } });
+  it('fails validation when the appItemUniqueId is not a GUID', async () => {
+    const actual = await command.validate({ options: { appItemUniqueId: 'a' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the appItemUniqueId is a GUID', () => {
-    const actual = command.validate({ options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4' } });
+  it('passes validation when the appItemUniqueId is a GUID', async () => {
+    const actual = await command.validate({ options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when the specified file already exists', () => {
+  it('fails validation when the specified file already exists', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = command.validate({ options: { appItemId: 1, fileName: 'file.zip' } });
+    const actual = await command.validate({ options: { appItemId: 1, fileName: 'file.zip' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the specified file does not exist', () => {
+  it('passes validation when the specified file does not exist', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = command.validate({ options: { appItemId: 1, fileName: 'file.zip' } });
+    const actual = await command.validate({ options: { appItemId: 1, fileName: 'file.zip' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when the appItemUniqueId and appItemId specified', () => {
-    const actual = command.validate({ options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4', appItemId: 1 } });
+  it('fails validation when the appItemUniqueId and appItemId specified', async () => {
+    const actual = await command.validate({ options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4', appItemId: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the appItemUniqueId and appName specified', () => {
-    const actual = command.validate({ options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4', appName: 'app.sppkg' } });
+  it('fails validation when the appItemUniqueId and appName specified', async () => {
+    const actual = await command.validate({ options: { appItemUniqueId: '335a5612-3e85-462d-9d5b-c014b5abeac4', appName: 'app.sppkg' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when the appItemId and appName specified', () => {
-    const actual = command.validate({ options: { appItemId: 1, appName: 'app.sppkg' } });
+  it('fails validation when the appItemId and appName specified', async () => {
+    const actual = await command.validate({ options: { appItemId: 1, appName: 'app.sppkg' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when no app identifier specified', () => {
-    const actual = command.validate({ options: {} });
+  it('fails validation when no app identifier specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -1,9 +1,8 @@
+import auth from "../../../../Auth";
 import { Logger } from "../../../../cli";
-import { CommandOption } from "../../../../Command";
-import { accessToken } from "../../../../utils";
 import GlobalOptions from "../../../../GlobalOptions";
-import Auth from "../../../../Auth";
 import request from "../../../../request";
+import { accessToken } from "../../../../utils";
 import GraphCommand from "../../../base/GraphCommand";
 import commands from "../../commands";
 
@@ -21,14 +20,29 @@ class PlannerTaskChecklistItemListCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return "Lists the checklist items of a Planner task.";
+    return 'Lists the checklist items of a Planner task.';
   }
+
   public defaultProperties(): string[] | undefined {
     return ['id', 'title', 'isChecked'];
   }
 
+  constructor() {
+    super();
+  
+    this.#initOptions();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: "-i, --taskId <taskId>"
+      }
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
     }
@@ -55,16 +69,6 @@ class PlannerTaskChecklistItemListCommand extends GraphCommand {
       },
       (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb)
     );
-  }
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: "-i, --taskId <taskId>"
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

@@ -136,7 +136,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -147,7 +147,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
   });
 
   it('supports specifying grantId', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--grantId') > -1) {
@@ -158,7 +158,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
   });
 
   it('supports specifying scope', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--scope') > -1) {

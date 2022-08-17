@@ -1,7 +1,5 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
-import Command, {
-  CommandOption
-} from '../../../../Command';
+import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -27,15 +25,56 @@ class PaAppGetCommand extends PowerAppsCommand {
     return 'Gets information about the specified Microsoft Power App';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.name = typeof args.options.name !== 'undefined';
-    telemetryProps.displayName = typeof args.options.displayName !== 'undefined';
-    return telemetryProps;
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['name', 'displayName', 'description', 'appVersion', 'owner'];
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        name: typeof args.options.name !== 'undefined',
+        displayName: typeof args.options.displayName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --name [name]'
+      },
+      {
+        option: '-d, --displayName [displayName]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.name && !args.options.displayName) {
+          return 'Specify either name or displayName';
+        }
+    
+        if (args.options.name && args.options.displayName) {
+          return 'Specify either name or displayName but not both';
+        }
+    
+        if (args.options.name && !validation.isValidGuid(args.options.name)) {
+          return `${args.options.name} is not a valid GUID`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -112,37 +151,6 @@ class PaAppGetCommand extends PowerAppsCommand {
     app.owner = app.properties.owner.email || '';
     return app;
   }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --name [name]'
-      },
-      {
-        option: '-d, --displayName [displayName]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.name && !args.options.displayName) {
-      return 'Specify either name or displayName';
-    }
-
-    if (args.options.name && args.options.displayName) {
-      return 'Specify either name or displayName but not both';
-    }
-
-    if (args.options.name && !validation.isValidGuid(args.options.name)) {
-      return `${args.options.name} is not a valid GUID`;
-    }
-
-    return true;
-  }
-
 }
 
 module.exports = new PaAppGetCommand();

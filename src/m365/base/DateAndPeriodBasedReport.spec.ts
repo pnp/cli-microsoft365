@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../appInsights';
 import auth from '../../Auth';
-import { Logger } from '../../cli';
+import { Cli, CommandInfo, Logger } from '../../cli';
 import { CommandError } from '../../Command';
 import request from '../../request';
 import { sinonUtil } from '../../utils';
@@ -30,10 +30,13 @@ describe('PeriodBasedReport', () => {
   const mockCommand = new MockCommand();
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
+  
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(mockCommand);
   });
 
   beforeEach(() => {
@@ -75,59 +78,59 @@ describe('PeriodBasedReport', () => {
     assert.notStrictEqual(mockCommand.description, null);
   });
 
-  it('fails validation if period option is not passed', () => {
-    const actual = mockCommand.validate({ options: {} });
+  it('fails validation if period option is not passed', async () => {
+    const actual = mockCommand.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation on invalid period', () => {
-    const actual = mockCommand.validate({ options: { period: 'abc' } });
+  it('fails validation on invalid period', async () => {
+    const actual = mockCommand.validate({ options: { period: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation on invalid date', () => {
-    const actual = mockCommand.validate({ options: { date: '10.10.2019' } });
+  it('fails validation on invalid date', async () => {
+    const actual = mockCommand.validate({ options: { date: '10.10.2019' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation on valid \'D7\' period', () => {
-    const actual = mockCommand.validate({
+  it('passes validation on valid \'D7\' period', async () => {
+    const actual = await mockCommand.validate({
       options: {
         period: 'D7'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation on valid \'D30\' period', () => {
-    const actual = mockCommand.validate({
+  it('passes validation on valid \'D30\' period', async () => {
+    const actual = await mockCommand.validate({
       options: {
         period: 'D30'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation on valid \'D90\' period', () => {
-    const actual = mockCommand.validate({
+  it('passes validation on valid \'D90\' period', async () => {
+    const actual = await mockCommand.validate({
       options: {
         period: 'D90'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation on valid \'180\' period', () => {
-    const actual = mockCommand.validate({
+  it('passes validation on valid \'180\' period', async () => {
+    const actual = await mockCommand.validate({
       options: {
         period: 'D90'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if both period and date options set', () => {
-    const actual = mockCommand.validate({ options: { period: 'D7', date: '2019-07-13' } });
+  it('fails validation if both period and date options set', async () => {
+    const actual = await mockCommand.validate({ options: { period: 'D7', date: '2019-07-13' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -155,13 +158,13 @@ describe('PeriodBasedReport', () => {
     });
   }); 
 
-  it('fails validation if the date option is not a valid date string', () => {
-    const actual = mockCommand.validate({
+  it('fails validation if the date option is not a valid date string', async () => {
+    const actual = await mockCommand.validate({
       options:
       {
         date: '2018-X-09'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -205,7 +208,7 @@ describe('PeriodBasedReport', () => {
   });
 
   it('supports debug mode', () => {
-    const options = mockCommand.options();
+    const options = mockCommand.options;
     let containsOption = false;
     options.forEach((o: any) => {
       if (o.option === '--debug') {

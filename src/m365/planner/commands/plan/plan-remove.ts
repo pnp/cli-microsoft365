@@ -1,8 +1,7 @@
 import { PlannerPlan } from '@microsoft/microsoft-graph-types';
 import { AxiosRequestConfig } from 'axios';
-import Auth from '../../../../Auth';
+import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { accessToken, validation } from '../../../../utils';
@@ -32,18 +31,78 @@ class PlannerPlanRemoveCommand extends GraphCommand {
     return 'Removes the Microsoft Planner plan';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.title = typeof args.options.title !== 'undefined';
-    telemetryProps.ownerGroupId = typeof args.options.ownerGroupId !== 'undefined';
-    telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
-    telemetryProps.confirm = !!args.options.confirm;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        id: typeof args.options.id !== 'undefined',
+        title: typeof args.options.title !== 'undefined',
+        ownerGroupId: typeof args.options.ownerGroupId !== 'undefined',
+        ownerGroupName: typeof args.options.ownerGroupName !== 'undefined',
+        confirm: !!args.options.confirm
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-t, --title [title]'
+      },
+      {
+        option: '--ownerGroupId [ownerGroupId]'
+      },
+      {
+        option: '--ownerGroupName [ownerGroupName]'
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.title) {
+          if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
+            return 'Specify either ownerGroupId or ownerGroupName';
+          }
+
+          if (args.options.ownerGroupId && args.options.ownerGroupName) {
+            return 'Specify either ownerGroupId or ownerGroupName but not both';
+          }
+
+          if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
+            return `${args.options.ownerGroupId} is not a valid GUID`;
+          }
+        }
+        else if (args.options.ownerGroupId || args.options.ownerGroupName) {
+          return 'Don\'t specify ownerGroupId or ownerGroupName when using id';
+        }
+
+        return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'title']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (accessToken.isAppOnlyAccessToken(Auth.service.accessTokens[this.resource].accessToken)) {
+    if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
       this.handleError('This command does not support application permissions.', logger, cb);
       return;
     }
@@ -109,54 +168,6 @@ class PlannerPlanRemoveCommand extends GraphCommand {
 
     const group = await aadGroup.getGroupByDisplayName(ownerGroupName!);
     return group.id!;
-  }
-
-  public optionSets(): string[][] | undefined {
-    return [['id', 'title']];
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '--ownerGroupId [ownerGroupId]'
-      },
-      {
-        option: '--ownerGroupName [ownerGroupName]'
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.title) {
-      if (!args.options.ownerGroupId && !args.options.ownerGroupName) {
-        return 'Specify either ownerGroupId or ownerGroupName';
-      }
-
-      if (args.options.ownerGroupId && args.options.ownerGroupName) {
-        return 'Specify either ownerGroupId or ownerGroupName but not both';
-      }
-
-      if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId)) {
-        return `${args.options.ownerGroupId} is not a valid GUID`;
-      }
-    }
-    else if (args.options.ownerGroupId || args.options.ownerGroupName) {
-      return 'Don\'t specify ownerGroupId or ownerGroupName when using id';
-    }
-
-    return true;
   }
 }
 

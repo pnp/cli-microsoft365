@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,14 +12,15 @@ const command: Command = require('./app-remove');
 describe(commands.APP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let promptOptions: any;
-
   let deleteRequestStub: sinon.SinonStub;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -101,48 +102,48 @@ describe(commands.APP_REMOVE, () => {
     assert.strictEqual((alias && alias.indexOf(commands.APP_DELETE) > -1), true);
   });
 
-  it('fails validation if appId and objectId specified', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8' } });
+  it('fails validation if appId and objectId specified', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if appId and name specified', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } });
+  it('fails validation if appId and name specified', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if objectId and name specified', () => {
-    const actual = command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } });
+  it('fails validation if objectId and name specified', async () => {
+    const actual = await command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if neither appId, objectId, nor name specified', () => {
-    const actual = command.validate({ options: {} });
+  it('fails validation if neither appId, objectId, nor name specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the objectId is not a valid guid', () => {
-    const actual = command.validate({ options: { objectId: 'abc' } });
+  it('fails validation if the objectId is not a valid guid', async () => {
+    const actual = await command.validate({ options: { objectId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the appId is not a valid guid', () => {
-    const actual = command.validate({ options: { appId: 'abc' } });
+  it('fails validation if the appId is not a valid guid', async () => {
+    const actual = await command.validate({ options: { appId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if required options specified (appId)', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } });
+  it('passes validation if required options specified (appId)', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if required options specified (objectId)', () => {
-    const actual = command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } });
+  it('passes validation if required options specified (objectId)', async () => {
+    const actual = await command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if required options specified (name)', () => {
-    const actual = command.validate({ options: { name: 'My app' } });
+  it('passes validation if required options specified (name)', async () => {
+    const actual = await command.validate({ options: { name: 'My app' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
@@ -340,7 +341,7 @@ describe(commands.APP_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

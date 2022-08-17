@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
-import { Logger } from '../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../cli';
 import Command, { CommandError } from '../../../Command';
 import request from '../../../request';
 import { sinonUtil } from '../../../utils';
@@ -44,6 +44,7 @@ enum TestID {
 describe(commands.SEARCH, () => {
   let log: any[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let returnArrayLength = 0;
   let executedTest: TestID = TestID.None;
   const urlContains = (opts: any, substring: string): boolean => {
@@ -298,6 +299,7 @@ describe(commands.SEARCH, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -978,73 +980,73 @@ describe(commands.SEARCH, () => {
     });
   });
 
-  it('fails validation if the sourceId is not a valid GUID', () => {
-    const actual = command.validate({
+  it('fails validation if the sourceId is not a valid GUID', async () => {
+    const actual = await command.validate({
       options: {
         sourceId: '123',
         queryText: '*'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the sourceId is a valid GUID', () => {
-    const actual = command.validate({
+  it('passes validation if the sourceId is a valid GUID', async () => {
+    const actual = await command.validate({
       options: {
         sourceId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844',
         queryText: '*'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the rankingModelId is not a valid GUID', () => {
-    const actual = command.validate({
+  it('fails validation if the rankingModelId is not a valid GUID', async () => {
+    const actual = await command.validate({
       options: {
         rankingModelId: '123',
         queryText: '*'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if the rankingModelId is a valid GUID', () => {
-    const actual = command.validate({
+  it('passes validation if the rankingModelId is a valid GUID', async () => {
+    const actual = await command.validate({
       options: {
         rankingModelId: 'd4ac6500-d1d0-48aa-86d4-8fe9a57a74af',
         queryText: '*'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if the rowLimit is not a valid number', () => {
-    const actual = command.validate({
+  it('fails validation if the rowLimit is not a valid number', async () => {
+    const actual = await command.validate({
       options: {
         rowLimit: '1X',
         queryText: '*'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the startRow is not a valid number', () => {
-    const actual = command.validate({
+  it('fails validation if the startRow is not a valid number', async () => {
+    const actual = await command.validate({
       options: {
         startRow: '1X',
         queryText: '*'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the culture is not a valid number', () => {
-    const actual = command.validate({
+  it('fails validation if the culture is not a valid number', async () => {
+    const actual = await command.validate({
       options: {
         culture: '1X',
         queryText: '*'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
@@ -1085,7 +1087,7 @@ describe(commands.SEARCH, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -1096,7 +1098,7 @@ describe(commands.SEARCH, () => {
   });
 
   it('supports specifying queryText', () => {
-    const options = command.options();
+    const options = command.options;
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<queryText>') > -1) {
@@ -1106,18 +1108,18 @@ describe(commands.SEARCH, () => {
     assert(containsTypeOption);
   });
 
-  it('passes validation if all options are provided', () => {
-    const actual = command.validate({ options: { queryText: '*' } });
+  it('passes validation if all options are provided', async () => {
+    const actual = await command.validate({ options: { queryText: '*' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if sortList is in an invalid format', () => {
-    const actual = command.validate({ options: { queryText: '*', sortList: 'property1:wrongvalue' } });
+  it('fails validation if sortList is in an invalid format', async () => {
+    const actual = await command.validate({ options: { queryText: '*', sortList: 'property1:wrongvalue' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if sortList is in a valid format', () => {
-    const actual = command.validate({ options: { queryText: '*', sortList: 'property1:ascending,property2:descending' } });
+  it('passes validation if sortList is in a valid format', async () => {
+    const actual = await command.validate({ options: { queryText: '*', sortList: 'property1:ascending,property2:descending' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 }); 

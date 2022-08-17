@@ -1,7 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -30,17 +27,71 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
     return 'Removes the specified custom action';
   }
 
-  public optionSets(): string[][] | undefined {
-    return [
-      ['id', 'title']
-    ];
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initOptionSets();
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.scope = args.options.scope || 'All';
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        scope: args.options.scope || 'All',
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-t, --title [title]'
+      },
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '-s, --scope [scope]',
+        autocomplete: ['Site', 'Web', 'All']
+      },
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.id && validation.isValidGuid(args.options.id) === false) {
+	      return `${args.options.id} is not valid. Custom action Id (GUID) expected.`;
+	    }
+
+	    if (validation.isValidSharePointUrl(args.options.url) !== true) {
+	      return 'Missing required option url';
+	    }
+
+	    if (args.options.scope) {
+	      if (args.options.scope !== 'Site' &&
+	        args.options.scope !== 'Web' &&
+	        args.options.scope !== 'All') {
+	        return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
+	      }
+	    }
+
+	    return true;
+      }
+    );
+  }
+
+  #initOptionSets(): void {
+  	this.optionSets.push(['id', 'title']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -155,50 +206,6 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
           reject(err);
         });
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --id [id]'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: ['Site', 'Web', 'All']
-      },
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.id && validation.isValidGuid(args.options.id) === false) {
-      return `${args.options.id} is not valid. Custom action Id (GUID) expected.`;
-    }
-
-    if (validation.isValidSharePointUrl(args.options.url) !== true) {
-      return 'Missing required option url';
-    }
-
-    if (args.options.scope) {
-      if (args.options.scope !== 'Site' &&
-        args.options.scope !== 'Web' &&
-        args.options.scope !== 'All') {
-        return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
-      }
-    }
-
-    return true;
   }
 }
 

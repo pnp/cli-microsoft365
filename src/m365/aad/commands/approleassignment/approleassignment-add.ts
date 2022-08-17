@@ -1,8 +1,5 @@
 import * as os from 'os';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -37,12 +34,67 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
     return 'Adds service principal permissions also known as scopes and app role assignments for specified Azure AD application registration';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.appId = typeof args.options.appId !== 'undefined';
-    telemetryProps.objectId = typeof args.options.objectId !== 'undefined';
-    telemetryProps.displayName = typeof args.options.displayName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        appId: typeof args.options.appId !== 'undefined',
+        objectId: typeof args.options.objectId !== 'undefined',
+        displayName: typeof args.options.displayName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--appId [appId]'
+      },
+      {
+        option: '--objectId [objectId]'
+      },
+      {
+        option: '--displayName [displayName]'
+      },
+      {
+        option: '-r, --resource <resource>',
+        autocomplete: ['Microsoft Graph', 'SharePoint', 'OneNote', 'Exchange', 'Microsoft Forms', 'Azure Active Directory Graph', 'Skype for Business']
+      },
+      {
+        option: '-s, --scope <scope>'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        let optionsSpecified: number = 0;
+        optionsSpecified += args.options.appId ? 1 : 0;
+        optionsSpecified += args.options.displayName ? 1 : 0;
+        optionsSpecified += args.options.objectId ? 1 : 0;
+        if (optionsSpecified !== 1) {
+          return 'Specify either appId, objectId or displayName';
+        }
+
+        if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
+          return `${args.options.appId} is not a valid GUID`;
+        }
+
+        if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
+          return `${args.options.objectId} is not a valid GUID`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -186,50 +238,6 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
     };
 
     return request.post(requestOptions);
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--appId [appId]'
-      },
-      {
-        option: '--objectId [objectId]'
-      },
-      {
-        option: '--displayName [displayName]'
-      },
-      {
-        option: '-r, --resource <resource>',
-        autocomplete: ['Microsoft Graph', 'SharePoint', 'OneNote', 'Exchange', 'Microsoft Forms', 'Azure Active Directory Graph', 'Skype for Business']
-      },
-      {
-        option: '-s, --scope <scope>'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    let optionsSpecified: number = 0;
-    optionsSpecified += args.options.appId ? 1 : 0;
-    optionsSpecified += args.options.displayName ? 1 : 0;
-    optionsSpecified += args.options.objectId ? 1 : 0;
-    if (optionsSpecified !== 1) {
-      return 'Specify either appId, objectId or displayName';
-    }
-
-    if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
-      return `${args.options.appId} is not a valid GUID`;
-    }
-
-    if (args.options.objectId && !validation.isValidGuid(args.options.objectId)) {
-      return `${args.options.objectId} is not a valid GUID`;
-    }
-
-    return true;
   }
 }
 

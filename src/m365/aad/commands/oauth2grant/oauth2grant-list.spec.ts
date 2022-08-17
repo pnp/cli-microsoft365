@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.OAUTH2GRANT_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -284,18 +286,18 @@ describe(commands.OAUTH2GRANT_LIST, () => {
     });
   });
 
-  it('fails validation if the spObjectId is not a valid GUID', () => {
-    const actual = command.validate({ options: { spObjectId: '123' } });
+  it('fails validation if the spObjectId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { spObjectId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the spObjectId option specified', () => {
-    const actual = command.validate({ options: { spObjectId: '6a7b1395-d313-4682-8ed4-65a6265a6320' } });
+  it('passes validation when the spObjectId option specified', async () => {
+    const actual = await command.validate({ options: { spObjectId: '6a7b1395-d313-4682-8ed4-65a6265a6320' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -306,7 +308,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
   });
 
   it('supports specifying spObjectId', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--spObjectId') > -1) {

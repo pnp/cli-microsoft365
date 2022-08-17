@@ -4,7 +4,6 @@ import * as os from 'os';
 import * as path from 'path';
 import { v4 } from 'uuid';
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { fsUtil } from '../../../../utils';
 import AnonymousCommand from '../../../base/AnonymousCommand';
@@ -42,18 +41,62 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
     return 'Generates SharePoint Framework solution package with a no-framework web part rendering the specified HTML snippet';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.allowTenantWideDeployment = args.options.allowTenantWideDeployment === true;
-    telemetryProps.developerMpnId = typeof args.options.developerMpnId !== 'undefined';
-    telemetryProps.developerName = typeof args.options.developerName !== 'undefined';
-    telemetryProps.developerPrivacyUrl = typeof args.options.developerPrivacyUrl !== 'undefined';
-    telemetryProps.developerTermsOfUseUrl = typeof args.options.developerTermsOfUseUrl !== 'undefined';
-    telemetryProps.developerWebsiteUrl = typeof args.options.developerWebsiteUrl !== 'undefined';
-    telemetryProps.enableForTeams = args.options.enableForTeams;
-    telemetryProps.exposePageContextGlobally = args.options.exposePageContextGlobally === true;
-    telemetryProps.exposeTeamsContextGlobally = args.options.exposeTeamsContextGlobally === true;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        allowTenantWideDeployment: args.options.allowTenantWideDeployment === true,
+        developerMpnId: typeof args.options.developerMpnId !== 'undefined',
+        developerName: typeof args.options.developerName !== 'undefined',
+        developerPrivacyUrl: typeof args.options.developerPrivacyUrl !== 'undefined',
+        developerTermsOfUseUrl: typeof args.options.developerTermsOfUseUrl !== 'undefined',
+        developerWebsiteUrl: typeof args.options.developerWebsiteUrl !== 'undefined',
+        enableForTeams: args.options.enableForTeams,
+        exposePageContextGlobally: args.options.exposePageContextGlobally === true,
+        exposeTeamsContextGlobally: args.options.exposeTeamsContextGlobally === true
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '-t, --webPartTitle <webPartTitle>' },
+      { option: '-d, --webPartDescription <webPartDescription>' },
+      { option: '-n, --packageName <packageName>' },
+      { option: '--html <html>' },
+      {
+        option: '--enableForTeams [enableForTeams]',
+        autocomplete: SpfxPackageGenerateCommand.enableForTeamsOptions
+      },
+      { option: '--exposePageContextGlobally' },
+      { option: '--exposeTeamsContextGlobally' },
+      { option: '--allowTenantWideDeployment' },
+      { option: '--developerName [developerName]' },
+      { option: '--developerPrivacyUrl [developerPrivacyUrl]' },
+      { option: '--developerTermsOfUseUrl [developerTermsOfUseUrl]' },
+      { option: '--developerWebsiteUrl [developerWebsiteUrl]' },
+      { option: '--developerMpnId [developerMpnId]' }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.enableForTeams &&
+          SpfxPackageGenerateCommand.enableForTeamsOptions.indexOf(args.options.enableForTeams) < 0) {
+          return `${args.options.enableForTeams} is not a valid value for enableForTeams. Allowed values are: ${SpfxPackageGenerateCommand.enableForTeamsOptions.join(', ')}`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -207,39 +250,6 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
   private static generateNewId = (): string => {
     return v4();
   };
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '-t, --webPartTitle <webPartTitle>' },
-      { option: '-d, --webPartDescription <webPartDescription>' },
-      { option: '-n, --packageName <packageName>' },
-      { option: '--html <html>' },
-      {
-        option: '--enableForTeams [enableForTeams]',
-        autocomplete: SpfxPackageGenerateCommand.enableForTeamsOptions
-      },
-      { option: '--exposePageContextGlobally' },
-      { option: '--exposeTeamsContextGlobally' },
-      { option: '--allowTenantWideDeployment' },
-      { option: '--developerName [developerName]' },
-      { option: '--developerPrivacyUrl [developerPrivacyUrl]' },
-      { option: '--developerTermsOfUseUrl [developerTermsOfUseUrl]' },
-      { option: '--developerWebsiteUrl [developerWebsiteUrl]' },
-      { option: '--developerMpnId [developerMpnId]' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.enableForTeams &&
-      SpfxPackageGenerateCommand.enableForTeamsOptions.indexOf(args.options.enableForTeams) < 0) {
-      return `${args.options.enableForTeams} is not a valid value for enableForTeams. Allowed values are: ${SpfxPackageGenerateCommand.enableForTeamsOptions.join(', ')}`;
-    }
-
-    return true;
-  }
 }
 
 module.exports = new SpfxPackageGenerateCommand();

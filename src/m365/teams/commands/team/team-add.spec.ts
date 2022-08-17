@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.TEAM_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -61,45 +63,41 @@ describe(commands.TEAM_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes validation if name and description are passed when no template is passed', (done) => {
-    const actual = command.validate({
+  it('passes validation if name and description are passed when no template is passed', async () => {
+    const actual = await command.validate({
       options: {
         name: 'Architecture',
         description: 'Architecture Discussion'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation if name and description are not passed when a template is supplied', (done) => {
-    const actual = command.validate({
+  it('passes validation if name and description are not passed when a template is supplied', async () => {
+    const actual = await command.validate({
       options: {
         template: `abc`
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if description is not passed when no template is supplied', (done) => {
-    const actual = command.validate({
+  it('fails validation if description is not passed when no template is supplied', async () => {
+    const actual = await command.validate({
       options: {
         name: 'Architecture'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('fails validation if name is not passed when no template is supplied', (done) => {
-    const actual = command.validate({
+  it('fails validation if name is not passed when no template is supplied', async () => {
+    const actual = await command.validate({
       options: {
         description: 'Architecture Discussion'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
   it('creates Microsoft Teams team in the tenant when no template is supplied (verbose)', (done) => {
@@ -655,7 +653,7 @@ describe(commands.TEAM_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -1,8 +1,5 @@
 import * as os from 'os';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { odata } from '../../../../utils';
@@ -29,11 +26,52 @@ class OutlookMessageListCommand extends GraphCommand {
     return 'Gets all mail messages from the specified folder';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.folderId = typeof args.options.folderId !== 'undefined';
-    telemetryProps.folderName = typeof args.options.folderName !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        folderId: typeof args.options.folderId !== 'undefined',
+        folderName: typeof args.options.folderName !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--folderName [folderName]',
+        autocomplete: Outlook.wellKnownFolderNames
+      },
+      {
+        option: '--folderId [folderId]',
+        autocomplete: Outlook.wellKnownFolderNames
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!args.options.folderId &&
+          !args.options.folderName) {
+          return 'Specify folderId or folderName';
+        }
+    
+        if (args.options.folderId &&
+          args.options.folderName) {
+          return 'Specify either folderId or folderName but not both';
+        }
+    
+        return true;
+      }
+    );
   }
 
   public defaultProperties(): string[] | undefined {
@@ -92,36 +130,6 @@ class OutlookMessageListCommand extends GraphCommand {
           }
         }, err => reject(err));
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--folderName [folderName]',
-        autocomplete: Outlook.wellKnownFolderNames
-      },
-      {
-        option: '--folderId [folderId]',
-        autocomplete: Outlook.wellKnownFolderNames
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!args.options.folderId &&
-      !args.options.folderName) {
-      return 'Specify folderId or folderName';
-    }
-
-    if (args.options.folderId &&
-      args.options.folderName) {
-      return 'Specify either folderId or folderName but not both';
-    }
-
-    return true;
   }
 }
 

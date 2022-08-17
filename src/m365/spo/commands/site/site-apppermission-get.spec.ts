@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -59,37 +61,35 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation with an incorrect URL', (done) => {
-    const actual = command.validate({
+  it('fails validation with an incorrect URL', async () => {
+    const actual = await command.validate({
       options: {
-        siteUrl: 'https;//contoso,sharepoint:com/sites/sitecollection-name'
+        siteUrl: 'https;//contoso,sharepoint:com/sites/sitecollection-name',
+        permissionId: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('passes validation with a correct URL', (done) => {
-    const actual = command.validate({
+  it('passes validation with a correct URL', async () => {
+    const actual = await command.validate({
       options: {
+        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+        permissionId: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
+      }
+    }, commandInfo);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation with a correct URL and a filter value', async () => {
+    const actual = await command.validate({
+      options: {
+        permissionId: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0',
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
-
-  it('passes validation with a correct URL and a filter value', (done) => {
-    const actual = command.validate({
-      options: {
-        appId: '00000000-0000-0000-0000-000000000000',
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name'
-      }
-    });
-    assert.strictEqual(actual, true);
-    done();
-  });
-
 
   it('returns a specific application permissions for the site', (done) => {
     const site = {
@@ -190,7 +190,7 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -33,13 +32,77 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
     return 'Updates fun settings of a Microsoft Teams team';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    TeamsFunSettingsSetCommand.booleanProps.forEach(p => {
-      telemetryProps[p] = (args.options as any)[p];
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        giphyContentRating: args.options.giphyContentRating
+      });
+      TeamsFunSettingsSetCommand.booleanProps.forEach(p => {
+        this.telemetryProperties[p] = (args.options as any)[p];
+      });
     });
-    telemetryProps.giphyContentRating = args.options.giphyContentRating;
-    return telemetryProps;
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-i, --teamId <teamId>'
+      },
+      {
+        option: '--allowGiphy [allowGiphy]'
+      },
+      {
+        option: '--giphyContentRating [giphyContentRating]'
+      },
+      {
+        option: '--allowStickersAndMemes [allowStickersAndMemes]'
+      },
+      {
+        option: '--allowCustomMemes [allowCustomMemes]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (!validation.isValidGuid(args.options.teamId)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
+
+        let isValid: boolean = true;
+        let value, property: string = '';
+        TeamsFunSettingsSetCommand.booleanProps.every(p => {
+          property = p;
+          value = (args.options as any)[p];
+          isValid = typeof value === 'undefined' ||
+            value === 'true' ||
+            value === 'false';
+          return isValid;
+        });
+
+        if (!isValid) {
+          return `Value ${value} for option ${property} is not a valid boolean`;
+        }
+
+        if (args.options.giphyContentRating) {
+          const giphyContentRating = args.options.giphyContentRating.toLowerCase();
+          if (giphyContentRating !== 'strict' && giphyContentRating !== 'moderate') {
+            return `giphyContentRating value ${value} is not valid.  Please specify Strict or Moderate.`;
+          }
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -68,59 +131,6 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
     request
       .patch(requestOptions)
       .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-i, --teamId <teamId>'
-      },
-      {
-        option: '--allowGiphy [allowGiphy]'
-      },
-      {
-        option: '--giphyContentRating [giphyContentRating]'
-      },
-      {
-        option: '--allowStickersAndMemes [allowStickersAndMemes]'
-      },
-      {
-        option: '--allowCustomMemes [allowCustomMemes]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (!validation.isValidGuid(args.options.teamId)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    let isValid: boolean = true;
-    let value, property: string = '';
-    TeamsFunSettingsSetCommand.booleanProps.every(p => {
-      property = p;
-      value = (args.options as any)[p];
-      isValid = typeof value === 'undefined' ||
-        value === 'true' ||
-        value === 'false';
-      return isValid;
-    });
-
-    if (!isValid) {
-      return `Value ${value} for option ${property} is not a valid boolean`;
-    }
-
-    if (args.options.giphyContentRating) {
-      const giphyContentRating = args.options.giphyContentRating.toLowerCase();
-      if (giphyContentRating !== 'strict' && giphyContentRating !== 'moderate') {
-        return `giphyContentRating value ${value} is not valid.  Please specify Strict or Moderate.`;
-      }
-    }
-
-    return true;
   }
 }
 

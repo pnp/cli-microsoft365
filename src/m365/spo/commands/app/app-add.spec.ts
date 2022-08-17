@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -14,6 +14,7 @@ describe(commands.APP_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   let requests: any[];
 
   before(() => {
@@ -21,6 +22,7 @@ describe(commands.APP_ADD, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -495,7 +497,7 @@ describe(commands.APP_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -505,18 +507,18 @@ describe(commands.APP_ADD, () => {
     assert(containsdebugOption);
   });
 
-  it('fails validation on invalid scope', () => {
-    const actual = command.validate({ options: { scope: 'abc' } });
+  it('fails validation on invalid scope', async () => {
+    const actual = await command.validate({ options: { scope: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation on valid \'tenant\' scope', () => {
+  it('passes validation on valid \'tenant\' scope', async () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = command.validate({ options: { scope: 'tenant', filePath: 'abc' } });
+    const actual = await command.validate({ options: { scope: 'tenant', filePath: 'abc' } }, commandInfo);
     sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
@@ -524,13 +526,13 @@ describe(commands.APP_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation on valid \'Tenant\' scope', () => {
+  it('passes validation on valid \'Tenant\' scope', async () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = command.validate({ options: { scope: 'Tenant', filePath: 'abc' } });
+    const actual = await command.validate({ options: { scope: 'Tenant', filePath: 'abc' } }, commandInfo);
     sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
@@ -538,13 +540,13 @@ describe(commands.APP_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation on valid \'SiteCollection\' scope', () => {
+  it('passes validation on valid \'SiteCollection\' scope', async () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = command.validate({ options: { scope: 'SiteCollection', appCatalogUrl: 'https://contoso.sharepoint.com', filePath: 'abc' } });
+    const actual = await command.validate({ options: { scope: 'SiteCollection', appCatalogUrl: 'https://contoso.sharepoint.com', filePath: 'abc' } }, commandInfo);
     sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
@@ -681,19 +683,19 @@ describe(commands.APP_ADD, () => {
     });
   });
 
-  it('fails validation if file path doesn\'t exist', () => {
+  it('fails validation if file path doesn\'t exist', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = command.validate({ options: { filePath: 'abc' } });
+    const actual = await command.validate({ options: { filePath: 'abc' } }, commandInfo);
     sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if file path points to a directory', () => {
+  it('fails validation if file path points to a directory', async () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => true);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-    const actual = command.validate({ options: { filePath: 'abc' } });
+    const actual = await command.validate({ options: { filePath: 'abc' } }, commandInfo);
     sinonUtil.restore([
       fs.existsSync,
       fs.lstatSync
@@ -701,74 +703,13 @@ describe(commands.APP_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation when invalid scope is specified', () => {
+  it('fails validation when invalid scope is specified', async () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = command.validate({ options: { filePath: 'abc', scope: 'foo' } });
-
-    sinonUtil.restore([
-      fs.existsSync,
-      fs.lstatSync
-    ]);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when path points to a valid file', () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').callsFake(() => false);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-
-    const actual = command.validate({ options: { filePath: 'abc' } });
-
-    sinonUtil.restore([
-      fs.existsSync,
-      fs.lstatSync
-    ]);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation when no scope is specified', () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').callsFake(() => false);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-
-    const actual = command.validate({ options: { filePath: 'abc' } });
-
-    sinonUtil.restore([
-      fs.existsSync,
-      fs.lstatSync
-    ]);
-    assert.strictEqual(actual, true);
-  });
-
-  it('passes validation when the scope is specified with \'tenant\'', () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').callsFake(() => false);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-
-    const actual = command.validate({ options: { filePath: 'abc', scope: 'tenant' } });
-
-    sinonUtil.restore([
-      fs.existsSync,
-      fs.lstatSync
-    ]);
-    assert.strictEqual(actual, true);
-  });
-
-
-  it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').callsFake(() => false);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-
-    const actual = command.validate({ options: { filePath: 'abc', scope: 'sitecollection' } });
+    const actual = await command.validate({ options: { filePath: 'abc', scope: 'foo' } }, commandInfo);
 
     sinonUtil.restore([
       fs.existsSync,
@@ -777,13 +718,13 @@ describe(commands.APP_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('should not fail when \'tenant\' scope, but also appCatalogUrl specified', () => {
+  it('passes validation when path points to a valid file', async () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = command.validate({ options: { filePath: 'abc', scope: 'tenant', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+    const actual = await command.validate({ options: { filePath: 'abc' } }, commandInfo);
 
     sinonUtil.restore([
       fs.existsSync,
@@ -792,13 +733,74 @@ describe(commands.APP_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('should fail when \'sitecollection\' scope, but bad appCatalogUrl format specified', () => {
+  it('passes validation when no scope is specified', async () => {
     const stats: fs.Stats = new fs.Stats();
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = command.validate({ options: { filePath: 'abc', scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } });
+    const actual = await command.validate({ options: { filePath: 'abc' } }, commandInfo);
+
+    sinonUtil.restore([
+      fs.existsSync,
+      fs.lstatSync
+    ]);
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation when the scope is specified with \'tenant\'', async () => {
+    const stats: fs.Stats = new fs.Stats();
+    sinon.stub(stats, 'isDirectory').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+
+    const actual = await command.validate({ options: { filePath: 'abc', scope: 'tenant' } }, commandInfo);
+
+    sinonUtil.restore([
+      fs.existsSync,
+      fs.lstatSync
+    ]);
+    assert.strictEqual(actual, true);
+  });
+
+
+  it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', async () => {
+    const stats: fs.Stats = new fs.Stats();
+    sinon.stub(stats, 'isDirectory').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+
+    const actual = await command.validate({ options: { filePath: 'abc', scope: 'sitecollection' } }, commandInfo);
+
+    sinonUtil.restore([
+      fs.existsSync,
+      fs.lstatSync
+    ]);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('should not fail when \'tenant\' scope, but also appCatalogUrl specified', async () => {
+    const stats: fs.Stats = new fs.Stats();
+    sinon.stub(stats, 'isDirectory').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+
+    const actual = await command.validate({ options: { filePath: 'abc', scope: 'tenant', appCatalogUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+
+    sinonUtil.restore([
+      fs.existsSync,
+      fs.lstatSync
+    ]);
+    assert.strictEqual(actual, true);
+  });
+
+  it('should fail when \'sitecollection\' scope, but bad appCatalogUrl format specified', async () => {
+    const stats: fs.Stats = new fs.Stats();
+    sinon.stub(stats, 'isDirectory').callsFake(() => false);
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
+
+    const actual = await command.validate({ options: { filePath: 'abc', scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } }, commandInfo);
 
     sinonUtil.restore([
       fs.existsSync,

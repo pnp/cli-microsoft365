@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -12,6 +12,7 @@ const command: Command = require('./task-reference-remove');
 describe(commands.TASK_REFERENCE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
   let promptOptions: any;
   const validTaskId = '2Vf8JHgsBUiIf-nuvBtv-ZgAAYw2';
   const validUrl = 'https://www.microsoft.com';
@@ -48,7 +49,12 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    auth.service.accessTokens[(command as any).resource] = {
+      accessToken: 'abc',
+      expiresOn: new Date()
+    };
     sinon.stub(Cli.getInstance().config, 'all').value({});
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -88,6 +94,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
       Cli.getInstance().config.all
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -98,41 +105,38 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if url does not contain http or https', (done) => {
-    const actual = command.validate({
+  it('fails validation if url does not contain http or https', async () => {
+    const actual = await command.validate({
       options: {
         taskId: validTaskId,
         url: 'www.microsoft.com'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid url with http specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid url with http specified', async () => {
+    const actual = await command.validate({
       options: {
         taskId: validTaskId,
         url: 'http://www.microsoft.com'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid url with https specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid url with https specified', async () => {
+    const actual = await command.validate({
       options: {
         taskId: validTaskId,
         url: 'https://www.microsoft.com'
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('defines correct option sets', () => {
-    const optionSets = command.optionSets();
+    const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [['url', 'alias']]);
   });
 
@@ -165,15 +169,14 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
     });
   });
 
-  it('passes validation when valid options specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid options specified', async () => {
+    const actual = await command.validate({
       options: {
         taskId: validTaskId,
         url: validUrl
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('correctly removes reference', (done) => {
@@ -367,7 +370,7 @@ describe(commands.TASK_REFERENCE_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

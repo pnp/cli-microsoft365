@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.SITE_GROUPIFY, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -361,7 +363,7 @@ describe(commands.SITE_GROUPIFY, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -371,18 +373,18 @@ describe(commands.SITE_GROUPIFY, () => {
     assert(containsOption);
   });
 
-  it('fails validation if siteUrl is not an absolute URL', () => {
-    const actual = command.validate({ options: { siteUrl: '/sites/team-a', alias: 'team-a', displayName: 'Team A' } });
+  it('fails validation if siteUrl is not an absolute URL', async () => {
+    const actual = await command.validate({ options: { siteUrl: '/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if siteUrl is not a SharePoint URL', () => {
-    const actual = command.validate({ options: { siteUrl: 'http://contoso/sites/team-a', alias: 'team-a', displayName: 'Team A' } });
+  it('fails validation if siteUrl is not a SharePoint URL', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'http://contoso/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if all required options are specified', () => {
-    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } });
+  it('passes validation if all required options are specified', async () => {
+    const actual = await command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

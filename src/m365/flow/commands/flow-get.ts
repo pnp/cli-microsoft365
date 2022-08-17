@@ -1,7 +1,4 @@
 import { Logger } from '../../../cli';
-import {
-  CommandOption
-} from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
 import AzmgmtCommand from '../../base/AzmgmtCommand';
@@ -55,6 +52,26 @@ class FlowGetCommand extends AzmgmtCommand {
     return ['name', 'displayName', 'description', 'triggers', 'actions'];
   }
 
+  constructor() {
+    super();
+  
+    this.#initOptions();
+  }
+  
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --name <name>'
+      },
+      {
+        option: '-e, --environment <environment>'
+      },
+      {
+        option: '--asAdmin'
+      }      
+    );
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
       logger.logToStderr(`Retrieving information about Microsoft Flow ${args.options.name}...`);
@@ -80,23 +97,6 @@ class FlowGetCommand extends AzmgmtCommand {
 
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --name <name>'
-      },
-      {
-        option: '-e, --environment <environment>'
-      },
-      {
-        option: '--asAdmin'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

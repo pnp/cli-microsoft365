@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -41,21 +40,144 @@ class SpoSiteClassicSetCommand extends SpoCommand {
     return 'Change classic site settings';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.title = typeof args.options.title !== 'undefined';
-    telemetryProps.description = typeof args.options.description !== 'undefined';
-    telemetryProps.sharing = args.options.sharing;
-    telemetryProps.resourceQuota = typeof args.options.resourceQuota !== 'undefined';
-    telemetryProps.resourceQuotaWarningLevel = typeof args.options.resourceQuotaWarningLevel !== 'undefined';
-    telemetryProps.storageQuota = typeof args.options.storageQuota !== 'undefined';
-    telemetryProps.storageQuotaWarningLevel = typeof args.options.storageQuotaWarningLevel !== 'undefined';
-    telemetryProps.allowSelfServiceUpgrade = args.options.allowSelfServiceUpgrade;
-    telemetryProps.owners = typeof args.options.owners !== 'undefined';
-    telemetryProps.lockState = args.options.lockState;
-    telemetryProps.noScriptSite = args.options.noScriptSite;
-    telemetryProps.wait = args.options.wait;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        title: typeof args.options.title !== 'undefined',
+        description: typeof args.options.description !== 'undefined',
+        sharing: args.options.sharing,
+        resourceQuota: typeof args.options.resourceQuota !== 'undefined',
+        resourceQuotaWarningLevel: typeof args.options.resourceQuotaWarningLevel !== 'undefined',
+        storageQuota: typeof args.options.storageQuota !== 'undefined',
+        storageQuotaWarningLevel: typeof args.options.storageQuotaWarningLevel !== 'undefined',
+        allowSelfServiceUpgrade: args.options.allowSelfServiceUpgrade,
+        owners: typeof args.options.owners !== 'undefined',
+        lockState: args.options.lockState,
+        noScriptSite: args.options.noScriptSite,
+        wait: args.options.wait
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '-t, --title [title]'
+      },
+      {
+        option: '-d, --description [description]'
+      },
+      {
+        option: '--sharing [sharing]',
+        autocomplete: ['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly']
+      },
+      {
+        option: '--resourceQuota [resourceQuota]'
+      },
+      {
+        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
+      },
+      {
+        option: '--storageQuota [storageQuota]'
+      },
+      {
+        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
+      },
+      {
+        option: '--allowSelfServiceUpgrade [allowSelfServiceUpgrade]'
+      },
+      {
+        option: '--owners [owners]'
+      },
+      {
+        option: '--lockState [lockState]',
+        autocomplete: ['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess']
+      },
+      {
+        option: '--noScriptSite [noScriptSite]'
+      },
+      {
+        option: '--wait'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+
+        if (args.options.sharing &&
+          ['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly'].indexOf(args.options.sharing) === -1) {
+          return `${args.options.sharing} is not a valid value for the sharing option. Allowed values Disabled|ExternalUserSharingOnly|ExternalUserAndGuestSharing|ExistingExternalUserSharingOnly`;
+        }
+
+        if (args.options.resourceQuota &&
+          typeof args.options.resourceQuota !== 'number') {
+          return `${args.options.resourceQuota} is not a number`;
+        }
+
+        if (args.options.resourceQuotaWarningLevel &&
+          typeof args.options.resourceQuotaWarningLevel !== 'number') {
+          return `${args.options.resourceQuotaWarningLevel} is not a number`;
+        }
+
+        if (args.options.resourceQuota &&
+          args.options.resourceQuotaWarningLevel &&
+          args.options.resourceQuotaWarningLevel > args.options.resourceQuota) {
+          return `resourceQuotaWarningLevel must not exceed the resourceQuota`;
+        }
+
+        if (args.options.storageQuota &&
+          typeof args.options.storageQuota !== 'number') {
+          return `${args.options.storageQuota} is not a number`;
+        }
+
+        if (args.options.storageQuotaWarningLevel &&
+          typeof args.options.storageQuotaWarningLevel !== 'number') {
+          return `${args.options.storageQuotaWarningLevel} is not a number`;
+        }
+
+        if (args.options.storageQuota &&
+          args.options.storageQuotaWarningLevel &&
+          args.options.storageQuotaWarningLevel > args.options.storageQuota) {
+          return `storageQuotaWarningLevel must not exceed the storageQuota`;
+        }
+
+        if (args.options.allowSelfServiceUpgrade &&
+          args.options.allowSelfServiceUpgrade !== 'true' &&
+          args.options.allowSelfServiceUpgrade !== 'false') {
+          return `${args.options.allowSelfServiceUpgrade} is not a valid boolean value`;
+        }
+
+        if (args.options.lockState &&
+          ['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess'].indexOf(args.options.lockState) === -1) {
+          return `${args.options.lockState} is not a valid value for the lockState option. Allowed values Unlock|NoAdditions|ReadOnly|NoAccess`;
+        }
+
+        if (args.options.noScriptSite &&
+          args.options.noScriptSite !== 'true' &&
+          args.options.noScriptSite !== 'false') {
+          return `${args.options.noScriptSite} is not a valid boolean value`;
+        }
+
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -309,118 +431,6 @@ class SpoSiteClassicSetCommand extends SpoCommand {
           reject(err);
         });
     });
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-t, --title [title]'
-      },
-      {
-        option: '-d, --description [description]'
-      },
-      {
-        option: '--sharing [sharing]',
-        autocomplete: ['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly']
-      },
-      {
-        option: '--resourceQuota [resourceQuota]'
-      },
-      {
-        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
-      },
-      {
-        option: '--storageQuota [storageQuota]'
-      },
-      {
-        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
-      },
-      {
-        option: '--allowSelfServiceUpgrade [allowSelfServiceUpgrade]'
-      },
-      {
-        option: '--owners [owners]'
-      },
-      {
-        option: '--lockState [lockState]',
-        autocomplete: ['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess']
-      },
-      {
-        option: '--noScriptSite [noScriptSite]'
-      },
-      {
-        option: '--wait'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.url);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    if (args.options.sharing &&
-      ['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly'].indexOf(args.options.sharing) === -1) {
-      return `${args.options.sharing} is not a valid value for the sharing option. Allowed values Disabled|ExternalUserSharingOnly|ExternalUserAndGuestSharing|ExistingExternalUserSharingOnly`;
-    }
-
-    if (args.options.resourceQuota &&
-      typeof args.options.resourceQuota !== 'number') {
-      return `${args.options.resourceQuota} is not a number`;
-    }
-
-    if (args.options.resourceQuotaWarningLevel &&
-      typeof args.options.resourceQuotaWarningLevel !== 'number') {
-      return `${args.options.resourceQuotaWarningLevel} is not a number`;
-    }
-
-    if (args.options.resourceQuota &&
-      args.options.resourceQuotaWarningLevel &&
-      args.options.resourceQuotaWarningLevel > args.options.resourceQuota) {
-      return `resourceQuotaWarningLevel must not exceed the resourceQuota`;
-    }
-
-    if (args.options.storageQuota &&
-      typeof args.options.storageQuota !== 'number') {
-      return `${args.options.storageQuota} is not a number`;
-    }
-
-    if (args.options.storageQuotaWarningLevel &&
-      typeof args.options.storageQuotaWarningLevel !== 'number') {
-      return `${args.options.storageQuotaWarningLevel} is not a number`;
-    }
-
-    if (args.options.storageQuota &&
-      args.options.storageQuotaWarningLevel &&
-      args.options.storageQuotaWarningLevel > args.options.storageQuota) {
-      return `storageQuotaWarningLevel must not exceed the storageQuota`;
-    }
-
-    if (args.options.allowSelfServiceUpgrade &&
-      args.options.allowSelfServiceUpgrade !== 'true' &&
-      args.options.allowSelfServiceUpgrade !== 'false') {
-      return `${args.options.allowSelfServiceUpgrade} is not a valid boolean value`;
-    }
-
-    if (args.options.lockState &&
-      ['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess'].indexOf(args.options.lockState) === -1) {
-      return `${args.options.lockState} is not a valid value for the lockState option. Allowed values Unlock|NoAdditions|ReadOnly|NoAccess`;
-    }
-
-    if (args.options.noScriptSite &&
-      args.options.noScriptSite !== 'true' &&
-      args.options.noScriptSite !== 'false') {
-      return `${args.options.noScriptSite} is not a valid boolean value`;
-    }
-
-    return true;
   }
 }
 

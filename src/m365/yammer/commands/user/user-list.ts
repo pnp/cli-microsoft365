@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
@@ -20,11 +19,6 @@ interface Options extends GlobalOptions {
 class YammerUserListCommand extends YammerCommand {
   protected items: any[];
 
-  constructor() {
-    super();
-    this.items = [];
-  }
-
   public get name(): string {
     return commands.USER_LIST;
   }
@@ -33,18 +27,78 @@ class YammerUserListCommand extends YammerCommand {
     return 'Returns users from the current network';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.letter = args.options.letter !== undefined;
-    telemetryProps.sortBy = args.options.sortBy !== undefined;
-    telemetryProps.reverse = args.options.reverse !== undefined;
-    telemetryProps.limit = args.options.limit !== undefined;
-    telemetryProps.groupId = args.options.groupId !== undefined;
-    return telemetryProps;
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['id', 'full_name', 'email'];
+  }
+
+  constructor() {
+    super();
+    this.items = [];
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        letter: args.options.letter !== undefined,
+        sortBy: args.options.sortBy !== undefined,
+        reverse: args.options.reverse !== undefined,
+        limit: args.options.limit !== undefined,
+        groupId: args.options.groupId !== undefined
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-g, --groupId [groupId]'
+      },
+      {
+        option: '-l, --letter [letter]'
+      },
+      {
+        option: '--reverse'
+      },
+      {
+        option: '--limit [limit]'
+      },
+      {
+        option: '--sortBy [sortBy]',
+        autocomplete: ['messages', 'followers']
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.groupId && typeof args.options.groupId !== 'number') {
+          return `${args.options.groupId} is not a number`;
+        }
+
+        if (args.options.limit && typeof args.options.limit !== 'number') {
+          return `${args.options.limit} is not a number`;
+        }
+
+        if (args.options.sortBy && args.options.sortBy !== 'messages' && args.options.sortBy !== 'followers') {
+          return `sortBy accepts only the values "messages" or "followers"`;
+        }
+
+        if (args.options.letter && !/^(?!\d)[a-zA-Z]+$/i.test(args.options.letter)) {
+          return `Value of 'letter' is invalid. Only characters within the ranges [A - Z], [a - z] are allowed.`;
+        }
+
+        if (args.options.letter && args.options.letter.length !== 1) {
+          return `Only one char as value of 'letter' accepted.`;
+        }
+
+        return true;
+      }
+    );
   }
 
   private getAllItems(logger: Logger, args: CommandArgs, page: number): Promise<void> {
@@ -126,54 +180,6 @@ class YammerUserListCommand extends YammerCommand {
         logger.log(this.items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-g, --groupId [groupId]'
-      },
-      {
-        option: '-l, --letter [letter]'
-      },
-      {
-        option: '--reverse'
-      },
-      {
-        option: '--limit [limit]'
-      },
-      {
-        option: '--sortBy [sortBy]',
-        autocomplete: ['messages', 'followers']
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.groupId && typeof args.options.groupId !== 'number') {
-      return `${args.options.groupId} is not a number`;
-    }
-
-    if (args.options.limit && typeof args.options.limit !== 'number') {
-      return `${args.options.limit} is not a number`;
-    }
-
-    if (args.options.sortBy && args.options.sortBy !== 'messages' && args.options.sortBy !== 'followers') {
-      return `sortBy accepts only the values "messages" or "followers"`;
-    }
-
-    if (args.options.letter && !/^(?!\d)[a-zA-Z]+$/i.test(args.options.letter)) {
-      return `Value of 'letter' is invalid. Only characters within the ranges [A - Z], [a - z] are allowed.`;
-    }
-
-    if (args.options.letter && args.options.letter.length !== 1) {
-      return `Only one char as value of 'letter' accepted.`;
-    }
-
-    return true;
   }
 }
 

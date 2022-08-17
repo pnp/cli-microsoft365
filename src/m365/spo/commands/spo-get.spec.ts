@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
-import { Logger } from '../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../cli';
 import Command, { CommandError } from '../../../Command';
 import { sinonUtil } from '../../../utils';
 import commands from '../commands';
@@ -12,12 +12,14 @@ describe(commands.GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -115,7 +117,7 @@ describe(commands.GET, () => {
   });
 
   it('Contains the correct options', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOutputOption = false;
     let containsVerboseOption = false;
     let containsDebugOption = false;
@@ -143,8 +145,8 @@ describe(commands.GET, () => {
     assert(containsQueryOption, "Query option not available");
   });
 
-  it('passes validation without any extra options', () => {
-    const actual = command.validate({ options: {} });
+  it('passes validation without any extra options', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

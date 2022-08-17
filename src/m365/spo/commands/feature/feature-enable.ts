@@ -1,8 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption,
-  CommandTypes
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -29,11 +25,58 @@ class SpoFeatureEnableCommand extends SpoCommand {
     return 'Enables feature for the specified site or web';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.scope = args.options.scope || 'web';
-    telemetryProps.force = args.options.force || false;
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+    this.#initTypes();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        scope: args.options.scope || 'web',
+        force: args.options.force || false
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-u, --url <url>'
+      },
+      {
+        option: '-f, --featureId <id>'
+      },
+      {
+        option: '-s, --scope [scope]',
+        autocomplete: ['Site', 'Web']
+      },
+      {
+        option: '--force'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.scope) {
+          if (['site', 'web'].indexOf(args.options.scope.toLowerCase()) < 0) {
+            return `${args.options.scope} is not a valid Feature scope. Allowed values are Site|Web`;
+          }
+        }
+
+        return validation.isValidSharePointUrl(args.options.url);
+      }
+    );
+  }
+
+  #initTypes(): void {
+    this.types.string.push('scope', 's');
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -62,43 +105,6 @@ class SpoFeatureEnableCommand extends SpoCommand {
     request
       .post(requestOptions)
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  public types(): CommandTypes {
-    return {
-      string: ['scope', 's']
-    };
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-u, --url <url>'
-      },
-      {
-        option: '-f, --featureId <id>'
-      },
-      {
-        option: '-s, --scope [scope]',
-        autocomplete: ['Site', 'Web']
-      },
-      {
-        option: '--force'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.scope) {
-      if (['site', 'web'].indexOf(args.options.scope.toLowerCase()) < 0) {
-        return `${args.options.scope} is not a valid Feature scope. Allowed values are Site|Web`;
-      }
-    }
-
-    return validation.isValidSharePointUrl(args.options.url);
   }
 }
 

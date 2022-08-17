@@ -1,8 +1,5 @@
 import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
@@ -30,11 +27,27 @@ class AadUserListCommand extends GraphCommand {
     return true;
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.properties = args.options.properties;
-    telemetryProps.deleted = typeof args.options.deleted !== 'undefined';
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        properties: args.options.properties,
+        deleted: typeof args.options.deleted !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '-p, --properties [properties]' },
+      { option: '-d, --deleted' }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -79,16 +92,6 @@ class AadUserListCommand extends GraphCommand {
     }
 
     return filter;
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      { option: '-p, --properties [properties]' },
-      { option: '-d, --deleted' }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
   }
 }
 

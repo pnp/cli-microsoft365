@@ -1,8 +1,5 @@
 import * as util from 'util';
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
@@ -24,10 +21,44 @@ class TeamsCacheRemoveCommand extends GraphCommand {
     return 'Removes the Microsoft Teams client cache';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.confirm = (!(!args.options.confirm)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '--confirm'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async () => {
+        if (process.env.CLIMICROSOFT365_ENV === 'docker') {
+          return 'Because you\'re running CLI for Microsoft 365 in a Docker container, we can\'t clear the cache on your host. Instead run this command on your host using "npx ..."';
+        }
+    
+        if (process.platform !== 'win32' && process.platform !== 'darwin') {
+          return `${process.platform} platform is unsupported for this command`;
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -145,29 +176,6 @@ class TeamsCacheRemoveCommand extends GraphCommand {
   }
 
   private exec = util.promisify(require('child_process').exec);
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '--confirm'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(): boolean | string {
-    if (process.env.CLIMICROSOFT365_ENV === 'docker') {
-      return 'Because you\'re running CLI for Microsoft 365 in a Docker container, we can\'t clear the cache on your host. Instead run this command on your host using "npx ..."';
-    }
-
-    if (process.platform !== 'win32' && process.platform !== 'darwin') {
-      return `${process.platform} platform is unsupported for this command`;
-    }
-
-    return true;
-  }
 }
 
 module.exports = new TeamsCacheRemoveCommand();

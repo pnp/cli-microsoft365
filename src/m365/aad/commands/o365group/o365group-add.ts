@@ -2,9 +2,6 @@ import { Group, User } from '@microsoft/microsoft-graph-types';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting } from '../../../../utils';
@@ -40,17 +37,109 @@ class AadO365GroupAddCommand extends GraphCommand {
     return 'Creates a Microsoft 365 Group';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.owners = typeof args.options.owners !== 'undefined';
-    telemetryProps.members = typeof args.options.members !== 'undefined';
-    telemetryProps.logoPath = typeof args.options.logoPath !== 'undefined';
-    telemetryProps.isPrivate = typeof args.options.isPrivate !== 'undefined';
-    telemetryProps.allowMembersToPost = (!(!args.options.allowMembersToPost)).toString();
-    telemetryProps.hideGroupInOutlook = (!(!args.options.hideGroupInOutlook)).toString();
-    telemetryProps.subscribeNewGroupMembers = (!(!args.options.subscribeNewGroupMembers)).toString();
-    telemetryProps.welcomeEmailDisabled = (!(!args.options.welcomeEmailDisabled)).toString();
-    return telemetryProps;
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        owners: typeof args.options.owners !== 'undefined',
+        members: typeof args.options.members !== 'undefined',
+        logoPath: typeof args.options.logoPath !== 'undefined',
+        isPrivate: typeof args.options.isPrivate !== 'undefined',
+        allowMembersToPost: (!(!args.options.allowMembersToPost)).toString(),
+        hideGroupInOutlook: (!(!args.options.hideGroupInOutlook)).toString(),
+        subscribeNewGroupMembers: (!(!args.options.subscribeNewGroupMembers)).toString(),
+        welcomeEmailDisabled: (!(!args.options.welcomeEmailDisabled)).toString()
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      {
+        option: '-n, --displayName <displayName>'
+      },
+      {
+        option: '-d, --description <description>'
+      },
+      {
+        option: '-m, --mailNickname <mailNickname>'
+      },
+      {
+        option: '--owners [owners]'
+      },
+      {
+        option: '--members [members]'
+      },
+      {
+        option: '--isPrivate [isPrivate]'
+      },
+      {
+        option: '--allowMembersToPost [allowMembersToPost]'
+      },
+      {
+        option: '--hideGroupInOutlook [hideGroupInOutlook]'
+      },
+      {
+        option: '--subscribeNewGroupMembers [subscribeNewGroupMembers]'
+      },
+      {
+        option: '--welcomeEmailDisabled [welcomeEmailDisabled]'
+      },
+      {
+        option: '-l, --logoPath [logoPath]'
+      }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (args.options.owners) {
+          const owners: string[] = args.options.owners.split(',').map(o => o.trim());
+          for (let i = 0; i < owners.length; i++) {
+            if (owners[i].indexOf('@') < 0) {
+              return `${owners[i]} is not a valid userPrincipalName`;
+            }
+          }
+        }
+    
+        if (args.options.members) {
+          const members: string[] = args.options.members.split(',').map(m => m.trim());
+          for (let i = 0; i < members.length; i++) {
+            if (members[i].indexOf('@') < 0) {
+              return `${members[i]} is not a valid userPrincipalName`;
+            }
+          }
+        }
+    
+        if (typeof args.options.isPrivate !== 'undefined' &&
+          args.options.isPrivate !== 'true' &&
+          args.options.isPrivate !== 'false') {
+          return `${args.options.isPrivate} is not a valid boolean value`;
+        }
+    
+        if (args.options.logoPath) {
+          const fullPath: string = path.resolve(args.options.logoPath);
+    
+          if (!fs.existsSync(fullPath)) {
+            return `File '${fullPath}' not found`;
+          }
+    
+          if (fs.lstatSync(fullPath).isDirectory()) {
+            return `Path '${fullPath}' points to a directory`;
+          }
+        }
+    
+        return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -246,87 +335,6 @@ class AadO365GroupAddCommand extends GraphCommand {
       default:
         return 'image/jpeg';
     }
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-n, --displayName <displayName>'
-      },
-      {
-        option: '-d, --description <description>'
-      },
-      {
-        option: '-m, --mailNickname <mailNickname>'
-      },
-      {
-        option: '--owners [owners]'
-      },
-      {
-        option: '--members [members]'
-      },
-      {
-        option: '--isPrivate [isPrivate]'
-      },
-      {
-        option: '--allowMembersToPost [allowMembersToPost]'
-      },
-      {
-        option: '--hideGroupInOutlook [hideGroupInOutlook]'
-      },
-      {
-        option: '--subscribeNewGroupMembers [subscribeNewGroupMembers]'
-      },
-      {
-        option: '--welcomeEmailDisabled [welcomeEmailDisabled]'
-      },
-      {
-        option: '-l, --logoPath [logoPath]'
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (args.options.owners) {
-      const owners: string[] = args.options.owners.split(',').map(o => o.trim());
-      for (let i = 0; i < owners.length; i++) {
-        if (owners[i].indexOf('@') < 0) {
-          return `${owners[i]} is not a valid userPrincipalName`;
-        }
-      }
-    }
-
-    if (args.options.members) {
-      const members: string[] = args.options.members.split(',').map(m => m.trim());
-      for (let i = 0; i < members.length; i++) {
-        if (members[i].indexOf('@') < 0) {
-          return `${members[i]} is not a valid userPrincipalName`;
-        }
-      }
-    }
-
-    if (typeof args.options.isPrivate !== 'undefined' &&
-      args.options.isPrivate !== 'true' &&
-      args.options.isPrivate !== 'false') {
-      return `${args.options.isPrivate} is not a valid boolean value`;
-    }
-
-    if (args.options.logoPath) {
-      const fullPath: string = path.resolve(args.options.logoPath);
-
-      if (!fs.existsSync(fullPath)) {
-        return `File '${fullPath}' not found`;
-      }
-
-      if (fs.lstatSync(fullPath).isDirectory()) {
-        return `Path '${fullPath}' points to a directory`;
-      }
-    }
-
-    return true;
   }
 }
 

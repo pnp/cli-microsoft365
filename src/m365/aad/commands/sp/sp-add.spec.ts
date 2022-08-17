@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -13,11 +13,13 @@ describe(commands.SP_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -60,53 +62,53 @@ describe(commands.SP_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if neither the appId, appName, nor objectId option specified', () => {
-    const actual = command.validate({ options: {} });
+  it('fails validation if neither the appId, appName, nor objectId option specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the appId is not a valid GUID', () => {
-    const actual = command.validate({ options: { appId: '123' } });
+  it('fails validation if the appId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { appId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the objectId is not a valid GUID', () => {
-    const actual = command.validate({ options: { objectId: '123' } });
+  it('fails validation if the objectId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { objectId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both appId and appName are specified', () => {
-    const actual = command.validate({ options: { appId: '00000000-0000-0000-0000-000000000000', appName: 'abc' } });
+  it('fails validation if both appId and appName are specified', async () => {
+    const actual = await command.validate({ options: { appId: '00000000-0000-0000-0000-000000000000', appName: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both appName and objectId are specified', () => {
-    const actual = command.validate({ options: { appName: 'abc', objectId: '123' } });
+  it('fails validation if both appName and objectId are specified', async () => {
+    const actual = await command.validate({ options: { appName: 'abc', objectId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both appId and objectId are specified', () => {
-    const actual = command.validate({ options: { appId: '00000000-0000-0000-0000-000000000000', objectId: '00000000-0000-0000-0000-000000000000' } });
+  it('fails validation if both appId and objectId are specified', async () => {
+    const actual = await command.validate({ options: { appId: '00000000-0000-0000-0000-000000000000', objectId: '00000000-0000-0000-0000-000000000000' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the appId option specified', () => {
-    const actual = command.validate({ options: { appId: '00000000-0000-0000-0000-000000000000' } });
+  it('passes validation when the appId option specified', async () => {
+    const actual = await command.validate({ options: { appId: '00000000-0000-0000-0000-000000000000' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the appName option specified', () => {
-    const actual = command.validate({ options: { appName: 'abc' } });
+  it('passes validation when the appName option specified', async () => {
+    const actual = await command.validate({ options: { appName: 'abc' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when the objectId option specified', () => {
-    const actual = command.validate({ options: { objectId: '00000000-0000-0000-0000-000000000000' } });
+  it('passes validation when the objectId option specified', async () => {
+    const actual = await command.validate({ options: { objectId: '00000000-0000-0000-0000-000000000000' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports specifying appId', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--appId') > -1) {
@@ -117,7 +119,7 @@ describe(commands.SP_ADD, () => {
   });
 
   it('supports specifying appName', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--appName') > -1) {
@@ -128,7 +130,7 @@ describe(commands.SP_ADD, () => {
   });
 
   it('supports specifying objectId', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--objectId') > -1) {
@@ -385,7 +387,7 @@ describe(commands.SP_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

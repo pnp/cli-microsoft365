@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -14,6 +14,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   const apiResponse = {
     "ListItemAllFields": {
@@ -79,6 +80,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -441,7 +443,7 @@ describe(commands.PAGE_COLUMN_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -451,23 +453,23 @@ describe(commands.PAGE_COLUMN_LIST, () => {
     assert(containsOption);
   });
 
-  it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = command.validate({ options: { webUrl: 'foo', name: 'home.aspx', section: 1 } });
+  it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
+    const actual = await command.validate({ options: { webUrl: 'foo', name: 'home.aspx', section: 1 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the section option is not specifed', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx' } });
+  it('fails validation if the section option is not specifed', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the section option is not a number', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', section: 'abc' } });
+  it('fails validation if the section option is not a number', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', section: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the webUrl is a valid SharePoint URL and name is specified and section is specified', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', section: 1 } });
+  it('passes validation when the webUrl is a valid SharePoint URL and name is specified and section is specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', section: 1 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

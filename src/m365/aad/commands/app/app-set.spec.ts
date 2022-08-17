@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -18,11 +18,13 @@ describe(commands.APP_SET, () => {
 
   let log: string[];
   let logger: Logger;
+  let commandInfo: CommandInfo;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -1238,92 +1240,92 @@ describe(commands.APP_SET, () => {
     });
   });
 
-  it('fails validation if appId and objectId specified', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8' } });
+  it('fails validation if appId and objectId specified', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if appId and name specified', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } });
+  it('fails validation if appId and name specified', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', name: 'My app' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if objectId and name specified', () => {
-    const actual = command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app' } });
+  it('fails validation if objectId and name specified', async () => {
+    const actual = await command.validate({ options: { appObjectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', appName: 'My app' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if neither appId, objectId nor name specified', () => {
-    const actual = command.validate({ options: {} });
+  it('fails validation if neither appId, objectId nor name specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if redirectUris specified without platform', () => {
-    const actual = command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', redirectUris: 'https://foo.com' } });
+  it('fails validation if redirectUris specified without platform', async () => {
+    const actual = await command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', redirectUris: 'https://foo.com' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if invalid platform specified', () => {
-    const actual = command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', redirectUris: 'https://foo.com', platform: 'invalid' } });
+  it('fails validation if invalid platform specified', async () => {
+    const actual = await command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', redirectUris: 'https://foo.com', platform: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if certificateDisplayName is specified without certificate', () => {
-    const actual = command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', certificateDisplayName: 'Some certificate' } });
+  it('fails validation if certificateDisplayName is specified without certificate', async () => {
+    const actual = await command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', certificateDisplayName: 'Some certificate' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both certificateBase64Encoded and certificateFile are specified', () => {
-    const actual = command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', certificateFile: 'c:\\temp\\some-certificate.cer', certificateBase64Encoded: 'somebase64string' } });
+  it('fails validation if both certificateBase64Encoded and certificateFile are specified', async () => {
+    const actual = await command.validate({ options: { objectId: 'c75be2e1-0204-4f95-857d-51a37cf40be8', certificateFile: 'c:\\temp\\some-certificate.cer', certificateBase64Encoded: 'somebase64string' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if certificateFile specified with certificateDisplayName', () => {
+  it('passes validation if certificateFile specified with certificateDisplayName', async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
 
-    const actual = command.validate({ options: { name: 'My AAD app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' } });
+    const actual = await command.validate({ options: { name: 'My AAD app', certificateDisplayName: 'Some certificate', certificateFile: 'c:\\temp\\some-certificate.cer' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation when certificate file is not found', () => {
+  it('fails validation when certificate file is not found', async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => false);
 
-    const actual = command.validate({ options: { debug: true, objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83', certificateDisplayName: 'some certificate', certificateFile: 'C:\\temp\\some-certificate.cer' } });
+    const actual = await command.validate({ options: { debug: true, objectId: '95cfe30d-ed44-4f9d-b73d-c66560f72e83', certificateDisplayName: 'some certificate', certificateFile: 'C:\\temp\\some-certificate.cer' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if required options specified (appId)', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' } });
+  it('passes validation if required options specified (appId)', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if required options specified (objectId)', () => {
-    const actual = command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' } });
+  it('passes validation if required options specified (objectId)', async () => {
+    const actual = await command.validate({ options: { objectId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if required options specified (name)', () => {
-    const actual = command.validate({ options: { name: 'My app', uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' } });
+  it('passes validation if required options specified (name)', async () => {
+    const actual = await command.validate({ options: { name: 'My app', uri: 'https://contoso.com/bc724b77-da87-43a9-b385-6ebaaf969db8' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when redirectUris specified with spa', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', redirectUris: 'https://foo.com', platform: 'spa' } });
+  it('passes validation when redirectUris specified with spa', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', redirectUris: 'https://foo.com', platform: 'spa' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when redirectUris specified with publicClient', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', redirectUris: 'https://foo.com', platform: 'publicClient' } });
+  it('passes validation when redirectUris specified with publicClient', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', redirectUris: 'https://foo.com', platform: 'publicClient' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation when redirectUris specified with web', () => {
-    const actual = command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', redirectUris: 'https://foo.com', platform: 'web' } });
+  it('passes validation when redirectUris specified with web', async () => {
+    const actual = await command.validate({ options: { appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f', redirectUris: 'https://foo.com', platform: 'web' } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "spfx-1150-webpart-optionaldeps-client-side-solution",
+    "id": "38997152-85e6-4f5c-8de2-1bd1d0135008",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.15.0"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "spfx-1150-webpart-optionaldeps description"
+      },
+      "longDescription": {
+        "default": "spfx-1150-webpart-optionaldeps description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "spfx-1150-webpart-optionaldeps Feature",
+        "description": "The feature that activates elements of the spfx-1150-webpart-optionaldeps solution.",
+        "id": "2338f599-1a25-4bb6-a25d-150ed77641f1",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/spfx-1150-webpart-optionaldeps.sppkg"
+  }
+}

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import { settingsNames } from '../../../../settingsNames';
 import { sinonUtil } from '../../../../utils';
@@ -11,6 +11,11 @@ describe(commands.CONFIG_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
+
+  before(() => {
+    commandInfo = Cli.getCommandInfo(command);
+  });
 
   beforeEach(() => {
     log = [];
@@ -69,7 +74,7 @@ describe(commands.CONFIG_GET, () => {
   });
 
   it('supports specifying key', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOptionKey = false;
     options.forEach(o => {
       if (o.option.indexOf('--key') > -1) {
@@ -79,13 +84,13 @@ describe(commands.CONFIG_GET, () => {
     assert(containsOptionKey);
   });
 
-  it('fails validation if specified key is invalid ', () => {
-    const actual = command.validate({ options: { key: 'invalid' } });
+  it('fails validation if specified key is invalid ', async () => {
+    const actual = await command.validate({ options: { key: 'invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it(`passes validation if setting is set to ${settingsNames.showHelpOnFailure}`, () => {
-    const actual = command.validate({ options: { key: settingsNames.showHelpOnFailure } });
+  it(`passes validation if setting is set to ${settingsNames.showHelpOnFailure}`, async () => {
+    const actual = await command.validate({ options: { key: settingsNames.showHelpOnFailure } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 });

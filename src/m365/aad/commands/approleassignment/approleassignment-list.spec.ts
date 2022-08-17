@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
@@ -410,6 +410,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
 
   const jsonOutput = [
     {
@@ -436,6 +437,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -604,38 +606,38 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
     });
   });
 
-  it('fails validation if neither appId nor displayName are not specified', () => {
-    const actual = command.validate({ options: {} });
+  it('fails validation if neither appId nor displayName are not specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the appId is not a valid GUID', () => {
-    const actual = command.validate({ options: { appId: '123' } });
+  it('fails validation if the appId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { appId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if the objectId is not a valid GUID', () => {
-    const actual = command.validate({ options: { objectId: '123' } });
+  it('fails validation if the objectId is not a valid GUID', async () => {
+    const actual = await command.validate({ options: { objectId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if both appId and displayName are specified', () => {
-    const actual = command.validate({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments, displayName: CommandActionParameters.appNameWithRoleAssignments } });
+  it('fails validation if both appId and displayName are specified', async () => {
+    const actual = await command.validate({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments, displayName: CommandActionParameters.appNameWithRoleAssignments } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if objectId and displayName are specified', () => {
-    const actual = command.validate({ options: { displayName: CommandActionParameters.appNameWithRoleAssignments, objectId: CommandActionParameters.objectIdWithRoleAssignments } });
+  it('fails validation if objectId and displayName are specified', async () => {
+    const actual = await command.validate({ options: { displayName: CommandActionParameters.appNameWithRoleAssignments, objectId: CommandActionParameters.objectIdWithRoleAssignments } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the appId option specified', () => {
-    const actual = command.validate({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments } });
+  it('passes validation when the appId option specified', async () => {
+    const actual = await command.validate({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -646,7 +648,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   });
 
   it('supports specifying appId', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--appId') > -1) {
@@ -657,7 +659,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   });
 
   it('supports specifying displayName', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--displayName') > -1) {
