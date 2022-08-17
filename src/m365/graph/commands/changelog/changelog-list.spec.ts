@@ -1,4 +1,4 @@
-import { sinonUtil } from './../../../../utils/sinonUtil';
+import { sinonUtil } from './../../../../utils';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
