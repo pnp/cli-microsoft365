@@ -2,7 +2,7 @@
 
 # Meet the Team
 
-Do you want to know the curious and bright minds behind the CLI for M365? Look no further! Below you will find a list of all our hard-working maintainers and brilliant contributors.
+Do you want to know the curious and bright minds behind the CLI for Microsoft 365? Look no further! Below you will find a list of all our hard-working maintainers and brilliant contributors.
 
 ## Maintainers
 
