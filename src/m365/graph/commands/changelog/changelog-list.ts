@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils';
 import AnonymousCommand from '../../../base/AnonymousCommand';
@@ -41,18 +40,72 @@ class GraphChangelogListCommand extends AnonymousCommand {
     return 'Gets an overview of specific API-level changes in Microsoft Graph v1.0 and beta';
   }
 
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.versions = typeof args.options.versions !== 'undefined';
-    telemetryProps.changeType = typeof args.options.changeType !== 'undefined';
-    telemetryProps.services = typeof args.options.services !== 'undefined';
-    telemetryProps.startDate = typeof args.options.startDate !== 'undefined';
-    telemetryProps.endDate = typeof args.options.endDate !== 'undefined';
-    return telemetryProps;
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['guid', 'category', 'title', 'description', 'pubDate'];
+  }
+
+  constructor() {
+    super();
+
+    this.#initTelemetry();
+    this.#initOptions();
+    this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        versions: typeof args.options.versions !== 'undefined',
+        changeType: typeof args.options.changeType !== 'undefined',
+        services: typeof args.options.services !== 'undefined',
+        startDate: typeof args.options.startDate !== 'undefined',
+        endDate: typeof args.options.endDate !== 'undefined'
+      });
+    });
+  }
+
+  #initOptions(): void {
+    this.options.unshift(
+      { option: '-v, --versions [versions]', autocomplete: this.allowedVersions },
+      { option: "-c, --changeType [changeType]", autocomplete: this.allowedChangeTypes },
+      { option: "-s, --services [services]", autocomplete: this.allowedServices },
+      { option: "--startDate [startDate]" },
+      { option: "--endDate [endDate]" }
+    );
+  }
+
+  #initValidators(): void {
+    this.validators.push(
+      async (args: CommandArgs) => {
+        if (
+          args.options.versions && 
+          args.options.versions.toLocaleLowerCase().split(',').some(x => !this.allowedVersions.map(y => y.toLocaleLowerCase()).includes(x))) {
+          return `The verions contains an invalid value. Specify either ${this.allowedVersions.join(', ')} as properties`;
+        }
+    
+        if (
+          args.options.changeType && 
+          !this.allowedChangeTypes.map(x => x.toLocaleLowerCase()).includes(args.options.changeType.toLocaleLowerCase())) {
+          return `The change type contain an invalid value. Specify either ${this.allowedChangeTypes.join(', ')} as properties`;
+        }
+    
+        if (
+          args.options.services && 
+          args.options.services.toLocaleLowerCase().split(',').some(x => !this.allowedServices.map(y => y.toLocaleLowerCase()).includes(x))) {
+          return `The services contains invalid value. Specify either ${this.allowedServices.join(', ')} as properties`;
+        }
+    
+        if (args.options.startDate && !validation.isValidISODate(args.options.startDate)) {
+          return 'The startDate is not a valid ISO date string';
+        }
+    
+        if (args.options.endDate && !validation.isValidISODate(args.options.endDate)) {
+          return 'The endDate is not a valid ISO date string';
+        }
+
+	      return true;
+      }
+    );
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -139,62 +192,6 @@ class GraphChangelogListCommand extends AnonymousCommand {
     });
 
     return changelog;
-  }
-
-  public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-v, --versions [versions]',
-        autocomplete: this.allowedVersions
-      },
-      {
-        option: "-c, --changeType [changeType]",
-        autocomplete: this.allowedChangeTypes
-      },
-      {
-        option: "-s, --services [services]",
-        autocomplete: this.allowedServices
-      },
-      {
-        option: "--startDate [startDate]"
-      },
-      {
-        option: "--endDate [endDate]"
-      }
-    ];
-
-    const parentOptions: CommandOption[] = super.options();
-    return options.concat(parentOptions);
-  }
-
-  public validate(args: CommandArgs): boolean | string {
-    if (
-      args.options.versions && 
-      args.options.versions.toLocaleLowerCase().split(',').some(x => !this.allowedVersions.map(y => y.toLocaleLowerCase()).includes(x))) {
-      return `The verions contains an invalid value. Specify either ${this.allowedVersions.join(', ')} as properties`;
-    }
-
-    if (
-      args.options.changeType && 
-      !this.allowedChangeTypes.map(x => x.toLocaleLowerCase()).includes(args.options.changeType.toLocaleLowerCase())) {
-      return `The change type contain an invalid value. Specify either ${this.allowedChangeTypes.join(', ')} as properties`;
-    }
-
-    if (
-      args.options.services && 
-      args.options.services.toLocaleLowerCase().split(',').some(x => !this.allowedServices.map(y => y.toLocaleLowerCase()).includes(x))) {
-      return `The services contains invalid value. Specify either ${this.allowedServices.join(', ')} as properties`;
-    }
-
-    if (args.options.startDate && !validation.isValidISODate(args.options.startDate)) {
-      return 'The startDate is not a valid ISO date string';
-    }
-
-    if (args.options.endDate && !validation.isValidISODate(args.options.endDate)) {
-      return 'The endDate is not a valid ISO date string';
-    }
-
-    return true;
   }
 }
 

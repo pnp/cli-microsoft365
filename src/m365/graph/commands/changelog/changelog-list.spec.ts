@@ -3,7 +3,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import { Logger } from '../../../../cli';
+import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import commands from '../../commands';
 import request from '../../../../request';
@@ -13,6 +13,7 @@ describe(commands.CHANGELOG_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let commandInfo: CommandInfo;
   const validVersions = 'beta,v1.0';
   const validChangeType = 'Addition';
   const validServices = 'Groups,Security';
@@ -69,6 +70,7 @@ describe(commands.CHANGELOG_LIST, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    commandInfo = Cli.getCommandInfo(command);
   });
 
   beforeEach(() => {
@@ -118,7 +120,7 @@ describe(commands.CHANGELOG_LIST, () => {
       options: {
         versions: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
     done();
   });
@@ -128,7 +130,7 @@ describe(commands.CHANGELOG_LIST, () => {
       options: {
         changeType: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
     done();
   });
@@ -138,7 +140,7 @@ describe(commands.CHANGELOG_LIST, () => {
       options: {
         services: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
     done();
   });
@@ -148,7 +150,7 @@ describe(commands.CHANGELOG_LIST, () => {
       options: {
         startDate: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
     done();
   });
@@ -158,59 +160,54 @@ describe(commands.CHANGELOG_LIST, () => {
       options: {
         endDate: 'invalid'
       }
-    });
+    }, commandInfo);
     assert.notStrictEqual(actual, true);
     done();
   });
 
-  it('passes validation when valid versions specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid versions specified', async () => {
+    const actual = await command.validate({
       options: {
         versions: validVersions
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid changeType specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid changeType specified', async () => {
+    const actual = await command.validate({
       options: {
         changeType: validChangeType
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid services specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid services specified', async () => {
+    const actual = await command.validate({
       options: {
         services: validServices
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid startDate specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid startDate specified', async () => {
+    const actual = await command.validate({
       options: {
         startDate: validStartDate
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
-  it('passes validation when valid endDate specified', (done) => {
-    const actual = command.validate({
+  it('passes validation when valid endDate specified', async () => {
+    const actual = await command.validate({
       options: {
         endDate: validEndDate
       }
-    });
+    }, commandInfo);
     assert.strictEqual(actual, true);
-    done();
   });
 
   it('retrieves changelog list', (done) => {
@@ -287,7 +284,7 @@ describe(commands.CHANGELOG_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = command.options();
+    const options = command.options;
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
