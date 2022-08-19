@@ -150,11 +150,6 @@ class Request {
       return Promise.reject('Logger not set on the request object');
     }
 
-    const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
-    if (!options.method || methods.indexOf(options.method) === -1 ) {
-      return Promise.reject('No valid method set in the request options');
-    }
-
     return new Promise<TResponse>((_resolve: (res: TResponse) => void, _reject: (error: any) => void): void => {
       ((): Promise<string> => {
         if (options.headers && options.headers['x-anonymous']) {

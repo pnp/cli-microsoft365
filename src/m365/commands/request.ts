@@ -14,10 +14,11 @@ interface Options extends GlobalOptions {
   method?: string;
   resource?: string;
   body?: string;
-  accept?: string;
 }
 
 class RequestCommand extends Command {
+  private allowedMethods: string[] = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'];
+
   public get name(): string {
     return commands.REQUEST;
   }
@@ -40,7 +41,7 @@ class RequestCommand extends Command {
 
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
-      const properties: any= {
+      const properties: any = {
         method: args.options.method || 'get',
         resource: typeof args.options.resource !== 'undefined',
         accept: args.options.accept || 'application/json',
@@ -64,16 +65,13 @@ class RequestCommand extends Command {
       },
       {
         option: '-m, --method [method]',
-        autocomplete: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
+        autocomplete: this.allowedMethods
       },
       {
         option: '-r, --resource [resource]'
       },
       {
         option: '-b, --body [body]'
-      },
-      {
-        option: '-a, --accept [accept]'
       }
     );
   }
@@ -81,10 +79,9 @@ class RequestCommand extends Command {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        const allowedMethods = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'];
         const currentMethod = args.options.method || 'get';
-        if (allowedMethods.indexOf(currentMethod) === -1) {
-          return `${currentMethod} is not a valid value for method. Allowed values: ${allowedMethods.join(', ')}`;
+        if (this.allowedMethods.indexOf(currentMethod) === -1) {
+          return `${currentMethod} is not a valid value for method. Allowed values: ${this.allowedMethods.join(', ')}`;
         }
 
         if (args.options.body && (!args.options.method || args.options.method === 'get')) {
@@ -92,7 +89,7 @@ class RequestCommand extends Command {
         }
 
         if (args.options.body && !args.options['content-type']) {
-          return 'Specify the contentType when using body';
+          return 'Specify the content-type when using body';
         }
 
         return true;
@@ -106,20 +103,22 @@ class RequestCommand extends Command {
     }
 
     const method = (args.options.method || 'get').toUpperCase();
-    const headers: AxiosRequestHeaders = {
-      accept: args.options.accept || 'application/json'
-    };
-      
+    const headers: AxiosRequestHeaders = {};
+
     const unknownOptions: any = this.getUnknownOptions(args.options);
     const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
     unknownOptionsNames.forEach(o => {
       headers[o] = unknownOptions[o];
     });
 
+    if (!headers.accept) {
+      headers.accept = 'application/json';
+    }
+
     if (args.options.resource) {
       headers['x-resource'] = args.options.resource;
     }
-    
+
     const config: AxiosRequestConfig<string> = {
       url: args.options.url,
       headers,
@@ -130,11 +129,11 @@ class RequestCommand extends Command {
     if (headers.accept.toString().startsWith('application/json')) {
       config.responseType = 'json';
     }
-    
+
     if (this.verbose) {
       logger.logToStderr(`Executing request...`);
     }
-    
+
     request.execute<string>(config)
       .then(response => {
         logger.log(response);

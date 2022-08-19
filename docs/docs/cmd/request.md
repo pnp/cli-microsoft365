@@ -17,22 +17,23 @@ m365 request [options]
 : The HTTP request method. Accepted values are `get, post, put, patch, delete, head, options`. The default value is `get`.
 
 `-r, --resource [resource]`
-: The resource url for which the CLI should acquire a token from AAD in order to access 
+: The resource uri for which the CLI should acquire a token from AAD in order to access 
 the service.
 
 `-b, --body [body]`
 : The request body. Optionally use `@example.json` to load the body from a file. 
 
-`-a, --accept [accept]`
-: A convenience option to set the `accept` header of the request. The default to `application/json`. 
-
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
-The request will be issued as bare as possible, meaning you are responsible for all request information, such as headers, method and body. The only exception is the `authorization` header. By default, the command will try to retrieve a valid token for the API you are executing a request against based on the `url` option. 
+The request will be issued as bare as possible, meaning you are responsible for most request information, such as headers, method and body. There are a few exceptions: 
 
-If you specify the `resource` option, the CLI will try to retrieve a valid token for the resource instead of determining the resource based on the url. 
+- the command does apply compression and throttling handling as part of the request execution. 
+- The `accept` header is set and defaults to `application/json`. 
+- The `authorization` header is set. By default, the command will try to retrieve a valid token for the API you are executing a request against based on the `url` option. 
+
+If you specify the `resource` option, the CLI will try to retrieve a valid token for the resource instead of determining the resource based on the url. The value doesn't have to be a URL. It can be also a URI like `app://<guid>`.
 
 Specify additional headers by typing them as options, for example: `--content-type "application/json"`, `--if-match "*"`, `--x-requestdigest "somedigest"`
 
