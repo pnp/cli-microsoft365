@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+import path = require('path');
 import { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 import { Logger } from '../../cli';
 import Command from '../../Command';
@@ -14,6 +16,7 @@ interface Options extends GlobalOptions {
   method?: string;
   resource?: string;
   body?: string;
+  filePath?: string;
 }
 
 class RequestCommand extends Command {
@@ -45,7 +48,8 @@ class RequestCommand extends Command {
         method: args.options.method || 'get',
         resource: typeof args.options.resource !== 'undefined',
         accept: args.options.accept || 'application/json',
-        body: typeof args.options.body !== 'undefined'
+        body: typeof args.options.body !== 'undefined',
+        filePath: typeof args.options.filePath !== 'undefined'
       };
 
       const unknownOptions: any = this.getUnknownOptions(args.options);
@@ -71,7 +75,10 @@ class RequestCommand extends Command {
         option: '-r, --resource [resource]'
       },
       {
-        option: '-b, --body [body]'
+        option: '-b, --body [body]'      
+      },
+      {
+        option: '-p, --filePath [filePath]'
       }
     );
   }
@@ -90,6 +97,10 @@ class RequestCommand extends Command {
 
         if (args.options.body && !args.options['content-type']) {
           return 'Specify the content-type when using body';
+        }
+
+        if (args.options.filePath && !fs.existsSync(path.dirname(args.options.filePath))) {
+          return 'Specified filePath to save the file does not exist';
         }
 
         return true;
@@ -130,15 +141,45 @@ class RequestCommand extends Command {
       config.responseType = 'json';
     }
 
+    if (args.options.filePath) {
+      config.responseType = 'stream';
+    }
+
     if (this.verbose) {
       logger.logToStderr(`Executing request...`);
     }
 
-    request.execute<string>(config)
-      .then(response => {
-        logger.log(response);
-        cb();
-      }, (rawRes: any): void => this.handleError(rawRes, logger, cb));
+    if (args.options.filePath) {
+      request
+        .execute<any>(config)
+        .then((file: any): Promise<string> => {
+          return new Promise((resolve, reject) => {
+            const writer = fs.createWriteStream(args.options.filePath as string);
+
+            file.data.pipe(writer);
+
+            writer.on('error', err => {
+              reject(err);
+            });
+            writer.on('close', () => {
+              resolve(args.options.filePath as string);
+            });
+          });
+        })
+        .then((file: string): void => {
+          if (this.verbose) {
+            logger.logToStderr(`File saved to path ${file}`);
+          }
+          cb();
+        }, (err: any): void => this.handleError(err, logger, cb));
+    }
+    else {
+      request.execute<string>(config)
+        .then(response => {
+          logger.log(response);
+          cb();
+        }, (rawRes: any): void => this.handleError(rawRes, logger, cb));
+    }
   }
 
 }

@@ -23,14 +23,17 @@ the service.
 `-b, --body [body]`
 : The request body. Optionally use `@example.json` to load the body from a file. 
 
+`-p, --filePath [filePath]`
+: The file path to save the response to. This option can be used when downloading files.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
 The request will be issued as bare as possible, meaning you are responsible for most request information, such as headers, method and body. There are a few exceptions: 
 
-- the command does apply compression and throttling handling as part of the request execution. 
-- The `accept` header is set and defaults to `application/json`. 
+- The command does apply compression and throttling handling as part of the request execution. 
+- The `accept` header can be set manually, but if you don't, it defaults to `application/json`. 
 - The `authorization` header is set. By default, the command will try to retrieve a valid token for the API you are executing a request against based on the `url` option. 
 
 If you specify the `resource` option, the CLI will try to retrieve a valid token for the resource instead of determining the resource based on the url. The value doesn't have to be a URL. It can be also a URI like `app://<guid>`.

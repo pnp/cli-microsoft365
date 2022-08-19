@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../appInsights';
@@ -7,6 +8,7 @@ import Command, { CommandError } from '../../Command';
 import request from '../../request';
 import { sinonUtil } from '../../utils';
 import commands from './commands';
+import { PassThrough } from 'stream';
 const command: Command = require('./request');
 
 describe(commands.REQUEST, () => {
@@ -48,7 +50,8 @@ describe(commands.REQUEST, () => {
 
   afterEach(() => {
     sinonUtil.restore([
-      request.execute
+      request.execute,
+      fs.createWriteStream
     ]);
   });
 
@@ -100,6 +103,16 @@ describe(commands.REQUEST, () => {
         method: 'get' 
       } 
     }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if filePath doesn\'t exist', async () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => false);
+    const actual = await command.validate({ options: { 
+      url: "https://contoso.sharepoint.com/_api/web/GetFileById('b2307a39-e878-458b-bc90-03bc578531d6')/$value", 
+      method: 'get', 
+      filePath: 'abc' } }, commandInfo);
+    sinonUtil.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
   });
 
@@ -334,5 +347,117 @@ describe(commands.REQUEST, () => {
         done(e);
       }
     });
+  });
+
+  
+  it('writeFile called when option --asFile is specified (verbose)', (done) => {
+    const mockResponse = `{"data": 123}`;
+    const responseStream = new PassThrough();
+    responseStream.write(mockResponse);
+    responseStream.end(); //Mark that we pushed all the data.
+
+    const writeStream = new PassThrough();
+    const fsStub = sinon.stub(fs, 'createWriteStream').returns(writeStream as any);
+
+    setTimeout(() => {
+      writeStream.emit('close');
+    }, 5);
+
+    sinon.stub(request, 'execute').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
+        return Promise.resolve({
+          data: responseStream
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const options = {
+      verbose: true,
+      url: "https://contoso.sharepoint.com/_api/web/GetFileById('b2307a39-e878-458b-bc90-03bc578531d6')/$value", 
+      body: '{ "key": "value" }',
+      'content-type': 'application/json',
+      method: 'get', 
+      filePath: 'test1.docx'
+    };
+
+    command.action(logger, { options: options } as any, (err?: any) => {
+      try {
+        assert(fsStub.calledOnce);
+        assert.strictEqual(err, undefined);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        sinonUtil.restore([
+          fs.createWriteStream
+        ]);
+      }
+    });
+  });
+
+  
+  it('fails when empty file is created file with --asFile is specified', (done) => {
+    const mockResponse = `{"data": 123}`;
+    const responseStream = new PassThrough();
+    responseStream.write(mockResponse);
+    responseStream.end(); //Mark that we pushed all the data.
+
+    const writeStream = new PassThrough();
+    const fsStub = sinon.stub(fs, 'createWriteStream').returns(writeStream as any);
+
+    setTimeout(() => {
+      writeStream.emit('error', "Writestream throws error");
+    }, 5);
+
+    sinon.stub(request, 'execute').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
+        return Promise.resolve({
+          data: responseStream
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    const options = {
+      debug: false,
+      url: "https://contoso.sharepoint.com/_api/web/GetFileById('b2307a39-e878-458b-bc90-03bc578531d6')/$value", 
+      body: '{ "key": "value" }',
+      'content-type': 'application/json',
+      method: 'get', 
+      filePath: 'test1.docx'
+    };
+
+    command.action(logger, { options: options } as any, (err?: any) => {
+      try {
+        assert(fsStub.calledOnce);
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Writestream throws error')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        sinonUtil.restore([
+          fs.createWriteStream
+        ]);
+      }
+    });
+  });
+
+  
+  it('supports debug mode', () => {
+    const options = command.options;
+    let containsDebugOption = false;
+    options.forEach(o => {
+      if (o.option === '--debug') {
+        containsDebugOption = true;
+      }
+    });
+    assert(containsDebugOption);
   });
 });
