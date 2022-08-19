@@ -46,28 +46,30 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const clearO365GroupRecycleBinItems: () => void = (): void => {
-      this.processRecycleBinItemsClear().then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const clearO365GroupRecycleBinItems: () => Promise<void> = async (): Promise<void> => {
+      try {
+        await this.processRecycleBinItemsClear();
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      clearO365GroupRecycleBinItems();
+      await clearO365GroupRecycleBinItems();
     }
     else {
-      Cli.prompt({
+      const response = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to clear all O365 Groups from recycle bin ?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          clearO365GroupRecycleBinItems();
-        }
       });
+
+      if (response.continue){
+        await clearO365GroupRecycleBinItems();
+      }
     }
   }
 

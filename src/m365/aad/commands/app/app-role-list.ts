@@ -75,14 +75,15 @@ class AadAppRoleListCommand extends GraphCommand {
     return ['displayName', 'description', 'id'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getAppObjectId(args, logger)
-      .then(objectId => odata.getAllItems<AppRole>(`${this.resource}/v1.0/myorganization/applications/${objectId}/appRoles`))
-      .then(appRoles => {
-        logger.log(appRoles);
-        cb();
-      }, rawRes => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const objectId = await this.getAppObjectId(args, logger);
+      const appRoles = await odata.getAllItems<AppRole>(`${this.resource}/v1.0/myorganization/applications/${objectId}/appRoles`);
+      logger.log(appRoles);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getAppObjectId(args: CommandArgs, logger: Logger): Promise<string> {

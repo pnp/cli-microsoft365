@@ -50,7 +50,7 @@ class AadUserListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const properties: string[] = args.options.properties ?
       args.options.properties.split(',').map(p => p.trim()) :
       ['userPrincipalName', 'displayName'];
@@ -58,12 +58,14 @@ class AadUserListCommand extends GraphCommand {
     const endpoint: string = args.options.deleted ? 'directory/deletedItems/microsoft.graph.user' : 'users';
     const url: string = `${this.resource}/v1.0/${endpoint}?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
 
-    odata
-      .getAllItems<User>(url)
-      .then((users): void => {
-        logger.log(users);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const users = await odata.getAllItems<User>(url);
+
+      logger.log(users);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getFilter(options: any): string {

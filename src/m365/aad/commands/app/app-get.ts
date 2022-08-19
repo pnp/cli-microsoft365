@@ -83,15 +83,16 @@ class AadAppGetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getAppObjectId(args)
-      .then(appObjectId => this.getAppInfo(appObjectId))
-      .then(appInfo => this.saveAppInfo(args, appInfo, logger))
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const appObjectId = await this.getAppObjectId(args);
+      const appInfo = await this.getAppInfo(appObjectId);
+      const res = await this.saveAppInfo(args, appInfo, logger);
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getAppObjectId(args: CommandArgs): Promise<string> {

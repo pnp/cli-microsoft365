@@ -97,8 +97,8 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeAppRoleAssignment: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeAppRoleAssignment: () => Promise<void> = async (): Promise<void> => {
       let sp: ServicePrincipal;
       // get the service principal associated with the appId
       let spMatchQuery: string = '';
@@ -112,106 +112,103 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
         spMatchQuery = `displayName eq '${encodeURIComponent(args.options.displayName as string)}'`;
       }
 
-      this
-        .getServicePrincipalForApp(spMatchQuery)
-        .then((resp: { value: ServicePrincipal[] }): Promise<{ value: ServicePrincipal[] }> => {
-          if (!resp.value.length) {
-            return Promise.reject('app registration not found');
+      try {
+        let resp = await this.getServicePrincipalForApp(spMatchQuery);
+
+        if (!resp.value.length) {
+          throw 'app registration not found';
+        }
+
+        sp = resp.value[0];
+        let resource: string = encodeURIComponent(args.options.resource);
+
+        // try resolve aliases that the user might enter since these are seen in the Azure portal
+        switch (args.options.resource.toLocaleLowerCase()) {
+          case 'sharepoint':
+            resource = 'Office 365 SharePoint Online';
+            break;
+          case 'intune':
+            resource = 'Microsoft Intune API';
+            break;
+          case 'exchange':
+            resource = 'Office 365 Exchange Online';
+            break;
+        }
+
+        // will perform resource name, appId or objectId search
+        let filter: string = `$filter=(displayName eq '${resource}' or startswith(displayName,'${resource}'))`;
+
+        if (validation.isValidGuid(resource)) {
+          filter += ` or appId eq '${resource}' or id eq '${resource}'`;
+        }
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/servicePrincipals?${filter}`,
+          headers: {
+            'accept': 'application/json'
+          },
+          responseType: 'json'
+        };
+
+        resp = await request.get<{ value: ServicePrincipal[] }>(requestOptions);
+
+        if (!resp.value.length) {
+          throw 'Resource not found';
+        }
+
+        const appRolesToBeDeleted: AppRole[] = [];
+        const appRolesFound: AppRole[] = resp.value[0].appRoles;
+
+        if (!appRolesFound.length) {
+          throw `The resource '${args.options.resource}' does not have any application permissions available.`;
+        }
+
+        for (const scope of args.options.scope.split(',')) {
+          const existingRoles = appRolesFound.filter((role: AppRole) => {
+            return role.value.toLocaleLowerCase() === scope.toLocaleLowerCase().trim();
+          });
+          if (!existingRoles.length) {
+            // the role specified in the scope option does not belong to the found service principles
+            // throw an error and show list with available roles (scopes)
+            let availableRoles: string = '';
+            appRolesFound.map((r: AppRole) => availableRoles += `${os.EOL}${r.value}`);
+
+            throw `The scope value '${scope}' you have specified does not exist for ${args.options.resource}. ${os.EOL}Available scopes (application permissions) are: ${availableRoles}`;
           }
 
-          sp = resp.value[0];
-          let resource: string = encodeURIComponent(args.options.resource);
+          appRolesToBeDeleted.push(existingRoles[0]);
+        }
+        const tasks: Promise<any>[] = [];
 
-          // try resolve aliases that the user might enter since these are seen in the Azure portal
-          switch (args.options.resource.toLocaleLowerCase()) {
-            case 'sharepoint':
-              resource = 'Office 365 SharePoint Online';
-              break;
-            case 'intune':
-              resource = 'Microsoft Intune API';
-              break;
-            case 'exchange':
-              resource = 'Office 365 Exchange Online';
-              break;
+        for (const appRole of appRolesToBeDeleted) {
+          const appRoleAssignment = sp.appRoleAssignments.filter((role: AppRoleAssignment) => role.appRoleId === appRole.id);
+          if (!appRoleAssignment.length) {
+            throw 'App role assignment not found';
           }
+          tasks.push(this.removeAppRoleAssignmentForServicePrincipal(sp.id, appRoleAssignment[0].id));
+        }
 
-          // will perform resource name, appId or objectId search
-          let filter: string = `$filter=(displayName eq '${resource}' or startswith(displayName,'${resource}'))`;
-
-          if (validation.isValidGuid(resource)) {
-            filter += ` or appId eq '${resource}' or id eq '${resource}'`;
-          }
-          const requestOptions: any = {
-            url: `${this.resource}/v1.0/servicePrincipals?${filter}`,
-            headers: {
-              'accept': 'application/json'
-            },
-            responseType: 'json'
-          };
-
-          return request.get<{ value: ServicePrincipal[] }>(requestOptions);
-        })
-        .then((resp: { value: ServicePrincipal[] }): Promise<AppRole[]> => {
-          if (!resp.value.length) {
-            return Promise.reject('Resource not found');
-          }
-
-          const appRolesToBeDeleted: AppRole[] = [];
-          const appRolesFound: AppRole[] = resp.value[0].appRoles;
-
-          if (!appRolesFound.length) {
-            return Promise.reject(`The resource '${args.options.resource}' does not have any application permissions available.`);
-          }
-
-          for (const scope of args.options.scope.split(',')) {
-            const existingRoles = appRolesFound.filter((role: AppRole) => {
-              return role.value.toLocaleLowerCase() === scope.toLocaleLowerCase().trim();
-            });
-            if (!existingRoles.length) {
-              // the role specified in the scope option does not belong to the found service principles
-              // throw an error and show list with available roles (scopes)
-              let availableRoles: string = '';
-              appRolesFound.map((r: AppRole) => availableRoles += `${os.EOL}${r.value}`);
-
-              return Promise.reject(`The scope value '${scope}' you have specified does not exist for ${args.options.resource}. ${os.EOL}Available scopes (application permissions) are: ${availableRoles}`);
-            }
-
-            appRolesToBeDeleted.push(existingRoles[0]);
-          }
-          const tasks: Promise<any>[] = [];
-
-          for (const appRole of appRolesToBeDeleted) {
-            const appRoleAssignment = sp.appRoleAssignments.filter((role: AppRoleAssignment) => role.appRoleId === appRole.id);
-            if (!appRoleAssignment.length) {
-              return Promise.reject('App role assignment not found');
-            }
-            tasks.push(this.removeAppRoleAssignmentForServicePrincipal(sp.id, appRoleAssignment[0].id));
-          }
-
-          return Promise.all(tasks);
-        }).then(_ => cb(), (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
+        await Promise.all(tasks);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeAppRoleAssignment();
+      await removeAppRoleAssignment();
     }
     else {
-      Cli.prompt(
+      const result = await Cli.prompt<{ continue: boolean }>(
         {
           type: 'confirm',
           name: 'continue',
           default: false,
           message: `Are you sure you want to remove the appRoleAssignment with scope ${args.options.scope} for resource ${args.options.resource}?`
-        },
-        (result: { continue: boolean }): void => {
-          if (!result.continue) {
-            cb();
-          }
-          else {
-            removeAppRoleAssignment();
-          }
-        }
-      );
+        });
+
+      if (result.continue) {
+        await removeAppRoleAssignment();
+      }
     }
   }
 

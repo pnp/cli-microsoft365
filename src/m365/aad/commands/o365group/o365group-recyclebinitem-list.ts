@@ -54,20 +54,20 @@ class AadO365GroupRecycleBinItemListCommand extends GraphCommand {
     return ['id', 'displayName', 'mailNickname'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const filter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
-    const displayNameFilter: string = args.options.displayName ? ` and startswith(DisplayName,'${encodeURIComponent(args.options.displayName).replace(/'/g, `''`)}')` : '';
-    const mailNicknameFilter: string = args.options.mailNickname ? ` and startswith(MailNickname,'${encodeURIComponent(args.options.mailNickname).replace(/'/g, `''`)}')` : '';
-    const topCount: string = '&$top=100';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const filter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
+      const displayNameFilter: string = args.options.displayName ? ` and startswith(DisplayName,'${encodeURIComponent(args.options.displayName).replace(/'/g, `''`)}')` : '';
+      const mailNicknameFilter: string = args.options.mailNickname ? ` and startswith(MailNickname,'${encodeURIComponent(args.options.mailNickname).replace(/'/g, `''`)}')` : '';
+      const topCount: string = '&$top=100';
+      const endpoint: string = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${filter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
 
-    const endpoint: string = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${filter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
-
-    odata
-      .getAllItems<DirectoryObject>(endpoint)
-      .then((recycleBinItems): void => {
-        logger.log(recycleBinItems);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const recycleBinItems = await odata.getAllItems<DirectoryObject>(endpoint);
+      logger.log(recycleBinItems);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

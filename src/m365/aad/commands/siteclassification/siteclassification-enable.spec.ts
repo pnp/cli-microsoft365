@@ -68,7 +68,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
     assert(containsOption);
   });
 
-  it('handles Microsoft 365 Tenant siteclassification missing DirectorySettingTemplate', (done) => {
+  it('handles Microsoft 365 Tenant siteclassification missing DirectorySettingTemplate', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettingTemplates`) {
         return Promise.resolve({
@@ -139,19 +139,11 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\"")));
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any),
+      new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\""));
   });
 
-  it('sets Microsoft 365 Tenant siteclassification with usage guidelines url and guest usage guidelines url (debug)', (done) => {
+  it('sets Microsoft 365 Tenant siteclassification with usage guidelines url and guest usage guidelines url (debug)', async () => {
     let enableRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -235,19 +227,11 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, () => {
-      try {
-        assert(enableRequestIssued);
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
+    assert(enableRequestIssued);
   });
 
-  it('sets Microsoft 365 Tenant siteclassification with usage guidelines url and guest usage guidelines url', (done) => {
+  it('sets Microsoft 365 Tenant siteclassification with usage guidelines url and guest usage guidelines url', async () => {
     let enableRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -331,19 +315,11 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, () => {
-      try {
-        assert(enableRequestIssued);
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
+    assert(enableRequestIssued);
   });
 
-  it('sets Microsoft 365 Tenant siteclassification with usage guidelines url', (done) => {
+  it('sets Microsoft 365 Tenant siteclassification with usage guidelines url', async () => {
     let enableRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -427,19 +403,11 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, () => {
-      try {
-        assert(enableRequestIssued);
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
+    assert(enableRequestIssued);
   });
 
-  it('sets Microsoft 365 Tenant siteclassification with guest usage guidelines url', (done) => {
+  it('sets Microsoft 365 Tenant siteclassification with guest usage guidelines url', async () => {
     let enableRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -523,19 +491,11 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, () => {
-      try {
-        assert(enableRequestIssued);
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any);
+    assert(enableRequestIssued);
   });
 
-  it('sets Microsoft 365 Tenant siteclassification', (done) => {
+  it('sets Microsoft 365 Tenant siteclassification', async () => {
     let enableRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -619,19 +579,11 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any, () => {
-      try {
-        assert(enableRequestIssued);
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any);
+    assert(enableRequestIssued);
   });
 
-  it('Handles enabling when already enabled (conflicting errors)', (done) => {
+  it('Handles enabling when already enabled (conflicting errors)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettingTemplates`) {
         return Promise.resolve({
@@ -722,15 +674,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`A conflicting object with one or more of the specified property values is present in the directory.`)));
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any),
+      new CommandError(`A conflicting object with one or more of the specified property values is present in the directory.`));
   });
 });

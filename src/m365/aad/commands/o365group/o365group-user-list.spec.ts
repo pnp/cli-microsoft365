@@ -119,7 +119,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('correctly lists all users in a Microsoft 365 group', (done) => {
+  it('correctly lists all users in a Microsoft 365 group', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -138,37 +138,30 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "00000000-0000-0000-0000-000000000000",
-            "displayName": "Anne Matthews",
-            "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-            "userType": "Owner"
-          },
-          {
-            "id": "00000000-0000-0000-0000-000000000000",
-            "displayName": "Anne Matthews",
-            "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-            "userType": "Member"
-          },
-          {
-            "id": "00000000-0000-0000-0000-000000000001",
-            "displayName": "Karl Matteson",
-            "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com",
-            "userType": "Member"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000" } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "displayName": "Anne Matthews",
+        "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
+        "userType": "Owner"
+      },
+      {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "displayName": "Anne Matthews",
+        "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
+        "userType": "Member"
+      },
+      {
+        "id": "00000000-0000-0000-0000-000000000001",
+        "displayName": "Karl Matteson",
+        "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com",
+        "userType": "Member"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('correctly lists all owners in a Microsoft 365 group', (done) => {
+  it('correctly lists all owners in a Microsoft 365 group', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -178,25 +171,18 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", role: "Owner" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "00000000-0000-0000-0000-000000000000",
-            "displayName": "Anne Matthews",
-            "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-            "userType": "Owner"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", role: "Owner" } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "displayName": "Anne Matthews",
+        "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
+        "userType": "Owner"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('correctly lists all members in a Microsoft 365 group', (done) => {
+  it('correctly lists all members in a Microsoft 365 group', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -215,31 +201,24 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", role: "Member" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "00000000-0000-0000-0000-000000000000",
-            "displayName": "Anne Matthews",
-            "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-            "userType": "Member"
-          },
-          {
-            "id": "00000000-0000-0000-0000-000000000001",
-            "displayName": "Karl Matteson",
-            "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com",
-            "userType": "Member"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", role: "Member" } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "displayName": "Anne Matthews",
+        "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
+        "userType": "Member"
+      },
+      {
+        "id": "00000000-0000-0000-0000-000000000001",
+        "displayName": "Karl Matteson",
+        "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com",
+        "userType": "Member"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('correctly lists all users in a Microsoft 365 group (debug)', (done) => {
+  it('correctly lists all users in a Microsoft 365 group (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -258,50 +237,36 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "00000000-0000-0000-0000-000000000000",
-            "displayName": "Anne Matthews",
-            "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-            "userType": "Owner"
-          },
-          {
-            "id": "00000000-0000-0000-0000-000000000000",
-            "displayName": "Anne Matthews",
-            "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-            "userType": "Member"
-          },
-          {
-            "id": "00000000-0000-0000-0000-000000000001",
-            "displayName": "Karl Matteson",
-            "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com",
-            "userType": "Member"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000" } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "displayName": "Anne Matthews",
+        "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
+        "userType": "Owner"
+      },
+      {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "displayName": "Anne Matthews",
+        "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
+        "userType": "Member"
+      },
+      {
+        "id": "00000000-0000-0000-0000-000000000001",
+        "displayName": "Karl Matteson",
+        "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com",
+        "userType": "Member"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('correctly handles error when listing users', (done) => {
+  it('correctly handles error when listing users', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000" } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000" } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

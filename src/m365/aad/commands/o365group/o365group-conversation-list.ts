@@ -53,13 +53,14 @@ class AadO365GroupConversationListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    odata
-      .getAllItems<Conversation>(`${this.resource}/v1.0/groups/${args.options.groupId}/conversations`)
-      .then((conversations): void => {
-        logger.log(conversations);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const conversations = await odata.getAllItems<Conversation>(`${this.resource}/v1.0/groups/${args.options.groupId}/conversations`);
+      logger.log(conversations);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

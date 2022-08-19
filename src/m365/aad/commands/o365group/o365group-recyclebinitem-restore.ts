@@ -79,26 +79,27 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
   	this.optionSets.push(['id', 'displayName', 'mailNickname']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Restoring Microsoft 365 Group: ${args.options.id || args.options.displayName || args.options.mailNickname}...`);
     }
 
-    this
-      .getGroupId(args.options)
-      .then((groupId: string): Promise<void> => {
-        const requestOptions: AxiosRequestConfig = {
-          url: `${this.resource}/v1.0/directory/deleteditems/${groupId}/restore`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json'
-          },
-          responseType: 'json'
-        };
-  
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const groupId = await this.getGroupId(args.options);
+      const requestOptions: AxiosRequestConfig = {
+        url: `${this.resource}/v1.0/directory/deleteditems/${groupId}/restore`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          'content-type': 'application/json'
+        },
+        responseType: 'json'
+      };
+
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getGroupId(options: Options): Promise<string> {

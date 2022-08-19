@@ -90,51 +90,49 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
     return ['resourceDisplayName', 'roleName'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let spAppRoleAssignments: AppRoleAssignment[];
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const spAppRoleAssignments = await this.getAppRoleAssignments(args.options);
+      // the role assignment has an appRoleId but no name. To get the name,
+      // we need to get all the roles from the resource. the resource is
+      // a service principal. Multiple roles may have same resource id.
+      const resourceIds = spAppRoleAssignments.map((item: AppRoleAssignment) => item.resourceId);
 
-    this.getAppRoleAssignments(args.options)
-      .then((appRoleAssignments: AppRoleAssignment[]) => {
-        spAppRoleAssignments = appRoleAssignments;
-        // the role assignment has an appRoleId but no name. To get the name,
-        // we need to get all the roles from the resource. the resource is
-        // a service principal. Multiple roles may have same resource id.
-        const resourceIds = appRoleAssignments.map((item: AppRoleAssignment) => item.resourceId);
+      const tasks: Promise<ServicePrincipal>[] = [];
+      for (let i: number = 0; i < resourceIds.length; i++) {
+        tasks.push(this.getServicePrincipal(resourceIds[i]));
+      }
 
-        const tasks: Promise<ServicePrincipal>[] = [];
-        for (let i: number = 0; i < resourceIds.length; i++) {
-          tasks.push(this.getServicePrincipal(resourceIds[i]));
-        }
+      const resources = await Promise.all(tasks);
 
-        return Promise.all(tasks);
-      })
-      .then((resources: ServicePrincipal[]) => {
-        // loop through all appRoleAssignments for the servicePrincipal
-        // and lookup the appRole.Id in the resources[resourceId].appRoles array...
-        const results: any[] = [];
-        spAppRoleAssignments.map((appRoleAssignment: AppRoleAssignment) => {
-          const resource: ServicePrincipal | undefined = resources.find((r: any) => r.id === appRoleAssignment.resourceId);
+      // loop through all appRoleAssignments for the servicePrincipal
+      // and lookup the appRole.Id in the resources[resourceId].appRoles array...
+      const results: any[] = [];
+      spAppRoleAssignments.map((appRoleAssignment: AppRoleAssignment) => {
+        const resource: ServicePrincipal | undefined = resources.find((r: any) => r.id === appRoleAssignment.resourceId);
 
-          if (resource) {
-            const appRole: AppRole | undefined = resource.appRoles.find((r: any) => r.id === appRoleAssignment.appRoleId);
+        if (resource) {
+          const appRole: AppRole | undefined = resource.appRoles.find((r: any) => r.id === appRoleAssignment.appRoleId);
 
-            if (appRole) {
-              results.push({
-                appRoleId: appRoleAssignment.appRoleId,
-                resourceDisplayName: appRoleAssignment.resourceDisplayName,
-                resourceId: appRoleAssignment.resourceId,
-                roleId: appRole.id,
-                roleName: appRole.value,
-                created: appRoleAssignment.createdDateTime,
-                deleted: appRoleAssignment.deletedDateTime
-              });
-            }
+          if (appRole) {
+            results.push({
+              appRoleId: appRoleAssignment.appRoleId,
+              resourceDisplayName: appRoleAssignment.resourceDisplayName,
+              resourceId: appRoleAssignment.resourceId,
+              roleId: appRole.id,
+              roleName: appRole.value,
+              created: appRoleAssignment.createdDateTime,
+              deleted: appRoleAssignment.deletedDateTime
+            });
           }
-        });
+        }
+      });
 
-        logger.log(results);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(results);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getAppRoleAssignments(argOptions: Options): Promise<AppRoleAssignment[]> {

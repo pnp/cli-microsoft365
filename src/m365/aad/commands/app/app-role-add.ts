@@ -109,34 +109,37 @@ class AadAppRoleAddCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getAppObjectId(args, logger)
-      .then((appId: string) => this.getAppInfo(appId, logger))
-      .then((appInfo: AppInfo): Promise<void> => {
-        if (this.verbose) {
-          logger.logToStderr(`Adding role ${args.options.name} to Azure AD app ${appInfo.id}...`);
-        }
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const appId = await this.getAppObjectId(args, logger);
+      const appInfo = await this.getAppInfo(appId, logger);
 
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/myorganization/applications/${appInfo.id}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json',
-          data: {
-            appRoles: appInfo.appRoles.concat({
-              displayName: args.options.name,
-              description: args.options.description,
-              id: v4(),
-              value: args.options.claim,
-              allowedMemberTypes: this.getAllowedMemberTypes(args)
-            })
-          }
-        };
-        return request.patch(requestOptions);
-      })
-      .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      if (this.verbose) {
+        logger.logToStderr(`Adding role ${args.options.name} to Azure AD app ${appInfo.id}...`);
+      }
+
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/myorganization/applications/${appInfo.id}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: {
+          appRoles: appInfo.appRoles.concat({
+            displayName: args.options.name,
+            description: args.options.description,
+            id: v4(),
+            value: args.options.claim,
+            allowedMemberTypes: this.getAllowedMemberTypes(args)
+          })
+        }
+      };
+
+      await request.patch(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getAppInfo(appId: string, logger: Logger): Promise<AppInfo> {

@@ -61,7 +61,7 @@ describe(commands.O365GROUP_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves information about the specified Microsoft 365 Group', (done) => {
+  it('retrieves information about the specified Microsoft 365 Group', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
         return Promise.resolve(<Group>{
@@ -94,42 +94,35 @@ describe(commands.O365GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
-          "deletedDateTime": null,
-          "classification": null,
-          "createdDateTime": "2017-11-29T03:27:05Z",
-          "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
-          "displayName": "Finance",
-          "groupTypes": [
-            "Unified"
-          ],
-          "mail": "finance@contoso.onmicrosoft.com",
-          "mailEnabled": true,
-          "mailNickname": "finance",
-          "onPremisesLastSyncDateTime": null,
-          "onPremisesProvisioningErrors": [],
-          "onPremisesSecurityIdentifier": null,
-          "onPremisesSyncEnabled": null,
-          "preferredDataLocation": null,
-          "proxyAddresses": [
-            "SMTP:finance@contoso.onmicrosoft.com"
-          ],
-          "renewedDateTime": "2017-11-29T03:27:05Z",
-          "securityEnabled": false,
-          "visibility": "Public"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
+    assert(loggerLogSpy.calledWith({
+      "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
+      "deletedDateTime": null,
+      "classification": null,
+      "createdDateTime": "2017-11-29T03:27:05Z",
+      "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+      "displayName": "Finance",
+      "groupTypes": [
+        "Unified"
+      ],
+      "mail": "finance@contoso.onmicrosoft.com",
+      "mailEnabled": true,
+      "mailNickname": "finance",
+      "onPremisesLastSyncDateTime": null,
+      "onPremisesProvisioningErrors": [],
+      "onPremisesSecurityIdentifier": null,
+      "onPremisesSyncEnabled": null,
+      "preferredDataLocation": null,
+      "proxyAddresses": [
+        "SMTP:finance@contoso.onmicrosoft.com"
+      ],
+      "renewedDateTime": "2017-11-29T03:27:05Z",
+      "securityEnabled": false,
+      "visibility": "Public"
+    }));
   });
 
-  it('retrieves information about the specified Microsoft 365 Group (debug)', (done) => {
+  it('retrieves information about the specified Microsoft 365 Group (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
         return Promise.resolve(<Group>{
@@ -162,117 +155,35 @@ describe(commands.O365GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
-          "deletedDateTime": null,
-          "classification": null,
-          "createdDateTime": "2017-11-29T03:27:05Z",
-          "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
-          "displayName": "Finance",
-          "groupTypes": [
-            "Unified"
-          ],
-          "mail": "finance@contoso.onmicrosoft.com",
-          "mailEnabled": true,
-          "mailNickname": "finance",
-          "onPremisesLastSyncDateTime": null,
-          "onPremisesProvisioningErrors": [],
-          "onPremisesSecurityIdentifier": null,
-          "onPremisesSyncEnabled": null,
-          "preferredDataLocation": null,
-          "proxyAddresses": [
-            "SMTP:finance@contoso.onmicrosoft.com"
-          ],
-          "renewedDateTime": "2017-11-29T03:27:05Z",
-          "securityEnabled": false,
-          "visibility": "Public"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
+    assert(loggerLogSpy.calledWith({
+      "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
+      "deletedDateTime": null,
+      "classification": null,
+      "createdDateTime": "2017-11-29T03:27:05Z",
+      "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+      "displayName": "Finance",
+      "groupTypes": [
+        "Unified"
+      ],
+      "mail": "finance@contoso.onmicrosoft.com",
+      "mailEnabled": true,
+      "mailNickname": "finance",
+      "onPremisesLastSyncDateTime": null,
+      "onPremisesProvisioningErrors": [],
+      "onPremisesSecurityIdentifier": null,
+      "onPremisesSyncEnabled": null,
+      "preferredDataLocation": null,
+      "proxyAddresses": [
+        "SMTP:finance@contoso.onmicrosoft.com"
+      ],
+      "renewedDateTime": "2017-11-29T03:27:05Z",
+      "securityEnabled": false,
+      "visibility": "Public"
+    }));
   });
 
-  it('retrieves information about the specified Microsoft 365 Group including its site URL', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
-        return Promise.resolve(<Group>{
-          "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
-          "deletedDateTime": null,
-          "classification": null,
-          "createdDateTime": "2017-11-29T03:27:05Z",
-          "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
-          "displayName": "Finance",
-          "groupTypes": [
-            "Unified"
-          ],
-          "mail": "finance@contoso.onmicrosoft.com",
-          "mailEnabled": true,
-          "mailNickname": "finance",
-          "onPremisesLastSyncDateTime": null,
-          "onPremisesProvisioningErrors": [],
-          "onPremisesSecurityIdentifier": null,
-          "onPremisesSyncEnabled": null,
-          "preferredDataLocation": null,
-          "proxyAddresses": [
-            "SMTP:finance@contoso.onmicrosoft.com"
-          ],
-          "renewedDateTime": "2017-11-29T03:27:05Z",
-          "securityEnabled": false,
-          "visibility": "Public"
-        });
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844/drive?$select=webUrl`) {
-        return Promise.resolve(<Group>{
-          webUrl: "https://contoso.sharepoint.com/sites/finance/Shared%20Documents"
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
-          "deletedDateTime": null,
-          "classification": null,
-          "createdDateTime": "2017-11-29T03:27:05Z",
-          "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
-          "displayName": "Finance",
-          "groupTypes": [
-            "Unified"
-          ],
-          "mail": "finance@contoso.onmicrosoft.com",
-          "mailEnabled": true,
-          "mailNickname": "finance",
-          "onPremisesLastSyncDateTime": null,
-          "onPremisesProvisioningErrors": [],
-          "onPremisesSecurityIdentifier": null,
-          "onPremisesSyncEnabled": null,
-          "preferredDataLocation": null,
-          "proxyAddresses": [
-            "SMTP:finance@contoso.onmicrosoft.com"
-          ],
-          "renewedDateTime": "2017-11-29T03:27:05Z",
-          "securityEnabled": false,
-          "siteUrl": "https://contoso.sharepoint.com/sites/finance",
-          "visibility": "Public"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('retrieves information about the specified Microsoft 365 Group including its site URL (debug)', (done) => {
+  it('retrieves information about the specified Microsoft 365 Group including its site URL', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
         return Promise.resolve(<Group>{
@@ -311,9 +222,39 @@ describe(commands.O365GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
+    await command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
+    assert(loggerLogSpy.calledWith({
+      "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
+      "deletedDateTime": null,
+      "classification": null,
+      "createdDateTime": "2017-11-29T03:27:05Z",
+      "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+      "displayName": "Finance",
+      "groupTypes": [
+        "Unified"
+      ],
+      "mail": "finance@contoso.onmicrosoft.com",
+      "mailEnabled": true,
+      "mailNickname": "finance",
+      "onPremisesLastSyncDateTime": null,
+      "onPremisesProvisioningErrors": [],
+      "onPremisesSecurityIdentifier": null,
+      "onPremisesSyncEnabled": null,
+      "preferredDataLocation": null,
+      "proxyAddresses": [
+        "SMTP:finance@contoso.onmicrosoft.com"
+      ],
+      "renewedDateTime": "2017-11-29T03:27:05Z",
+      "securityEnabled": false,
+      "siteUrl": "https://contoso.sharepoint.com/sites/finance",
+      "visibility": "Public"
+    }));
+  });
+
+  it('retrieves information about the specified Microsoft 365 Group including its site URL (debug)', async () => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
+        return Promise.resolve(<Group>{
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "deletedDateTime": null,
           "classification": null,
@@ -336,18 +277,49 @@ describe(commands.O365GROUP_GET, () => {
           ],
           "renewedDateTime": "2017-11-29T03:27:05Z",
           "securityEnabled": false,
-          "siteUrl": "https://contoso.sharepoint.com/sites/finance",
           "visibility": "Public"
-        }));
-        done();
+        });
       }
-      catch (e) {
-        done(e);
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844/drive?$select=webUrl`) {
+        return Promise.resolve(<Group>{
+          webUrl: "https://contoso.sharepoint.com/sites/finance/Shared%20Documents"
+        });
       }
+
+      return Promise.reject('Invalid request');
     });
+
+    await command.action(logger, { options: { debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
+    assert(loggerLogSpy.calledWith({
+      "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
+      "deletedDateTime": null,
+      "classification": null,
+      "createdDateTime": "2017-11-29T03:27:05Z",
+      "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+      "displayName": "Finance",
+      "groupTypes": [
+        "Unified"
+      ],
+      "mail": "finance@contoso.onmicrosoft.com",
+      "mailEnabled": true,
+      "mailNickname": "finance",
+      "onPremisesLastSyncDateTime": null,
+      "onPremisesProvisioningErrors": [],
+      "onPremisesSecurityIdentifier": null,
+      "onPremisesSyncEnabled": null,
+      "preferredDataLocation": null,
+      "proxyAddresses": [
+        "SMTP:finance@contoso.onmicrosoft.com"
+      ],
+      "renewedDateTime": "2017-11-29T03:27:05Z",
+      "securityEnabled": false,
+      "siteUrl": "https://contoso.sharepoint.com/sites/finance",
+      "visibility": "Public"
+    }));
   });
 
-  it('retrieves information about the specified Microsoft 365 Group including its site URL (group has no site)', (done) => {
+  it('retrieves information about the specified Microsoft 365 Group including its site URL (group has no site)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
         return Promise.resolve(<Group>{
@@ -386,40 +358,33 @@ describe(commands.O365GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
-          "deletedDateTime": null,
-          "classification": null,
-          "createdDateTime": "2017-11-29T03:27:05Z",
-          "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
-          "displayName": "Finance",
-          "groupTypes": [
-            "Unified"
-          ],
-          "mail": "finance@contoso.onmicrosoft.com",
-          "mailEnabled": true,
-          "mailNickname": "finance",
-          "onPremisesLastSyncDateTime": null,
-          "onPremisesProvisioningErrors": [],
-          "onPremisesSecurityIdentifier": null,
-          "onPremisesSyncEnabled": null,
-          "preferredDataLocation": null,
-          "proxyAddresses": [
-            "SMTP:finance@contoso.onmicrosoft.com"
-          ],
-          "renewedDateTime": "2017-11-29T03:27:05Z",
-          "securityEnabled": false,
-          "visibility": "Public",
-          "siteUrl": ""
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', includeSiteUrl: true } });
+    assert(loggerLogSpy.calledWith({
+      "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
+      "deletedDateTime": null,
+      "classification": null,
+      "createdDateTime": "2017-11-29T03:27:05Z",
+      "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+      "displayName": "Finance",
+      "groupTypes": [
+        "Unified"
+      ],
+      "mail": "finance@contoso.onmicrosoft.com",
+      "mailEnabled": true,
+      "mailNickname": "finance",
+      "onPremisesLastSyncDateTime": null,
+      "onPremisesProvisioningErrors": [],
+      "onPremisesSecurityIdentifier": null,
+      "onPremisesSyncEnabled": null,
+      "preferredDataLocation": null,
+      "proxyAddresses": [
+        "SMTP:finance@contoso.onmicrosoft.com"
+      ],
+      "renewedDateTime": "2017-11-29T03:27:05Z",
+      "securityEnabled": false,
+      "visibility": "Public",
+      "siteUrl": ""
+    }));
   });
 
   it('fails validation if the id is not a valid GUID', async () => {

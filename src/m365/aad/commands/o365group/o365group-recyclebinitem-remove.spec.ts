@@ -77,9 +77,9 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
       }
     };
     promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
   });
 
@@ -129,46 +129,32 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the specified group when confirm option not passed with id', (done) => {
-    command.action(logger, {
+  it('prompts before removing the specified group when confirm option not passed with id', async () => {
+    await command.action(logger, {
       options: {
         id: validGroupId
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
-  it('aborts removing the specified group when confirm option not passed and prompt not confirmed', (done) => {
+  it('aborts removing the specified group when confirm option not passed and prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         id: validGroupId
       }
-    }, () => {
-      try {
-        assert(deleteSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(deleteSpy.notCalled);
   });
 
-  it('throws error message when no group was found', (done) => {
+  it('throws error message when no group was found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'`) {
         return Promise.resolve({ value: [] });
@@ -177,23 +163,15 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         mailNickname: validGroupMailNickname,
         confirm: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified group '${validGroupMailNickname}' does not exist.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`The specified group '${validGroupMailNickname}' does not exist.`));
   });
 
-  it('throws error message when multiple groups were found', (done) => {
+  it('throws error message when multiple groups were found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'`) {
         return Promise.resolve(multipleGroupsResponse);
@@ -202,23 +180,15 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         mailNickname: validGroupMailNickname,
         confirm: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple groups with name '${validGroupMailNickname}' found: ${multipleGroupsResponse.value.map(x => x.id).join(',')}.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Multiple groups with name '${validGroupMailNickname}' found: ${multipleGroupsResponse.value.map(x => x.id).join(',')}.`));
   });
 
-  it('correctly deletes group by id', (done) => {
+  it('correctly deletes group by id', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/${validGroupId}`) {
         return Promise.resolve();
@@ -227,26 +197,18 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         id: validGroupId
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
       }
     });
   });
 
-  it('correctly deletes group by displayName', (done) => {
+  it('correctly deletes group by displayName', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=displayName eq '${formatting.encodeQueryParameter(validGroupDisplayName)}'`) {
         return Promise.resolve(singleGroupsResponse);
@@ -262,26 +224,18 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         displayName: validGroupDisplayName
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
       }
     });
   });
 
-  it('correctly deletes group by mailNickname', (done) => {
+  it('correctly deletes group by mailNickname', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=mailNickname eq '${formatting.encodeQueryParameter(validGroupMailNickname)}'`) {
         return Promise.resolve(singleGroupsResponse);
@@ -297,42 +251,26 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         mailNickname: validGroupMailNickname
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
       }
     });
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'delete').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         id: validGroupId,
         confirm: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError("An error has occurred"));
   });
 
   it('supports debug mode', () => {

@@ -85,47 +85,46 @@ class AadAppRemoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.showDeprecationWarning(logger, commands.APP_DELETE, commands.APP_REMOVE);
 
-    const deleteApp: () => void = (): void => {
-      this
-        .getObjectId(args, logger)
-        .then((objectId: string): Promise<void> => {
-          if (this.verbose) {
-            logger.logToStderr(`Deleting Azure AD app ${objectId}...`);
-          }
+    const deleteApp: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const objectId = await this.getObjectId(args, logger);
 
-          const requestOptions: any = {
-            url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
-            headers: {
-              accept: 'application/json;odata.metadata=none'
-            },
-            responseType: 'json'
-          };
+        if (this.verbose) {
+          logger.logToStderr(`Deleting Azure AD app ${objectId}...`);
+        }
 
-          return request.delete(requestOptions);
-        })
-        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/myorganization/applications/${objectId}`,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          responseType: 'json'
+        };
+
+        await request.delete(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      deleteApp();
+      await deleteApp();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the app?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          deleteApp();
-        }
       });
+        
+      if (result.continue) {
+        await deleteApp();
+      }
     }
   }
 

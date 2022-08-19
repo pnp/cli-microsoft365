@@ -66,7 +66,7 @@ describe(commands.O365GROUP_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('creates Microsoft 365 Group using basic info', (done) => {
+  it('creates Microsoft 365 Group using basic info', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -109,39 +109,32 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
-          deletedDateTime: null,
-          classification: null,
-          createdDateTime: "2018-02-24T18:38:53Z",
-          description: "My awesome group",
-          displayName: "My group",
-          groupTypes: ["Unified"],
-          mail: "my_group@contoso.onmicrosoft.com",
-          mailEnabled: true,
-          mailNickname: "my_group",
-          onPremisesLastSyncDateTime: null,
-          onPremisesProvisioningErrors: [],
-          onPremisesSecurityIdentifier: null,
-          onPremisesSyncEnabled: null,
-          preferredDataLocation: null,
-          proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
-          renewedDateTime: "2018-02-24T18:38:53Z",
-          resourceBehaviorOptions: [],
-          securityEnabled: false,
-          visibility: "Public"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } });
+    assert(loggerLogSpy.calledWith({
+      id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
+      deletedDateTime: null,
+      classification: null,
+      createdDateTime: "2018-02-24T18:38:53Z",
+      description: "My awesome group",
+      displayName: "My group",
+      groupTypes: ["Unified"],
+      mail: "my_group@contoso.onmicrosoft.com",
+      mailEnabled: true,
+      mailNickname: "my_group",
+      onPremisesLastSyncDateTime: null,
+      onPremisesProvisioningErrors: [],
+      onPremisesSecurityIdentifier: null,
+      onPremisesSyncEnabled: null,
+      preferredDataLocation: null,
+      proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
+      renewedDateTime: "2018-02-24T18:38:53Z",
+      resourceBehaviorOptions: [],
+      securityEnabled: false,
+      visibility: "Public"
+    }));
   });
 
-  it('creates Microsoft 365 Group using basic info (debug)', (done) => {
+  it('creates Microsoft 365 Group using basic info (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -184,39 +177,32 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
-          deletedDateTime: null,
-          classification: null,
-          createdDateTime: "2018-02-24T18:38:53Z",
-          description: "My awesome group",
-          displayName: "My group",
-          groupTypes: ["Unified"],
-          mail: "my_group@contoso.onmicrosoft.com",
-          mailEnabled: true,
-          mailNickname: "my_group",
-          onPremisesLastSyncDateTime: null,
-          onPremisesProvisioningErrors: [],
-          onPremisesSecurityIdentifier: null,
-          onPremisesSyncEnabled: null,
-          preferredDataLocation: null,
-          proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
-          renewedDateTime: "2018-02-24T18:38:53Z",
-          resourceBehaviorOptions: [],
-          securityEnabled: false,
-          visibility: "Public"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } });
+    assert(loggerLogSpy.calledWith({
+      id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
+      deletedDateTime: null,
+      classification: null,
+      createdDateTime: "2018-02-24T18:38:53Z",
+      description: "My awesome group",
+      displayName: "My group",
+      groupTypes: ["Unified"],
+      mail: "my_group@contoso.onmicrosoft.com",
+      mailEnabled: true,
+      mailNickname: "my_group",
+      onPremisesLastSyncDateTime: null,
+      onPremisesProvisioningErrors: [],
+      onPremisesSecurityIdentifier: null,
+      onPremisesSyncEnabled: null,
+      preferredDataLocation: null,
+      proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
+      renewedDateTime: "2018-02-24T18:38:53Z",
+      resourceBehaviorOptions: [],
+      securityEnabled: false,
+      visibility: "Public"
+    }));
   });
 
-  it('creates private Microsoft 365 Group using basic info', (done) => {
+  it('creates private Microsoft 365 Group using basic info', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -259,39 +245,32 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'true' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
-          deletedDateTime: null,
-          classification: null,
-          createdDateTime: "2018-02-24T18:38:53Z",
-          description: "My awesome group",
-          displayName: "My group",
-          groupTypes: ["Unified"],
-          mail: "my_group@contoso.onmicrosoft.com",
-          mailEnabled: true,
-          mailNickname: "my_group",
-          onPremisesLastSyncDateTime: null,
-          onPremisesProvisioningErrors: [],
-          onPremisesSecurityIdentifier: null,
-          onPremisesSyncEnabled: null,
-          preferredDataLocation: null,
-          proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
-          renewedDateTime: "2018-02-24T18:38:53Z",
-          resourceBehaviorOptions: [],
-          securityEnabled: false,
-          visibility: "Private"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'true' } });
+    assert(loggerLogSpy.calledWith({
+      id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
+      deletedDateTime: null,
+      classification: null,
+      createdDateTime: "2018-02-24T18:38:53Z",
+      description: "My awesome group",
+      displayName: "My group",
+      groupTypes: ["Unified"],
+      mail: "my_group@contoso.onmicrosoft.com",
+      mailEnabled: true,
+      mailNickname: "my_group",
+      onPremisesLastSyncDateTime: null,
+      onPremisesProvisioningErrors: [],
+      onPremisesSecurityIdentifier: null,
+      onPremisesSyncEnabled: null,
+      preferredDataLocation: null,
+      proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
+      renewedDateTime: "2018-02-24T18:38:53Z",
+      resourceBehaviorOptions: [],
+      securityEnabled: false,
+      visibility: "Private"
+    }));
   });
 
-  it('creates Microsoft 365 Group with resourceBehaviorOptions (debug)', (done) => {
+  it('creates Microsoft 365 Group with resourceBehaviorOptions (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -334,39 +313,32 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', allowMembersToPost: true, hideGroupInOutlook: true, subscribeNewGroupMembers: true, welcomeEmailDisabled: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
-          deletedDateTime: null,
-          classification: null,
-          createdDateTime: "2018-02-24T18:38:53Z",
-          description: "My awesome group",
-          displayName: "My group",
-          groupTypes: ["Unified"],
-          mail: "my_group@contoso.onmicrosoft.com",
-          mailEnabled: true,
-          mailNickname: "my_group",
-          onPremisesLastSyncDateTime: null,
-          onPremisesProvisioningErrors: [],
-          onPremisesSecurityIdentifier: null,
-          onPremisesSyncEnabled: null,
-          preferredDataLocation: null,
-          proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
-          renewedDateTime: "2018-02-24T18:38:53Z",
-          resourceBehaviorOptions: ["allowMembersToPost", "hideGroupInOutlook", "subscribeNewGroupMembers", "welcomeEmailDisabled"],
-          securityEnabled: false,
-          visibility: "Public"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', allowMembersToPost: true, hideGroupInOutlook: true, subscribeNewGroupMembers: true, welcomeEmailDisabled: true } });
+    assert(loggerLogSpy.calledWith({
+      id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
+      deletedDateTime: null,
+      classification: null,
+      createdDateTime: "2018-02-24T18:38:53Z",
+      description: "My awesome group",
+      displayName: "My group",
+      groupTypes: ["Unified"],
+      mail: "my_group@contoso.onmicrosoft.com",
+      mailEnabled: true,
+      mailNickname: "my_group",
+      onPremisesLastSyncDateTime: null,
+      onPremisesProvisioningErrors: [],
+      onPremisesSecurityIdentifier: null,
+      onPremisesSyncEnabled: null,
+      preferredDataLocation: null,
+      proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
+      renewedDateTime: "2018-02-24T18:38:53Z",
+      resourceBehaviorOptions: ["allowMembersToPost", "hideGroupInOutlook", "subscribeNewGroupMembers", "welcomeEmailDisabled"],
+      securityEnabled: false,
+      visibility: "Public"
+    }));
   });
 
-  it('creates Microsoft 365 Group with a png logo', (done) => {
+  it('creates Microsoft 365 Group with a png logo', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -418,39 +390,32 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
-          deletedDateTime: null,
-          classification: null,
-          createdDateTime: "2018-02-24T18:38:53Z",
-          description: "My awesome group",
-          displayName: "My group",
-          groupTypes: ["Unified"],
-          mail: "my_group@contoso.onmicrosoft.com",
-          mailEnabled: true,
-          mailNickname: "my_group",
-          onPremisesLastSyncDateTime: null,
-          onPremisesProvisioningErrors: [],
-          onPremisesSecurityIdentifier: null,
-          onPremisesSyncEnabled: null,
-          preferredDataLocation: null,
-          proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
-          renewedDateTime: "2018-02-24T18:38:53Z",
-          resourceBehaviorOptions: [],
-          securityEnabled: false,
-          visibility: "Public"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any);
+    assert(loggerLogSpy.calledWith({
+      id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
+      deletedDateTime: null,
+      classification: null,
+      createdDateTime: "2018-02-24T18:38:53Z",
+      description: "My awesome group",
+      displayName: "My group",
+      groupTypes: ["Unified"],
+      mail: "my_group@contoso.onmicrosoft.com",
+      mailEnabled: true,
+      mailNickname: "my_group",
+      onPremisesLastSyncDateTime: null,
+      onPremisesProvisioningErrors: [],
+      onPremisesSecurityIdentifier: null,
+      onPremisesSyncEnabled: null,
+      preferredDataLocation: null,
+      proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
+      renewedDateTime: "2018-02-24T18:38:53Z",
+      resourceBehaviorOptions: [],
+      securityEnabled: false,
+      visibility: "Public"
+    }));
   });
 
-  it('creates Microsoft 365 Group with a jpg logo (debug)', (done) => {
+  it('creates Microsoft 365 Group with a jpg logo (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -502,39 +467,32 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.jpg' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
-          deletedDateTime: null,
-          classification: null,
-          createdDateTime: "2018-02-24T18:38:53Z",
-          description: "My awesome group",
-          displayName: "My group",
-          groupTypes: ["Unified"],
-          mail: "my_group@contoso.onmicrosoft.com",
-          mailEnabled: true,
-          mailNickname: "my_group",
-          onPremisesLastSyncDateTime: null,
-          onPremisesProvisioningErrors: [],
-          onPremisesSecurityIdentifier: null,
-          onPremisesSyncEnabled: null,
-          preferredDataLocation: null,
-          proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
-          renewedDateTime: "2018-02-24T18:38:53Z",
-          resourceBehaviorOptions: [],
-          securityEnabled: false,
-          visibility: "Public"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.jpg' } });
+    assert(loggerLogSpy.calledWith({
+      id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
+      deletedDateTime: null,
+      classification: null,
+      createdDateTime: "2018-02-24T18:38:53Z",
+      description: "My awesome group",
+      displayName: "My group",
+      groupTypes: ["Unified"],
+      mail: "my_group@contoso.onmicrosoft.com",
+      mailEnabled: true,
+      mailNickname: "my_group",
+      onPremisesLastSyncDateTime: null,
+      onPremisesProvisioningErrors: [],
+      onPremisesSecurityIdentifier: null,
+      onPremisesSyncEnabled: null,
+      preferredDataLocation: null,
+      proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
+      renewedDateTime: "2018-02-24T18:38:53Z",
+      resourceBehaviorOptions: [],
+      securityEnabled: false,
+      visibility: "Public"
+    }));
   });
 
-  it('creates Microsoft 365 Group with a gif logo', (done) => {
+  it('creates Microsoft 365 Group with a gif logo', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -586,39 +544,32 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.gif' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
-          deletedDateTime: null,
-          classification: null,
-          createdDateTime: "2018-02-24T18:38:53Z",
-          description: "My awesome group",
-          displayName: "My group",
-          groupTypes: ["Unified"],
-          mail: "my_group@contoso.onmicrosoft.com",
-          mailEnabled: true,
-          mailNickname: "my_group",
-          onPremisesLastSyncDateTime: null,
-          onPremisesProvisioningErrors: [],
-          onPremisesSecurityIdentifier: null,
-          onPremisesSyncEnabled: null,
-          preferredDataLocation: null,
-          proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
-          renewedDateTime: "2018-02-24T18:38:53Z",
-          resourceBehaviorOptions: [],
-          securityEnabled: false,
-          visibility: "Public"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.gif' } });
+    assert(loggerLogSpy.calledWith({
+      id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
+      deletedDateTime: null,
+      classification: null,
+      createdDateTime: "2018-02-24T18:38:53Z",
+      description: "My awesome group",
+      displayName: "My group",
+      groupTypes: ["Unified"],
+      mail: "my_group@contoso.onmicrosoft.com",
+      mailEnabled: true,
+      mailNickname: "my_group",
+      onPremisesLastSyncDateTime: null,
+      onPremisesProvisioningErrors: [],
+      onPremisesSecurityIdentifier: null,
+      onPremisesSyncEnabled: null,
+      preferredDataLocation: null,
+      proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
+      renewedDateTime: "2018-02-24T18:38:53Z",
+      resourceBehaviorOptions: [],
+      securityEnabled: false,
+      visibility: "Public"
+    }));
   });
 
-  it('handles failure when creating Microsoft 365 Group with a logo', (done) => {
+  it('handles failure when creating Microsoft 365 Group with a logo', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -672,18 +623,11 @@ describe(commands.O365GROUP_ADD, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Invalid request')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any),
+      new CommandError('Invalid request'));
   });
 
-  it('handles failure when creating Microsoft 365 Group with a logo (debug)', (done) => {
+  it('handles failure when creating Microsoft 365 Group with a logo (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -737,18 +681,11 @@ describe(commands.O365GROUP_ADD, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Invalid request')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any),
+      new CommandError('Invalid request'));
   });
 
-  it('creates Microsoft 365 Group with specific owner', (done) => {
+  it('creates Microsoft 365 Group with specific owner', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -810,39 +747,32 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user@contoso.onmicrosoft.com' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
-          deletedDateTime: null,
-          classification: null,
-          createdDateTime: "2018-02-24T18:38:53Z",
-          description: "My awesome group",
-          displayName: "My group",
-          groupTypes: ["Unified"],
-          mail: "my_group@contoso.onmicrosoft.com",
-          mailEnabled: true,
-          mailNickname: "my_group",
-          onPremisesLastSyncDateTime: null,
-          onPremisesProvisioningErrors: [],
-          onPremisesSecurityIdentifier: null,
-          onPremisesSyncEnabled: null,
-          preferredDataLocation: null,
-          proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
-          renewedDateTime: "2018-02-24T18:38:53Z",
-          resourceBehaviorOptions: [],
-          securityEnabled: false,
-          visibility: "Public"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user@contoso.onmicrosoft.com' } });
+    assert(loggerLogSpy.calledWith({
+      id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
+      deletedDateTime: null,
+      classification: null,
+      createdDateTime: "2018-02-24T18:38:53Z",
+      description: "My awesome group",
+      displayName: "My group",
+      groupTypes: ["Unified"],
+      mail: "my_group@contoso.onmicrosoft.com",
+      mailEnabled: true,
+      mailNickname: "my_group",
+      onPremisesLastSyncDateTime: null,
+      onPremisesProvisioningErrors: [],
+      onPremisesSecurityIdentifier: null,
+      onPremisesSyncEnabled: null,
+      preferredDataLocation: null,
+      proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
+      renewedDateTime: "2018-02-24T18:38:53Z",
+      resourceBehaviorOptions: [],
+      securityEnabled: false,
+      visibility: "Public"
+    }));
   });
 
-  it('creates Microsoft 365 Group with specific owners (debug)', (done) => {
+  it('creates Microsoft 365 Group with specific owners (debug)', async () => {
     let groupCreated: boolean = false;
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
@@ -922,18 +852,11 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, () => {
-      try {
-        assert(groupCreated);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
+    assert(groupCreated);
   });
 
-  it('creates Microsoft 365 Group with specific member', (done) => {
+  it('creates Microsoft 365 Group with specific member', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -995,39 +918,32 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user@contoso.onmicrosoft.com' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
-          deletedDateTime: null,
-          classification: null,
-          createdDateTime: "2018-02-24T18:38:53Z",
-          description: "My awesome group",
-          displayName: "My group",
-          groupTypes: ["Unified"],
-          mail: "my_group@contoso.onmicrosoft.com",
-          mailEnabled: true,
-          mailNickname: "my_group",
-          onPremisesLastSyncDateTime: null,
-          onPremisesProvisioningErrors: [],
-          onPremisesSecurityIdentifier: null,
-          onPremisesSyncEnabled: null,
-          preferredDataLocation: null,
-          proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
-          renewedDateTime: "2018-02-24T18:38:53Z",
-          resourceBehaviorOptions: [],
-          securityEnabled: false,
-          visibility: "Public"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user@contoso.onmicrosoft.com' } });
+    assert(loggerLogSpy.calledWith({
+      id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
+      deletedDateTime: null,
+      classification: null,
+      createdDateTime: "2018-02-24T18:38:53Z",
+      description: "My awesome group",
+      displayName: "My group",
+      groupTypes: ["Unified"],
+      mail: "my_group@contoso.onmicrosoft.com",
+      mailEnabled: true,
+      mailNickname: "my_group",
+      onPremisesLastSyncDateTime: null,
+      onPremisesProvisioningErrors: [],
+      onPremisesSecurityIdentifier: null,
+      onPremisesSyncEnabled: null,
+      preferredDataLocation: null,
+      proxyAddresses: ["SMTP:my_group@contoso.onmicrosoft.com"],
+      renewedDateTime: "2018-02-24T18:38:53Z",
+      resourceBehaviorOptions: [],
+      securityEnabled: false,
+      visibility: "Public"
+    }));
   });
 
-  it('creates Microsoft 365 Group with specific members (debug)', (done) => {
+  it('creates Microsoft 365 Group with specific members (debug)', async () => {
     let groupCreated: boolean = false;
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
@@ -1107,18 +1023,11 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, () => {
-      try {
-        assert(groupCreated);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
+    assert(groupCreated);
   });
 
-  it('fails when an invalid user is specified as owner', (done) => {
+  it('fails when an invalid user is specified as owner', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
@@ -1140,18 +1049,11 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, "Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
+      new CommandError("Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com"));
   });
 
-  it('fails when an invalid user is specified as owner (debug)', (done) => {
+  it('fails when an invalid user is specified as owner (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
@@ -1173,18 +1075,11 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, "Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
+      new CommandError("Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com"));
   });
 
-  it('fails when an invalid user is specified as member', (done) => {
+  it('fails when an invalid user is specified as member', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
@@ -1206,18 +1101,11 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, "Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
+      new CommandError("Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com"));
   });
 
-  it('fails when an invalid user is specified as member (debug)', (done) => {
+  it('fails when an invalid user is specified as member (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
@@ -1239,18 +1127,11 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, "Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }),
+      new CommandError("Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com"));
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
@@ -1264,15 +1145,8 @@ describe(commands.O365GROUP_ADD, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Invalid request')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } } as any),
+      new CommandError('Invalid request'));
   });
 
   it('passes validation when the displayName, description and mailNickname are specified', async () => {

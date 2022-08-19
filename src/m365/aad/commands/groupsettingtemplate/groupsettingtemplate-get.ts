@@ -1,5 +1,4 @@
 import { Logger } from '../../../../cli';
-import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata, validation } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
@@ -73,22 +72,22 @@ class AadGroupSettingTemplateGetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    odata
-      .getAllItems<GroupSettingTemplate>(`${this.resource}/v1.0/groupSettingTemplates`)
-      .then((templates): void => {
-        const groupSettingTemplate: GroupSettingTemplate[] = templates.filter(t => args.options.id ? t.id === args.options.id : t.displayName === args.options.displayName);
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const templates = await odata.getAllItems<GroupSettingTemplate>(`${this.resource}/v1.0/groupSettingTemplates`);
 
-        if (groupSettingTemplate && groupSettingTemplate.length > 0) {
-          logger.log(groupSettingTemplate.pop());
-        }
-        else {
-          cb(new CommandError(`Resource '${(args.options.id || args.options.displayName)}' does not exist.`));
-          return;
-        }
+      const groupSettingTemplate: GroupSettingTemplate[] = templates.filter(t => args.options.id ? t.id === args.options.id : t.displayName === args.options.displayName);
 
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      if (groupSettingTemplate && groupSettingTemplate.length > 0) {
+        logger.log(groupSettingTemplate.pop());
+      }
+      else {
+        throw `Resource '${(args.options.id || args.options.displayName)}' does not exist.`;
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

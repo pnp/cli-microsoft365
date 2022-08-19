@@ -58,7 +58,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('handles Microsoft 365 Tenant siteclassification is not enabled', (done) => {
+  it('handles Microsoft 365 Tenant siteclassification is not enabled', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
@@ -70,18 +70,11 @@ describe(commands.SITECLASSIFICATION_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Site classification is not enabled.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), 
+      new CommandError('Site classification is not enabled.'));
   });
 
-  it('handles Microsoft 365 Tenant siteclassification missing DirectorySettingTemplate', (done) => {
+  it('handles Microsoft 365 Tenant siteclassification missing DirectorySettingTemplate', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
@@ -152,19 +145,12 @@ describe(commands.SITECLASSIFICATION_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\"")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), 
+      new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\""));
   });
 
 
-  it('retrieves information about the Microsoft 365 Tenant siteclassification (single siteclassification)', (done) => {
+  it('retrieves information about the Microsoft 365 Tenant siteclassification (single siteclassification)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
@@ -235,23 +221,16 @@ describe(commands.SITECLASSIFICATION_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Classifications": ["TopSecret"],
-          "DefaultClassification": "TopSecret",
-          "UsageGuidelinesUrl": "https://test",
-          "GuestUsageGuidelinesUrl": "https://test"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith({
+      "Classifications": ["TopSecret"],
+      "DefaultClassification": "TopSecret",
+      "UsageGuidelinesUrl": "https://test",
+      "GuestUsageGuidelinesUrl": "https://test"
+    }));
   });
 
-  it('retrieves information about the Microsoft 365 Tenant siteclassification (multi siteclassification)', (done) => {
+  it('retrieves information about the Microsoft 365 Tenant siteclassification (multi siteclassification)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
@@ -322,23 +301,16 @@ describe(commands.SITECLASSIFICATION_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Classifications": ["TopSecret", "HBI"],
-          "DefaultClassification": "TopSecret",
-          "UsageGuidelinesUrl": "https://test",
-          "GuestUsageGuidelinesUrl": ""
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith({
+      "Classifications": ["TopSecret", "HBI"],
+      "DefaultClassification": "TopSecret",
+      "UsageGuidelinesUrl": "https://test",
+      "GuestUsageGuidelinesUrl": ""
+    }));
   });
 
-  it('Handles Microsoft 365 Tenant siteclassification DirectorySettings Key does not exist', (done) => {
+  it('Handles Microsoft 365 Tenant siteclassification DirectorySettings Key does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
@@ -409,35 +381,20 @@ describe(commands.SITECLASSIFICATION_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Classifications": [],
-          "DefaultClassification": "",
-          "UsageGuidelinesUrl": "",
-          "GuestUsageGuidelinesUrl": ""
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith({
+      "Classifications": [],
+      "DefaultClassification": "",
+      "UsageGuidelinesUrl": "",
+      "GuestUsageGuidelinesUrl": ""
+    }));
   });
 
-  it('handles error correctly', (done) => {
+  it('handles error correctly', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('An error has occurred'));
   });
 });

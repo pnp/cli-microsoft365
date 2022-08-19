@@ -37,9 +37,9 @@ describe(commands.GROUPSETTING_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     promptOptions = undefined;
   });
@@ -69,7 +69,7 @@ describe(commands.GROUPSETTING_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes the specified group setting without prompting for confirmation when confirm option specified', (done) => {
+  it('removes the specified group setting without prompting for confirmation when confirm option specified', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groupSettings/28beab62-7540-4db1-a23f-29a6018a3848') {
         return Promise.resolve();
@@ -78,18 +78,11 @@ describe(commands.GROUPSETTING_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848', confirm: true } }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848', confirm: true } });
+    assert(deleteRequestStub.called);
   });
 
-  it('removes the specified group setting without prompting for confirmation when confirm option specified (debug)', (done) => {
+  it('removes the specified group setting without prompting for confirmation when confirm option specified (debug)', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groupSettings/28beab62-7540-4db1-a23f-29a6018a3848') {
         return Promise.resolve();
@@ -98,131 +91,75 @@ describe(commands.GROUPSETTING_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', confirm: true } }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', confirm: true } });
+    assert(deleteRequestStub.called);
   });
 
-  it('prompts before removing the specified group setting when confirm option not passed', (done) => {
-    command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } }, () => {
-      let promptIssued = false;
+  it('prompts before removing the specified group setting when confirm option not passed', async () => {
+    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('prompts before removing the specified group setting when confirm option not passed (debug)', (done) => {
-    command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } }, () => {
-      let promptIssued = false;
+  it('prompts before removing the specified group setting when confirm option not passed (debug)', async () => {
+    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('aborts removing the group setting when prompt not confirmed', (done) => {
+  it('aborts removing the group setting when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
 
-    command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    assert(postSpy.notCalled);
   });
 
-  it('aborts removing the group setting when prompt not confirmed (debug)', (done) => {
+  it('aborts removing the group setting when prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
 
-    command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    assert(postSpy.notCalled);
   });
 
-  it('removes the group setting when prompt confirmed', (done) => {
+  it('removes the group setting when prompt confirmed', async () => {
     const postStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } }, () => {
-      try {
-        assert(postStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    assert(postStub.called);
   });
 
-  it('removes the group setting when prompt confirmed (debug)', (done) => {
+  it('removes the group setting when prompt confirmed (debug)', async () => {
     const postStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } }, () => {
-      try {
-        assert(postStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
+    assert(postStub.called);
   });
 
-  it('correctly handles error when group setting is not found', (done) => {
+  it('correctly handles error when group setting is not found', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    command.action(logger, { options: { debug: false, confirm: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, confirm: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } } as any), 
+      new CommandError('File Not Found.'));
   });
 
   it('supports debug mode', () => {

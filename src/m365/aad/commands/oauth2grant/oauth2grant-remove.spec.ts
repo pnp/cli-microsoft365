@@ -35,9 +35,9 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     promptOptions = undefined;
     loggerLogSpy = sinon.spy(logger, 'log');
@@ -67,7 +67,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes OAuth2 permission grant when prompt confirmed (debug)', (done) => {
+  it('removes OAuth2 permission grant when prompt confirmed (debug)', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants/YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek`) > -1) {
         return Promise.resolve();
@@ -77,23 +77,16 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, { options: { debug: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
+    assert(loggerLogToStderrSpy.called);
+    assert(deleteRequestStub.called);
   });
 
-  it('removes OAuth2 permission grant when prompt confirmed', (done) => {
+  it('removes OAuth2 permission grant when prompt confirmed', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants/YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek`) > -1) {
         return Promise.resolve();
@@ -103,23 +96,16 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, { options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
+    assert(loggerLogSpy.notCalled);
+    assert(deleteRequestStub.called);
   });
 
-  it('removes OAuth2 permission grant when confirm specified', (done) => {
+  it('removes OAuth2 permission grant when confirm specified', async () => {
     const deleteRequestStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants/YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek`) > -1) {
         return Promise.resolve();
@@ -128,93 +114,58 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek', confirm: true } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek', confirm: true } });
+    assert(loggerLogSpy.notCalled);
+    assert(deleteRequestStub.called);
   });
 
-  it('prompts before removing OAuth2 permission grant when confirm option not passed', (done) => {
-    command.action(logger, { options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } }, () => {
-      let promptIssued = false;
+  it('prompts before removing OAuth2 permission grant when confirm option not passed', async () => {
+    await command.action(logger, { options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('prompts before removing OAuth2 permission grant when confirm option not passed (debug)', (done) => {
-    command.action(logger, { options: { debug: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } }, () => {
-      let promptIssued = false;
+  it('prompts before removing OAuth2 permission grant when confirm option not passed (debug)', async () => {
+    await command.action(logger, { options: { debug: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('aborts removing OAuth2 permission grant when prompt not confirmed', (done) => {
+  it('aborts removing OAuth2 permission grant when prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, { options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } }, () => {
-      try {
-        assert(deleteSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
+    assert(deleteSpy.notCalled);
   });
 
-  it('aborts removing OAuth2 permission grant when prompt not confirmed (debug)', (done) => {
+  it('aborts removing OAuth2 permission grant when prompt not confirmed (debug)', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, { options: { debug: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } }, () => {
-      try {
-        assert(deleteSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
+    assert(deleteSpy.notCalled);
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject({
         error: {
@@ -228,15 +179,8 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, confirm: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, confirm: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

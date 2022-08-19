@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -65,7 +65,7 @@ describe(commands.APP_ROLE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['displayName', 'description', 'id']);
   });
 
-  it('lists roles for the specified appId (debug)', (done) => {
+  it('lists roles for the specified appId (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq 'bc724b77-da87-43a9-b385-6ebaaf969db8'&$select=id`) {
         return Promise.resolve({
@@ -107,41 +107,34 @@ describe(commands.APP_ROLE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "allowedMemberTypes": [
-              "User"
-            ],
-            "description": "Readers",
-            "displayName": "Readers",
-            "id": "ca12d0da-cd83-4dc9-8e4c-b6a529bebbb4",
-            "isEnabled": true,
-            "origin": "Application",
-            "value": "readers"
-          },
-          {
-            "allowedMemberTypes": [
-              "User"
-            ],
-            "description": "Writers",
-            "displayName": "Writers",
-            "id": "85c03d41-b438-48ea-bccd-8389c0e327bc",
-            "isEnabled": true,
-            "origin": "Application",
-            "value": "writers"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: true, appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "allowedMemberTypes": [
+          "User"
+        ],
+        "description": "Readers",
+        "displayName": "Readers",
+        "id": "ca12d0da-cd83-4dc9-8e4c-b6a529bebbb4",
+        "isEnabled": true,
+        "origin": "Application",
+        "value": "readers"
+      },
+      {
+        "allowedMemberTypes": [
+          "User"
+        ],
+        "description": "Writers",
+        "displayName": "Writers",
+        "id": "85c03d41-b438-48ea-bccd-8389c0e327bc",
+        "isEnabled": true,
+        "origin": "Application",
+        "value": "writers"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists roles for the specified appName (debug)', (done) => {
+  it('lists roles for the specified appName (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
         return Promise.resolve({
@@ -183,41 +176,34 @@ describe(commands.APP_ROLE_LIST, () => {
       return Promise.reject(`Invalid request ${opts.url}`);
     });
 
-    command.action(logger, { options: { debug: true, appName: 'My app' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "allowedMemberTypes": [
-              "User"
-            ],
-            "description": "Readers",
-            "displayName": "Readers",
-            "id": "ca12d0da-cd83-4dc9-8e4c-b6a529bebbb4",
-            "isEnabled": true,
-            "origin": "Application",
-            "value": "readers"
-          },
-          {
-            "allowedMemberTypes": [
-              "User"
-            ],
-            "description": "Writers",
-            "displayName": "Writers",
-            "id": "85c03d41-b438-48ea-bccd-8389c0e327bc",
-            "isEnabled": true,
-            "origin": "Application",
-            "value": "writers"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: true, appName: 'My app' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "allowedMemberTypes": [
+          "User"
+        ],
+        "description": "Readers",
+        "displayName": "Readers",
+        "id": "ca12d0da-cd83-4dc9-8e4c-b6a529bebbb4",
+        "isEnabled": true,
+        "origin": "Application",
+        "value": "readers"
+      },
+      {
+        "allowedMemberTypes": [
+          "User"
+        ],
+        "description": "Writers",
+        "displayName": "Writers",
+        "id": "85c03d41-b438-48ea-bccd-8389c0e327bc",
+        "isEnabled": true,
+        "origin": "Application",
+        "value": "writers"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists roles for the specified appId', (done) => {
+  it('lists roles for the specified appId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/appRoles`) {
         return Promise.resolve({
@@ -251,41 +237,34 @@ describe(commands.APP_ROLE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "allowedMemberTypes": [
-              "User"
-            ],
-            "description": "Readers",
-            "displayName": "Readers",
-            "id": "ca12d0da-cd83-4dc9-8e4c-b6a529bebbb4",
-            "isEnabled": true,
-            "origin": "Application",
-            "value": "readers"
-          },
-          {
-            "allowedMemberTypes": [
-              "User"
-            ],
-            "description": "Writers",
-            "displayName": "Writers",
-            "id": "85c03d41-b438-48ea-bccd-8389c0e327bc",
-            "isEnabled": true,
-            "origin": "Application",
-            "value": "writers"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false, appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "allowedMemberTypes": [
+          "User"
+        ],
+        "description": "Readers",
+        "displayName": "Readers",
+        "id": "ca12d0da-cd83-4dc9-8e4c-b6a529bebbb4",
+        "isEnabled": true,
+        "origin": "Application",
+        "value": "readers"
+      },
+      {
+        "allowedMemberTypes": [
+          "User"
+        ],
+        "description": "Writers",
+        "displayName": "Writers",
+        "id": "85c03d41-b438-48ea-bccd-8389c0e327bc",
+        "isEnabled": true,
+        "origin": "Application",
+        "value": "writers"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it(`returns an empty array if the specified app has no roles`, (done) => {
+  it(`returns an empty array if the specified app has no roles`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/appRoles`) {
         return Promise.resolve({
@@ -296,18 +275,11 @@ describe(commands.APP_ROLE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230' } });
+    assert(loggerLogSpy.calledWith([]));
   });
 
-  it('handles error when the app specified with appObjectId not found', (done) => {
+  it('handles error when the app specified with appObjectId not found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/5b31c38c-2584-42f0-aa47-657fb3a84230/appRoles') {
         return Promise.reject({
@@ -326,23 +298,15 @@ describe(commands.APP_ROLE_LIST, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         appObjectId: '5b31c38c-2584-42f0-aa47-657fb3a84230'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Resource '5b31c38c-2584-42f0-aa47-657fb3a84230' does not exist or one of its queried reference-property objects are not present.`));
   });
 
-  it('handles error when the app specified with the appId not found', (done) => {
+  it('handles error when the app specified with the appId not found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=appId eq '9b1b1e42-794b-4c71-93ac-5ed92488b67f'&$select=id`) {
         return Promise.resolve({ value: [] });
@@ -351,23 +315,15 @@ describe(commands.APP_ROLE_LIST, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`No Azure AD application registration with ID 9b1b1e42-794b-4c71-93ac-5ed92488b67f found`));
   });
 
-  it('handles error when the app specified with appName not found', (done) => {
+  it('handles error when the app specified with appName not found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
         return Promise.resolve({ value: [] });
@@ -376,23 +332,15 @@ describe(commands.APP_ROLE_LIST, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         appName: 'My app'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `No Azure AD application registration with name My app found`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`No Azure AD application registration with name My app found`));
   });
 
-  it('handles error when multiple apps with the specified appName found', (done) => {
+  it('handles error when multiple apps with the specified appName found', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/myorganization/applications?$filter=displayName eq 'My%20app'&$select=id`) {
         return Promise.resolve({
@@ -406,56 +354,32 @@ describe(commands.APP_ROLE_LIST, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         appName: 'My app'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `Multiple Azure AD application registration with name My app found. Please disambiguate (app object IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Multiple Azure AD application registration with name My app found. Please disambiguate (app object IDs): 9b1b1e42-794b-4c71-93ac-5ed92488b67f, 9b1b1e42-794b-4c71-93ac-5ed92488b67g`));
   });
 
-  it('handles error when retrieving information about app through appId failed', (done) => {
+  it('handles error when retrieving information about app through appId failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `An error has occurred`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('handles error when retrieving information about app through appName failed', (done) => {
+  it('handles error when retrieving information about app through appName failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         appName: 'My app'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `An error has occurred`);
-        done();
-      }
-      catch (e) {
-        done(e);
       }
     });
   });

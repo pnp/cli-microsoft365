@@ -63,7 +63,7 @@ describe(commands.GROUP_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'groupType']);
   });
 
-  it('lists aad Groups in the tenant (verbose)', (done) => {
+  it('lists aad Groups in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups`) {
         return Promise.resolve({
@@ -119,64 +119,57 @@ describe(commands.GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { verbose: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
-            "description": "Code Challenge",
-            "displayName": "Code Challenge",
-            "groupTypes": [
-              "Unified"
-            ],
-            "mail": "CodeChallenge@dev1802.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "CodeChallenge",
-            "securityEnabled": false
-          },
-          {
-            "id": "2f64f70d-386b-489f-805a-670cad739fde",
-            "description": "The Jumping Jacks",
-            "displayName": "The Jumping Jacks",
-            "groupTypes": [
-            ],
-            "mail": "TheJumpingJacks@dev1802.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "TheJumpingJacks",
-            "securityEnabled": true
-          },
-          {
-            "id": "ff0554cc-8aa8-40f2-a369-ed604503fb79",
-            "description": "Emergency Response",
-            "displayName": "Emergency Response",
-            "groupTypes": [
-            ],
-            "mail": null,
-            "mailEnabled": false,
-            "mailNickname": "00000000-0000-0000-0000-000000000000",
-            "securityEnabled": true
-          },
-          {
-            "id": "0a0bf25a-2de0-40de-9908-c96941a2615b",
-            "description": "Free Birds",
-            "displayName": "Free Birds",
-            "groupTypes": [
-            ],
-            "mail": "FreeBirds@dev1802.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "FreeBirds",
-            "securityEnabled": false
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { verbose: true } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+        "description": "Code Challenge",
+        "displayName": "Code Challenge",
+        "groupTypes": [
+          "Unified"
+        ],
+        "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "CodeChallenge",
+        "securityEnabled": false
+      },
+      {
+        "id": "2f64f70d-386b-489f-805a-670cad739fde",
+        "description": "The Jumping Jacks",
+        "displayName": "The Jumping Jacks",
+        "groupTypes": [
+        ],
+        "mail": "TheJumpingJacks@dev1802.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "TheJumpingJacks",
+        "securityEnabled": true
+      },
+      {
+        "id": "ff0554cc-8aa8-40f2-a369-ed604503fb79",
+        "description": "Emergency Response",
+        "displayName": "Emergency Response",
+        "groupTypes": [
+        ],
+        "mail": null,
+        "mailEnabled": false,
+        "mailNickname": "00000000-0000-0000-0000-000000000000",
+        "securityEnabled": true
+      },
+      {
+        "id": "0a0bf25a-2de0-40de-9908-c96941a2615b",
+        "description": "Free Birds",
+        "displayName": "Free Birds",
+        "groupTypes": [
+        ],
+        "mail": "FreeBirds@dev1802.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "FreeBirds",
+        "securityEnabled": false
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists deleted groups in the tenant with the default properties', (done) => {
+  it('lists deleted groups in the tenant with the default properties', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/microsoft.graph.group`) {
         return Promise.resolve({
@@ -211,42 +204,35 @@ describe(commands.GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, deleted: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
-            "description": "Code Challenge",
-            "displayName": "Code Challenge",
-            "groupTypes": [
-              "Unified"
-            ],
-            "mail": "CodeChallenge@dev1802.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "CodeChallenge",
-            "securityEnabled": false
-          },
-          {
-            "id": "2f64f70d-386b-489f-805a-670cad739fde",
-            "description": "The Jumping Jacks",
-            "displayName": "The Jumping Jacks",
-            "groupTypes": [
-            ],
-            "mail": "TheJumpingJacks@dev1802.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "TheJumpingJacks",
-            "securityEnabled": true
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false, deleted: true } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+        "description": "Code Challenge",
+        "displayName": "Code Challenge",
+        "groupTypes": [
+          "Unified"
+        ],
+        "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "CodeChallenge",
+        "securityEnabled": false
+      },
+      {
+        "id": "2f64f70d-386b-489f-805a-670cad739fde",
+        "description": "The Jumping Jacks",
+        "displayName": "The Jumping Jacks",
+        "groupTypes": [
+        ],
+        "mail": "TheJumpingJacks@dev1802.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "TheJumpingJacks",
+        "securityEnabled": true
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists aad Groups in the tenant (text)', (done) => {
+  it('lists aad Groups in the tenant (text)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups`) {
         return Promise.resolve({
@@ -302,65 +288,58 @@ describe(commands.GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, output: 'text' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
-            "description": "Code Challenge",
-            "displayName": "Code Challenge",
-            "groupTypes": [
-              "Unified"
-            ],
-            "mail": "CodeChallenge@dev1802.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "CodeChallenge",
-            "securityEnabled": false,
-            "groupType": "Microsoft 365"
-          },
-          {
-            "id": "2f64f70d-386b-489f-805a-670cad739fde",
-            "description": "The Jumping Jacks",
-            "displayName": "The Jumping Jacks",
-            "groupTypes": [
-            ],
-            "mail": "TheJumpingJacks@dev1802.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "TheJumpingJacks",
-            "securityEnabled": true,
-            "groupType": "Mail enabled security"
-          },
-          {
-            "id": "ff0554cc-8aa8-40f2-a369-ed604503fb79",
-            "description": "Emergency Response",
-            "displayName": "Emergency Response",
-            "groupTypes": [
-            ],
-            "mail": null,
-            "mailEnabled": false,
-            "mailNickname": "00000000-0000-0000-0000-000000000000",
-            "securityEnabled": true,
-            "groupType": "Security"
-          },
-          {
-            "id": "0a0bf25a-2de0-40de-9908-c96941a2615b",
-            "description": "Free Birds",
-            "displayName": "Free Birds",
-            "groupTypes": [
-            ],
-            "mail": "FreeBirds@dev1802.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "FreeBirds",
-            "securityEnabled": false,
-            "groupType": "Distribution"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: true, output: 'text' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
+        "description": "Code Challenge",
+        "displayName": "Code Challenge",
+        "groupTypes": [
+          "Unified"
+        ],
+        "mail": "CodeChallenge@dev1802.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "CodeChallenge",
+        "securityEnabled": false,
+        "groupType": "Microsoft 365"
+      },
+      {
+        "id": "2f64f70d-386b-489f-805a-670cad739fde",
+        "description": "The Jumping Jacks",
+        "displayName": "The Jumping Jacks",
+        "groupTypes": [
+        ],
+        "mail": "TheJumpingJacks@dev1802.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "TheJumpingJacks",
+        "securityEnabled": true,
+        "groupType": "Mail enabled security"
+      },
+      {
+        "id": "ff0554cc-8aa8-40f2-a369-ed604503fb79",
+        "description": "Emergency Response",
+        "displayName": "Emergency Response",
+        "groupTypes": [
+        ],
+        "mail": null,
+        "mailEnabled": false,
+        "mailNickname": "00000000-0000-0000-0000-000000000000",
+        "securityEnabled": true,
+        "groupType": "Security"
+      },
+      {
+        "id": "0a0bf25a-2de0-40de-9908-c96941a2615b",
+        "description": "Free Birds",
+        "displayName": "Free Birds",
+        "groupTypes": [
+        ],
+        "mail": "FreeBirds@dev1802.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "FreeBirds",
+        "securityEnabled": false,
+        "groupType": "Distribution"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
   it('supports debug mode', () => {
