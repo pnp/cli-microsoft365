@@ -15,6 +15,7 @@
 - removes chatUtil.convertParticipantStringToArray from code. Only split by comma [#3340](https://github.com/pnp/cli-microsoft365/issues/3340)
 - extends 'aad app add' command with admin consent process. [#2563](https://github.com/pnp/cli-microsoft365/issues/2563)
 - updates MkDocs, extends docs with tag support and dark mode. [#3416](https://github.com/pnp/cli-microsoft365/issues/3416)
+- extended spfx doctor with support for SPFx v1.15.2 [#3558](https://github.com/pnp/cli-microsoft365/issues/3558)
 
 ## [v5.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.6.0)
 
