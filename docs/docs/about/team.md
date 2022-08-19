@@ -4,12 +4,12 @@
 
 Do you want to know the curious and bright minds behind the CLI for M365? Look no further! Below you will find a list of all our hard-working maintainers and brilliant contributors.
 
-## Maintainers 
+## Maintainers
 
 <div id='cli-grid-maintainers' class='cli-grid'>
 </div>
 
-## Contributors 
+## Contributors
 
 <div id='cli-grid-contributors' class='cli-grid'>
 </div>

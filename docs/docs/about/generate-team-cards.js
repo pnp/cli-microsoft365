@@ -24,10 +24,22 @@ const maintainers = [
     twitter: 'garrytrinder'
   },
   {
+    name: 'Jasey Waegebaert',
+    company: 'GMI group',
+    github: 'Jwaegebaert',
+    twitter: 'jwaegebaert'
+  },
+  {
     name: 'Martin Lingstuyl',
     company: 'I4-YOU',
     github: 'martinlingstuyl',
     twitter: 'martinlingstuyl'
+  },
+  {
+    name: 'Milan Holemans',
+    company: 'VanRoey',
+    github: 'milanholemans',
+    twitter: ''
   },
   {
     name: 'Patrick Lamber',
