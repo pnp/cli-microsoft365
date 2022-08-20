@@ -2,7 +2,7 @@ import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command, { CommandErrorWithOutput } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { formatting, urlUtil, validation } from '../../../../utils';
+import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import * as SpoUserGetCommand from '../user/user-get';
@@ -19,9 +19,6 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
-  listId?: string;
-  listTitle?: string;
-  listUrl?: string;
   principalId?: number;
   upn?: string;
   groupName?: string;
@@ -29,13 +26,13 @@ interface Options extends GlobalOptions {
   roleDefinitionName?: string;
 }
 
-class SpoListRoleAssignmentAddCommand extends SpoCommand {
+class SpoWebRoleAssignmentAddCommand extends SpoCommand {
   public get name(): string {
-    return commands.LIST_ROLEASSIGNMENT_ADD;
+    return commands.WEB_ROLEASSIGNMENT_ADD;
   }
 
   public get description(): string {
-    return 'Adds a role assignment to list permissions';
+    return 'Adds a role assignment to web';
   }
 
   constructor() {
@@ -49,9 +46,6 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
-        listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined',
-        listUrl: typeof args.options.listUrl !== 'undefined',
         principalId: typeof args.options.principalId !== 'undefined',
         upn: typeof args.options.upn !== 'undefined',
         groupName: typeof args.options.groupName !== 'undefined',
@@ -65,15 +59,6 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
     this.options.unshift(
       {
         option: '-u, --webUrl <webUrl>'
-      },
-      {
-        option: '-i, --listId [listId]'
-      },
-      {
-        option: '-t, --listTitle [listTitle]'
-      },
-      {
-        option: '--listUrl [listUrl]'
       },
       {
         option: '--principalId [principalId]'
@@ -101,25 +86,12 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} is not a valid GUID`;
-        }
-
         if (args.options.principalId && isNaN(args.options.principalId)) {
           return `Specified principalId ${args.options.principalId} is not a number`;
         }
 
         if (args.options.roleDefinitionId && isNaN(args.options.roleDefinitionId)) {
           return `Specified roleDefinitionId ${args.options.roleDefinitionId} is not a number`;
-        }
-
-        const listOptions: any[] = [args.options.listId, args.options.listTitle, args.options.listUrl];
-        if (listOptions.some(item => item !== undefined) && listOptions.filter(item => item !== undefined).length > 1) {
-          return `Specify either list id or title or list url`;
-        }
-
-        if (listOptions.filter(item => item !== undefined).length === 0) {
-          return `Specify at least list id or title or list url`;
         }
 
         const principalOptions: any[] = [args.options.principalId, args.options.upn, args.options.groupName];
@@ -147,19 +119,7 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.logToStderr(`Adding role assignment to list in site at ${args.options.webUrl}...`);
-    }
-
-    let requestUrl: string = `${args.options.webUrl}/_api/web/`;
-    if (args.options.listId) {
-      requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
-    }
-    else if (args.options.listTitle) {
-      requestUrl += `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/`;
-    }
-    else if (args.options.listUrl) {
-      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-      requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
+      logger.logToStderr(`Adding role assignment to web ${args.options.webUrl}...`);
     }
 
     this.GetRoleDefinitionId(args.options)
@@ -169,25 +129,25 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
           this.GetUserPrincipalId(args.options)
             .then((userPrincipalId: number) => {
               args.options.principalId = userPrincipalId;
-              this.AddRoleAssignment(requestUrl, logger, args.options, cb);
+              this.AddRoleAssignment(logger, args.options, cb);
             }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
         }
         else if (args.options.groupName) {
           this.GetGroupPrincipalId(args.options)
             .then((groupPrincipalId: number) => {
               args.options.principalId = groupPrincipalId;
-              this.AddRoleAssignment(requestUrl, logger, args.options, cb);
+              this.AddRoleAssignment(logger, args.options, cb);
             }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
         }
         else {
-          this.AddRoleAssignment(requestUrl, logger, args.options, cb);
+          this.AddRoleAssignment(logger, args.options, cb);
         }
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private AddRoleAssignment(requestUrl: string, logger: Logger, options: Options, cb: () => void): void {
+  private AddRoleAssignment(logger: Logger, options: Options, cb: () => void): void {
     const requestOptions: any = {
-      url: `${requestUrl}roleassignments/addroleassignment(principalid='${options.principalId}',roledefid='${options.roleDefinitionId}')`,
+      url: `${options.webUrl}/_api/web/roleassignments/addroleassignment(principalid='${options.principalId}',roledefid='${options.roleDefinitionId}')`,
       method: 'POST',
       headers: {
         'accept': 'application/json;odata=nometadata',
@@ -261,4 +221,4 @@ class SpoListRoleAssignmentAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoListRoleAssignmentAddCommand();
+module.exports = new SpoWebRoleAssignmentAddCommand();

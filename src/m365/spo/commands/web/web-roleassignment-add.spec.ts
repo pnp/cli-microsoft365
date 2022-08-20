@@ -10,9 +10,9 @@ import commands from '../../commands';
 import * as SpoUserGetCommand from '../user/user-get';
 import * as SpoGroupGetCommand from '../group/group-get';
 import * as SpoRoleDefinitionListCommand from '../roledefinition/roledefinition-list';
-const command: Command = require('./list-roleassignment-add');
+const command: Command = require('./web-roleassignment-add');
 
-describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
+describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
@@ -55,7 +55,7 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.LIST_ROLEASSIGNMENT_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.WEB_ROLEASSIGNMENT_ADD), true);
   });
 
   it('has a description', () => {
@@ -74,98 +74,68 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.strictEqual(actual, true);
-  });
-
-  it('fails validation if the id option is not a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation if the id option is a valid GUID', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if the principalId option is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 'abc', roleDefinitionId: 1073741827 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', principalId: 'abc', roleDefinitionId: 1073741827 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the principalId option is a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if the roleDefinitionId option is not a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11, roleDefinitionId: 'abc' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', principalId: 11, roleDefinitionId: 'abc' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the roleDefinitionId option is a number', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if listId and listTitle are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if listId and listUrl are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listUrl: '/sites/Documents', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if listTitle and listUrl are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', listUrl: '/sites/Documents', principalId: 11, roleDefinitionId: 1073741827 } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
   it('fails validation if principalId and upn are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', principalId: 11, upn: 'someaccount@tenant.onmicrosoft.com', roleDefinitionId: 1073741827 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', principalId: 11, upn: 'someaccount@tenant.onmicrosoft.com', roleDefinitionId: 1073741827 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if principalId and groupName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', principalId: 11, groupName: 'someGroup', roleDefinitionId: 1073741827 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', principalId: 11, groupName: 'someGroup', roleDefinitionId: 1073741827 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if upn and groupName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', upn: 'someaccount@tenant.onmicrosoft.com', groupName: 'someGroup', roleDefinitionId: 1073741827 } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', upn: 'someaccount@tenant.onmicrosoft.com', groupName: 'someGroup', roleDefinitionId: 1073741827 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if roleDefinitionId and roleDefinitionName are specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', groupName: 'someGroup', roleDefinitionId: 1073741827, roleDefinitionName: 'readers' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', groupName: 'someGroup', roleDefinitionId: 1073741827, roleDefinitionName: 'readers' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation neither roleDefinitionId nor roleDefinitionName is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', groupName: 'someGroup'} }, commandInfo);
+  it('fails validation if neither roleDefinitionId nor roleDefinitionName is specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', groupName: 'someGroup' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation neither groupName nor principalId or upn is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', roleDefinitionName: 'readers' } }, commandInfo);
+  it('fails validation if neither if neither principalId nor groupName or upn is specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', roleDefinitionId: 1073741827 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation neither listTitle nor listId or listUrl is specified', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', groupName: 'someGroup', roleDefinitionName: 'readers' } }, commandInfo);
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('add role assignment on list by title and role definition id', (done) => {
+  it('add role assignment on web by role definition id', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('_api/web/lists/getByTitle(\'test\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if ((opts.url as string).indexOf('_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
       }
 
@@ -176,7 +146,6 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        listTitle: 'test',
         principalId: 11,
         roleDefinitionId: 1073741827
       }
@@ -191,65 +160,9 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
     });
   });
 
-  it('add role assignment on list by id and role definition id', (done) => {
+  it('add role assignment on web get principal id by upn', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
-        principalId: 11,
-        roleDefinitionId: 1073741827
-      }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('add role assignment on list by url and role definition id', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetList(\'%2Fsites%2Fdocuments\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        listUrl: 'sites/documents',
-        principalId: 11,
-        roleDefinitionId: 1073741827
-      }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('add role assignment on list get principal id by upn', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
       }
 
@@ -270,7 +183,6 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         upn: 'someaccount@tenant.onmicrosoft.com',
         roleDefinitionId: 1073741827
       }
@@ -287,7 +199,7 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when upn does not exist', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
       }
 
@@ -307,7 +219,6 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         upn: 'someaccount@tenant.onmicrosoft.com',
         roleDefinitionId: 1073741827
       }
@@ -322,9 +233,9 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
     });
   });
 
-  it('add role assignment on list get principal id by group name', (done) => {
+  it('add role assignment on web get principal id by group name', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
       }
 
@@ -345,7 +256,6 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         groupName: 'someGroup',
         roleDefinitionId: 1073741827
       }
@@ -362,7 +272,7 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when group does not exist', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
       }
 
@@ -382,7 +292,6 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         groupName: 'someGroup',
         roleDefinitionId: 1073741827
       }
@@ -397,9 +306,9 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
     });
   });
 
-  it('add role assignment on list get role definition id by role definition name', (done) => {
+  it('add role assignment on web get role definition id by role definition name', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
       }
 
@@ -420,7 +329,6 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         principalId: 11,
         roleDefinitionName: 'Full Control'
       }
@@ -437,7 +345,7 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
 
   it('correctly handles error when role definition does not exist', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
       }
 
@@ -457,7 +365,6 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         principalId: 11,
         roleDefinitionName: 'Full Control'
       }
