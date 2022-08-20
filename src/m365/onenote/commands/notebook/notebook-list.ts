@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   webUrl?: string;
 }
 
-class OnenoteNotebookListCommand extends GraphCommand {
+class OneNoteNotebookListCommand extends GraphCommand {
   public get name(): string {
     return commands.NOTEBOOK_LIST;
   }
@@ -161,4 +161,4 @@ class OnenoteNotebookListCommand extends GraphCommand {
   }
 }
 
-module.exports = new OnenoteNotebookListCommand();
+module.exports = new OneNoteNotebookListCommand();
