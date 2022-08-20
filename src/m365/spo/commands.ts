@@ -270,6 +270,7 @@ export default {
   WEB_REINDEX: `${prefix} web reindex`,
   WEB_REMOVE: `${prefix} web remove`,
   WEB_ROLEASSIGNMENT_REMOVE: `${prefix} web roleassignment remove`,
+  WEB_ROLEASSIGNMENT_ADD: `${prefix} web roleassignment add`,
   WEB_ROLEINHERITANCE_RESET: `${prefix} web roleinheritance reset`,
   WEB_SET: `${prefix} web set`
 };
