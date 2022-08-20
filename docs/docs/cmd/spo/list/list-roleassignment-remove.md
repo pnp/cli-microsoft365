@@ -31,6 +31,9 @@ m365 spo list roleassignment remove [options]
 `--groupName [groupName]`
 : enter group name of Azure AD or SharePoint group. Specify either groupName or princpialId.
 
+`--confirm`
+: Don't prompt for confirming removing the role assignment
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples

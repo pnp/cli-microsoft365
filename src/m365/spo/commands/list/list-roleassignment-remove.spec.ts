@@ -15,6 +15,8 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let requests: any[];
+  let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -36,12 +38,18 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
         log.push(msg);
       }
     };
+    requests = [];
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
   });
 
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      Cli.executeCommandWithOutput
+      Cli.executeCommandWithOutput,
+      Cli.prompt
     ]);
   });
 
@@ -146,7 +154,8 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
-        principalId: 11
+        principalId: 11,
+        confirm: true
       }
     }, (err: any) => {
       try {
@@ -173,7 +182,8 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
-        principalId: 11
+        principalId: 11,
+        confirm: true
       }
     }, (err: any) => {
       try {
@@ -200,7 +210,8 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listUrl: 'sites/documents',
-        principalId: 11
+        principalId: 11,
+        confirm: true
       }
     }, (err: any) => {
       try {
@@ -237,7 +248,8 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
-        upn: 'someaccount@tenant.onmicrosoft.com'
+        upn: 'someaccount@tenant.onmicrosoft.com',
+        confirm: true
       }
     }, (err: any) => {
       try {
@@ -273,7 +285,8 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
-        upn: 'someaccount@tenant.onmicrosoft.com'
+        upn: 'someaccount@tenant.onmicrosoft.com',
+        confirm: true
       }
     }, (err?: any) => {
       try {
@@ -310,7 +323,8 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
-        groupName: 'someGroup'
+        groupName: 'someGroup',
+        confirm: true
       }
     }, (err: any) => {
       try {
@@ -346,11 +360,126 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
-        groupName: 'someGroup'
+        groupName: 'someGroup',
+        confirm: true
       }
     }, (err: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('aborts removing role assignment when prompt not confirmed', (done) => {
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: false });
+    });
+    command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
+        groupName: 'someGroup'
+      }
+    }, () => {
+      try {
+        assert(requests.length === 0);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('prompts before removing role assignment when confirmation argument not passed (Id)', (done) => {
+    command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
+        groupName: 'someGroup'
+      }
+    }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('prompts before removing role assignment when confirmation argument not passed (Title)', (done) => {
+    command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listTitle: 'someList',
+        groupName: 'someGroup'
+      }
+    }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('removes role assignment when prompt confirmed', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/web/lists(guid\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+      if (command === SpoGroupGetCommand) {
+        return Promise.resolve({
+          stdout: '{"Id": 11,"IsHiddenInUI": false,"LoginName": "otherGroup","Title": "otherGroup","PrincipalType": 8,"AllowMembersEditMembership": false,"AllowRequestToJoinLeave": false,"AutoAcceptRequestToJoinLeave": false,"Description": "","OnlyAllowMembersViewMembership": true,"OwnerTitle": "Some Account","RequestToJoinLeaveEmailSetting": null}'
+        });
+      }
+
+      return Promise.reject(new CommandError('Unknown case'));
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    });
+    command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
+        groupName: 'someGroup'
+      }
+    }, (err) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
