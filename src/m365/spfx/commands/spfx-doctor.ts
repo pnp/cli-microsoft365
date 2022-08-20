@@ -1,6 +1,9 @@
 import * as chalk from 'chalk';
 import * as child_process from 'child_process';
+import { resolve } from 'dns';
+import { string } from 'easy-table';
 import { satisfies } from 'semver';
+import { version } from 'typescript';
 import { Logger } from '../../../cli';
 import { CommandError } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
@@ -72,6 +75,7 @@ enum SharePointVersion {
 
 interface SpfxVersionPrerequisites {
   gulp: VersionCheck;
+  gulpCli: VersionCheck;
   node: VersionCheck;
   sp: SharePointVersion;
   yo: VersionCheck;
@@ -82,7 +86,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.0.0': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^6',
@@ -97,7 +105,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.1.0': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^6',
@@ -112,7 +124,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.2.0': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^6',
@@ -127,7 +143,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.4.0': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^6',
@@ -142,7 +162,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.4.1': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^6 || ^8',
@@ -157,7 +181,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.5.0': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^6 || ^8',
@@ -172,7 +200,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.5.1': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^6 || ^8',
@@ -187,7 +219,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.6.0': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^6 || ^8',
@@ -202,7 +238,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.7.0': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^8',
@@ -217,7 +257,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.7.1': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^8',
@@ -232,7 +276,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.8.0': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^8',
@@ -247,7 +295,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.8.1': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^8',
@@ -262,7 +314,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.8.2': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^8 || ^10',
@@ -277,7 +333,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.9.0': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^8 || ^10',
@@ -292,7 +352,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.9.1': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^10',
@@ -307,7 +371,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.10.0': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^10',
@@ -322,7 +390,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.11.0': {
       gulp: {
         range: '^3',
-        fix: 'npm i -g gulp@3'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^10',
@@ -337,7 +409,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.12.0': {
       gulp: {
         range: '^4',
-        fix: 'npm i -g gulp@4'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^12',
@@ -352,7 +428,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.12.1': {
       gulp: {
         range: '^4',
-        fix: 'npm i -g gulp@4'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^12 || ^14',
@@ -367,7 +447,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.13.0': {
       gulp: {
         range: '^4',
-        fix: 'npm i -g gulp@4'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^12 || ^14',
@@ -382,7 +466,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.13.1': {
       gulp: {
         range: '^4',
-        fix: 'npm i -g gulp@4'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^12 || ^14',
@@ -397,7 +485,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.14.0': {
       gulp: {
         range: '^4',
-        fix: 'npm i -g gulp@4'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^12 || ^14',
@@ -412,7 +504,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.15.0': {
       gulp: {
         range: '^4',
-        fix: 'npm i -g gulp@4'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^12.13 || ^14.15 || ^16.13',
@@ -427,7 +523,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
     '1.15.2': {
       gulp: {
         range: '^4',
-        fix: 'npm i -g gulp@4'
+        fix: 'npm un -g gulp'
+      },
+      gulpCli: {
+        range: '^1 || ^2',
+        fix: 'npm i -g gulp-cli'
       },
       node: {
         range: '^12.13 || ^14.15 || ^16.13',
@@ -440,6 +540,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       }
     }
   };
+
 
   public get name(): string {
     return commands.DOCTOR;
@@ -534,6 +635,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       .then(_ => this.checkSharePointCompatibility(spfxVersion, prerequisites, args, fixes, logger))
       .then(_ => this.checkNodeVersion(prerequisites, fixes, logger))
       .then(_ => this.checkYo(prerequisites, fixes, logger))
+      .then(_ => this.checkGulpCli(prerequisites, fixes, logger))
       .then(_ => this.checkGulp(prerequisites, fixes, logger))
       .then(_ => this.checkTypeScript(fixes, logger))
       .then(_ => {
@@ -603,15 +705,26 @@ class SpfxDoctorCommand extends AnonymousCommand {
       });
   }
 
+  private checkGulpCli(prerequisites: SpfxVersionPrerequisites, fixes: string[], logger: Logger): Promise<void> {
+    return this
+      .getPackageVersion('gulp-cli', PackageSearchMode.GlobalOnly, HandlePromise.Continue, logger)
+      .then((gulpCliVersion: string): void => {
+        if (gulpCliVersion) {
+          this.checkStatus('gulp-cli', gulpCliVersion, prerequisites.gulpCli, OptionalOrRequired.Required, fixes, logger);
+        }
+        else {
+          logger.log(this.getStatus(CheckStatus.Failure, `gulp-cli not found`));
+          fixes.push(prerequisites.gulpCli.fix);
+        }
+      });
+  }
+
   private checkGulp(prerequisites: SpfxVersionPrerequisites, fixes: string[], logger: Logger): Promise<void> {
     return this
       .getPackageVersion('gulp', PackageSearchMode.GlobalOnly, HandlePromise.Continue, logger)
       .then((gulpVersion: string): void => {
         if (gulpVersion) {
-          this.checkStatus('gulp', gulpVersion, prerequisites.gulp, OptionalOrRequired.Required, fixes, logger);
-        }
-        else {
-          logger.log(this.getStatus(CheckStatus.Failure, `gulp not found`));
+          logger.log(this.getStatus(CheckStatus.Failure, `gulp should be removed`));
           fixes.push(prerequisites.gulp.fix);
         }
       });
