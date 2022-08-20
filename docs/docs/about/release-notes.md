@@ -2,14 +2,26 @@
 
 ## [v5.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.7.0)
 
+**Bookings:**
+
+- [booking business get](../cmd/spo/list/list-roleassignment-add.md) - adds 'booking business get' command [#3534](https://github.com/pnp/cli-microsoft365/issues/3534)
+- [booking business list]('../cmd/booking/business/business-get.md') - adds 'booking business list' command [#3532](https://github.com/pnp/cli-microsoft365/issues/3532)
+
 **SharePoint:**
 
 - [spo list roleassignment add](../cmd/spo/list/list-roleassignment-add.md) - adds 'spo list roleassignment add' command [#3300](https://github.com/pnp/cli-microsoft365/issues/3300)
 - [spo list roleassignment remove](../cmd/spo/list/list-roleassignment-remove.md) - adds 'spo list roleassignment remove' command [#3542](https://github.com/pnp/cli-microsoft365/issues/3542)
 - [spo web roleinheritance reset](../cmd/spo/web/web-roleinheritance-reset.md) - adds 'spo web roleinheritance reset' command [#3548](https://github.com/pnp/cli-microsoft365/issues/3548)
 
+**Search:**
+
+- [search externalConnections remove]('../cmd/search/externalconnection/externalconnection-remove.md') - adds 'search externalConnections remove' command [#3170](https://github.com/pnp/cli-microsoft365/issues/3170)
+
 ### Changes
 
+- fixes docs 'aad app add', 'aad app set' [#3588](https://github.com/pnp/cli-microsoft365/issues/3588)
+- adds dark theme support for Team page [#3582](https://github.com/pnp/cli-microsoft365/issues/3582)
+- adds testing on Node@18 [#3255](https://github.com/pnp/cli-microsoft365/issues/3255)
 - refactored command configuration [#3409](https://github.com/pnp/cli-microsoft365/issues/3409)
 - extends docs with a Team page [#2166](https://github.com/pnp/cli-microsoft365/issues/2166)
 - removes chatUtil.convertParticipantStringToArray from code. Only split by comma [#3340](https://github.com/pnp/cli-microsoft365/issues/3340)
