@@ -140,6 +140,16 @@ describe(commands.LIST_ROLEASSIGNMENT_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if neither upn nor principalId or groupName is specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if neither listId nor listTitle or listUrl is specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', upn: 'someaccount@tenant.onmicrosoft.com' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('remove role assignment from list by title', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_api/web/lists/getByTitle(\'test\')/roleassignments/removeroleassignment(principalid=\'11\')') > -1) {
