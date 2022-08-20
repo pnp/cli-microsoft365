@@ -37,8 +37,8 @@ describe('utils/md', () => {
   });
 
   it('keeps only label when hyperlink label and URL are the same', () => {
-    assert(cliCompletionClinkUpdateHelpPlain.includes('https://pnp.github.io/cli-microsoft365/concepts/completion/'));
-    assert(!cliCompletionClinkUpdateHelpPlain.includes('(https://pnp.github.io/cli-microsoft365/concepts/completion/)'));
+    assert(cliCompletionClinkUpdateHelpPlain.includes('https://pnp.github.io/cli-microsoft365/user-guide/completion/'));
+    assert(!cliCompletionClinkUpdateHelpPlain.includes('(https://pnp.github.io/cli-microsoft365/user-guide/completion/)'));
   });
 
   it('keeps only label when hyperlink URL is relative', () => {
