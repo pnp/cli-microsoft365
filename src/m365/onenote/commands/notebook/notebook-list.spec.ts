@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -91,6 +91,11 @@ describe(commands.NOTEBOOK_LIST, () => {
   it('fails validation if the groupId is not a valid GUID', async () => {
     const actual = await command.validate({ options: { groupId: '123' } }, commandInfo);
     assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if no option specified', async () => {
+    const actual = await command.validate({ options: {} }, commandInfo);
+    assert.strictEqual(actual, true);
   });
 
   it('lists Microsoft OneNote notebooks for the currently logged in user (debug)', (done) => {
@@ -237,6 +242,26 @@ describe(commands.NOTEBOOK_LIST, () => {
     });
   });
 
+  it('handles error when retrieving Microsoft OneNote notebooks in group by name', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
+        return Promise.reject('An error has occurred');
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { groupName: 'MyGroup' } } as any, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('lists Microsoft OneNote notebooks in group by name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
@@ -297,38 +322,64 @@ describe(commands.NOTEBOOK_LIST, () => {
     });
   });
 
-  it('lists Microsoft OneNote notebooks for site', (done) => {
+  it('handles error when retrieving Microsoft OneNote notebooks for site', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/sites/`) > -1) {
-        return Promise.resolve({
-          "id": "contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2",
-          "name": "testsite",
-          "webUrl": "https://contoso.sharepoint.com/sites/testsite",
-          "displayName": "testsite"
-        });
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2/onenote/notebooks`) {
-        return Promise.resolve({
-          "value": [
-            {
-              "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
-              "createdDateTime": "2021-11-15T10:27:22Z",
-              "displayName": "Meeting Notes",
-              "lastModifiedDateTime": "2021-11-15T10:27:22Z"
-            },
-            {
-              "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
-              "createdDateTime": "2020-01-13T17:52:03Z",
-              "displayName": "My Notebook",
-              "lastModifiedDateTime": "2020-01-13T17:52:03Z"
-            }
-          ]
-        });
+        return Promise.reject('An error has occurred');
       }
 
       return Promise.reject('Invalid request');
     });
+
+    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite' } } as any, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('lists Microsoft OneNote notebooks for site', (done) => {
+    const getRequestStub = sinon.stub(request, 'get');
+    getRequestStub.onCall(0)
+      .callsFake((opts) => {
+        if ((opts.url as string).indexOf('/v1.0/sites/') > -1) {
+          return Promise.resolve({
+            "id": "contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2",
+            "name": "testsite",
+            "webUrl": "https://contoso.sharepoint.com/sites/testsite",
+            "displayName": "testsite"
+          });
+        }
+        return Promise.reject('Invalid request');
+      });
+
+    getRequestStub.onCall(1)
+      .callsFake((opts) => {
+        if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2/onenote/notebooks`) {
+          return Promise.resolve({
+            "value": [
+              {
+                "id": "1-99a44a87-c92f-495a-8295-3ab308387821",
+                "createdDateTime": "2021-11-15T10:27:22Z",
+                "displayName": "Meeting Notes",
+                "lastModifiedDateTime": "2021-11-15T10:27:22Z"
+              },
+              {
+                "id": "1-1c1fbd21-1d48-4057-bfb1-ce41b4f7d624",
+                "createdDateTime": "2020-01-13T17:52:03Z",
+                "displayName": "My Notebook",
+                "lastModifiedDateTime": "2020-01-13T17:52:03Z"
+              }
+            ]
+          });
+        }
+
+        return Promise.reject('Invalid request');
+      });
 
     command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/testsite' } }, () => {
       try {
