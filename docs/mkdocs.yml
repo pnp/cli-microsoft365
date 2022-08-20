@@ -164,6 +164,9 @@ nav:
         - report usageaccountdetail: 'cmd/onedrive/report/report-usageaccountdetail.md'
         - report usagefilecounts: 'cmd/onedrive/report/report-usagefilecounts.md'
         - report usagestorage: 'cmd/onedrive/report/report-usagestorage.md'
+    - OneNote (onenote):
+      - notebook:
+        - notebook list: 'cmd/onenote/notebook/notebook-list.md'
     - Outlook (outlook):
       - mail:
         - mail send: 'cmd/outlook/mail/mail-send.md'
