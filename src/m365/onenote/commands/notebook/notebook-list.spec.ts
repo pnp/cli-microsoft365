@@ -301,14 +301,10 @@ describe(commands.NOTEBOOK_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/sites/`) > -1) {
         return Promise.resolve({
-          "value": [
-            {
-              "id": "contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2",
-              "name": "testsite",
-              "webUrl": "https://contoso.sharepoint.com/sites/testsite",
-              "displayName": "testsite"
-            }
-          ]
+          "id": "contoso.sharepoint.com,c2ceff0c-063b-45b3-a9ec-3a7f8e67547f,4aef2b1f-7a54-4f54-be16-167abba63cf2",
+          "name": "testsite",
+          "webUrl": "https://contoso.sharepoint.com/sites/testsite",
+          "displayName": "testsite"
         });
       }
 
