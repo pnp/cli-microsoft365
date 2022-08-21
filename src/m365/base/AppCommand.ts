@@ -85,7 +85,7 @@ export default abstract class AppCommand extends Command {
     }
 
     if (this.m365rcJson.apps.length > 1) {
-      Cli.prompt({
+      const result = await Cli.prompt<{ appIdIndex: number }>({
         message: `Multiple Azure AD apps found in ${m365rcJsonPath}. Which app would you like to use?`,
         type: 'list',
         choices: this.m365rcJson.apps.map((app, i) => {
@@ -96,10 +96,10 @@ export default abstract class AppCommand extends Command {
         }),
         default: 0,
         name: 'appIdIndex'
-      }, (result: { appIdIndex: number }): void => {
-        this.appId = ((this.m365rcJson as M365RcJson).apps as M365RcJsonApp[])[result.appIdIndex].appId;
-        super.action(logger, args);
       });
+
+      this.appId = ((this.m365rcJson as M365RcJson).apps as M365RcJsonApp[])[result.appIdIndex].appId;
+      await super.action(logger, args);
     }
   }
 }

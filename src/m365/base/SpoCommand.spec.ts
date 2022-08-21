@@ -30,7 +30,7 @@ class MockCommand extends SpoCommand {
     );
   }
 
-  public commandAction(): void {
+  public async commandAction(): Promise<void> {
   }
 
   public validateUnknownCsomOptionsPublic(options: any, csomObject: string, csomPropertyType: 'get' | 'set'): string | boolean {
@@ -84,7 +84,7 @@ describe('SpoCommand', () => {
     auth.service.connected = false;
   });
 
-  it('correctly reports an error while restoring auth info', (done) => {
+  it('correctly reports an error while restoring auth info', async () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
 
@@ -94,21 +94,10 @@ describe('SpoCommand', () => {
       logToStderr: () => { }
     };
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(auth.restoreAuth);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
-  it('doesn\'t execute command when error occurred while restoring auth info', (done) => {
+  it('doesn\'t execute command when error occurred while restoring auth info', async () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
     const logger: Logger = {
@@ -117,18 +106,8 @@ describe('SpoCommand', () => {
       logToStderr: () => { }
     };
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(commandCommandActionSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(auth.restoreAuth);
-      }
-    });
+    await command.action(logger, { options: {} });
+    assert(commandCommandActionSpy.notCalled);
   });
 
   it('passes validation of unknown properties when no unknown properties are set', async () => {
@@ -203,106 +182,59 @@ describe('SpoCommand', () => {
     assert.deepStrictEqual(actual, expected);
   });
 
-  it('resolves server-relative URLs in known options to absolute when SPO URL available', (done) => {
+  it('resolves server-relative URLs in known options to absolute when SPO URL available', async () => {
     const command = new MockCommand();
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     const options = {
       url: '/'
     };
-    command
-      .processOptions(options)
-      .then(() => {
-        try {
-          assert.strictEqual(options.url, 'https://contoso.sharepoint.com/');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+    await command.processOptions(options);
+    assert.strictEqual(options.url, 'https://contoso.sharepoint.com/');
   });
 
-  it('leaves absolute URLs as-is', (done) => {
+  it('leaves absolute URLs as-is', async () => {
     const command = new MockCommand();
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     const options = {
       url: 'https://contoso.sharepoint.com/sites/contoso'
     };
-    command
-      .processOptions(options)
-      .then(() => {
-        try {
-          assert.strictEqual(options.url, 'https://contoso.sharepoint.com/sites/contoso');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+    await command.processOptions(options);
+    assert.strictEqual(options.url, 'https://contoso.sharepoint.com/sites/contoso');
   });
 
-  it('leaves site-relative URLs as-is', (done) => {
+  it('leaves site-relative URLs as-is', async () => {
     const command = new MockCommand();
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     const options = {
       url: 'sites/contoso'
     };
-    command
-      .processOptions(options)
-      .then(() => {
-        try {
-          assert.strictEqual(options.url, 'sites/contoso');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+    await command.processOptions(options);
+    assert.strictEqual(options.url, 'sites/contoso');
   });
 
-  it('leaves server-relative URLs as-is in unknown options', (done) => {
+  it('leaves server-relative URLs as-is in unknown options', async () => {
     const command = new MockCommand();
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     const options = {
       nonProcessedUrl: '/'
     };
-    command
-      .processOptions(options)
-      .then(() => {
-        try {
-          assert.strictEqual(options.nonProcessedUrl, '/');
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
+    await command.processOptions(options);
+    assert.strictEqual(options.nonProcessedUrl, '/');
   });
 
-  it('throws error when server-relative URL specified but SPO URL not available', (done) => {
+  it('throws error when server-relative URL specified but SPO URL not available', async () => {
     const command = new MockCommand();
     const options = {
       url: '/'
     };
-    command
-      .processOptions(options)
-      .then(_ => {
-        done('Options resolved while error expected');
-      }, _ => done());
+    await assert.rejects(command.processOptions(options));
   });
 
-  it('Shows an error when CLI is connected with authType "Secret"', (done) => {
+  it('Shows an error when CLI is connected with authType "Secret"', async () => {
     sinon.stub(auth.service, 'authType').value(5);
 
     const mock = new MockCommand();
-    mock.action(logger, { options: {} }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('SharePoint does not support authentication using client ID and secret. Please use a different login type to use SharePoint commands.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(mock.action(logger, { options: {} }),
+      new CommandError('SharePoint does not support authentication using client ID and secret. Please use a different login type to use SharePoint commands.'));
   });
 });
