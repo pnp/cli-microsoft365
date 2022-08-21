@@ -54,27 +54,13 @@ describe(commands.COMPLETION_PWSH_UPDATE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('builds command completion', (done) => {
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(generateShCompletionStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('builds command completion', async () => {
+    await command.action(logger, { options: { debug: false } });
+    assert(generateShCompletionStub.called);
   });
 
-  it('build command completion (debug)', (done) => {
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('build command completion (debug)', async () => {
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogToStderrSpy.called);
   });
 });

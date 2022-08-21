@@ -59,7 +59,7 @@ class CliIssueCommand extends AnonymousCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let issueLink: string = '';
 
     switch (encodeURIComponent(args.options.type)) {
@@ -74,10 +74,8 @@ class CliIssueCommand extends AnonymousCommand {
         break;
     }
 
-    this.openBrowser(issueLink).then((): void => {
-      logger.log(issueLink);
-      cb();
-    });
+    await this.openBrowser(issueLink);
+    logger.log(issueLink);
   }
 
   private async openBrowser(issueLink: string): Promise<ChildProcess> {

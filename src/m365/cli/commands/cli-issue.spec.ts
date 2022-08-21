@@ -76,55 +76,34 @@ describe(commands.ISSUE, () => {
     assert.strictEqual(actual, `${type} is not a valid Issue type. Allowed values are bug, command, sample`);
   });
 
-  it('Opens URL for a command (debug)', (done) => {
-    command.action(logger, {
+  it('Opens URL for a command (debug)', async () => {
+    await command.action(logger, {
       options: {
         debug: true,
         type: 'command'
       }
-    } as any, () => {
-      try {
-        openBrowserSpy.calledWith("https://aka.ms/cli-m365/new-command");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    openBrowserSpy.calledWith("https://aka.ms/cli-m365/new-command");
   });
 
-  it('Opens URL for a bug (debug)', (done) => {
-    command.action(logger, {
+  it('Opens URL for a bug (debug)', async () => {
+    await command.action(logger, {
       options: {
         debug: true,
         type: 'bug'
       }
-    } as any, () => {
-      try {
-        openBrowserSpy.calledWith("https://aka.ms/cli-m365/bug");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    openBrowserSpy.calledWith("https://aka.ms/cli-m365/bug");
   });
 
-  it('Opens URL for a sample (debug)', (done) => {
-    command.action(logger, {
+  it('Opens URL for a sample (debug)', async () => {
+    await command.action(logger, {
       options: {
         debug: true,
         type: 'sample'
       }
-    } as any, () => {
-      try {
-        openBrowserSpy.calledWith("https://aka.ms/cli-m365/new-sample-script");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    openBrowserSpy.calledWith("https://aka.ms/cli-m365/new-sample-script");
   });
 
   it('supports debug mode', () => {

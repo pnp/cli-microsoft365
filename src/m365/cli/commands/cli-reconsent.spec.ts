@@ -60,61 +60,34 @@ describe(commands.RECONSENT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('shows message with url (not using autoOpenLinksInBrowser)', (done) => {
-    command.action(logger, { options: { debug: false } }, (err) => {
-      try {
-        assert(loggerLogSpy.calledWith(`To re-consent the PnP Microsoft 365 Management Shell Azure AD application navigate in your web browser to https://login.microsoftonline.com/common/oauth2/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&prompt=admin_consent`));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('shows message with url (not using autoOpenLinksInBrowser)', async () => {
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(`To re-consent the PnP Microsoft 365 Management Shell Azure AD application navigate in your web browser to https://login.microsoftonline.com/common/oauth2/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&prompt=admin_consent`));
   });
 
-  it('shows message with url (using autoOpenLinksInBrowser)', (done) => {
+  it('shows message with url (using autoOpenLinksInBrowser)', async () => {
     getSettingWithDefaultValueStub.restore();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false
       }
-    }, (err?: any) => {
-      try {
-        assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://login.microsoftonline.com/common/oauth2/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&prompt=admin_consent`));
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://login.microsoftonline.com/common/oauth2/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&prompt=admin_consent`));
   });
 
-  it('throws error when open in browser fails', (done) => {
+  it('throws error when open in browser fails', async () => {
     openStub.restore();
     openStub = sinon.stub(command as any, '_open').callsFake(() => Promise.reject("An error occurred"));
     getSettingWithDefaultValueStub.restore();
     getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => true));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false
       }
-    }, (err?: any) => {
-      try {
-        assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://login.microsoftonline.com/common/oauth2/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&prompt=admin_consent`));
-        assert.strictEqual(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError("An error occurred"))
-        );
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError("An error occurred"));
+    assert(loggerLogSpy.calledWith(`Opening the following page in your browser: https://login.microsoftonline.com/common/oauth2/authorize?client_id=31359c7f-bd7e-475c-86db-fdb8c937548e&response_type=code&prompt=admin_consent`));
   });
 });

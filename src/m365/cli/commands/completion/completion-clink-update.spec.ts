@@ -52,15 +52,8 @@ describe(commands.COMPLETION_CLINK_UPDATE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('builds command completion', (done) => {
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(generateClinkCompletionStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('builds command completion', async () => {
+    await command.action(logger, { options: { debug: false } });
+    assert(generateClinkCompletionStub.called);
   });
 });

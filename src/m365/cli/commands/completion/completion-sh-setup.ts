@@ -1,12 +1,7 @@
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli';
-import GlobalOptions from '../../../../GlobalOptions';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import commands from '../../commands';
-
-interface CommandArgs {
-  options: GlobalOptions;
-}
 
 class CliCompletionShSetupCommand extends AnonymousCommand {
   public get name(): string {
@@ -17,7 +12,7 @@ class CliCompletionShSetupCommand extends AnonymousCommand {
     return 'Sets up command completion for Zsh, Bash and Fish';
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger): Promise<void> {
     if (this.debug) {
       logger.logToStderr('Generating command completion...');
     }
@@ -31,8 +26,6 @@ class CliCompletionShSetupCommand extends AnonymousCommand {
     autocomplete.setupShCompletion();
 
     logger.log('Command completion successfully registered. Restart your shell to load the completion');
-
-    cb();
   }
 }
 
