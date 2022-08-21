@@ -53,7 +53,6 @@
         "@types/sinon": "^10.0.12",
         "@types/update-notifier": "^5.1.0",
         "@types/uuid": "^8.3.4",
-        "@types/xml2js": "^0.4.11",
         "@typescript-eslint/eslint-plugin": "^5.30.5",
         "@typescript-eslint/parser": "^5.30.5",
         "c8": "^7.11.3",
@@ -620,15 +619,6 @@
       "resolved": "https://registry.npmjs.org/@types/uuid/-/uuid-8.3.4.tgz",
       "integrity": "sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==",
       "dev": true
-    },
-    "node_modules/@types/xml2js": {
-      "version": "0.4.11",
-      "resolved": "https://registry.npmjs.org/@types/xml2js/-/xml2js-0.4.11.tgz",
-      "integrity": "sha512-JdigeAKmCyoJUiQljjr7tQG3if9NkqGUgwEUqBvV0N7LM4HyQk7UXCnusRa1lnvXAEYJ8mw8GtZWioagNztOwA==",
-      "dev": true,
-      "dependencies": {
-        "@types/node": "*"
-      }
     },
     "node_modules/@types/xmldom": {
       "version": "0.1.31",
@@ -6156,15 +6146,6 @@
       "resolved": "https://registry.npmjs.org/@types/uuid/-/uuid-8.3.4.tgz",
       "integrity": "sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==",
       "dev": true
-    },
-    "@types/xml2js": {
-      "version": "0.4.11",
-      "resolved": "https://registry.npmjs.org/@types/xml2js/-/xml2js-0.4.11.tgz",
-      "integrity": "sha512-JdigeAKmCyoJUiQljjr7tQG3if9NkqGUgwEUqBvV0N7LM4HyQk7UXCnusRa1lnvXAEYJ8mw8GtZWioagNztOwA==",
-      "dev": true,
-      "requires": {
-        "@types/node": "*"
-      }
     },
     "@types/xmldom": {
       "version": "0.1.31",

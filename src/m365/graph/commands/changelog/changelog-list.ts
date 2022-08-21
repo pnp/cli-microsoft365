@@ -103,7 +103,7 @@ class GraphChangelogListCommand extends AnonymousCommand {
           return 'The endDate is not a valid ISO date string';
         }
 
-	      return true;
+        return true;
       }
     );
   }
@@ -164,8 +164,6 @@ class GraphChangelogListCommand extends AnonymousCommand {
 
     // Make sure everything is unique based on the item guid
     items = [...new Map(items.map((item) => [item.guid, item])).values()];
-
-    // Order items by date desc
     changelog.items = items.sort((itemA, itemB) => Number(itemB.pubDate) - Number(itemA.pubDate));
 
     return changelog;
