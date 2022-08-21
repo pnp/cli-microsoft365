@@ -127,6 +127,7 @@ export default {
   LISTITEM_RECORD_DECLARE: `${prefix} listitem record declare`,
   LISTITEM_RECORD_UNDECLARE: `${prefix} listitem record undeclare`,
   LISTITEM_REMOVE: `${prefix} listitem remove`,
+  LISTITEM_ROLEASSIGNMENT_REMOVE: `${prefix} listitem roleassignment remove`,
   LISTITEM_ROLEINHERITANCE_BREAK: `${prefix} listitem roleinheritance break`,
   LISTITEM_ROLEINHERITANCE_RESET: `${prefix} listitem roleinheritance reset`,
   LISTITEM_SET: `${prefix} listitem set`,
