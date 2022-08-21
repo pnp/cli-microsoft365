@@ -6,9 +6,6 @@ import * as url from 'url';
 import { v4 } from 'uuid';
 import auth, { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import {
-  CommandError
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -73,7 +70,7 @@ class FileConvertPdfCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (error?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let sourceFileUrl: string = '';
     // path to the local file that contains the PDF-converted source file
     let localTargetFilePath: string = args.options.targetFile;
@@ -83,7 +80,7 @@ class FileConvertPdfCommand extends GraphCommand {
 
     const isAppOnlyAuth: boolean | undefined = Auth.isAppOnlyAuth(auth.service.accessTokens[auth.defaultResource].accessToken);
     if (typeof isAppOnlyAuth === 'undefined') {
-      return cb(new CommandError('Unable to determine authentication type'));
+      throw 'Unable to determine authentication type';
     }
 
     if (args.options.sourceFile.toLowerCase().startsWith('https://')) {
@@ -99,49 +96,49 @@ class FileConvertPdfCommand extends GraphCommand {
       }
     }
 
-    this
-      .getSourceFileUrl(logger, args, isAppOnlyAuth)
-      .then((_sourceFileUrl: string): Promise<string> => {
-        sourceFileUrl = _sourceFileUrl;
-        return this.getGraphFileUrl(logger, sourceFileUrl, this.sourceFileGraphUrl);
-      })
-      .then((graphFileUrl: string): Promise<any> => this.convertFile(logger, graphFileUrl))
-      .then(fileResponse => this.writeFileToDisk(logger, fileResponse, localTargetFilePath))
-      .then(_ => this.uploadConvertedFileIfNecessary(logger, targetIsLocalFile, localTargetFilePath, args.options.targetFile))
-      .then(_ => this.deleteRemoteSourceFileIfNecessary(logger, sourceIsLocalFile, sourceFileUrl),
+    try {
+      try {
+        sourceFileUrl = await this.getSourceFileUrl(logger, args, isAppOnlyAuth);
+        const graphFileUrl = await this.getGraphFileUrl(logger, sourceFileUrl, this.sourceFileGraphUrl);
+        const fileResponse = await this.convertFile(logger, graphFileUrl);
+        await this.writeFileToDisk(logger, fileResponse, localTargetFilePath);
+        await this.uploadConvertedFileIfNecessary(logger, targetIsLocalFile, localTargetFilePath, args.options.targetFile);
+      }
+      catch (err: any) {
         // catch the error from any of the previous promises so that we can
         // clean up resources in case something went wrong
         // if this.deleteRemoteSourceFileIfNecessary fails, it won't be caught
         // here, but rather at the end
-        err => error = err
-      )
-      .then(_ => {
-        // if the target was a remote file, delete the local temp file
-        if (!targetIsLocalFile) {
-          if (this.verbose) {
-            logger.logToStderr(`Deleting the temporary PDF file at ${localTargetFilePath}...`);
-          }
+        error = err;
+      }
 
-          try {
-            fs.unlinkSync(localTargetFilePath);
-          }
-          catch (e) {
-            return cb(e);
-          }
-        }
-        else {
-          if (this.debug) {
-            logger.logToStderr(`Target is a local path. Not deleting`);
-          }
+      await this.deleteRemoteSourceFileIfNecessary(logger, sourceIsLocalFile, sourceFileUrl);
+      // if the target was a remote file, delete the local temp file
+      if (!targetIsLocalFile) {
+        if (this.verbose) {
+          logger.logToStderr(`Deleting the temporary PDF file at ${localTargetFilePath}...`);
         }
 
-        if (error) {
-          this.handleRejectedODataJsonPromise(error, logger, cb);
+        try {
+          fs.unlinkSync(localTargetFilePath);
         }
-        else {
-          cb();
+        catch (e) {
+          throw e;
         }
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      }
+      else {
+        if (this.debug) {
+          logger.logToStderr(`Target is a local path. Not deleting`);
+        }
+      }
+
+      if (error) {
+        this.handleRejectedODataJsonPromise(error);
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   /**

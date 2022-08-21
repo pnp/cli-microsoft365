@@ -62,7 +62,7 @@ class FileListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (error?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let webUrl: string = args.options.webUrl;
     if (!webUrl.endsWith('/')) {
       webUrl += '/';
@@ -70,34 +70,29 @@ class FileListCommand extends GraphCommand {
     const folderUrl: URL = new URL(args.options.folderUrl, webUrl);
     let driveId: string = '';
 
-    this
-      .getSiteId(args.options.webUrl, logger)
-      .then((siteId: string): Promise<Drive> => this.getDocumentLibrary(siteId, folderUrl, args.options.folderUrl, logger))
-      .then((drive: Drive): Promise<string> => {
-        driveId = drive.id as string;
-        return this.getStartingFolderId(drive, folderUrl, logger);
-      })
-      .then((folderId: string) => {
-        if (this.verbose) {
-          logger.logToStderr(`Loading folders to get files from...`);
-        }
+    try {
+      const siteId = await this.getSiteId(args.options.webUrl, logger);
+      const drive = await this.getDocumentLibrary(siteId, folderUrl, args.options.folderUrl, logger);
+      driveId = drive.id as string;
 
-        // add the starting folder to the list of folders to get files from
-        this.foldersToGetFilesFrom.push(folderId);
+      const folderId = await this.getStartingFolderId(drive, folderUrl, logger);
+      if (this.verbose) {
+        logger.logToStderr(`Loading folders to get files from...`);
+      }
 
-        return this.loadFoldersToGetFilesFrom(folderId, driveId, args.options.recursive);
-      })
-      .then(_ => {
-        if (this.debug) {
-          logger.logToStderr(`Folders to get files from: ${this.foldersToGetFilesFrom.join(', ')}`);
-        }
+      // add the starting folder to the list of folders to get files from
+      this.foldersToGetFilesFrom.push(folderId);
+      await this.loadFoldersToGetFilesFrom(folderId, driveId, args.options.recursive);
+      if (this.debug) {
+        logger.logToStderr(`Folders to get files from: ${this.foldersToGetFilesFrom.join(', ')}`);
+      }
 
-        return this.loadFilesFromFolders(driveId, this.foldersToGetFilesFrom, logger);
-      })
-      .then(files => {
-        logger.log(files);
-        cb();
-      }, err => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const files = await this.loadFilesFromFolders(driveId, this.foldersToGetFilesFrom, logger);
+      logger.log(files);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getSiteId(webUrl: string, logger: Logger): Promise<string> {
