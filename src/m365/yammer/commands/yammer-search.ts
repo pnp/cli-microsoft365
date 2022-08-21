@@ -249,7 +249,7 @@ class YammerSearchCommand extends YammerCommand {
     });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.summary = {
       messages: 0,
       groups: 0,
@@ -260,84 +260,86 @@ class YammerSearchCommand extends YammerCommand {
     this.groups = [];
     this.topics = [];
     this.users = [];
-
-    this
-      .getAllItems(logger, args, 1)
-      .then((): void => {
-        if (args.options.output === 'json') {
-          logger.log(
-            {
-              summary: this.summary,
-              messages: this.messages,
-              users: this.users,
-              topics: this.topics,
-              groups: this.groups
-            });
+    
+    try {
+      await this.getAllItems(logger, args, 1);
+  
+      if (args.options.output === 'json') {
+        logger.log(
+          {
+            summary: this.summary,
+            messages: this.messages,
+            users: this.users,
+            topics: this.topics,
+            groups: this.groups
+          });
+      }
+      else {
+        const show = args.options.show?.toLowerCase();
+  
+        if (show === "summary") {
+          logger.log(this.summary);
         }
         else {
-          const show = args.options.show?.toLowerCase();
-
-          if (show === "summary") {
-            logger.log(this.summary);
+          let results: YammerConsolidatedResponse[] = [];
+          if (show === undefined || show === "messages") {
+            results = [...results, ...this.messages.map((msg) => {
+              let trimmedMessage = msg.content_excerpt;
+              trimmedMessage = trimmedMessage?.length >= 80 ? (trimmedMessage.substring(0, 80) + "...") : trimmedMessage;
+              trimmedMessage = trimmedMessage?.replace(/\n/g, " ");
+              return <YammerConsolidatedResponse>
+                {
+                  id: msg.id,
+                  description: trimmedMessage,
+                  type: "message",
+                  web_url: msg.web_url
+                };
+            })];
           }
-          else {
-            let results: YammerConsolidatedResponse[] = [];
-            if (show === undefined || show === "messages") {
-              results = [...results, ...this.messages.map((msg) => {
-                let trimmedMessage = msg.content_excerpt;
-                trimmedMessage = trimmedMessage?.length >= 80 ? (trimmedMessage.substring(0, 80) + "...") : trimmedMessage;
-                trimmedMessage = trimmedMessage?.replace(/\n/g, " ");
-                return <YammerConsolidatedResponse>
-                  {
-                    id: msg.id,
-                    description: trimmedMessage,
-                    type: "message",
-                    web_url: msg.web_url
-                  };
-              })];
-            }
-
-            if (show === undefined || show === "topics") {
-              results = [...results, ...this.topics.map((topic) => {
-                return <YammerConsolidatedResponse>
-                  {
-                    id: topic.id,
-                    description: topic.name,
-                    type: "topic",
-                    web_url: topic.web_url
-                  };
-              })];
-            }
-
-            if (show === undefined || show === "users") {
-              results = [...results, ...this.users.map((user) => {
-                return <YammerConsolidatedResponse>
-                  {
-                    id: user.id,
-                    description: user.name,
-                    type: "user",
-                    web_url: user.web_url
-                  };
-              })];
-            }
-
-            if (show === undefined || show === "groups") {
-              results = [...results, ...this.groups.map((group) => {
-                return <YammerConsolidatedResponse>
-                  {
-                    id: group.id,
-                    description: group.name,
-                    type: "group",
-                    web_url: group.web_url
-                  };
-              })];
-            }
-
-            logger.log(results);
+  
+          if (show === undefined || show === "topics") {
+            results = [...results, ...this.topics.map((topic) => {
+              return <YammerConsolidatedResponse>
+                {
+                  id: topic.id,
+                  description: topic.name,
+                  type: "topic",
+                  web_url: topic.web_url
+                };
+            })];
           }
+  
+          if (show === undefined || show === "users") {
+            results = [...results, ...this.users.map((user) => {
+              return <YammerConsolidatedResponse>
+                {
+                  id: user.id,
+                  description: user.name,
+                  type: "user",
+                  web_url: user.web_url
+                };
+            })];
+          }
+  
+          if (show === undefined || show === "groups") {
+            results = [...results, ...this.groups.map((group) => {
+              return <YammerConsolidatedResponse>
+                {
+                  id: group.id,
+                  description: group.name,
+                  type: "group",
+                  web_url: group.web_url
+                };
+            })];
+          }
+  
+          logger.log(results);
         }
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 
