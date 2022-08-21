@@ -4,8 +4,8 @@
 
 **Bookings:**
 
-- [booking business get](../cmd/spo/list/list-roleassignment-add.md) - adds 'booking business get' command [#3534](https://github.com/pnp/cli-microsoft365/issues/3534)
-- [booking business list]('../cmd/booking/business/business-get.md') - adds 'booking business list' command [#3532](https://github.com/pnp/cli-microsoft365/issues/3532)
+- [booking business get](../cmd/booking/business/business-get.md) - adds 'booking business get' command [#3534](https://github.com/pnp/cli-microsoft365/issues/3534)
+- [booking business list]('../cmd/booking/business/business-list.md') - adds 'booking business list' command [#3532](https://github.com/pnp/cli-microsoft365/issues/3532)
 
 **SharePoint:**
 
