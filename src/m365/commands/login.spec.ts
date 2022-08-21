@@ -66,137 +66,74 @@ describe(commands.LOGIN, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('logs in to Microsoft 365', (done) => {
+  it('logs in to Microsoft 365', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(auth.service.connected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(auth.service.connected);
   });
 
-  it('logs in to Microsoft 365 (debug)', (done) => {
+  it('logs in to Microsoft 365 (debug)', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(auth.service.connected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(auth.service.connected);
   });
 
-  it('logs in to Microsoft 365 using username and password when authType password set', (done) => {
+  it('logs in to Microsoft 365 using username and password when authType password set', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
-    command.action(logger, { options: { debug: false, authType: 'password', userName: 'user', password: 'password' } }, () => {
-      try {
-        assert.strictEqual(auth.service.authType, AuthType.Password, 'Incorrect authType set');
-        assert.strictEqual(auth.service.userName, 'user', 'Incorrect user name set');
-        assert.strictEqual(auth.service.password, 'password', 'Incorrect password set');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, authType: 'password', userName: 'user', password: 'password' } });
+    assert.strictEqual(auth.service.authType, AuthType.Password, 'Incorrect authType set');
+    assert.strictEqual(auth.service.userName, 'user', 'Incorrect user name set');
+    assert.strictEqual(auth.service.password, 'password', 'Incorrect password set');
   });
 
-  it('logs in to Microsoft 365 using certificate when authType certificate set and certificateFile is provided', (done) => {
+  it('logs in to Microsoft 365 using certificate when authType certificate set and certificateFile is provided', async () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
 
-    command.action(logger, { options: { debug: false, authType: 'certificate', certificateFile: 'certificate' } }, () => {
-      try {
-        assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
-        assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, authType: 'certificate', certificateFile: 'certificate' } });
+    assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
+    assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
   });
 
-  it('logs in to Microsoft 365 using certificate when authType certificate set with thumbprint', (done) => {
+  it('logs in to Microsoft 365 using certificate when authType certificate set with thumbprint', async () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
 
-    command.action(logger, { options: { debug: false, authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } }, () => {
-      try {
-        assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
-        assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
-        assert.strictEqual(auth.service.thumbprint, 'thumbprint', 'Incorrect thumbprint set');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } });
+    assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
+    assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
+    assert.strictEqual(auth.service.thumbprint, 'thumbprint', 'Incorrect thumbprint set');
   });
 
-  it('logs in to Microsoft 365 using certificate when authType certificate set and certificateBase64Encoded is provided', (done) => {
+  it('logs in to Microsoft 365 using certificate when authType certificate set and certificateBase64Encoded is provided', async () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
 
-    command.action(logger, { options: { debug: false, authType: 'certificate', certificateBase64Encoded: 'certificate', thumbprint: 'thumbprint' } }, () => {
-      try {
-        assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
-        assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
-        assert.strictEqual(auth.service.thumbprint, 'thumbprint', 'Incorrect thumbprint set');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, authType: 'certificate', certificateBase64Encoded: 'certificate', thumbprint: 'thumbprint' } });
+    assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
+    assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
+    assert.strictEqual(auth.service.thumbprint, 'thumbprint', 'Incorrect thumbprint set');
   });
 
-  it('logs in to Microsoft 365 using system managed identity when authType identity set', (done) => {
+  it('logs in to Microsoft 365 using system managed identity when authType identity set', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
 
-    command.action(logger, { options: { debug: false, authType: 'identity', userName:  'ac9fbed5-804c-4362-a369-21a4ec51109e' } }, () => {
-      try {
-        assert.strictEqual(auth.service.authType, AuthType.Identity, 'Incorrect authType set');
-        assert.strictEqual(auth.service.userName, 'ac9fbed5-804c-4362-a369-21a4ec51109e', 'Incorrect userName set');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, authType: 'identity', userName:  'ac9fbed5-804c-4362-a369-21a4ec51109e' } });
+    assert.strictEqual(auth.service.authType, AuthType.Identity, 'Incorrect authType set');
+    assert.strictEqual(auth.service.userName, 'ac9fbed5-804c-4362-a369-21a4ec51109e', 'Incorrect userName set');
   });
 
-  it('logs in to Microsoft 365 using user-assigned managed identity when authType identity set', (done) => {
+  it('logs in to Microsoft 365 using user-assigned managed identity when authType identity set', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
 
-    command.action(logger, { options: { debug: false, authType: 'identity' } }, () => {
-      try {
-        assert.strictEqual(auth.service.authType, AuthType.Identity, 'Incorrect authType set');
-        assert.strictEqual(auth.service.userName, undefined, 'Incorrect userName set');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, authType: 'identity' } });
+    assert.strictEqual(auth.service.authType, AuthType.Identity, 'Incorrect authType set');
+    assert.strictEqual(auth.service.userName, undefined, 'Incorrect userName set');
   });
 
   
-  it('logs in to Microsoft 365 using client secret authType "secret" set', (done) => {
+  it('logs in to Microsoft 365 using client secret authType "secret" set', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
-    command.action(logger, { options: { debug: false, authType: 'secret', secret: 'unBrEakaBle@123' } }, () => {
-      try {
-        assert.strictEqual(auth.service.authType, AuthType.Secret, 'Incorrect authType set');
-        assert.strictEqual(auth.service.secret, 'unBrEakaBle@123', 'Incorrect secret set');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, authType: 'secret', secret: 'unBrEakaBle@123' } });
+    assert.strictEqual(auth.service.authType, AuthType.Secret, 'Incorrect authType set');
+    assert.strictEqual(auth.service.secret, 'unBrEakaBle@123', 'Incorrect secret set');
   });
 
 
@@ -291,106 +228,68 @@ describe(commands.LOGIN, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('correctly handles error in device code auth flow', (done) => {
+  it('correctly handles error in device code auth flow', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error')); });
-    command.action(logger, { options: {} } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('Error'));
   });
 
-  it('correctly handles error in device code auth flow (debug)', (done) => {
+  it('correctly handles error in device code auth flow (debug)', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error')); });
-    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('Error'));
   });
 
-  it('logs in to Microsoft 365 using browser authentication', (done) => {
+  it('logs in to Microsoft 365 using browser authentication', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
 
-    command.action(logger, { options: { debug: false, authType: 'browser' } }, () => {
-      try {
-        assert.strictEqual(auth.service.authType, AuthType.Browser, 'Incorrect authType set');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, authType: 'browser' } });
+    assert.strictEqual(auth.service.authType, AuthType.Browser, 'Incorrect authType set');
   });
 
-  it('correctly handles error when clearing persisted auth information', (done) => {
+  it('correctly handles error when clearing persisted auth information', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
     sinonUtil.restore(auth.clearConnectionInfo);
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    command.action(logger, { options: {} }, () => {
-      try {
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          auth.clearConnectionInfo
-        ]);
-      }
-    });
+    
+    try {
+      await command.action(logger, { options: {} });
+    }
+    finally {
+      sinonUtil.restore([
+        auth.clearConnectionInfo
+      ]);
+    }
   });
 
-  it('correctly handles error when clearing persisted auth information (debug)', (done) => {
+  it('correctly handles error when clearing persisted auth information (debug)', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
     sinonUtil.restore(auth.clearConnectionInfo);
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          auth.clearConnectionInfo
-        ]);
-      }
-    });
+    
+    try {
+      await command.action(logger, { options: { debug: true } });
+    }
+    finally {
+      sinonUtil.restore([
+        auth.clearConnectionInfo
+      ]);
+    }
   });
 
-  it('correctly handles error when restoring auth information', (done) => {
+  it('correctly handles error when restoring auth information', async () => {
     sinonUtil.restore(auth.restoreAuth);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
-    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          auth.clearConnectionInfo
-        ]);
-      }
-    });
+    try {
+      await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('An error has occurred'));
+    }
+    finally {
+      sinonUtil.restore([
+        auth.clearConnectionInfo
+      ]);
+    }
   });
 
   it('fails validation if authType is set to secret and secret option is not specified', async () => {
     const actual = await command.validate({ options: { authType: 'secret' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
-
 });

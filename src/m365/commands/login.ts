@@ -166,7 +166,6 @@ class LoginCommand extends Command {
       try {
         await auth.ensureAccessToken(auth.defaultResource, logger, this.debug);
         auth.service.connected = true;
-
       }
       catch(error: any) {
         if (this.debug) {
