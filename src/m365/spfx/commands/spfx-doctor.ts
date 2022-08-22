@@ -1,9 +1,6 @@
 import * as chalk from 'chalk';
 import * as child_process from 'child_process';
-import { resolve } from 'dns';
-import { string } from 'easy-table';
 import { satisfies } from 'semver';
-import { version } from 'typescript';
 import { Logger } from '../../../cli';
 import { CommandError } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
