@@ -5,7 +5,7 @@
 **Bookings:**
 
 - [booking business get](../cmd/booking/business/business-get.md) - adds 'booking business get' command [#3534](https://github.com/pnp/cli-microsoft365/issues/3534)
-- [booking business list]('../cmd/booking/business/business-list.md') - adds 'booking business list' command [#3532](https://github.com/pnp/cli-microsoft365/issues/3532)
+- [booking business list](../cmd/booking/business/business-list.md) - adds 'booking business list' command [#3532](https://github.com/pnp/cli-microsoft365/issues/3532)
 
 **SharePoint:**
 
@@ -15,7 +15,7 @@
 
 **Search:**
 
-- [search externalConnections remove]('../cmd/search/externalconnection/externalconnection-remove.md') - adds 'search externalConnections remove' command [#3170](https://github.com/pnp/cli-microsoft365/issues/3170)
+- [search externalConnections remove](../cmd/search/externalconnection/externalconnection-remove.md) - adds 'search externalConnections remove' command [#3170](https://github.com/pnp/cli-microsoft365/issues/3170)
 
 ### Changes
 
