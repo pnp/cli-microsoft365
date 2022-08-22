@@ -229,7 +229,7 @@ describe(commands.GROUP_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'name', 'email', 'privacy', 'external', 'moderated']);
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -237,16 +237,8 @@ describe(commands.GROUP_LIST, () => {
         }
       });
     });
-
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation without parameters', async () => {
@@ -280,25 +272,20 @@ describe(commands.GROUP_LIST, () => {
     assert(containsOption);
   });
 
-  it('returns groups without more results', function (done) {
+  it('returns groups without more results', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/groups.json?page=1') {
         return Promise.resolve(groupsSecondBatchList);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: {} } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 4708910);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: {} } as any);
+
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 4708910);
   });
 
-  it('returns all groups', (done) => {
+  it('returns all groups', async () => {
     const first50Groups: any[] = [];
     // create a batch with 50 groups
     for (let index = 0; index < 25; index++) {
@@ -314,33 +301,23 @@ describe(commands.GROUP_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { output: 'json' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 3);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { output: 'json' } } as any);
+
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 3);
   });
 
-  it('returns groups with a specific limit', (done) => {
+  it('returns groups with a specific limit', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve(groupsFirstBatchList);
     });
-    command.action(logger, { options: { limit: 1, output: 'json' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { limit: 1, output: 'json' } } as any);
+
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 1);
   });
 
-  it('handles error in loop', (done) => {
+  it('handles error in loop', async () => {
     let i: number = 0;
     const first50Groups: any[] = [];
     // create a batch with 50 groups
@@ -360,32 +337,20 @@ describe(commands.GROUP_LIST, () => {
         });
       }
     });
-    command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    
+    await assert.rejects(command.action(logger, { options: { output: 'json' } } as any), new CommandError('An error has occurred.'));
   });
 
-  it('handles correct parameters userId', (done) => {
+  it('handles correct parameters userId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/groups/for_user/10123190123128.json?page=1') {
         return Promise.resolve(groupsSecondBatchList);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { userId: 10123190123128, output: 'json' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 4708910);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { userId: 10123190123128, output: 'json' } } as any);
+    
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 4708910);
   });
 });

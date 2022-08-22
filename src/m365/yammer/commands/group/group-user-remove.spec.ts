@@ -61,7 +61,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -70,19 +70,11 @@ describe(commands.GROUP_USER_REMOVE, () => {
       });
     });
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation with parameters', async () => {
@@ -111,7 +103,7 @@ describe(commands.GROUP_USER_REMOVE, () => {
     assert(containsOption);
   });
 
-  it('calls the service if the current user is removed from the group', (done) => {
+  it('calls the service if the current user is removed from the group', async () => {
     const requestDeleteStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/group_memberships.json') {
         return Promise.resolve();
@@ -119,22 +111,16 @@ describe(commands.GROUP_USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, { options: { debug: true, id: 1231231 } }, () => {
-      try {
-        assert(requestDeleteStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: 1231231 } });
+
+    assert(requestDeleteStub.called);
   });
 
-  it('calls the service if the user 989998789 is removed from the group 1231231 with the confirm command', (done) => {
+  it('calls the service if the user 989998789 is removed from the group 1231231 with the confirm command', async () => {
     const requestDeleteStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/group_memberships.json') {
         return Promise.resolve();
@@ -142,18 +128,12 @@ describe(commands.GROUP_USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: 1231231, userId: 989998789, confirm: true } }, () => {
-      try {
-        assert(requestDeleteStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: 1231231, userId: 989998789, confirm: true } });
+
+    assert(requestDeleteStub.called);
   });
 
-  it('calls the service if the user 989998789 is removed from the group 1231231', (done) => {
+  it('calls the service if the user 989998789 is removed from the group 1231231', async () => {
     const requestDeleteStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/group_memberships.json') {
         return Promise.resolve();
@@ -161,48 +141,32 @@ describe(commands.GROUP_USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, { options: { debug: true, id: 1231231, userId: 989998789 } }, () => {
-      try {
-        assert(requestDeleteStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: 1231231, userId: 989998789 } });
+
+    assert(requestDeleteStub.called);
   });
 
-  it('prompts before removal when confirmation argument not passed', (done) => {
-    const promptStub: sinon.SinonStub = sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { debug: false, id: 1231231, userId: 989998789 } }, () => {
-      try {
-        assert(promptStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('prompts before removal when confirmation argument not passed', async () => {
+    const promptStub: sinon.SinonStub = sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    
+    await command.action(logger, { options: { debug: false, id: 1231231, userId: 989998789 } });
+
+    assert(promptStub.called);
   });
 
-  it('aborts execution when prompt not confirmed', (done) => {
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { debug: false, id: 1231231, userId: 989998789 } }, () => {
-      try {
-        assert(requests.length === 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('aborts execution when prompt not confirmed', async () => {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));  
+
+    await command.action(logger, { options: { debug: false, id: 1231231, userId: 989998789 } });
+
+    assert(requests.length === 0);
   });
 }); 
