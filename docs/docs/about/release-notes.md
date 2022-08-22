@@ -30,6 +30,7 @@
 - extended spfx doctor with support for SPFx v1.15.2 [#3558](https://github.com/pnp/cli-microsoft365/issues/3558)
 - fixes booking commands links in release notes
 - fixes release notes links
+- fixes broken links to completion page in docs [#3586](https://github.com/pnp/cli-microsoft365/issues/3586)
 
 ## [v5.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.6.0)
 
