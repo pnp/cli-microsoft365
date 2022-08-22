@@ -270,5 +270,6 @@ export default {
   WEB_REINDEX: `${prefix} web reindex`,
   WEB_REMOVE: `${prefix} web remove`,
   WEB_ROLEINHERITANCE_RESET: `${prefix} web roleinheritance reset`,
-  WEB_SET: `${prefix} web set`
+  WEB_SET: `${prefix} web set`,
+  WEB_ROLEINHERITANCE_BREAK: `${prefix} web roleinheritance break`
 };

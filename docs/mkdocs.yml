@@ -579,6 +579,7 @@ nav:
         - web remove: 'cmd/spo/web/web-remove.md'
         - web roleinheritance reset: 'cmd/spo/web/web-roleinheritance-reset.md'
         - web set: 'cmd/spo/web/web-set.md'
+        - web roleinheritance break: 'cmd/spo/web/web-roleinheritance-break.md'
     - Teams (teams):
       - app:
         - app install: 'cmd/teams/app/app-install.md'
