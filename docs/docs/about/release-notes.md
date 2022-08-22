@@ -29,6 +29,7 @@
 - updates MkDocs, extends docs with tag support and dark mode. [#3416](https://github.com/pnp/cli-microsoft365/issues/3416)
 - extended spfx doctor with support for SPFx v1.15.2 [#3558](https://github.com/pnp/cli-microsoft365/issues/3558)
 - fixes booking commands links in release notes
+- fixes release notes links
 
 ## [v5.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.6.0)
 
