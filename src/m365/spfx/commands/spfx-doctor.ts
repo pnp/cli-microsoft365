@@ -90,7 +90,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^6',
@@ -109,7 +109,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^6',
@@ -128,7 +128,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^6',
@@ -147,7 +147,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^6',
@@ -166,7 +166,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^6 || ^8',
@@ -185,7 +185,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^6 || ^8',
@@ -204,7 +204,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^6 || ^8',
@@ -223,7 +223,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^6 || ^8',
@@ -242,7 +242,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^8',
@@ -261,7 +261,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^8',
@@ -280,7 +280,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^8',
@@ -299,7 +299,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^8',
@@ -318,7 +318,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^8 || ^10',
@@ -337,7 +337,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^8 || ^10',
@@ -356,7 +356,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^10',
@@ -375,7 +375,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^10',
@@ -394,7 +394,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^10',
@@ -413,7 +413,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^12',
@@ -432,7 +432,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^12 || ^14',
@@ -451,7 +451,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^12 || ^14',
@@ -470,7 +470,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^12 || ^14',
@@ -489,7 +489,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^12 || ^14',
@@ -508,7 +508,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^12.13 || ^14.15 || ^16.13',
@@ -527,7 +527,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       },
       gulpCli: {
         range: '^1 || ^2',
-        fix: 'npm i -g gulp-cli'
+        fix: 'npm i -g gulp-cli@2'
       },
       node: {
         range: '^12.13 || ^14.15 || ^16.13',
