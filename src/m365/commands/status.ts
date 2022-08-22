@@ -37,13 +37,9 @@ class StatusCommand extends Command {
             logger.logToStderr(rej);
           }
 
+          logger.log('Your login has expired. Sign in again to continue.');
           auth.service.logout();
-          if (this.verbose) {
-            logger.logToStderr('Logged out from Microsoft 365');
-          }
-          else {
-            logger.log('Logged out');
-          }
+          cb(new CommandError(rej.message));
         });
     }
     else {
