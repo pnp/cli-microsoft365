@@ -165,71 +165,43 @@ describe(commands.EXPORT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('exports the specified flow (debug)', (done) => {
+  it('exports the specified flow (debug)', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    command.action(logger, { options: { debug: true, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(`File saved to path './${actualFilename}'`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } });
+    assert(loggerLogToStderrSpy.calledWith(`File saved to path './${actualFilename}'`));
   });
 
-  it('exports flow to zip does not contain token', (done) => {
+  it('exports flow to zip does not contain token', async () => {
     const getRequestsStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    command.action(logger, { options: { debug: true, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } }, () => {
-      try {
-        assert.strictEqual(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } });
+    assert.strictEqual(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
   });
 
-  it('exports the specified flow with a non zip file returned by the API (debug)', (done) => {
+  it('exports the specified flow with a non zip file returned by the API (debug)', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    command.action(logger, { options: { debug: true, id: `${nonZipFileFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip', verbose: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(`File saved to path './output.zip'`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: `${nonZipFileFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip', verbose: true } });
+    assert(loggerLogToStderrSpy.calledWith(`File saved to path './output.zip'`));
   });
 
-  it('exports the specified flow in json format', (done) => {
+  it('exports the specified flow in json format', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'json' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(`./${flowDisplayName}.json`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'json' } });
+    assert(loggerLogSpy.calledWith(`./${flowDisplayName}.json`));
   });
 
-  it('exports the specified flow in json format with illegal characters', (done) => {
+  it('exports the specified flow in json format with illegal characters', async () => {
     sinon.stub(request, 'get').callsFake((opts: any) => {
       if (opts.url.match(/\/flows\/[^\?]+\?api-version\=2016-11-01/i)) {
         return Promise.resolve(
@@ -247,145 +219,82 @@ describe(commands.EXPORT, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'json' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith('./_Flow __name_ _ with_ Illegal _ characters__.json'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'json' } });
+    assert(loggerLogSpy.calledWith('./_Flow __name_ _ with_ Illegal _ characters__.json'));
   });
 
-  it('exports the specified flow in json format (debug)', (done) => {
+  it('exports the specified flow in json format (debug)', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    command.action(logger, { options: { debug: true, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'json' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(`File saved to path './${flowDisplayName}.json'`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'json' } });
+    assert(loggerLogToStderrSpy.calledWith(`File saved to path './${flowDisplayName}.json'`));
   });
 
-  it('returns ZIP file location when format specified as ZIP', (done) => {
+  it('returns ZIP file location when format specified as ZIP', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(`./${actualFilename}`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } });
+    assert(loggerLogSpy.calledWith(`./${actualFilename}`));
   });
 
-  it('call is made without token when format specified as ZIP', (done) => {
+  it('call is made without token when format specified as ZIP', async () => {
     const getRequestsStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } }, () => {
-      try {
-        assert.strictEqual(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } });
+    assert.strictEqual(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
   });
 
-  it('nothing returned when path parameter is specified', (done) => {
+  it('nothing returned when path parameter is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('call is made without token when ZIP with specified path', (done) => {
+  it('call is made without token when ZIP with specified path', async () => {
     const getRequestsStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } }, () => {
-      try {
-        assert.strictEqual(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } });
+    assert.strictEqual(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
   });
 
-  it('call is made with suggestedCreationType properties when format specified as ZIP', (done) => {
+  it('call is made with suggestedCreationType properties when format specified as ZIP', async () => {
     const resourceIds = ["L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FAZFGGHDDCAAVEX0FQUFJPVkFMUw==", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkAZVVDSSAFBRTM2NVVTRVJTL0NPTk5FQ1RJT05TL1NIQVJFRC1PRkZJQ0UzNjVVU0VSLUExOUI5QjBELTFFQTUtNDhGOS1BQUM4LTgwRjkyQTFGRjE3OB==", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX09GRklDRTM2NVVTRVJT", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX0FQUFJPVkFMUy9DT05ORUNUSU9OUy1AFFFVAGJXAAGHQUk9WQUxTLUQ2Njc1RUE5LUZDM0QtNDA4MS1CNTY4LUFCRDc3MzMyOTMyMZ==", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NFTkRNQUlM", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NFTkRNQUlML0NPTk5FQ1RJT05TL1NIQVJFRC1TRU5ETUFJTC05NEUzODVCQi1CNUE3LTRBODgtOURFRC1FMEVFRDAzNTY1Njk=", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NIQVJFUE9JTlRPTkxJTkU=", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NIQVJFUE9JTlRPTkxJTkUvQ09OTkVDVElPTlMvU0hBUkVELVNIQVJFUE9JTlRPTkwtRjg0NTE4MDktREEwNi00RDQ3LTg3ODYtMTUxMjM4RDUwRTdB"];
     const postRequestsStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } }, () => {
-      try {
-        assert.strictEqual(postRequestsStub.lastCall.args[0].data.resources["L1BST1ZJREVSUy9NSUNST1NPRlQuRkxPVy9GTE9XUy9GMkVCOEIzNy1GNjI0LTRCMjItOTk1NC1CNUQwQ0JCMjhGOEI="].suggestedCreationType, 'Update');
-        resourceIds.forEach((id) => {
-          assert.strictEqual(postRequestsStub.lastCall.args[0].data.resources[id].suggestedCreationType, 'Existing');
-        });
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
+    await command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } });
+    assert.strictEqual(postRequestsStub.lastCall.args[0].data.resources["L1BST1ZJREVSUy9NSUNST1NPRlQuRkxPVy9GTE9XUy9GMkVCOEIzNy1GNjI0LTRCMjItOTk1NC1CNUQwQ0JCMjhGOEI="].suggestedCreationType, 'Update');
+    resourceIds.forEach((id) => {
+      assert.strictEqual(postRequestsStub.lastCall.args[0].data.resources[id].suggestedCreationType, 'Existing');
     });
   });
 
-  it('correctly handles no environment found', (done) => {
+  it('correctly handles no environment found', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    command.action(logger, { options: { debug: false, environment: `Default-${notFoundEnvironmentId}`, id: `${foundFlowId}` } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-${notFoundEnvironmentId}' is denied.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, environment: `Default-${notFoundEnvironmentId}`, id: `${foundFlowId}` } } as any),
+      new CommandError(`Access to the environment 'Default-${notFoundEnvironmentId}' is denied.`));
   });
 
-  it('correctly handles Flow not found', (done) => {
+  it('correctly handles Flow not found', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    command.action(logger, { options: { debug: false, environment: `Default-${foundEnvironmentId}`, id: notFoundFlowId } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The caller with object id '${foundEnvironmentId}' does not have permission for connection '${notFoundFlowId}' under Api 'shared_logicflows'.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, environment: `Default-${foundEnvironmentId}`, id: notFoundFlowId } } as any),
+      new CommandError(`The caller with object id '${foundEnvironmentId}' does not have permission for connection '${notFoundFlowId}' under Api 'shared_logicflows'.`));
   });
 
   it('fails validation if the id is not a GUID', async () => {
