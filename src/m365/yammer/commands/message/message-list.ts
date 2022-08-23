@@ -210,33 +210,35 @@ class YammerMessageListCommand extends YammerCommand {
     });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.items = []; // this will reset the items array in interactive mode
 
-    this
-      .getAllItems(logger, args, -1)
-      .then((): void => {
-        this.items.forEach(m => {
-          let shortBody;
-          const bodyToProcess = m.body.plain;
+    try {
+      await this.getAllItems(logger, args, -1);
 
-          if (bodyToProcess) {
-            let maxLength = 35;
-            let addedDots = "...";
-            if (bodyToProcess.length < maxLength) {
-              maxLength = bodyToProcess.length;
-              addedDots = "";
-            }
+      this.items.forEach(m => {
+        let shortBody;
+        const bodyToProcess = m.body.plain;
 
-            shortBody = bodyToProcess.replace(/\n/g, ' ').substring(0, maxLength) + addedDots;
+        if (bodyToProcess) {
+          let maxLength = 35;
+          let addedDots = "...";
+          if (bodyToProcess.length < maxLength) {
+            maxLength = bodyToProcess.length;
+            addedDots = "";
           }
 
-          m.shortBody = shortBody;
-        });
+          shortBody = bodyToProcess.replace(/\n/g, ' ').substring(0, maxLength) + addedDots;
+        }
 
-        logger.log(this.items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        m.shortBody = shortBody;
+      });
+
+      logger.log(this.items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

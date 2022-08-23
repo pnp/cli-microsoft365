@@ -85,7 +85,7 @@ describe(commands.MESSAGE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'replied_to_id', 'thread_id', 'group_id', 'shortBody']);
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -94,15 +94,7 @@ describe(commands.MESSAGE_LIST, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation without parameters', async () => {
@@ -166,187 +158,117 @@ describe(commands.MESSAGE_LIST, () => {
     assert(containsOption);
   });
 
-  it('returns messages without more results', function (done) {
+  it('returns messages without more results', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages.json') {
         return Promise.resolve(secondMessageBatch);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: {} } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
-  it('returns messages from top feed', function (done) {
+  it('returns messages from top feed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/algo.json') {
         return Promise.resolve(secondMessageBatch);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { feedType: 'Top' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { feedType: 'Top' } } as any,);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
-  it('returns messages from my feed', function (done) {
+  it('returns messages from my feed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/my_feed.json') {
         return Promise.resolve(secondMessageBatch);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { feedType: 'My' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { feedType: 'My' } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
-  it('returns messages from following feed', function (done) {
+  it('returns messages from following feed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/following.json') {
         return Promise.resolve(secondMessageBatch);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { feedType: 'Following' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { feedType: 'Following' } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
-  it('returns messages from sent feed', function (done) {
+  it('returns messages from sent feed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/sent.json') {
         return Promise.resolve(secondMessageBatch);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { feedType: 'Sent' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { feedType: 'Sent' } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
-  it('returns messages from private feed', function (done) {
+  it('returns messages from private feed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/private.json') {
         return Promise.resolve(secondMessageBatch);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { feedType: 'Private' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { feedType: 'Private' } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
-  it('returns messages from received feed', function (done) {
+  it('returns messages from received feed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/received.json') {
         return Promise.resolve(secondMessageBatch);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { feedType: 'Received' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { feedType: 'Received' } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
-  it('returns messages from all feed', function (done) {
+  it('returns messages from all feed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages.json') {
         return Promise.resolve(secondMessageBatch);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { feedType: 'All' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { feedType: 'All' } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
-  it('returns messages from the group feed', function (done) {
+  it('returns messages from the group feed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/in_group/123123.json') {
         return Promise.resolve(secondMessageBatch);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { groupId: 123123 } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { groupId: 123123 } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
-  it('returns messages from thread feed', function (done) {
+  it('returns messages from thread feed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/in_thread/123123.json') {
         return Promise.resolve(secondMessageBatch);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { threadId: 123123 } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { threadId: 123123 } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
-  it('returns all messages', (done) => {
+  it('returns all messages', async () => {
     let i: number = 0;
 
     sinon.stub(request, 'get').callsFake(() => {
@@ -357,18 +279,11 @@ describe(commands.MESSAGE_LIST, () => {
         return Promise.resolve(secondMessageBatch);
       }
     });
-    command.action(logger, { options: { output: 'json' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 7);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { output: 'json' } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 7);
   });
 
-  it('returns message with a specific limit', (done) => {
+  it('returns message with a specific limit', async () => {
     let i: number = 0;
 
     sinon.stub(request, 'get').callsFake(() => {
@@ -379,18 +294,11 @@ describe(commands.MESSAGE_LIST, () => {
         return Promise.resolve(secondMessageBatch);
       }
     });
-    command.action(logger, { options: { limit: 6, output: 'json' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 6);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { limit: 6, output: 'json' } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 6);
   });
 
-  it('handles error in loop', (done) => {
+  it('handles error in loop', async () => {
     let i: number = 0;
 
     sinon.stub(request, 'get').callsFake(() => {
@@ -405,68 +313,40 @@ describe(commands.MESSAGE_LIST, () => {
         });
       }
     });
-    command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    
+    await assert.rejects(command.action(logger, { options: { output: 'json' } } as any), new CommandError('An error has occurred.'));
   });
 
-  it('handles correct parameters older than', (done) => {
+  it('handles correct parameters older than', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages.json?older_than=10123190123128') {
         return Promise.resolve(secondMessageBatch);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { olderThanId: 10123190123128, output: 'json' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { olderThanId: 10123190123128, output: 'json' } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
-  it('handles correct parameters older than and threaded', (done) => {
+  it('handles correct parameters older than and threaded', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages.json?older_than=10123190123128&threaded=true') {
         return Promise.resolve(secondMessageBatch);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { olderThanId: 10123190123128, threaded: true, output: 'json' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { olderThanId: 10123190123128, threaded: true, output: 'json' } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 
-  it('handles correct parameters with threaded', (done) => {
+  it('handles correct parameters with threaded', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages.json?threaded=true') {
         return Promise.resolve(secondMessageBatch);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { threaded: true, output: 'json' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { threaded: true, output: 'json' } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
   });
 });
