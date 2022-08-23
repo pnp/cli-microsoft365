@@ -62,12 +62,12 @@ class PaAppRemoveCommand extends PowerAppsCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Removing Microsoft Power App ${args.options.name}...`);
     }
 
-    const removePaApp: () => void = (): void => {
+    const removePaApp: () => Promise<void> = async (): Promise<void> => {
       const requestOptions: any = {
         url: `${this.resource}/providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2017-08-01`,
         resolveWithFullResponse: true,
@@ -77,35 +77,33 @@ class PaAppRemoveCommand extends PowerAppsCommand {
         responseType: 'json'
       };
 
-      request
-        .delete(requestOptions)
-        .then((): void => cb(), (rawRes: any): void => {
-          if (rawRes.response && rawRes.response.status === 403) {
-            cb(`App '${args.options.name}' does not exist`);
-          }
-          else {
-            this.handleRejectedODataJsonPromise(rawRes, logger, cb);
-          }
-        });
+      try {
+        await request.delete(requestOptions);
+      }
+      catch (err: any) {
+        if (err.response && err.response.status === 403) {
+          throw `App '${args.options.name}' does not exist`;
+        }
+        else {
+          this.handleRejectedODataJsonPromise(err);
+        }
+      }
     };
 
     if (args.options.confirm) {
-      removePaApp();
+      await removePaApp();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the Microsoft Power App ${args.options.name}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removePaApp();
-        }
       });
+
+      if (result.continue) {
+        await removePaApp();
+      }
     }
   }
 }

@@ -79,7 +79,7 @@ class PaConnectorExportCommand extends PowerAppsCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const outputFolder = path.resolve(args.options.outputFolder || '.', args.options.connector);
 
     const requestOptions: any = {
@@ -95,121 +95,120 @@ class PaConnectorExportCommand extends PowerAppsCommand {
     if (this.verbose) {
       logger.logToStderr('Downloading connector...');
     }
-    request
-      .get<Connector>(requestOptions)
-      .then((connectorRes: Connector): Promise<string> => {
-        connector = connectorRes;
 
-        if (!connector.properties) {
-          return Promise.reject('Properties not present in the api registration information.');
+    try {
+      connector = await request.get<Connector>(requestOptions);
+
+      if (!connector.properties) {
+        throw 'Properties not present in the api registration information.';
+      }
+
+      if (this.verbose) {
+        logger.logToStderr(`Creating output folder ${outputFolder}...`);
+      }
+      fs.mkdirSync(outputFolder);
+
+      const settings: any = {
+        apiDefinition: "apiDefinition.swagger.json",
+        apiProperties: "apiProperties.json",
+        connectorId: args.options.connector,
+        environment: args.options.environment,
+        icon: "icon.png",
+        powerAppsApiVersion: "2016-11-01",
+        powerAppsUrl: "https://api.powerapps.com"
+      };
+      if (this.verbose) {
+        logger.logToStderr('Exporting settings...');
+      }
+      fs.writeFileSync(path.join(outputFolder, 'settings.json'), JSON.stringify(settings, null, 2), 'utf8');
+
+      const propertiesWhitelist: string[] = [
+        "connectionParameters",
+        "iconBrandColor",
+        "capabilities",
+        "policyTemplateInstances"
+      ];
+
+      const apiProperties: any = {
+        properties: JSON.parse(JSON.stringify(connector.properties))
+      };
+      Object.keys(apiProperties.properties).forEach(k => {
+        if (propertiesWhitelist.indexOf(k) < 0) {
+          delete apiProperties.properties[k];
         }
+      });
+      if (this.verbose) {
+        logger.logToStderr('Exporting API properties...');
+      }
+      fs.writeFileSync(path.join(outputFolder, 'apiProperties.json'), JSON.stringify(apiProperties, null, 2), 'utf8');
 
+      let swagger = '';
+      if (connector.properties.apiDefinitions &&
+        connector.properties.apiDefinitions.originalSwaggerUrl) {
         if (this.verbose) {
-          logger.logToStderr(`Creating output folder ${outputFolder}...`);
+          logger.logToStderr(`Downloading swagger from ${connector.properties.apiDefinitions.originalSwaggerUrl}...`);
         }
-        fs.mkdirSync(outputFolder);
+        swagger = await request
+          .get({
+            url: connector.properties.apiDefinitions.originalSwaggerUrl,
+            headers: {
+              'x-anonymous': 'true'
+            }
+          });
+      }
+      else {
+        if (this.debug) {
+          logger.logToStderr('originalSwaggerUrl not set. Skipping');
+        }
+      }
 
-        const settings: any = {
-          apiDefinition: "apiDefinition.swagger.json",
-          apiProperties: "apiProperties.json",
-          connectorId: args.options.connector,
-          environment: args.options.environment,
-          icon: "icon.png",
-          powerAppsApiVersion: "2016-11-01",
-          powerAppsUrl: "https://api.powerapps.com"
-        };
+      if (swagger && swagger.length > 0) {
+        if (this.debug) {
+          logger.logToStderr('Downloaded swagger');
+          logger.logToStderr(swagger);
+        }
         if (this.verbose) {
-          logger.logToStderr('Exporting settings...');
+          logger.logToStderr('Exporting swagger...');
         }
-        fs.writeFileSync(path.join(outputFolder, 'settings.json'), JSON.stringify(settings, null, 2), 'utf8');
+        fs.writeFileSync(path.join(outputFolder, 'apiDefinition.swagger.json'), swagger, 'utf8');
+      }
 
-        const propertiesWhitelist: string[] = [
-          "connectionParameters",
-          "iconBrandColor",
-          "capabilities",
-          "policyTemplateInstances"
-        ];
-
-        const apiProperties: any = {
-          properties: JSON.parse(JSON.stringify(connector.properties))
-        };
-        Object.keys(apiProperties.properties).forEach(k => {
-          if (propertiesWhitelist.indexOf(k) < 0) {
-            delete apiProperties.properties[k];
-          }
-        });
+      let icon = '';
+      if (connector.properties.iconUri) {
         if (this.verbose) {
-          logger.logToStderr('Exporting API properties...');
+          logger.logToStderr(`Downloading icon from ${connector.properties.iconUri}...`);
         }
-        fs.writeFileSync(path.join(outputFolder, 'apiProperties.json'), JSON.stringify(apiProperties, null, 2), 'utf8');
+        icon = await request
+          .get({
+            url: connector.properties.iconUri,
+            responseType: 'arraybuffer',
+            headers: {
+              'x-anonymous': 'true'
+            }
+          });
+      }
+      else {
+        if (this.debug) {
+          logger.logToStderr('iconUri not set. Skipping');
+        }
+      }
 
-        if (connector.properties.apiDefinitions &&
-          connector.properties.apiDefinitions.originalSwaggerUrl) {
-          if (this.verbose) {
-            logger.logToStderr(`Downloading swagger from ${connector.properties.apiDefinitions.originalSwaggerUrl}...`);
-          }
-          return request
-            .get({
-              url: connector.properties.apiDefinitions.originalSwaggerUrl,
-              headers: {
-                'x-anonymous': 'true'
-              }
-            });
+      if (icon) {
+        if (this.verbose) {
+          logger.logToStderr('Exporting icon...');
         }
-        else {
-          if (this.debug) {
-            logger.logToStderr('originalSwaggerUrl not set. Skipping');
-          }
-          return Promise.resolve('');
+        const iconBuffer: Buffer = Buffer.from(icon, 'utf8');
+        fs.writeFileSync(path.join(outputFolder, 'icon.png'), iconBuffer);
+      }
+      else {
+        if (this.debug) {
+          logger.logToStderr('No icon retrieved');
         }
-      })
-      .then((swagger: string): Promise<any> => {
-        if (swagger && swagger.length > 0) {
-          if (this.debug) {
-            logger.logToStderr('Downloaded swagger');
-            logger.logToStderr(swagger);
-          }
-          if (this.verbose) {
-            logger.logToStderr('Exporting swagger...');
-          }
-          fs.writeFileSync(path.join(outputFolder, 'apiDefinition.swagger.json'), swagger, 'utf8');
-        }
-
-        if (connector.properties.iconUri) {
-          if (this.verbose) {
-            logger.logToStderr(`Downloading icon from ${connector.properties.iconUri}...`);
-          }
-          return request
-            .get({
-              url: connector.properties.iconUri,
-              responseType: 'arraybuffer',
-              headers: {
-                'x-anonymous': 'true'
-              }
-            });
-        }
-        else {
-          if (this.debug) {
-            logger.logToStderr('iconUri not set. Skipping');
-          }
-          return Promise.resolve();
-        }
-      })
-      .then((icon: any): void => {
-        if (icon) {
-          if (this.verbose) {
-            logger.logToStderr('Exporting icon...');
-          }
-          const iconBuffer: Buffer = Buffer.from(icon, 'utf8');
-          fs.writeFileSync(path.join(outputFolder, 'icon.png'), iconBuffer);
-        }
-        else {
-          if (this.debug) {
-            logger.logToStderr('No icon retrieved');
-          }
-        }
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

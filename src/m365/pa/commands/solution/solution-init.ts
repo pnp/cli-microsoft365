@@ -79,7 +79,7 @@ class PaSolutionInitCommand extends AnonymousCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const solutionInitTemplatePath: string = path.join(__dirname, 'solution-init', 'assets');
       const cdsAssetsTemplatePath: string = path.join(solutionInitTemplatePath, 'Other');
@@ -128,11 +128,9 @@ class PaSolutionInitCommand extends AnonymousCommand {
         logger.log(chalk.green(`CDS solution files were successfully created for this project in the sub-directory 'Other', using solution name '${workingDirectory}', publisher name '${publisherName}', and customization prefix '${publisherPrefix}'.`));
         logger.log(`Please verify the publisher information and solution name found in the '${chalk.grey('Solution.xml')}' file.`);
       }
-
-      cb();
     }
     catch (err: any) {
-      cb(new CommandError(err));
+      throw new CommandError(err);
     }
   }
 
