@@ -176,5 +176,5 @@ m365 aad app add --name 'My AAD app' --save
 Create new Azure AD app registration with a certificate
 
 ```sh
-m365 aad app add --name 'My AAD app' --certificateDisplayName "Some certificate name" --certificateFile c:\temp\some-certificate.cer
+m365 aad app add --name 'My AAD app' --certificateDisplayName "Some certificate name" --certificateFile "c:\temp\some-certificate.cer"
 ```

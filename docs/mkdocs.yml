@@ -97,6 +97,10 @@ nav:
         - user signin list: 'cmd/aad/user/user-signin-list.md'
     - Adaptive Card (adaptivecard):
       - send: 'cmd/adaptivecard/adaptivecard-send.md'
+    - Bookings (booking):
+      - business:
+        - business get: 'cmd/booking/business/business-get.md'
+        - business list: 'cmd/booking/business/business-list.md'
     - CLI (cli):
       - consent: 'cmd/cli/cli-consent.md'
       - doctor: 'cmd/cli/cli-doctor.md'
@@ -258,6 +262,7 @@ nav:
         - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
         - externalconnection get: 'cmd/search/externalconnection/externalconnection-get.md'
         - externalconnection list: 'cmd/search/externalconnection/externalconnection-list.md'
+        - externalconnection remove: 'cmd/search/externalconnection/externalconnection-remove.md'
     - Skype (skype):
       - report:
         - report activitycounts: 'cmd/skype/report/report-activitycounts.md'

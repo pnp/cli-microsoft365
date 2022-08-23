@@ -85,5 +85,5 @@ m365 aad app set --objectId 95cfe30d-ed44-4f9d-b73d-c66560f72e83 --redirectUris 
 Add a certificate to the app
 
 ```sh
-m365 aad app set --certificateDisplayName "Some certificate name" --certificateFile c:\temp\some-certificate.cer
+m365 aad app set --appId e75be2e1-0204-4f95-857d-51a37cf40be8 --certificateDisplayName "Some certificate name" --certificateFile "c:\temp\some-certificate.cer"
 ```
