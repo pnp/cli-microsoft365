@@ -49,6 +49,7 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
     if (this.verbose) {
       logger.logToStderr(`Break role inheritance of subsite at ${args.options.webUrl}...`);
     }
+    logger.log('peter1');
 
     const requestOptions: any = {
       url: `${args.options.webUrl}/_api/web/breakroleinheritance`,
