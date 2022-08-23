@@ -98,36 +98,32 @@ class OutlookMessageMoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let sourceFolder: string;
     let targetFolder: string;
 
-    this
-      .getFolderId(args.options.sourceFolderId, args.options.sourceFolderName)
-      .then((folderId: string): Promise<string> => {
-        sourceFolder = folderId;
+    try {
+      sourceFolder = await this.getFolderId(args.options.sourceFolderId, args.options.sourceFolderName);
+      targetFolder = await this.getFolderId(args.options.targetFolderId, args.options.targetFolderName);
 
-        return this.getFolderId(args.options.targetFolderId, args.options.targetFolderName);
-      })
-      .then((folderId: string): Promise<void> => {
-        targetFolder = folderId;
+      const messageUrl: string = `mailFolders/${sourceFolder}/messages/${args.options.messageId}`;
 
-        const messageUrl: string = `mailFolders/${sourceFolder}/messages/${args.options.messageId}`;
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/me/${messageUrl}/move`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        data: {
+          destinationId: targetFolder
+        },
+        responseType: 'json'
+      };
 
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/me/${messageUrl}/move`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          data: {
-            destinationId: targetFolder
-          },
-          responseType: 'json'
-        };
-
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getFolderId(folderId: string | undefined, folderName: string | undefined): Promise<string> {
