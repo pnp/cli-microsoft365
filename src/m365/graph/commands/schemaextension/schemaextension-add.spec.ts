@@ -61,7 +61,7 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds schema extension', (done) => {
+  it('adds schema extension', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/schemaExtensions`) {
         return Promise.resolve({
@@ -88,7 +88,7 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -97,36 +97,29 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
       }
-    }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
-          "id": "ext6kguklm2_TestSchemaExtension",
-          "description": "Test Description",
-          "targetTypes": [
-            "Group"
-          ],
-          "status": "InDevelopment",
-          "owner": "b07a45b3-f7b7-489b-9269-da6f3f93dff0",
-          "properties": [
-            {
-              "name": "MyInt",
-              "type": "Integer"
-            },
-            {
-              "name": "MyString",
-              "type": "String"
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
+      "id": "ext6kguklm2_TestSchemaExtension",
+      "description": "Test Description",
+      "targetTypes": [
+        "Group"
+      ],
+      "status": "InDevelopment",
+      "owner": "b07a45b3-f7b7-489b-9269-da6f3f93dff0",
+      "properties": [
+        {
+          "name": "MyInt",
+          "type": "Integer"
+        },
+        {
+          "name": "MyString",
+          "type": "String"
+        }
+      ]
+    }));
   });
 
-  it('adds schema extension (debug)', (done) => {
+  it('adds schema extension (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/schemaExtensions`) {
         return Promise.resolve({
@@ -154,7 +147,7 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         id: 'TestSchemaExtension',
@@ -163,42 +156,35 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
-          "id": "ext6kguklm2_TestSchemaExtension",
-          "description": "Test Description",
-          "targetTypes": [
-            "Group"
-          ],
-          "status": "InDevelopment",
-          "owner": "b07a45b3-f7b7-489b-9269-da6f3f93dff0",
-          "properties": [
-            {
-              "name": "MyInt",
-              "type": "Integer"
-            },
-            {
-              "name": "MyString",
-              "type": "String"
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
+      "id": "ext6kguklm2_TestSchemaExtension",
+      "description": "Test Description",
+      "targetTypes": [
+        "Group"
+      ],
+      "status": "InDevelopment",
+      "owner": "b07a45b3-f7b7-489b-9269-da6f3f93dff0",
+      "properties": [
+        {
+          "name": "MyInt",
+          "type": "Integer"
+        },
+        {
+          "name": "MyString",
+          "type": "String"
+        }
+      ]
+    }));
   });
 
-  it('handles error correctly', (done) => {
+  it('handles error correctly', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -207,15 +193,7 @@ describe(commands.SCHEMAEXTENSION_ADD, () => {
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if the owner is not a valid GUID', async () => {

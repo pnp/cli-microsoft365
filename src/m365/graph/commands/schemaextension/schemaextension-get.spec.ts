@@ -59,7 +59,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
-  it('gets schema extension', (done) => {
+  it('gets schema extension', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
         return Promise.resolve({
@@ -86,44 +86,39 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: 'adatumisv_exo2'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
-          "id": "adatumisv_exo2",
-          "description": "sample description",
-          "targetTypes": [
-            "Message"
-          ],
-          "status": "Available",
-          "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
-          "properties": [
-            {
-              "name": "p1",
-              "type": "String"
-            },
-            {
-              "name": "p2",
-              "type": "String"
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
     });
+    try {
+      assert(loggerLogSpy.calledWith({
+        "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
+        "id": "adatumisv_exo2",
+        "description": "sample description",
+        "targetTypes": [
+          "Message"
+        ],
+        "status": "Available",
+        "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
+        "properties": [
+          {
+            "name": "p1",
+            "type": "String"
+          },
+          {
+            "name": "p2",
+            "type": "String"
+          }
+        ]
+      })); 
+    }
+    finally {
+      sinonUtil.restore(request.get);
+    }
   });
-  it('gets schema extension(debug)', (done) => {
+  it('gets schema extension(debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
         return Promise.resolve({
@@ -150,41 +145,34 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         id: 'adatumisv_exo2'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
-          "id": "adatumisv_exo2",
-          "description": "sample description",
-          "targetTypes": [
-            "Message"
-          ],
-          "status": "Available",
-          "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
-          "properties": [
-            {
-              "name": "p1",
-              "type": "String"
-            },
-            {
-              "name": "p2",
-              "type": "String"
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
+      "id": "adatumisv_exo2",
+      "description": "sample description",
+      "targetTypes": [
+        "Message"
+      ],
+      "status": "Available",
+      "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
+      "properties": [
+        {
+          "name": "p1",
+          "type": "String"
+        },
+        {
+          "name": "p2",
+          "type": "String"
+        }
+      ]
+    }));
   });
-  it('handles error', (done) => {
+  it('handles error', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
         return Promise.reject('An error has occurred');
@@ -192,20 +180,12 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         id: 'adatumisv_exo2'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {
