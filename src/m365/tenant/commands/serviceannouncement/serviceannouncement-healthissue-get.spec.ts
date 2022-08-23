@@ -103,7 +103,7 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('handles promise error while getting a specified service health issue for tenant', (done) => {
+  it('handles promise error while getting a specified service health issue for tenant', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/admin/serviceAnnouncement/issues/') > -1) {
         return Promise.reject('An error has occurred');
@@ -111,18 +111,10 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { id: 'invalid' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 'invalid' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('gets the specified service health issue for tenant', (done) => {
+  it('gets the specified service health issue for tenant', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/admin/serviceAnnouncement/issues/') > -1) {
         return Promise.resolve(jsonOutput);
@@ -130,20 +122,13 @@ describe(commands.SERVICEANNOUNCEMENT_HEALTHISSUE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         id: 'CR275975',
         debug: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(jsonOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(jsonOutput));
   });
 
   it('supports debug mode', () => {

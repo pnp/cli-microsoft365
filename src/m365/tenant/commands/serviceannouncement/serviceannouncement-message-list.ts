@@ -49,19 +49,20 @@ class TenantServiceAnnouncementMessageListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let endpoint: string = `${this.resource}/v1.0/admin/serviceAnnouncement/messages`;
 
     if (args.options.service) {
       endpoint += `?$filter=services/any(c:c+eq+'${encodeURIComponent(args.options.service)}')`;
     }
 
-    odata
-      .getAllItems<ServiceUpdateMessage>(endpoint)
-      .then((items): void => {
-        logger.log(items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const items: ServiceUpdateMessage[] = await odata.getAllItems<ServiceUpdateMessage>(endpoint);
+      logger.log(items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

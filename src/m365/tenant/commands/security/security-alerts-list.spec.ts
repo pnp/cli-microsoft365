@@ -579,7 +579,7 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'severity']);
   });
 
-  it('correctly returns list of security alerts for vendor with name Azure Security Center', (done) => {
+  it('correctly returns list of security alerts for vendor with name Azure Security Center', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/security/alerts?$filter=vendorInformation/provider eq 'ASC'`) {
         return Promise.resolve(
@@ -596,18 +596,11 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
       vendor: 'Azure Security Center'
     };
 
-    command.action(logger, { options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(alertASC));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options } as any);
+    assert(loggerLogSpy.calledWith(alertASC));
   });
 
-  it('correctly returns list of security alerts for vendor with name Microsoft Cloud App Security', (done) => {
+  it('correctly returns list of security alerts for vendor with name Microsoft Cloud App Security', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/security/alerts?$filter=vendorInformation/provider eq 'MCAS'`) {
         return Promise.resolve(
@@ -624,18 +617,11 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
       vendor: 'Microsoft Cloud App Security'
     };
 
-    command.action(logger, { options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(alertMCAS));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options } as any);
+    assert(loggerLogSpy.calledWith(alertMCAS));
   });
 
-  it('correctly returns list of security alerts for vendor with name Azure Active Directory Identity Protection', (done) => {
+  it('correctly returns list of security alerts for vendor with name Azure Active Directory Identity Protection', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/security/alerts?$filter=vendorInformation/provider eq 'IPC'`) {
         return Promise.resolve(
@@ -652,18 +638,11 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
       vendor: 'Azure Active Directory Identity Protection'
     };
 
-    command.action(logger, { options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(alertIPC));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options } as any);
+    assert(loggerLogSpy.calledWith(alertIPC));
   });
 
-  it('correctly returns list of security alerts as csv', (done) => {
+  it('correctly returns list of security alerts as csv', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/security/alerts`) {
         return Promise.resolve(
@@ -680,18 +659,11 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
       output: "csv"
     };
 
-    command.action(logger, { options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(alertResponseCSV));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options } as any);
+    assert(loggerLogSpy.calledWith(alertResponseCSV));
   });
 
-  it('correctly returns list with security alerts', (done) => {
+  it('correctly returns list with security alerts', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/security/alerts`) {
         return Promise.resolve(
@@ -707,18 +679,11 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
     const options: any = {
     };
 
-    command.action(logger, { options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(alertResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options } as any);
+    assert(loggerLogSpy.calledWith(alertResponse));
   });
 
-  it('fails when serviceAnnouncement endpoint fails', (done) => {
+  it('fails when serviceAnnouncement endpoint fails', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/security/alerts`) {
         return Promise.resolve({});
@@ -727,32 +692,14 @@ describe(commands.SECURITY_ALERTS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    const options: any = {};
-
-    command.action(logger, { options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, "Error fetching security alerts");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Error fetching security alerts'));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
-
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {
