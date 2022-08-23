@@ -1,13 +1,8 @@
 import { Logger } from '../../../../cli';
-import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { ToDoList } from '../../ToDoList';
-
-interface CommandArgs {
-  options: GlobalOptions;
-}
 
 class TodoListListCommand extends GraphCommand {
   public get name(): string {
@@ -22,13 +17,14 @@ class TodoListListCommand extends GraphCommand {
     return ['displayName', 'id'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    odata
-      .getAllItems<ToDoList>(`${this.resource}/v1.0/me/todo/lists`)
-      .then((items): void => {
-        logger.log(items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  public async commandAction(logger: Logger): Promise<void> {
+    try {
+      const items: any = await odata.getAllItems<ToDoList>(`${this.resource}/v1.0/me/todo/lists`);
+      logger.log(items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

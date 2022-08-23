@@ -97,31 +97,30 @@ class TodoTaskListCommand extends GraphCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getTodoListId(args)
-      .then((listId: string): Promise<any> => {
-        const endpoint: string = `${this.resource}/v1.0/me/todo/lists/${listId}/tasks`;
-        return odata.getAllItems(endpoint);
-      })
-      .then((items: ToDoTask[]): void => {
-        if (args.options.output === 'json') {
-          logger.log(items);
-        }
-        else {
-          logger.log(items.map(m => {
-            return {
-              id: m.id,
-              title: m.title,
-              status: m.status,
-              createdDateTime: m.createdDateTime,
-              lastModifiedDateTime: m.lastModifiedDateTime
-            };
-          }));
-        }
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const listId: string = await this.getTodoListId(args);
+      const endpoint: string = `${this.resource}/v1.0/me/todo/lists/${listId}/tasks`;
+      const items: ToDoTask[] = await odata.getAllItems(endpoint);
 
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      if (args.options.output === 'json') {
+        logger.log(items);
+      }
+      else {
+        logger.log(items.map(m => {
+          return {
+            id: m.id,
+            title: m.title,
+            status: m.status,
+            createdDateTime: m.createdDateTime,
+            lastModifiedDateTime: m.lastModifiedDateTime
+          };
+        }));
+      }
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

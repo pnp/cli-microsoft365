@@ -102,26 +102,19 @@ describe(commands.TASK_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('updates tasks for  list using listId', (done) => {
-    command.action(logger, {
+  it('updates tasks for  list using listId', async () => {
+    await command.action(logger, {
       options: {
         id: 'abc',
         title: "New task",
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA=='
       }
-    } as any, () => {
-      try {
-        assert.strictEqual(JSON.stringify(log[0]), JSON.stringify(patchRequestData));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert.strictEqual(JSON.stringify(log[0]), JSON.stringify(patchRequestData));
   });
 
-  it('updates tasks for list using listName (debug)', (done) => {
-    command.action(logger, {
+  it('updates tasks for list using listName (debug)', async () => {
+    await command.action(logger, {
       options: {
         id: 'abc',
         title: "New task",
@@ -129,20 +122,13 @@ describe(commands.TASK_SET, () => {
         status: "notStarted",
         debug: true
       }
-    } as any, () => {
-      try {
-        assert.strictEqual(JSON.stringify(log[0]), JSON.stringify(patchRequestData));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert.strictEqual(JSON.stringify(log[0]), JSON.stringify(patchRequestData));
   });
 
 
 
-  it('rejects if no tasks list is found with the specified list name', (done) => {
+  it('rejects if no tasks list is found with the specified list name', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks%20List'`) {
@@ -155,45 +141,24 @@ describe(commands.TASK_SET, () => {
       }
       return Promise.reject();
     });
-    command.action(logger, {
-      options: {
-        id: 'abc',
-        title: "New task",
-        listName: 'Tasks List',
-        debug: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The specified task list does not exist')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    
+    await assert.rejects(command.action(logger, { options: {
+      id: 'abc',
+      title: "New task",
+      listName: 'Tasks List',
+      debug: true } } as any), new CommandError('The specified task list does not exist'));
   });
 
-  it('handles error correctly', (done) => {
+  it('handles error correctly', async () => {
     sinonUtil.restore(request.patch);
     sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        listName: "Tasks List",
-        id: 'abc',
-        title: "New task"
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      listName: "Tasks List",
+      id: 'abc',
+      title: "New task" } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if both listId and listName options are passed', async () => {
