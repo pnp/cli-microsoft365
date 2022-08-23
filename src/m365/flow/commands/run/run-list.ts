@@ -42,31 +42,33 @@ class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTim
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving list of runs for Microsoft Flow ${args.options.flow}...`);
     }
 
     const url: string = `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/runs?api-version=2016-11-01`;
 
-    this
-      .getAllItems(url, logger, true)
-      .then((): void => {
-        if (this.items.length > 0) {
-          this.items.forEach(i => {
-            i.startTime = i.properties.startTime;
-            i.status = i.properties.status;
-          });
+    try {
+      await this.getAllItems(url, logger, true);
 
-          logger.log(this.items);
+      if (this.items.length > 0) {
+        this.items.forEach(i => {
+          i.startTime = i.properties.startTime;
+          i.status = i.properties.status;
+        });
+
+        logger.log(this.items);
+      }
+      else {
+        if (this.verbose) {
+          logger.logToStderr('No runs found');
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr('No runs found');
-          }
-        }
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

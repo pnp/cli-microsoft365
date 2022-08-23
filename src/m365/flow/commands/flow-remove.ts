@@ -72,12 +72,12 @@ class FlowRemoveCommand extends AzmgmtCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Removing Microsoft Flow ${args.options.name}...`);
     }
 
-    const removeFlow: () => void = (): void => {
+    const removeFlow: () => Promise<void> = async (): Promise<void> => {
       const requestOptions: any = {
         url: `${this.resource}providers/Microsoft.ProcessSimple/${args.options.asAdmin ? 'scopes/admin/' : ''}environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
         resolveWithFullResponse: true,
@@ -87,37 +87,33 @@ class FlowRemoveCommand extends AzmgmtCommand {
         responseType: 'json'
       };
 
-      request
-        .delete(requestOptions)
-        .then((rawRes: any): void => {
-          // handle 204 and throw error message to cmd when invalid flow id is passed
-          // https://github.com/pnp/cli-microsoft365/issues/1063#issuecomment-537218957
-          if (rawRes.statusCode === 204) {
-            logger.log(chalk.red(`Error: Resource '${args.options.name}' does not exist in environment '${args.options.environment}'`));
-            cb();
-          }
-          else {
-            cb();
-          }
-        }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      try {
+        const rawRes = await request.delete<any>(requestOptions);
+        // handle 204 and throw error message to cmd when invalid flow id is passed
+        // https://github.com/pnp/cli-microsoft365/issues/1063#issuecomment-537218957
+
+        if (rawRes.statusCode === 204) {
+          logger.log(chalk.red(`Error: Resource '${args.options.name}' does not exist in environment '${args.options.environment}'`));
+        }
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
     if (args.options.confirm) {
-      removeFlow();
+      await removeFlow();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the Microsoft Flow ${args.options.name}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeFlow();
-        }
       });
+
+      if (result.continue) {
+        await removeFlow();
+      }
     }
   }
 }

@@ -70,16 +70,19 @@ class FileAddCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (error?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let folderUrlWithoutTrailingSlash = args.options.folderUrl;
     if (folderUrlWithoutTrailingSlash.endsWith('/')) {
       folderUrlWithoutTrailingSlash = folderUrlWithoutTrailingSlash.substr(0, folderUrlWithoutTrailingSlash.length - 1);
     }
 
-    this
-      .getGraphFileUrl(logger, `${folderUrlWithoutTrailingSlash}/${path.basename(args.options.filePath)}`, args.options.siteUrl)
-      .then(graphFileUrl => this.uploadFile(args.options.filePath, graphFileUrl))
-      .then(_ => cb(), rawRes => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+    try {
+      const graphFileUrl = await this.getGraphFileUrl(logger, `${folderUrlWithoutTrailingSlash}/${path.basename(args.options.filePath)}`, args.options.siteUrl);
+      await this.uploadFile(args.options.filePath, graphFileUrl);
+    }
+    catch (err: any){
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   /**

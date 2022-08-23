@@ -72,7 +72,7 @@ class FlowGetCommand extends AzmgmtCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving information about Microsoft Flow ${args.options.name}...`);
     }
@@ -85,18 +85,19 @@ class FlowGetCommand extends AzmgmtCommand {
       responseType: 'json'
     };
 
-    request
-      .get<Flow>(requestOptions)
-      .then((res): void => {
-        res.displayName = res.properties.displayName;
-        res.description = res.properties.definitionSummary.description || '';
-        res.triggers = res.properties.definitionSummary.triggers.map((t: Trigger) => (t.type + (t.kind ? "-" + t.kind : '')) as string).join(', ');
-        res.actions = res.properties.definitionSummary.actions.map((a: Action) => (a.type + (a.swaggerOperationId ? "-" + a.swaggerOperationId : '')) as string).join(', ');
+    try {
+      const res = await request.get<Flow>(requestOptions);
 
-        logger.log(res);
+      res.displayName = res.properties.displayName;
+      res.description = res.properties.definitionSummary.description || '';
+      res.triggers = res.properties.definitionSummary.triggers.map((t: Trigger) => (t.type + (t.kind ? "-" + t.kind : '')) as string).join(', ');
+      res.actions = res.properties.definitionSummary.actions.map((a: Action) => (a.type + (a.swaggerOperationId ? "-" + a.swaggerOperationId : '')) as string).join(', ');
 
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 
