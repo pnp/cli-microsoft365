@@ -16,7 +16,7 @@ class PpGatewayListCommand extends PowerBICommand {
     return ['id', 'name'];
   }
 
-  public commandAction(logger: Logger, args: any, cb: () => void): void {
+  public async commandAction(logger: Logger): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving list of gateways for which the user is an admin...`);
     }
@@ -29,12 +29,13 @@ class PpGatewayListCommand extends PowerBICommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ value: any[] }>(requestOptions)
-      .then((res: { value: any[] }): void => {
-        logger.log(res.value);
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+    try {
+      const res = await request.get<{ value: any[] }>(requestOptions);
+      logger.log(res.value);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

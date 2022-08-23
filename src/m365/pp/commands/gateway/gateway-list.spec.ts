@@ -62,7 +62,7 @@ describe(commands.GATEWAY_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'name']);
   });
 
-  it('retrieves list of gateways (debug)', (done) => {
+  it('retrieves list of gateways (debug)', async () => {
     const gateways: any = {
       "value": [
         {
@@ -91,18 +91,11 @@ describe(commands.GATEWAY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(gateways.value));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith(gateways.value));
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
@@ -116,15 +109,8 @@ describe(commands.GATEWAY_LIST, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
   it('supports debug mode', () => {
