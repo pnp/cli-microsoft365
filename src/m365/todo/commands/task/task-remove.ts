@@ -75,8 +75,8 @@ class TodoTaskRemoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    const getToDoListId = (): Promise<string | undefined> => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const getToDoListId = async (): Promise<string | undefined> => {
       if (args.options.listName) {
         // Search list by its name
         const requestOptions: any = {
@@ -86,55 +86,51 @@ class TodoTaskRemoveCommand extends GraphCommand {
           },
           responseType: 'json'
         };
-        return request
-          .get<{ value: { id: string }[] }>(requestOptions)
-          .then((response): string | undefined =>
-            response.value && response.value.length === 1 ? response.value[0].id : undefined);
+        const response: { value: { id: string }[] } = await request.get<{ value: { id: string }[] }>(requestOptions);
+          
+        return response.value && response.value.length === 1 ? response.value[0].id : undefined;  
       }
 
       return Promise.resolve(args.options.listId as string);
     };
 
-    const removeToDoTask = () => {
-      getToDoListId()
-        .then(toDoListId => {
-          if (!toDoListId) {
-            return Promise.reject(`The list ${args.options.listName} cannot be found`);
-          }
+    const removeToDoTask = async () => {
+      try {
+        const toDoListId: string | undefined = await getToDoListId();
 
-          const requestOptions: any = {
-            url: `${this.resource}/v1.0/me/todo/lists/${toDoListId}/tasks/${args.options.id}`,
-            headers: {
-              accept: "application/json;odata.metadata=none"
-            },
-            responseType: 'json'
-          };
+        if (!toDoListId) {
+          throw `The list ${args.options.listName} cannot be found`;
+        }
 
-          return request.delete(requestOptions);
-        })
-        .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/me/todo/lists/${toDoListId}/tasks/${args.options.id}`,
+          headers: {
+            accept: "application/json;odata.metadata=none"
+          },
+          responseType: 'json'
+        };
+
+        await request.delete(requestOptions);
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeToDoTask();
+      await removeToDoTask();
     }
     else {
-      Cli.prompt(
-        {
-          type: "confirm",
-          name: "continue",
-          default: false,
-          message: `Are you sure you want to remove the task ${args.options.id} from list ${args.options.listId || args.options.listName}?`
-        },
-        (result: { continue: boolean }): void => {
-          if (!result.continue) {
-            cb();
-          }
-          else {
-            removeToDoTask();
-          }
-        }
-      );
+      const result = await Cli.prompt<{ continue: boolean }>({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to remove the task ${args.options.id} from list ${args.options.listId || args.options.listName}?`
+      });
+      
+      if (result.continue) {
+        await removeToDoTask();
+      }
     }
   }
 }

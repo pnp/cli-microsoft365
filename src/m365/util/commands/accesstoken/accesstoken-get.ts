@@ -1,8 +1,6 @@
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command, {
-  CommandError
-} from '../../../../Command';
+import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import commands from '../../commands';
 
@@ -50,23 +48,25 @@ class UtilAccessTokenGetCommand extends Command {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let resource: string = args.options.resource;
-    if (resource.toLowerCase() === 'sharepoint') {
-      if (auth.service.spoUrl) {
-        resource = auth.service.spoUrl;
-      }
-      else {
-        return cb(`SharePoint URL undefined. Use the 'm365 spo set --url https://contoso.sharepoint.com' command to set the URL`);
-      }
-    }
 
-    auth
-      .ensureAccessToken(resource, logger, this.debug, args.options.new)
-      .then((accessToken: string): void => {
-        logger.log(accessToken);
-        cb();
-      }, (err: any): void => cb(new CommandError(err)));
+    try {
+      if (resource.toLowerCase() === 'sharepoint') {
+        if (auth.service.spoUrl) {
+          resource = auth.service.spoUrl;
+        }
+        else {
+          throw `SharePoint URL undefined. Use the 'm365 spo set --url https://contoso.sharepoint.com' command to set the URL`;
+        }
+      }
+  
+      const accessToken: string = await auth.ensureAccessToken(resource, logger, this.debug, args.options.new);
+      logger.log(accessToken);      
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

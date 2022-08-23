@@ -58,7 +58,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves access token for the specified resource', (done) => {
+  it('retrieves access token for the specified resource', async () => {
     const d: Date = new Date();
     d.setMinutes(d.getMinutes() + 1);
     auth.service.accessTokens['https://graph.microsoft.com'] = {
@@ -66,18 +66,11 @@ describe(commands.ACCESSTOKEN_GET, () => {
       accessToken: 'ABC'
     };
 
-    command.action(logger, { options: { debug: false, resource: 'https://graph.microsoft.com' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith('ABC'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, resource: 'https://graph.microsoft.com' } });
+    assert(loggerLogSpy.calledWith('ABC'));
   });
 
-  it('retrieves access token for SharePoint when sharepoint specified as the resource and SPO URL previously retrieved', (done) => {
+  it('retrieves access token for SharePoint when sharepoint specified as the resource and SPO URL previously retrieved', async () => {
     const d: Date = new Date();
     d.setMinutes(d.getMinutes() + 1);
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
@@ -86,32 +79,17 @@ describe(commands.ACCESSTOKEN_GET, () => {
       accessToken: 'ABC'
     };
 
-    command.action(logger, { options: { debug: false, resource: 'sharepoint' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith('ABC'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, resource: 'sharepoint' } });
+    assert(loggerLogSpy.calledWith('ABC'));
   });
 
-  it('correctly handles error when retrieving access token', (done) => {
+  it('correctly handles error when retrieving access token', async () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: false, resource: 'https://graph.microsoft.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, resource: 'https://graph.microsoft.com' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('returns error when sharepoint specified as resource and SPO URL not available', (done) => {
+  it('returns error when sharepoint specified as resource and SPO URL not available', async () => {
     const d: Date = new Date();
     d.setMinutes(d.getMinutes() + 1);
     auth.service.accessTokens['https://contoso.sharepoint.com'] = {
@@ -119,15 +97,7 @@ describe(commands.ACCESSTOKEN_GET, () => {
       accessToken: 'ABC'
     };
 
-    command.action(logger, { options: { debug: false, resource: 'sharepoint' } }, (err?: any) => {
-      try {
-        assert.notStrictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, resource: 'sharepoint' } } as any), new CommandError(`SharePoint URL undefined. Use the 'm365 spo set --url https://contoso.sharepoint.com' command to set the URL`));
   });
 
   it('supports debug mode', () => {

@@ -61,39 +61,39 @@ class YammerMessageRemoveCommand extends YammerCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeMessage: () => void = (): void => {
-      const requestOptions: any = {
-        url: `${this.resource}/v1/messages/${args.options.id}.json`,
-        headers: {
-          accept: 'application/json;odata.metadata=none',
-          'content-type': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      request
-        .delete(requestOptions)
-        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeMessage: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const requestOptions: any = {
+          url: `${this.resource}/v1/messages/${args.options.id}.json`,
+          headers: {
+            accept: 'application/json;odata.metadata=none',
+            'content-type': 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+  
+        await request.delete(requestOptions);        
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeMessage();
+      await removeMessage();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the Yammer message ${args.options.id}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeMessage();
-        }
       });
+
+      if (result.continue) {
+        await removeMessage();
+      }
     }
   }
 }

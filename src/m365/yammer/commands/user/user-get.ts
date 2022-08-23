@@ -66,7 +66,7 @@ class YammerUserGetCommand extends YammerCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let endPoint = `${this.resource}/v1/users/current.json`;
 
     if (args.options.userId) {
@@ -85,12 +85,14 @@ class YammerUserGetCommand extends YammerCommand {
       responseType: 'json'
     };
 
-    request
-      .get(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const res: any = await request.get(requestOptions);
+      
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

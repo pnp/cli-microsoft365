@@ -171,15 +171,16 @@ class YammerUserListCommand extends YammerCommand {
     });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.items = []; // this will reset the items array in interactive mode
 
-    this
-      .getAllItems(logger, args, 1)
-      .then((): void => {
-        logger.log(this.items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      await this.getAllItems(logger, args, 1);
+      logger.log(this.items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

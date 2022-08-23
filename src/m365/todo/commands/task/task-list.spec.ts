@@ -83,28 +83,15 @@ describe(commands.TASK_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails to get ToDo Task list when the specified task list does not exist', (done) => {
+  it('fails to get ToDo Task list when the specified task list does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/me/todo/lists?$filter=displayName eq '`) > -1) {
         return Promise.resolve({ value: [] });
       }
       return Promise.reject('The specified task list does not exist');
     });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        listName: 'Tasks List'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified task list does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    
+    await assert.rejects(command.action(logger, { options: { debug: false, listName: 'Tasks List' } } as any), new CommandError('The specified task list does not exist'));
   });
 
   it('passes validation if only listId is passed', async () => {
@@ -125,7 +112,7 @@ describe(commands.TASK_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('lists To Do tasks using listId in JSON output mode', (done) => {
+  it('lists To Do tasks using listId in JSON output mode', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/tasks`) > -1) {
         return Promise.resolve({
@@ -163,53 +150,46 @@ describe(commands.TASK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         output: 'json',
         listId: "AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA=="
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [
-            {
-              "importance": "normal",
-              "isReminderOn": false,
-              "status": "notStarted",
-              "title": "Stay healthy",
-              "createdDateTime": "2020-11-01T17:13:13.9582172Z",
-              "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z",
-              "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
-              "body": {
-                "content": "",
-                "contentType": "text"
-              }
-            },
-            {
-              "importance": "normal",
-              "isReminderOn": false,
-              "status": "notStarted",
-              "title": "Eat food",
-              "createdDateTime": "2020-11-01T17:13:10.7970391Z",
-              "lastModifiedDateTime": "2020-11-01T17:13:13.1037095Z",
-              "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuOAAA=",
-              "body": {
-                "content": "",
-                "contentType": "text"
-              }
-            }
-          ]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [
+        {
+          "importance": "normal",
+          "isReminderOn": false,
+          "status": "notStarted",
+          "title": "Stay healthy",
+          "createdDateTime": "2020-11-01T17:13:13.9582172Z",
+          "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z",
+          "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
+          "body": {
+            "content": "",
+            "contentType": "text"
+          }
+        },
+        {
+          "importance": "normal",
+          "isReminderOn": false,
+          "status": "notStarted",
+          "title": "Eat food",
+          "createdDateTime": "2020-11-01T17:13:10.7970391Z",
+          "lastModifiedDateTime": "2020-11-01T17:13:13.1037095Z",
+          "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuOAAA=",
+          "body": {
+            "content": "",
+            "contentType": "text"
+          }
+        }
+      ]
+    ));
   });
 
-  it('lists To Do tasks using listName', (done) => {
+  it('lists To Do tasks using listName', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/me/todo/lists?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
@@ -252,37 +232,30 @@ describe(commands.TASK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         listName: 'Tasks List'
       }
-    }, () => {
-      try {
-        const actual = JSON.stringify(log[log.length - 1]);
-        const expected = JSON.stringify([
-          {
-            "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
-            "title": "Stay healthy",
-            "status": "notStarted",
-            "createdDateTime": "2020-11-01T17:13:13.9582172Z",
-            "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z"
-          },
-          {
-            "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuOAAA=",
-            "title": "Eat food",
-            "status": "notStarted",
-            "createdDateTime": "2020-11-01T17:13:10.7970391Z",
-            "lastModifiedDateTime": "2020-11-01T17:13:13.1037095Z"
-          }
-        ]);
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const actual = JSON.stringify(log[log.length - 1]);
+    const expected = JSON.stringify([
+      {
+        "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
+        "title": "Stay healthy",
+        "status": "notStarted",
+        "createdDateTime": "2020-11-01T17:13:13.9582172Z",
+        "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z"
+      },
+      {
+        "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuOAAA=",
+        "title": "Eat food",
+        "status": "notStarted",
+        "createdDateTime": "2020-11-01T17:13:10.7970391Z",
+        "lastModifiedDateTime": "2020-11-01T17:13:13.1037095Z"
+      }
+    ]);
+    assert.strictEqual(actual, expected);
   });
 
   it('supports debug mode', () => {

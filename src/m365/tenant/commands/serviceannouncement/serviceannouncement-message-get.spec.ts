@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from "../../commands";
@@ -131,7 +131,7 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
     assert(actual);
   });
 
-  it('correctly retrieves service update message', (done) => {
+  it('correctly retrieves service update message', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/messages/${testId}`) {
         return Promise.resolve(resMessage);
@@ -140,24 +140,17 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         id: testId
       }
-    }, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.calledWith(resMessage), true);
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, testId);
-        assert.strictEqual(loggerLogSpy.callCount, 1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(loggerLogSpy.calledWith(resMessage), true);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].id, testId);
+    assert.strictEqual(loggerLogSpy.callCount, 1);
   });
 
-  it('correctly retrieves service update message (debug)', (done) => {
+  it('correctly retrieves service update message (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/messages/${testId}`) {
         return Promise.resolve(resMessage);
@@ -166,25 +159,18 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         id: testId
       }
-    }, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.calledWith(resMessage), true);
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, testId);
-        assert.strictEqual(loggerLogSpy.callCount, 1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(loggerLogSpy.calledWith(resMessage), true);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].id, testId);
+    assert.strictEqual(loggerLogSpy.callCount, 1);
   });
 
-  it('fails when the message does not exist for the tenant', (done) => {
+  it('fails when the message does not exist for the tenant', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/messages/${testIncorrectId}`) {
         return Promise.reject(resResourceNotExist);
@@ -193,23 +179,10 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        id: testIncorrectId
-      }
-    }, (err?: any) => {
-      try {
-        assert((JSON.parse(JSON.parse(err.message).message).error as string).indexOf(`Resource doesn't exist for the tenant.`) > -1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    }
-    );
+    await assert.rejects(command.action(logger, { options: { debug: false, id: testIncorrectId } } as any), new CommandError(resResourceNotExist.error.message));
   });
 
-  it('lists all properties for output json', (done) => {
+  it('lists all properties for output json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/admin/serviceAnnouncement/messages/${testId}`) {
         return Promise.resolve(resMessage);
@@ -219,21 +192,14 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_GET, () => {
     });
 
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         id: testId,
         output: 'json'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(resMessage));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(resMessage));
   });
 
   it('supports debug mode', () => {
