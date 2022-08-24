@@ -110,7 +110,7 @@ class PaPcfInitCommand extends AnonymousCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     try {
       const pcfTemplatePath: string = path.join(__dirname, 'pcf-init', 'assets');
       const pcfComponentTemplatePath: string = path.join(pcfTemplatePath, 'control', `${args.options.template.toLowerCase()}-template`);
@@ -145,11 +145,9 @@ class PaPcfInitCommand extends AnonymousCommand {
 
       logger.log(chalk.green(`The PowerApps component framework project was successfully created in '${workingDirectory}'.`));
       logger.log(`Be sure to run '${chalk.grey('npm install')}' in this directory to install project dependencies.`);
-
-      cb();
     }
     catch (err: any) {
-      cb(new CommandError(err));
+      throw new CommandError(err);
     }
   }
 }

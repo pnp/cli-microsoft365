@@ -166,7 +166,7 @@ describe(commands.ROOM_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'phone', 'emailAddress']);
   });
 
-  it('lists all available rooms in the tenant (verbose)', (done) => {
+  it('lists all available rooms in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/places/microsoft.graph.room`) {
         return Promise.resolve(
@@ -176,20 +176,13 @@ describe(commands.ROOM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { verbose: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          jsonOutput.value
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { verbose: true } });
+    assert(loggerLogSpy.calledWith(
+      jsonOutput.value
+    ));
   });
 
-  it('lists all available rooms filter by roomlistEmail in the tenant (verbose)', (done) => {
+  it('lists all available rooms filter by roomlistEmail in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/places/bldg2@contoso.com/microsoft.graph.roomlist/rooms`) {
         return Promise.resolve(
@@ -199,17 +192,10 @@ describe(commands.ROOM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { verbose: true, roomlistEmail: "bldg2@contoso.com" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          jsonOutputFilter.value
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { verbose: true, roomlistEmail: "bldg2@contoso.com" } });
+    assert(loggerLogSpy.calledWith(
+      jsonOutputFilter.value
+    ));
   });
 
   it('supports debug mode', () => {

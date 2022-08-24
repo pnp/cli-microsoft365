@@ -78,18 +78,18 @@ class OutlookMessageListCommand extends GraphCommand {
     return ['subject', 'receivedDateTime'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getFolderId(args)
-      .then((folderId: string): Promise<Message[]> => {
-        const url: string = folderId ? `me/mailFolders/${folderId}/messages` : 'me/messages';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const folderId = await this.getFolderId(args);
 
-        return odata.getAllItems<Message>(`${this.resource}/v1.0/${url}?$top=50`);
-      })
-      .then((messages): void => {
-        logger.log(messages);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const url: string = folderId ? `me/mailFolders/${folderId}/messages` : 'me/messages';
+      const messages = await odata.getAllItems<Message>(`${this.resource}/v1.0/${url}?$top=50`);
+
+      logger.log(messages);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getFolderId(args: CommandArgs): Promise<string> {

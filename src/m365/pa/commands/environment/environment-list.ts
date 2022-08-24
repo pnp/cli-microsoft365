@@ -1,12 +1,7 @@
 import { Logger } from '../../../../cli';
-import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import PowerAppsCommand from '../../../base/PowerAppsCommand';
 import commands from '../../commands';
-
-interface CommandArgs {
-  options: GlobalOptions;
-}
 
 class PaEnvironmentListCommand extends PowerAppsCommand {
   public get name(): string {
@@ -21,7 +16,7 @@ class PaEnvironmentListCommand extends PowerAppsCommand {
     return ['name', 'displayName'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving list of Microsoft Power Apps environments...`);
     }
@@ -34,19 +29,20 @@ class PaEnvironmentListCommand extends PowerAppsCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ value: [{ name: string, displayName: string; properties: { displayName: string } }] }>(requestOptions)
-      .then((res: { value: [{ name: string, displayName: string; properties: { displayName: string } }] }): void => {
-        if (res.value.length > 0) {
-          res.value.forEach(e => {
-            e.displayName = e.properties.displayName;
-          });
+    try {
+      const res = await request.get<{ value: [{ name: string, displayName: string; properties: { displayName: string } }] }>(requestOptions);
 
-          logger.log(res.value);
-        }
+      if (res.value.length > 0) {
+        res.value.forEach(e => {
+          e.displayName = e.properties.displayName;
+        });
 
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        logger.log(res.value);
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

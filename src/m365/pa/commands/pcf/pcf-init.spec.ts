@@ -63,16 +63,14 @@ describe(commands.PCF_INIT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('calls telemetry', () => {
-    command.action(logger, { options: {} }, () => {
-      assert(trackEvent.called);
-    });
+  it('calls telemetry', async () => {
+    await command.action(logger, { options: {} });
+    assert(trackEvent.called);
   });
 
-  it('logs correct telemetry event', () => {
-    command.action(logger, { options: {} }, () => {
-      assert.strictEqual(telemetry.name, commands.PCF_INIT);
-    });
+  it('logs correct telemetry event', async () => {
+    await command.action(logger, { options: {} });
+    assert.strictEqual(telemetry.name, commands.PCF_INIT);
   });
 
   it('supports specifying namespace', () => {
@@ -231,24 +229,22 @@ describe(commands.PCF_INIT, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('TemplateInstantiator.instantiate is called exactly twice', () => {
+  it('TemplateInstantiator.instantiate is called exactly twice', async () => {
     const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
 
-    command.action(logger, { options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } }, () => {
-      assert(templateInstantiate.calledTwice);
-      assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledOnce);
-      assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, true, sinon.match.object, false).calledOnce);
-    });
+    await command.action(logger, { options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field' } });
+    assert(templateInstantiate.calledTwice);
+    assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledOnce);
+    assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, true, sinon.match.object, false).calledOnce);
   });
 
-  it('TemplateInstantiator.instantiate is called exactly twice (verbose)', () => {
+  it('TemplateInstantiator.instantiate is called exactly twice (verbose)', async () => {
     const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
 
-    command.action(logger, { options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field', verbose: true } }, () => {
-      assert(templateInstantiate.calledTwice);
-      assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, true).calledOnce);
-      assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, true, sinon.match.object, true).calledOnce);
-    });
+    await command.action(logger, { options: { name: 'Example1Name', namespace: 'Example1.Namespace', template: 'Field', verbose: true } });
+    assert(templateInstantiate.calledTwice);
+    assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, true).calledOnce);
+    assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, true, sinon.match.object, true).calledOnce);
   });
 
   it('supports verbose mode', () => {

@@ -49,19 +49,20 @@ class OutlookRoomListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let endpoint: string = `${this.resource}/v1.0/places/microsoft.graph.room`;
 
     if (args.options.roomlistEmail) {
       endpoint = `${this.resource}/v1.0/places/${args.options.roomlistEmail}/microsoft.graph.roomlist/rooms`;
     }
 
-    odata
-      .getAllItems<Room>(endpoint)
-      .then((rooms): void => {
-        logger.log(rooms);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const rooms = await odata.getAllItems<Room>(endpoint);
+      logger.log(rooms);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

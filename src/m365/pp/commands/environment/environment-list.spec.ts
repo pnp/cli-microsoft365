@@ -62,7 +62,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['name', 'displayName']);
   });
 
-  it('retrieves Microsoft App environments (debug)', (done) => {
+  it('retrieves Microsoft App environments (debug)', async () => {
     const env: any = {
       "value": [
         {
@@ -218,19 +218,11 @@ describe(commands.ENVIRONMENT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-
-        assert(loggerLogSpy.calledWith(env.value));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith(env.value));
   });
 
-  it('retrieves Microsoft Power Platform environments', (done) => {
+  it('retrieves Microsoft Power Platform environments', async () => {
     const env: any = {
       "value": [
         {
@@ -386,19 +378,11 @@ describe(commands.ENVIRONMENT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-
-        assert(loggerLogSpy.calledWith(env.value));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(env.value));
   });
 
-  it('retrieves Microsoft Power Platform environments as Admin', (done) => {
+  it('retrieves Microsoft Power Platform environments as Admin', async () => {
     const env: any = {
       "value": [
         {
@@ -554,18 +538,10 @@ describe(commands.ENVIRONMENT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: {asAdmin:true, debug: false } }, () => {
-      try {
-
-        assert(loggerLogSpy.calledWith(env.value));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {asAdmin:true, debug: false } });
+    assert(loggerLogSpy.calledWith(env.value));
   });
-  it('correctly handles no environments', (done) => {
+  it('correctly handles no environments', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/providers/Microsoft.BusinessAppPlatform/environments?api-version=2020-10-01`) > -1) {
         if (opts.headers &&
@@ -580,18 +556,11 @@ describe(commands.ENVIRONMENT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
@@ -605,15 +574,8 @@ describe(commands.ENVIRONMENT_LIST, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
   it('supports debug mode', () => {

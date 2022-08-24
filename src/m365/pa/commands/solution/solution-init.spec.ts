@@ -63,16 +63,14 @@ describe(commands.SOLUTION_INIT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('calls telemetry', () => {
-    command.action(logger, { options: {} }, () => {
-      assert(trackEvent.called);
-    });
+  it('calls telemetry', async () => {
+    await command.action(logger, { options: {} });
+    assert(trackEvent.called);
   });
 
-  it('logs correct telemetry event', () => {
-    command.action(logger, { options: {} }, () => {
-      assert.strictEqual(telemetry.name, commands.SOLUTION_INIT);
-    });
+  it('logs correct telemetry event', async () => {
+    await command.action(logger, { options: {} });
+    assert.strictEqual(telemetry.name, commands.SOLUTION_INIT);
   });
 
   it('supports specifying publisher name', () => {
@@ -185,37 +183,34 @@ describe(commands.SOLUTION_INIT, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('TemplateInstantiator.instantiate is called exactly twice in an empty directory', () => {
+  it('TemplateInstantiator.instantiate is called exactly twice in an empty directory', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
 
-    command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } }, () => {
-      assert(templateInstantiate.calledTwice);
-      assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledTwice);
-    });
+    await command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
+    assert(templateInstantiate.calledTwice);
+    assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledTwice);
   });
 
-  it('TemplateInstantiator.instantiate is called exactly twice in an empty directory (verbose)', () => {
+  it('TemplateInstantiator.instantiate is called exactly twice in an empty directory (verbose)', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
 
-    command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix', verbose: true } }, () => {
-      assert(templateInstantiate.calledTwice);
-      assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, true).calledTwice);
-    });
+    await command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix', verbose: true } });
+    assert(templateInstantiate.calledTwice);
+    assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, true).calledTwice);
   });
 
-  it('TemplateInstantiator.instantiate is called exactly twice in an empty directory, using the standard publisherPrefix \'new\'', () => {
+  it('TemplateInstantiator.instantiate is called exactly twice in an empty directory, using the standard publisherPrefix \'new\'', async () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
 
-    command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'new' } }, () => {
-      assert(templateInstantiate.calledTwice);
-      assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledTwice);
-    });
+    await command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'new' } });
+    assert(templateInstantiate.calledTwice);
+    assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledTwice);
   });
 
-  it('TemplateInstantiator.instantiate is called exactly twice when the CDS Assets Directory \'Other\' already exists in the current directory, but doesn\'t contain a Solution.xml file', () => {
+  it('TemplateInstantiator.instantiate is called exactly twice when the CDS Assets Directory \'Other\' already exists in the current directory, but doesn\'t contain a Solution.xml file', async () => {
     const originalExistsSync = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake((pathToCheck) => {
       if(path.basename(pathToCheck.toString()).toLowerCase() === 'other') {
@@ -230,13 +225,12 @@ describe(commands.SOLUTION_INIT, () => {
     });
     const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
 
-    command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } }, () => {
-      assert(templateInstantiate.calledTwice);
-      assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledTwice);
-    });
+    await command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
+    assert(templateInstantiate.calledTwice);
+    assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledTwice);
   });
 
-  it('TemplateInstantiator.instantiate is called exactly once when the CDS Assets Directory \'Other\' already exists in the current directory and contains a Solution.xml file', () => {
+  it('TemplateInstantiator.instantiate is called exactly once when the CDS Assets Directory \'Other\' already exists in the current directory and contains a Solution.xml file', async () => {
     const originalExistsSync = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake((pathToCheck) => {
       if(path.basename(pathToCheck.toString()).toLowerCase() === 'other') {
@@ -251,10 +245,9 @@ describe(commands.SOLUTION_INIT, () => {
     });
     const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
 
-    command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } }, () => {
-      assert(templateInstantiate.calledOnce);
-      assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledOnce);
-    });
+    await command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
+    assert(templateInstantiate.calledOnce);
+    assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledOnce);
   });
 
   it('supports verbose mode', () => {

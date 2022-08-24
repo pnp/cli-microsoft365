@@ -80,27 +80,19 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
     assert.deepStrictEqual(optionSets, [['id', 'name']]);
   });
   
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('An error has occurred'));
   });
 
-  it('should get external connection information for the Microsoft Search by id (debug)', (done) => {
+  it('should get external connection information for the Microsoft Search by id (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections/contosohr`) {
         return Promise.resolve(externalConnection);
@@ -108,27 +100,21 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         id: 'contosohr'
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-        assert.strictEqual(call.args[0].id, 'contosohr');
-        assert.strictEqual(call.args[0].name, 'Contoso HR');
-        assert.strictEqual(call.args[0].description, 'Connection to index Contoso HR system');
-        assert.strictEqual(call.args[0].state, 'draft');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].id, 'contosohr');
+    assert.strictEqual(call.args[0].name, 'Contoso HR');
+    assert.strictEqual(call.args[0].description, 'Connection to index Contoso HR system');
+    assert.strictEqual(call.args[0].state, 'draft');
   });
 
-  it('should get external connection information for the Microsoft Search by name', (done) => {
+  it('should get external connection information for the Microsoft Search by name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/external/connections?$filter=name eq '`) > -1) {
         return Promise.resolve({
@@ -141,27 +127,20 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         name: 'Contoso HR'
       }
-    }, () => {
-      try {
-        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
-        assert.strictEqual(call.args[0].id, 'contosohr');
-        assert.strictEqual(call.args[0].name, 'Contoso HR');
-        assert.strictEqual(call.args[0].description, 'Connection to index Contoso HR system');
-        assert.strictEqual(call.args[0].state, 'draft');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
+    assert.strictEqual(call.args[0].id, 'contosohr');
+    assert.strictEqual(call.args[0].name, 'Contoso HR');
+    assert.strictEqual(call.args[0].description, 'Connection to index Contoso HR system');
+    assert.strictEqual(call.args[0].state, 'draft');
   });
 
-  it('fails retrieving external connection not found by name', (done) => {
+  it('fails retrieving external connection not found by name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/external/connections?$filter=name eq '`) > -1) {
         return Promise.resolve({
@@ -172,20 +151,12 @@ describe(commands.EXTERNALCONNECTION_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         name: 'Contoso HR'
       }
-    }, (err?: any) => {
-      try {
-        assert.deepStrictEqual(err, new CommandError(`External connection with name 'Contoso HR' not found`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`External connection with name 'Contoso HR' not found`));
   });
 
   it('supports debug mode', () => {

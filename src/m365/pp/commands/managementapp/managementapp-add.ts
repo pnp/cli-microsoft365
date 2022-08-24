@@ -79,25 +79,25 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getAppId(args)
-      .then((appId: string): Promise<any> => {
-        const requestOptions: any = {
-          // This should be refactored once we implement a PowerPlatform base class as api.bap will differ between envs.
-          url: `${this.resource}/providers/Microsoft.BusinessAppPlatform/adminApplications/${appId}?api-version=2020-06-01`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const appId = await this.getAppId(args);
 
-        return request.put(requestOptions);
-      })
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const requestOptions: any = {
+        // This should be refactored once we implement a PowerPlatform base class as api.bap will differ between envs.
+        url: `${this.resource}/providers/Microsoft.BusinessAppPlatform/adminApplications/${appId}?api-version=2020-06-01`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
+
+      const res = await request.put(requestOptions);
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getAppId(args: CommandArgs): Promise<string> {
