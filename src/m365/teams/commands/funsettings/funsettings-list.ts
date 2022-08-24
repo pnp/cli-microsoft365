@@ -49,7 +49,7 @@ class TeamsFunSettingsListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}?$select=funSettings`,
       headers: {
@@ -58,12 +58,13 @@ class TeamsFunSettingsListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ funSettings: any }>(requestOptions)
-      .then((res: { funSettings: any }): void => {
-        logger.log(res.funSettings);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const res: { funSettings: any } = await request.get<{ funSettings: any }>(requestOptions);
+      logger.log(res.funSettings);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

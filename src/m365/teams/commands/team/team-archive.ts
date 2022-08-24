@@ -107,7 +107,7 @@ class TeamsTeamArchiveCommand extends GraphCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.teamId) {
       args.options.id = args.options.teamId;
 
@@ -116,24 +116,25 @@ class TeamsTeamArchiveCommand extends GraphCommand {
 
     const siteReadOnlyForMembers: boolean = args.options.shouldSetSpoSiteReadOnlyForMembers === true;
 
-    this
-      .getTeamId(args)
-      .then((teamId: string): Promise<void> => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/archive`,
-          headers: {
-            'content-type': 'application/json;odata=nometadata',
-            'accept': 'application/json;odata.metadata=none'
-          },
-          responseType: 'json',
-          data: {
-            shouldSetSpoSiteReadOnlyForMembers: siteReadOnlyForMembers
-          }
-        };
+    try {
+      const teamId: string = await this.getTeamId(args);
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/archive`,
+        headers: {
+          'content-type': 'application/json;odata=nometadata',
+          'accept': 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: {
+          shouldSetSpoSiteReadOnlyForMembers: siteReadOnlyForMembers
+        }
+      };
 
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
+      await request.post(requestOptions);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

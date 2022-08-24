@@ -40,9 +40,9 @@ describe(commands.TEAM_REMOVE, () => {
 
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
   });
 
@@ -136,7 +136,7 @@ describe(commands.TEAM_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('logs deprecation warning when option teamId is specified', (done) => {
+  it('logs deprecation warning when option teamId is specified', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000`) {
         return Promise.resolve();
@@ -145,18 +145,11 @@ describe(commands.TEAM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", confirm: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", confirm: true } });
+    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
   });
 
-  it('fails when team name does not exist', (done) => {
+  it('fails when team name does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Finance'`) {
         return Promise.resolve({
@@ -174,86 +167,45 @@ describe(commands.TEAM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        name: 'Finance',
-        confirm: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { 
+      debug: false,
+      name: 'Finance',
+      confirm: true }} as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
-  it('prompts before removing the specified team when confirm option not passed', (done) => {
-    command.action(logger, { options: { debug: false, id: "00000000-0000-0000-0000-000000000000" } }, () => {
-      let promptIssued = false;
+  it('prompts before removing the specified team when confirm option not passed', async () => {
+    await command.action(logger, { options: { debug: false, id: "00000000-0000-0000-0000-000000000000" } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    assert(promptIssued);
   });
 
-  it('prompts before removing the specified team when confirm option not passed (debug)', (done) => {
-    command.action(logger, { options: { debug: true, id: "00000000-0000-0000-0000-000000000000" } }, () => {
-      let promptIssued = false;
+  it('prompts before removing the specified team when confirm option not passed (debug)', async () => {
+    await command.action(logger, { options: { debug: true, id: "00000000-0000-0000-0000-000000000000" } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    assert(promptIssued);
   });
 
-  it('aborts removing the specified team when confirm option not passed and prompt not confirmed', (done) => {
+  it('aborts removing the specified team when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    command.action(logger, { options: { debug: false, id: "00000000-0000-0000-0000-000000000000" } }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: "00000000-0000-0000-0000-000000000000" } });
+    assert(postSpy.notCalled);
   });
 
-  it('aborts removing the specified team when confirm option not passed and prompt not confirmed (debug)', (done) => {
+  it('aborts removing the specified team when confirm option not passed and prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    command.action(logger, { options: { debug: true, id: "00000000-0000-0000-0000-000000000000" } }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: "00000000-0000-0000-0000-000000000000" } });
+    assert(postSpy.notCalled);
   });
 
-  it('removes the specified team when prompt confirmed (debug)', (done) => {
+  it('removes the specified team when prompt confirmed (debug)', async () => {
     let teamsDeleteCallIssued = false;
 
     sinon.stub(request, 'delete').callsFake((opts) => {
@@ -266,21 +218,14 @@ describe(commands.TEAM_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: true, id: "00000000-0000-0000-0000-000000000000" } }, () => {
-      try {
-        assert(teamsDeleteCallIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: true, id: "00000000-0000-0000-0000-000000000000" } });
+    assert(teamsDeleteCallIssued);
   });
 
-  it('removes the specified team by id without prompting when confirmed specified', (done) => {
+  it('removes the specified team by id without prompting when confirmed specified', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000`) {
         return Promise.resolve();
@@ -289,12 +234,10 @@ describe(commands.TEAM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: "00000000-0000-0000-0000-000000000000", confirm: true } }, () => {
-      done();
-    });
+    await command.action(logger, { options: { debug: false, id: "00000000-0000-0000-0000-000000000000", confirm: true } });
   });
 
-  it('removes the specified team by name without prompting when confirmed specified', (done) => {
+  it('removes the specified team by name without prompting when confirmed specified', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Finance'`) {
         return Promise.resolve({
@@ -317,12 +260,10 @@ describe(commands.TEAM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: "Finance", confirm: true } }, () => {
-      done();
-    });
+    await command.action(logger, { options: { debug: false, name: "Finance", confirm: true } });
   });
 
-  it('should handle Microsoft graph error response', (done) => {
+  it('should handle Microsoft graph error response', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee`) {
         return Promise.reject({
@@ -341,20 +282,11 @@ describe(commands.TEAM_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
-      options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, 'No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    
+    await assert.rejects(command.action(logger, { options: { id: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' } } as any), new CommandError('No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee'));
   });
 
   it('supports debug mode', () => {

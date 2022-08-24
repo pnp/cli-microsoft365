@@ -105,7 +105,7 @@ describe(commands.USER_HIBP, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, userName: 'account-exists@hibp-integration-tests.com', apiKey: "2975xc539c304xf797f665x43f8x557x" } });
+    await command.action(logger, { options: { debug: false, userName: 'account-exists@hibp-integration-tests.com', apiKey: "2975xc539c304xf797f665x43f8x557x" } });
     assert(loggerLogSpy.calledWith([{ "Name": "Adobe" }, { "Name": "Gawker" }, { "Name": "Stratfor" }]));
   });
 

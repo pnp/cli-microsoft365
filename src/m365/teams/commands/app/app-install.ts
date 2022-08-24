@@ -89,33 +89,35 @@ class TeamsAppInstallCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .validateUser(args, logger)
-      .then(_ => {
-        let url: string = `${this.resource}/v1.0`;
-        if (args.options.teamId) {
-          url += `/teams/${encodeURIComponent(args.options.teamId)}/installedApps`;
-        }
-        else {
-          url += `/users/${encodeURIComponent((args.options.userId ?? args.options.userName) as string)}/teamwork/installedApps`;
-        }
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      await this.validateUser(args, logger);
 
-        const requestOptions: any = {
-          url: url,
-          headers: {
-            'content-type': 'application/json;odata=nometadata',
-            'accept': 'application/json;odata.metadata=none'
-          },
-          responseType: 'json',
-          data: {
-            'teamsApp@odata.bind': `${this.resource}/v1.0/appCatalogs/teamsApps/${args.options.appId}`
-          }
-        };
+      let url: string = `${this.resource}/v1.0`;
+      if (args.options.teamId) {
+        url += `/teams/${encodeURIComponent(args.options.teamId)}/installedApps`;
+      }
+      else {
+        url += `/users/${encodeURIComponent((args.options.userId ?? args.options.userName) as string)}/teamwork/installedApps`;
+      }
 
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
+      const requestOptions: any = {
+        url: url,
+        headers: {
+          'content-type': 'application/json;odata=nometadata',
+          'accept': 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: {
+          'teamsApp@odata.bind': `${this.resource}/v1.0/appCatalogs/teamsApps/${args.options.appId}`
+        }
+      };
+
+      await request.post(requestOptions);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   // we need this method, because passing an invalid user ID to the API

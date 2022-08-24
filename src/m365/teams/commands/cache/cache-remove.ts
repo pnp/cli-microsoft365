@@ -61,43 +61,43 @@ class TeamsCacheRemoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    if (args.options.confirm) {
-      this.clearTeamsCache(logger, cb);
-    }
-    else {
-      logger.logToStderr('This command will execute the following steps.');
-      logger.logToStderr('- Stop the Microsoft Teams client.');
-      logger.logToStderr('- Clear the Microsoft Teams cached files.');
-
-      Cli.prompt({
-        type: 'confirm',
-        name: 'continue',
-        default: false,
-        message: `Are you sure you want to clear your Microsoft Teams cache?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      if (args.options.confirm) {
+        await this.clearTeamsCache(logger);
+      }
+      else {
+        logger.logToStderr('This command will execute the following steps.');
+        logger.logToStderr('- Stop the Microsoft Teams client.');
+        logger.logToStderr('- Clear the Microsoft Teams cached files.');
+  
+        const result = await Cli.prompt<{ continue: boolean }>({
+          type: 'confirm',
+          name: 'continue',
+          default: false,
+          message: `Are you sure you want to clear your Microsoft Teams cache?`
+        });
+        
+        if (result.continue) {
+          await this.clearTeamsCache(logger);
         }
-        else {
-          this.clearTeamsCache(logger, cb);
-        }
-      });
+      }      
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 
-  private async clearTeamsCache(logger: Logger, cb: (err?: any) => void): Promise<void> {
+  private async clearTeamsCache(logger: Logger): Promise<void> {
     try {
       await this.killRunningProcess(logger);
       await this.removeCacheFiles(logger);
     }
     catch (e: any) {
-      cb(e.message as string);
-      return;
+      throw e.message as string;
     }
 
     logger.logToStderr('Teams cache cleared!');
-    cb();
   }
 
   private async killRunningProcess(logger: Logger): Promise<void> {

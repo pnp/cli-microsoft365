@@ -56,7 +56,7 @@ class TeamsAppPublishCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const fullPath: string = path.resolve(args.options.filePath);
     if (this.verbose) {
       logger.logToStderr(`Adding app '${fullPath}' to app catalog...`);
@@ -70,16 +70,18 @@ class TeamsAppPublishCommand extends GraphCommand {
       },
       data: fs.readFileSync(fullPath)
     };
+    
+    try {
+      const res: { id: string; } = await request.post<{ id: string; }>(requestOptions);
 
-    request
-      .post<{ id: string; }>(requestOptions)
-      .then((res: { id: string; }): void => {
-        if (res && res.id) {
-          logger.log(res.id);
-        }
+      if (res && res.id) {
+        logger.log(res.id);
+      }
 
-        cb();
-      }, (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

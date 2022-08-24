@@ -88,7 +88,7 @@ describe(commands.TEAM_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails to get team information due to wrong team id', (done) => {
+  it('fails to get team information due to wrong team id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/1caf7dcd-7e83-4c3a-94f7-932a1299c843`) {
         return Promise.reject({
@@ -109,20 +109,12 @@ describe(commands.TEAM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c843' }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, 'No team found with Group Id 1caf7dcd-7e83-4c3a-94f7-932a1299c843');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { 
+      debug: false, 
+      id: '1caf7dcd-7e83-4c3a-94f7-932a1299c843' } } as any), new CommandError('No team found with Group Id 1caf7dcd-7e83-4c3a-94f7-932a1299c843'));
   });
 
-  it('fails when team name does not exist', (done) => {
+  it('fails when team name does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Finance'`) {
         return Promise.resolve({
@@ -140,23 +132,12 @@ describe(commands.TEAM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        name: 'Finance'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      name: 'Finance' } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
-  it('retrieves information about the specified Microsoft Team', (done) => {
+  it('retrieves information about the specified Microsoft Team', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/1caf7dcd-7e83-4c3a-94f7-932a1299c844`) {
 
@@ -205,57 +186,50 @@ describe(commands.TEAM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
-          "createdDateTime": "2017-11-29T03:27:05Z",
-          "displayName": "Finance",
-          "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
-          "classification": null,
-          "specialization": "none",
-          "visibility": "Public",
-          "webUrl": "https://teams.microsoft.com/l/team/19:ASjdflg-xKFnjueOwbm3es6HF2zx3Ki57MyfDFrjeg01%40thread.tacv2/conversations?groupId=1caf7dcd-7e83-4c3a-94f7-932a1299c844&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35",
-          "isArchived": false,
-          "isMembershipLimitedToOwners": false,
-          "discoverySettings": {
-            "showInTeamsSearchAndSuggestions": false
-          },
-          "memberSettings": {
-            "allowCreateUpdateChannels": true,
-            "allowCreatePrivateChannels": true,
-            "allowDeleteChannels": true,
-            "allowAddRemoveApps": true,
-            "allowCreateUpdateRemoveTabs": true,
-            "allowCreateUpdateRemoveConnectors": true
-          },
-          "guestSettings": {
-            "allowCreateUpdateChannels": false,
-            "allowDeleteChannels": false
-          },
-          "messagingSettings": {
-            "allowUserEditMessages": true,
-            "allowUserDeleteMessages": true,
-            "allowOwnerDeleteMessages": true,
-            "allowTeamMentions": true,
-            "allowChannelMentions": true
-          },
-          "funSettings": {
-            "allowGiphy": true,
-            "giphyContentRating": "moderate",
-            "allowStickersAndMemes": true,
-            "allowCustomMemes": true
-          }
-        }));
-        done();
+    await command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
+    assert(loggerLogSpy.calledWith({
+      "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
+      "createdDateTime": "2017-11-29T03:27:05Z",
+      "displayName": "Finance",
+      "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+      "classification": null,
+      "specialization": "none",
+      "visibility": "Public",
+      "webUrl": "https://teams.microsoft.com/l/team/19:ASjdflg-xKFnjueOwbm3es6HF2zx3Ki57MyfDFrjeg01%40thread.tacv2/conversations?groupId=1caf7dcd-7e83-4c3a-94f7-932a1299c844&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35",
+      "isArchived": false,
+      "isMembershipLimitedToOwners": false,
+      "discoverySettings": {
+        "showInTeamsSearchAndSuggestions": false
+      },
+      "memberSettings": {
+        "allowCreateUpdateChannels": true,
+        "allowCreatePrivateChannels": true,
+        "allowDeleteChannels": true,
+        "allowAddRemoveApps": true,
+        "allowCreateUpdateRemoveTabs": true,
+        "allowCreateUpdateRemoveConnectors": true
+      },
+      "guestSettings": {
+        "allowCreateUpdateChannels": false,
+        "allowDeleteChannels": false
+      },
+      "messagingSettings": {
+        "allowUserEditMessages": true,
+        "allowUserDeleteMessages": true,
+        "allowOwnerDeleteMessages": true,
+        "allowTeamMentions": true,
+        "allowChannelMentions": true
+      },
+      "funSettings": {
+        "allowGiphy": true,
+        "giphyContentRating": "moderate",
+        "allowStickersAndMemes": true,
+        "allowCustomMemes": true
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    }));
   });
 
-  it('retrieves information about the specified Microsoft Teams team by name', (done) => {
+  it('retrieves information about the specified Microsoft Teams team by name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Finance'`) {
@@ -316,54 +290,47 @@ describe(commands.TEAM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'Finance' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
-          "createdDateTime": "2017-11-29T03:27:05Z",
-          "displayName": "Finance",
-          "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
-          "classification": null,
-          "specialization": "none",
-          "visibility": "Public",
-          "webUrl": "https://teams.microsoft.com/l/team/19:ASjdflg-xKFnjueOwbm3es6HF2zx3Ki57MyfDFrjeg01%40thread.tacv2/conversations?groupId=1caf7dcd-7e83-4c3a-94f7-932a1299c844&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35",
-          "isArchived": false,
-          "isMembershipLimitedToOwners": false,
-          "discoverySettings": {
-            "showInTeamsSearchAndSuggestions": false
-          },
-          "memberSettings": {
-            "allowCreateUpdateChannels": true,
-            "allowCreatePrivateChannels": true,
-            "allowDeleteChannels": true,
-            "allowAddRemoveApps": true,
-            "allowCreateUpdateRemoveTabs": true,
-            "allowCreateUpdateRemoveConnectors": true
-          },
-          "guestSettings": {
-            "allowCreateUpdateChannels": false,
-            "allowDeleteChannels": false
-          },
-          "messagingSettings": {
-            "allowUserEditMessages": true,
-            "allowUserDeleteMessages": true,
-            "allowOwnerDeleteMessages": true,
-            "allowTeamMentions": true,
-            "allowChannelMentions": true
-          },
-          "funSettings": {
-            "allowGiphy": true,
-            "giphyContentRating": "moderate",
-            "allowStickersAndMemes": true,
-            "allowCustomMemes": true
-          }
-        }));
-        done();
+    await command.action(logger, { options: { debug: false, name: 'Finance' } });
+    assert(loggerLogSpy.calledWith({
+      "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
+      "createdDateTime": "2017-11-29T03:27:05Z",
+      "displayName": "Finance",
+      "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+      "classification": null,
+      "specialization": "none",
+      "visibility": "Public",
+      "webUrl": "https://teams.microsoft.com/l/team/19:ASjdflg-xKFnjueOwbm3es6HF2zx3Ki57MyfDFrjeg01%40thread.tacv2/conversations?groupId=1caf7dcd-7e83-4c3a-94f7-932a1299c844&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35",
+      "isArchived": false,
+      "isMembershipLimitedToOwners": false,
+      "discoverySettings": {
+        "showInTeamsSearchAndSuggestions": false
+      },
+      "memberSettings": {
+        "allowCreateUpdateChannels": true,
+        "allowCreatePrivateChannels": true,
+        "allowDeleteChannels": true,
+        "allowAddRemoveApps": true,
+        "allowCreateUpdateRemoveTabs": true,
+        "allowCreateUpdateRemoveConnectors": true
+      },
+      "guestSettings": {
+        "allowCreateUpdateChannels": false,
+        "allowDeleteChannels": false
+      },
+      "messagingSettings": {
+        "allowUserEditMessages": true,
+        "allowUserDeleteMessages": true,
+        "allowOwnerDeleteMessages": true,
+        "allowTeamMentions": true,
+        "allowChannelMentions": true
+      },
+      "funSettings": {
+        "allowGiphy": true,
+        "giphyContentRating": "moderate",
+        "allowStickersAndMemes": true,
+        "allowCustomMemes": true
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    }));
   });
 
 

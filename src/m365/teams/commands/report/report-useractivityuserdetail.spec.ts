@@ -57,7 +57,7 @@ describe(commands.REPORT_USERACTIVITYUSERDETAIL, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('gets details about Microsoft Teams user activity by user for the given date', (done) => {
+  it('gets details about Microsoft Teams user activity by user for the given date', async () => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(date=2019-07-13)`) {
         return Promise.resolve(`
@@ -70,15 +70,8 @@ describe(commands.REPORT_USERACTIVITYUSERDETAIL, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, date: '2019-07-13' } }, () => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(date=2019-07-13)");
-        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, date: '2019-07-13' } });
+    assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(date=2019-07-13)");
+    assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
 });

@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -39,9 +39,9 @@ describe(commands.CACHE_REMOVE, () => {
 
     promptOptions = undefined;
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: true });
+      return { continue: true };
     });
   });
 
@@ -68,33 +68,25 @@ describe(commands.CACHE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before clear cache when confirm option not passed', (done) => {
+  it('prompts before clear cache when confirm option not passed', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {}
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    assert(promptIssued);
   });
 
   it('fails validation if called from docker container.', async () => {
@@ -127,149 +119,86 @@ describe(commands.CACHE_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails to remove teams cache when exec fails', (done) => {
+  it('fails to remove teams cache when exec fails', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     const error = new Error('ERROR: The process "Teams.exe" not found.');
     const exec = sinon.stub(command, 'exec' as any).throws(error);
 
-    command.action(logger, {
-      options: {
-        confirm: true,
-        verbose: true
-      }
-    }, (err) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(`ERROR: The process "Teams.exe" not found.`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        exec.restore();
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { confirm: true, verbose: true } } as any), new CommandError('ERROR: The process "Teams.exe" not found.'));
+    exec.restore();
   });
 
-  it('fails to remove teams cache when exec fails randomly', (done) => {
+  it('fails to remove teams cache when exec fails randomly', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     const error = new Error('random error');
     const exec = sinon.stub(command, 'exec' as any).throws(error);
 
-    command.action(logger, {
-      options: {
-        confirm: true
-      }
-    }, (err) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(`random error`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        exec.restore();
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { confirm: true } } as any), new CommandError('random error'));
+    exec.restore();
   });
 
-  it('removes Teams cache from macOs platform without prompting.', (done) => {
+  it('removes Teams cache from macOs platform without prompting.', async () => {
     sinon.stub(process, 'platform').value('darwin');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     const exec = sinon.stub(command, 'exec' as any).returns({ stdout: 'pid' });
     const kill = sinon.stub(process, 'kill' as any).returns(null);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         confirm: true,
         verbose: true
       }
-    }, () => {
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        exec.restore();
-        kill.restore();
-      }
     });
+    assert(true);
+    exec.restore();
+    kill.restore();
   });
 
-  it('removes Teams cache from win32 platform without prompting.', (done) => {
+  it('removes Teams cache from win32 platform without prompting.', async () => {
     sinon.stub(process, 'platform').value('win32');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     const exec = sinon.stub(command, 'exec' as any).returns({ stdout: '' });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         confirm: true,
         verbose: true
       }
-    }, () => {
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        exec.restore();
-      }
     });
+    assert(true);
+    exec.restore();
   });
 
-  it('removes Teams cache from darwin platform with prompting.', (done) => {
+  it('removes Teams cache from darwin platform with prompting.', async () => {
     sinon.stub(process, 'platform').value('darwin');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     const exec = sinon.stub(command, 'exec' as any).returns({ stdout: 'pid' });
     const kill = sinon.stub(process, 'kill' as any).returns(null);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true
       }
-    }, () => {
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        exec.restore();
-        kill.restore();
-      }
     });
+    assert(true);
+    exec.restore();
+    kill.restore();
   });
 
-  it('aborts cache clearing from Teams when prompt not confirmed', (done) => {
+  it('aborts cache clearing from Teams when prompt not confirmed', async () => {
     sinon.stub(process, 'platform').value('darwin');
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
 
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} });
+    assert(postSpy.notCalled);
   });
 
 

@@ -110,7 +110,7 @@ class TeamsMessagingSettingsSetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const data: any = {
       messagingSettings: {}
     };
@@ -129,9 +129,12 @@ class TeamsMessagingSettingsSetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    request
-      .patch(requestOptions)
-      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      await request.patch(requestOptions);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

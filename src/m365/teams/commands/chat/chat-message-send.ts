@@ -97,13 +97,14 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getChatId(logger, args)
-      .then(chatId => this.sendChatMessage(chatId as string, args))
-      .then(_ => {
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const chatId = await this.getChatId(logger, args);
+      await this.sendChatMessage(chatId as string, args);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private async getChatId(logger: Logger, args: CommandArgs): Promise<string> {

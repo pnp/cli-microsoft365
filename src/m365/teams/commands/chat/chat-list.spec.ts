@@ -119,7 +119,7 @@ describe(commands.CHAT_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('lists all chat conversations (debug)', (done) => {
+  it('lists all chat conversations (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats`) {
         return Promise.resolve({
@@ -130,45 +130,37 @@ describe(commands.CHAT_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "19:meeting_MjdhNjM4YzUtYzExZi00OTFkLTkzZTAtNTVlNmZmMDhkNGU2@thread.v2",
-            "topic": "Meeting chat sample",
-            "createdDateTime": "2020-12-08T23:53:05.801Z",
-            "lastUpdatedDateTime": "2020-12-08T23:58:32.511Z",
-            "chatType": "meeting"
-          },
-          {
-            "id": "19:561082c0f3f847a58069deb8eb300807@thread.v2",
-            "topic": "Group chat sample",
-            "createdDateTime": "2020-12-03T19:41:07.054Z",
-            "lastUpdatedDateTime": "2020-12-08T23:53:11.012Z",
-            "chatType": "group"
-          },
-          {
-            "id": "19:d74fc2ed-cb0e-4288-a219-b5c71abaf2aa_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces",
-            "topic": null,
-            "createdDateTime": "2020-12-04T23:10:28.51Z",
-            "lastUpdatedDateTime": "2020-12-04T23:10:36.925Z",
-            "chatType": "oneOnOne"
-          }
-        ]));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "19:meeting_MjdhNjM4YzUtYzExZi00OTFkLTkzZTAtNTVlNmZmMDhkNGU2@thread.v2",
+        "topic": "Meeting chat sample",
+        "createdDateTime": "2020-12-08T23:53:05.801Z",
+        "lastUpdatedDateTime": "2020-12-08T23:58:32.511Z",
+        "chatType": "meeting"
+      },
+      {
+        "id": "19:561082c0f3f847a58069deb8eb300807@thread.v2",
+        "topic": "Group chat sample",
+        "createdDateTime": "2020-12-03T19:41:07.054Z",
+        "lastUpdatedDateTime": "2020-12-08T23:53:11.012Z",
+        "chatType": "group"
+      },
+      {
+        "id": "19:d74fc2ed-cb0e-4288-a219-b5c71abaf2aa_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces",
+        "topic": null,
+        "createdDateTime": "2020-12-04T23:10:28.51Z",
+        "lastUpdatedDateTime": "2020-12-04T23:10:36.925Z",
+        "chatType": "oneOnOne"
+      }
+    ]));
   });
 
-  it('lists all chat conversations', (done) => {
+  it('lists all chat conversations', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats`) {
         return Promise.resolve({
@@ -179,45 +171,37 @@ describe(commands.CHAT_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "19:meeting_MjdhNjM4YzUtYzExZi00OTFkLTkzZTAtNTVlNmZmMDhkNGU2@thread.v2",
-            "topic": "Meeting chat sample",
-            "createdDateTime": "2020-12-08T23:53:05.801Z",
-            "lastUpdatedDateTime": "2020-12-08T23:58:32.511Z",
-            "chatType": "meeting"
-          },
-          {
-            "id": "19:561082c0f3f847a58069deb8eb300807@thread.v2",
-            "topic": "Group chat sample",
-            "createdDateTime": "2020-12-03T19:41:07.054Z",
-            "lastUpdatedDateTime": "2020-12-08T23:53:11.012Z",
-            "chatType": "group"
-          },
-          {
-            "id": "19:d74fc2ed-cb0e-4288-a219-b5c71abaf2aa_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces",
-            "topic": null,
-            "createdDateTime": "2020-12-04T23:10:28.51Z",
-            "lastUpdatedDateTime": "2020-12-04T23:10:36.925Z",
-            "chatType": "oneOnOne"
-          }
-        ]));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "19:meeting_MjdhNjM4YzUtYzExZi00OTFkLTkzZTAtNTVlNmZmMDhkNGU2@thread.v2",
+        "topic": "Meeting chat sample",
+        "createdDateTime": "2020-12-08T23:53:05.801Z",
+        "lastUpdatedDateTime": "2020-12-08T23:58:32.511Z",
+        "chatType": "meeting"
+      },
+      {
+        "id": "19:561082c0f3f847a58069deb8eb300807@thread.v2",
+        "topic": "Group chat sample",
+        "createdDateTime": "2020-12-03T19:41:07.054Z",
+        "lastUpdatedDateTime": "2020-12-08T23:53:11.012Z",
+        "chatType": "group"
+      },
+      {
+        "id": "19:d74fc2ed-cb0e-4288-a219-b5c71abaf2aa_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces",
+        "topic": null,
+        "createdDateTime": "2020-12-04T23:10:28.51Z",
+        "lastUpdatedDateTime": "2020-12-04T23:10:36.925Z",
+        "chatType": "oneOnOne"
+      }
+    ]));
   });
 
-  it('lists oneOnOne chat conversations', (done) => {
+  it('lists oneOnOne chat conversations', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats?$filter=chatType eq 'oneOnOne'`) {
         return Promise.resolve({
@@ -228,32 +212,24 @@ describe(commands.CHAT_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         type: "oneOnOne"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "19:d74fc2ed-cb0e-4288-a219-b5c71abaf2aa_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces",
-            "topic": null,
-            "createdDateTime": "2020-12-04T23:10:28.51Z",
-            "lastUpdatedDateTime": "2020-12-04T23:10:36.925Z",
-            "chatType": "oneOnOne"
-          }
-        ]));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "19:d74fc2ed-cb0e-4288-a219-b5c71abaf2aa_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces",
+        "topic": null,
+        "createdDateTime": "2020-12-04T23:10:28.51Z",
+        "lastUpdatedDateTime": "2020-12-04T23:10:36.925Z",
+        "chatType": "oneOnOne"
+      }
+    ]));
   });
 
-  it('lists group chat conversations', (done) => {
+  it('lists group chat conversations', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats?$filter=chatType eq 'group'`) {
         return Promise.resolve({
@@ -264,32 +240,24 @@ describe(commands.CHAT_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         type: "group"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "19:561082c0f3f847a58069deb8eb300807@thread.v2",
-            "topic": "Group chat sample",
-            "createdDateTime": "2020-12-03T19:41:07.054Z",
-            "lastUpdatedDateTime": "2020-12-08T23:53:11.012Z",
-            "chatType": "group"
-          }
-        ]));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "19:561082c0f3f847a58069deb8eb300807@thread.v2",
+        "topic": "Group chat sample",
+        "createdDateTime": "2020-12-03T19:41:07.054Z",
+        "lastUpdatedDateTime": "2020-12-08T23:53:11.012Z",
+        "chatType": "group"
+      }
+    ]));
   });
 
-  it('lists meeting chat conversations', (done) => {
+  it('lists meeting chat conversations', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats?$filter=chatType eq 'meeting'`) {
         return Promise.resolve({
@@ -300,33 +268,26 @@ describe(commands.CHAT_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         type: "meeting"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "19:meeting_MjdhNjM4YzUtYzExZi00OTFkLTkzZTAtNTVlNmZmMDhkNGU2@thread.v2",
-            "topic": "Meeting chat sample",
-            "createdDateTime": "2020-12-08T23:53:05.801Z",
-            "lastUpdatedDateTime": "2020-12-08T23:58:32.511Z",
-            "chatType": "meeting"
-          }
-        ]));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "19:meeting_MjdhNjM4YzUtYzExZi00OTFkLTkzZTAtNTVlNmZmMDhkNGU2@thread.v2",
+        "topic": "Meeting chat sample",
+        "createdDateTime": "2020-12-08T23:53:05.801Z",
+        "lastUpdatedDateTime": "2020-12-08T23:58:32.511Z",
+        "chatType": "meeting"
+      }
+    ]));
+
   });
 
 
-  it('outputs all data in json output mode', (done) => {
+  it('outputs all data in json output mode', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats`) {
         return Promise.resolve({
@@ -337,40 +298,20 @@ describe(commands.CHAT_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         output: 'json'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{ "id": "19:meeting_MjdhNjM4YzUtYzExZi00OTFkLTkzZTAtNTVlNmZmMDhkNGU2@thread.v2", "topic": "Meeting chat sample", "createdDateTime": "2020-12-08T23:53:05.801Z", "lastUpdatedDateTime": "2020-12-08T23:58:32.511Z", "chatType": "meeting" }, { "id": "19:561082c0f3f847a58069deb8eb300807@thread.v2", "topic": "Group chat sample", "createdDateTime": "2020-12-03T19:41:07.054Z", "lastUpdatedDateTime": "2020-12-08T23:53:11.012Z", "chatType": "group" }, { "id": "19:d74fc2ed-cb0e-4288-a219-b5c71abaf2aa_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces", "topic": null, "createdDateTime": "2020-12-04T23:10:28.51Z", "lastUpdatedDateTime": "2020-12-04T23:10:36.925Z", "chatType": "oneOnOne" }]));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([{ "id": "19:meeting_MjdhNjM4YzUtYzExZi00OTFkLTkzZTAtNTVlNmZmMDhkNGU2@thread.v2", "topic": "Meeting chat sample", "createdDateTime": "2020-12-08T23:53:05.801Z", "lastUpdatedDateTime": "2020-12-08T23:58:32.511Z", "chatType": "meeting" }, { "id": "19:561082c0f3f847a58069deb8eb300807@thread.v2", "topic": "Group chat sample", "createdDateTime": "2020-12-03T19:41:07.054Z", "lastUpdatedDateTime": "2020-12-08T23:53:11.012Z", "chatType": "group" }, { "id": "19:d74fc2ed-cb0e-4288-a219-b5c71abaf2aa_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces", "topic": null, "createdDateTime": "2020-12-04T23:10:28.51Z", "lastUpdatedDateTime": "2020-12-04T23:10:36.925Z", "chatType": "oneOnOne" }]));
   });
 
-  it('correctly handles error when listing chat conversations', (done) => {
+  it('correctly handles error when listing chat conversations', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        debug: false
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 });

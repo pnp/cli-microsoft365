@@ -274,7 +274,7 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails to get team when resourceprovisioning does not exist', (done) => {
+  it('fails to get team when resourceprovisioning does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
@@ -291,25 +291,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
-      options: {
-        teamName: 'Team Name',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        id: '00000',
-        role: 'owner'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      teamName: 'Team Name',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      id: '00000',
+      role: 'owner' } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
-  it('correctly get teams id by team name', (done) => {
+  it('correctly get teams id by team name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve(groupsResponse);
@@ -326,26 +315,18 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         teamName: 'Team Name',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         id: '00000',
         role: 'owner'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(memberResponse));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(memberResponse));
   });
 
-  it('fails to get channel when channel does not exist', (done) => {
+  it('fails to get channel when channel does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/teams/00000000-0000-0000-0000-000000000000/channels?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
@@ -356,25 +337,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelName: 'Channel Name',
-        id: '00000',
-        role: 'owner'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified channel does not exist in the Microsoft Teams team`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelName: 'Channel Name',
+      id: '00000',
+      role: 'owner' } } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
   });
 
-  it('fails to get channel when channel does is not private', (done) => {
+  it('fails to get channel when channel does is not private', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('00000000-0000-0000-0000-000000000000')}/channels?$filter=displayName eq '${encodeURIComponent('Other Channel')}'`) {
@@ -391,27 +361,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelName: 'Other Channel',
-        id: '00000',
-        role: 'owner'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError(`The specified channel is not a private channel`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelName: 'Other Channel',
+      id: '00000',
+      role: 'owner' } } as any), new CommandError('The specified channel is not a private channel'));
   });
 
-  it('correctly get channel id by channel name', (done) => {
+  it('correctly get channel id by channel name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/teams/00000000-0000-0000-0000-000000000000/channels?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
@@ -435,26 +392,18 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelName: 'Channel Name',
         id: '00000',
         role: 'owner'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(memberResponse));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(memberResponse));
   });
 
-  it('fails to get member when member does not exist by userId', (done) => {
+  it('fails to get member when member does not exist by userId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) > -1) {
         return Promise.resolve({
@@ -472,25 +421,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        userId: '00000000-0000-0000-0000-000000000000',
-        role: 'owner'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified member does not exist in the Microsoft Teams channel`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      userId: '00000000-0000-0000-0000-000000000000',
+      role: 'owner' } } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
-  it('fails to get member when member does not return userId', (done) => {
+  it('fails to get member when member does not return userId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) > -1) {
         return Promise.resolve({
@@ -507,25 +445,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        userId: '00000000-0000-0000-0000-000000000000',
-        role: 'owner'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified member does not exist in the Microsoft Teams channel`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      userId: '00000000-0000-0000-0000-000000000000',
+      role: 'owner' } } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
-  it('fails to get member when member does not exist by userName', (done) => {
+  it('fails to get member when member does not exist by userName', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
@@ -543,25 +470,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        userName: 'user@domainname.com',
-        role: 'owner'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified member does not exist in the Microsoft Teams channel`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      userName: 'user@domainname.com',
+      role: 'owner' } } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
-  it('fails to get member when member does not return email', (done) => {
+  it('fails to get member when member does not return email', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
@@ -578,25 +494,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        userName: 'user@domainname.com',
-        role: 'owner'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified member does not exist in the Microsoft Teams channel`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      userName: 'user@domainname.com',
+      role: 'owner' } } as any), new CommandError('The specified member does not exist in the Microsoft Teams channel'));
   });
 
-  it('fails to get member when member does multiple exist with username', (done) => {
+  it('fails to get member when member does multiple exist with username', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
@@ -619,25 +524,14 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
-        userName: 'user@domainname.com',
-        role: 'owner'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple Microsoft Teams channel members with name user@domainname.com found: 00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelId: '19:00000000000000000000000000000000@thread.skype',
+      userName: 'user@domainname.com',
+      role: 'owner' } } as any), new CommandError('Multiple Microsoft Teams channel members with name user@domainname.com found: 00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'));
   });
 
-  it('correctly get member id by user id', (done) => {
+  it('correctly get member id by user id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
@@ -662,26 +556,18 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userId: '00000000-0000-0000-0000-000000000000',
         role: 'owner'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(memberResponse));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(memberResponse));
   });
 
-  it('correctly get member id by user name', (done) => {
+  it('correctly get member id by user name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
@@ -706,44 +592,25 @@ describe(commands.CHANNEL_MEMBER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype',
         userName: 'user@domainname.com',
         role: 'owner'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(memberResponse));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(memberResponse));
   });
 
-  it('correctly handles error when retrieving all teams', (done) => {
+  it('correctly handles error when retrieving all teams', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        teamId: '00000000-0000-0000-0000-000000000000'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      teamId: '00000000-0000-0000-0000-000000000000' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

@@ -128,21 +128,23 @@ class TeamsAppListCommand extends GraphCommand {
     });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    this
-      .getEndpointUrl(args)
-      .then(endpoint => odata.getAllItems<TeamsApp>(endpoint))
-      .then((items): void => {
-        if (args.options.teamId || args.options.teamName) {
-          items.forEach(t => {
-            t.displayName = (t as any).teamsApp.displayName;
-            t.distributionMethod = (t as any).teamsApp.distributionMethod;
-          });
-        }
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const endpoint = await this.getEndpointUrl(args);
+      const items = await odata.getAllItems<TeamsApp>(endpoint);
 
-        logger.log(items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      if (args.options.teamId || args.options.teamName) {
+        items.forEach(t => {
+          t.displayName = (t as any).teamsApp.displayName;
+          t.distributionMethod = (t as any).teamsApp.distributionMethod;
+        });
+      }
+
+      logger.log(items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

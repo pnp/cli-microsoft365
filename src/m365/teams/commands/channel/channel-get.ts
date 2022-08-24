@@ -165,36 +165,32 @@ class TeamsChannelGetCommand extends GraphCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getTeamId(args)
-      .then((teamId: string): Promise<string> => {
-        this.teamId = teamId;
-        return this.getChannelId(args);
-      })
-      .then((channelId: string): Promise<Channel> => {
-        let url: string = '';
-        if (args.options.primary) {
-          url = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/primaryChannel`;
-        }
-        else {
-          url = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(channelId)}`;
-        }
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      this.teamId = await this.getTeamId(args);
+      const channelId: string = await this.getChannelId(args);
+      let url: string = '';
+      if (args.options.primary) {
+        url = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/primaryChannel`;
+      }
+      else {
+        url = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(channelId)}`;
+      }
 
-        const requestOptions: any = {
-          url: url,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
+      const requestOptions: any = {
+        url: url,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
 
-        return request.get<Channel>(requestOptions);
-      })
-      .then((res: Channel): void => {
-        logger.log(res);
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res: Channel = await request.get<Channel>(requestOptions);
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

@@ -100,7 +100,7 @@ describe(commands.TEAM_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('creates Microsoft Teams team in the tenant when no template is supplied (verbose)', (done) => {
+  it('creates Microsoft Teams team in the tenant when no template is supplied (verbose)', async () => {
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
@@ -127,29 +127,22 @@ describe(commands.TEAM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         name: 'Architecture',
         description: 'Architecture Discussion'
       }
-    }, () => {
-      try {
-        assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
-          displayName: 'Architecture',
-          description: 'Architecture Discussion'
-        });
-        assert(getRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.deepEqual(requestStub.getCall(0).args[0].data, {
+      "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
+      displayName: 'Architecture',
+      description: 'Architecture Discussion'
+    });
+    assert(getRequestStub.called);
   });
 
-  it('creates Microsoft Teams team in the tenant when template is supplied (verbose)', (done) => {
+  it('creates Microsoft Teams team in the tenant when template is supplied (verbose)', async () => {
     const template = `
     {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
@@ -182,28 +175,21 @@ describe(commands.TEAM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         template
       }
-    }, () => {
-      try {
-        assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
-          displayName: 'Sample Engineering Team',
-          description: 'This is a sample engineering team, used to showcase the range of properties supported by this API'
-        });
-        assert(getRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.deepEqual(requestStub.getCall(0).args[0].data, {
+      "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
+      displayName: 'Sample Engineering Team',
+      description: 'This is a sample engineering team, used to showcase the range of properties supported by this API'
+    });
+    assert(getRequestStub.called);
   });
 
-  it('creates Microsoft Teams team in the tenant when template and name is supplied (verbose)', (done) => {
+  it('creates Microsoft Teams team in the tenant when template and name is supplied (verbose)', async () => {
     const template = `
     {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
@@ -236,29 +222,22 @@ describe(commands.TEAM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         name: 'Sample Classroom Team',
         template
       }
-    }, () => {
-      try {
-        assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
-          displayName: 'Sample Classroom Team',
-          description: 'This is a sample engineering team, used to showcase the range of properties supported by this API'
-        });
-        assert(getRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.deepEqual(requestStub.getCall(0).args[0].data, {
+      "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
+      displayName: 'Sample Classroom Team',
+      description: 'This is a sample engineering team, used to showcase the range of properties supported by this API'
+    });
+    assert(getRequestStub.called);
   });
 
-  it('creates Microsoft Teams team in the tenant when template and description is supplied (verbose)', (done) => {
+  it('creates Microsoft Teams team in the tenant when template and description is supplied (verbose)', async () => {
     const template = `
     {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
@@ -291,29 +270,22 @@ describe(commands.TEAM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
         template
       }
-    }, () => {
-      try {
-        assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
-          displayName: 'Sample Engineering Team',
-          description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
-        });
-        assert(getRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.deepEqual(requestStub.getCall(0).args[0].data, {
+      "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
+      displayName: 'Sample Engineering Team',
+      description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
+    });
+    assert(getRequestStub.called);
   });
 
-  it('creates Microsoft Teams team in the tenant when template, name and description is supplied (verbose)', (done) => {
+  it('creates Microsoft Teams team in the tenant when template, name and description is supplied (verbose)', async () => {
     const template = `
     {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
@@ -346,30 +318,23 @@ describe(commands.TEAM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         name: 'Sample Classroom Team',
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
         template
       }
-    }, () => {
-      try {
-        assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
-          displayName: 'Sample Classroom Team',
-          description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
-        });
-        assert(getRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.deepEqual(requestStub.getCall(0).args[0].data, {
+      "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
+      displayName: 'Sample Classroom Team',
+      description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
+    });
+    assert(getRequestStub.called);
   });
 
-  it('creates Microsoft Teams team in the tenant when template, name and description is supplied and waits for command to complete (verbose)', (done) => {
+  it('creates Microsoft Teams team in the tenant when template, name and description is supplied and waits for command to complete (verbose)', async () => {
     const template = `
     {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
@@ -445,7 +410,7 @@ describe(commands.TEAM_ADD, () => {
       return {} as any;
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         wait: true,
@@ -453,50 +418,33 @@ describe(commands.TEAM_ADD, () => {
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
         template
       }
-    }, () => {
-      try {
-        assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
-          displayName: 'Sample Classroom Team',
-          description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
-        });
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
+    });
+    assert.deepEqual(requestStub.getCall(0).args[0].data, {
+      "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
+      displayName: 'Sample Classroom Team',
+      description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
     });
   });
 
-  it('correctly handles error when creating a Team', (done) => {
+  it('correctly handles error when creating a Team', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        verbose: true,
-        name: 'Architecture',
-        description: 'Architecture Discussion'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      verbose: true,
+      name: 'Architecture',
+      description: 'Architecture Discussion' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('correctly handles operation error when creating a Team when waiting for command to complete', (done) => {
+  it('correctly handles operation error when creating a Team when waiting for command to complete', async () => {
     const template = `
     {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       "displayName": "Sample Engineering Team",
       "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
     }`;
+
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
@@ -547,31 +495,20 @@ describe(commands.TEAM_ADD, () => {
       fn();
       return {} as any;
     });
-
-    command.action(logger, {
-      options: {
-        wait: true,
-        name: 'Sample Classroom Team',
-        description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
-        template
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
-          displayName: 'Sample Classroom Team',
-          description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
-        });
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
+    await assert.rejects(command.action(logger, { options: {
+      wait: true,
+      name: 'Sample Classroom Team',
+      description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
+      template } } as any), new CommandError('An error has occurred'));
+    
+    assert.deepEqual(requestStub.getCall(0).args[0].data, {
+      "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
+      displayName: 'Sample Classroom Team',
+      description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
     });
   });
 
-  it('correctly handles inProgress operation status when creating a Team and waiting for the command to complete', (done) => {
+  it('correctly handles inProgress operation status when creating a Team and waiting for the command to complete', async () => {
     const template = `
     {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
@@ -629,27 +566,20 @@ describe(commands.TEAM_ADD, () => {
       return {} as any;
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         wait: true,
         name: 'Sample Classroom Team',
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
         template
       }
-    } as any, () => {
-      try {
-        assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
-          displayName: 'Sample Classroom Team',
-          description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
-        });
-        assert(loggerLogSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
+    } as any);
+    assert.deepEqual(requestStub.getCall(0).args[0].data, {
+      "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
+      displayName: 'Sample Classroom Team',
+      description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
     });
+    assert(loggerLogSpy.called);
   });
 
   it('supports debug mode', () => {

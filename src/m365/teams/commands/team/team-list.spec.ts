@@ -59,7 +59,7 @@ describe(commands.TEAM_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('lists Microsoft Teams in the tenant', (done) => {
+  it('lists Microsoft Teams in the tenant', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$select=id,displayName,description,resourceProvisioningOptions`) {
         return Promise.resolve({
@@ -110,25 +110,18 @@ describe(commands.TEAM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
-            "displayName": "Team 1",
-            "description": "Team 1 description",
-            "isArchived": false
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
+        "displayName": "Team 1",
+        "description": "Team 1 description",
+        "isArchived": false
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('correctly handles when listing a team a user is not member of', (done) => {
+  it('correctly handles when listing a team a user is not member of', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$select=id,displayName,description,resourceProvisioningOptions`) {
         return Promise.resolve({
@@ -149,25 +142,18 @@ describe(commands.TEAM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
-            "displayName": "Team 1",
-            "description": "Team 1 description",
-            "isArchived": undefined
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
+        "displayName": "Team 1",
+        "description": "Team 1 description",
+        "isArchived": undefined
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('correctly handles when listing a team a user is not member of, and the graph returns an unexpected error', (done) => {
+  it('correctly handles when listing a team a user is not member of, and the graph returns an unexpected error', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$select=id,displayName,description,resourceProvisioningOptions`) {
         return Promise.resolve({
@@ -185,18 +171,10 @@ describe(commands.TEAM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Invalid request')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Invalid request'));
   });
 
-  it('lists Microsoft Teams in the tenant (debug)', (done) => {
+  it('lists Microsoft Teams in the tenant (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$select=id,displayName,description,resourceProvisioningOptions`) {
         return Promise.resolve({
@@ -253,31 +231,24 @@ describe(commands.TEAM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
-            "displayName": "Team 1",
-            "description": "Team 1 description",
-            "isArchived": false
-          },
-          {
-            "id": "13be6971-79db-4f33-9d41-b25589ca25af",
-            "displayName": "Team 2",
-            "description": "Team 2 description",
-            "isArchived": false
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
+        "displayName": "Team 1",
+        "description": "Team 1 description",
+        "isArchived": false
+      },
+      {
+        "id": "13be6971-79db-4f33-9d41-b25589ca25af",
+        "displayName": "Team 2",
+        "description": "Team 2 description",
+        "isArchived": false
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists joined Microsoft Teams in the tenant', (done) => {
+  it('lists joined Microsoft Teams in the tenant', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$select=id,displayName,description,resourceProvisioningOptions`) {
         return Promise.resolve({
@@ -352,31 +323,24 @@ describe(commands.TEAM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { joined: true, debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
-            "displayName": "Team 1",
-            "description": "Team 1 description",
-            "isArchived": false
-          },
-          {
-            "id": "13be6971-79db-4f33-9d41-b25589ca25af",
-            "displayName": "Team 2",
-            "description": "Team 2 description",
-            "isArchived": false
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { joined: true, debug: false } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
+        "displayName": "Team 1",
+        "description": "Team 1 description",
+        "isArchived": false
+      },
+      {
+        "id": "13be6971-79db-4f33-9d41-b25589ca25af",
+        "displayName": "Team 2",
+        "description": "Team 2 description",
+        "isArchived": false
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists all properties for output json', (done) => {
+  it('lists all properties for output json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$select=id,displayName,description,resourceProvisioningOptions`) {
         return Promise.resolve({
@@ -451,28 +415,21 @@ describe(commands.TEAM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { output: 'json', debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
-            "displayName": "Team 1",
-            "description": "Team 1 description",
-            "isArchived": false
-          },
-          {
-            "id": "13be6971-79db-4f33-9d41-b25589ca25af",
-            "displayName": "Team 2",
-            "description": "Team 2 description",
-            "isArchived": false
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { output: 'json', debug: false } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
+        "displayName": "Team 1",
+        "description": "Team 1 description",
+        "isArchived": false
+      },
+      {
+        "id": "13be6971-79db-4f33-9d41-b25589ca25af",
+        "displayName": "Team 2",
+        "description": "Team 2 description",
+        "isArchived": false
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
   it('supports debug mode', () => {

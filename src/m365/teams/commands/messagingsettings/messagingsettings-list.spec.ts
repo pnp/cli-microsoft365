@@ -61,7 +61,7 @@ describe(commands.MESSAGINGSETTINGS_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('lists messaging settings for a Microsoft Team', (done) => {
+  it('lists messaging settings for a Microsoft Team', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/2609af39-7775-4f94-a3dc-0dd67657e900?$select=messagingSettings`) {
         return Promise.resolve({
@@ -78,24 +78,17 @@ describe(commands.MESSAGINGSETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "allowUserEditMessages": true,
-          "allowUserDeleteMessages": true,
-          "allowOwnerDeleteMessages": true,
-          "allowTeamMentions": true,
-          "allowChannelMentions": true
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: false } });
+    assert(loggerLogSpy.calledWith({
+      "allowUserEditMessages": true,
+      "allowUserDeleteMessages": true,
+      "allowOwnerDeleteMessages": true,
+      "allowTeamMentions": true,
+      "allowChannelMentions": true
+    }));
   });
 
-  it('lists messaging settings for a Microsoft Team (debug)', (done) => {
+  it('lists messaging settings for a Microsoft Team (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/2609af39-7775-4f94-a3dc-0dd67657e900?$select=messagingSettings`) {
         return Promise.resolve({
@@ -112,37 +105,22 @@ describe(commands.MESSAGINGSETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "allowUserEditMessages": true,
-          "allowUserDeleteMessages": true,
-          "allowOwnerDeleteMessages": true,
-          "allowTeamMentions": true,
-          "allowChannelMentions": true
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: true } });
+    assert(loggerLogSpy.calledWith({
+      "allowUserEditMessages": true,
+      "allowUserDeleteMessages": true,
+      "allowOwnerDeleteMessages": true,
+      "allowTeamMentions": true,
+      "allowChannelMentions": true
+    }));
   });
 
-  it('correctly handles error when listing messaging settings', (done) => {
+  it('correctly handles error when listing messaging settings', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if teamId is not a valid GUID', async () => {
@@ -165,7 +143,7 @@ describe(commands.MESSAGINGSETTINGS_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('lists all properties for output json', (done) => {
+  it('lists all properties for output json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/2609af39-7775-4f94-a3dc-0dd67657e900?$select=messagingSettings`) {
         return Promise.resolve({
@@ -182,21 +160,14 @@ describe(commands.MESSAGINGSETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", output: 'json', debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "allowUserEditMessages": true,
-          "allowUserDeleteMessages": true,
-          "allowOwnerDeleteMessages": true,
-          "allowTeamMentions": true,
-          "allowChannelMentions": true
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", output: 'json', debug: false } });
+    assert(loggerLogSpy.calledWith({
+      "allowUserEditMessages": true,
+      "allowUserDeleteMessages": true,
+      "allowOwnerDeleteMessages": true,
+      "allowTeamMentions": true,
+      "allowChannelMentions": true
+    }));
   });
 
   it('supports debug mode', () => {

@@ -57,7 +57,7 @@ class TeamsChatMessageListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const endpoint: string = `${this.resource}/v1.0/chats/${args.options.chatId}/messages`;
 
     odata
