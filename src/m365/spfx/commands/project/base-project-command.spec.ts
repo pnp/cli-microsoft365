@@ -12,7 +12,7 @@ class MockCommand extends BaseProjectCommand {
   public get description(): string {
     return 'Mock command';
   }
-  public commandAction(): void {
+  public async commandAction(): Promise<void> {
   }
 
   public getProjectPublic(): Project {

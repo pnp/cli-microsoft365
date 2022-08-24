@@ -67,37 +67,28 @@ describe(commands.PROJECT_RENAME, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('calls telemetry', () => {
+  it('calls telemetry', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
-    command.action(logger, { options: { newName: 'spfx-react' } }, () => {
-      assert(trackEvent.called);
-    });
+    await command.action(logger, { options: { newName: 'spfx-react' } });
+    assert(trackEvent.called);
   });
 
-  it('logs correct telemetry event', () => {
+  it('logs correct telemetry event', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
-    command.action(logger, { options: { newName: 'spfx-react' } }, () => {
-      assert.strictEqual(telemetry.name, commands.PROJECT_RENAME);
-    });
+    await command.action(logger, { options: { newName: 'spfx-react' } });
+    assert.strictEqual(telemetry.name, commands.PROJECT_RENAME);
   });
 
-  it('shows error if the project path couldn\'t be determined', (done) => {
+  it('shows error if the project path couldn\'t be determined', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => null);
 
-    command.action(logger, { options: { newName: 'spfx-react' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { newName: 'spfx-react' } } as any),
+      new CommandError(`Couldn't find project root folder`, 1));
   });
 
-  it('updates only the files found and skips other files', (done) => {
+  it('updates only the files found and skips other files', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
     sinon.stub(command as any, 'getProject').callsFake(_ => {
       return {
@@ -109,18 +100,11 @@ describe(commands.PROJECT_RENAME, () => {
       };
     });
     sinon.stub(fs, 'existsSync').callsFake(_ => false);
-    command.action(logger, { options: { newName: 'spfx-react' } } as any, () => {
-      try {
-        assert(writeFileSyncSpy.notCalled);
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await command.action(logger, { options: { newName: 'spfx-react' } } as any);
+    assert(writeFileSyncSpy.notCalled);
   });
 
-  it('handles error while updating the files', (done) => {
+  it('handles error while updating the files', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
     sinon.stub(command as any, 'getProject').callsFake(_ => {
       return {
@@ -132,18 +116,11 @@ describe(commands.PROJECT_RENAME, () => {
       };
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => { throw 'error'; });
-    command.action(logger, { options: { newName: 'spfx-react' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error')));
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { newName: 'spfx-react' } } as any),
+      new CommandError('error'));
   });
 
-  it('replaces project name in package.json', (done) => {
+  it('replaces project name in package.json', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
     const replacedContent = `{
@@ -188,18 +165,11 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    command.action(logger, { options: { newName: 'spfx-react', generateNewId: true } } as any, () => {
-      try {
-        assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await command.action(logger, { options: { newName: 'spfx-react', generateNewId: true } } as any);
+    assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
   });
 
-  it('replaces only project name in .yo-rc.json when --generateNewId is not passed', (done) => {
+  it('replaces only project name in .yo-rc.json when --generateNewId is not passed', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
     const replacedContent = `{
@@ -220,18 +190,11 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    command.action(logger, { options: { newName: 'spfx-react' } } as any, () => {
-      try {
-        assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await command.action(logger, { options: { newName: 'spfx-react' } } as any);
+    assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
   });
 
-  it('replaces project name and id in .yo-rc.json when --generateNewId is passed', (done) => {
+  it('replaces project name and id in .yo-rc.json when --generateNewId is passed', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
     sinon.stub((command as any), 'generateNewId').callsFake(() => {
@@ -256,18 +219,11 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    command.action(logger, { options: { newName: 'spfx-react', generateNewId: true, debug: true } } as any, () => {
-      try {
-        assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await command.action(logger, { options: { newName: 'spfx-react', generateNewId: true, debug: true } } as any);
+    assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
   });
 
-  it('replaces only project name in package-solution.json when --generateNewId is not passed', (done) => {
+  it('replaces only project name in package-solution.json when --generateNewId is not passed', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
     const replacedContent = `{
@@ -284,18 +240,11 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    command.action(logger, { options: { newName: 'spfx-react' } } as any, () => {
-      try {
-        assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    command.action(logger, { options: { newName: 'spfx-react' } } as any);
+    assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
   });
 
-  it('replaces project name and id in package-solution.json when --generateNewId is passed', (done) => {
+  it('replaces project name and id in package-solution.json when --generateNewId is passed', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
     sinon.stub((command as any), 'generateNewId').callsFake(() => {
@@ -316,18 +265,11 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    command.action(logger, { options: { newName: 'spfx-react', generateNewId: true } } as any, () => {
-      try {
-        assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await command.action(logger, { options: { newName: 'spfx-react', generateNewId: true } } as any);
+    assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
   });
 
-  it('replaces project name in deploy-azure-storage.json', (done) => {
+  it('replaces project name in deploy-azure-storage.json', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
     const replacedContent = `{
@@ -338,18 +280,11 @@ describe(commands.PROJECT_RENAME, () => {
   "accessKey": "<!-- ACCESS KEY -->"
 }`;
 
-    command.action(logger, { options: { newName: 'spfx-react' } } as any, () => {
-      try {
-        assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await command.action(logger, { options: { newName: 'spfx-react' } } as any);
+    assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
   });
 
-  it('replaces project name in README.md', (done) => {
+  it('replaces project name in README.md', async () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
     let replacedContent = `## spfx-react
@@ -380,19 +315,12 @@ gulp bundle - TODO
 gulp package-solution - TODO
 `;
 
-    command.action(logger, { options: { newName: 'spfx-react', debug: true } } as any, () => {
-      try {
-        let fileSyncContent: string = writeFileSyncSpy.lastCall.args[1];
-        fileSyncContent = fileSyncContent.replace(/(\r\n|\n|\r)/gm, "");
-        replacedContent = replacedContent.replace(/(\r\n|\n|\r)/gm, "");
-        assert.strictEqual(fileSyncContent, replacedContent);
-        assert.strictEqual(loggerLogToStderrSpy.getCall(5).args[0], `Updated README.md`);
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
+    await command.action(logger, { options: { newName: 'spfx-react', debug: true } } as any);
+    let fileSyncContent: string = writeFileSyncSpy.lastCall.args[1];
+    fileSyncContent = fileSyncContent.replace(/(\r\n|\n|\r)/gm, "");
+    replacedContent = replacedContent.replace(/(\r\n|\n|\r)/gm, "");
+    assert.strictEqual(fileSyncContent, replacedContent);
+    assert.strictEqual(loggerLogToStderrSpy.getCall(5).args[0], `Updated README.md`);
   });
 
   it('supports debug mode', () => {

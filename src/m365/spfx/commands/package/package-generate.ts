@@ -99,7 +99,7 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const supportedHosts: string[] = ['SharePointWebPart'];
     if (args.options.enableForTeams === 'tab' || args.options.enableForTeams === 'all') {
       supportedHosts.push('TeamsTab');
@@ -212,10 +212,10 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
           }
           fs.rmdirSync(tmpDir, { recursive: true });
         }
-        cb(error);
+        throw error;
       }
       catch (ex) {
-        cb(`An error has occurred while removing the temp folder at ${tmpDir}. Please remove it manually.`);
+        throw `An error has occurred while removing the temp folder at ${tmpDir}. Please remove it manually.`;
       }
     }
   }

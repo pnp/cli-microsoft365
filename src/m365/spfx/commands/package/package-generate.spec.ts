@@ -88,9 +88,9 @@ describe(commands.PACKAGE_GENERATE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('creates a package for the specified HTML snippet', done => {
+  it('creates a package for the specified HTML snippet', async () => {
     const archiveWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -100,21 +100,13 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'all',
         debug: false
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(archiveWriteZipSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(archiveWriteZipSpy.called);
   });
 
-  it('creates a package for the specified HTML snippet (debug)', done => {
+  it('creates a package for the specified HTML snippet (debug)', async () => {
     const archiveWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -124,23 +116,15 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'all',
         debug: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(archiveWriteZipSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(archiveWriteZipSpy.called);
   });
 
-  it('creates a package exposed as a Teams tab', done => {
+  it('creates a package exposed as a Teams tab', async () => {
     sinonUtil.restore([fs.readFileSync, fs.writeFileSync]);
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$supportedHosts$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -150,22 +134,15 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'tab',
         debug: false
       }
-    }, () => {
-      try {
-        assert(fsWriteFileSyncSpy.calledWith('file.json', JSON.stringify(['SharePointWebPart', 'TeamsTab']).replace(/"/g, '&quot;')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(fsWriteFileSyncSpy.calledWith('file.json', JSON.stringify(['SharePointWebPart', 'TeamsTab']).replace(/"/g, '&quot;')));
   });
 
-  it('creates a package exposed as a Teams personal app', done => {
+  it('creates a package exposed as a Teams personal app', async () => {
     sinonUtil.restore([fs.readFileSync, fs.writeFileSync]);
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$supportedHosts$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -175,22 +152,15 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'personalApp',
         debug: false
       }
-    }, () => {
-      try {
-        assert(fsWriteFileSyncSpy.calledWith('file.json', JSON.stringify(['SharePointWebPart', 'TeamsPersonalApp']).replace(/"/g, '&quot;')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(fsWriteFileSyncSpy.calledWith('file.json', JSON.stringify(['SharePointWebPart', 'TeamsPersonalApp']).replace(/"/g, '&quot;')));
   });
 
-  it('creates a package exposed as a Teams tab and personal app', done => {
+  it('creates a package exposed as a Teams tab and personal app', async () => {
     sinonUtil.restore([fs.readFileSync, fs.writeFileSync]);
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$supportedHosts$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -200,22 +170,15 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'all',
         debug: false
       }
-    }, () => {
-      try {
-        assert(fsWriteFileSyncSpy.calledWith('file.json', JSON.stringify(['SharePointWebPart', 'TeamsTab', 'TeamsPersonalApp']).replace(/"/g, '&quot;')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(fsWriteFileSyncSpy.calledWith('file.json', JSON.stringify(['SharePointWebPart', 'TeamsTab', 'TeamsPersonalApp']).replace(/"/g, '&quot;')));
   });
 
-  it('handles exception when creating a temp folder failed', done => {
+  it('handles exception when creating a temp folder failed', async () => {
     sinonUtil.restore(fs.mkdtempSync);
     sinon.stub(fs, 'mkdtempSync').throws(new Error('An error has occurred'));
     const archiveWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -225,21 +188,13 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'all',
         debug: false
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err, 'An error has occurred');
-        assert(archiveWriteZipSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(archiveWriteZipSpy.notCalled);
   });
 
-  it('handles error when creating the package failed', done => {
+  it('handles error when creating the package failed', async () => {
     sinon.stub(admZipMock, 'writeZip').throws(new Error('An error has occurred'));
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -249,21 +204,13 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'all',
         debug: false
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('removes the temp directory after the package has been created', done => {
+  it('removes the temp directory after the package has been created', async () => {
     sinonUtil.restore(fs.rmdirSync);
     const fsrmdirSyncSpy = sinon.stub(fs, 'rmdirSync').callsFake(_ => { });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -273,23 +220,15 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'all',
         debug: false
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(fsrmdirSyncSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(fsrmdirSyncSpy.called);
   });
 
-  it('removes the temp directory if creating the package failed', done => {
+  it('removes the temp directory if creating the package failed', async () => {
     sinonUtil.restore(fs.rmdirSync);
     const fsrmdirSyncSpy = sinon.stub(fs, 'rmdirSync').callsFake(_ => { });
     sinon.stub(admZipMock, 'writeZip').throws(new Error('An error has occurred'));
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -299,22 +238,14 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'all',
         debug: false
       }
-    }, (err?: any) => {
-      try {
-        assert.notStrictEqual(typeof err, 'undefined');
-        assert(fsrmdirSyncSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(fsrmdirSyncSpy.called);
   });
 
-  it('prompts user to remove the temp directory manually if removing it automatically failed', done => {
+  it('prompts user to remove the temp directory manually if removing it automatically failed', async () => {
     sinonUtil.restore(fs.rmdirSync);
     sinon.stub(fs, 'rmdirSync').throws(new Error('An error has occurred'));
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -324,22 +255,14 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'all',
         debug: false
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err, 'An error has occurred while removing the temp folder at /tmp/abc. Please remove it manually.');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), 'An error has occurred while removing the temp folder at /tmp/abc. Please remove it manually.');
   });
 
-  it('leaves unknown token as-is', done => {
+  it('leaves unknown token as-is', async () => {
     sinonUtil.restore([fs.readFileSync, fs.writeFileSync]);
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$token$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -349,22 +272,15 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'tab',
         debug: false
       }
-    }, () => {
-      try {
-        assert(fsWriteFileSyncSpy.calledWith('file.json', '$token$'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(fsWriteFileSyncSpy.calledWith('file.json', '$token$'));
   });
 
-  it('exposes page context globally', done => {
+  it('exposes page context globally', async () => {
     sinonUtil.restore([fs.readFileSync, fs.writeFileSync]);
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$exposePageContextGlobally$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -374,22 +290,15 @@ describe(commands.PACKAGE_GENERATE, () => {
         exposePageContextGlobally: true,
         debug: false
       }
-    }, () => {
-      try {
-        assert(fsWriteFileSyncSpy.calledWith('file.json', '!0'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(fsWriteFileSyncSpy.calledWith('file.json', '!0'));
   });
 
-  it('exposes Teams context globally', done => {
+  it('exposes Teams context globally', async () => {
     sinonUtil.restore([fs.readFileSync, fs.writeFileSync]);
     sinon.stub(fs, 'readFileSync').callsFake(_ => '$exposeTeamsContextGlobally$');
     const fsWriteFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -399,15 +308,8 @@ describe(commands.PACKAGE_GENERATE, () => {
         exposeTeamsContextGlobally: true,
         debug: false
       }
-    }, () => {
-      try {
-        assert(fsWriteFileSyncSpy.calledWith('file.json', '!0'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(fsWriteFileSyncSpy.calledWith('file.json', '!0'));
   });
 
   it(`fails validation if the enableForTeams option is invalid`, async () => {
