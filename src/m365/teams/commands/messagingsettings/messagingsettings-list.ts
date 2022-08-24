@@ -50,7 +50,7 @@ class TeamsMessagingSettingsListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}?$select=messagingSettings`,
       headers: {
@@ -59,12 +59,13 @@ class TeamsMessagingSettingsListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    request
-      .get<Team>(requestOptions)
-      .then((res: Team): void => {
-        logger.log(res.messagingSettings);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const res: Team = await request.get<Team>(requestOptions);
+      logger.log(res.messagingSettings);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

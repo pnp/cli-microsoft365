@@ -120,7 +120,7 @@ class AadUserGetCommand extends GraphCommand {
         throw `The specified user with ${identifier} does not exist`;
       }
 
-      if (res.value.length > 0) {
+      if (res.value.length > 1) {
         throw `Multiple users with ${identifier} found. Please disambiguate (user names): ${res.value.map(a => a.userPrincipalName).join(', ')} or (ids): ${res.value.map(a => a.id).join(', ')}`;
       }
 

@@ -36,9 +36,9 @@ describe(commands.CHANNEL_REMOVE, () => {
       }
     };
     promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
   });
 
@@ -126,7 +126,7 @@ describe(commands.CHANNEL_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails to remove channel when channel does not exists', (done) => {
+  it('fails to remove channel when channel does not exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'channelName'`) > -1) {
         return Promise.resolve({ value: [] });
@@ -134,111 +134,76 @@ describe(commands.CHANNEL_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
-        channelName: 'channelName',
-        confirm: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified channel does not exist in the Microsoft Teams team`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+      channelName: 'channelName',
+      confirm: true } } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
   });
 
-  it('prompts before removing the specified channel when confirm option not passed', (done) => {
-    command.action(logger, {
+  it('prompts before removing the specified channel when confirm option not passed', async () => {
+    await command.action(logger, {
       options: {
         debug: false,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
-  it('prompts before removing the specified channel when confirm option not passed (debug)', (done) => {
-    command.action(logger, {
+  it('prompts before removing the specified channel when confirm option not passed (debug)', async () => {
+    await command.action(logger, {
       options: {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
-  it('aborts removing the specified channel when confirm option not passed and prompt not confirmed', (done) => {
+  it('aborts removing the specified channel when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+
+    assert(postSpy.notCalled);
   });
 
-  it('aborts removing the specified channel when confirm option not passed and prompt not confirmed (debug)', (done) => {
+  it('aborts removing the specified channel when confirm option not passed and prompt not confirmed (debug)', async () => {
     const postSpy = sinon.spy(request, 'delete');
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+
+    assert(postSpy.notCalled);
   });
 
-  it('removes the specified channel by name when prompt confirmed (debug)', (done) => {
+  it('removes the specified channel by name when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'channelName'`) > -1) {
         return Promise.resolve({
@@ -265,26 +230,19 @@ describe(commands.CHANNEL_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
+    await command.action(logger, {
       options: {
         debug: true,
         channelName: 'channelName',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
-  it('should handle Microsoft graph error response', (done) => {
+  it('should handle Microsoft graph error response', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/d66b8110-fcad-49e8-8159-0d488ddb7656/channels/19%3Af3dcbb1674574677abcae89cb626f1e6%40thread.skype`) {
         return Promise.reject({
@@ -303,23 +261,13 @@ describe(commands.CHANNEL_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
-      options: {
-        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, "Failed to execute Skype backend request GetThreadS2SRequest.");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
+    await assert.rejects(command.action(logger, { options: {
+      channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+      teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656' } } as any), new CommandError('Failed to execute Skype backend request GetThreadS2SRequest.'));
   });
 
   it('supports debug mode', () => {

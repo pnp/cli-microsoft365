@@ -119,7 +119,7 @@ describe(commands.TAB_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('creates tab in channel within the Microsoft Teams team in the tenant', (done) => {
+  it('creates tab in channel within the Microsoft Teams team in the tenant', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/teams/3b4797e5-bdf3-48e1-a552-839af71562ef`) > -1) {
         return Promise.resolve({
@@ -131,7 +131,7 @@ describe(commands.TAB_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         teamId: '3b4797e5-bdf3-48e1-a552-839af71562ef',
@@ -140,22 +140,15 @@ describe(commands.TAB_ADD, () => {
         appName: 'testweb',
         contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
-          "displayName": "testweb",
-          "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
+      "displayName": "testweb",
+      "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
+    }));
   });
 
-  it('creates tab in channel within the Microsoft Teams team in the tenant with all options', (done) => {
+  it('creates tab in channel within the Microsoft Teams team in the tenant with all options', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/teams/3b4797e5-bdf3-48e1-a552-839af71562ef`) > -1) {
         return Promise.resolve({
@@ -167,7 +160,7 @@ describe(commands.TAB_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         teamId: '3b4797e5-bdf3-48e1-a552-839af71562ef',
@@ -180,22 +173,15 @@ describe(commands.TAB_ADD, () => {
         websiteUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
         unknown: 'unknown value'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
-          "displayName": "testweb",
-          "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
+      "displayName": "testweb",
+      "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
+    }));
   });
 
-  it('ignores global options when creating request data', (done) => {
+  it('ignores global options when creating request data', async () => {
     const postStub: Sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/teams/3b4797e5-bdf3-48e1-a552-839af71562ef`) > -1) {
         return Promise.resolve({
@@ -207,7 +193,7 @@ describe(commands.TAB_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         verbose: true,
@@ -222,51 +208,33 @@ describe(commands.TAB_ADD, () => {
         websiteUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
         unknown: 'unknown value'
       }
-    }, () => {
-      try {
-        assert.deepEqual(postStub.firstCall.args[0].data, {
-          'teamsApp@odata.bind': 'https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/com.microsoft.teamspace.tab.web',
-          configuration: {
-            contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
-            entityId: 'https://xxx.sharepoint.com/Shared%20Documents/',
-            removeUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
-            unknown: 'unknown value',
-            websiteUrl: 'https://xxx.sharepoint.com/Shared%20Documents/'
-          },
-          displayName: 'testweb'
-        });
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
+    });
+    assert.deepEqual(postStub.firstCall.args[0].data, {
+      'teamsApp@odata.bind': 'https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/com.microsoft.teamspace.tab.web',
+      configuration: {
+        contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
+        entityId: 'https://xxx.sharepoint.com/Shared%20Documents/',
+        removeUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
+        unknown: 'unknown value',
+        websiteUrl: 'https://xxx.sharepoint.com/Shared%20Documents/'
+      },
+      displayName: 'testweb'
     });
   });
 
-  it('correctly handles error when adding a tab', (done) => {
+  it('correctly handles error when adding a tab', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        teamId: '3b4797e5-bdf3-48e1-a552-839af71562ef',
-        channelId: '19:eab8fda0837c48edb542574d419ff8ab@thread.skype/tabs',
-        appId: 'com.microsoft.teamspace.tab.web',
-        appName: 'testweb',
-        contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
-        websiteUrl: 'https://xxx.sharepoint.com/Shared%20Documents/'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      teamId: '3b4797e5-bdf3-48e1-a552-839af71562ef',
+      channelId: '19:eab8fda0837c48edb542574d419ff8ab@thread.skype/tabs',
+      appId: 'com.microsoft.teamspace.tab.web',
+      appName: 'testweb',
+      contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
+      websiteUrl: 'https://xxx.sharepoint.com/Shared%20Documents/' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

@@ -91,7 +91,7 @@ class TeamsTeamUnarchiveCommand extends GraphCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.teamId) {
       args.options.id = args.options.teamId;
 
@@ -100,21 +100,22 @@ class TeamsTeamUnarchiveCommand extends GraphCommand {
 
     const endpoint: string = `${this.resource}/v1.0`;
 
-    this
-      .getTeamId(args)
-      .then((teamId: string): Promise<void> => {
-        const requestOptions: any = {
-          url: `${endpoint}/teams/${encodeURIComponent(teamId)}/unarchive`,
-          headers: {
-            'content-type': 'application/json;odata=nometadata',
-            'accept': 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        };
+    try {
+      const teamId: string = await this.getTeamId(args);
+      const requestOptions: any = {
+        url: `${endpoint}/teams/${encodeURIComponent(teamId)}/unarchive`,
+        headers: {
+          'content-type': 'application/json;odata=nometadata',
+          'accept': 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
 
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
+      await request.post(requestOptions);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

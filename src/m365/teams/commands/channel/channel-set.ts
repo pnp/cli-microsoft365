@@ -75,7 +75,7 @@ class TeamsChannelSetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName)}'`,
       headers: {
@@ -83,30 +83,31 @@ class TeamsChannelSetCommand extends GraphCommand {
       },
       responseType: 'json'
     };
+    
+    try {
+      const res: { value: Channel[] } = await request.get<{ value: Channel[] }>(requestOptions);
+      const channelItem: Channel | undefined = res.value[0];
 
-    request
-      .get<{ value: Channel[] }>(requestOptions)
-      .then((res: { value: Channel[] }): Promise<void> => {
-        const channelItem: Channel | undefined = res.value[0];
+      if (!channelItem) {
+        return Promise.reject(`The specified channel does not exist in the Microsoft Teams team`);
+      }
 
-        if (!channelItem) {
-          return Promise.reject(`The specified channel does not exist in the Microsoft Teams team`);
-        }
+      const channelId: string = res.value[0].id;
+      const data: any = this.mapRequestBody(args.options);
+      const requestOptionsPatch: any = {
+        url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${channelId}`,
+        headers: {
+          'accept': 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: data
+      };
 
-        const channelId: string = res.value[0].id;
-        const data: any = this.mapRequestBody(args.options);
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${channelId}`,
-          headers: {
-            'accept': 'application/json;odata.metadata=none'
-          },
-          responseType: 'json',
-          data: data
-        };
-
-        return request.patch(requestOptions);
-      })
-      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      await request.patch(requestOptionsPatch);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private mapRequestBody(options: Options): any {

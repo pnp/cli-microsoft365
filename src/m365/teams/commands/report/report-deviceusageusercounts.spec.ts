@@ -57,7 +57,7 @@ describe(commands.REPORT_DEVICEUSAGEUSERCOUNTS, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('gets the number of Microsoft Teams daily unique users by device type for the given period', (done) => {
+  it('gets the number of Microsoft Teams daily unique users by device type for the given period', async () => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserCounts(period='D7')`) {
         return Promise.resolve(`
@@ -70,15 +70,8 @@ describe(commands.REPORT_DEVICEUSAGEUSERCOUNTS, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, period: 'D7' } }, () => {
-      try {
-        assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserCounts(period='D7')");
-        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, period: 'D7' } });
+    assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsDeviceUsageUserCounts(period='D7')");
+    assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
   });
 });

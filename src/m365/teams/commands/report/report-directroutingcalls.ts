@@ -75,7 +75,7 @@ class TeamsReportDirectroutingcallsCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const toDateTimeParameter: string = encodeURIComponent(args.options.toDateTime ? args.options.toDateTime : new Date().toISOString());
 
     const requestOptions: any = {
@@ -86,12 +86,13 @@ class TeamsReportDirectroutingcallsCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ value: any[] }>(requestOptions)
-      .then((res: { value: any[] }): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const res: { value: any[] } = await request.get<{ value: any[] }>(requestOptions);
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

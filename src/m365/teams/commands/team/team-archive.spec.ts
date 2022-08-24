@@ -13,7 +13,6 @@ const command: Command = require('./team-archive');
 describe(commands.TEAM_ARCHIVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
@@ -37,7 +36,6 @@ describe(commands.TEAM_ARCHIVE, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
@@ -131,7 +129,7 @@ describe(commands.TEAM_ARCHIVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('logs deprecation warning when option teamId is specified', (done) => {
+  it('logs deprecation warning when option teamId is specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/archive`) {
         return Promise.resolve();
@@ -140,18 +138,11 @@ describe(commands.TEAM_ARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000" } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000" } });
+    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
   });
 
-  it('fails when team name does not exist', (done) => {
+  it('fails when team name does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Finance'`) {
         return Promise.resolve({
@@ -169,24 +160,13 @@ describe(commands.TEAM_ARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        name: 'Finance',
-        confirm: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      name: 'Finance',
+      confirm: true } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
-  it('archives a Microsoft Team by id', (done) => {
+  it('archives a Microsoft Team by id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/archive`) {
         return Promise.resolve();
@@ -195,22 +175,14 @@ describe(commands.TEAM_ARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
   });
 
-  it('archives a Microsoft Team by name', (done) => {
+  it('archives a Microsoft Team by name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq 'Finance'`) {
         return Promise.resolve({
@@ -233,22 +205,14 @@ describe(commands.TEAM_ARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         name: 'Finance'
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
   });
 
-  it('archives a Microsoft Teams teams when \'shouldSetSpoSiteReadOnlyForMembers\' specified', (done) => {
+  it('archives a Microsoft Teams teams when \'shouldSetSpoSiteReadOnlyForMembers\' specified', async () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/archive`) {
         return Promise.resolve();
@@ -257,23 +221,16 @@ describe(commands.TEAM_ARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6',
         shouldSetSpoSiteReadOnlyForMembers: true
       }
-    } as any, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].data.shouldSetSpoSiteReadOnlyForMembers, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert.strictEqual(postStub.lastCall.args[0].data.shouldSetSpoSiteReadOnlyForMembers, true);
   });
 
-  it('should set to false value when \'shouldSetSpoSiteReadOnlyForMembers\' not specified', (done) => {
+  it('should set to false value when \'shouldSetSpoSiteReadOnlyForMembers\' not specified', async () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/archive`) {
         return Promise.resolve();
@@ -282,22 +239,15 @@ describe(commands.TEAM_ARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
       }
-    } as any, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].data["shouldSetSpoSiteReadOnlyForMembers"], false);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert.strictEqual(postStub.lastCall.args[0].data["shouldSetSpoSiteReadOnlyForMembers"], false);
   });
 
-  it('should correctly handle graph error response', (done) => {
+  it('should correctly handle graph error response', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/archive`) {
         return Promise.reject(
@@ -316,40 +266,17 @@ describe(commands.TEAM_ARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, 'No team found with Group Id f5dba91d-6494-4d5e-89a7-ad832f6946d6');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6' } } as any), new CommandError('No team found with Group Id f5dba91d-6494-4d5e-89a7-ad832f6946d6'));
   });
 
-  it('correctly handles error when archiving a team', (done) => {
+  it('correctly handles error when archiving a team', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6',
-        debug: false
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      id: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6',
+      debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

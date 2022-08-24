@@ -103,7 +103,7 @@ class TeamsTeamAddCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.dots = '';
 
     let requestBody: any;
@@ -135,7 +135,7 @@ class TeamsTeamAddCommand extends GraphCommand {
       };
     }
 
-    const requestOptions: AxiosRequestConfig = {
+    const requestOptionsPost: AxiosRequestConfig = {
       url: `${this.resource}/v1.0/teams`,
       headers: {
         'accept': 'application/json;odata.metadata=none'
@@ -144,44 +144,42 @@ class TeamsTeamAddCommand extends GraphCommand {
       responseType: 'stream'
     };
 
-    request
-      .post(requestOptions)
-      .then((res: any): Promise<TeamsAsyncOperation> => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0${res.headers.location}`,
-          headers: {
-            accept: 'application/json;odata.metadata=minimal'
-          },
-          responseType: 'json'
-        };
+    try {
+      const res: any = await request.post(requestOptionsPost);
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0${res.headers.location}`,
+        headers: {
+          accept: 'application/json;odata.metadata=minimal'
+        },
+        responseType: 'json'
+      };
 
-        return new Promise((resolve, reject) => {
-          request.get<TeamsAsyncOperation>(requestOptions)
-            .then((teamsAsyncOperation: TeamsAsyncOperation) => {
-              if (!args.options.wait) {
-                resolve(teamsAsyncOperation);
-              }
-              else {
-                setTimeout(() => {
-                  this.waitUntilFinished(requestOptions, resolve, reject, logger, this.dots);
-                }, this.pollingInterval);
-              }
-            });
-        });
-      })
-      .then((teamsAsyncOperation: TeamsAsyncOperation): any => {
-        if (teamsAsyncOperation.status !== TeamsAsyncOperationStatus.Succeeded) {
-          return Promise.resolve(teamsAsyncOperation);
+      const teamsAsyncOperation: TeamsAsyncOperation = await new Promise(async (resolve, reject) => {
+        const teamsAsyncOperation: TeamsAsyncOperation = await request.get<TeamsAsyncOperation>(requestOptions);
+        if (!args.options.wait) {
+          resolve(teamsAsyncOperation);
         }
-
-        return aadGroup.getGroupById(teamsAsyncOperation.targetResourceId);
-      })
-      .then((output: any) => {
-        logger.log(output);
-        cb();
-      }, (err: any): void => {
-        this.handleRejectedODataJsonPromise(err, logger, cb);
+        else {
+          setTimeout(() => {
+            this.waitUntilFinished(requestOptions, resolve, reject, logger, this.dots);
+          }, this.pollingInterval);
+        }
       });
+
+      let output;
+
+      if (teamsAsyncOperation.status !== TeamsAsyncOperationStatus.Succeeded) {
+        output = teamsAsyncOperation;
+      } 
+      else {
+        output = await aadGroup.getGroupById(teamsAsyncOperation.targetResourceId);
+      }
+
+      logger.log(output);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private waitUntilFinished(requestOptions: any, resolve: (teamsAsyncOperation: TeamsAsyncOperation) => void, reject: (error: any) => void, logger: Logger, dots?: string): void {

@@ -121,7 +121,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('lists chat messages (debug)', (done) => {
+  it('lists chat messages (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages`) {
         return Promise.resolve({
@@ -132,7 +132,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         chatId: "19:2da4c29f6d7041eca70b638b43d45437@thread.v2"
@@ -254,7 +254,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
     });
   });
 
-  it('lists chat messages', (done) => {
+  it('lists chat messages', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages`) {
         return Promise.resolve({
@@ -265,7 +265,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         chatId: "19:2da4c29f6d7041eca70b638b43d45437@thread.v2"
@@ -388,7 +388,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
   });
 
 
-  it('lists chat messages, with truncated shortbody property in text mode', (done) => {
+  it('lists chat messages, with truncated shortbody property in text mode', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages`) {
         return Promise.resolve({
@@ -399,7 +399,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         output: "text",
@@ -523,7 +523,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
   });
 
 
-  it('outputs all data in json output mode', (done) => {
+  it('outputs all data in json output mode', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages`) {
         return Promise.resolve({
@@ -534,7 +534,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         output: 'json',
@@ -552,12 +552,12 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
     });
   });
 
-  it('correctly handles error when listing messages', (done) => {
+  it('correctly handles error when listing messages', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         chatId: "19:2da4c29f6d7041eca70b638b43d45437@thread.v2"

@@ -180,7 +180,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('fails when group has no team', (done) => {
+  it('fails when group has no team', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
@@ -240,23 +240,12 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
       return Promise.reject('The specified team does not exist in the Microsoft Teams');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        teamName: 'Team Name'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      teamName: 'Team Name' } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
-  it('correctly get teams id by team name', (done) => {
+  it('correctly get teams id by team name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
@@ -324,28 +313,20 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         output: 'json',
         teamName: 'Team name',
         channelId: '19:00000000000000000000000000000000@thread.skype'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          []
-        ));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      []
+    ));
   });
 
-  it('correctly get channel id by channel name', (done) => {
+  it('correctly get channel id by channel name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/teams/00000000-0000-0000-0000-000000000000/channels?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
@@ -373,28 +354,20 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         output: 'json',
         teamId: '00000000-0000-0000-0000-000000000000',
         channelName: 'Channel Name'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          []
-        ));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      []
+    ));
   });
 
-  it('fails to get channel when channel does not exist', (done) => {
+  it('fails to get channel when channel does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/teams/00000000-0000-0000-0000-000000000000/channels?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
@@ -405,45 +378,23 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
       return Promise.reject('The specified channel does not exist in the Microsoft Teams team');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelName: "Channel name"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified channel does not exist in the Microsoft Teams team`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      teamId: '00000000-0000-0000-0000-000000000000',
+      channelName: "Channel name" } } as any), new CommandError('The specified channel does not exist in the Microsoft Teams team'));
   });
 
-  it('correctly handles error when retrieving all teams', (done) => {
+  it('correctly handles error when retrieving all teams', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        teamId: '00000000-0000-0000-0000-000000000000'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      teamId: '00000000-0000-0000-0000-000000000000' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('outputs all data in json output mode', (done) => {
+  it('outputs all data in json output mode', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
@@ -485,60 +436,52 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         output: 'json',
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:00000000000000000000000000000000@thread.skype'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [
-            {
-              "id": "MCMjMiMjZjU4NTk3NTgtMzE3YS00NTMzLTg3MDgtNDU3ODFlOTgzYzZhIyMxOTpkNTdmY2ZmNGMzMjE0MDVhYjY5YzJhZWVlMTIzODllMkB0aHJlYWQuc2t5cGUjIzkxZmYyZTE3LTg0ZGUtNDU1YS04ODE1LTUyYjIxNjgzZjY0ZQ==",
-              "roles": [],
-              "displayName": "User 1",
-              "visibleHistoryStartDateTime": "0001-01-01T00:00:00Z",
-              "userId": "00000000-0000-0000-0000-000000000001",
-              "email": "user1@domainname.com",
-              "tenantId": "00000000-0000-0000-0000-000000000000"
-            },
-            {
-              "id": "MCMjMiMjZjU4NTk3NTgtMzE3YS00NTMzLTg3MDgtNDU3ODFlOTgzYzZhIyMxOTpkNTdmY2ZmNGMzMjE0MDVhYjY5YzJhZWVlMTIzODllMkB0aHJlYWQuc2t5cGUjI2IyMDkxZTE4LTc4ODItNGVmZS1iN2QxLTkwNzAzZjVhNWM2NQ==",
-              "roles": [
-                "owner"
-              ],
-              "displayName": "User 2",
-              "visibleHistoryStartDateTime": "0001-01-01T00:00:00Z",
-              "userId": "00000000-0000-0000-0000-000000000002",
-              "email": "user2@domainname.com",
-              "tenantId": "00000000-0000-0000-0000-000000000000"
-            },
-            {
-              "id": "MCMjMiMjZjU4NTk3NTgtMzE3YS00NTMzLTg3MDgtNDU3ODFlOTgzYzZhIyMxOTpkNTdmY2ZmNGMzMjE0MDVhYjY5YzJhZWVlMTIzODllMkB0aHJlYWQuc2t5cGUjIzg0OTg3NjNmLTJjYTItNGRmNy05OTBhLWZkNjg4NTJkOTVmOA==",
-              "roles": [
-                "guest"
-              ],
-              "displayName": "User 3",
-              "visibleHistoryStartDateTime": "0001-01-01T00:00:00Z",
-              "userId": "00000000-0000-0000-0000-000000000003",
-              "email": "user3@externaldomainname.com",
-              "tenantId": "00000000-0000-0000-0000-000000000000"
-            }
-          ]
-        ));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [
+        {
+          "id": "MCMjMiMjZjU4NTk3NTgtMzE3YS00NTMzLTg3MDgtNDU3ODFlOTgzYzZhIyMxOTpkNTdmY2ZmNGMzMjE0MDVhYjY5YzJhZWVlMTIzODllMkB0aHJlYWQuc2t5cGUjIzkxZmYyZTE3LTg0ZGUtNDU1YS04ODE1LTUyYjIxNjgzZjY0ZQ==",
+          "roles": [],
+          "displayName": "User 1",
+          "visibleHistoryStartDateTime": "0001-01-01T00:00:00Z",
+          "userId": "00000000-0000-0000-0000-000000000001",
+          "email": "user1@domainname.com",
+          "tenantId": "00000000-0000-0000-0000-000000000000"
+        },
+        {
+          "id": "MCMjMiMjZjU4NTk3NTgtMzE3YS00NTMzLTg3MDgtNDU3ODFlOTgzYzZhIyMxOTpkNTdmY2ZmNGMzMjE0MDVhYjY5YzJhZWVlMTIzODllMkB0aHJlYWQuc2t5cGUjI2IyMDkxZTE4LTc4ODItNGVmZS1iN2QxLTkwNzAzZjVhNWM2NQ==",
+          "roles": [
+            "owner"
+          ],
+          "displayName": "User 2",
+          "visibleHistoryStartDateTime": "0001-01-01T00:00:00Z",
+          "userId": "00000000-0000-0000-0000-000000000002",
+          "email": "user2@domainname.com",
+          "tenantId": "00000000-0000-0000-0000-000000000000"
+        },
+        {
+          "id": "MCMjMiMjZjU4NTk3NTgtMzE3YS00NTMzLTg3MDgtNDU3ODFlOTgzYzZhIyMxOTpkNTdmY2ZmNGMzMjE0MDVhYjY5YzJhZWVlMTIzODllMkB0aHJlYWQuc2t5cGUjIzg0OTg3NjNmLTJjYTItNGRmNy05OTBhLWZkNjg4NTJkOTVmOA==",
+          "roles": [
+            "guest"
+          ],
+          "displayName": "User 3",
+          "visibleHistoryStartDateTime": "0001-01-01T00:00:00Z",
+          "userId": "00000000-0000-0000-0000-000000000003",
+          "email": "user3@externaldomainname.com",
+          "tenantId": "00000000-0000-0000-0000-000000000000"
+        }
+      ]
+    ));
   });
 
-  it('fails when filtering on member role is incorrect', (done) => {
+  it('fails when filtering on member role is incorrect', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
@@ -580,7 +523,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         output: 'json',
@@ -588,31 +531,23 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
         channelId: '19:00000000000000000000000000000000@thread.skype',
         role: 'member'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [
-            {
-              "id": "MCMjMiMjZjU4NTk3NTgtMzE3YS00NTMzLTg3MDgtNDU3ODFlOTgzYzZhIyMxOTpkNTdmY2ZmNGMzMjE0MDVhYjY5YzJhZWVlMTIzODllMkB0aHJlYWQuc2t5cGUjIzkxZmYyZTE3LTg0ZGUtNDU1YS04ODE1LTUyYjIxNjgzZjY0ZQ==",
-              "roles": [],
-              "displayName": "User 1",
-              "visibleHistoryStartDateTime": "0001-01-01T00:00:00Z",
-              "userId": "00000000-0000-0000-0000-000000000001",
-              "email": "user1@domainname.com",
-              "tenantId": "00000000-0000-0000-0000-000000000000"
-            }
-          ]
-        ));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [
+        {
+          "id": "MCMjMiMjZjU4NTk3NTgtMzE3YS00NTMzLTg3MDgtNDU3ODFlOTgzYzZhIyMxOTpkNTdmY2ZmNGMzMjE0MDVhYjY5YzJhZWVlMTIzODllMkB0aHJlYWQuc2t5cGUjIzkxZmYyZTE3LTg0ZGUtNDU1YS04ODE1LTUyYjIxNjgzZjY0ZQ==",
+          "roles": [],
+          "displayName": "User 1",
+          "visibleHistoryStartDateTime": "0001-01-01T00:00:00Z",
+          "userId": "00000000-0000-0000-0000-000000000001",
+          "email": "user1@domainname.com",
+          "tenantId": "00000000-0000-0000-0000-000000000000"
+        }
+      ]
+    ));
   });
 
-  it('fails when filtering on owner role is incorrect', (done) => {
+  it('fails when filtering on owner role is incorrect', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
@@ -654,7 +589,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         output: 'json',
@@ -662,33 +597,25 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
         channelId: '19:00000000000000000000000000000000@thread.skype',
         role: 'owner'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [
-            {
-              "id": "MCMjMiMjZjU4NTk3NTgtMzE3YS00NTMzLTg3MDgtNDU3ODFlOTgzYzZhIyMxOTpkNTdmY2ZmNGMzMjE0MDVhYjY5YzJhZWVlMTIzODllMkB0aHJlYWQuc2t5cGUjI2IyMDkxZTE4LTc4ODItNGVmZS1iN2QxLTkwNzAzZjVhNWM2NQ==",
-              "roles": [
-                "owner"
-              ],
-              "displayName": "User 2",
-              "visibleHistoryStartDateTime": "0001-01-01T00:00:00Z",
-              "userId": "00000000-0000-0000-0000-000000000002",
-              "email": "user2@domainname.com",
-              "tenantId": "00000000-0000-0000-0000-000000000000"
-            }
-          ]
-        ));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [
+        {
+          "id": "MCMjMiMjZjU4NTk3NTgtMzE3YS00NTMzLTg3MDgtNDU3ODFlOTgzYzZhIyMxOTpkNTdmY2ZmNGMzMjE0MDVhYjY5YzJhZWVlMTIzODllMkB0aHJlYWQuc2t5cGUjI2IyMDkxZTE4LTc4ODItNGVmZS1iN2QxLTkwNzAzZjVhNWM2NQ==",
+          "roles": [
+            "owner"
+          ],
+          "displayName": "User 2",
+          "visibleHistoryStartDateTime": "0001-01-01T00:00:00Z",
+          "userId": "00000000-0000-0000-0000-000000000002",
+          "email": "user2@domainname.com",
+          "tenantId": "00000000-0000-0000-0000-000000000000"
+        }
+      ]
+    ));
   });
 
-  it('fails when filtering on guest role is incorrect', (done) => {
+  it('fails when filtering on guest role is incorrect', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19:00000000000000000000000000000000@thread.skype/members`) {
         return Promise.resolve({
@@ -730,7 +657,7 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         output: 'json',
@@ -738,30 +665,22 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
         channelId: '19:00000000000000000000000000000000@thread.skype',
         role: 'guest'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [
-            {
-              "id": "MCMjMiMjZjU4NTk3NTgtMzE3YS00NTMzLTg3MDgtNDU3ODFlOTgzYzZhIyMxOTpkNTdmY2ZmNGMzMjE0MDVhYjY5YzJhZWVlMTIzODllMkB0aHJlYWQuc2t5cGUjIzg0OTg3NjNmLTJjYTItNGRmNy05OTBhLWZkNjg4NTJkOTVmOA==",
-              "roles": [
-                "guest"
-              ],
-              "displayName": "User 3",
-              "visibleHistoryStartDateTime": "0001-01-01T00:00:00Z",
-              "userId": "00000000-0000-0000-0000-000000000003",
-              "email": "user3@externaldomainname.com",
-              "tenantId": "00000000-0000-0000-0000-000000000000"
-            }
-          ]
-        ));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [
+        {
+          "id": "MCMjMiMjZjU4NTk3NTgtMzE3YS00NTMzLTg3MDgtNDU3ODFlOTgzYzZhIyMxOTpkNTdmY2ZmNGMzMjE0MDVhYjY5YzJhZWVlMTIzODllMkB0aHJlYWQuc2t5cGUjIzg0OTg3NjNmLTJjYTItNGRmNy05OTBhLWZkNjg4NTJkOTVmOA==",
+          "roles": [
+            "guest"
+          ],
+          "displayName": "User 3",
+          "visibleHistoryStartDateTime": "0001-01-01T00:00:00Z",
+          "userId": "00000000-0000-0000-0000-000000000003",
+          "email": "user3@externaldomainname.com",
+          "tenantId": "00000000-0000-0000-0000-000000000000"
+        }
+      ]
+    ));
   });
 
   it('supports debug mode', () => {

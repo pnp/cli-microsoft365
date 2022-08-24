@@ -164,16 +164,15 @@ class TeamsChannelAddCommand extends GraphCommand {
     return request.post(requestOptions);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getTeamId(args)
-      .then((teamId: string): Promise<void> =>
-        this.createChannel(args, teamId)
-      )
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const teamId: string = await this.getTeamId(args);
+      const res: any = await this.createChannel(args, teamId);
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

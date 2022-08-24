@@ -110,7 +110,7 @@ describe(commands.CHANNEL_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('correctly lists all channels in a Microsoft teams team by team id', (done) => {
+  it('correctly lists all channels in a Microsoft teams team by team id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels`) {
         return Promise.resolve({
@@ -145,51 +145,43 @@ describe(commands.CHANNEL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         teamId: '00000000-0000-0000-0000-000000000000'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [
-            {
-              "id": "19:17de660d16844149ab3f0240405f9316@thread.skype",
-              "displayName": "General",
-              "description": "Test group for office cli commands",
-              "isFavoriteByDefault": null,
-              "email": "",
-              "webUrl": "https://teams.microsoft.com/l/channel/19%3a17de660d16844149ab3f0240405f9316%40thread.skype/General?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
-            },
-            {
-              "id": "19:e14b10cd0b684901b53d14e89aa4221f@thread.skype",
-              "displayName": "Development",
-              "description": null,
-              "isFavoriteByDefault": null,
-              "email": "",
-              "webUrl": "https://teams.microsoft.com/l/channel/19%3ae14b10cd0b684901b53d14e89aa4221f%40thread.skype/Development?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
-            },
-            {
-              "id": "19:12ff25ec5325468dba1f73522cd08248@thread.skype",
-              "displayName": "Social",
-              "description": null,
-              "isFavoriteByDefault": null,
-              "email": "",
-              "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
-            }
-          ]
-        ));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [
+        {
+          "id": "19:17de660d16844149ab3f0240405f9316@thread.skype",
+          "displayName": "General",
+          "description": "Test group for office cli commands",
+          "isFavoriteByDefault": null,
+          "email": "",
+          "webUrl": "https://teams.microsoft.com/l/channel/19%3a17de660d16844149ab3f0240405f9316%40thread.skype/General?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
+        },
+        {
+          "id": "19:e14b10cd0b684901b53d14e89aa4221f@thread.skype",
+          "displayName": "Development",
+          "description": null,
+          "isFavoriteByDefault": null,
+          "email": "",
+          "webUrl": "https://teams.microsoft.com/l/channel/19%3ae14b10cd0b684901b53d14e89aa4221f%40thread.skype/Development?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
+        },
+        {
+          "id": "19:12ff25ec5325468dba1f73522cd08248@thread.skype",
+          "displayName": "Social",
+          "description": null,
+          "isFavoriteByDefault": null,
+          "email": "",
+          "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
+        }
+      ]
+    ));
   });
 
-  it('fails when group has no team', (done) => {
+  it('fails when group has no team', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
@@ -207,22 +199,10 @@ describe(commands.CHANNEL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        teamName: 'Team Name'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { teamName: 'Team Name' } } as any), new CommandError('The specified team does not exist in the Microsoft Teams'));
   });
 
-  it('correctly lists all channels in a Microsoft teams team with specified type parameter', (done) => {
+  it('correctly lists all channels in a Microsoft teams team with specified type parameter', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels?$filter=membershipType eq 'private'`) {
         return Promise.resolve({
@@ -251,46 +231,38 @@ describe(commands.CHANNEL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
         type: 'private'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [
-            {
-              "id": "19:e14b10cd0b684901b53d14e89aa4221f@thread.skype",
-              "displayName": "Development",
-              "description": null,
-              "isFavoriteByDefault": null,
-              "email": "",
-              "webUrl": "https://teams.microsoft.com/l/channel/19%3ae14b10cd0b684901b53d14e89aa4221f%40thread.skype/Development?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8",
-              "membershipType": "private"
-            },
-            {
-              "id": "19:12ff25ec5325468dba1f73522cd08248@thread.skype",
-              "displayName": "Social",
-              "description": null,
-              "isFavoriteByDefault": null,
-              "email": "",
-              "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8",
-              "membershipType": "private"
-            }
-          ]
-        ));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [
+        {
+          "id": "19:e14b10cd0b684901b53d14e89aa4221f@thread.skype",
+          "displayName": "Development",
+          "description": null,
+          "isFavoriteByDefault": null,
+          "email": "",
+          "webUrl": "https://teams.microsoft.com/l/channel/19%3ae14b10cd0b684901b53d14e89aa4221f%40thread.skype/Development?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8",
+          "membershipType": "private"
+        },
+        {
+          "id": "19:12ff25ec5325468dba1f73522cd08248@thread.skype",
+          "displayName": "Social",
+          "description": null,
+          "isFavoriteByDefault": null,
+          "email": "",
+          "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8",
+          "membershipType": "private"
+        }
+      ]
+    ));
   });
 
-  it('correctly lists all channels in a Microsoft teams team by team name', (done) => {
+  it('correctly lists all channels in a Microsoft teams team by team name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/groups?$filter=displayName eq '`) > -1) {
         return Promise.resolve({
@@ -381,51 +353,43 @@ describe(commands.CHANNEL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         teamName: 'Team Name'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [
-            {
-              "id": "19:17de660d16844149ab3f0240405f9316@thread.skype",
-              "displayName": "General",
-              "description": "Test group for office cli commands",
-              "isFavoriteByDefault": null,
-              "email": "",
-              "webUrl": "https://teams.microsoft.com/l/channel/19%3a17de660d16844149ab3f0240405f9316%40thread.skype/General?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
-            },
-            {
-              "id": "19:e14b10cd0b684901b53d14e89aa4221f@thread.skype",
-              "displayName": "Development",
-              "description": null,
-              "isFavoriteByDefault": null,
-              "email": "",
-              "webUrl": "https://teams.microsoft.com/l/channel/19%3ae14b10cd0b684901b53d14e89aa4221f%40thread.skype/Development?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
-            },
-            {
-              "id": "19:12ff25ec5325468dba1f73522cd08248@thread.skype",
-              "displayName": "Social",
-              "description": null,
-              "isFavoriteByDefault": null,
-              "email": "",
-              "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
-            }
-          ]
-        ));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [
+        {
+          "id": "19:17de660d16844149ab3f0240405f9316@thread.skype",
+          "displayName": "General",
+          "description": "Test group for office cli commands",
+          "isFavoriteByDefault": null,
+          "email": "",
+          "webUrl": "https://teams.microsoft.com/l/channel/19%3a17de660d16844149ab3f0240405f9316%40thread.skype/General?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
+        },
+        {
+          "id": "19:e14b10cd0b684901b53d14e89aa4221f@thread.skype",
+          "displayName": "Development",
+          "description": null,
+          "isFavoriteByDefault": null,
+          "email": "",
+          "webUrl": "https://teams.microsoft.com/l/channel/19%3ae14b10cd0b684901b53d14e89aa4221f%40thread.skype/Development?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
+        },
+        {
+          "id": "19:12ff25ec5325468dba1f73522cd08248@thread.skype",
+          "displayName": "Social",
+          "description": null,
+          "isFavoriteByDefault": null,
+          "email": "",
+          "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
+        }
+      ]
+    ));
   });
 
-  it('correctly lists all channels in a Microsoft teams team (debug)', (done) => {
+  it('correctly lists all channels in a Microsoft teams team (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels`) {
         return Promise.resolve({
@@ -435,18 +399,11 @@ describe(commands.CHANNEL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{ "id": "19:17de660d16844149ab3f0240405f9316@thread.skype", "displayName": "General", "description": "Test group for office cli commands", "isFavoriteByDefault": null, "email": "", "webUrl": "https://teams.microsoft.com/l/channel/19%3a17de660d16844149ab3f0240405f9316%40thread.skype/General?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8" }, { "id": "19:e14b10cd0b684901b53d14e89aa4221f@thread.skype", "displayName": "Development", "description": null, "isFavoriteByDefault": null, "email": "", "webUrl": "https://teams.microsoft.com/l/channel/19%3ae14b10cd0b684901b53d14e89aa4221f%40thread.skype/Development?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8" }, { "id": "19:12ff25ec5325468dba1f73522cd08248@thread.skype", "displayName": "Social", "description": null, "isFavoriteByDefault": null, "email": "", "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8" }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000" } });
+    assert(loggerLogSpy.calledWith([{ "id": "19:17de660d16844149ab3f0240405f9316@thread.skype", "displayName": "General", "description": "Test group for office cli commands", "isFavoriteByDefault": null, "email": "", "webUrl": "https://teams.microsoft.com/l/channel/19%3a17de660d16844149ab3f0240405f9316%40thread.skype/General?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8" }, { "id": "19:e14b10cd0b684901b53d14e89aa4221f@thread.skype", "displayName": "Development", "description": null, "isFavoriteByDefault": null, "email": "", "webUrl": "https://teams.microsoft.com/l/channel/19%3ae14b10cd0b684901b53d14e89aa4221f%40thread.skype/Development?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8" }, { "id": "19:12ff25ec5325468dba1f73522cd08248@thread.skype", "displayName": "Social", "description": null, "isFavoriteByDefault": null, "email": "", "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8" }]));
   });
 
-  it('outputs all data in json output mode', (done) => {
+  it('outputs all data in json output mode', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels`) {
         return Promise.resolve({
@@ -481,70 +438,51 @@ describe(commands.CHANNEL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         output: 'json',
         teamId: '00000000-0000-0000-0000-000000000000'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [
-            {
-              "id": "19:17de660d16844149ab3f0240405f9316@thread.skype",
-              "displayName": "General",
-              "description": "Test group for office cli commands",
-              "isFavoriteByDefault": null,
-              "email": "",
-              "webUrl": "https://teams.microsoft.com/l/channel/19%3a17de660d16844149ab3f0240405f9316%40thread.skype/General?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
-            },
-            {
-              "id": "19:e14b10cd0b684901b53d14e89aa4221f@thread.skype",
-              "displayName": "Development",
-              "description": null,
-              "isFavoriteByDefault": null,
-              "email": "",
-              "webUrl": "https://teams.microsoft.com/l/channel/19%3ae14b10cd0b684901b53d14e89aa4221f%40thread.skype/Development?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
-            },
-            {
-              "id": "19:12ff25ec5325468dba1f73522cd08248@thread.skype",
-              "displayName": "Social",
-              "description": null,
-              "isFavoriteByDefault": null,
-              "email": "",
-              "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
-            }
-          ]
-        ));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [
+        {
+          "id": "19:17de660d16844149ab3f0240405f9316@thread.skype",
+          "displayName": "General",
+          "description": "Test group for office cli commands",
+          "isFavoriteByDefault": null,
+          "email": "",
+          "webUrl": "https://teams.microsoft.com/l/channel/19%3a17de660d16844149ab3f0240405f9316%40thread.skype/General?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
+        },
+        {
+          "id": "19:e14b10cd0b684901b53d14e89aa4221f@thread.skype",
+          "displayName": "Development",
+          "description": null,
+          "isFavoriteByDefault": null,
+          "email": "",
+          "webUrl": "https://teams.microsoft.com/l/channel/19%3ae14b10cd0b684901b53d14e89aa4221f%40thread.skype/Development?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
+        },
+        {
+          "id": "19:12ff25ec5325468dba1f73522cd08248@thread.skype",
+          "displayName": "Social",
+          "description": null,
+          "isFavoriteByDefault": null,
+          "email": "",
+          "webUrl": "https://teams.microsoft.com/l/channel/19%3a12ff25ec5325468dba1f73522cd08248%40thread.skype/Social?teamId=290a87a4-38f4-4f6c-a664-9dddf09bdbcc&tenantId=3a7a651b-2620-433b-a1a3-42de27ae94e8"
+        }
+      ]
+    ));
   });
 
-  it('correctly handles error when retrieving all teams', (done) => {
+  it('correctly handles error when retrieving all teams', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        teamId: '00000000-0000-0000-0000-000000000000'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      teamId: '00000000-0000-0000-0000-000000000000' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

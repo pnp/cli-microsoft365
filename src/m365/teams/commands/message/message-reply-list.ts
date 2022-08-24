@@ -65,21 +65,22 @@ class TeamsMessageReplyListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const endpoint: string = `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${args.options.channelId}/messages/${args.options.messageId}/replies`;
 
-    odata
-      .getAllItems<Reply>(endpoint)
-      .then((items): void => {
-        if (args.options.output !== 'json') {
-          items.forEach(i => {
-            i.body = i.body.content as any;
-          });
-        }
+    try {
+      const items = await odata.getAllItems<Reply>(endpoint);
+      if (args.options.output !== 'json') {
+        items.forEach(i => {
+          i.body = i.body.content as any;
+        });
+      }
 
-        logger.log(items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

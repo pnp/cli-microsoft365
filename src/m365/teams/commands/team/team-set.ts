@@ -130,7 +130,7 @@ class TeamsTeamSetCommand extends GraphCommand {
     return requestBody;
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.teamId) {
       args.options.id = args.options.teamId;
 
@@ -154,9 +154,12 @@ class TeamsTeamSetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    request
-      .patch(requestOptions)
-      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      await request.patch(requestOptions);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 
