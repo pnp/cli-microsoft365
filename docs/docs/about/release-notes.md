@@ -14,6 +14,8 @@
 - removed default type of spo site list [#3526](https://github.com/pnp/cli-microsoft365/issues/3526)
 - removed deprecated spo site classic _verb_ commands [#3458](https://github.com/pnp/cli-microsoft365/issues/3458)
 - aligned commands' options with naming convention [#2696](https://github.com/pnp/cli-microsoft365/issues/2696)
+- removed the setting autoOpenBrowserOnLogin to follow new settings autoOpenLinksInBrowser [#3163](https://github.com/pnp/cli-microsoft365/issues/3163)
+- removed deprecated options for 'teams team remove', 'teams team archive', and 'teams team unarchive' command [#3502](https://github.com/pnp/cli-microsoft365/issues/3502)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
