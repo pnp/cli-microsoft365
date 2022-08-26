@@ -63,7 +63,7 @@ describe(commands.APP_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves information about the app with the specified id from the tenant app catalog (debug)', (done) => {
+  it('retrieves information about the app with the specified id from the tenant app catalog (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
@@ -84,26 +84,16 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
-          Title: 'online-client-side-solution',
-          Deployed: true,
-          AppCatalogVersion: '1.0.0.0'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+    assert(loggerLogSpy.calledWith({
+      ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
+      Title: 'online-client-side-solution',
+      Deployed: true,
+      AppCatalogVersion: '1.0.0.0'
+    }));
   });
 
-  it('retrieves information about the app with the specified id from the site app catalog (debug)', (done) => {
+  it('retrieves information about the app with the specified id from the site app catalog (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
@@ -124,26 +114,16 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
-          Title: 'online-client-side-solution',
-          Deployed: true,
-          AppCatalogVersion: '1.0.0.0'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } });
+    assert(loggerLogSpy.calledWith({
+      ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
+      Title: 'online-client-side-solution',
+      Deployed: true,
+      AppCatalogVersion: '1.0.0.0'
+    }));
   });
 
-  it('retrieves information about the app with the specified id from the tenant app catalog', (done) => {
+  it('retrieves information about the app with the specified id from the tenant app catalog', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
@@ -164,26 +144,16 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
-          Title: 'online-client-side-solution',
-          Deployed: true,
-          AppCatalogVersion: '1.0.0.0'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+    assert(loggerLogSpy.calledWith({
+      ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
+      Title: 'online-client-side-solution',
+      Deployed: true,
+      AppCatalogVersion: '1.0.0.0'
+    }));
   });
 
-  it('retrieves information about the app with the specified id from the site app catalog', (done) => {
+  it('retrieves information about the app with the specified id from the site app catalog', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
@@ -204,26 +174,16 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
-          Title: 'online-client-side-solution',
-          Deployed: true,
-          AppCatalogVersion: '1.0.0.0'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } });
+    assert(loggerLogSpy.calledWith({
+      ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
+      Title: 'online-client-side-solution',
+      Deployed: true,
+      AppCatalogVersion: '1.0.0.0'
+    }));
   });
 
-  it('retrieves information about the app with the specified name from the specified tenant app catalog', (done) => {
+  it('retrieves information about the app with the specified name from the specified tenant app catalog', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
@@ -250,26 +210,16 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
-          Title: 'online-client-side-solution',
-          Deployed: true,
-          AppCatalogVersion: '1.0.0.0'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
-    });
+    await command.action(logger, { options: { debug: false, name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' } });
+    assert(loggerLogSpy.calledWith({
+      ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
+      Title: 'online-client-side-solution',
+      Deployed: true,
+      AppCatalogVersion: '1.0.0.0'
+    }));
   });
 
-  it('retrieves information about the app with the specified name from the specified site app catalog', (done) => {
+  it('retrieves information about the app with the specified name from the specified site app catalog', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
@@ -297,26 +247,16 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'solution.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com/sites/site1' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
-          Title: 'online-client-side-solution',
-          Deployed: true,
-          AppCatalogVersion: '1.0.0.0'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
-    });
+    await command.action(logger, { options: { debug: false, name: 'solution.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com/sites/site1' } });
+    assert(loggerLogSpy.calledWith({
+      ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
+      Title: 'online-client-side-solution',
+      Deployed: true,
+      AppCatalogVersion: '1.0.0.0'
+    }));
   });
 
-  it('retrieves information about the app with the specified name with auto-discovered tenant app catalog (debug)', (done) => {
+  it('retrieves information about the app with the specified name with auto-discovered tenant app catalog (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
@@ -343,26 +283,16 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, name: 'solution.sppkg' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
-          Title: 'online-client-side-solution',
-          Deployed: true,
-          AppCatalogVersion: '1.0.0.0'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
-    });
+    await command.action(logger, { options: { debug: true, name: 'solution.sppkg' } });
+    assert(loggerLogSpy.calledWith({
+      ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
+      Title: 'online-client-side-solution',
+      Deployed: true,
+      AppCatalogVersion: '1.0.0.0'
+    }));
   });
 
-  it('should handle getfolderbyserverrelativeurl error', (done) => {
+  it('should handle getfolderbyserverrelativeurl error', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('solution.sppkg')?$select=UniqueId`) {
         return Promise.reject({
@@ -380,21 +310,14 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { appCatalogUrl: string, }) => void) => {
-      cb({ appCatalogUrl: '' });
-    });
-    command.action(logger, { options: { debug: false, name: 'solution.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { appCatalogUrl: '' }
+    ));
+    await assert.rejects(command.action(logger, { options: { debug: false, name: 'solution.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
+      new CommandError('An error has occurred'));
   });
 
-  it('retrieves information about the app with the specified name from the specified tenant app catalog via prompt', (done) => {
+  it('retrieves information about the app with the specified name from the specified tenant app catalog via prompt', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
@@ -422,26 +345,19 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { appCatalogUrl: string }) => void) => {
-      cb({ appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' });
-    });
-    command.action(logger, { options: { debug: false, name: 'solution.sppkg' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
-          Title: 'online-client-side-solution',
-          Deployed: true,
-          AppCatalogVersion: '1.0.0.0'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' }
+    ));
+    await command.action(logger, { options: { debug: false, name: 'solution.sppkg' } });
+    assert(loggerLogSpy.calledWith({
+      ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
+      Title: 'online-client-side-solution',
+      Deployed: true,
+      AppCatalogVersion: '1.0.0.0'
+    }));
   });
 
-  it('correctly handles no app found in the tenant app catalog', (done) => {
+  it('correctly handles no app found in the tenant app catalog', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
@@ -468,21 +384,11 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+      new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
   });
 
-  it('correctly handles no app found in the site app catalog', (done) => {
+  it('correctly handles no app found in the site app catalog', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
@@ -508,21 +414,11 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } } as any),
+      new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
@@ -538,21 +434,11 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+      new CommandError('An error has occurred'));
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('SP_TenantSettings_Current') > -1) {
         return Promise.resolve({ "CorporateCatalogUrl": "https://contoso.sharepoint.com/sites/apps" });
@@ -578,18 +464,8 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.get);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('fails validation if neither the id nor the name options are specified', async () => {

@@ -103,62 +103,60 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let appId: string = '';
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     let appCatalogUrl: string = '';
 
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((spoUrl: string): Promise<string> => {
-        return this.getAppCatalogSiteUrl(logger, spoUrl, args);
-      })
-      .then((_appCatalogUrl: string): Promise<{ UniqueId: string; }> => {
-        appCatalogUrl = _appCatalogUrl;
+    try {
+      const spoUrl = await spo.getSpoUrl(logger, this.debug);
+      appCatalogUrl = await this.getAppCatalogSiteUrl(logger, spoUrl, args);
 
-        if (args.options.id) {
-          if (this.verbose) {
-            logger.logToStderr(`Using the specified app id ${args.options.id}`);
-          }
-
-          return Promise.resolve({ UniqueId: args.options.id });
-        }
-        else {
-          if (this.verbose) {
-            logger.logToStderr(`Looking up app id for app named ${args.options.name}...`);
-          }
-
-          const requestOptions: any = {
-            url: `${appCatalogUrl}/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('${args.options.name}')?$select=UniqueId`,
-            headers: {
-              accept: 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
-
-          return request.get(requestOptions);
-        }
-      })
-      .then((res: { UniqueId: string }): Promise<void> => {
-        appId = res.UniqueId;
-
+      let res: { UniqueId: string };
+      if (args.options.id) {
         if (this.verbose) {
-          logger.logToStderr(`Deploying app...`);
+          logger.logToStderr(`Using the specified app id ${args.options.id}`);
+        }
+
+        res = { UniqueId: args.options.id };
+      }
+      else {
+        if (this.verbose) {
+          logger.logToStderr(`Looking up app id for app named ${args.options.name}...`);
         }
 
         const requestOptions: any = {
-          url: `${appCatalogUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${appId}')/deploy`,
+          url: `${appCatalogUrl}/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('${args.options.name}')?$select=UniqueId`,
           headers: {
-            accept: 'application/json;odata=nometadata',
-            'content-type': 'application/json;odata=nometadata;charset=utf-8'
+            accept: 'application/json;odata=nometadata'
           },
-          data: { 'skipFeatureDeployment': args.options.skipFeatureDeployment || false },
           responseType: 'json'
         };
 
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        res = await request.get(requestOptions);
+      }
+
+      appId = res.UniqueId;
+
+      if (this.verbose) {
+        logger.logToStderr(`Deploying app...`);
+      }
+
+      const requestOptions: any = {
+        url: `${appCatalogUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${appId}')/deploy`,
+        headers: {
+          accept: 'application/json;odata=nometadata',
+          'content-type': 'application/json;odata=nometadata;charset=utf-8'
+        },
+        data: { 'skipFeatureDeployment': args.options.skipFeatureDeployment || false },
+        responseType: 'json'
+      };
+
+      await  request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

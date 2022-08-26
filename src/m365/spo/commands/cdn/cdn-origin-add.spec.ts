@@ -88,70 +88,49 @@ describe(commands.CDN_ORIGIN_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('sets CDN origin on the public CDN when Public type specified', (done) => {
-    command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="AddTenantCdnOrigin" Id="27" ObjectPathId="23"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="String">*/cdn</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="23" Name="abc" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('sets CDN origin on the public CDN when Public type specified', async () => {
+    await command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="AddTenantCdnOrigin" Id="27" ObjectPathId="23"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="String">*/cdn</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="23" Name="abc" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('sets CDN origin on the private CDN when Private type specified', (done) => {
-    command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Private' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="AddTenantCdnOrigin" Id="27" ObjectPathId="23"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="String">*/cdn</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="23" Name="abc" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('sets CDN origin on the private CDN when Private type specified', async () => {
+    await command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Private' } });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="AddTenantCdnOrigin" Id="27" ObjectPathId="23"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="String">*/cdn</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="23" Name="abc" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('sets CDN origin on the public CDN when no type specified', (done) => {
-    command.action(logger, { options: { debug: false, origin: '*/cdn' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="AddTenantCdnOrigin" Id="27" ObjectPathId="23"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="String">*/cdn</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="23" Name="abc" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('sets CDN origin on the public CDN when no type specified', async () => {
+    await command.action(logger, { options: { debug: false, origin: '*/cdn' } });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="AddTenantCdnOrigin" Id="27" ObjectPathId="23"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="String">*/cdn</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="23" Name="abc" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('correctly handles trying to set CDN origin that has already been set', (done) => {
+  it('correctly handles trying to set CDN origin that has already been set', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -182,34 +161,20 @@ describe(commands.CDN_ORIGIN_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, 'The library is already registered as a CDN origin.');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } } as any),
+      new CommandError('The library is already registered as a CDN origin.'));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
-    command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } } as any), 
+      new CommandError('An error has occurred'));
   });
 
-  it('escapes XML in user input', (done) => {
+  it('escapes XML in user input', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -241,22 +206,15 @@ describe(commands.CDN_ORIGIN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, origin: '<*/CDN>' } }, () => {
-      let isDone = false;
-      log.forEach(l => {
-        if (l && typeof l === 'string' && l.indexOf('DONE')) {
-          isDone = true;
-        }
-      });
-
-      try {
-        assert(isDone);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: true, origin: '<*/CDN>' } });
+    let isDone = false;
+    log.forEach(l => {
+      if (l && typeof l === 'string' && l.indexOf('DONE')) {
+        isDone = true;
       }
     });
+
+    assert(isDone);
   });
 
   it('supports debug mode', () => {

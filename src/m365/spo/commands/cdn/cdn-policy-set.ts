@@ -1,11 +1,8 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandError
-} from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, spo } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, formatting, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -82,57 +79,50 @@ class SpoCdnPolicySetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const cdnTypeString: string = args.options.type || 'Public';
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
     let spoAdminUrl: string = '';
     let tenantId: string = '';
 
-    spo
-      .getTenantId(logger, this.debug)
-      .then((_tenantId: string): Promise<string> => {
-        tenantId = _tenantId;
-        return spo.getSpoAdminUrl(logger, this.debug);
-      })
-      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
-        spoAdminUrl = _spoAdminUrl;
-        return spo.getRequestDigest(spoAdminUrl);
-      })
-      .then((res: ContextInfo): Promise<string> => {
-        if (this.verbose) {
-          logger.logToStderr(`Configuring policy on the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
-        }
+    try {
+      tenantId = await spo.getTenantId(logger, this.debug);
+      spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+      const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
-        let policyId: number = -1;
-        switch (args.options.policy) {
-          case "IncludeFileExtensions":
-            policyId = 0;
-            break;
-          case "ExcludeRestrictedSiteClassifications":
-            policyId = 1;
-            break;
-        }
+      if (this.verbose) {
+        logger.logToStderr(`Configuring policy on the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
+      }
 
-        const requestOptions: any = {
-          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'X-RequestDigest': res.FormDigestValue
-          },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetTenantCdnPolicy" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">${cdnType}</Parameter><Parameter Type="Enum">${policyId}</Parameter><Parameter Type="String">${formatting.escapeXml(args.options.value)}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="${tenantId}" /></ObjectPaths></Request>`
-        };
+      let policyId: number = -1;
+      switch (args.options.policy) {
+        case "IncludeFileExtensions":
+          policyId = 0;
+          break;
+        case "ExcludeRestrictedSiteClassifications":
+          policyId = 1;
+          break;
+      }
 
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          cb(new CommandError(response.ErrorInfo.ErrorMessage));
-          return;
-        }
+      const requestOptions: any = {
+        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+        headers: {
+          'X-RequestDigest': reqDigest.FormDigestValue
+        },
+        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetTenantCdnPolicy" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">${cdnType}</Parameter><Parameter Type="Enum">${policyId}</Parameter><Parameter Type="String">${formatting.escapeXml(args.options.value)}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="${tenantId}" /></ObjectPaths></Request>`
+      };
 
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      const res = await request.post<string>(requestOptions);
+
+      const json: ClientSvcResponse = JSON.parse(res);
+      const response: ClientSvcResponseContents = json[0];
+      if (response.ErrorInfo) {
+        throw response.ErrorInfo.ErrorMessage;
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
   }
 }
 
