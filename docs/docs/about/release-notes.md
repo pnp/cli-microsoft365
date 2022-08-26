@@ -2,35 +2,37 @@
 
 ## [v5.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.7.0)
 
+### New commands
+
 **Bookings:**
 
-- [booking business get](../cmd/booking/business/business-get.md) - adds 'booking business get' command [#3534](https://github.com/pnp/cli-microsoft365/issues/3534)
-- [booking business list](../cmd/booking/business/business-list.md) - adds 'booking business list' command [#3532](https://github.com/pnp/cli-microsoft365/issues/3532)
+- [booking business get](../cmd/booking/business/business-get.md) - retrieves the specified Microsoft Bookings business [#3534](https://github.com/pnp/cli-microsoft365/issues/3534)
+- [booking business list](../cmd/booking/business/business-list.md) - Lists all Microsoft Bookings businesses that are created for the tenant [#3532](https://github.com/pnp/cli-microsoft365/issues/3532)
 
 **SharePoint:**
 
-- [spo list roleassignment add](../cmd/spo/list/list-roleassignment-add.md) - adds 'spo list roleassignment add' command [#3300](https://github.com/pnp/cli-microsoft365/issues/3300)
-- [spo list roleassignment remove](../cmd/spo/list/list-roleassignment-remove.md) - adds 'spo list roleassignment remove' command [#3542](https://github.com/pnp/cli-microsoft365/issues/3542)
-- [spo web roleinheritance reset](../cmd/spo/web/web-roleinheritance-reset.md) - adds 'spo web roleinheritance reset' command [#3548](https://github.com/pnp/cli-microsoft365/issues/3548)
+- [spo list roleassignment add](../cmd/spo/list/list-roleassignment-add.md) - adds a role assignment to list permissions [#3300](https://github.com/pnp/cli-microsoft365/issues/3300)
+- [spo list roleassignment remove](../cmd/spo/list/list-roleassignment-remove.md) - removes a role assignment from list permissions [#3542](https://github.com/pnp/cli-microsoft365/issues/3542)
+- [spo web roleinheritance reset](../cmd/spo/web/web-roleinheritance-reset.md) - restores role inheritance of subsite [#3548](https://github.com/pnp/cli-microsoft365/issues/3548)
 
 **Search:**
 
-- [search externalConnections remove](../cmd/search/externalconnection/externalconnection-remove.md) - adds 'search externalConnections remove' command [#3170](https://github.com/pnp/cli-microsoft365/issues/3170)
+- [search externalConnections remove](../cmd/search/externalconnection/externalconnection-remove.md) - allows the administrator to remove a specific external connection used in Microsoft Search [#3170](https://github.com/pnp/cli-microsoft365/issues/3170)
 
 ### Changes
 
-- fixes docs 'aad app add', 'aad app set' [#3588](https://github.com/pnp/cli-microsoft365/issues/3588)
-- adds dark theme support for Team page [#3582](https://github.com/pnp/cli-microsoft365/issues/3582)
-- adds testing on Node@18 [#3255](https://github.com/pnp/cli-microsoft365/issues/3255)
+- fixed docs 'aad app add', 'aad app set' [#3588](https://github.com/pnp/cli-microsoft365/issues/3588)
+- added dark theme support for Team page [#3582](https://github.com/pnp/cli-microsoft365/issues/3582)
+- added testing on Node@18 [#3255](https://github.com/pnp/cli-microsoft365/issues/3255)
 - refactored command configuration [#3409](https://github.com/pnp/cli-microsoft365/issues/3409)
-- extends docs with a Team page [#2166](https://github.com/pnp/cli-microsoft365/issues/2166)
-- removes chatUtil.convertParticipantStringToArray from code. Only split by comma [#3340](https://github.com/pnp/cli-microsoft365/issues/3340)
-- extends 'aad app add' command with admin consent process. [#2563](https://github.com/pnp/cli-microsoft365/issues/2563)
-- updates MkDocs, extends docs with tag support and dark mode. [#3416](https://github.com/pnp/cli-microsoft365/issues/3416)
+- extended docs with a Team page [#2166](https://github.com/pnp/cli-microsoft365/issues/2166)
+- removed chatUtil.convertParticipantStringToArray from code. Only split by comma [#3340](https://github.com/pnp/cli-microsoft365/issues/3340)
+- extended 'aad app add' command with admin consent process. [#2563](https://github.com/pnp/cli-microsoft365/issues/2563)
+- updated MkDocs, extends docs with tag support and dark mode. [#3416](https://github.com/pnp/cli-microsoft365/issues/3416)
 - extended spfx doctor with support for SPFx v1.15.2 [#3558](https://github.com/pnp/cli-microsoft365/issues/3558)
-- fixes booking commands links in release notes
-- fixes release notes links
-- fixes broken links to completion page in docs [#3586](https://github.com/pnp/cli-microsoft365/issues/3586)
+- fixed booking commands links in release notes [#3602](https://github.com/pnp/cli-microsoft365/pull/3602)
+- fixed release notes links [#3611](https://github.com/pnp/cli-microsoft365/pull/3611)
+- fixed broken links to completion page in docs [#3586](https://github.com/pnp/cli-microsoft365/issues/3586)
 
 ## [v5.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.6.0)
 
