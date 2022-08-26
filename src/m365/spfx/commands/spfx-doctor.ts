@@ -625,7 +625,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       .then((gulpVersion: string): void => {
         if (gulpVersion) {
           logger.log(this.getStatus(CheckStatus.Failure, `gulp should be removed`));
-					fixes.push('npm un -g gulp');
+          fixes.push('npm un -g gulp');
         }
       });
   }
