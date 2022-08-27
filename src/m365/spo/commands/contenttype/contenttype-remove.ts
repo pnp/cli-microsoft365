@@ -1,5 +1,4 @@
 import { Cli, Logger } from '../../../../cli';
-import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -87,84 +86,80 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
     this.types.string.push('id', 'i');
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let contentTypeId: string = '';
 
     const contentTypeIdentifierLabel: string = args.options.id ?
       `with id ${args.options.id}` :
       `with name ${args.options.name}`;
 
-    const removeContentType = (): void => {
-      ((): Promise<any> => {
+    const removeContentType: () => Promise<void> = async (): Promise<void> => {
+      try {
         if (this.debug) {
           logger.logToStderr(`Retrieving information about the content type ${contentTypeIdentifierLabel}...`);
         }
 
+        let contentTypeIdResult: { value: { StringId: string }[] };
         if (args.options.id) {
-          return Promise.resolve({ "value": [{ "StringId": args.options.id }] });
+          contentTypeIdResult = { "value": [{ "StringId": args.options.id }] };
+        }
+        else {
+          if (this.verbose) {
+            logger.logToStderr(`Looking up the ID of content type ${contentTypeIdentifierLabel}...`);
+          }
+  
+          const requestOptions: any = {
+            url: `${args.options.webUrl}/_api/web/availableContentTypes?$filter=(Name eq '${encodeURIComponent(args.options.name as string)}')`,
+            headers: {
+              accept: 'application/json;odata=nometadata'
+            },
+            responseType: 'json'
+          };
+  
+          contentTypeIdResult = await request.get<{ value: { StringId: string }[] }>(requestOptions);
         }
 
-        if (this.verbose) {
-          logger.logToStderr(`Looking up the ID of content type ${contentTypeIdentifierLabel}...`);
+        let res: any;
+        if (contentTypeIdResult &&
+          contentTypeIdResult.value &&
+          contentTypeIdResult.value.length > 0) {
+          contentTypeId = contentTypeIdResult.value[0].StringId;
+
+          //execute delete operation
+          const requestOptions: any = {
+            url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(contentTypeId)}')`,
+            headers: {
+              'X-HTTP-Method': 'DELETE',
+              'If-Match': '*',
+              'accept': 'application/json;odata=nometadata'
+            },
+            responseType: 'json'
+          };
+
+          res = await request.post<any>(requestOptions);
+        }
+        else {
+          res = { "odata.null": true };
         }
 
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/availableContentTypes?$filter=(Name eq '${encodeURIComponent(args.options.name as string)}')`,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        return request.get(requestOptions);
-      })()
-        .then((contentTypeIdResult: { value: { StringId: string }[] }): Promise<any> => {
-          if (contentTypeIdResult &&
-            contentTypeIdResult.value &&
-            contentTypeIdResult.value.length > 0) {
-            contentTypeId = contentTypeIdResult.value[0].StringId;
-
-            //execute delete operation
-            const requestOptions: any = {
-              url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(contentTypeId)}')`,
-              headers: {
-                'X-HTTP-Method': 'DELETE',
-                'If-Match': '*',
-                'accept': 'application/json;odata=nometadata'
-              },
-              responseType: 'json'
-            };
-
-            return request.post(requestOptions);
-          }
-          else {
-            return Promise.resolve({ "odata.null": true });
-          }
-        })
-        .then((res): void => {
-          if (res && res["odata.null"] === true) {
-            cb(new CommandError(`Content type not found`));
-            return;
-          }
-
-          cb();
-        }, (err: any): void => {
-          this.handleRejectedODataJsonPromise(err, logger, cb);
-        });
+        if (res && res["odata.null"] === true) {
+          throw `Content type not found`;
+        }
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeContentType();
+      await removeContentType();
     }
     else {
-      Cli.prompt({ type: 'confirm', name: 'continue', default: false, message: `Are you sure you want to remove the content type ${args.options.id || args.options.name}?` }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeContentType();
-        }
-      });
+      const result = await Cli.prompt<{ continue: boolean }>({ type: 'confirm', name: 'continue', default: false, message: `Are you sure you want to remove the content type ${args.options.id || args.options.name}?` });
+
+      if (result.continue) {
+        await removeContentType();
+      }
     }
   }
 }

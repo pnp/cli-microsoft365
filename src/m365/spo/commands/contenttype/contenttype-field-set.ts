@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandError
-} from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -109,65 +106,54 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     this.types.string.push('contentTypeId', 'c');
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    let schemaXmlWithResourceTokens: string = '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      let schemaXmlWithResourceTokens: string = '';
 
-    if (this.verbose) {
-      logger.logToStderr(`Retrieving field link for field ${args.options.fieldId}...`);
-    }
+      if (this.verbose) {
+        logger.logToStderr(`Retrieving field link for field ${args.options.fieldId}...`);
+      }
+  
+      let requestOptions: any = {
+        url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.fieldId}')`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.fieldId}')`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
+      const fieldLink = await request.get<FieldLink>(requestOptions);
 
-    request
-      .get<FieldLink>(requestOptions)
-      .then((res: FieldLink): Promise<{ SchemaXmlWithResourceTokens: string; }> => {
-        if (res["odata.null"] !== true) {
-          if (this.verbose) {
-            logger.logToStderr('Field link found');
-          }
-          this.fieldLink = res;
-          return Promise.resolve(undefined as any);
+      if (fieldLink["odata.null"] !== true) {
+        if (this.verbose) {
+          logger.logToStderr('Field link found');
         }
-
+        this.fieldLink = fieldLink;
+      }
+      else {
         if (this.verbose) {
           logger.logToStderr('Field link not found. Creating...');
           logger.logToStderr(`Retrieving information about site column ${args.options.fieldId}...`);
         }
-
-        const requestOptions: any = {
+  
+        requestOptions = {
           url: `${args.options.webUrl}/_api/web/fields('${args.options.fieldId}')?$select=SchemaXmlWithResourceTokens`,
           headers: {
             accept: 'application/json;odata=nometadata'
           },
           responseType: 'json'
         };
-
-        return request.get(requestOptions);
-      })
-      .then((res?: { SchemaXmlWithResourceTokens: string; }): Promise<void> => {
-        if (!res) {
-          return Promise.resolve();
-        }
-
-        schemaXmlWithResourceTokens = res.SchemaXmlWithResourceTokens;
-        return this.createFieldLink(logger, args, schemaXmlWithResourceTokens);
-      })
-      .then((): Promise<FieldLink> => {
-        if (this.fieldLink) {
-          return Promise.resolve(undefined as any);
-        }
-
+  
+        const field = await request.get<{ SchemaXmlWithResourceTokens: string; }>(requestOptions);
+        schemaXmlWithResourceTokens = field.SchemaXmlWithResourceTokens;
+        await this.createFieldLink(logger, args, schemaXmlWithResourceTokens);
+      }
+      if (!this.fieldLink) {
         if (this.verbose) {
           logger.logToStderr(`Retrieving information about field link for field ${args.options.fieldId}...`);
         }
 
-        const requestOptions: any = {
+        requestOptions = {
           url: `${args.options.webUrl}/_api/web/contenttypes('${encodeURIComponent(args.options.contentTypeId)}')/fieldlinks('${args.options.fieldId}')`,
           headers: {
             accept: 'application/json;odata=nometadata'
@@ -175,67 +161,57 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           responseType: 'json'
         };
 
-        return request.get(requestOptions);
-      })
-      .then((res?: FieldLink): Promise<{ Id: string; }> => {
-        if (res && res["odata.null"] !== true) {
-          this.fieldLink = res;
+        const fieldLinkResult = await request.get<FieldLink>(requestOptions);
+        if (fieldLinkResult && fieldLinkResult["odata.null"] !== true) {
+          this.fieldLink = fieldLinkResult;
         }
+      }
 
-        if (!this.fieldLink) {
-          return Promise.reject(`Couldn't find field link for field ${args.options.fieldId}`);
-        }
+      if (!this.fieldLink) {
+        throw `Couldn't find field link for field ${args.options.fieldId}`;
+      }
+      
+      let updateHidden: boolean = false;
+      let updateRequired: boolean = false;
+      if (typeof args.options.hidden !== 'undefined' &&
+        this.fieldLink.Hidden !== (args.options.hidden === 'true')) {
+        updateHidden = true;
+      }
+      if (typeof args.options.required !== 'undefined' &&
+        this.fieldLink.Required !== (args.options.required === 'true')) {
+        updateRequired = true;
+      }
 
-        let updateHidden: boolean = false;
-        let updateRequired: boolean = false;
-        if (typeof args.options.hidden !== 'undefined' &&
-          this.fieldLink.Hidden !== (args.options.hidden === 'true')) {
-          updateHidden = true;
+      if (!updateHidden && !updateRequired) {
+        if (this.verbose) {
+          logger.logToStderr('Field link already up-to-date');
         }
-        if (typeof args.options.required !== 'undefined' &&
-          this.fieldLink.Required !== (args.options.required === 'true')) {
-          updateRequired = true;
-        }
+        throw 'DONE';
+      }
 
-        if (!updateHidden && !updateRequired) {
-          if (this.verbose) {
-            logger.logToStderr('Field link already up-to-date');
-          }
-          return Promise.reject('DONE');
-        }
-
-        if (this.siteId) {
-          return Promise.resolve(undefined as any);
-        }
-
+      if (!this.siteId) {
         if (this.verbose) {
           logger.logToStderr(`Retrieving site collection id...`);
         }
-
-        const requestOptions: any = {
+  
+        requestOptions = {
           url: `${args.options.webUrl}/_api/site?$select=Id`,
           headers: {
             accept: 'application/json;odata=nometadata'
           },
           responseType: 'json'
         };
+  
+        const site = await request.get<{ Id: string }>(requestOptions);
+        this.siteId = site.Id;
+      }
 
-        return request.get(requestOptions);
-      })
-      .then((res?: { Id: string }): Promise<{ Id: string; }> => {
-        if (res) {
-          this.siteId = res.Id;
-        }
-
-        if (this.webId) {
-          return Promise.resolve(undefined as any);
-        }
-
+      if (!this.webId) {
         if (this.verbose) {
           logger.logToStderr(`Retrieving site id...`);
         }
 
-        const requestOptions: any = {
+        requestOptions = {
           url: `${args.options.webUrl}/_api/web?$select=Id`,
           headers: {
             accept: 'application/json;odata=nometadata'
@@ -243,49 +219,39 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           responseType: 'json'
         };
 
-        return request.get(requestOptions);
-      })
-      .then((res?: { Id: string }): Promise<string> => {
-        if (res) {
-          this.webId = res.Id;
-        }
+        const web = await request.get<{ Id: string }>(requestOptions);
+        this.webId = web.Id;
+      }
 
-        if (this.verbose) {
-          logger.logToStderr(`Updating field link...`);
-        }
+      if (this.verbose) {
+        logger.logToStderr(`Updating field link...`);
+      }
 
-        const requiredProperty: string = typeof args.options.required !== 'undefined' &&
-          (this.fieldLink as FieldLink).Required !== (args.options.required === 'true') ? `<SetProperty Id="122" ObjectPathId="121" Name="Required"><Parameter Type="Boolean">${args.options.required}</Parameter></SetProperty>` : '';
-        const hiddenProperty: string = typeof args.options.hidden !== 'undefined' &&
-          (this.fieldLink as FieldLink).Hidden !== (args.options.hidden === 'true') ? `<SetProperty Id="123" ObjectPathId="121" Name="Hidden"><Parameter Type="Boolean">${args.options.hidden}</Parameter></SetProperty>` : '';
+      const requiredProperty: string = typeof args.options.required !== 'undefined' &&
+        (this.fieldLink as FieldLink).Required !== (args.options.required === 'true') ? `<SetProperty Id="122" ObjectPathId="121" Name="Required"><Parameter Type="Boolean">${args.options.required}</Parameter></SetProperty>` : '';
+      const hiddenProperty: string = typeof args.options.hidden !== 'undefined' &&
+        (this.fieldLink as FieldLink).Hidden !== (args.options.hidden === 'true') ? `<SetProperty Id="123" ObjectPathId="121" Name="Hidden"><Parameter Type="Boolean">${args.options.hidden}</Parameter></SetProperty>` : '';
 
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'X-RequestDigest': this.requestDigest
-          },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${requiredProperty}${hiddenProperty}<Method Name="Update" Id="124" ObjectPathId="19"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="121" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${formatting.escapeXml(args.options.contentTypeId)}:fl:${(this.fieldLink as FieldLink).Id}" /><Identity Id="19" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${formatting.escapeXml(args.options.contentTypeId)}" /></ObjectPaths></Request>`
-        };
+      requestOptions = {
+        url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
+        headers: {
+          'X-RequestDigest': this.requestDigest
+        },
+        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${requiredProperty}${hiddenProperty}<Method Name="Update" Id="124" ObjectPathId="19"><Parameters><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="121" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${formatting.escapeXml(args.options.contentTypeId)}:fl:${(this.fieldLink as FieldLink).Id}" /><Identity Id="19" Name="716a7b9e-3012-0000-22fb-84acfcc67d04|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${this.siteId}:web:${this.webId}:contenttype:${formatting.escapeXml(args.options.contentTypeId)}" /></ObjectPaths></Request>`
+      };
 
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          cb(new CommandError(response.ErrorInfo.ErrorMessage));
-        }
-        else {
-          cb();
-        }
-      }, (error: any): void => {
-        if (error === 'DONE') {
-          cb();
-        }
-        else {
-          this.handleRejectedODataJsonPromise(error, logger, cb);
-        }
-      });
+      const res = await request.post<string>(requestOptions);
+      const json: ClientSvcResponse = JSON.parse(res);
+      const response: ClientSvcResponseContents = json[0];
+      if (response.ErrorInfo) {
+        throw response.ErrorInfo.ErrorMessage;
+      }
+    }
+    catch (err: any) {
+      if (err !== 'DONE') {
+        this.handleRejectedODataJsonPromise(err);
+      }
+    }
   }
 
   private createFieldLink(logger: Logger, args: CommandArgs, schemaXmlWithResourceTokens: string): Promise<void> {

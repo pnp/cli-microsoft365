@@ -57,9 +57,9 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
 
     promptOptions = undefined;
@@ -95,7 +95,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     ]);
   });
 
-  it('handles error when multiple user custom actions with the specified title found', (done) => {
+  it('handles error when multiple user custom actions with the specified title found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/UserCustomActions?$filter=Title eq ') > -1) {
         return Promise.resolve({
@@ -151,25 +151,17 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
       return Promise.reject(`Invalid request`);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         title: 'YourAppCustomizer',
         url: 'https://contoso.sharepoint.com',
         confirm: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `Multiple user custom actions with title 'YourAppCustomizer' found. Please disambiguate using IDs: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Multiple user custom actions with title 'YourAppCustomizer' found. Please disambiguate using IDs: a70d8013-3b9f-4601-93a5-0e453ab9a1f3, 63aa745f-b4dd-4055-a4d7-d9032a0cfc59`));
   });
 
-  it('handles error when no user custom actions with the specified title found', (done) => {
+  it('handles error when no user custom actions with the specified title found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/UserCustomActions?$filter=Title eq ') > -1) {
         return Promise.resolve({
@@ -181,109 +173,75 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
       return Promise.reject(`Invalid request`);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         title: 'YourAppCustomizer',
         url: 'https://contoso.sharepoint.com',
         confirm: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `No user custom action with title 'YourAppCustomizer' found`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`No user custom action with title 'YourAppCustomizer' found`));
   });
 
-  it('should user custom action removed successfully without prompting with confirmation argument', (done) => {
+  it('should user custom action removed successfully without prompting with confirmation argument', async () => {
     defaultPostCallsStub();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: false,
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         url: 'https://contoso.sharepoint.com',
         confirm: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('should prompt before removing custom action when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' } }, () => {
-      let promptIssued = false;
+  it('should prompt before removing custom action when confirmation argument not passed', async () => {
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('should abort custom action remove when prompt not confirmed', (done) => {
+  it('should abort custom action remove when prompt not confirmed', async () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' } } as any, () => {
-      try {
-        assert(postCallsSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' } } as any);
+    assert(postCallsSpy.notCalled);
   });
 
-  it('should remove custom action by id when prompt confirmed', (done) => {
+  it('should remove custom action by id when prompt confirmed', async () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' } } as any, () => {
-      try {
-        assert(postCallsSpy.calledOnce);
-        assert(removeScopedCustomActionSpy.calledWith(sinon.match(
-          {
-            id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-            url: 'https://contoso.sharepoint.com'
-          })));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore((command as any)['removeScopedCustomAction']);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' } } as any);
+    try {
+      assert(postCallsSpy.calledOnce);
+      assert(removeScopedCustomActionSpy.calledWith(sinon.match(
+        {
+          id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+          url: 'https://contoso.sharepoint.com'
+        })));
+    }
+    finally {
+      sinonUtil.restore((command as any)['removeScopedCustomAction']);
+    }
   });
 
-  it('should remove custom action by title when prompt confirmed', (done) => {
+  it('should remove custom action by title when prompt confirmed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/UserCustomActions?$filter=Title eq ') > -1) {
         return Promise.resolve({
@@ -319,30 +277,25 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, { options: { title: 'Places', url: 'https://contoso.sharepoint.com' } } as any, () => {
-      try {
-        assert(postCallsSpy.calledOnce);
-        assert(removeScopedCustomActionSpy.calledWith(sinon.match(
-          {
-            title: 'Places',
-            url: 'https://contoso.sharepoint.com'
-          })));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore((command as any)['removeScopedCustomAction']);
-      }
-    });
+    await command.action(logger, { options: { title: 'Places', url: 'https://contoso.sharepoint.com' } } as any);
+    try {
+      assert(postCallsSpy.calledOnce);
+      assert(removeScopedCustomActionSpy.calledWith(sinon.match(
+        {
+          title: 'Places',
+          url: 'https://contoso.sharepoint.com'
+        })));
+    }
+    finally {
+      sinonUtil.restore((command as any)['removeScopedCustomAction']);
+    }
   });
 
-  it('should removeScopedCustomAction be called once when scope is Web', (done) => {
+  it('should removeScopedCustomAction be called once when scope is Web', async () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
@@ -354,29 +307,24 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
       confirm: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(postCallsSpy.calledOnce);
-        assert(removeScopedCustomActionSpy.calledWith({
-          debug: false,
-          id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-          url: 'https://contoso.sharepoint.com',
-          scope: 'Web',
-          confirm: true
-        }), 'removeScopedCustomActionSpy data error');
-        assert(removeScopedCustomActionSpy.calledOnce, 'removeScopedCustomActionSpy calledOnce error');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore((command as any)['removeScopedCustomAction']);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    try {
+      assert(postCallsSpy.calledOnce);
+      assert(removeScopedCustomActionSpy.calledWith({
+        debug: false,
+        id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+        url: 'https://contoso.sharepoint.com',
+        scope: 'Web',
+        confirm: true
+      }), 'removeScopedCustomActionSpy data error');
+      assert(removeScopedCustomActionSpy.calledOnce, 'removeScopedCustomActionSpy calledOnce error');
+    }
+    finally {
+      sinonUtil.restore((command as any)['removeScopedCustomAction']);
+    }
   });
 
-  it('should removeScopedCustomAction be called once when scope is Site', (done) => {
+  it('should removeScopedCustomAction be called once when scope is Site', async () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
@@ -387,56 +335,46 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
       confirm: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(postCallsSpy.calledOnce);
-        assert(removeScopedCustomActionSpy.calledWith(
-          {
-            id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-            url: 'https://contoso.sharepoint.com',
-            scope: 'Site',
-            confirm: true
-          }), 'removeScopedCustomActionSpy data error');
-        assert(removeScopedCustomActionSpy.calledOnce, 'removeScopedCustomActionSpy calledOnce error');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore((command as any)['removeScopedCustomAction']);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    try {
+      assert(postCallsSpy.calledOnce);
+      assert(removeScopedCustomActionSpy.calledWith(
+        {
+          id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+          url: 'https://contoso.sharepoint.com',
+          scope: 'Site',
+          confirm: true
+        }), 'removeScopedCustomActionSpy data error');
+      assert(removeScopedCustomActionSpy.calledOnce, 'removeScopedCustomActionSpy calledOnce error');
+    }
+    finally {
+      sinonUtil.restore((command as any)['removeScopedCustomAction']);
+    }
   });
 
-  it('should removeScopedCustomAction be called once when scope is All, but item found on web level', (done) => {
+  it('should removeScopedCustomAction be called once when scope is All, but item found on web level', async () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         confirm: true,
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         url: 'https://contoso.sharepoint.com',
         scope: 'All'
       }
-    }, () => {
-      try {
-        assert(postCallsSpy.calledOnce);
-        assert(removeScopedCustomActionSpy.calledOnce);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore((command as any)['removeScopedCustomAction']);
-      }
     });
+    try {
+      assert(postCallsSpy.calledOnce);
+      assert(removeScopedCustomActionSpy.calledOnce);
+    }
+    finally {
+      sinonUtil.restore((command as any)['removeScopedCustomAction']);
+    }
   });
 
-  it('should removeScopedCustomAction be called twice when scope is All, but item not found on web level', (done) => {
+  it('should removeScopedCustomAction be called twice when scope is All, but item not found on web level', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       // fakes remove custom action success (site)
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
@@ -453,28 +391,23 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         url: 'https://contoso.sharepoint.com',
         confirm: true
       }
-    }, () => {
-      try {
-        assert(removeScopedCustomActionSpy.calledTwice);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore((command as any)['removeScopedCustomAction']);
-      }
     });
+    try {
+      assert(removeScopedCustomActionSpy.calledTwice);
+    }
+    finally {
+      sinonUtil.restore((command as any)['removeScopedCustomAction']);
+    }
   });
 
-  it('should searchAllScopes be called when scope is All', (done) => {
+  it('should searchAllScopes be called when scope is All', async () => {
     defaultPostCallsStub();
 
     const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
@@ -484,27 +417,22 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
       confirm: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(searchAllScopesSpy.calledWith(sinon.match(
-          {
-            id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-            url: 'https://contoso.sharepoint.com',
-            confirm: true
-          })), 'searchAllScopesSpy.calledWith');
-        assert(searchAllScopesSpy.calledOnce, 'searchAllScopesSpy.calledOnce');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore((command as any)['searchAllScopes']);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    try {
+      assert(searchAllScopesSpy.calledWith(sinon.match(
+        {
+          id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+          url: 'https://contoso.sharepoint.com',
+          confirm: true
+        })), 'searchAllScopesSpy.calledWith');
+      assert(searchAllScopesSpy.calledOnce, 'searchAllScopesSpy.calledOnce');
+    }
+    finally {
+      sinonUtil.restore((command as any)['searchAllScopes']);
+    }
   });
 
-  it('should searchAllScopes correctly handles custom action odata.null when All scope specified', (done) => {
+  it('should searchAllScopes correctly handles custom action odata.null when All scope specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       // fakes remove custom action success (site)
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
@@ -521,7 +449,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: false,
         id: actionId,
@@ -529,18 +457,11 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         scope: 'All',
         confirm: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('should searchAllScopes correctly handles custom action odata.null when All scope specified (verbose)', (done) => {
+  it('should searchAllScopes correctly handles custom action odata.null when All scope specified (verbose)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       // fakes remove custom action success (site)
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
@@ -557,7 +478,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         id: actionId,
@@ -565,18 +486,11 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
         scope: 'All',
         confirm: true
       }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(`Custom action with id ${actionId} not found`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.calledWith(`Custom action with id ${actionId} not found`));
   });
 
-  it('should correctly handle custom action reject request (web)', (done) => {
+  it('should correctly handle custom action reject request (web)', async () => {
     const err = 'abc error';
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -590,25 +504,17 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         id: actionId,
         url: 'https://contoso.sharepoint.com',
         scope: 'All',
         confirm: true
       }
-    }, (error: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
-  it('should correctly handle custom action reject request (site)', (done) => {
+  it('should correctly handle custom action reject request (site)', async () => {
     const err = 'abc error';
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -626,22 +532,14 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
     const actionId: string = 'b2307a39-e878-458b-bc90-03bc578531d6';
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         id: actionId,
         url: 'https://contoso.sharepoint.com',
         scope: 'All',
         confirm: true
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
   it('supports debug mode', () => {

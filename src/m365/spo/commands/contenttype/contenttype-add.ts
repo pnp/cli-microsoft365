@@ -1,9 +1,9 @@
-import { Cli, CommandOutput, Logger } from '../../../../cli';
-import Command, { CommandError, CommandErrorWithOutput } from '../../../../Command';
+import { Cli, Logger } from '../../../../cli';
+import Command from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, spo, validation } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, formatting, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import * as SpoContentTypeGetCommand from './contenttype-get';
@@ -83,67 +83,61 @@ class SpoContentTypeAddCommand extends SpoCommand {
     this.types.string.push('id', 'i');
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    let parentInfo: string = '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const parentInfo = await this.getParentInfo(args.options.listTitle, args.options.webUrl, logger);
 
-    this
-      .getParentInfo(args.options.listTitle, args.options.webUrl, logger)
-      .then((parent: string): Promise<ContextInfo> => {
-        parentInfo = parent;
+      if (this.verbose) {
+        logger.logToStderr(`Retrieving request digest...`);
+      }
 
-        if (this.verbose) {
-          logger.logToStderr(`Retrieving request digest...`);
+      const reqDigest = await spo.getRequestDigest(args.options.webUrl);
+      const description: string = args.options.description ?
+        `<Property Name="Description" Type="String">${formatting.escapeXml(args.options.description)}</Property>` :
+        '<Property Name="Description" Type="Null" />';
+      const group: string = args.options.group ?
+        `<Property Name="Group" Type="String">${formatting.escapeXml(args.options.group)}</Property>` :
+        '<Property Name="Group" Type="Null" />';
+
+      const requestOptions: any = {
+        url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
+        headers: {
+          'X-RequestDigest': reqDigest.FormDigestValue
+        },
+        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="8" ObjectPathId="7" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /></Actions><ObjectPaths><Property Id="7" ParentId="5" Name="ContentTypes" /><Method Id="9" ParentId="7" Name="Add"><Parameters><Parameter TypeId="{168f3091-4554-4f14-8866-b20d48e45b54}">${description}${group}<Property Name="Id" Type="String">${formatting.escapeXml(args.options.id)}</Property><Property Name="Name" Type="String">${formatting.escapeXml(args.options.name)}</Property><Property Name="ParentContentType" Type="Null" /></Parameter></Parameters></Method>${parentInfo}</ObjectPaths></Request>`
+      };
+
+      const res = await request.post<string>(requestOptions);
+      const json: ClientSvcResponse = JSON.parse(res);
+      const response: ClientSvcResponseContents = json[0];
+      if (response.ErrorInfo) {
+        throw response.ErrorInfo.ErrorMessage;
+      }
+
+      const options: SpoContentTypeGetCommandOptions = {
+        webUrl: args.options.webUrl,
+        listTitle: args.options.listTitle,
+        id: args.options.id,
+        output: 'json',
+        debug: this.debug,
+        verbose: this.verbose
+      };
+      
+      try {
+        const output = await Cli.executeCommandWithOutput(SpoContentTypeGetCommand as Command, { options: { ...options, _: [] } });
+        if (this.debug) {
+          logger.logToStderr(output.stderr);
         }
 
-        return spo.getRequestDigest(args.options.webUrl);
-      })
-      .then((res: ContextInfo): Promise<string> => {
-        const description: string = args.options.description ?
-          `<Property Name="Description" Type="String">${formatting.escapeXml(args.options.description)}</Property>` :
-          '<Property Name="Description" Type="Null" />';
-        const group: string = args.options.group ?
-          `<Property Name="Group" Type="String">${formatting.escapeXml(args.options.group)}</Property>` :
-          '<Property Name="Group" Type="Null" />';
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'X-RequestDigest': res.FormDigestValue
-          },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="8" ObjectPathId="7" /><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /></Actions><ObjectPaths><Property Id="7" ParentId="5" Name="ContentTypes" /><Method Id="9" ParentId="7" Name="Add"><Parameters><Parameter TypeId="{168f3091-4554-4f14-8866-b20d48e45b54}">${description}${group}<Property Name="Id" Type="String">${formatting.escapeXml(args.options.id)}</Property><Property Name="Name" Type="String">${formatting.escapeXml(args.options.name)}</Property><Property Name="ParentContentType" Type="Null" /></Parameter></Parameters></Method>${parentInfo}</ObjectPaths></Request>`
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          cb(new CommandError(response.ErrorInfo.ErrorMessage));
-          return;
-        }
-
-        const options: SpoContentTypeGetCommandOptions = {
-          webUrl: args.options.webUrl,
-          listTitle: args.options.listTitle,
-          id: args.options.id,
-          output: 'json',
-          debug: this.debug,
-          verbose: this.verbose
-        };
-        Cli.executeCommandWithOutput(SpoContentTypeGetCommand as Command, { options: { ...options, _: [] } })
-          .then((res: CommandOutput): void => {
-            if (this.debug) {
-              logger.logToStderr(res.stderr);
-            }
-
-            logger.log(JSON.parse(res.stdout));
-            cb();
-          }, (err: CommandErrorWithOutput) => {
-            cb(err.error);
-          });
-        return;
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+        logger.log(JSON.parse(output.stdout));
+      }
+      catch (cmdError: any) {
+        throw cmdError.error;
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
   }
 
   private getParentInfo(listTitle: string | undefined, webUrl: string, logger: Logger): Promise<string> {

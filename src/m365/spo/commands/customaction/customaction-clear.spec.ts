@@ -52,9 +52,9 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     promptOptions = undefined;
   });
@@ -82,87 +82,61 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('should user custom actions cleared successfully without prompting with confirmation argument', (done) => {
+  it('should user custom actions cleared successfully without prompting with confirmation argument', async () => {
     defaultPostCallsStub();
 
-    command.action(logger, { options: {
+    await command.action(logger, { options: {
       verbose: false,
       url: 'https://contoso.sharepoint.com',
       confirm: true
-    } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('should prompt before clearing custom actions when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com'} }, () => {
-      let promptIssued = false;
+  it('should prompt before clearing custom actions when confirmation argument not passed', async () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com'} });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('should abort custom actions clear when prompt not confirmed', (done) => {
+  it('should abort custom actions clear when prompt not confirmed', async () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
     
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: {  url: 'https://contoso.sharepoint.com'}} as any, () => {
-      try {
-        assert(postCallsSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: {  url: 'https://contoso.sharepoint.com'}} as any);
+    assert(postCallsSpy.notCalled);
   });
 
-  it('should clear custom actions when prompt confirmed', (done) => {
+  it('should clear custom actions when prompt confirmed', async () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: {  url: 'https://contoso.sharepoint.com' }} as any, () => {
-      try {
-        assert(postCallsSpy.calledTwice);
-        assert(clearScopedCustomActionsSpy.calledWith(sinon.match(
-          { 
-            url: 'https://contoso.sharepoint.com'
-          })) === true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore((command as any)['clearScopedCustomActions']);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: {  url: 'https://contoso.sharepoint.com' }} as any);
+    try {
+      assert(postCallsSpy.calledTwice);
+      assert(clearScopedCustomActionsSpy.calledWith(sinon.match(
+        { 
+          url: 'https://contoso.sharepoint.com'
+        })) === true);
+    }
+    finally {
+      sinonUtil.restore((command as any)['clearScopedCustomActions']);
+    }
   });
 
-  it('should clearScopedCustomActions be called once when scope is Web', (done) => {
+  it('should clearScopedCustomActions be called once when scope is Web', async () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
@@ -173,28 +147,23 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       confirm: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(postCallsSpy.calledOnce);
-        assert(clearScopedCustomActionsSpy.calledWith({
-          debug: false,
-          url: 'https://contoso.sharepoint.com',
-          scope: 'Web',
-          confirm: true
-        }), 'clearScopedCustomActionsSpy data error');
-        assert(clearScopedCustomActionsSpy.calledOnce, 'clearScopedCustomActionsSpy calledOnce error');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore((command as any)['clearScopedCustomActions']);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    try {
+      assert(postCallsSpy.calledOnce);
+      assert(clearScopedCustomActionsSpy.calledWith({
+        debug: false,
+        url: 'https://contoso.sharepoint.com',
+        scope: 'Web',
+        confirm: true
+      }), 'clearScopedCustomActionsSpy data error');
+      assert(clearScopedCustomActionsSpy.calledOnce, 'clearScopedCustomActionsSpy calledOnce error');
+    }
+    finally {
+      sinonUtil.restore((command as any)['clearScopedCustomActions']);
+    }
   });
 
-  it('should clearScopedCustomActions be called once when scope is Site', (done) => {
+  it('should clearScopedCustomActions be called once when scope is Site', async () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
@@ -204,53 +173,43 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       confirm: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(postCallsSpy.calledOnce === true);
-        assert(clearScopedCustomActionsSpy.calledWith(
-          {
-            url: 'https://contoso.sharepoint.com',
-            scope: 'Site',
-            confirm: true
-          }), 'clearScopedCustomActionsSpy data error');
-        assert(clearScopedCustomActionsSpy.calledOnce, 'clearScopedCustomActionsSpy calledOnce error');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore((command as any)['clearScopedCustomActions']);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    try {
+      assert(postCallsSpy.calledOnce === true);
+      assert(clearScopedCustomActionsSpy.calledWith(
+        {
+          url: 'https://contoso.sharepoint.com',
+          scope: 'Site',
+          confirm: true
+        }), 'clearScopedCustomActionsSpy data error');
+      assert(clearScopedCustomActionsSpy.calledOnce, 'clearScopedCustomActionsSpy calledOnce error');
+    }
+    finally {
+      sinonUtil.restore((command as any)['clearScopedCustomActions']);
+    }
   });
 
-  it('should clearScopedCustomActions be called twice when scope is All', (done) => {
+  it('should clearScopedCustomActions be called twice when scope is All', async () => {
     defaultPostCallsStub();
 
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         url: 'https://contoso.sharepoint.com',
         confirm: true
       }
-    }, () => {
-      try {
-        assert(clearScopedCustomActionsSpy.calledTwice);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore((command as any)['clearScopedCustomActions']);
-      }
     });
+    try {
+      assert(clearScopedCustomActionsSpy.calledTwice);
+    }
+    finally {
+      sinonUtil.restore((command as any)['clearScopedCustomActions']);
+    }
   });
 
-  it('should clearScopedCustomActions be calledTwice when scope is All', (done) => {
+  it('should clearScopedCustomActions be calledTwice when scope is All', async () => {
     defaultPostCallsStub();
 
     const clearScopedCustomActionsSpy: sinon.SinonSpy = sinon.spy((command as any), 'clearScopedCustomActions');
@@ -259,21 +218,16 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       confirm: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(clearScopedCustomActionsSpy.calledTwice, 'clearScopedCustomActionsSpy.calledTwice');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore((command as any)['clearScopedCustomActions']);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    try {
+      assert(clearScopedCustomActionsSpy.calledTwice, 'clearScopedCustomActionsSpy.calledTwice');
+    }
+    finally {
+      sinonUtil.restore((command as any)['clearScopedCustomActions']);
+    }
   });
 
-  it('should the post calls be have the correct endpoint urls when scope is All', (done) => {
+  it('should the post calls be have the correct endpoint urls when scope is All', async () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
     const options = {
@@ -281,23 +235,16 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       confirm: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(postCallsSpy.calledWith(sinon.match({
-          url: 'https://contoso.sharepoint.com/_api/Web/UserCustomActions/clear'
-        })));
-        assert(postCallsSpy.calledWith(sinon.match({
-          url: 'https://contoso.sharepoint.com/_api/Site/UserCustomActions/clear'
-        })));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(postCallsSpy.calledWith(sinon.match({
+      url: 'https://contoso.sharepoint.com/_api/Web/UserCustomActions/clear'
+    })));
+    assert(postCallsSpy.calledWith(sinon.match({
+      url: 'https://contoso.sharepoint.com/_api/Site/UserCustomActions/clear'
+    })));
   });
 
-  it('should correctly handle custom action reject request (web)', (done) => {
+  it('should correctly handle custom action reject request (web)', async () => {
     const err = 'abc error';
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -309,24 +256,16 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         url: 'https://contoso.sharepoint.com',
         scope: 'All',
         confirm: true
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
-  it('should correctly handle custom action reject request (site)', (done) => {
+  it('should correctly handle custom action reject request (site)', async () => {
     const err = 'abc error';
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -342,21 +281,13 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         url: 'https://contoso.sharepoint.com',
         scope: 'All',
         confirm: true
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
   it('supports debug mode', () => {

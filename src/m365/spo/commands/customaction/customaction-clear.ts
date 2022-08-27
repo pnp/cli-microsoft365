@@ -77,35 +77,35 @@ class SpoCustomActionClearCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const clearCustomActions = (): void => {
-      ((): Promise<void> => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const clearCustomActions: () => Promise<void> = async (): Promise<void> => {
+      try {
         if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
-          return this.clearScopedCustomActions(args.options);
+          await this.clearScopedCustomActions(args.options);
         }
-
-        return this.clearAllScopes(args.options);
-      })()
-        .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
+        else {
+          await this.clearAllScopes(args.options);
+        }
+      }
+      catch (err: any) {
+        this.handleRejectedPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      clearCustomActions();
+      await clearCustomActions();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to clear all the user custom actions with scope ${chalk.yellow(args.options.scope || 'All')}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          clearCustomActions();
-        }
       });
+
+      if (result.continue) {
+        await clearCustomActions();
+      }
     }
   }
 
