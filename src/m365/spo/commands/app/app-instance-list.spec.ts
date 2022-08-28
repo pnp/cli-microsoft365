@@ -78,7 +78,7 @@ describe(commands.APP_INSTANCE_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('retrieves available apps from the site collection', (done) => {
+  it('retrieves available apps from the site collection', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/AppTiles') > -1) {
         if (opts.headers &&
@@ -102,29 +102,22 @@ describe(commands.APP_INSTANCE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/testsite' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            AppId: 'b2307a39-e878-458b-bc90-03bc578531d6',
-            Title: 'online-client-side-solution'
-          },
-          {
-            AppId: 'e5f65aef-68fe-45b0-801e-92733dd57e2c',
-            Title: 'onprem-client-side-solution'
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/testsite' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        AppId: 'b2307a39-e878-458b-bc90-03bc578531d6',
+        Title: 'online-client-side-solution'
+      },
+      {
+        AppId: 'e5f65aef-68fe-45b0-801e-92733dd57e2c',
+        Title: 'onprem-client-side-solution'
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
 
 
-  it('correctly handles no apps found in the site collection', (done) => {
+  it('correctly handles no apps found in the site collection', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/AppTiles') > -1) {
         if (opts.headers &&
@@ -137,18 +130,11 @@ describe(commands.APP_INSTANCE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/testsite', debug: false } }, () => {
-      try {
-        assert.strictEqual(log.length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/testsite', debug: false } });
+    assert.strictEqual(log.length, 0);
   });
 
-  it('correctly handles no apps found in the site collection (verbose)', (done) => {
+  it('correctly handles no apps found in the site collection (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/AppTiles') > -1) {
         if (opts.headers &&
@@ -161,36 +147,21 @@ describe(commands.APP_INSTANCE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/testsite', verbose: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith('No apps found'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/testsite', verbose: true } });
+    assert(loggerLogToStderrSpy.calledWith('No apps found'));
   });
 
-  it('correctly handles error while listing apps in the site collection', (done) => {
+  it('correctly handles error while listing apps in the site collection', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
 
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/testsite'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

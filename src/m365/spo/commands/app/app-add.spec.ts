@@ -68,7 +68,7 @@ describe(commands.APP_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds new app to the tenant app catalog', (done) => {
+  it('adds new app to the tenant app catalog', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1) {
         if (opts.headers &&
@@ -85,18 +85,11 @@ describe(commands.APP_ADD, () => {
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    command.action(logger, { options: { debug: false, filePath: 'spfx.sppkg' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith("bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, filePath: 'spfx.sppkg' } });
+    assert(loggerLogSpy.calledWith("bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"));
   });
 
-  it('adds new app to the tenant app catalog (debug)', (done) => {
+  it('adds new app to the tenant app catalog (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -113,8 +106,8 @@ describe(commands.APP_ADD, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
-
-    command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg' } }, () => {
+    try {
+      await command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg' } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/tenantappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1 &&
@@ -126,23 +119,17 @@ describe(commands.APP_ADD, () => {
         }
       });
 
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post,
-          fs.readFileSync
-        ]);
-      }
-    });
+      assert(correctRequestIssued);
+    }
+    finally {
+      sinonUtil.restore([
+        request.post,
+        fs.readFileSync
+      ]);
+    }
   });
 
-  it('adds new app to a site app catalog (debug)', (done) => {
+  it('adds new app to a site app catalog (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -160,7 +147,8 @@ describe(commands.APP_ADD, () => {
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } }, () => {
+    try {
+      await command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/web/sitecollectionappcatalog/Add(overwrite=false, url='spfx.sppkg')`) > -1 &&
@@ -172,23 +160,17 @@ describe(commands.APP_ADD, () => {
         }
       });
 
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post,
-          fs.readFileSync
-        ]);
-      }
-    });
+      assert(correctRequestIssued);
+    }
+    finally {
+      sinonUtil.restore([
+        request.post,
+        fs.readFileSync
+      ]);
+    }
   });
 
-  it('returns all info about the added app in the JSON output mode', (done) => {
+  it('returns all info about the added app in the JSON output mode', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -206,24 +188,19 @@ describe(commands.APP_ADD, () => {
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    command.action(logger, { options: { debug: false, filePath: 'spfx.sppkg', output: 'json' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(JSON.parse('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post,
-          fs.readFileSync
-        ]);
-      }
-    });
+    try {
+      await command.action(logger, { options: { debug: false, filePath: 'spfx.sppkg', output: 'json' } });
+      assert(loggerLogSpy.calledWith(JSON.parse('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}')));
+    }
+    finally {
+      sinonUtil.restore([
+        request.post,
+        fs.readFileSync
+      ]);
+    }
   });
 
-  it('correctly handles failure when the app already exists in the tenant app catalog', (done) => {
+  it('correctly handles failure when the app already exists in the tenant app catalog', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -243,24 +220,19 @@ describe(commands.APP_ADD, () => {
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('A file with the name AppCatalog/spfx.sppkg already exists. It was last modified by i:0#.f|membership|admin@contoso.onmi on 24 Nov 2017 12:50:43 -0800.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post,
-          fs.readFileSync
-        ]);
-      }
-    });
+    try {
+      await assert.rejects(command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg' } } as any),
+        new CommandError('A file with the name AppCatalog/spfx.sppkg already exists. It was last modified by i:0#.f|membership|admin@contoso.onmi on 24 Nov 2017 12:50:43 -0800.'));
+    }
+    finally {
+      sinonUtil.restore([
+        request.post,
+        fs.readFileSync
+      ]);
+    }
   });
 
-  it('correctly handles failure when the app already exists in the site app catalog', (done) => {
+  it('correctly handles failure when the app already exists in the site app catalog', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -280,24 +252,19 @@ describe(commands.APP_ADD, () => {
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('A file with the name AppCatalog/spfx.sppkg already exists. It was last modified by i:0#.f|membership|admin@contoso.onmi on 24 Nov 2017 12:50:43 -0800.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post,
-          fs.readFileSync
-        ]);
-      }
-    });
+    try {
+      await assert.rejects(command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any), 
+        new CommandError('A file with the name AppCatalog/spfx.sppkg already exists. It was last modified by i:0#.f|membership|admin@contoso.onmi on 24 Nov 2017 12:50:43 -0800.'));
+    }
+    finally {
+      sinonUtil.restore([
+        request.post,
+        fs.readFileSync
+      ]);
+    }
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -315,24 +282,18 @@ describe(commands.APP_ADD, () => {
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post,
-          fs.readFileSync
-        ]);
-      }
-    });
+    try {
+      await assert.rejects(command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg' } } as any), new CommandError('An error has occurred'));
+    }
+    finally {
+      sinonUtil.restore([
+        request.post,
+        fs.readFileSync
+      ]);
+    }
   });
 
-  it('correctly handles random API error when sitecollection', (done) => {
+  it('correctly handles random API error when sitecollection', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -350,24 +311,19 @@ describe(commands.APP_ADD, () => {
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post,
-          fs.readFileSync
-        ]);
-      }
-    });
+    try {
+      await assert.rejects(command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
+        new CommandError('An error has occurred'));
+    }
+    finally {
+      sinonUtil.restore([
+        request.post,
+        fs.readFileSync
+      ]);
+    }
   });
 
-  it('correctly handles random API error (string error)', (done) => {
+  it('correctly handles random API error (string error)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -385,24 +341,19 @@ describe(commands.APP_ADD, () => {
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post,
-          fs.readFileSync
-        ]);
-      }
-    });
+    try {
+      await assert.rejects(command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg' } } as any),
+        new CommandError('An error has occurred'));
+    }
+    finally {
+      sinonUtil.restore([
+        request.post,
+        fs.readFileSync
+      ]);
+    }
   });
 
-  it('correctly handles random API error when sitecollection (string error)', (done) => {
+  it('correctly handles random API error when sitecollection (string error)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -420,45 +371,32 @@ describe(commands.APP_ADD, () => {
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post,
-          fs.readFileSync
-        ]);
-      }
-    });
+    try {
+      await assert.rejects(command.action(logger, { options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any),
+        new CommandError('An error has occurred'));
+    }
+    finally {
+      sinonUtil.restore([
+        request.post,
+        fs.readFileSync
+      ]);
+    }
   });
 
-  it('handles promise error while getting tenant appcatalog', (done) => {
+  it('handles promise error while getting tenant appcatalog', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true, filePath: 'spfx.sppkg'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
   });
 
-  it('handles error while getting tenant appcatalog', (done) => {
+  it('handles error while getting tenant appcatalog', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
@@ -481,19 +419,11 @@ describe(commands.APP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true, filePath: 'spfx.sppkg'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {
@@ -554,7 +484,7 @@ describe(commands.APP_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('submits to tenant app catalog when scope not specified', (done) => {
+  it('submits to tenant app catalog when scope not specified', async () => {
     // setup call to fake requests...
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -573,7 +503,8 @@ describe(commands.APP_ADD, () => {
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    command.action(logger, { options: { filePath: 'spfx.sppkg' } }, () => {
+    try {
+      await command.action(logger, { options: { filePath: 'spfx.sppkg' } });
       let correctAppCatalogUsed = false;
       requests.forEach(r => {
         if (r.url.indexOf('/tenantappcatalog/') > -1) {
@@ -581,23 +512,17 @@ describe(commands.APP_ADD, () => {
         }
       });
 
-      try {
-        assert(correctAppCatalogUsed);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post,
-          fs.readFileSync
-        ]);
-      }
-    });
+      assert(correctAppCatalogUsed);
+    }
+    finally {
+      sinonUtil.restore([
+        request.post,
+        fs.readFileSync
+      ]);
+    }
   });
 
-  it('submits to tenant app catalog when scope \'tenant\' specified ', (done) => {
+  it('submits to tenant app catalog when scope \'tenant\' specified ', async () => {
     // setup call to fake requests...
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -614,33 +539,27 @@ describe(commands.APP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(fs, 'readFileSync').callsFake(() => '123');
+    sinon.stub(fs, 'readFileSync').callsFake(() => '123');    
 
-    command.action(logger, { options: { scope: 'tenant', filePath: 'spfx.sppkg' } }, () => {
+    try {
+      await command.action(logger, { options: { scope: 'tenant', filePath: 'spfx.sppkg' } });
       let correctAppCatalogUsed = false;
       requests.forEach(r => {
         if (r.url.indexOf('/tenantappcatalog/') > -1) {
           correctAppCatalogUsed = true;
         }
       });
-
-      try {
-        assert(correctAppCatalogUsed);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post,
-          fs.readFileSync
-        ]);
-      }
-    });
+      assert(correctAppCatalogUsed);
+    }
+    finally {
+      sinonUtil.restore([
+        request.post,
+        fs.readFileSync
+      ]);
+    }
   });
 
-  it('submits to sitecollection app catalog when scope \'sitecollection\' specified ', (done) => {
+  it('submits to sitecollection app catalog when scope \'sitecollection\' specified ', async () => {
     // setup call to fake requests...
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -659,28 +578,22 @@ describe(commands.APP_ADD, () => {
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    command.action(logger, { options: { scope: 'sitecollection', filePath: 'spfx.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com' } }, () => {
+    try {
+      await command.action(logger, { options: { scope: 'sitecollection', filePath: 'spfx.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com' } });
       let correctAppCatalogUsed = false;
       requests.forEach(r => {
         if (r.url.indexOf('/sitecollectionappcatalog/') > -1) {
           correctAppCatalogUsed = true;
         }
       });
-
-      try {
-        assert(correctAppCatalogUsed);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post,
-          fs.readFileSync
-        ]);
-      }
-    });
+      assert(correctAppCatalogUsed);
+    }
+    finally {
+      sinonUtil.restore([
+        request.post,
+        fs.readFileSync
+      ]);
+    }
   });
 
   it('fails validation if file path doesn\'t exist', async () => {

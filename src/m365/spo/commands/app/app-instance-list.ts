@@ -55,7 +55,7 @@ class SpoAppInStanceListCommand extends SpoAppBaseCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving installed apps in site at ${args.options.siteUrl}...`);
     }
@@ -69,19 +69,20 @@ class SpoAppInStanceListCommand extends SpoAppBaseCommand {
       responseType: 'json'
     };
 
-    request.get(requestOptions)
-      .then((apps: any): void => {
-        if (apps.value && apps.value.length > 0) {
-          logger.log(apps.value);
+    try {
+      const apps = await request.get<any>(requestOptions);
+      if (apps.value && apps.value.length > 0) {
+        logger.log(apps.value);
+      }
+      else {
+        if (this.verbose) {
+          logger.logToStderr('No apps found');
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr('No apps found');
-          }
-        }
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
-
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

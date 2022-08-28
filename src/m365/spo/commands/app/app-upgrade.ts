@@ -74,7 +74,7 @@ class SpoAppUpgradeCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
 
     if (this.verbose) {
@@ -88,9 +88,12 @@ class SpoAppUpgradeCommand extends SpoCommand {
       }
     };
 
-    request
-      .post(requestOptions)
-      .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
+    try {
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataPromise(err);
+    }
   }
 }
 

@@ -1,7 +1,7 @@
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ContextInfo, formatting, spo, validation } from '../../../../utils';
+import { formatting, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -84,31 +84,30 @@ class SpoFieldAddCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    spo
-      .getRequestDigest(args.options.webUrl)
-      .then((res: ContextInfo): Promise<any> => {
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/` : '')}fields/CreateFieldAsXml`,
-          headers: {
-            'X-RequestDigest': res.FormDigestValue,
-            accept: 'application/json;odata=nometadata'
-          },
-          data: {
-            parameters: {
-              SchemaXml: args.options.xml,
-              Options: this.getOptions(args.options.options)
-            }
-          },
-          responseType: 'json'
-        };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const reqDigest = await spo.getRequestDigest(args.options.webUrl);
+      const requestOptions: any = {
+        url: `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/` : '')}fields/CreateFieldAsXml`,
+        headers: {
+          'X-RequestDigest': reqDigest.FormDigestValue,
+          accept: 'application/json;odata=nometadata'
+        },
+        data: {
+          parameters: {
+            SchemaXml: args.options.xml,
+            Options: this.getOptions(args.options.options)
+          }
+        },
+        responseType: 'json'
+      };
 
-        return request.post(requestOptions);
-      })
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res = await request.post<any>(requestOptions);
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getOptions(options?: string): number {

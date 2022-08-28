@@ -70,7 +70,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('lists first page of 10 tenant external users (debug)', (done) => {
+  it('lists first page of 10 tenant external users (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -95,25 +95,18 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          DisplayName: 'Dear Vesa',
-          InvitedAs: 'me@dearvesa.fi',
-          UniqueId: '100300009BF10C95',
-          AcceptedAs: 'me@dearvesa.fi',
-          WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
-          InvitedBy: null
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith([{
+      DisplayName: 'Dear Vesa',
+      InvitedAs: 'me@dearvesa.fi',
+      UniqueId: '100300009BF10C95',
+      AcceptedAs: 'me@dearvesa.fi',
+      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      InvitedBy: null
+    }]));
   });
 
-  it('lists first page of 10 tenant external users', (done) => {
+  it('lists first page of 10 tenant external users', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -138,25 +131,18 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          DisplayName: 'Dear Vesa',
-          InvitedAs: 'me@dearvesa.fi',
-          UniqueId: '100300009BF10C95',
-          AcceptedAs: 'me@dearvesa.fi',
-          WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
-          InvitedBy: null
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith([{
+      DisplayName: 'Dear Vesa',
+      InvitedAs: 'me@dearvesa.fi',
+      UniqueId: '100300009BF10C95',
+      AcceptedAs: 'me@dearvesa.fi',
+      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      InvitedBy: null
+    }]));
   });
 
-  it('lists first page of 50 tenant external users', (done) => {
+  it('lists first page of 50 tenant external users', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -181,25 +167,18 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, pageSize: '50' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          DisplayName: 'Dear Vesa',
-          InvitedAs: 'me@dearvesa.fi',
-          UniqueId: '100300009BF10C95',
-          AcceptedAs: 'me@dearvesa.fi',
-          WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
-          InvitedBy: null
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, pageSize: '50' } });
+    assert(loggerLogSpy.calledWith([{
+      DisplayName: 'Dear Vesa',
+      InvitedAs: 'me@dearvesa.fi',
+      UniqueId: '100300009BF10C95',
+      AcceptedAs: 'me@dearvesa.fi',
+      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      InvitedBy: null
+    }]));
   });
 
-  it('lists second page of 50 tenant external users', (done) => {
+  it('lists second page of 50 tenant external users', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -224,25 +203,18 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, position: '1', pageSize: '50' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          DisplayName: 'Dear Vesa',
-          InvitedAs: 'me@dearvesa.fi',
-          UniqueId: '100300009BF10C95',
-          AcceptedAs: 'me@dearvesa.fi',
-          WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
-          InvitedBy: null
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, position: '1', pageSize: '50' } });
+    assert(loggerLogSpy.calledWith([{
+      DisplayName: 'Dear Vesa',
+      InvitedAs: 'me@dearvesa.fi',
+      UniqueId: '100300009BF10C95',
+      AcceptedAs: 'me@dearvesa.fi',
+      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      InvitedBy: null
+    }]));
   });
 
-  it('lists first page of 10 tenant external users whose name match Vesa', (done) => {
+  it('lists first page of 10 tenant external users whose name match Vesa', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -267,25 +239,18 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, filter: 'Vesa' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          DisplayName: 'Vesa',
-          InvitedAs: 'me@dearvesa.fi',
-          UniqueId: '100300009BF10C95',
-          AcceptedAs: 'me@dearvesa.fi',
-          WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
-          InvitedBy: null
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, filter: 'Vesa' } });
+    assert(loggerLogSpy.calledWith([{
+      DisplayName: 'Vesa',
+      InvitedAs: 'me@dearvesa.fi',
+      UniqueId: '100300009BF10C95',
+      AcceptedAs: 'me@dearvesa.fi',
+      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      InvitedBy: null
+    }]));
   });
 
-  it('lists first page of 10 tenant external users sorted descending by email', (done) => {
+  it('lists first page of 10 tenant external users sorted descending by email', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -310,25 +275,18 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, sortOrder: 'desc' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          DisplayName: 'Dear Vesa',
-          InvitedAs: 'me@dearvesa.fi',
-          UniqueId: '100300009BF10C95',
-          AcceptedAs: 'me@dearvesa.fi',
-          WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
-          InvitedBy: null
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, sortOrder: 'desc' } });
+    assert(loggerLogSpy.calledWith([{
+      DisplayName: 'Dear Vesa',
+      InvitedAs: 'me@dearvesa.fi',
+      UniqueId: '100300009BF10C95',
+      AcceptedAs: 'me@dearvesa.fi',
+      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      InvitedBy: null
+    }]));
   });
 
-  it('lists first page of 10 external users for the specified site (debug)', (done) => {
+  it('lists first page of 10 external users for the specified site (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -353,25 +311,18 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          DisplayName: 'Dear Vesa',
-          InvitedAs: 'me@dearvesa.fi',
-          UniqueId: '100300009BF10C95',
-          AcceptedAs: 'me@dearvesa.fi',
-          WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
-          InvitedBy: null
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com' } });
+    assert(loggerLogSpy.calledWith([{
+      DisplayName: 'Dear Vesa',
+      InvitedAs: 'me@dearvesa.fi',
+      UniqueId: '100300009BF10C95',
+      AcceptedAs: 'me@dearvesa.fi',
+      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      InvitedBy: null
+    }]));
   });
 
-  it('lists first page of 10 external users for the specified site', (done) => {
+  it('lists first page of 10 external users for the specified site', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -396,25 +347,18 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          DisplayName: 'Dear Vesa',
-          InvitedAs: 'me@dearvesa.fi',
-          UniqueId: '100300009BF10C95',
-          AcceptedAs: 'me@dearvesa.fi',
-          WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
-          InvitedBy: null
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com' } });
+    assert(loggerLogSpy.calledWith([{
+      DisplayName: 'Dear Vesa',
+      InvitedAs: 'me@dearvesa.fi',
+      UniqueId: '100300009BF10C95',
+      AcceptedAs: 'me@dearvesa.fi',
+      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      InvitedBy: null
+    }]));
   });
 
-  it('lists first page of 50 external users for the specified site', (done) => {
+  it('lists first page of 50 external users for the specified site', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -439,25 +383,18 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, pageSize: '50', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          DisplayName: 'Dear Vesa',
-          InvitedAs: 'me@dearvesa.fi',
-          UniqueId: '100300009BF10C95',
-          AcceptedAs: 'me@dearvesa.fi',
-          WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
-          InvitedBy: null
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, pageSize: '50', siteUrl: 'https://contoso.sharepoint.com' } });
+    assert(loggerLogSpy.calledWith([{
+      DisplayName: 'Dear Vesa',
+      InvitedAs: 'me@dearvesa.fi',
+      UniqueId: '100300009BF10C95',
+      AcceptedAs: 'me@dearvesa.fi',
+      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      InvitedBy: null
+    }]));
   });
 
-  it('lists second page of 50 external users for the specified site', (done) => {
+  it('lists second page of 50 external users for the specified site', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -482,25 +419,18 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, position: '1', pageSize: '50', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          DisplayName: 'Dear Vesa',
-          InvitedAs: 'me@dearvesa.fi',
-          UniqueId: '100300009BF10C95',
-          AcceptedAs: 'me@dearvesa.fi',
-          WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
-          InvitedBy: null
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, position: '1', pageSize: '50', siteUrl: 'https://contoso.sharepoint.com' } });
+    assert(loggerLogSpy.calledWith([{
+      DisplayName: 'Dear Vesa',
+      InvitedAs: 'me@dearvesa.fi',
+      UniqueId: '100300009BF10C95',
+      AcceptedAs: 'me@dearvesa.fi',
+      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      InvitedBy: null
+    }]));
   });
 
-  it('lists first page of 10 external users for the specified site whose name match Vesa', (done) => {
+  it('lists first page of 10 external users for the specified site whose name match Vesa', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -525,25 +455,18 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, filter: 'Vesa', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          DisplayName: 'Vesa',
-          InvitedAs: 'me@dearvesa.fi',
-          UniqueId: '100300009BF10C95',
-          AcceptedAs: 'me@dearvesa.fi',
-          WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
-          InvitedBy: null
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, filter: 'Vesa', siteUrl: 'https://contoso.sharepoint.com' } });
+    assert(loggerLogSpy.calledWith([{
+      DisplayName: 'Vesa',
+      InvitedAs: 'me@dearvesa.fi',
+      UniqueId: '100300009BF10C95',
+      AcceptedAs: 'me@dearvesa.fi',
+      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      InvitedBy: null
+    }]));
   });
 
-  it('lists first page of 10 external users for the specified site sorted descending by email', (done) => {
+  it('lists first page of 10 external users for the specified site sorted descending by email', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -568,25 +491,18 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, sortOrder: 'desc', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          DisplayName: 'Dear Vesa',
-          InvitedAs: 'me@dearvesa.fi',
-          UniqueId: '100300009BF10C95',
-          AcceptedAs: 'me@dearvesa.fi',
-          WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
-          InvitedBy: null
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, sortOrder: 'desc', siteUrl: 'https://contoso.sharepoint.com' } });
+    assert(loggerLogSpy.calledWith([{
+      DisplayName: 'Dear Vesa',
+      InvitedAs: 'me@dearvesa.fi',
+      UniqueId: '100300009BF10C95',
+      AcceptedAs: 'me@dearvesa.fi',
+      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      InvitedBy: null
+    }]));
   });
 
-  it('escapes XML in user input', (done) => {
+  it('escapes XML in user input', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -611,25 +527,18 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, filter: '<Vesa', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          DisplayName: '<Vesa',
-          InvitedAs: 'me@dearvesa.fi',
-          UniqueId: '100300009BF10C95',
-          AcceptedAs: 'me@dearvesa.fi',
-          WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
-          InvitedBy: null
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, filter: '<Vesa', siteUrl: 'https://contoso.sharepoint.com' } });
+    assert(loggerLogSpy.calledWith([{
+      DisplayName: '<Vesa',
+      InvitedAs: 'me@dearvesa.fi',
+      UniqueId: '100300009BF10C95',
+      AcceptedAs: 'me@dearvesa.fi',
+      WhenCreated: new Date(2016, 10, 2, 21, 50, 52, 0),
+      InvitedBy: null
+    }]));
   });
 
-  it('correctly handles no results', (done) => {
+  it('correctly handles no results', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
@@ -645,18 +554,11 @@ describe(commands.EXTERNALUSER_LIST, () => {
         }
       ]));
     });
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles a generic error when retrieving external users', (done) => {
+  it('correctly handles a generic error when retrieving external users', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
@@ -666,30 +568,14 @@ describe(commands.EXTERNALUSER_LIST, () => {
         }
       ]));
     });
-    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('File Not Found.'));
   });
 
-  it('correctly handles a random API error', (done) => {
+  it('correctly handles a random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
-    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

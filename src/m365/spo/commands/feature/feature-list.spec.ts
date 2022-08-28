@@ -60,7 +60,7 @@ describe(commands.FEATURE_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves available features from site collection', (done) => {
+  it('retrieves available features from site collection', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
@@ -80,34 +80,27 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         verbose: false,
         url: 'https://contoso.sharepoint.com',
         scope: 'Site'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
-            DisplayName: "TenantSitesList"
-          },
-          {
-            DefinitionId: "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
-            DisplayName: "Ratings"
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
+        DisplayName: "TenantSitesList"
+      },
+      {
+        DefinitionId: "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
+        DisplayName: "Ratings"
+      }
+    ]));
   });
 
-  it('retrieves available features from site', (done) => {
+  it('retrieves available features from site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
@@ -127,34 +120,27 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         verbose: false,
         url: 'https://contoso.sharepoint.com',
         scope: 'Web'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
-            DisplayName: "TenantSitesList"
-          },
-          {
-            DefinitionId: "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
-            DisplayName: "Ratings"
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
+        DisplayName: "TenantSitesList"
+      },
+      {
+        DefinitionId: "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
+        DisplayName: "Ratings"
+      }
+    ]));
   });
 
-  it('retrieves available features from site (default) when no scope is entered', (done) => {
+  it('retrieves available features from site (default) when no scope is entered', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.reject('Invalid request');
@@ -178,33 +164,26 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         verbose: false,
         url: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
-            DisplayName: "TenantSitesList"
-          },
-          {
-            DefinitionId: "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
-            DisplayName: "Ratings"
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
+        DisplayName: "TenantSitesList"
+      },
+      {
+        DefinitionId: "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
+        DisplayName: "Ratings"
+      }
+    ]));
   });
 
-  it('returns all properties for output JSON', (done) => {
+  it('returns all properties for output JSON', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
@@ -237,34 +216,27 @@ describe(commands.FEATURE_LIST, () => {
       output: 'json'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [
-            {
-              "odata.type": "SP.Feature",
-              "odata.id": "https://contoso.sharepoint.com/_api/Site/Features/GetById(guid'3019c9b4-e371-438d-98f6-0a08c34d06eb')",
-              "odata.editLink": "Site/Features/GetById(guid'3019c9b4-e371-438d-98f6-0a08c34d06eb')",
-              "DefinitionId": "3019c9b4-e371-438d-98f6-0a08c34d06eb",
-              "DisplayName": "TenantSitesList"
-            },
-            {
-              "odata.type": "SP.Feature",
-              "odata.id": "https://contoso.sharepoint.com/_api/Site/Features/GetById(guid'915c240e-a6cc-49b8-8b2c-0bff8b553ed3')",
-              "odata.editLink": "Site/Features/GetById(guid'915c240e-a6cc-49b8-8b2c-0bff8b553ed3')",
-              "DefinitionId": "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
-              "DisplayName": "Ratings"
-            }
-          ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(
+      [
+        {
+          "odata.type": "SP.Feature",
+          "odata.id": "https://contoso.sharepoint.com/_api/Site/Features/GetById(guid'3019c9b4-e371-438d-98f6-0a08c34d06eb')",
+          "odata.editLink": "Site/Features/GetById(guid'3019c9b4-e371-438d-98f6-0a08c34d06eb')",
+          "DefinitionId": "3019c9b4-e371-438d-98f6-0a08c34d06eb",
+          "DisplayName": "TenantSitesList"
+        },
+        {
+          "odata.type": "SP.Feature",
+          "odata.id": "https://contoso.sharepoint.com/_api/Site/Features/GetById(guid'915c240e-a6cc-49b8-8b2c-0bff8b553ed3')",
+          "odata.editLink": "Site/Features/GetById(guid'915c240e-a6cc-49b8-8b2c-0bff8b553ed3')",
+          "DefinitionId": "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
+          "DisplayName": "Ratings"
+        }
+      ]));
   });
 
-  it('correctly handles no features in site collection', (done) => {
+  it('correctly handles no features in site collection', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve(JSON.stringify({ value: [] }));
@@ -279,18 +251,11 @@ describe(commands.FEATURE_LIST, () => {
       scope: 'Site'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(log.length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(log.length, 0);
   });
 
-  it('correctly handles no features in site', (done) => {
+  it('correctly handles no features in site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve(JSON.stringify({ value: [] }));
@@ -305,18 +270,11 @@ describe(commands.FEATURE_LIST, () => {
       scope: 'Web'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(log.length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(log.length, 0);
   });
 
-  it('correctly handles no features in site collection (verbose)', (done) => {
+  it('correctly handles no features in site collection (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve(JSON.stringify({ value: [] }));
@@ -331,28 +289,21 @@ describe(commands.FEATURE_LIST, () => {
       url: 'https://contoso.sharepoint.com',
       scope: 'Site'
     };
-    command.action(logger, { options: options } as any, () => {
-      let correctLogStatement = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('No activated Features found') > -1) {
-          correctLogStatement = true;
-        }
-      });
-      try {
-        assert(correctLogStatement);
-        done();
+    await command.action(logger, { options: options } as any);
+    let correctLogStatement = false;
+    log.forEach(l => {
+      if (!l || typeof l !== 'string') {
+        return;
       }
-      catch (e) {
-        done(e);
+
+      if (l.indexOf('No activated Features found') > -1) {
+        correctLogStatement = true;
       }
     });
+    assert(correctLogStatement);
   });
 
-  it('correctly handles no features in site (verbose)', (done) => {
+  it('correctly handles no features in site (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve(JSON.stringify({ value: [] }));
@@ -367,28 +318,21 @@ describe(commands.FEATURE_LIST, () => {
       url: 'https://contoso.sharepoint.com',
       scope: 'Web'
     };
-    command.action(logger, { options: options } as any, () => {
-      let correctLogStatement = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('No activated Features found') > -1) {
-          correctLogStatement = true;
-        }
-      });
-      try {
-        assert(correctLogStatement);
-        done();
+    await command.action(logger, { options: options } as any);
+    let correctLogStatement = false;
+    log.forEach(l => {
+      if (!l || typeof l !== 'string') {
+        return;
       }
-      catch (e) {
-        done(e);
+
+      if (l.indexOf('No activated Features found') > -1) {
+        correctLogStatement = true;
       }
     });
+    assert(correctLogStatement);
   });
 
-  it('correctly handles web feature reject request', (done) => {
+  it('correctly handles web feature reject request', async () => {
     const err = 'Invalid web Features reject request';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
@@ -398,24 +342,16 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         url: 'https://contoso.sharepoint.com',
         scope: 'Web'
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
-  it('correctly handles site Features reject request', (done) => {
+  it('correctly handles site Features reject request', async () => {
     const err = 'Invalid site Features reject request';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
@@ -425,22 +361,14 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         verbose: true,
         url: 'https://contoso.sharepoint.com',
         scope: 'Site'
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
   it('supports debug mode', () => {
@@ -465,7 +393,7 @@ describe(commands.FEATURE_LIST, () => {
     assert(containsScopeOption);
   });
 
-  it('retrieves all Web features', (done) => {
+  it('retrieves all Web features', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Web/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
@@ -480,23 +408,16 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/abc', scope: 'Web' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            DefinitionId: '00bfea71-5932-4f9c-ad71-1557e5751100',
-            DisplayName: 'WebPageLibrary'
-          }]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/abc', scope: 'Web' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        DefinitionId: '00bfea71-5932-4f9c-ad71-1557e5751100',
+        DisplayName: 'WebPageLibrary'
+      }]
+    ));
   });
 
-  it('retrieves all site features', (done) => {
+  it('retrieves all site features', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Site/Features?$select=DisplayName,DefinitionId') > -1) {
         return Promise.resolve({
@@ -512,20 +433,13 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/abc', scope: 'Site' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            DefinitionId: '3019c9b4-e371-438d-98f6-0a08c34d06eb',
-            DisplayName: 'TenantSitesList'
-          }]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/abc', scope: 'Site' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        DefinitionId: '3019c9b4-e371-438d-98f6-0a08c34d06eb',
+        DisplayName: 'TenantSitesList'
+      }]
+    ));
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {

@@ -86,7 +86,7 @@ class SpoFieldListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let listUrl: string = '';
 
     if (args.options.listId) {
@@ -109,12 +109,13 @@ class SpoFieldListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ value: any[] }>(requestOptions)
-      .then((res): void => {
-        logger.log(res.value);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const res = await request.get<{ value: any[] }>(requestOptions);
+      logger.log(res.value);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

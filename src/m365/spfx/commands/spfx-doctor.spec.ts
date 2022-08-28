@@ -73,7 +73,7 @@ describe(commands.DOCTOR, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('passes all checks for SPFx v1.11 project when all requirements met', (done) => {
+  it('passes all checks for SPFx v1.11 project when all requirements met', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.22.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -97,22 +97,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.22.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.22.0')), 'Invalid Node version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
   });
 
-  it('passes all checks for SPFx v1.11 project when all requirements met (debug)', (done) => {
+  it('passes all checks for SPFx v1.11 project when all requirements met (debug)', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -136,22 +129,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
   });
 
-  it('passes all checks for SPFx v1.11 generator installed locally when all requirements met (debug)', (done) => {
+  it('passes all checks for SPFx v1.11 generator installed locally when all requirements met (debug)', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -179,22 +165,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
   });
 
-  it('passes all checks for SPFx v1.11 generator installed globally when all requirements met', (done) => {
+  it('passes all checks for SPFx v1.11 generator installed globally when all requirements met', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -222,22 +201,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
   });
 
-  it('passes all checks for SPFx v1.11 generator installed locally when all requirements met', (done) => {
+  it('passes all checks for SPFx v1.11 generator installed locally when all requirements met', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -265,22 +237,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
   });
 
-  it('passes all checks for SPFx v1.10 project when all requirements met', (done) => {
+  it('passes all checks for SPFx v1.10 project when all requirements met', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -304,22 +269,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
   });
 
-  it('passes all checks for SPFx v1.10 project when all requirements met (debug)', (done) => {
+  it('passes all checks for SPFx v1.10 project when all requirements met (debug)', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -343,22 +301,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
   });
 
-  it('passes all checks for SPFx v1.10 generator installed locally when all requirements met', (done) => {
+  it('passes all checks for SPFx v1.10 generator installed locally when all requirements met', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -386,22 +337,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
   });
 
-  it('passes all checks for SPFx v1.10 generator installed locally when all requirements met (debug)', (done) => {
+  it('passes all checks for SPFx v1.10 generator installed locally when all requirements met (debug)', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -429,22 +373,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
   });
 
-  it('passes all checks for SPFx v1.10 generator installed globally when all requirements met', (done) => {
+  it('passes all checks for SPFx v1.10 generator installed globally when all requirements met', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -472,22 +409,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+    assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
   });
 
-  it('fails with error when SPFx not found', (done) => {
+  it('fails with error when SPFx not found', async () => {
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
       switch (packageName) {
@@ -503,20 +433,12 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err: any) => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('SharePoint Framework not found')));
-        assert(!loggerLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('SharePoint Framework not found'));
+    assert(loggerLogSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
+    assert(!loggerLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
   });
 
-  it('fails with error when SPFx not found (debug)', (done) => {
+  it('fails with error when SPFx not found (debug)', async () => {
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
       switch (packageName) {
@@ -532,20 +454,12 @@ describe(commands.DOCTOR, () => {
       }
     });
 
-    command.action(logger, { options: { debug: true } } as any, (err: any) => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('SharePoint Framework not found')));
-        assert(!loggerLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError('SharePoint Framework not found'));
+    assert(loggerLogSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
+    assert(!loggerLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
   });
 
-  it('passes SPO compatibility check for SPFx v1.11.0', (done) => {
+  it('passes SPO compatibility check for SPFx v1.11.0', async () => {
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
       switch (packageName) {
@@ -558,18 +472,11 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false, env: 'spo' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SPO')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, env: 'spo' } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SPO')));
   });
 
-  it('passes SPO compatibility check for SPFx v1.10.0', (done) => {
+  it('passes SPO compatibility check for SPFx v1.10.0', async () => {
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
       switch (packageName) {
@@ -582,18 +489,11 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false, env: 'spo' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SPO')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, env: 'spo' } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SPO')));
   });
 
-  it('passes SP2019 compatibility check for SPFx v1.4.1', (done) => {
+  it('passes SP2019 compatibility check for SPFx v1.4.1', async () => {
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
       switch (packageName) {
@@ -606,15 +506,8 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false, env: 'sp2019' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SP2019')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, env: 'sp2019' } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SP2019')));
   });
 
   it('fails validation if output does not equal text.', async () => {
@@ -627,7 +520,7 @@ describe(commands.DOCTOR, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails SP2019 compatibility check for SPFx v1.5.0', (done) => {
+  it('fails SP2019 compatibility check for SPFx v1.5.0', async () => {
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
       switch (packageName) {
@@ -640,19 +533,12 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false, env: 'sp2019' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'Not supported in SP2019')));
-        assert(loggerLogSpy.calledWith('- Use SharePoint Framework v1.4.1'), 'No fix provided');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, env: 'sp2019' } });
+    assert(loggerLogSpy.calledWith(getStatus(1, 'Not supported in SP2019')));
+    assert(loggerLogSpy.calledWith('- Use SharePoint Framework v1.4.1'), 'No fix provided');
   });
 
-  it('passes SP2016 compatibility check for SPFx v1.1.0', (done) => {
+  it('passes SP2016 compatibility check for SPFx v1.1.0', async () => {
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
       switch (packageName) {
@@ -665,18 +551,11 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false, env: 'sp2016' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SP2016')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, env: 'sp2016' } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SP2016')));
   });
 
-  it('fails SP2016 compatibility check for SPFx v1.2.0', (done) => {
+  it('fails SP2016 compatibility check for SPFx v1.2.0', async () => {
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
       const packageName: string = file.split(' ')[2];
       switch (packageName) {
@@ -689,19 +568,12 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false, env: 'sp2016' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'Not supported in SP2016')));
-        assert(loggerLogSpy.calledWith('- Use SharePoint Framework v1.1'), 'No fix provided');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, env: 'sp2016' } });
+    assert(loggerLogSpy.calledWith(getStatus(1, 'Not supported in SP2016')));
+    assert(loggerLogSpy.calledWith('- Use SharePoint Framework v1.1'), 'No fix provided');
   });
 
-  it('passes Node check when version meets single range prerequisite', (done) => {
+  it('passes Node check when version meets single range prerequisite', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -716,18 +588,11 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')));
   });
 
-  it('passes Node check when version meets double range prerequisite', (done) => {
+  it('passes Node check when version meets double range prerequisite', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v8.0.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -742,18 +607,11 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v8.0.0')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'Node v8.0.0')));
   });
 
-  it('fails Node check when version does not meet single range prerequisite', (done) => {
+  it('fails Node check when version does not meet single range prerequisite', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v12.0.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -768,19 +626,12 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^10 required')));
-        assert(loggerLogSpy.calledWith('- Install Node.js v10'), 'No fix provided');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^10 required')));
+    assert(loggerLogSpy.calledWith('- Install Node.js v10'), 'No fix provided');
   });
 
-  it('fails Node check when version does not meet double range prerequisite', (done) => {
+  it('fails Node check when version does not meet double range prerequisite', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v12.0.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -795,19 +646,12 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^8 || ^10 required')));
-        assert(loggerLogSpy.calledWith('- Install Node.js v10'), 'No fix provided');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^8 || ^10 required')));
+    assert(loggerLogSpy.calledWith('- Install Node.js v10'), 'No fix provided');
   });
 
-  it('fails with friendly error message when npm not found', (done) => {
+  it('fails with friendly error message when npm not found', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.0.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -815,19 +659,11 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('npm not found')));
-        assert(!loggerLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('npm not found'));
+    assert(!loggerLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
   });
   
-  it('passes yo check when yo found', (done) => {
+  it('passes yo check when yo found', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -845,18 +681,11 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')));
   });
 
-  it('fails yo check when yo not found', (done) => {
+  it('fails yo check when yo not found', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -871,19 +700,12 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'yo not found')));
-        assert(loggerLogSpy.calledWith('- npm i -g yo@3'), 'No fix provided');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(1, 'yo not found')));
+    assert(loggerLogSpy.calledWith('- npm i -g yo@3'), 'No fix provided');
   });
 
-  it('passes gulp check when gulp found', (done) => {
+  it('passes gulp check when gulp found', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
 
@@ -902,18 +724,11 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')));
   });
 
-  it('fails gulp check when gulp not found', (done) => {
+  it('fails gulp check when gulp not found', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -928,19 +743,12 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'gulp not found')));
-        assert(loggerLogSpy.calledWith('- npm i -g gulp@3'), 'No fix provided');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(1, 'gulp not found')));
+    assert(loggerLogSpy.calledWith('- npm i -g gulp@3'), 'No fix provided');
   });
 
-  it('passes typescript check when typescript not found', (done) => {
+  it('passes typescript check when typescript not found', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -958,18 +766,11 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')));
   });
 
-  it('fails typescript check when typescript found', (done) => {
+  it('fails typescript check when typescript found', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -987,19 +788,12 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'typescript v3.7.5 installed in the project')));
-        assert(loggerLogSpy.calledWith('- npm un typescript'), 'No fix provided');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(1, 'typescript v3.7.5 installed in the project')));
+    assert(loggerLogSpy.calledWith('- npm un typescript'), 'No fix provided');
   });
 
-  it('returns error when used with an unsupported version of spfx', (done) => {
+  it('returns error when used with an unsupported version of spfx', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -1014,18 +808,10 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`spfx doctor doesn't support SPFx v0.9.0 at this moment`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError(`spfx doctor doesn't support SPFx v0.9.0 at this moment`));
   });
 
-  it('uses alternative symbols for win32', (done) => {
+  it('uses alternative symbols for win32', async () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sandbox.stub(process, 'platform').value('win32');
@@ -1047,15 +833,8 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
   });
 
   it('supports specifying environment', () => {

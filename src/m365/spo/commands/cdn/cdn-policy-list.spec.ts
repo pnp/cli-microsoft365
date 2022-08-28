@@ -65,7 +65,7 @@ describe(commands.CDN_POLICY_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves the policies for the public CDN when type set to Public', (done) => {
+  it('retrieves the policies for the public CDN when type set to Public', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
@@ -86,26 +86,16 @@ describe(commands.CDN_POLICY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, type: 'Public' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          Policy: 'IncludeFileExtensions',
-          Value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON'
-        },
-        { Policy: 'ExcludeRestrictedSiteClassifications', Value: ' ' },
-        { Policy: 'ExcludeIfNoScriptDisabled', Value: 'False' }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await command.action(logger, { options: { debug: true, type: 'Public' } });
+    assert(loggerLogSpy.calledWith([{
+      Policy: 'IncludeFileExtensions',
+      Value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON'
+    },
+    { Policy: 'ExcludeRestrictedSiteClassifications', Value: ' ' },
+    { Policy: 'ExcludeIfNoScriptDisabled', Value: 'False' }]));
   });
 
-  it('retrieves the policies for the private CDN when type set to Private', (done) => {
+  it('retrieves the policies for the private CDN when type set to Private', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
@@ -126,26 +116,16 @@ describe(commands.CDN_POLICY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, type: 'Private' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          Policy: 'IncludeFileExtensions',
-          Value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON'
-        },
-        { Policy: 'ExcludeRestrictedSiteClassifications', Value: ' ' },
-        { Policy: 'ExcludeIfNoScriptDisabled', Value: 'False' }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await command.action(logger, { options: { debug: true, type: 'Private' } });
+    assert(loggerLogSpy.calledWith([{
+      Policy: 'IncludeFileExtensions',
+      Value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON'
+    },
+    { Policy: 'ExcludeRestrictedSiteClassifications', Value: ' ' },
+    { Policy: 'ExcludeIfNoScriptDisabled', Value: 'False' }]));
   });
 
-  it('retrieves the policies for the public CDN when no type set', (done) => {
+  it('retrieves the policies for the public CDN when no type set', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         if (opts.headers &&
@@ -166,26 +146,16 @@ describe(commands.CDN_POLICY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          Policy: 'IncludeFileExtensions',
-          Value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON'
-        },
-        { Policy: 'ExcludeRestrictedSiteClassifications', Value: ' ' },
-        { Policy: 'ExcludeIfNoScriptDisabled', Value: 'False' }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith([{
+      Policy: 'IncludeFileExtensions',
+      Value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON'
+    },
+    { Policy: 'ExcludeRestrictedSiteClassifications', Value: ' ' },
+    { Policy: 'ExcludeIfNoScriptDisabled', Value: 'False' }]));
   });
 
-  it('correctly handles an error when retrieving tenant CDN policies', (done) => {
+  it('correctly handles an error when retrieving tenant CDN policies', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
@@ -215,38 +185,18 @@ describe(commands.CDN_POLICY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError('An error has occurred'));
   });
 
-  it('correctly handles a random API error', (done) => {
+  it('correctly handles a random API error', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

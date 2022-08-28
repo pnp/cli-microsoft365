@@ -99,56 +99,50 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     let appCatalogSiteUrl: string = '';
 
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((spoUrl: string): Promise<string> => {
-        return this.getAppCatalogSiteUrl(logger, spoUrl, args);
-      })
-      .then((appCatalogUrl: string): Promise<{ UniqueId: string }> => {
-        appCatalogSiteUrl = appCatalogUrl;
+    try {
+      const spoUrl = await spo.getSpoUrl(logger, this.debug);
+      appCatalogSiteUrl = await this.getAppCatalogSiteUrl(logger, spoUrl, args);
 
-        if (args.options.id) {
-          return Promise.resolve({ UniqueId: args.options.id });
-        }
+      if (args.options.id) {
+        throw { UniqueId: args.options.id };
+      }
 
-        if (this.verbose) {
-          logger.logToStderr(`Looking up app id for app named ${args.options.name}...`);
-        }
+      if (this.verbose) {
+        logger.logToStderr(`Looking up app id for app named ${args.options.name}...`);
+      }
 
-        const requestOptions: any = {
-          url: `${appCatalogSiteUrl}/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('${args.options.name}')?$select=UniqueId`,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
+      let requestOptions: any = {
+        url: `${appCatalogSiteUrl}/_api/web/getfolderbyserverrelativeurl('AppCatalog')/files('${args.options.name}')?$select=UniqueId`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-        return request.get(requestOptions);
-      })
-      .then((res: { UniqueId: string }): Promise<AppMetadata> => {
-        if (this.verbose) {
-          logger.logToStderr(`Retrieving information for app ${res}...`);
-        }
+      const res = await request.get<{ UniqueId: string }>(requestOptions);
 
-        const requestOptions: any = {
-          url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(res.UniqueId)}')`,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
+      if (this.verbose) {
+        logger.logToStderr(`Retrieving information for app ${res}...`);
+      }
 
-        return request.get(requestOptions);
-      })
-      .then((res: AppMetadata): void => {
-        logger.log(res);
+      requestOptions = {
+        url: `${appCatalogSiteUrl}/_api/web/${scope}appcatalog/AvailableApps/GetById('${encodeURIComponent(res.UniqueId)}')`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      const res2 = request.get<AppMetadata>(requestOptions);
+      logger.log(res2);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

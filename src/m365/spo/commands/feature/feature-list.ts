@@ -67,7 +67,7 @@ class SpoFeatureListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const scope: string = (args.options.scope) ? args.options.scope : 'Web';
     const requestOptions: any = {
       url: `${args.options.url}/_api/${scope}/Features?$select=DisplayName,DefinitionId`,
@@ -77,19 +77,20 @@ class SpoFeatureListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ value: Feature[] }>(requestOptions)
-      .then((features: { value: Feature[] }): void => {
-        if (features.value && features.value.length > 0) {
-          logger.log(features.value);
+    try {
+      const features = await request.get<{ value: Feature[] }>(requestOptions);
+      if (features.value && features.value.length > 0) {
+        logger.log(features.value);
+      }
+      else {
+        if (this.verbose) {
+          logger.logToStderr('No activated Features found');
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr('No activated Features found');
-          }
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

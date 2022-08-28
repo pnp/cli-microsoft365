@@ -1,11 +1,8 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandError
-} from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, spo } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, formatting, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -75,70 +72,59 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const cdnTypeString: string = args.options.type || 'Public';
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
     let spoAdminUrl: string = '';
     let tenantId: string = '';
 
-    const removeCdnOrigin = (): void => {
-      spo
-        .getTenantId(logger, this.debug)
-        .then((_tenantId: string): Promise<string> => {
-          tenantId = _tenantId;
-          return spo.getSpoAdminUrl(logger, this.debug);
-        })
-        .then((_spoAdminUrl: string): Promise<ContextInfo> => {
-          spoAdminUrl = _spoAdminUrl;
-          return spo.getRequestDigest(spoAdminUrl);
-        })
-        .then((res: ContextInfo): Promise<string> => {
-          if (this.verbose) {
-            logger.logToStderr(`Removing origin ${args.options.origin} from the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
-          }
+    const removeCdnOrigin: () => Promise<void> = async (): Promise<void> => {
+      try {
+        tenantId = await spo.getTenantId(logger, this.debug);
+        spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+        const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
-          const requestOptions: any = {
-            url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': res.FormDigestValue
-            },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="RemoveTenantCdnOrigin" Id="33" ObjectPathId="29"><Parameters><Parameter Type="Enum">${cdnType}</Parameter><Parameter Type="String">${formatting.escapeXml(args.options.origin)}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="29" Name="${tenantId}" /></ObjectPaths></Request>`
-          };
+        if (this.verbose) {
+          logger.logToStderr(`Removing origin ${args.options.origin} from the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
+        }
 
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            cb(new CommandError(response.ErrorInfo.ErrorMessage));
-          }
-          else {
-            cb();
-          }
-        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+        const requestOptions: any = {
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'X-RequestDigest': reqDigest.FormDigestValue
+          },
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="RemoveTenantCdnOrigin" Id="33" ObjectPathId="29"><Parameters><Parameter Type="Enum">${cdnType}</Parameter><Parameter Type="String">${formatting.escapeXml(args.options.origin)}</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="29" Name="${tenantId}" /></ObjectPaths></Request>`
+        };
+
+        const res = await request.post<string>(requestOptions);
+        const json: ClientSvcResponse = JSON.parse(res);
+        const response: ClientSvcResponseContents = json[0];
+        if (response.ErrorInfo) {
+          throw response.ErrorInfo.ErrorMessage;
+        }
+      }
+      catch (err: any) {
+        this.handleRejectedPromise(err);
+      }
     };
 
     if (args.options.confirm) {
       if (this.debug) {
         logger.logToStderr('Confirmation suppressed through the confirm option. Removing CDN origin...');
       }
-      removeCdnOrigin();
+      await removeCdnOrigin();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to delete the ${args.options.origin} CDN origin?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeCdnOrigin();
-        }
       });
+
+      if (result.continue) {
+        await removeCdnOrigin();
+      }
     }
   }
 }

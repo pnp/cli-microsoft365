@@ -98,74 +98,53 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('should send correct request body', (done) => {
+  it('should send correct request body', async () => {
     const requestStub: sinon.SinonStub = stubAllPostRequests();
     const options = {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        const bodyPayload = `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}">
-  <Actions>
-    <ObjectPath Id="2" ObjectPathId="1" />
-    <ObjectIdentityQuery Id="3" ObjectPathId="1" />
-    <ObjectPath Id="5" ObjectPathId="4" />
-    <ObjectIdentityQuery Id="6" ObjectPathId="4" />
-    <Query Id="7" ObjectPathId="4">
-      <Query SelectAllProperties="false">
-        <Properties>
-          <Property Name="ContentTypePublishingHub" ScalarProperty="true" />
-        </Properties>
+    await command.action(logger, { options: options } as any);
+    const bodyPayload = `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}">
+    <Actions>
+      <ObjectPath Id="2" ObjectPathId="1" />
+      <ObjectIdentityQuery Id="3" ObjectPathId="1" />
+      <ObjectPath Id="5" ObjectPathId="4" />
+      <ObjectIdentityQuery Id="6" ObjectPathId="4" />
+      <Query Id="7" ObjectPathId="4">
+        <Query SelectAllProperties="false">
+          <Properties>
+            <Property Name="ContentTypePublishingHub" ScalarProperty="true" />
+          </Properties>
+        </Query>
       </Query>
-    </Query>
-  </Actions>
-  <ObjectPaths>
-    <StaticMethod Id="1" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" />
-    <Method Id="4" ParentId="1" Name="GetDefaultSiteCollectionTermStore" />
-  </ObjectPaths>
-</Request>`;
-        assert.strictEqual(requestStub.lastCall.args[0].data, bodyPayload);
-        assert(loggerLogSpy.calledWith({ "ContentTypePublishingHub": "https:\\u002f\\u002fcontoso.sharepoint.com\\u002fsites\\u002fcontentTypeHub" }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    </Actions>
+    <ObjectPaths>
+      <StaticMethod Id="1" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" />
+      <Method Id="4" ParentId="1" Name="GetDefaultSiteCollectionTermStore" />
+    </ObjectPaths>
+  </Request>`;
+    assert.strictEqual(requestStub.lastCall.args[0].data, bodyPayload);
+    assert(loggerLogSpy.calledWith({ "ContentTypePublishingHub": "https:\\u002f\\u002fcontoso.sharepoint.com\\u002fsites\\u002fcontentTypeHub" }));
   });
 
-  it('should correctly handle reject promise', (done) => {
+  it('should correctly handle reject promise', async () => {
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('request error'); }));
     const options = {
       verbose: true
     };
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('request error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('request error'));
   });
 
-  it('should correctly handle ErrorInfo', (done) => {
+  it('should correctly handle ErrorInfo', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "ClientSvc error" } }]);
     stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }));
     const options = {
       verbose: true
     };
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('ClientSvc error'));
   });
 
   it('Contains the correct options', () => {
