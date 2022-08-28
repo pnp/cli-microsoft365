@@ -293,8 +293,8 @@ describe(commands.CUSTOMACTION_GET, () => {
       scope: 'Web'
     };
 
-    await command.action(logger, { options: options } as any);
     try {
+      await command.action(logger, { options: options } as any);
       assert(getRequestSpy.calledOnce, 'getRequestSpy.calledOnce');
       assert(getCustomActionSpy.calledWith({
         debug: false,
@@ -326,8 +326,8 @@ describe(commands.CUSTOMACTION_GET, () => {
       scope: 'Site'
     };
 
-    await command.action(logger, { options: options } as any);
     try {
+      await command.action(logger, { options: options } as any);
       assert(getRequestSpy.calledOnce, 'getRequestSpy.calledOnce');
       assert(getCustomActionSpy.calledWith(
         {
@@ -354,15 +354,15 @@ describe(commands.CUSTOMACTION_GET, () => {
 
     const getCustomActionSpy = sinon.spy((command as any), 'getCustomAction');
 
-    await command.action(logger, {
-      options: {
-        debug: false,
-        id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com',
-        scope: 'All'
-      }
-    });
     try {
+      await command.action(logger, {
+        options: {
+          debug: false,
+          id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+          url: 'https://contoso.sharepoint.com',
+          scope: 'All'
+        }
+      });
       assert(getRequestSpy.calledOnce);
       assert(getCustomActionSpy.calledOnce);
     }
@@ -386,14 +386,14 @@ describe(commands.CUSTOMACTION_GET, () => {
 
     const getCustomActionSpy = sinon.spy((command as any), 'getCustomAction');
 
-    await command.action(logger, {
-      options: {
-        debug: true,
-        id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com'
-      }
-    });
     try {
+      await command.action(logger, {
+        options: {
+          debug: true,
+          id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+          url: 'https://contoso.sharepoint.com'
+        }
+      });
       assert(getRequestSpy.calledTwice);
       assert(getCustomActionSpy.calledTwice);
     }
@@ -419,8 +419,8 @@ describe(commands.CUSTOMACTION_GET, () => {
       scope: "All"
     };
 
-    await command.action(logger, { options: options } as any);
     try {
+      await command.action(logger, { options: options } as any);
       assert(searchAllScopesSpy.calledWith(sinon.match(
         {
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',

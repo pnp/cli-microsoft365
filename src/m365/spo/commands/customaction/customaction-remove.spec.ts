@@ -227,8 +227,9 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' } } as any);
+    
     try {
+      await command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' } } as any);
       assert(postCallsSpy.calledOnce);
       assert(removeScopedCustomActionSpy.calledWith(sinon.match(
         {
@@ -281,8 +282,8 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
       { continue: true }
     ));
 
-    await command.action(logger, { options: { title: 'Places', url: 'https://contoso.sharepoint.com' } } as any);
     try {
+      await command.action(logger, { options: { title: 'Places', url: 'https://contoso.sharepoint.com' } } as any);
       assert(postCallsSpy.calledOnce);
       assert(removeScopedCustomActionSpy.calledWith(sinon.match(
         {
@@ -307,8 +308,8 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
       confirm: true
     };
 
-    await command.action(logger, { options: options } as any);
     try {
+      await command.action(logger, { options: options } as any);
       assert(postCallsSpy.calledOnce);
       assert(removeScopedCustomActionSpy.calledWith({
         debug: false,
@@ -335,8 +336,8 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
       confirm: true
     };
 
-    await command.action(logger, { options: options } as any);
     try {
+      await command.action(logger, { options: options } as any);
       assert(postCallsSpy.calledOnce);
       assert(removeScopedCustomActionSpy.calledWith(
         {
@@ -357,15 +358,15 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
 
-    await command.action(logger, {
-      options: {
-        confirm: true,
-        id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com',
-        scope: 'All'
-      }
-    });
     try {
+      await command.action(logger, {
+        options: {
+          confirm: true,
+          id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+          url: 'https://contoso.sharepoint.com',
+          scope: 'All'
+        }
+      });
       assert(postCallsSpy.calledOnce);
       assert(removeScopedCustomActionSpy.calledOnce);
     }
@@ -391,15 +392,15 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
 
-    await command.action(logger, {
-      options: {
-        debug: true,
-        id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        url: 'https://contoso.sharepoint.com',
-        confirm: true
-      }
-    });
     try {
+      await command.action(logger, {
+        options: {
+          debug: true,
+          id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+          url: 'https://contoso.sharepoint.com',
+          confirm: true
+        }
+      });
       assert(removeScopedCustomActionSpy.calledTwice);
     }
     finally {
@@ -417,8 +418,8 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
       confirm: true
     };
 
-    await command.action(logger, { options: options } as any);
     try {
+      await command.action(logger, { options: options } as any);
       assert(searchAllScopesSpy.calledWith(sinon.match(
         {
           id: 'b2307a39-e878-458b-bc90-03bc578531d6',

@@ -107,7 +107,7 @@ describe(commands.FEATURE_DISABLE, () => {
     assert(containsScopeOption);
   });
 
-  it('disables web feature (scope not defined, so defaults to web), no force', (done) => {
+  it('disables web feature (scope not defined, so defaults to web), no force', async () => {
     const requestUrl = `https://contoso.sharepoint.com/_api/web/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=false)`;
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -123,27 +123,22 @@ describe(commands.FEATURE_DISABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, featureId: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', url: 'https://contoso.sharepoint.com' } }, () => {
+    try {
+      await command.action(logger, { options: { debug: true, featureId: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', url: 'https://contoso.sharepoint.com' } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
           correctRequestIssued = true;
         }
       });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+      assert(correctRequestIssued);
+    }
+    finally {
+      sinonUtil.restore(request.post);
+    }
   });
 
-  it('disables web feature (scope not defined, so defaults to web), with force', (done) => {
+  it('disables web feature (scope not defined, so defaults to web), with force', async () => {
     const requestUrl = `https://contoso.sharepoint.com/_api/web/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=true)`;
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -159,27 +154,22 @@ describe(commands.FEATURE_DISABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, featureId: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', url: 'https://contoso.sharepoint.com', force: true } }, () => {
+    try {
+      await command.action(logger, { options: { debug: true, featureId: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', url: 'https://contoso.sharepoint.com', force: true } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
           correctRequestIssued = true;
         }
       });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+      assert(correctRequestIssued);
+    }
+    finally {
+      sinonUtil.restore(request.post);
+    }
   });
 
-  it('disables site feature (scope explicitly set), no force', (done) => {
+  it('disables site feature (scope explicitly set), no force', async () => {
     const requestUrl = `https://contoso.sharepoint.com/_api/site/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=false)`;
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -195,27 +185,22 @@ describe(commands.FEATURE_DISABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, featureId: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', url: 'https://contoso.sharepoint.com', scope: 'site' } }, () => {
+    try {
+      await command.action(logger, { options: { debug: true, featureId: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', url: 'https://contoso.sharepoint.com', scope: 'site' } });
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
           correctRequestIssued = true;
         }
       });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+      assert(correctRequestIssued);
+    }
+    finally {
+      sinonUtil.restore(request.post);
+    }
   });
 
-  it('correctly handles disable feature reject request', (done) => {
+  it('correctly handles disable feature reject request', async () => {
     const err = 'Invalid disable feature reject request';
     const requestUrl = `https://contoso.sharepoint.com/_api/web/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=false)`;
 
@@ -227,21 +212,13 @@ describe(commands.FEATURE_DISABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         url: 'https://contoso.sharepoint.com',
         featureId: "780ac353-eaf8-4ac2-8c47-536d93c03fd6",
         scope: 'web'
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 });

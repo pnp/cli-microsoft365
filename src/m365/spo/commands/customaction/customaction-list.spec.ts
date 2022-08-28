@@ -82,8 +82,8 @@ describe(commands.CUSTOMACTION_LIST, () => {
       scope: 'Web'
     };
 
-    await command.action(logger, { options: options } as any);
     try {
+      await command.action(logger, { options: options } as any);
       assert(getRequestSpy.calledOnce);
       assert(getCustomActionsSpy.calledWith({
         debug: false,
@@ -113,8 +113,8 @@ describe(commands.CUSTOMACTION_LIST, () => {
       scope: 'Site'
     };
 
-    await command.action(logger, { options: options } as any);
     try {
+      await command.action(logger, { options: options } as any);
       assert(getRequestSpy.calledOnce);
       assert(getCustomActionsSpy.calledWith({
         debug: false,
@@ -144,8 +144,8 @@ describe(commands.CUSTOMACTION_LIST, () => {
       output: 'json'
     };
 
-    await command.action(logger, { options: options } as any);
     try {
+      await command.action(logger, { options: options } as any);
       assert(loggerLogSpy.calledWith([{"ClientSideComponentId":"b41916e7-e69d-467f-b37f-ff8ecf8f99f2","ClientSideComponentProperties":"{\"testMessage\":\"Test message\"}","CommandUIExtension":null,"Description":null,"Group":null,"Id":"8b86123a-3194-49cf-b167-c044b613a48a","ImageUrl":null,"Location":"ClientSideExtension.ApplicationCustomizer","Name":"YourName","RegistrationId":null,"RegistrationType":0,"Rights":{"High":"0","Low":"0"},"Scope":3,"ScriptBlock":null,"ScriptSrc":null,"Sequence":0,"Title":"YourAppCustomizer","Url":null,"VersionOfUserCustomAction":"16.0.1.0"},{"ClientSideComponentId":"b41916e7-e69d-467f-b37f-ff8ecf8f99f2","ClientSideComponentProperties":"{\"testMessage\":\"Test message\"}","CommandUIExtension":null,"Description":null,"Group":null,"Id":"9115bb61-d9f1-4ed4-b7b7-e5d1834e60f5","ImageUrl":null,"Location":"ClientSideExtension.ApplicationCustomizer","Name":"YourName","RegistrationId":null,"RegistrationType":0,"Rights":{"High":"0","Low":"0"},"Scope":3,"ScriptBlock":null,"ScriptSrc":null,"Sequence":0,"Title":"YourAppCustomizer","Url":null,"VersionOfUserCustomAction":"16.0.1.0"}]));
     }
     finally {
@@ -168,13 +168,13 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
     const getCustomActionsSpy = sinon.spy((command as any), 'getCustomActions');
 
-    await command.action(logger, {
-      options: {
-        debug: true,
-        url: 'https://contoso.sharepoint.com'
-      }
-    });
     try {
+      await command.action(logger, {
+        options: {
+          debug: true,
+          url: 'https://contoso.sharepoint.com'
+        }
+      });
       assert(getRequestSpy.calledTwice);
       assert(getCustomActionsSpy.calledTwice);
     }
@@ -199,8 +199,8 @@ describe(commands.CUSTOMACTION_LIST, () => {
       scope: "All"
     };
 
-    await command.action(logger, { options: options } as any);
     try {
+      await command.action(logger, { options: options } as any);
       assert(searchAllScopesSpy.calledWith(sinon.match(
         {
           url: 'https://contoso.sharepoint.com'

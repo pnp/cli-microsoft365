@@ -79,7 +79,7 @@ class SpoFeatureEnableCommand extends SpoCommand {
     this.types.string.push('scope', 's');
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let scope: string | undefined = args.options.scope;
     let force: boolean = args.options.force;
 
@@ -102,9 +102,12 @@ class SpoFeatureEnableCommand extends SpoCommand {
       }
     };
 
-    request
-      .post(requestOptions)
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

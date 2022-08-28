@@ -123,8 +123,9 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    await command.action(logger, { options: {  url: 'https://contoso.sharepoint.com' }} as any);
+    
     try {
+      await command.action(logger, { options: {  url: 'https://contoso.sharepoint.com' }} as any);
       assert(postCallsSpy.calledTwice);
       assert(clearScopedCustomActionsSpy.calledWith(sinon.match(
         { 
@@ -147,8 +148,8 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       confirm: true
     };
 
-    await command.action(logger, { options: options } as any);
     try {
+      await command.action(logger, { options: options } as any);
       assert(postCallsSpy.calledOnce);
       assert(clearScopedCustomActionsSpy.calledWith({
         debug: false,
@@ -173,8 +174,8 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       confirm: true
     };
 
-    await command.action(logger, { options: options } as any);
     try {
+      await command.action(logger, { options: options } as any);
       assert(postCallsSpy.calledOnce === true);
       assert(clearScopedCustomActionsSpy.calledWith(
         {
@@ -194,14 +195,14 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
 
-    await command.action(logger, {
-      options: {
-        debug: true,
-        url: 'https://contoso.sharepoint.com',
-        confirm: true
-      }
-    });
     try {
+      await command.action(logger, {
+        options: {
+          debug: true,
+          url: 'https://contoso.sharepoint.com',
+          confirm: true
+        }
+      });
       assert(clearScopedCustomActionsSpy.calledTwice);
     }
     finally {
@@ -218,8 +219,9 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       confirm: true
     };
 
-    await command.action(logger, { options: options } as any);
+    
     try {
+      await command.action(logger, { options: options } as any);
       assert(clearScopedCustomActionsSpy.calledTwice, 'clearScopedCustomActionsSpy.calledTwice');
     }
     finally {

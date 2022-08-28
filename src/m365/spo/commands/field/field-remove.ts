@@ -110,7 +110,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
     this.optionSets.push(['id', 'title', 'fieldTitle', 'group']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.fieldTitle) {
       args.options.title = args.options.fieldTitle;
 
@@ -125,7 +125,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
       messageEnd = `in site ${args.options.webUrl}`;
     }
 
-    const removeField = (listRestUrl: string, fieldId: string | undefined, title: string | undefined): Promise<void> => {
+    const removeField = async (listRestUrl: string, fieldId: string | undefined, title: string | undefined): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing field ${fieldId || title} ${messageEnd}...`);
       }
@@ -149,10 +149,10 @@ class SpoFieldRemoveCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      return request.post(requestOptions);
+      await request.post(requestOptions);
     };
 
-    const prepareRemoval = (): void => {
+    const prepareRemoval: () => Promise<void> = async (): Promise<void> => {
       let listRestUrl: string = '';
 
       if (args.options.listId) {
@@ -178,55 +178,51 @@ class SpoFieldRemoveCommand extends SpoCommand {
           responseType: 'json'
         };
 
-        request
-          .get(requestOptions)
-          .then((res: any): void => {
-            const filteredResults = res.value.filter((field: { Id: string | undefined, Group: string | undefined; }) => field.Group === args.options.group);
-            if (this.verbose) {
-              logger.logToStderr(`${filteredResults.length} matches found...`);
-            }
+        try {
+          const res = await request.get<any>(requestOptions);
+          const filteredResults = res.value.filter((field: { Id: string | undefined, Group: string | undefined; }) => field.Group === args.options.group);
+          if (this.verbose) {
+            logger.logToStderr(`${filteredResults.length} matches found...`);
+          }
 
-            const promises = [];
-            for (let index = 0; index < filteredResults.length; index++) {
-              promises.push(removeField(listRestUrl, filteredResults[index].Id, undefined));
-            }
+          const promises = [];
+          for (let index = 0; index < filteredResults.length; index++) {
+            promises.push(removeField(listRestUrl, filteredResults[index].Id, undefined));
+          }
 
-            Promise.all(promises).then(() => {
-              cb();
-            })
-              .catch((err) => {
-                this.handleRejectedODataJsonPromise(err, logger, cb);
-              });
-          }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+          await Promise.all(promises);
+        }
+        catch (err: any) {
+          this.handleRejectedODataJsonPromise(err);
+        }
       }
       else {
-        removeField(listRestUrl, args.options.id, args.options.title)
-          .then((): void => {
-            // REST post call doesn't return anything
-            cb();
-          }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        try {
+          await removeField(listRestUrl, args.options.id, args.options.title);
+          // REST post call doesn't return anything
+        }
+        catch (err: any) {
+          this.handleRejectedODataJsonPromise(err);
+        }
       }
     };
 
     if (args.options.confirm) {
-      prepareRemoval();
+      await prepareRemoval();
     }
     else {
       const confirmMessage: string = `Are you sure you want to remove the ${args.options.group ? 'fields' : 'field'} ${args.options.id || args.options.title || 'from group ' + args.options.group} ${messageEnd}?`;
 
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: confirmMessage
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          prepareRemoval();
-        }
       });
+
+      if (result.continue) {
+        await prepareRemoval();
+      }
     }
   }
 }
