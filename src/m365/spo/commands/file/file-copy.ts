@@ -76,75 +76,68 @@ class SpoFileCopyCommand extends SpoCommand {
     return ['targetUrl'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const webUrl = args.options.webUrl;
     const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
     const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
 
-    // Check if the source file exists.
-    // Called on purpose, we explicitly check if user specified file
-    // in the sourceUrl option.
-    // The CreateCopyJobs endpoint accepts file, folder or batch from both.
-    // A user might enter folder instead of file as source url by mistake
-    // then there are edge cases when deleteIfAlreadyExists flag is set
-    // the user can receive misleading error message.
-    this
-      .fileExists(tenantUrl, webUrl, args.options.sourceUrl)
-      .then((): Promise<void> => {
-        if (args.options.deleteIfAlreadyExists) {
-          // try delete target file, if deleteIfAlreadyExists flag is set
-          const filename = args.options.sourceUrl.replace(/^.*[\\\/]/, '');
-          return this.recycleFile(tenantUrl, args.options.targetUrl, filename, logger);
-        }
+    try {
+      // Check if the source file exists.
+      // Called on purpose, we explicitly check if user specified file
+      // in the sourceUrl option.
+      // The CreateCopyJobs endpoint accepts file, folder or batch from both.
+      // A user might enter folder instead of file as source url by mistake
+      // then there are edge cases when deleteIfAlreadyExists flag is set
+      // the user can receive misleading error message.
+      await this.fileExists(tenantUrl, webUrl, args.options.sourceUrl);
 
-        return Promise.resolve();
-      })
-      .then((): Promise<any> => {
-        // all preconditions met, now create copy job
-        const sourceAbsoluteUrl = urlUtil.urlCombine(webUrl, args.options.sourceUrl);
-        const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
-        const requestUrl: string = urlUtil.urlCombine(webUrl, '/_api/site/CreateCopyJobs');
-        const requestOptions: any = {
-          url: requestUrl,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          data: {
-            exportObjectUris: [sourceAbsoluteUrl],
-            destinationUri: urlUtil.urlCombine(tenantUrl, args.options.targetUrl),
-            options: {
-              "AllowSchemaMismatch": allowSchemaMismatch,
-              "IgnoreVersionHistory": true
-            }
-          },
-          responseType: 'json'
-        };
+      if (args.options.deleteIfAlreadyExists) {
+        // try delete target file, if deleteIfAlreadyExists flag is set
+        const filename = args.options.sourceUrl.replace(/^.*[\\\/]/, '');
+        await this.recycleFile(tenantUrl, args.options.targetUrl, filename, logger);
+      }
 
-        return request.post(requestOptions);
-      })
-      .then((jobInfo: any): Promise<any> => {
-        return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-          this.dots = '';
+      // all preconditions met, now create copy job
+      const sourceAbsoluteUrl = urlUtil.urlCombine(webUrl, args.options.sourceUrl);
+      const allowSchemaMismatch: boolean = args.options.allowSchemaMismatch || false;
+      const requestUrl: string = urlUtil.urlCombine(webUrl, '/_api/site/CreateCopyJobs');
+      const requestOptions: any = {
+        url: requestUrl,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        data: {
+          exportObjectUris: [sourceAbsoluteUrl],
+          destinationUri: urlUtil.urlCombine(tenantUrl, args.options.targetUrl),
+          options: {
+            "AllowSchemaMismatch": allowSchemaMismatch,
+            "IgnoreVersionHistory": true
+          }
+        },
+        responseType: 'json'
+      };
 
-          const copyJobInfo: any = jobInfo.value[0];
-          const progressPollInterval: number = 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
+      const jobInfo = await request.post<any>(requestOptions);
+      this.dots = '';
 
-          setTimeout(() => {
-            spo.waitUntilCopyJobFinished({
-              copyJobInfo,
-              siteUrl: webUrl,
-              pollingInterval: progressPollInterval,
-              resolve,
-              reject,
-              logger,
-              dots: this.dots,
-              debug: this.debug,
-              verbose: this.verbose
-            });
-          }, progressPollInterval);
+      const copyJobInfo: any = jobInfo.value[0];
+      const progressPollInterval: number = 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
+
+      setTimeout(async () => {
+        await spo.waitUntilCopyJobFinished({
+          copyJobInfo,
+          siteUrl: webUrl,
+          pollingInterval: progressPollInterval,
+          logger,
+          dots: this.dots,
+          debug: this.debug,
+          verbose: this.verbose
         });
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }, progressPollInterval);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   /**

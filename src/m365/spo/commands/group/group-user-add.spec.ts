@@ -208,7 +208,7 @@ describe(commands.GROUP_USER_ADD, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['DisplayName', 'Email']);
   });
 
-  it('adds user to a SharePoint Group by groupId and userName', (done) => {
+  it('adds user to a SharePoint Group by groupId and userName', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify(userInformation),
       stderr: ''
@@ -231,26 +231,18 @@ describe(commands.GROUP_USER_ADD, () => {
 
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
         userName: "Alex.Wilber@contoso.com"
       }
-    }, (err?: any) => {
-      try {
-        assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
   });
 
-  it('adds user to a SharePoint Group by groupId and userName (Debug)', (done) => {
+  it('adds user to a SharePoint Group by groupId and userName (Debug)', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify(userInformation),
       stderr: ''
@@ -274,26 +266,18 @@ describe(commands.GROUP_USER_ADD, () => {
 
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
         userName: "Alex.Wilber@contoso.com"
       }
-    }, (err?: any) => {
-      try {
-        assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
   });
 
-  it('adds user to a SharePoint Group by groupName and email (DEBUG)', (done) => {
+  it('adds user to a SharePoint Group by groupName and email (DEBUG)', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify(userInformation),
       stderr: ''
@@ -316,26 +300,18 @@ describe(commands.GROUP_USER_ADD, () => {
 
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupName: "Contoso Site Owners",
         email: "Alex.Wilber@contoso.com"
       }
-    }, (err?: any) => {
-      try {
-        assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(jsonSingleUser.UsersAddedToGroup));
   });
 
-  it('fails to get group when does not exists', (done) => {
+  it('fails to get group when does not exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetByName('`) > -1) {
         return Promise.resolve({});
@@ -343,25 +319,17 @@ describe(commands.GROUP_USER_ADD, () => {
       return Promise.reject('The specified group not exist in the SharePoint site');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupName: "Contoso Site Owners",
         email: "Alex.Wilber@contoso.com"
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified group does not exist in the SharePoint site`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`The specified group does not exist in the SharePoint site`));
   });
 
-  it('handles error when adding user to a SharePoint Group - Invalid Group', (done) => {
+  it('handles error when adding user to a SharePoint Group - Invalid Group', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('`) > -1) {
         return Promise.reject(jsonGroupNotFound);
@@ -369,25 +337,17 @@ describe(commands.GROUP_USER_ADD, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
 
     });
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 99999999,
         userName: "Alex.Wilber@contoso.com"
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Group cannot be found.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError("Group cannot be found."));
   });
 
-  it('handles error when adding user to a SharePoint Group ID - Username Does Not exist', (done) => {
+  it('handles error when adding user to a SharePoint Group ID - Username Does Not exist', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('4')`) {
         return Promise.resolve({
@@ -411,25 +371,17 @@ describe(commands.GROUP_USER_ADD, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 4,
         userName: "Alex.Wilber@invalidcontoso.onmicrosoft.com"
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Users not added to the group because the following users don't exist: Alex.Wilber@invalidcontoso.onmicrosoft.com`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Users not added to the group because the following users don't exist: Alex.Wilber@invalidcontoso.onmicrosoft.com`));
   });
 
-  it('Handles generic error when adding user to a SharePoint Group by groupId and userName', (done) => {
+  it('Handles generic error when adding user to a SharePoint Group by groupId and userName', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://contoso.sharepoint.com/sites/SiteA/_api/web/sitegroups/GetById('32')`) {
         return Promise.resolve({
@@ -454,22 +406,14 @@ describe(commands.GROUP_USER_ADD, () => {
       return Promise.reject(`Invalid request ${JSON.stringify(opts)}`);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/sites/SiteA",
         groupId: 32,
         userName: "Alex.Wilber@contoso.com"
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The selected permission level is not valid.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`The selected permission level is not valid.`));
   });
 
 

@@ -83,7 +83,7 @@ describe(commands.FILE_CHECKIN, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('command correctly handles file get reject request', (done) => {
+  it('command correctly handles file get reject request', async () => {
     const err = 'Invalid request';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById') > -1) {
@@ -93,24 +93,16 @@ describe(commands.FILE_CHECKIN, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         id: 'f09c4efe-b8c0-4e89-a166-03418661b89b'
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
-  it('should handle checkin with url promise rejection', (done) => {
+  it('should handle checkin with url promise rejection', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File Not Found." } } });
     const getFileByServerRelativeUrlResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -119,24 +111,16 @@ describe(commands.FILE_CHECKIN, () => {
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         verbose: true,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err.message), JSON.stringify(expectedError));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(expectedError));
   });
 
-  it('should handle checkin with id promise rejection', (done) => {
+  it('should handle checkin with id promise rejection', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File Not Found." } } });
     const getFileByIdResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -145,214 +129,138 @@ describe(commands.FILE_CHECKIN, () => {
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         verbose: true,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err.message), JSON.stringify(expectedError));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(expectedError));
   });
 
-  it('should call the correct API url when UniqueId option is passed', (done) => {
+  it('should call the correct API url when UniqueId option is passed', async () => {
     const postStub: sinon.SinonStub = stubPostResponses();
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment=\'\',checkintype=1)');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment=\'\',checkintype=1)');
   });
 
-  it('should call the correct API url when URL option is passed', (done) => {
+  it('should call the correct API url when URL option is passed', async () => {
     const postStub: sinon.SinonStub = stubPostResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         fileUrl: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=1)");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=1)");
   });
 
-  it('should call the correct API url when tenant root URL option is passed', (done) => {
+  it('should call the correct API url when tenant root URL option is passed', async () => {
     const postStub: sinon.SinonStub = stubPostResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         fileUrl: '/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl('%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=1)");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/_api/web/GetFileByServerRelativeUrl('%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=1)");
   });
 
-  it('should call correctly the API when type is minor', (done) => {
+  it('should call correctly the API when type is minor', async () => {
     const postStub: sinon.SinonStub = stubPostResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         fileUrl: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         type: 'minor'
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=0)");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=0)");
   });
 
-  it('should call correctly the API when type is overwrite', (done) => {
+  it('should call correctly the API when type is overwrite', async () => {
     const postStub: sinon.SinonStub = stubPostResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         fileUrl: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         type: 'overwrite'
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=2)");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='',checkintype=2)");
   });
 
-  it('should call correctly the API when comment specified', (done) => {
+  it('should call correctly the API when comment specified', async () => {
     const postStub: sinon.SinonStub = stubPostResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         fileUrl: '/sites/project-x/Documents/Test1.docx',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         comment: 'abc1'
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='abc1',checkintype=1)");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post
-        ]);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileByServerRelativeUrl('%2Fsites%2Fproject-x%2FDocuments%2FTest1.docx')/checkin(comment='abc1',checkintype=1)");
   });
 
-  it('should call correctly the API when type is minor (id)', (done) => {
+  it('should call correctly the API when type is minor (id)', async () => {
     const postStub: sinon.SinonStub = stubPostResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         type: 'minor'
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment='',checkintype=0)");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment='',checkintype=0)");
   });
 
-  it('should call correctly the API when type is overwrite (id)', (done) => {
+  it('should call correctly the API when type is overwrite (id)', async () => {
     const postStub: sinon.SinonStub = stubPostResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         type: 'overwrite'
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment='',checkintype=2)");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment='',checkintype=2)");
   });
 
-  it('should call correctly the API when comment specified (id)', (done) => {
+  it('should call correctly the API when comment specified (id)', async () => {
     const postStub: sinon.SinonStub = stubPostResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         comment: 'abc1'
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment='abc1',checkintype=1)");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, "https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkin(comment='abc1',checkintype=1)");
   });
 
   it('supports debug mode', () => {

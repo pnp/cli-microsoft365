@@ -88,41 +88,39 @@ class SpoFileRenameCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const webUrl = args.options.webUrl;
     const originalFileServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.sourceUrl);
 
-    this
-      .getFile(originalFileServerRelativeUrl, webUrl)
-      .then((_: FileProperties) => {
-        if (args.options.force) {
-          return this.deleteFile(webUrl, args.options.sourceUrl, args.options.targetFileName);
-        }
-        return Promise.resolve();
-      })
-      .then(_ => {
-        const requestBody: any = {
-          formValues: [{
-            FieldName: 'FileLeafRef',
-            FieldValue: args.options.targetFileName
-          }]
-        };
+    try {
+      await this.getFile(originalFileServerRelativeUrl, webUrl);
 
-        const requestOptions: any = {
-          url: `${webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(originalFileServerRelativeUrl)}')/ListItemAllFields/ValidateUpdateListItem()`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          data: requestBody,
-          responseType: 'json'
-        };
+      if (args.options.force) {
+        await this.deleteFile(webUrl, args.options.sourceUrl, args.options.targetFileName);
+      }
 
-        return request.post<RenameResponse>(requestOptions);
-      })
-      .then((resp: RenameResponse): void => {
-        logger.log(resp.value);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const requestBody: any = {
+        formValues: [{
+          FieldName: 'FileLeafRef',
+          FieldValue: args.options.targetFileName
+        }]
+      };
+
+      const requestOptions: any = {
+        url: `${webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(originalFileServerRelativeUrl)}')/ListItemAllFields/ValidateUpdateListItem()`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        data: requestBody,
+        responseType: 'json'
+      };
+
+      const resp = await request.post<RenameResponse>(requestOptions);
+      logger.log(resp.value);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getFile(originalFileServerRelativeUrl: string, webUrl: string): Promise<FileProperties> {

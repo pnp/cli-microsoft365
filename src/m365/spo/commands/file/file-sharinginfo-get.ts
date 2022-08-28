@@ -116,59 +116,59 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
     return ['url'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving sharing information report for the file...`);
     }
 
-    this
-      .getNeededFileInformation(args)
-      .then((fileInformation: { fileItemId: number; libraryName: string; }): Promise<SharingInformation> => {
-        if (this.verbose) {
-          logger.logToStderr(`Retrieving sharing information report for the file with item Id  ${fileInformation.fileItemId}`);
-        }
+    try {
+      const fileInformation = await this.getNeededFileInformation(args);
+      if (this.verbose) {
+        logger.logToStderr(`Retrieving sharing information report for the file with item Id  ${fileInformation.fileItemId}`);
+      }
 
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/lists/getbytitle('${formatting.encodeQueryParameter(fileInformation.libraryName)}')/items(${fileInformation.fileItemId})/GetSharingInformation?$select=permissionsInformation&$Expand=permissionsInformation`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-        return request.post(requestOptions);
-      }).then((res: SharingInformation): void => {
-        // typically, we don't do this, but in this case, we need to due to
-        // the complexity of the retrieved object and the fact that we can't
-        // use the generic way of simplifying the output
-        if (args.options.output === 'json') {
-          logger.log(res);
-        }
-        else {
-          const fileSharingInfoCollection: FileSharingInformation[] = [];
-          res.permissionsInformation.links.forEach(link => {
-            link.linkDetails.Invitations.forEach(linkInvite => {
-              fileSharingInfoCollection.push({
-                SharedWith: linkInvite.invitee.name,
-                IsActive: linkInvite.invitee.isActive,
-                IsExternal: linkInvite.invitee.isExternal,
-                PrincipalType: FileSharingPrincipalType[parseInt(linkInvite.invitee.principalType)]
-              });
-            });
-          });
-          res.permissionsInformation.principals.forEach(principal => {
+      const requestOptions: any = {
+        url: `${args.options.webUrl}/_api/web/lists/getbytitle('${formatting.encodeQueryParameter(fileInformation.libraryName)}')/items(${fileInformation.fileItemId})/GetSharingInformation?$select=permissionsInformation&$Expand=permissionsInformation`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+      const res = await request.post<SharingInformation>(requestOptions);
+
+      // typically, we don't do this, but in this case, we need to due to
+      // the complexity of the retrieved object and the fact that we can't
+      // use the generic way of simplifying the output
+      if (args.options.output === 'json') {
+        logger.log(res);
+      }
+      else {
+        const fileSharingInfoCollection: FileSharingInformation[] = [];
+        res.permissionsInformation.links.forEach(link => {
+          link.linkDetails.Invitations.forEach(linkInvite => {
             fileSharingInfoCollection.push({
-              SharedWith: principal.principal.name,
-              IsActive: principal.principal.isActive,
-              IsExternal: principal.principal.isExternal,
-              PrincipalType: FileSharingPrincipalType[parseInt(principal.principal.principalType)]
+              SharedWith: linkInvite.invitee.name,
+              IsActive: linkInvite.invitee.isActive,
+              IsExternal: linkInvite.invitee.isExternal,
+              PrincipalType: FileSharingPrincipalType[parseInt(linkInvite.invitee.principalType)]
             });
           });
+        });
+        res.permissionsInformation.principals.forEach(principal => {
+          fileSharingInfoCollection.push({
+            SharedWith: principal.principal.name,
+            IsActive: principal.principal.isActive,
+            IsExternal: principal.principal.isExternal,
+            PrincipalType: FileSharingPrincipalType[parseInt(principal.principal.principalType)]
+          });
+        });
 
-          logger.log(fileSharingInfoCollection);
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        logger.log(fileSharingInfoCollection);
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getNeededFileInformation(args: CommandArgs): Promise<{ fileItemId: number; libraryName: string; }> {

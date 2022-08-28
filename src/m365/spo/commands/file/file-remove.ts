@@ -95,8 +95,8 @@ class SpoFileRemoveCommand extends SpoCommand {
     return ['url'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeFile: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeFile: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing file in site at ${args.options.webUrl}...`);
       }
@@ -137,31 +137,28 @@ class SpoFileRemoveCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      request
-        .post(requestOptions)
-        .then((): void => {
-          // REST post call doesn't return anything
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      try {
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeFile();
+      await removeFile();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to ${args.options.recycle ? "recycle" : "remove"} the file ${args.options.id || args.options.url} located in site ${args.options.webUrl}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeFile();
-        }
       });
+
+      if (result.continue) {
+        await removeFile();
+      }
     }
   }
 }
