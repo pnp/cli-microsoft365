@@ -70,7 +70,7 @@ describe(commands.TERM_GROUP_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('gets taxonomy term group by id', (done) => {
+  it('gets taxonomy term group by id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -128,26 +128,19 @@ describe(commands.TERM_GROUP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, id: '36a62501-17ea-455a-bed4-eff862242def' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "CreatedDate": "2018-06-20T07:23:21.033Z",
-          "Id": "36a62501-17ea-455a-bed4-eff862242def",
-          "LastModifiedDate": "2018-06-20T07:23:21.033Z",
-          "Name": "People",
-          "Description": "",
-          "IsSiteCollectionGroup": false,
-          "IsSystemGroup": false
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '36a62501-17ea-455a-bed4-eff862242def' } });
+    assert(loggerLogSpy.calledWith({
+      "CreatedDate": "2018-06-20T07:23:21.033Z",
+      "Id": "36a62501-17ea-455a-bed4-eff862242def",
+      "LastModifiedDate": "2018-06-20T07:23:21.033Z",
+      "Name": "People",
+      "Description": "",
+      "IsSiteCollectionGroup": false,
+      "IsSystemGroup": false
+    }));
   });
 
-  it('gets taxonomy term group by name', (done) => {
+  it('gets taxonomy term group by name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -205,26 +198,19 @@ describe(commands.TERM_GROUP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, name: 'People' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "CreatedDate": "2018-06-20T07:23:21.033Z",
-          "Id": "36a62501-17ea-455a-bed4-eff862242def",
-          "LastModifiedDate": "2018-06-20T07:23:21.033Z",
-          "Name": "People",
-          "Description": "",
-          "IsSiteCollectionGroup": false,
-          "IsSystemGroup": false
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, name: 'People' } });
+    assert(loggerLogSpy.calledWith({
+      "CreatedDate": "2018-06-20T07:23:21.033Z",
+      "Id": "36a62501-17ea-455a-bed4-eff862242def",
+      "LastModifiedDate": "2018-06-20T07:23:21.033Z",
+      "Name": "People",
+      "Description": "",
+      "IsSiteCollectionGroup": false,
+      "IsSystemGroup": false
+    }));
   });
 
-  it('correctly handles term group not found via id', (done) => {
+  it('correctly handles term group not found via id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -241,18 +227,13 @@ describe(commands.TERM_GROUP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, id: '36a62501-17ea-455a-bed4-eff862242def' } } as any, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await assert.rejects(command.action(logger, { options: { 
+      debug: false, 
+      id: '36a62501-17ea-455a-bed4-eff862242def' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
-  it('correctly handles term group not found via name', (done) => {
+  it('correctly handles term group not found via name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -269,18 +250,11 @@ describe(commands.TERM_GROUP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, name: 'People' } } as any, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await assert.rejects(command.action(logger, { options: { debug: false, name: 'People' } } as any), new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index'));
   });
 
-  it('correctly handles error when retrieving taxonomy term groups', (done) => {
+  it('correctly handles error when retrieving taxonomy term groups', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
@@ -290,15 +264,8 @@ describe(commands.TERM_GROUP_GET, () => {
         }
       ]));
     });
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('File Not Found.'));
   });
 
   it('fails validation if neither id nor name specified', async () => {
@@ -337,20 +304,10 @@ describe(commands.TERM_GROUP_GET, () => {
     assert(containsOption);
   });
 
-  it('handles promise rejection', (done) => {
+  it('handles promise rejection', async () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
-    
-    command.action(logger, {
-      options: { debug: false, id: '36a62501-17ea-455a-bed4-eff862242def' }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getRequestDigest error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await assert.rejects(command.action(logger, { options: { debug: false, id: '36a62501-17ea-455a-bed4-eff862242def' } } as any), new CommandError('getRequestDigest error'));
   });
 });

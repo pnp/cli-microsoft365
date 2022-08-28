@@ -64,7 +64,7 @@ describe(commands.WEB_INSTALLEDLANGUAGE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['DisplayName', 'LanguageTag', 'Lcid']);
   });
 
-  it('retrieves all web installed languages', (done) => {
+  it('retrieves all web installed languages', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/RegionalSettings/InstalledLanguages') > -1) {
         return Promise.resolve(
@@ -85,33 +85,26 @@ describe(commands.WEB_INSTALLEDLANGUAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          "DisplayName": "German",
-          "LanguageTag": "de-DE",
-          "Lcid": 1031
-        },
-        {
-          "DisplayName": "French",
-          "LanguageTag": "fr-FR",
-          "Lcid": 1036
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([{
+      "DisplayName": "German",
+      "LanguageTag": "de-DE",
+      "Lcid": 1031
+    },
+    {
+      "DisplayName": "French",
+      "LanguageTag": "fr-FR",
+      "Lcid": 1036
+    }]));
   });
 
-  it('command correctly handles web list installed languages reject request', (done) => {
+  it('command correctly handles web list installed languages reject request', async () => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/RegionalSettings/InstalledLanguages') > -1) {
@@ -121,20 +114,9 @@ describe(commands.WEB_INSTALLEDLANGUAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com'
-      }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      webUrl: 'https://contoso.sharepoint.com' } } as any), new CommandError(err));
   });
 
   it('supports debug mode', () => {

@@ -38,9 +38,9 @@ describe(commands.WEB_REMOVE, () => {
     };
     requests = [];
     promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: true };
     });
   });
 
@@ -97,8 +97,8 @@ describe(commands.WEB_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('should prompt before deleting subsite when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/subsite' } }, () => {
+  it('should prompt before deleting subsite when confirmation argument not passed', async () => {
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/subsite' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -115,7 +115,7 @@ describe(commands.WEB_REMOVE, () => {
     });
   });
 
-  it('deletes web successfully without prompting with confirmation argument', (done) => {
+  it('deletes web successfully without prompting with confirmation argument', async () => {
     // Delete web
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -125,7 +125,7 @@ describe(commands.WEB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         confirm: true
@@ -150,7 +150,7 @@ describe(commands.WEB_REMOVE, () => {
 
   });
 
-  it('deletes web successfully when prompt confirmed', (done) => {
+  it('deletes web successfully when prompt confirmed', async () => {
     // Delete web
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -164,7 +164,7 @@ describe(commands.WEB_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite"
       }
@@ -187,7 +187,7 @@ describe(commands.WEB_REMOVE, () => {
     });
   });
 
-  it('deletes web successfully without prompting with confirmation argument (verbose)', (done) => {
+  it('deletes web successfully without prompting with confirmation argument (verbose)', async () => {
     // Delete web
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -197,7 +197,7 @@ describe(commands.WEB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         webUrl: "https://contoso.sharepoint.com/subsite",
@@ -222,7 +222,7 @@ describe(commands.WEB_REMOVE, () => {
     });
   });
 
-  it('deletes web successfully without prompting with confirmation argument (debug)', (done) => {
+  it('deletes web successfully without prompting with confirmation argument (debug)', async () => {
     // Delete web
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -232,7 +232,7 @@ describe(commands.WEB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/subsite",
@@ -257,7 +257,7 @@ describe(commands.WEB_REMOVE, () => {
     });
   });
 
-  it('handles error when deleting web', (done) => {
+  it('handles error when deleting web', async () => {
     // Delete web
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -267,7 +267,7 @@ describe(commands.WEB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         confirm: true

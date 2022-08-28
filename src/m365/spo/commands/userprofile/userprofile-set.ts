@@ -44,46 +44,42 @@ class SpoUserProfileSetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    let spoUrl: string = '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
 
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((_spoUrl: string): Promise<ContextInfo> => {
-        spoUrl = _spoUrl;
+      const res: ContextInfo = await spo.getRequestDigest(spoUrl);
+      const propertyValue: string[] = args.options.propertyValue.split(',').map(o => o.trim());
+      let propertyType: string = 'SetSingleValueProfileProperty';
+      const data: any = {
+        accountName: `i:0#.f|membership|${args.options.userName}`,
+        propertyName: args.options.propertyName
+      };
 
-        return spo.getRequestDigest(spoUrl);
-      })
-      .then((res: ContextInfo): Promise<string> => {
-        const propertyValue: string[] = args.options.propertyValue.split(',').map(o => o.trim());
-        let propertyType: string = 'SetSingleValueProfileProperty';
-        const data: any = {
-          accountName: `i:0#.f|membership|${args.options.userName}`,
-          propertyName: args.options.propertyName
-        };
+      if (propertyValue.length > 1) {
+        propertyType = 'SetMultiValuedProfileProperty';
+        data.propertyValues = [...propertyValue];
+      }
+      else {
+        data.propertyValue = propertyValue[0];
+      }
 
-        if (propertyValue.length > 1) {
-          propertyType = 'SetMultiValuedProfileProperty';
-          data.propertyValues = [...propertyValue];
-        }
-        else {
-          data.propertyValue = propertyValue[0];
-        }
+      const requestOptions: any = {
+        url: `${spoUrl}/_api/SP.UserProfiles.PeopleManager/${propertyType}`,
+        headers: {
+          'Accept': 'application/json;odata=nometadata',
+          'Content-type': 'application/json;odata=verbose',
+          'X-RequestDigest': res.FormDigestValue
+        },
+        data: data,
+        responseType: 'json'
+      };
 
-        const requestOptions: any = {
-          url: `${spoUrl}/_api/SP.UserProfiles.PeopleManager/${propertyType}`,
-          headers: {
-            'Accept': 'application/json;odata=nometadata',
-            'Content-type': 'application/json;odata=verbose',
-            'X-RequestDigest': res.FormDigestValue
-          },
-          data: data,
-          responseType: 'json'
-        };
-
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      await request.post(requestOptions);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

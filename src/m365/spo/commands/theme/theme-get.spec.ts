@@ -68,7 +68,7 @@ describe(commands.THEME_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('gets theme when correct parameters are passed', (done) => {
+  it('gets theme when correct parameters are passed', async () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
 
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
@@ -78,28 +78,21 @@ describe(commands.THEME_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'Contoso'
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
-        assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
-        assert.strictEqual(postStub.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><ObjectPath Id="14" ObjectPathId="13" /><Query Id="15" ObjectPathId="13"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="13" ParentId="11" Name="GetTenantTheme"><Parameters><Parameter Type="String">Contoso</Parameter></Parameters></Method></ObjectPaths></Request>`);
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].IsInverted, true);
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].Name, 'Custom22');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].Palette.themeLight, '#affefe');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
+    assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
+    assert.strictEqual(postStub.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><ObjectPath Id="14" ObjectPathId="13" /><Query Id="15" ObjectPathId="13"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="13" ParentId="11" Name="GetTenantTheme"><Parameters><Parameter Type="String">Contoso</Parameter></Parameters></Method></ObjectPaths></Request>`);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].IsInverted, true);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].Name, 'Custom22');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].Palette.themeLight, '#affefe');
   });
 
-  it('gets theme when correct parameters are passed (debug)', (done) => {
+  it('gets theme when correct parameters are passed (debug)', async () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
 
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
@@ -109,26 +102,19 @@ describe(commands.THEME_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         name: 'Contoso'
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
-        assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
-        assert.strictEqual(postStub.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><ObjectPath Id="14" ObjectPathId="13" /><Query Id="15" ObjectPathId="13"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="13" ParentId="11" Name="GetTenantTheme"><Parameters><Parameter Type="String">Contoso</Parameter></Parameters></Method></ObjectPaths></Request>`);
-        assert.strictEqual(loggerLogSpy.called, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
+    assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
+    assert.strictEqual(postStub.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><ObjectPath Id="14" ObjectPathId="13" /><Query Id="15" ObjectPathId="13"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="13" ParentId="11" Name="GetTenantTheme"><Parameters><Parameter Type="String">Contoso</Parameter></Parameters></Method></ObjectPaths></Request>`);
+    assert.strictEqual(loggerLogSpy.called, true);
   });
 
-  it('handles error correctly', (done) => {
+  it('handles error correctly', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
 
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
@@ -137,23 +123,12 @@ describe(commands.THEME_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        name: 'Contoso'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      name: 'Contoso' } } as any), new CommandError('Unknown Error'));
   });
 
-  it('handles empty error correctly', (done) => {
+  it('handles empty error correctly', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
 
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
@@ -162,23 +137,12 @@ describe(commands.THEME_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        name: 'Contoso'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      name: 'Contoso' } } as any), new CommandError('ClientSvc unknown error'));
   });
 
-  it('handles request error correctly', (done) => {
+  it('handles request error correctly', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.reject('An error has occurred');
@@ -186,20 +150,9 @@ describe(commands.THEME_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        name: 'Contoso'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      name: 'Contoso' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

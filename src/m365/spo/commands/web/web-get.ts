@@ -57,7 +57,7 @@ class SpoWebGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let url: string = `${args.options.webUrl}/_api/web`;
     if (args.options.withGroups) {
       url += '?$expand=AssociatedMemberGroup,AssociatedOwnerGroup,AssociatedVisitorGroup';

@@ -56,7 +56,7 @@ class SpoWebRemoveCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeWeb = (): void => {
       const requestOptions: any = {
         url: `${encodeURI(args.options.webUrl)}/_api/web`,

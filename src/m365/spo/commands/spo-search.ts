@@ -194,32 +194,29 @@ class SpoSearchCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let webUrl: string = '';
 
-    ((): Promise<string> => {
+    try {
       if (args.options.webUrl) {
-        return Promise.resolve(args.options.webUrl);
+        webUrl = args.options.webUrl;
       }
       else {
-        return spo.getSpoUrl(logger, this.debug);
+        webUrl = await spo.getSpoUrl(logger, this.debug);
       }
-    })()
-      .then((_webUrl: string): Promise<SearchResult[]> => {
-        webUrl = _webUrl;
 
-        if (this.verbose) {
-          logger.logToStderr(`Executing search query '${args.options.queryText}' on site at ${webUrl}...`);
-        }
+      if (this.verbose) {
+        logger.logToStderr(`Executing search query '${args.options.queryText}' on site at ${webUrl}...`);
+      }
 
-        const startRow = args.options.startRow ? args.options.startRow : 0;
+      const startRow = args.options.startRow ? args.options.startRow : 0;
 
-        return this.executeSearchQuery(logger, args, webUrl, [], startRow);
-      })
-      .then((results: SearchResult[]) => {
-        this.printResults(logger, args, results);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const results: SearchResult[] = await this.executeSearchQuery(logger, args, webUrl, [], startRow);
+      this.printResults(logger, args, results);      
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private executeSearchQuery(logger: Logger, args: CommandArgs, webUrl: string, resultSet: SearchResult[], startRow: number): Promise<SearchResult[]> {

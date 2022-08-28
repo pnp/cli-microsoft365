@@ -72,7 +72,7 @@ describe(commands.THEME_APPLY, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('applies theme when correct parameters are passed', (done) => {
+  it('applies theme when correct parameters are passed', async () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
@@ -80,27 +80,20 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'Contoso',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery', 'url');
-        assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC', 'request digest');
-        assert.strictEqual(postStub.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="SetWebTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">https://contoso.sharepoint.com/sites/project-x</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`, 'body');
-        assert(loggerLogSpy.calledWith(true), 'log');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery', 'url');
+    assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC', 'request digest');
+    assert.strictEqual(postStub.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="SetWebTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">https://contoso.sharepoint.com/sites/project-x</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`, 'body');
+    assert(loggerLogSpy.calledWith(true), 'log');
   });
 
-  it('applies theme when correct parameters are passed (debug)', (done) => {
+  it('applies theme when correct parameters are passed (debug)', async () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
@@ -108,26 +101,19 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         name: 'Contoso',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
-        assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
-        assert.strictEqual(postStub.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="SetWebTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">https://contoso.sharepoint.com/sites/project-x</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
+    assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
+    assert.strictEqual(postStub.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="SetWebTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">https://contoso.sharepoint.com/sites/project-x</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`);
   });
 
-  it('applies SharePoint theme (Blue) when correct parameters are passed', (done) => {
+  it('applies SharePoint theme (Blue) when correct parameters are passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -149,32 +135,25 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: "Blue",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
       }
-    }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.data) {
-          setRequestIssued = true;
-        }
-      });
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+        r.data) {
+        setRequestIssued = true;
       }
     });
+    assert(setRequestIssued);
   });
 
-  it('applies SharePoint theme (Orange) when correct parameters are passed', (done) => {
+  it('applies SharePoint theme (Orange) when correct parameters are passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -196,32 +175,25 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: "Orange",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
       }
-    }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.data) {
-          setRequestIssued = true;
-        }
-      });
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+        r.data) {
+        setRequestIssued = true;
       }
     });
+    assert(setRequestIssued);
   });
 
-  it('applies SharePoint theme (Red) when correct parameters are passed', (done) => {
+  it('applies SharePoint theme (Red) when correct parameters are passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -243,32 +215,25 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: "Red",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
       }
-    }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.data) {
-          setRequestIssued = true;
-        }
-      });
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+        r.data) {
+        setRequestIssued = true;
       }
     });
+    assert(setRequestIssued);
   });
 
-  it('applies SharePoint theme (Purple) when correct parameters are passed', (done) => {
+  it('applies SharePoint theme (Purple) when correct parameters are passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -290,32 +255,25 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: "Purple",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
       }
-    }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.data) {
-          setRequestIssued = true;
-        }
-      });
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+        r.data) {
+        setRequestIssued = true;
       }
     });
+    assert(setRequestIssued);
   });
 
-  it('applies SharePoint theme (Green) when correct parameters are passed', (done) => {
+  it('applies SharePoint theme (Green) when correct parameters are passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -337,32 +295,25 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: "Green",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
       }
-    }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.data) {
-          setRequestIssued = true;
-        }
-      });
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+        r.data) {
+        setRequestIssued = true;
       }
     });
+    assert(setRequestIssued);
   });
 
-  it('applies SharePoint theme (Gray) when correct parameters are passed', (done) => {
+  it('applies SharePoint theme (Gray) when correct parameters are passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -384,32 +335,25 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: "Gray",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
       }
-    }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.data) {
-          setRequestIssued = true;
-        }
-      });
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+        r.data) {
+        setRequestIssued = true;
       }
     });
+    assert(setRequestIssued);
   });
 
-  it('applies SharePoint theme (Dark Yellow) when correct parameters are passed', (done) => {
+  it('applies SharePoint theme (Dark Yellow) when correct parameters are passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -431,32 +375,25 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: "Dark Yellow",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
       }
-    }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.data) {
-          setRequestIssued = true;
-        }
-      });
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+        r.data) {
+        setRequestIssued = true;
       }
     });
+    assert(setRequestIssued);
   });
 
-  it('applies SharePoint theme (Dark Blue) when correct parameters are passed', (done) => {
+  it('applies SharePoint theme (Dark Blue) when correct parameters are passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -478,32 +415,25 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: "Dark Blue",
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
       }
-    }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.data) {
-          setRequestIssued = true;
-        }
-      });
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+        r.data) {
+        setRequestIssued = true;
       }
     });
+    assert(setRequestIssued);
   });
 
-  it('correctly handles error when applying custom theme', (done) => {
+  it('correctly handles error when applying custom theme', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity ClientSvc error" } }]));
@@ -511,24 +441,13 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        name: 'Contoso',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      name: 'Contoso',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x' } } as any), new CommandError('requestObjectIdentity ClientSvc error'));
   });
 
-  it('handles unknown error command error correctly', (done) => {
+  it('handles unknown error command error correctly', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "ClientSvc unknown error" } }]));
@@ -536,25 +455,14 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        name: 'Contoso',
-        filePath: 'theme.json',
-        inverted: false
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      name: 'Contoso',
+      filePath: 'theme.json',
+      inverted: false } } as any), new CommandError('ClientSvc unknown error'));
   });
 
-  it('handles command error correctly', (done) => {
+  it('handles command error correctly', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
@@ -577,50 +485,32 @@ describe(commands.THEME_APPLY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         name: 'Some color',
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         sharePointTheme: true
       }
-    }, () => {
-      let correctRequestIssued = false;
+    });
+    let correctRequestIssued = false;
 
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.data) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
+        r.data) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        name: 'Some color',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      name: 'Some color',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

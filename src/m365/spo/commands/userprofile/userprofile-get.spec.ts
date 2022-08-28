@@ -69,7 +69,7 @@ describe(commands.USERPROFILE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('gets userprofile information about the specified user', (done) => {
+  it('gets userprofile information about the specified user', async () => {
     const profile = {
       "AccountName": "i:0#.f|membership|dips1802@dev1802.onmicrosoft.com",
       "DirectReports": [],
@@ -104,25 +104,18 @@ describe(commands.USERPROFILE_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, {
+    await await command.action(logger, {
       options: {
         output: 'text',
         userName: 'john.doe@contoso.onmicrosoft.com'
       }
-    } as any, () => {
-      try {
-        const loggedProfile = JSON.parse(JSON.stringify(profile));
-        loggedProfile.UserProfileProperties = JSON.stringify(loggedProfile.UserProfileProperties);
-        assert.strictEqual(JSON.stringify(log[0]), JSON.stringify(loggedProfile));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    const loggedProfile = JSON.parse(JSON.stringify(profile));
+    loggedProfile.UserProfileProperties = JSON.stringify(loggedProfile.UserProfileProperties);
+    assert.strictEqual(JSON.stringify(log[0]), JSON.stringify(loggedProfile));
   });
 
-  it('gets userprofile information about the specified user output json', (done) => {
+  it('gets userprofile information about the specified user output json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor') > -1) {
         return Promise.resolve({
@@ -145,37 +138,30 @@ describe(commands.USERPROFILE_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         userName: 'john.doe@contoso.onmicrosoft.com'
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "AccountName": "i:0#.f|membership|dips1802@dev1802.onmicrosoft.com",
-          "DirectReports": [],
-          "DisplayName": "Dipen Shah",
-          "Email": "dips1802@dev1802.onmicrosoft.com",
-          "ExtendedManagers": [],
-          "ExtendedReports": [
-            "i:0#.f|membership|dips1802@dev1802.onmicrosoft.com"
-          ],
-          "IsFollowed": false,
-          "LatestPost": null,
-          "Peers": [],
-          "PersonalSiteHostUrl": "https://dev1802-my.sharepoint.com:443/",
-          "PersonalUrl": "https://dev1802-my.sharepoint.com/personal/dips1802_dev1802_onmicrosoft_com/",
-          "PictureUrl": null,
-          "Title": null
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(loggerLogSpy.calledWith({
+      "AccountName": "i:0#.f|membership|dips1802@dev1802.onmicrosoft.com",
+      "DirectReports": [],
+      "DisplayName": "Dipen Shah",
+      "Email": "dips1802@dev1802.onmicrosoft.com",
+      "ExtendedManagers": [],
+      "ExtendedReports": [
+        "i:0#.f|membership|dips1802@dev1802.onmicrosoft.com"
+      ],
+      "IsFollowed": false,
+      "LatestPost": null,
+      "Peers": [],
+      "PersonalSiteHostUrl": "https://dev1802-my.sharepoint.com:443/",
+      "PersonalUrl": "https://dev1802-my.sharepoint.com/personal/dips1802_dev1802_onmicrosoft_com/",
+      "PictureUrl": null,
+      "Title": null
+    }));
   });
 
   it('supports debug mode', () => {
