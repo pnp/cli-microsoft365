@@ -154,7 +154,7 @@ class SpoWebSetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const payload: any = {};
 
     this.addUnknownOptionsToPayload(payload, args.options);
@@ -201,10 +201,13 @@ class SpoWebSetCommand extends SpoCommand {
     if (this.verbose) {
       logger.logToStderr(`Updating properties of subsite ${args.options.webUrl}...`);
     }
-
-    request
-      .patch(requestOptions)
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    
+    try {
+      await request.patch(requestOptions);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   public allowUnknownOptions(): boolean | undefined {

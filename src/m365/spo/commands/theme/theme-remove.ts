@@ -49,48 +49,46 @@ class SpoThemeRemoveCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeTheme = (): void => {
-      spo
-        .getSpoAdminUrl(logger, this.debug)
-        .then((spoAdminUrl: string): Promise<void> => {
-          if (this.verbose) {
-            logger.logToStderr(`Removing theme from tenant...`);
-          }
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeTheme = async (): Promise<void> => {
+      try {
+        const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
+        if (this.verbose) {
+          logger.logToStderr(`Removing theme from tenant...`);
+        }
 
-          const requestOptions: any = {
-            url: `${spoAdminUrl}/_api/thememanager/DeleteTenantTheme`,
-            headers: {
-              'accept': 'application/json;odata=nometadata'
-            },
-            data: {
-              name: args.options.name
-            },
-            responseType: 'json'
-          };
+        const requestOptions: any = {
+          url: `${spoAdminUrl}/_api/thememanager/DeleteTenantTheme`,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          data: {
+            name: args.options.name
+          },
+          responseType: 'json'
+        };
 
-          return request.post(requestOptions);
-        })
-        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        await request.post(requestOptions);
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeTheme();
+      await removeTheme();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the theme`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeTheme();
-        }
       });
+      
+      if (result.continue) {
+        await removeTheme();
+      }
     }
   }
 }

@@ -340,52 +340,38 @@ describe(commands.SEARCH, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('executes search request', (done) => {
+  it('executes search request', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         queryText: '*'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_NoParameterTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_NoParameterTest);
   });
 
-  it('executes search request with output option text', (done) => {
+  it('executes search request with output option text', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: false,
         queryText: 'IsDocument:1'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 2);
-        assert.strictEqual(executedTest, TestID.QueryDocuments_NoParameterTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 2);
+    assert.strictEqual(executedTest, TestID.QueryDocuments_NoParameterTest);
   });
 
-  it('executes search request with output option text and \'allResults\'', (done) => {
+  it('executes search request with output option text and \'allResults\'', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: false,
@@ -393,132 +379,90 @@ describe(commands.SEARCH, () => {
         allResults: true,
         rowLimit: 1
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 2);
-        assert.strictEqual(executedTest, TestID.QueryDocuments_WithStartRow1Test);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 2);
+    assert.strictEqual(executedTest, TestID.QueryDocuments_WithStartRow1Test);
   });
 
-  it('executes search request with trimDuplicates', (done) => {
+  it('executes search request with trimDuplicates', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: false,
         queryText: '*',
         trimDuplicates: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 2);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithTrimDuplicatesTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 2);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithTrimDuplicatesTest);
   });
 
-  it('executes search request with sortList', (done) => {
+  it('executes search request with sortList', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: false,
         queryText: '*',
         sortList: 'Rank:ascending'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_SortListTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_SortListTest);
   });
 
-  it('executes search request with enableStemming=false', (done) => {
+  it('executes search request with enableStemming=false', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: false,
         queryText: '*',
         enableStemming: false
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 2);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithEnableStemmingTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 2);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithEnableStemmingTest);
   });
 
-  it('executes search request with enableStemming=true', (done) => {
+  it('executes search request with enableStemming=true', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: false,
         queryText: '*',
         enableStemming: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_NoParameterTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_NoParameterTest);
   });
 
-  it('executes search request with culture', (done) => {
+  it('executes search request with culture', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: false,
         queryText: '*',
         culture: 1043
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 1);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithCultureTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 1);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithCultureTest);
   });
 
-  it('executes search request with output option json and \'allResults\'', (done) => {
+  it('executes search request with output option json and \'allResults\'', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: false,
@@ -526,220 +470,150 @@ describe(commands.SEARCH, () => {
         allResults: true,
         rowLimit: 1
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 2);
-        assert.strictEqual(executedTest, TestID.QueryDocuments_WithStartRow1Test);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 2);
+    assert.strictEqual(executedTest, TestID.QueryDocuments_WithStartRow1Test);
   });
 
-  it('executes search request with selectProperties', (done) => {
+  it('executes search request with selectProperties', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: false,
         queryText: 'IsDocument:1',
         selectProperties: 'Path'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 2);
-        assert.strictEqual(executedTest, TestID.QueryDocuments_NoParameterTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 2);
+    assert.strictEqual(executedTest, TestID.QueryDocuments_NoParameterTest);
   });
 
-  it('executes search request with refinementFilters', (done) => {
+  it('executes search request with refinementFilters', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: false,
         queryText: '*',
         refinementFilters: 'fileExtension:equals("docx")'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 2);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithRefinementFiltersTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 2);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithRefinementFiltersTest);
   });
 
-  it('executes search request with queryTemplate', (done) => {
+  it('executes search request with queryTemplate', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: false,
         queryText: '*',
         queryTemplate: '{searchterms} fileType:docx'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 2);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithQueryTemplateTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 2);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithQueryTemplateTest);
   });
 
-  it('executes search request with sourceId', (done) => {
+  it('executes search request with sourceId', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: false,
         queryText: '*',
         sourceId: '6e71030e-5e16-4406-9bff-9c1829843083'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 1);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithSourceIdTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 1);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithSourceIdTest);
   });
 
-  it('executes search request with rankingModelId', (done) => {
+  it('executes search request with rankingModelId', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: false,
         queryText: '*',
         rankingModelId: 'd4ac6500-d1d0-48aa-86d4-8fe9a57a74af'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithRankingModelIdTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithRankingModelIdTest);
   });
 
-  it('executes search request with rowLimits defined', (done) => {
+  it('executes search request with rowLimits defined', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: true,
         queryText: '*',
         rowLimit: 1
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 1);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithRowLimitTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 1);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithRowLimitTest);
   });
 
-  it('executes search request with startRow defined', (done) => {
+  it('executes search request with startRow defined', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: true,
         queryText: '*',
         startRow: 1
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 3);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithStartRowTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 3);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithStartRowTest);
   });
 
-  it('executes search request with properties defined', (done) => {
+  it('executes search request with properties defined', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: true,
         queryText: '*',
         properties: 'termid:guid'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithPropertiesTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithPropertiesTest);
   });
 
-  it('executes search request with sourceName defined and no previous properties', (done) => {
+  it('executes search request with sourceName defined and no previous properties', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: true,
         queryText: '*',
         sourceName: 'Local SharePoint Results'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithSourceNameAndNoPreviousPropertiesTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithSourceNameAndNoPreviousPropertiesTest);
   });
 
-  it('executes search request with sourceName defined and previous properties (ends with \',\')', (done) => {
+  it('executes search request with sourceName defined and previous properties (ends with \',\')', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: true,
@@ -747,22 +621,15 @@ describe(commands.SEARCH, () => {
         properties: 'some:property,',
         sourceName: 'Local SharePoint Results'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithSourceNameAndPreviousPropertiesTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithSourceNameAndPreviousPropertiesTest);
   });
 
-  it('executes search request with sourceName defined and previous properties (Doesn\'t end with \',\')', (done) => {
+  it('executes search request with sourceName defined and previous properties (Doesn\'t end with \',\')', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: true,
@@ -770,214 +637,144 @@ describe(commands.SEARCH, () => {
         properties: 'some:property',
         sourceName: 'Local SharePoint Results'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithSourceNameAndPreviousPropertiesTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithSourceNameAndPreviousPropertiesTest);
   });
 
-  it('executes search request with refiners defined', (done) => {
+  it('executes search request with refiners defined', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: true,
         queryText: '*',
         refiners: 'author,size'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithRefinersTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithRefinersTest);
   });
 
-  it('executes search request with web defined', (done) => {
+  it('executes search request with web defined', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: true,
         queryText: '*',
         webUrl: 'https://contoso.sharepoint.com/sites/subsite'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithWebTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithWebTest);
   });
 
-  it('executes search request with hiddenConstraints defined', (done) => {
+  it('executes search request with hiddenConstraints defined', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: true,
         queryText: '*',
         hiddenConstraints: 'developer'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithHiddenConstraintsTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithHiddenConstraintsTest);
   });
 
-  it('executes search request with clientType defined', (done) => {
+  it('executes search request with clientType defined', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: true,
         queryText: '*',
         clientType: 'custom'
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithClientTypeTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithClientTypeTest);
   });
 
-  it('executes search request with enablePhonetic defined', (done) => {
+  it('executes search request with enablePhonetic defined', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: true,
         queryText: '*',
         enablePhonetic: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithEnablePhoneticTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithEnablePhoneticTest);
   });
 
-  it('executes search request with processBestBets defined', (done) => {
+  it('executes search request with processBestBets defined', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: true,
         queryText: '*',
         processBestBets: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithProcessBestBetsTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithProcessBestBetsTest);
   });
 
-  it('executes search request with enableQueryRules defined', (done) => {
+  it('executes search request with enableQueryRules defined', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: true,
         queryText: '*',
         enableQueryRules: false
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithEnableQueryRulesTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithEnableQueryRulesTest);
   });
 
-  it('executes search request with processPersonalFavorites defined', (done) => {
+  it('executes search request with processPersonalFavorites defined', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         debug: true,
         queryText: '*',
         processPersonalFavorites: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_WithProcessPersonalFavoritesTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_WithProcessPersonalFavoritesTest);
   });
 
-  it('executes search request with parameter rawOutput', (done) => {
+  it('executes search request with parameter rawOutput', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         queryText: '*',
         rawOutput: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(returnArrayLength, 4);
-        assert.strictEqual(executedTest, TestID.QueryAll_NoParameterTest);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(returnArrayLength, 4);
+    assert.strictEqual(executedTest, TestID.QueryAll_NoParameterTest);
   });
 
   it('fails validation if the sourceId is not a valid GUID', async () => {
@@ -1050,7 +847,7 @@ describe(commands.SEARCH, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('command correctly handles reject request', (done) => {
+  it('command correctly handles reject request', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         return Promise.resolve({
@@ -1070,20 +867,9 @@ describe(commands.SEARCH, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com'
-      }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      webUrl: 'https://contoso.sharepoint.com' } } as any), new CommandError(err));
   });
 
   it('supports debug mode', () => {

@@ -37,9 +37,9 @@ describe(commands.THEME_REMOVE, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
   });
 
@@ -67,25 +67,18 @@ describe(commands.THEME_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('should prompt before removing theme when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { debug: false, name: 'Contoso' } }, () => {
-      let promptIssued = false;
+  it('should prompt before removing theme when confirmation argument not passed', async () => {
+    await command.action(logger, { options: { debug: false, name: 'Contoso' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('removes theme successfully without prompting with confirmation argument', (done) => {
+  it('removes theme successfully without prompting with confirmation argument', async () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
 
       if ((opts.url as string).indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
@@ -95,27 +88,20 @@ describe(commands.THEME_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'Contoso',
         confirm: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
-        assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
-        assert.strictEqual(postStub.lastCall.args[0].data.name, 'Contoso');
-        assert.strictEqual(loggerLogSpy.notCalled, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
+    assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
+    assert.strictEqual(postStub.lastCall.args[0].data.name, 'Contoso');
+    assert.strictEqual(loggerLogSpy.notCalled, true);
   });
 
-  it('removes theme successfully without prompting with confirmation argument (debug)', (done) => {
+  it('removes theme successfully without prompting with confirmation argument (debug)', async () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
 
       if ((opts.url as string).indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
@@ -125,26 +111,19 @@ describe(commands.THEME_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         name: 'Contoso',
         confirm: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
-        assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
-        assert.strictEqual(postStub.lastCall.args[0].data.name, 'Contoso');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
+    assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
+    assert.strictEqual(postStub.lastCall.args[0].data.name, 'Contoso');
   });
 
-  it('removes theme successfully when prompt confirmed', (done) => {
+  it('removes theme successfully when prompt confirmed', async () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
 
       if ((opts.url as string).indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
@@ -155,29 +134,22 @@ describe(commands.THEME_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         name: 'Contoso'
       }
-    }, () => {
-      try {
-        assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
-        assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
-        assert.strictEqual(postStub.lastCall.args[0].data.name, 'Contoso');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
+    assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
+    assert.strictEqual(postStub.lastCall.args[0].data.name, 'Contoso');
   });
 
-  it('handles error when removing theme', (done) => {
+  it('handles error when removing theme', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
 
       if ((opts.url as string).indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
@@ -188,25 +160,14 @@ describe(commands.THEME_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        name: 'Contoso',
-        confirm: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      name: 'Contoso',
+      confirm: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

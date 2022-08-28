@@ -72,7 +72,7 @@ describe(commands.WEB_ADD, () => {
     assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['webUrl']);
   });
 
-  it('creates web without inheriting the navigation', (done) => {
+  it('creates web without inheriting the navigation', async () => {
     let configuredNavigation: boolean = false;
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -98,7 +98,7 @@ describe(commands.WEB_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         title: "subsite",
         webUrl: "subsite",
@@ -108,31 +108,24 @@ describe(commands.WEB_ADD, () => {
         inheritNavigation: false,
         debug: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Configuration: 0,
-          Created: "2018-01-24T18:24:20",
-          Description: '',
-          Id: "08385b9a-8d5f-4ee9-ac98-bf6984c1856b",
-          Language: 1033,
-          LastItemModifiedDate: "2018-01-24T18:24:27Z",
-          LastItemUserModifiedDate: "2018-01-24T18:24:27Z",
-          ServerRelativeUrl: "/subsite",
-          Title: "subsite",
-          WebTemplate: "STS",
-          WebTemplateId: 0
-        }), 'Invalid web info');
-        assert.strictEqual(configuredNavigation, false, 'Configured inheriting navigation while not expected');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      Configuration: 0,
+      Created: "2018-01-24T18:24:20",
+      Description: '',
+      Id: "08385b9a-8d5f-4ee9-ac98-bf6984c1856b",
+      Language: 1033,
+      LastItemModifiedDate: "2018-01-24T18:24:27Z",
+      LastItemUserModifiedDate: "2018-01-24T18:24:27Z",
+      ServerRelativeUrl: "/subsite",
+      Title: "subsite",
+      WebTemplate: "STS",
+      WebTemplateId: 0
+    }), 'Invalid web info');
+    assert.strictEqual(configuredNavigation, false, 'Configured inheriting navigation while not expected');
   });
 
-  it('creates web and does not set the inherit navigation (Noscript enabled)', (done) => {
+  it('creates web and does not set the inherit navigation (Noscript enabled)', async () => {
     let configuredNavigation: boolean = false;
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -171,7 +164,7 @@ describe(commands.WEB_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         title: "subsite",
         webUrl: "subsite",
@@ -179,31 +172,24 @@ describe(commands.WEB_ADD, () => {
         inheritNavigation: true,
         locale: 1033
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Configuration: 0,
-          Created: "2018-01-24T18:24:20",
-          Description: "subsite",
-          Id: "08385b9a-8d5f-4ee9-ac98-bf6984c1856b",
-          Language: 1033,
-          LastItemModifiedDate: "2018-01-24T18:24:27Z",
-          LastItemUserModifiedDate: "2018-01-24T18:24:27Z",
-          ServerRelativeUrl: "/subsite",
-          Title: "subsite",
-          WebTemplate: "STS",
-          WebTemplateId: 0
-        }), 'Incorrect web info');
-        assert.strictEqual(configuredNavigation, false, 'Configured inheriting navigation while not expected');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      Configuration: 0,
+      Created: "2018-01-24T18:24:20",
+      Description: "subsite",
+      Id: "08385b9a-8d5f-4ee9-ac98-bf6984c1856b",
+      Language: 1033,
+      LastItemModifiedDate: "2018-01-24T18:24:27Z",
+      LastItemUserModifiedDate: "2018-01-24T18:24:27Z",
+      ServerRelativeUrl: "/subsite",
+      Title: "subsite",
+      WebTemplate: "STS",
+      WebTemplateId: 0
+    }), 'Incorrect web info');
+    assert.strictEqual(configuredNavigation, false, 'Configured inheriting navigation while not expected');
   });
 
-  it('creates web and does not set the inherit navigation (Noscript enabled; debug)', (done) => {
+  it('creates web and does not set the inherit navigation (Noscript enabled; debug)', async () => {
     let configuredNavigation: boolean = false;
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -242,7 +228,7 @@ describe(commands.WEB_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         title: "subsite",
         webUrl: "subsite",
@@ -251,31 +237,24 @@ describe(commands.WEB_ADD, () => {
         locale: 1033,
         debug: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Configuration: 0,
-          Created: "2018-01-24T18:24:20",
-          Description: "subsite",
-          Id: "08385b9a-8d5f-4ee9-ac98-bf6984c1856b",
-          Language: 1033,
-          LastItemModifiedDate: "2018-01-24T18:24:27Z",
-          LastItemUserModifiedDate: "2018-01-24T18:24:27Z",
-          ServerRelativeUrl: "/subsite",
-          Title: "subsite",
-          WebTemplate: "STS",
-          WebTemplateId: 0
-        }), 'Incorrect web info');
-        assert.strictEqual(configuredNavigation, false, 'Configured inheriting navigation while not expected');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      Configuration: 0,
+      Created: "2018-01-24T18:24:20",
+      Description: "subsite",
+      Id: "08385b9a-8d5f-4ee9-ac98-bf6984c1856b",
+      Language: 1033,
+      LastItemModifiedDate: "2018-01-24T18:24:27Z",
+      LastItemUserModifiedDate: "2018-01-24T18:24:27Z",
+      ServerRelativeUrl: "/subsite",
+      Title: "subsite",
+      WebTemplate: "STS",
+      WebTemplateId: 0
+    }), 'Incorrect web info');
+    assert.strictEqual(configuredNavigation, false, 'Configured inheriting navigation while not expected');
   });
 
-  it('creates web and inherits the navigation (debug)', (done) => {
+  it('creates web and inherits the navigation (debug)', async () => {
     let configuredNavigation: boolean = false;
 
     // Create web
@@ -331,7 +310,7 @@ describe(commands.WEB_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         title: "subsite",
         webUrl: "subsite",
@@ -340,18 +319,11 @@ describe(commands.WEB_ADD, () => {
         locale: 1033,
         debug: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(configuredNavigation, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(configuredNavigation, true);
   });
 
-  it('creates web and inherits the navigation', (done) => {
+  it('creates web and inherits the navigation', async () => {
     let configuredNavigation: boolean = false;
 
     // Create web
@@ -407,7 +379,7 @@ describe(commands.WEB_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         title: "subsite",
         webUrl: "subsite",
@@ -415,18 +387,11 @@ describe(commands.WEB_ADD, () => {
         inheritNavigation: true,
         locale: 1033
       }
-    }, () => {
-      try {
-        assert.strictEqual(configuredNavigation, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(configuredNavigation, true);
   });
 
-  it('correctly handles the set inheritNavigation error', (done) => {
+  it('correctly handles the set inheritNavigation error', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       // Create web
       if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
@@ -472,27 +437,16 @@ describe(commands.WEB_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        title: "subsite",
-        webUrl: "subsite",
-        parentWebUrl: "https://contoso.sharepoint.com",
-        inheritNavigation: true,
-        local: 1033,
-        debug: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      title: "subsite",
+      webUrl: "subsite",
+      parentWebUrl: "https://contoso.sharepoint.com",
+      inheritNavigation: true,
+      local: 1033,
+      debug: true } } as any), new CommandError('An error has occurred.'));
   });
 
-  it('correctly handles the createweb call error', (done) => {
+  it('correctly handles the createweb call error', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
         return Promise.reject({
@@ -511,27 +465,16 @@ describe(commands.WEB_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        title: "subsite",
-        webUrl: "subsite",
-        parentWebUrl: "https://contoso.sharepoint.com/sites/test",
-        inheritNavigation: true,
-        local: 1033,
-        debug: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("The Web site address \"/sites/test/subsite\" is already in use.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      title: "subsite",
+      webUrl: "subsite",
+      parentWebUrl: "https://contoso.sharepoint.com/sites/test",
+      inheritNavigation: true,
+      local: 1033,
+      debug: true } } as any), new CommandError("The Web site address \"/sites/test/subsite\" is already in use."));
   });
 
-  it('creates web and handles the effectivebasepermission call error', (done) => {
+  it('creates web and handles the effectivebasepermission call error', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
         return Promise.resolve({
@@ -568,74 +511,42 @@ describe(commands.WEB_ADD, () => {
 
       return Promise.resolve('abc');
     });
-    command.action(logger, {
-      options: {
-        title: "subsite",
-        webUrl: "subsite",
-        parentWebUrl: "https://contoso.sharepoint.com",
-        inheritNavigation: true,
-        local: 1033,
-        debug: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await assert.rejects(command.action(logger, { options: {
+      title: "subsite",
+      webUrl: "subsite",
+      parentWebUrl: "https://contoso.sharepoint.com",
+      inheritNavigation: true,
+      local: 1033,
+      debug: true } } as any), new CommandError('An error has occurred.'));
   });
 
-  it('correctly handles the parentweb contextinfo call error', (done) => {
+  it('correctly handles the parentweb contextinfo call error', async () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => { return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } }); });
-
-    command.action(logger, {
-      options: {
-        title: "subsite",
-        webUrl: "subsite",
-        parentWebUrl: "https://contoso.sharepoint.com",
-        inheritNavigation: true,
-        local: 1033,
-        debug: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    
+    await assert.rejects(command.action(logger, { options: {
+      title: "subsite",
+      webUrl: "subsite",
+      parentWebUrl: "https://contoso.sharepoint.com",
+      inheritNavigation: true,
+      local: 1033,
+      debug: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it('correctly handles generic API error', (done) => {
+  it('correctly handles generic API error', async () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        title: "subsite",
-        webUrl: "subsite",
-        parentWebUrl: "https://contoso.sharepoint.com",
-        inheritNavigation: true,
-        local: 1033,
-        debug: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      title: "subsite",
+      webUrl: "subsite",
+      parentWebUrl: "https://contoso.sharepoint.com",
+      inheritNavigation: true,
+      local: 1033,
+      debug: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

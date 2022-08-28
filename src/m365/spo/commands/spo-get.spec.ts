@@ -59,28 +59,21 @@ describe(commands.GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('gets SPO URL when no URL was get previously', (done) => {
+  it('gets SPO URL when no URL was get previously', async () => {
     auth.service.spoUrl = undefined;
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          SpoUrl: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      SpoUrl: ''
+    }));
   });
 
-  it('gets SPO URL when other URL was get previously', (done) => {
+  it('gets SPO URL when other URL was get previously', async () => {
     auth.service.spoUrl = 'https://northwind.sharepoint.com';
 
     command.action(logger, {
@@ -88,32 +81,17 @@ describe(commands.GET, () => {
         output: 'json',
         debug: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          SpoUrl: 'https://northwind.sharepoint.com'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      SpoUrl: 'https://northwind.sharepoint.com'
+    }));
   });
 
-  it('throws error when trying to get SPO URL when not logged in to O365', (done) => {
+  it('throws error when trying to get SPO URL when not logged in to O365', async () => {
     auth.service.connected = false;
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Log in to Microsoft 365 first")));
-        assert.strictEqual(auth.service.spoUrl, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Log in to Microsoft 365 first'));
+    assert.strictEqual(auth.service.spoUrl, undefined);
   });
 
   it('Contains the correct options', () => {

@@ -83,7 +83,7 @@ class SpoUserGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving information for list in site at ${args.options.webUrl}...`);
     }
@@ -109,13 +109,13 @@ class SpoUserGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get(requestOptions)
-      .then((userInstance): void => {
-        logger.log(userInstance);
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const userInstance = await request.get(requestOptions);
+      logger.log(userInstance);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

@@ -1,8 +1,5 @@
 import auth from '../../../Auth';
 import { Logger } from '../../../cli';
-import {
-  CommandError
-} from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import { validation } from '../../../utils';
 import SpoCommand from '../../base/SpoCommand';
@@ -46,13 +43,15 @@ class SpoSetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     auth.service.spoUrl = args.options.url;
-    auth.storeConnectionInfo().then(() => {
-      cb();
-    }, err => {
-      cb(new CommandError(err));
-    });
+
+    try {
+      await auth.storeConnectionInfo();
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 
