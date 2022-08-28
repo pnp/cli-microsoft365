@@ -16,6 +16,7 @@
 - aligned commands' options with naming convention [#2696](https://github.com/pnp/cli-microsoft365/issues/2696)
 - removed the setting autoOpenBrowserOnLogin to follow new settings autoOpenLinksInBrowser [#3163](https://github.com/pnp/cli-microsoft365/issues/3163)
 - removed deprecated options for 'teams team remove', 'teams team archive', and 'teams team unarchive' command [#3502](https://github.com/pnp/cli-microsoft365/issues/3502)
+- updated classic references to spo site list [#3522](https://github.com/pnp/cli-microsoft365/issues/3522)
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
