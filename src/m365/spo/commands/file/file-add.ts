@@ -153,13 +153,13 @@ class SpoFileAddCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const folderPath: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.folder);
     const fullPath: string = path.resolve(args.options.path);
     const fileName: string = fsUtil.getSafeFileName(path.basename(fullPath));
 
     let isCheckedOut: boolean = false;
-    let listSettings: ListSettings;
+    let listSettings: ListSettings | undefined;
 
     if (this.debug) {
       logger.logToStderr(`folder path: ${folderPath}...`);
@@ -181,105 +181,92 @@ class SpoFileAddCommand extends SpoCommand {
       }
     };
 
-    request.get<void>(requestOptions).catch((): Promise<void> => {
-      // folder does not exist so will attempt to create the folder tree
-      return spo.ensureFolder(args.options.webUrl, folderPath, logger, this.debug);
-    })
-      .then((): Promise<void> => {
-        if (args.options.checkOut) {
-          return this.fileCheckOut(fileName, args.options.webUrl, folderPath)
-            .then(() => {
-              // flag the file is checkedOut by the command
-              // so in case of command failure we can try check it in
-              isCheckedOut = true;
+    try {
+      try {
+        await request.get<void>(requestOptions);
+      }
+      catch (err: any) {
+        // folder does not exist so will attempt to create the folder tree
+        await spo.ensureFolder(args.options.webUrl, folderPath, logger, this.debug);
+      }
 
-              return Promise.resolve();
-            })
-            .catch((err: any) => {
-              return Promise.reject(err);
-            });
-        }
+      if (args.options.checkOut) {
+        await this.fileCheckOut(fileName, args.options.webUrl, folderPath);
+        // flag the file is checkedOut by the command
+        // so in case of command failure we can try check it in
+        isCheckedOut = true;
+      }
 
-        return Promise.resolve();
-      })
-      .then((): Promise<void> => {
+      if (this.verbose) {
+        logger.logToStderr(`Upload file to site ${args.options.webUrl}...`);
+      }
+
+      const fileStats: fs.Stats = fs.statSync(fullPath);
+      const fileSize: number = fileStats.size;
+      if (this.debug) {
+        logger.logToStderr(`File size is ${fileSize} bytes`);
+      }
+
+      // only up to 250 MB are allowed in a single request
+      if (fileSize > this.fileChunkingThreshold) {
+        const fileChunkCount: number = Math.ceil(fileSize / this.fileChunkSize);
         if (this.verbose) {
-          logger.logToStderr(`Upload file to site ${args.options.webUrl}...`);
+          logger.logToStderr(`Uploading ${fileSize} bytes in ${fileChunkCount} chunks...`);
         }
 
-        const fileStats: fs.Stats = fs.statSync(fullPath);
-        const fileSize: number = fileStats.size;
-        if (this.debug) {
-          logger.logToStderr(`File size is ${fileSize} bytes`);
-        }
+        // initiate chunked upload session
+        const uploadId: string = v4();
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files/GetByPathOrAddStub(DecodedUrl='${encodeURIComponent(fileName)}')/StartUpload(uploadId=guid'${uploadId}')`,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          }
+        };
 
-        // only up to 250 MB are allowed in a single request
-        if (fileSize > this.fileChunkingThreshold) {
-          const fileChunkCount: number = Math.ceil(fileSize / this.fileChunkSize);
+        await request.post<void>(requestOptions);
+        // session started successfully, now upload our file chunks
+        const fileUploadInfo: FileUploadInfo = {
+          Name: fileName,
+          FilePath: fullPath,
+          WebUrl: args.options.webUrl,
+          FolderPath: folderPath,
+          Id: uploadId,
+          RetriesLeft: this.fileChunkRetryAttempts,
+          Position: 0,
+          Size: fileSize
+        };
+        
+        try {
+          await this.uploadFileChunks(fileUploadInfo, logger);
           if (this.verbose) {
-            logger.logToStderr(`Uploading ${fileSize} bytes in ${fileChunkCount} chunks...`);
+            logger.logToStderr(`Finished uploading ${fileUploadInfo.Position} bytes in ${fileChunkCount} chunks`);
+          }
+        }
+        catch (err: any) {
+          if (this.verbose) {
+            logger.logToStderr('Cancelling upload session due to error...');
           }
 
-          // initiate chunked upload session
-          const uploadId: string = v4();
           const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files/GetByPathOrAddStub(DecodedUrl='${encodeURIComponent(fileName)}')/StartUpload(uploadId=guid'${uploadId}')`,
+            url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/cancelupload(uploadId=guid'${uploadId}')`,
             headers: {
               'accept': 'application/json;odata=nometadata'
             }
           };
 
-          return request
-            .post<void>(requestOptions)
-            .then((): Promise<void> => {
-              // session started successfully, now upload our file chunks
-              const fileUploadInfo: FileUploadInfo = {
-                Name: fileName,
-                FilePath: fullPath,
-                WebUrl: args.options.webUrl,
-                FolderPath: folderPath,
-                Id: uploadId,
-                RetriesLeft: this.fileChunkRetryAttempts,
-                Position: 0,
-                Size: fileSize
-              };
-
-              return new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
-                this.uploadFileChunks(fileUploadInfo, logger, resolve, reject);
-              })
-                .then((): Promise<void> => {
-                  if (this.verbose) {
-                    logger.logToStderr(`Finished uploading ${fileUploadInfo.Position} bytes in ${fileChunkCount} chunks`);
-                  }
-                  return Promise.resolve();
-                })
-                .catch((err: any) => {
-                  if (this.verbose) {
-                    logger.logToStderr('Cancelling upload session due to error...');
-                  }
-
-                  const requestOptions: any = {
-                    url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/cancelupload(uploadId=guid'${uploadId}')`,
-                    headers: {
-                      'accept': 'application/json;odata=nometadata'
-                    }
-                  };
-
-                  return request
-                    .post<void>(requestOptions)
-                    .then((): Promise<void> => {
-                      return Promise.reject(err);  // original error
-                    })
-                    .catch((err_: any) => {
-                      if (this.debug) {
-                        logger.logToStderr(`Failed to cancel upload session: ${err_}`);
-                      }
-                      return Promise.reject(err);  // original error
-                    });
-                });
-            });
+          try {
+            await request.post<void>(requestOptions);
+            throw err;
+          }
+          catch (errRaw: any) {
+            if (this.debug) {
+              logger.logToStderr(`Failed to cancel upload session: ${errRaw}`);
+            }
+            throw errRaw; // original error
+          }
         }
-
+      }
+      else {
         // upload small file in a single request
         const fileBody: Buffer = fs.readFileSync(fullPath);
         const bodyLength: number = fileBody.byteLength;
@@ -294,115 +281,104 @@ class SpoFileAddCommand extends SpoCommand {
           maxBodyLength: this.fileChunkingThreshold
         };
 
-        return request.post(requestOptions);
-      })
-      .then((): Promise<void> => {
-        if (args.options.contentType || args.options.publish || args.options.approve) {
-          return this.getFileParentList(fileName, args.options.webUrl, folderPath, logger)
-            .then((listSettingsResp: ListSettings) => {
-              listSettings = listSettingsResp;
+        await request.post(requestOptions);
+      }
 
-              if (args.options.contentType) {
-                return this.listHasContentType(args.options.contentType, args.options.webUrl, listSettings, logger);
-              }
-
-              return Promise.resolve();
-            });
-        }
-
-        return Promise.resolve();
-      })
-      .then((): Promise<void> => {
-        // check if there are unknown options
-        // and map them as fields to update
-        const fieldsToUpdate: FieldValue[] = this.mapUnknownOptionsAsFieldValue(args.options);
+      if (args.options.contentType || args.options.publish || args.options.approve) {
+        listSettings = await this.getFileParentList(fileName, args.options.webUrl, folderPath, logger);
 
         if (args.options.contentType) {
-          fieldsToUpdate.push({
-            FieldName: 'ContentType',
-            FieldValue: args.options.contentType
-          });
+          await this.listHasContentType(args.options.contentType, args.options.webUrl, listSettings, logger);
+        }
+      }
+
+      // check if there are unknown options
+      // and map them as fields to update
+      const fieldsToUpdate: FieldValue[] = this.mapUnknownOptionsAsFieldValue(args.options);
+
+      if (args.options.contentType) {
+        fieldsToUpdate.push({
+          FieldName: 'ContentType',
+          FieldValue: args.options.contentType
+        });
+      }
+
+      if (fieldsToUpdate.length > 0) {
+        // perform list item update and checkin
+        await this.validateUpdateListItem(args.options.webUrl, folderPath, fileName, fieldsToUpdate, logger, args.options.checkInComment);
+      }
+      else if (isCheckedOut) {
+        // perform checkin
+        await this.fileCheckIn(args, fileName);
+      }
+
+      // approve and publish cannot be used together
+      // when approve is used it will automatically publish the file
+      // so then no need to publish afterwards
+      if (args.options.approve) {
+        if (this.verbose) {
+          logger.logToStderr(`Approve file ${fileName}`);
         }
 
-        if (fieldsToUpdate.length > 0) {
-          // perform list item update and checkin
-          return this.validateUpdateListItem(args.options.webUrl, folderPath, fileName, fieldsToUpdate, logger, args.options.checkInComment);
-        }
-        else if (isCheckedOut) {
-          // perform checkin
-          return this.fileCheckIn(args, fileName);
+        // approve the existing file with given comment
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/approve(comment='${encodeURIComponent(args.options.approveComment || '')}')`,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+
+        await request.post(requestOptions);
+      }
+      else if (args.options.publish) {
+        if (listSettings?.EnableModeration && listSettings.EnableMinorVersions) {
+          throw 'The file cannot be published without approval. Moderation for this list is enabled. Use the --approve option instead of --publish to approve and publish the file';
         }
 
-        return Promise.resolve();
-      })
-      .then((): Promise<void> => {
-        // approve and publish cannot be used together
-        // when approve is used it will automatically publish the file
-        // so then no need to publish afterwards
-        if (args.options.approve) {
+        if (this.verbose) {
+          logger.logToStderr(`Publish file ${fileName}`);
+        }
+
+        // publish the existing file with given comment
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/publish(comment='${encodeURIComponent(args.options.publishComment || '')}')`,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+
+        await request.post(requestOptions);
+      }
+    }
+    catch (err: any) {
+      if (isCheckedOut) {
+        // in a case the command has done checkout
+        // then have to rollback the checkout
+
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/UndoCheckOut()`
+        };
+
+        try {
+          await request.post(requestOptions);
+          this.handleRejectedODataJsonPromise(err);
+        }
+        catch (err: any) {
           if (this.verbose) {
-            logger.logToStderr(`Approve file ${fileName}`);
+            logger.logToStderr('Could not rollback file checkout');
+            logger.logToStderr(err);
+            logger.logToStderr('');
           }
 
-          // approve the existing file with given comment
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/approve(comment='${encodeURIComponent(args.options.approveComment || '')}')`,
-            headers: {
-              'accept': 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
-
-          return request.post(requestOptions);
+          this.handleRejectedODataJsonPromise(err);
         }
-        else if (args.options.publish) {
-          if (listSettings.EnableModeration && listSettings.EnableMinorVersions) {
-            return Promise.reject('The file cannot be published without approval. Moderation for this list is enabled. Use the --approve option instead of --publish to approve and publish the file');
-          }
-
-          if (this.verbose) {
-            logger.logToStderr(`Publish file ${fileName}`);
-          }
-
-          // publish the existing file with given comment
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/publish(comment='${encodeURIComponent(args.options.publishComment || '')}')`,
-            headers: {
-              'accept': 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
-
-          return request.post(requestOptions);
-        }
-
-        return Promise.resolve();
-      })
-      .then(_ => cb(), (err: any): void => {
-        if (isCheckedOut) {
-          // in a case the command has done checkout
-          // then have to rollback the checkout
-
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/UndoCheckOut()`
-          };
-
-          request.post(requestOptions)
-            .then(_ => this.handleRejectedODataJsonPromise(err, logger, cb))
-            .catch(checkoutError => {
-              if (this.verbose) {
-                logger.logToStderr('Could not rollback file checkout');
-                logger.logToStderr(checkoutError);
-                logger.logToStderr('');
-              }
-
-              this.handleRejectedODataJsonPromise(err, logger, cb);
-            });
-        }
-        else {
-          this.handleRejectedODataJsonPromise(err, logger, cb);
-        }
-      });
+      }
+      else {
+        this.handleRejectedODataJsonPromise(err);
+      }
+    }
   }
 
   private listHasContentType(contentType: string, webUrl: string, listSettings: ListSettings, logger: any): Promise<void> {
@@ -454,7 +430,7 @@ class SpoFileAddCommand extends SpoCommand {
       });
   }
 
-  private uploadFileChunks(info: FileUploadInfo, logger: any, resolve: () => void, reject: (err: any) => void): void {
+  private async uploadFileChunks(info: FileUploadInfo, logger: any): Promise<void> {
     let fd: number = 0;
     try {
       fd = fs.openSync(info.FilePath, 'r');
@@ -481,32 +457,28 @@ class SpoFileAddCommand extends SpoCommand {
         maxBodyLength: this.fileChunkingThreshold
       };
 
-      request
-        .post<void>(requestOptions)
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(`Uploaded ${info.Position} of ${info.Size} bytes (${Math.round(100 * info.Position / info.Size)}%)`);
-          }
+      try {
+        await request.post<void>(requestOptions);
+        if (this.verbose) {
+          logger.logToStderr(`Uploaded ${info.Position} of ${info.Size} bytes (${Math.round(100 * info.Position / info.Size)}%)`);
+        }
 
-          if (isLastChunk) {
-            resolve();
+        if (!isLastChunk) {
+          await this.uploadFileChunks(info, logger);
+        }
+      }
+      catch (err: any) {
+        if (--info.RetriesLeft > 0) {
+          if (this.verbose) {
+            logger.logToStderr(`Retrying to upload chunk due to error: ${err}`);
           }
-          else {
-            this.uploadFileChunks(info, logger, resolve, reject);
-          }
-        })
-        .catch((err: any) => {
-          if (--info.RetriesLeft > 0) {
-            if (this.verbose) {
-              logger.logToStderr(`Retrying to upload chunk due to error: ${err}`);
-            }
-            info.Position -= readCount;  // rewind
-            this.uploadFileChunks(info, logger, resolve, reject);
-          }
-          else {
-            reject(err);
-          }
-        });
+          info.Position -= readCount;  // rewind
+          await this.uploadFileChunks(info, logger);
+        }
+        else {
+          throw err;
+        }
+      }
     }
     catch (err) {
       if (fd) {
@@ -521,10 +493,10 @@ class SpoFileAddCommand extends SpoCommand {
         if (this.verbose) {
           logger.logToStderr(`Retrying to read chunk due to error: ${err}`);
         }
-        this.uploadFileChunks(info, logger, resolve, reject);
+        await this.uploadFileChunks(info, logger);
       }
       else {
-        reject(err);
+        throw err;
       }
     }
   }

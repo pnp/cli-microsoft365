@@ -119,28 +119,21 @@ describe(commands.FOLDER_MOVE, () => {
     assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['targetUrl']);
   });
 
-  it('should command complete successfully', (done) => {
+  it('should command complete successfully', async () => {
     stubAllPostRequests();
     stubAllGetRequests();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: 'abc/abc.pdf',
         targetUrl: 'abc'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.callCount === 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.callCount === 0);
   });
 
-  it('should show error when getCopyJobProgress rejects with JobError', (done) => {
+  it('should show error when getCopyJobProgress rejects with JobError', async () => {
     const getCopyJobProgress = new Promise<any>((resolve) => {
       const log = JSON.stringify({ Event: 'JobError', Message: 'error1' });
       return resolve({ Logs: [log] });
@@ -148,25 +141,17 @@ describe(commands.FOLDER_MOVE, () => {
     stubAllPostRequests(null, null, getCopyJobProgress);
     stubAllGetRequests();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: 'abc/abc.pdf',
         targetUrl: 'abc'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error1')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('error1'));
   });
 
-  it('should show error when getCopyJobProgress rejects with JobFatalError', (done) => {
+  it('should show error when getCopyJobProgress rejects with JobFatalError', async () => {
     const getCopyJobProgress = new Promise<any>((resolve) => {
       const log = JSON.stringify({ Event: 'JobFatalError', Message: 'error2' });
       return resolve({ JobState: 0, Logs: [log] });
@@ -174,25 +159,17 @@ describe(commands.FOLDER_MOVE, () => {
     stubAllPostRequests(null, null, getCopyJobProgress);
     stubAllGetRequests();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: 'abc/abc.pdf',
         targetUrl: 'abc'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error2')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('error2'));
   });
 
-  it('should complete successfully where baseUrl has a trailing /', (done) => {
+  it('should complete successfully where baseUrl has a trailing /', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       exportObjectUris: [
@@ -220,24 +197,17 @@ describe(commands.FOLDER_MOVE, () => {
 
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
         sourceUrl: 'library/folder1',
         targetUrl: 'sites/team-b/library2'
       }
-    }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(actual, expected);
   });
 
-  it('should complete successfully where sourceUrl and targetUrl has a trailing /', (done) => {
+  it('should complete successfully where sourceUrl and targetUrl has a trailing /', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       exportObjectUris: [
@@ -265,24 +235,17 @@ describe(commands.FOLDER_MOVE, () => {
 
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
         sourceUrl: 'library/folder1/',
         targetUrl: 'sites/team-b/library2/'
       }
-    }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(actual, expected);
   });
 
-  it('should complete successfully where sourceUrl and targetUrl has a beginning /', (done) => {
+  it('should complete successfully where sourceUrl and targetUrl has a beginning /', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       exportObjectUris: [
@@ -310,21 +273,14 @@ describe(commands.FOLDER_MOVE, () => {
 
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
         sourceUrl: '/library/folder1/',
         targetUrl: '/sites/team-b/library2/'
       }
-    }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(actual, expected);
   });
 
   it('supports debug mode', () => {

@@ -241,7 +241,7 @@ describe(commands.FILE_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('should call ensure folder when folder not found', (done) => {
+  it('should call ensure folder when folder not found', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Not Found." } } });
     const getFolderByServerRelativeUrlResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -249,7 +249,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses(getFolderByServerRelativeUrlResp);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -257,18 +257,11 @@ describe(commands.FILE_ADD, () => {
         debug: true,
         verbose: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(ensureFolderStub.called, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(ensureFolderStub.called, true);
   });
 
-  it('should proceed with no error if file does not exist in the folder', (done) => {
+  it('should proceed with no error if file does not exist in the folder', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File not found." } } });
     const fileNotFoundResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -276,25 +269,18 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses(null, fileNotFoundResp);
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: 'C:\Users\Velin\Desktop\MS365.jpg',
         checkOut: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.notCalled, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(loggerLogSpy.notCalled, true);
   });
 
-  it('should handle checkout error', (done) => {
+  it('should handle checkout error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Checkout Error." } } });
     const checkoutResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -302,7 +288,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(checkoutResp);
     stubGetResponses();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -310,19 +296,10 @@ describe(commands.FILE_ADD, () => {
         checkOut: true,
         debug: true
       }
-    }, (err: any) => {
-
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(expectedError));
   });
 
-  it('should handle file add error', (done) => {
+  it('should handle file add error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File add error." } } });
     const fileAddResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -330,7 +307,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, fileAddResp);
     stubGetResponses();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -338,19 +315,10 @@ describe(commands.FILE_ADD, () => {
         checkOut: true,
         debug: true
       }
-    }, (err: any) => {
-
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(expectedError));
   });
 
-  it('should handle get list response error', (done) => {
+  it('should handle get list response error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: List does not exist." } } });
     const listResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -358,7 +326,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses(null, null, listResp);
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -366,19 +334,10 @@ describe(commands.FILE_ADD, () => {
         contentType: 'abc',
         debug: true
       }
-    }, (err: any) => {
-
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(expectedError));
   });
 
-  it('should handle content type response error', (done) => {
+  it('should handle content type response error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: ContentType does not exist." } } });
     const contentTypeResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -386,7 +345,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses(null, null, null, contentTypeResp);
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -394,25 +353,16 @@ describe(commands.FILE_ADD, () => {
         contentType: 'abc',
         debug: true
       }
-    }, (err: any) => {
-
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(expectedError));
   });
 
-  it('should resolve server relative url specified for the folder option', (done) => {
+  it('should resolve server relative url specified for the folder option', async () => {
     stubPostResponses();
     stubGetResponses();
 
     const folderServerRelativePath: string = '/sites/project-x/Shared%20Documents/t1';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: folderServerRelativePath,
@@ -420,24 +370,17 @@ describe(commands.FILE_ADD, () => {
         contentType: 'abc',
         debug: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(loggerLogToStderrSpy.calledWith(`folder path: ${folderServerRelativePath}...`), true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(loggerLogToStderrSpy.calledWith(`folder path: ${folderServerRelativePath}...`), true);
   });
 
-  it('should resolve safe filename when path (bash) contains apostrophes in folders and filename', (done) => {
+  it('should resolve safe filename when path (bash) contains apostrophes in folders and filename', async () => {
     stubPostResponses();
     stubGetResponses();
 
     const unsafePath: string = '/Users/user/Projects/TEST\'FOLDER/TEST\'FILE.txt';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -445,22 +388,15 @@ describe(commands.FILE_ADD, () => {
         contentType: 'abc',
         debug: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(loggerLogToStderrSpy.calledWith(`file name: TEST''FILE.txt...`), true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(loggerLogToStderrSpy.calledWith(`file name: TEST''FILE.txt...`), true);
   });
 
-  it('should handle non existing content type', (done) => {
+  it('should handle non existing content type', async () => {
     stubPostResponses();
     stubGetResponses();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -468,19 +404,10 @@ describe(commands.FILE_ADD, () => {
         contentType: 'abc',
         debug: true
       }
-    }, (err: any) => {
-
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified content type \'abc\' doesn\'t exist on the target list')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('Specified content type \'abc\' doesn\'t exist on the target list'));
   });
 
-  it('should handle list item update response error', (done) => {
+  it('should handle list item update response error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Item update error." } } });
     const validateUpdateListItemResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -488,7 +415,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, null, validateUpdateListItemResp);
     stubGetResponses();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -496,19 +423,10 @@ describe(commands.FILE_ADD, () => {
         contentType: 'Picture',
         debug: true
       }
-    }, (err: any) => {
-
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(expectedError));
   });
 
-  it('should handle list item field value update response error', (done) => {
+  it('should handle list item field value update response error', async () => {
     const expectedResult: any = { "value": [{ "ErrorMessage": null, "FieldName": "Title", "FieldValue": "fsd", "HasException": false, "ItemId": 120 }, { "ErrorMessage": "check in comment x", "FieldName": "_CheckinComment", "FieldValue": "check in comment x", "HasException": true, "ItemId": 120 }] };
     const validateUpdateListItemResp: any = new Promise<any>((resolve) => {
       return resolve(expectedResult);
@@ -516,7 +434,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, null, validateUpdateListItemResp);
     stubGetResponses();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -524,19 +442,10 @@ describe(commands.FILE_ADD, () => {
         contentType: 'Picture',
         debug: true
       }
-    }, (err: any) => {
-      try {
-        const error: string = `Update field value error: ${JSON.stringify(expectedResult.value)}`;
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Update field value error: ${JSON.stringify(expectedResult.value)}`));
   });
 
-  it('should handle file checkin error', (done) => {
+  it('should handle file checkin error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Checkin error." } } });
     const checkinResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -544,7 +453,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, null, null, null, null, null, checkinResp);
     stubGetResponses();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -553,19 +462,10 @@ describe(commands.FILE_ADD, () => {
         checkInComment: 'abc',
         debug: true
       }
-    }, (err: any) => {
-
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(expectedError));
   });
 
-  it('should handle approve list item response error', (done) => {
+  it('should handle approve list item response error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Approve error." } } });
     const aproveResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -573,7 +473,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, null, null, aproveResp);
     stubGetResponses();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -582,18 +482,10 @@ describe(commands.FILE_ADD, () => {
         verbose: true,
         debug: true
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(expectedError));
   });
 
-  it('should handle publish list item response error', (done) => {
+  it('should handle publish list item response error', async () => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: Publish error." } } });
     const publishResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedError);
@@ -601,7 +493,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, null, null, null, publishResp);
     stubGetResponses();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -610,18 +502,10 @@ describe(commands.FILE_ADD, () => {
         verbose: true,
         debug: true
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(expectedError));
   });
 
-  it('should error when --publish used, but list moderation and minor ver enabled', (done) => {
+  it('should error when --publish used, but list moderation and minor ver enabled', async () => {
     const listSettingsResp: any = new Promise<any>((resolve) => {
       return resolve({ "EnableMinorVersions": true, "EnableModeration": true, "EnableVersioning": true, "Id": "0c7dc8ec-5871-4ac9-962c-f856102b917b" });
     });
@@ -629,29 +513,21 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses(null, null, listSettingsResp);
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: 'C:\Users\Velin\Desktop\MS365.jpg',
         publish: true
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The file cannot be published without approval. Moderation for this list is enabled. Use the --approve option instead of --publish to approve and publish the file')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('The file cannot be published without approval. Moderation for this list is enabled. Use the --approve option instead of --publish to approve and publish the file'));
   });
 
-  it('ignores global options when creating request data', (done) => {
+  it('ignores global options when creating request data', async () => {
     const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -663,29 +539,22 @@ describe(commands.FILE_ADD, () => {
         verbose: true,
         output: "text"
       }
-    }, () => {
-      try {
-        assert.deepEqual(postRequests.secondCall.args[0].data, {
-          bNewDocumentUpdate: true,
-          checkInComment: '',
-          formValues: [{ FieldName: 'Title', FieldValue: 'abc' }, { FieldName: 'ContentType', FieldValue: 'Picture' }]
-        });
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
+    });
+    assert.deepEqual(postRequests.secondCall.args[0].data, {
+      bNewDocumentUpdate: true,
+      checkInComment: '',
+      formValues: [{ FieldName: 'Title', FieldValue: 'abc' }, { FieldName: 'ContentType', FieldValue: 'Picture' }]
     });
   });
 
-  it('should perform single request upload for file up to 250 MB', (done) => {
+  it('should perform single request upload for file up to 250 MB', async () => {
     const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();
 
     sinonUtil.restore([fs.statSync]);
     sinon.stub(fs, 'statSync').returns({ size: 250 * 1024 * 1024 } as any); // 250 MB
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -693,25 +562,18 @@ describe(commands.FILE_ADD, () => {
         debug: true,
         verbose: true
       }
-    }, () => {
-      try {
-        assert.notStrictEqual(postRequests.lastCall.args[0].url.indexOf(`/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%2520Documents%2Ft1')/Files/Add`), -1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.notStrictEqual(postRequests.lastCall.args[0].url.indexOf(`/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%2520Documents%2Ft1')/Files/Add`), -1);
   });
 
-  it('should perform chunk upload on files over 250 MB (debug)', (done) => {
+  it('should perform chunk upload on files over 250 MB (debug)', async () => {
     const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();
 
     sinonUtil.restore([fs.statSync]);
     sinon.stub(fs, 'statSync').returns({ size: 251 * 1024 * 1024 } as any); // 250 MB
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -719,20 +581,13 @@ describe(commands.FILE_ADD, () => {
         debug: true,
         verbose: true
       }
-    }, () => {
-      try {
-        assert.notStrictEqual(postRequests.firstCall.args[0].url.indexOf('/StartUpload'), -1);
-        assert.notStrictEqual(postRequests.getCalls()[2].args[0].url.indexOf('/ContinueUpload'), -1);
-        assert.notStrictEqual(postRequests.lastCall.args[0].url.indexOf('/FinishUpload'), -1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.notStrictEqual(postRequests.firstCall.args[0].url.indexOf('/StartUpload'), -1);
+    assert.notStrictEqual(postRequests.getCalls()[2].args[0].url.indexOf('/ContinueUpload'), -1);
+    assert.notStrictEqual(postRequests.lastCall.args[0].url.indexOf('/FinishUpload'), -1);
   });
 
-  it('should cancel chunk upload on files over 250 MB on error', (done) => {
+  it('should cancel chunk upload on files over 250 MB on error', async () => {
     stubGetResponses();
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
@@ -758,7 +613,7 @@ describe(commands.FILE_ADD, () => {
     sinonUtil.restore([fs.statSync]);
     sinon.stub(fs, 'statSync').returns({ size: 251 * 1024 * 1024 } as any); // 250 MB
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -766,18 +621,10 @@ describe(commands.FILE_ADD, () => {
         debug: true,
         verbose: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, '123');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('123'));
   });
 
-  it('should handle fail to read file error', (done) => {
+  it('should handle fail to read file error', async () => {
     stubGetResponses();
     stubPostResponses();
 
@@ -785,7 +632,7 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(fs, 'statSync').returns({ size: 251 * 1024 * 1024 } as any); // 250 MB
     sinon.stub(fs, 'openSync').throws(new Error('openSync error'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -793,18 +640,10 @@ describe(commands.FILE_ADD, () => {
         debug: true,
         verbose: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, 'openSync error');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('openSync error'));
   });
 
-  it('should try closeSync on error', (done) => {
+  it('should try closeSync on error', async () => {
     stubGetResponses();
     stubPostResponses();
 
@@ -814,7 +653,7 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(fs, 'readSync').throws(new Error('readSync error'));
     sinon.stub(fs, 'closeSync').throws(new Error('failed to closeSync'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -822,22 +661,14 @@ describe(commands.FILE_ADD, () => {
         debug: true,
         verbose: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, 'readSync error');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('readSync error'));
   });
 
-  it('should succeed updating list item metadata', (done) => {
+  it('should succeed updating list item metadata', async () => {
     stubPostResponses();
     stubGetResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -846,18 +677,11 @@ describe(commands.FILE_ADD, () => {
         Title: 'abc',
         publish: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.notCalled, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(loggerLogSpy.notCalled, true);
   });
 
-  it('sets field with the same name as a command option but different casing', (done) => {
+  it('sets field with the same name as a command option but different casing', async () => {
     stubGetResponses();
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl(') > -1) {
@@ -891,7 +715,7 @@ describe(commands.FILE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -901,62 +725,40 @@ describe(commands.FILE_ADD, () => {
         Folder: 'Folder',
         publish: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(new Error(err.message));
-      }
-    });
+    } as any);
   });
 
-  it('should succeed approve', (done) => {
+  it('should succeed approve', async () => {
     stubPostResponses();
     stubGetResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: 'C:\Users\Velin\Desktop\MS365.jpg',
         approve: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.notCalled, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(loggerLogSpy.notCalled, true);
   });
 
-  it('should succeed when with checkout option', (done) => {
+  it('should succeed when with checkout option', async () => {
     stubPostResponses();
     stubGetResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: 'C:\Users\Velin\Desktop\MS365.jpg',
         checkOut: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.notCalled, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(loggerLogSpy.notCalled, true);
   });
 
-  it('should error if cannot rollback checkout (verbose)', (done) => {
+  it('should error if cannot rollback checkout (verbose)', async () => {
     const expectedFileAddError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File add error." } } });
     const fileAddResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedFileAddError);
@@ -970,7 +772,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, fileAddResp, null, null, null, rollbackCheckoutResp);
     stubGetResponses();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -979,18 +781,10 @@ describe(commands.FILE_ADD, () => {
         debug: true,
         verbose: true
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedFileAddError)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(expectedFileAddError));
   });
 
-  it('should error if cannot rollback checkout', (done) => {
+  it('should error if cannot rollback checkout', async () => {
     const expectedFileAddError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File add error." } } });
     const fileAddResp: any = new Promise<any>((resolve, reject) => {
       return reject(expectedFileAddError);
@@ -1004,22 +798,14 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, fileAddResp, null, null, null, rollbackCheckoutResp);
     stubGetResponses();
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: 'C:\Users\Velin\Desktop\MS365.jpg',
         checkOut: true
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedFileAddError)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(expectedFileAddError));
   });
 
   it('fails validation if the webUrl option not valid url', async () => {

@@ -37,9 +37,9 @@ describe(commands.FILE_REMOVE, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
   });
 
@@ -70,59 +70,38 @@ describe(commands.FILE_REMOVE, () => {
     assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['url']);
   });
 
-  it('prompts before removing file when confirmation argument not passed (id)', (done) => {
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } }, () => {
-      let promptIssued = false;
+  it('prompts before removing file when confirmation argument not passed (id)', async () => {
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('prompts before removing file when confirmation argument not passed (title)', (done) => {
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } }, () => {
-      let promptIssued = false;
+  it('prompts before removing file when confirmation argument not passed (title)', async () => {
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('aborts removing file when prompt not confirmed', (done) => {
+  it('aborts removing file when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } }, () => {
-      try {
-        assert(requests.length === 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    assert(requests.length === 0);
   });
 
-  it('removes the file when prompt confirmed (id)', (done) => {
+  it('removes the file when prompt confirmed (id)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -138,29 +117,22 @@ describe(commands.FILE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/GetFileById(guid'`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web/GetFileById(guid'`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes the file when webUrl does not includes a trailing /', (done) => {
+  it('removes the file when webUrl does not includes a trailing /', async () => {
     const siteUrl: string = 'https://contoso.sharepoint.com';
     const fileUrl: string = 'SharedDocuments/Document.docx';
 
@@ -179,29 +151,22 @@ describe(commands.FILE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/' + fileUrl)}')`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/' + fileUrl)}')`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes the file when webUrl includes a trailing /', (done) => {
+  it('removes the file when webUrl includes a trailing /', async () => {
     const siteUrl: string = 'https://contoso.sharepoint.com/';
     const fileUrl: string = 'SharedDocuments/Document.docx';
 
@@ -220,32 +185,22 @@ describe(commands.FILE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/' + fileUrl)}')`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/' + fileUrl)}')`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes the file when webUrl does not includes a trailing / and fileUrl is server relative', (done) => {
+  it('removes the file when webUrl does not includes a trailing / and fileUrl is server relative', async () => {
     const siteUrl: string = 'https://contoso.sharepoint.com';
     const fileUrl: string = '/SharedDocuments/Document.docx';
 
@@ -264,29 +219,22 @@ describe(commands.FILE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes the file when webUrl includes a trailing / and fileUrl is server relative', (done) => {
+  it('removes the file when webUrl includes a trailing / and fileUrl is server relative', async () => {
     const siteUrl: string = 'https://contoso.sharepoint.com/';
     const fileUrl: string = '/SharedDocuments/Document.docx';
 
@@ -305,29 +253,22 @@ describe(commands.FILE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes the file when webUrl (subsite) does not includes a trailing / ', (done) => {
+  it('removes the file when webUrl (subsite) does not includes a trailing / ', async () => {
     const siteUrl: string = 'https://contoso.sharepoint.com/sites/subsite';
     const fileUrl: string = 'SharedDocuments/Document.docx';
 
@@ -346,32 +287,22 @@ describe(commands.FILE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes the file when webUrl (subsite) includes a trailing /', (done) => {
+  it('removes the file when webUrl (subsite) includes a trailing /', async () => {
     const siteUrl: string = 'https://contoso.sharepoint.com/sites/subsite/';
     const fileUrl: string = 'SharedDocuments/Document.docx';
 
@@ -390,29 +321,22 @@ describe(commands.FILE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes the file when webUrl (subsite) does not includes a trailing / and fileUrl is server relative', (done) => {
+  it('removes the file when webUrl (subsite) does not includes a trailing / and fileUrl is server relative', async () => {
     const siteUrl: string = 'https://contoso.sharepoint.com/sites/subsite';
     const fileUrl: string = '/sites/subsite/SharedDocuments/Document.docx';
 
@@ -431,29 +355,22 @@ describe(commands.FILE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes the file when webUrl (subsite) includes a trailing / and fileUrl is server relative', (done) => {
+  it('removes the file when webUrl (subsite) includes a trailing / and fileUrl is server relative', async () => {
     const siteUrl: string = 'https://contoso.sharepoint.com/sites/subsite/';
     const fileUrl: string = '/sites/subsite/SharedDocuments/Document.docx';
 
@@ -472,29 +389,22 @@ describe(commands.FILE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes the file when webUrl (subsite) does not includes a trailing / and fileUrl is site relative', (done) => {
+  it('removes the file when webUrl (subsite) does not includes a trailing / and fileUrl is site relative', async () => {
     const siteUrl: string = 'https://contoso.sharepoint.com/sites/subsite';
     const fileUrl: string = 'SharedDocuments/Document.docx';
 
@@ -513,29 +423,22 @@ describe(commands.FILE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes the file when webUrl (subsite) includes a trailing / and fileUrl is site relative', (done) => {
+  it('removes the file when webUrl (subsite) includes a trailing / and fileUrl is site relative', async () => {
     const siteUrl: string = 'https://contoso.sharepoint.com/sites/subsite/';
     const fileUrl: string = 'SharedDocuments/Document.docx';
 
@@ -554,29 +457,22 @@ describe(commands.FILE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: siteUrl, url: fileUrl } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`GetFileByServerRelativeUrl('${encodeURIComponent('/sites/subsite/' + fileUrl)}')`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('recycles the file when prompt confirmed (id)', (done) => {
+  it('recycles the file when prompt confirmed (id)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -592,29 +488,22 @@ describe(commands.FILE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf', recycle: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/recycle()`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf', recycle: true } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/recycle()`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes the file when prompt confirmed (url)', (done) => {
+  it('removes the file when prompt confirmed (url)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -630,29 +519,22 @@ describe(commands.FILE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf' } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/GetFileByServerRelativeUrl('`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf' } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web/GetFileByServerRelativeUrl('`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('recycles the file when prompt confirmed (url)', (done) => {
+  it('recycles the file when prompt confirmed (url)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -668,29 +550,22 @@ describe(commands.FILE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf', recycle: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/recycle()`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', url: '0cd891ef-afce-4e55-b836-fce03286cccf', recycle: true } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/recycle()`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('command correctly handles file remove reject request', (done) => {
+  it('command correctly handles file remove reject request', async () => {
     const err = 'Invalid request';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
@@ -702,25 +577,17 @@ describe(commands.FILE_REMOVE, () => {
 
     const actionId: string = '0cd891ef-afce-4e55-b836-fce03286cccf';
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
-  it('uses correct API url when id option is passed', (done) => {
+  it('uses correct API url when id option is passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById(guid') > -1) {
         return Promise.resolve('Correct Url');
@@ -731,26 +598,17 @@ describe(commands.FILE_REMOVE, () => {
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
       }
-    }, () => {
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
-
   });
 
-  it('uses correct API url when url option is passed', (done) => {
+  it('uses correct API url when url option is passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativeUrl(') > -1) {
         return Promise.resolve('Correct Url');
@@ -761,26 +619,17 @@ describe(commands.FILE_REMOVE, () => {
 
     const actionUrl: string = 'SharedDocuments/Test.docx';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         url: actionUrl,
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
       }
-    }, () => {
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
-
   });
 
-  it('uses correct API url when recycle option is passed', (done) => {
+  it('uses correct API url when recycle option is passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/recycle()') > -1) {
         return Promise.resolve('Correct Url');
@@ -791,21 +640,13 @@ describe(commands.FILE_REMOVE, () => {
 
     const actionId: string = '0cd891ef-afce-4e55-b836-fce03286cccf';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: actionId,
         recycle: true,
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
-      }
-    }, () => {
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
       }
     });
   });

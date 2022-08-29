@@ -79,7 +79,7 @@ class SpoGroupUserListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving the list of members from the SharePoint group :  ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
     }
@@ -96,12 +96,13 @@ class SpoGroupUserListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get(requestOptions)
-      .then((response: any): void => {
-        logger.log(response);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const response = await request.get<any>(requestOptions);
+      logger.log(response);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

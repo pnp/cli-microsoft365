@@ -65,7 +65,7 @@ describe(commands.GROUP_GET, () => {
     assert.deepStrictEqual(optionSets, [['id', 'name', 'associatedGroup']]);
   });
 
-  it('retrieves group by id with output option json', (done) => {
+  it('retrieves group by id with output option json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetById') > -1) {
         return Promise.resolve(
@@ -90,40 +90,33 @@ describe(commands.GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         id: 7
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          value: [{
-            Id: 7,
-            IsHiddenInUI: false,
-            LoginName: "Team Site Members",
-            Title: "Team Site Members",
-            PrincipalType: 8,
-            AllowMembersEditMembership: false,
-            AllowRequestToJoinLeave: false,
-            AutoAcceptRequestToJoinLeave: false,
-            Description: null,
-            OnlyAllowMembersViewMembership: false,
-            OwnerTitle: "Team Site Members",
-            RequestToJoinLeaveEmailSetting: ""
-          }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      value: [{
+        Id: 7,
+        IsHiddenInUI: false,
+        LoginName: "Team Site Members",
+        Title: "Team Site Members",
+        PrincipalType: 8,
+        AllowMembersEditMembership: false,
+        AllowRequestToJoinLeave: false,
+        AutoAcceptRequestToJoinLeave: false,
+        Description: null,
+        OnlyAllowMembersViewMembership: false,
+        OwnerTitle: "Team Site Members",
+        RequestToJoinLeaveEmailSetting: ""
+      }]
+    }));
   });
 
-  it('retrieves group by name with output option json', (done) => {
+  it('retrieves group by name with output option json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups/GetByName') > -1) {
         return Promise.resolve(
@@ -148,40 +141,33 @@ describe(commands.GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         name: "Team Site Members"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          value: [{
-            Id: 7,
-            IsHiddenInUI: false,
-            LoginName: "Team Site Members",
-            Title: "Team Site Members",
-            PrincipalType: 8,
-            AllowMembersEditMembership: false,
-            AllowRequestToJoinLeave: false,
-            AutoAcceptRequestToJoinLeave: false,
-            Description: null,
-            OnlyAllowMembersViewMembership: false,
-            OwnerTitle: "Team Site Members",
-            RequestToJoinLeaveEmailSetting: ""
-          }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      value: [{
+        Id: 7,
+        IsHiddenInUI: false,
+        LoginName: "Team Site Members",
+        Title: "Team Site Members",
+        PrincipalType: 8,
+        AllowMembersEditMembership: false,
+        AllowRequestToJoinLeave: false,
+        AutoAcceptRequestToJoinLeave: false,
+        Description: null,
+        OnlyAllowMembersViewMembership: false,
+        OwnerTitle: "Team Site Members",
+        RequestToJoinLeaveEmailSetting: ""
+      }]
+    }));
   });
 
-  it('correctly retrieves the associated owner group', (done) => {
+  it('correctly retrieves the associated owner group', async () => {
     const ownerGroupResponse = {
       Id: 3,
       IsHiddenInUI: false,
@@ -198,22 +184,15 @@ describe(commands.GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         associatedGroup: 'Owner'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(ownerGroupResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(ownerGroupResponse));
   });
 
-  it('correctly retrieves the associated member group', (done) => {
+  it('correctly retrieves the associated member group', async () => {
     const memberGroupResponse = {
       Id: 3,
       IsHiddenInUI: false,
@@ -230,22 +209,15 @@ describe(commands.GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         associatedGroup: 'Member'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(memberGroupResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(memberGroupResponse));
   });
 
-  it('correctly retrieves the associated visitor group', (done) => {
+  it('correctly retrieves the associated visitor group', async () => {
     const visitorGroupResponse = {
       Id: 3,
       IsHiddenInUI: false,
@@ -262,19 +234,12 @@ describe(commands.GROUP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         associatedGroup: 'Visitor'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(visitorGroupResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(visitorGroupResponse));
   });
 
   it('supports specifying URL', () => {

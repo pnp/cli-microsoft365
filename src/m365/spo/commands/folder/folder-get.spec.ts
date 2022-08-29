@@ -76,106 +76,69 @@ describe(commands.FOLDER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('should correctly handle folder get reject request', (done) => {
+  it('should correctly handle folder get reject request', async () => {
     stubGetResponses(new Promise((resolve, reject) => { reject('error1'); }));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error1')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('error1'));
   });
 
-  it('should show tip when folder get rejects with error code 500', (done) => {
+  it('should show tip when folder get rejects with error code 500', async () => {
     sinon.stub(request, 'get').rejects({ statusCode: 500 });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Please check the folder URL. Folder might not exist on the specified URL')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('Please check the folder URL. Folder might not exist on the specified URL'));
   });
 
-  it('should correctly handle folder get success request', (done) => {
+  it('should correctly handle folder get success request', async () => {
     stubGetResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.lastCall.calledWith({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/test1", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.lastCall.calledWith({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/test1", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" }));
   });
 
-  it('should pass the correct url params to request', (done) => {
+  it('should pass the correct url params to request', async () => {
     const request = stubGetResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com',
         folderUrl: '/Shared Documents'
       }
-    }, () => {
-      try {
-        const lastCall: any = request.lastCall.args[0];
-        assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents\')');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const lastCall: any = request.lastCall.args[0];
+    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents\')');
   });
 
-  it('should pass the correct url params to request (sites/test1)', (done) => {
+  it('should pass the correct url params to request (sites/test1)', async () => {
     const request = stubGetResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com/sites/test1',
         folderUrl: 'Shared Documents/'
       }
-    }, () => {
-      try {
-        const lastCall: any = request.lastCall.args[0];
-        assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/sites/test1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2Ftest1%2FShared%20Documents\')');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const lastCall: any = request.lastCall.args[0];
+    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/sites/test1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2Ftest1%2FShared%20Documents\')');
   });
 
   it('supports debug mode', () => {

@@ -65,8 +65,8 @@ class SpoFolderRemoveCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeFolder: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeFolder: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         logger.logToStderr(`Removing folder in site at ${args.options.webUrl}...`);
       }
@@ -87,28 +87,28 @@ class SpoFolderRemoveCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      request
-        .post(requestOptions)
-        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      try {
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeFolder();
+      await removeFolder();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to ${args.options.recycle ? "recycle" : "remove"} the folder ${args.options.folderUrl} located in site ${args.options.webUrl}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeFolder();
-        }
       });
+
+      if (result.continue) {
+        await removeFolder();
+      }
     }
   }
 }

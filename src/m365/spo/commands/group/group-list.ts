@@ -48,7 +48,7 @@ class SpoGroupListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving list of groups for specified web at ${args.options.webUrl}...`);
     }
@@ -63,12 +63,13 @@ class SpoGroupListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<GroupPropertiesCollection>(requestOptions)
-      .then((groupProperties: GroupPropertiesCollection): void => {
-        logger.log(groupProperties.value);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const groupProperties = await request.get<GroupPropertiesCollection>(requestOptions);
+      logger.log(groupProperties.value);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

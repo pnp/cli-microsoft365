@@ -52,7 +52,7 @@ class SpoFolderListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving folders from site ${args.options.webUrl} parent folder ${args.options.parentFolderUrl}...`);
     }
@@ -67,12 +67,13 @@ class SpoFolderListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ value: FolderProperties[] }>(requestOptions)
-      .then((resp: { value: FolderProperties[] }): void => {
-        logger.log(resp.value);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const resp = await request.get<{ value: FolderProperties[] }>(requestOptions);
+      logger.log(resp.value);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

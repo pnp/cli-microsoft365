@@ -71,7 +71,7 @@ class SpoFolderCopyCommand extends SpoCommand {
     return ['targetUrl'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const webUrl: string = args.options.webUrl;
     const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
     const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
@@ -95,31 +95,28 @@ class SpoFolderCopyCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .post(requestOptions)
-      .then((jobInfo: any): Promise<void> => {
-        return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-          this.dots = '';
+    try {
+      const jobInfo = await request.post<any>(requestOptions);
+      this.dots = '';
 
-          const copyJobInfo: any = jobInfo.value[0];
-          const progressPollInterval: number = 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
+      const copyJobInfo: any = jobInfo.value[0];
+      const progressPollInterval: number = 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
 
-          setTimeout(() => {
-            spo.waitUntilCopyJobFinished({
-              copyJobInfo,
-              siteUrl: webUrl,
-              pollingInterval: progressPollInterval,
-              resolve,
-              reject,
-              logger,
-              dots: this.dots,
-              debug: this.debug,
-              verbose: this.verbose
-            });
-          }, progressPollInterval);
+      setTimeout(async () => {
+        await spo.waitUntilCopyJobFinished({
+          copyJobInfo,
+          siteUrl: webUrl,
+          pollingInterval: progressPollInterval,
+          logger,
+          dots: this.dots,
+          debug: this.debug,
+          verbose: this.verbose
         });
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }, progressPollInterval);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

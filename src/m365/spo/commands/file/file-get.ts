@@ -129,7 +129,7 @@ class SpoFileGetCommand extends SpoCommand {
     return ['url'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving file from site ${args.options.webUrl}...`);
     }
@@ -172,46 +172,37 @@ class SpoFileGetCommand extends SpoCommand {
       responseType: args.options.asFile ? 'stream' : 'json'
     };
 
-    if (args.options.asFile && args.options.path) {
-      request
-        .get<any>(requestOptions)
-        .then((file: any): Promise<string> => {
-          return new Promise((resolve, reject) => {
-            const writer = fs.createWriteStream(args.options.path as string);
+    try {
+      if (args.options.asFile && args.options.path) {
+        const file = await request.get<any>(requestOptions);
+        const writer = fs.createWriteStream(args.options.path as string);
 
-            file.data.pipe(writer);
+        file.data.pipe(writer);
 
-            writer.on('error', err => {
-              reject(err);
-            });
-            writer.on('close', () => {
-              resolve(args.options.path as string);
-            });
-          });
-        })
-        .then((file: string): void => {
+        writer.on('error', err => {
+          throw err;
+        });
+        writer.on('close', () => {
+          const file = args.options.path as string;
           if (this.verbose) {
             logger.logToStderr(`File saved to path ${file}`);
           }
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        });
+      }
+      else {
+        const file = await request.get<string>(requestOptions);
+        if (args.options.asString) {
+          logger.log(file.toString());
+        }
+        else {
+          const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
+          logger.log(args.options.asListItem ? fileProperties.ListItemAllFields : fileProperties);
+        }
+      }
     }
-    else {
-      request
-        .get<string>(requestOptions)
-        .then((file: string): void => {
-          if (args.options.asString) {
-            logger.log(file.toString());
-          }
-          else {
-            const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
-            logger.log(args.options.asListItem ? fileProperties.ListItemAllFields : fileProperties);
-          }
-
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
-
   }
 }
 
