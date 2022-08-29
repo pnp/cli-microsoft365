@@ -99,8 +99,8 @@ describe(commands.STORAGEENTITY_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves the details of an existing tenant property', (done) => {
-    command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+  it('retrieves the details of an existing tenant property', async () => {
+    await command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           Key: 'existingproperty',
@@ -116,8 +116,8 @@ describe(commands.STORAGEENTITY_GET, () => {
     });
   });
 
-  it('retrieves the details of an existing tenant property without a description', (done) => {
-    command.action(logger, { options: { debug: true, key: 'propertywithoutdescription', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+  it('retrieves the details of an existing tenant property without a description', async () => {
+    await command.action(logger, { options: { debug: true, key: 'propertywithoutdescription', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           Key: 'propertywithoutdescription',
@@ -133,8 +133,8 @@ describe(commands.STORAGEENTITY_GET, () => {
     });
   });
 
-  it('retrieves the details of an existing tenant property without a comment', (done) => {
-    command.action(logger, { options: { debug: false, key: 'propertywithoutcomments', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+  it('retrieves the details of an existing tenant property without a comment', async () => {
+    await command.action(logger, { options: { debug: false, key: 'propertywithoutcomments', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           Key: 'propertywithoutcomments',
@@ -150,8 +150,8 @@ describe(commands.STORAGEENTITY_GET, () => {
     });
   });
 
-  it('handles a non-existent tenant property', (done) => {
-    command.action(logger, { options: { debug: false, key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+  it('handles a non-existent tenant property', async () => {
+    await command.action(logger, { options: { debug: false, key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert.strictEqual(log.length, 0);
         done();
@@ -162,8 +162,8 @@ describe(commands.STORAGEENTITY_GET, () => {
     });
   });
 
-  it('handles a non-existent tenant property (debug)', (done) => {
-    command.action(logger, { options: { debug: true, key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+  it('handles a non-existent tenant property (debug)', async () => {
+    await command.action(logger, { options: { debug: true, key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       let correctValue: boolean = false;
       log.forEach(l => {
         if (l &&
@@ -182,8 +182,8 @@ describe(commands.STORAGEENTITY_GET, () => {
     });
   });
 
-  it('escapes special characters in property name', (done) => {
-    command.action(logger, { options: { debug: true, key: '#myprop', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+  it('escapes special characters in property name', async () => {
+    await command.action(logger, { options: { debug: true, key: '#myprop', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           Key: '#myprop',
@@ -221,11 +221,11 @@ describe(commands.STORAGEENTITY_GET, () => {
     assert(requiresTenantPropertyName);
   });
 
-  it('handles promise rejection', (done) => {
+  it('handles promise rejection', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('error'));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: { options: { debug: true, key: '#myprop' }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }
     } as any, (err?: any) => {
       try {

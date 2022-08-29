@@ -69,7 +69,7 @@ describe(commands.SITESCRIPT_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('updates title of an existing site script', (done) => {
+  it('updates title of an existing site script', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteScript`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -90,7 +90,7 @@ describe(commands.SITESCRIPT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Content": JSON.stringify({}),
@@ -107,7 +107,7 @@ describe(commands.SITESCRIPT_SET, () => {
     });
   });
 
-  it('updates title of an existing site script (debug)', (done) => {
+  it('updates title of an existing site script (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteScript`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -128,7 +128,7 @@ describe(commands.SITESCRIPT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso' } }, () => {
+    await command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Content": JSON.stringify({}),
@@ -145,7 +145,7 @@ describe(commands.SITESCRIPT_SET, () => {
     });
   });
 
-  it('updates description of an existing site script', (done) => {
+  it('updates description of an existing site script', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteScript`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -166,7 +166,7 @@ describe(commands.SITESCRIPT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', description: 'My contoso script' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', description: 'My contoso script' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Content": JSON.stringify({}),
@@ -183,7 +183,7 @@ describe(commands.SITESCRIPT_SET, () => {
     });
   });
 
-  it('updates version of an existing site script', (done) => {
+  it('updates version of an existing site script', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteScript`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -204,7 +204,7 @@ describe(commands.SITESCRIPT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', version: '1' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', version: '1' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Content": JSON.stringify({}),
@@ -221,7 +221,7 @@ describe(commands.SITESCRIPT_SET, () => {
     });
   });
 
-  it('updates content of an existing site script', (done) => {
+  it('updates content of an existing site script', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteScript`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -242,7 +242,7 @@ describe(commands.SITESCRIPT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', content: JSON.stringify({}) } }, () => {
+    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', content: JSON.stringify({}) } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Content": JSON.stringify({}),
@@ -259,7 +259,7 @@ describe(commands.SITESCRIPT_SET, () => {
     });
   });
 
-  it('updates all properties of an existing site script', (done) => {
+  it('updates all properties of an existing site script', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteScript`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -283,7 +283,7 @@ describe(commands.SITESCRIPT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso', description: 'My contoso script', version: '1', content: JSON.stringify({}) } }, () => {
+    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso', description: 'My contoso script', version: '1', content: JSON.stringify({}) } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Content": JSON.stringify({}),
@@ -300,12 +300,12 @@ describe(commands.SITESCRIPT_SET, () => {
     });
   });
 
-  it('correctly handles OData error when creating site script', (done) => {
+  it('correctly handles OData error when creating site script', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false, id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24', title: 'Contoso' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, id: '449c0c6d-5380-4df2-b84b-622e0ac8ec24', title: 'Contoso' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();

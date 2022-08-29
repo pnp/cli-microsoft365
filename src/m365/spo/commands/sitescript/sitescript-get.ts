@@ -49,7 +49,7 @@ class SpoSiteScriptGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let spoUrl: string = '';
 
     spo

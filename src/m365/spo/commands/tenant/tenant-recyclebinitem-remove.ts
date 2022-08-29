@@ -66,83 +66,70 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    const removeDeletedSite = () => {
-      spo
-        .getSpoAdminUrl(logger, this.debug)
-        .then((adminUrl: string): Promise<FormDigestInfo> => {
-          this.spoAdminUrl = adminUrl;
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeDeletedSite = async () => {
+      try {
+        const adminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
+        const res: FormDigestInfo = await spo.ensureFormDigest(adminUrl, logger, this.context, this.debug);
+        if (this.verbose) {
+          logger.logToStderr(`Removing deleted site collection ${args.options.url}...`);
+        }
 
-          return spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
-        })
-        .then((res: FormDigestInfo): Promise<string> => {
-          this.context = res;
+        const requestOptions: any = {
+          url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'X-RequestDigest': res.FormDigestValue
+          },
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="16" ObjectPathId="15" /><Query Id="17" ObjectPathId="15"><Query SelectAllProperties="false"><Properties><Property Name="PollingInterval" ScalarProperty="true" /><Property Name="IsComplete" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="15" ParentId="1" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.url)}</Parameter></Parameters></Method><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+        };
 
-          if (this.verbose) {
-            logger.logToStderr(`Removing deleted site collection ${args.options.url}...`);
+        const res2: string = await request.post(requestOptions);
+        const json: ClientSvcResponse = JSON.parse(res2);
+        const response: ClientSvcResponseContents = json[0];
+        if (response.ErrorInfo) {
+          throw response.ErrorInfo.ErrorMessage;
+        }
+        else {
+          const operation: SpoOperation = json[json.length - 1];
+          const isComplete: boolean = operation.IsComplete;
+          if (!args.options.wait || isComplete) {
+            return;
           }
 
-          const requestOptions: any = {
-            url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': this.context.FormDigestValue
-            },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="16" ObjectPathId="15" /><Query Id="17" ObjectPathId="15"><Query SelectAllProperties="false"><Properties><Property Name="PollingInterval" ScalarProperty="true" /><Property Name="IsComplete" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="15" ParentId="1" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.url)}</Parameter></Parameters></Method><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
-          };
-
-          return request.post(requestOptions);
-        })
-        .then((res: string): Promise<void> => {
-          return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-            const json: ClientSvcResponse = JSON.parse(res);
-            const response: ClientSvcResponseContents = json[0];
-            if (response.ErrorInfo) {
-              reject(response.ErrorInfo.ErrorMessage);
-            }
-            else {
-              const operation: SpoOperation = json[json.length - 1];
-              const isComplete: boolean = operation.IsComplete;
-              if (!args.options.wait || isComplete) {
-                resolve();
-                return;
-              }
-
-              setTimeout(() => {
-                spo.waitUntilFinished({
-                  operationId: JSON.stringify(operation._ObjectIdentity_),
-                  siteUrl: this.spoAdminUrl as string,
-                  resolve,
-                  reject,
-                  logger,
-                  currentContext: this.context as FormDigestInfo,
-                  dots: this.dots,
-                  debug: this.debug,
-                  verbose: this.verbose
-                });
-              }, operation.PollingInterval);
-            }
-          });
-        })
-        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+          setTimeout(() => {
+            spo.waitUntilFinished({
+              operationId: JSON.stringify(operation._ObjectIdentity_),
+              siteUrl: this.spoAdminUrl as string,
+              resolve: () => null,
+              reject: (error) => { throw error; },
+              logger,
+              currentContext: this.context as FormDigestInfo,
+              dots: this.dots,
+              debug: this.debug,
+              verbose: this.verbose
+            });
+          }, operation.PollingInterval);
+        } 
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeDeletedSite();
+      await removeDeletedSite();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the deleted site collection ${args.options.url} from tenant recycle bin?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeDeletedSite();
-        }
       });
+      
+      if (result.continue) {
+        await removeDeletedSite();
+      }
     }
   }
 }

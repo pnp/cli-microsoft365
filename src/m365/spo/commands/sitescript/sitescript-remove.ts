@@ -62,7 +62,7 @@ class SpoSiteScriptRemoveCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeSiteScript: () => void = (): void => {
       let spoUrl: string = '';
 

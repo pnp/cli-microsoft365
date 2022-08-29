@@ -69,7 +69,7 @@ describe(commands.SITESCRIPT_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('gets information about the specified site script', (done) => {
+  it('gets information about the specified site script', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScriptMetadata`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -97,7 +97,7 @@ describe(commands.SITESCRIPT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Content": JSON.stringify({
@@ -124,7 +124,7 @@ describe(commands.SITESCRIPT_GET, () => {
     });
   });
 
-  it('gets information about the specified site script (debug)', (done) => {
+  it('gets information about the specified site script (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScriptMetadata`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -152,7 +152,7 @@ describe(commands.SITESCRIPT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
+    await command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Content": JSON.stringify({
@@ -179,12 +179,12 @@ describe(commands.SITESCRIPT_GET, () => {
     });
   });
 
-  it('correctly handles error when site script not found', (done) => {
+  it('correctly handles error when site script not found', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
         done();

@@ -60,7 +60,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves the list of configured tenant properties', (done) => {
+  it('retrieves the list of configured tenant properties', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
         if (opts.headers &&
@@ -83,7 +83,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    await command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -107,7 +107,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
     });
   });
 
-  it('doesn\'t fail if no tenant properties have been configured', (done) => {
+  it('doesn\'t fail if no tenant properties have been configured', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
         if (opts.headers &&
@@ -119,7 +119,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    await command.action(logger, { options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert.strictEqual(log.length, 0);
         done();
@@ -130,7 +130,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
     });
   });
 
-  it('doesn\'t fail if tenant properties web property value is empty', (done) => {
+  it('doesn\'t fail if tenant properties web property value is empty', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
         if (opts.headers &&
@@ -142,7 +142,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    await command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       let correctResponse: boolean = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -163,7 +163,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
     });
   });
 
-  it('doesn\'t fail if tenant properties web property value is empty JSON object', (done) => {
+  it('doesn\'t fail if tenant properties web property value is empty JSON object', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
         if (opts.headers &&
@@ -175,7 +175,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    await command.action(logger, { options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert.strictEqual(log.length, 0);
         done();
@@ -186,7 +186,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
     });
   });
 
-  it('doesn\'t fail if tenant properties web property value is empty JSON object (debug)', (done) => {
+  it('doesn\'t fail if tenant properties web property value is empty JSON object (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
         if (opts.headers &&
@@ -198,7 +198,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    await command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       let correctResponse: boolean = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -219,7 +219,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
     });
   });
 
-  it('doesn\'t fail if tenant properties web property value is invalid JSON', (done) => {
+  it('doesn\'t fail if tenant properties web property value is invalid JSON', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/AllProperties?$select=storageentitiesindex`) > -1) {
         if (opts.headers &&
@@ -231,7 +231,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unexpected token a in JSON at position 0')));
         done();
@@ -285,10 +285,10 @@ describe(commands.STORAGEENTITY_LIST, () => {
     assert.strictEqual(actual, 'Required option appCatalogUrl not specified');
   });
 
-  it('handles promise rejection', (done) => {
+  it('handles promise rejection', async () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('error'));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }
     } as any, (err?: any) => {
       try {

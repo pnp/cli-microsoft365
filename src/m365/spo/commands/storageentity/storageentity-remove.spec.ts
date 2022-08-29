@@ -43,9 +43,9 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: true };
     });
   });
 
@@ -74,7 +74,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes existing tenant property without prompting with confirmation argument', (done) => {
+  it('removes existing tenant property without prompting with confirmation argument', async () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": null, "TraceCorrelationId": "4456299e-d09e-4000-ae61-ddde716daa27" }, 31, { "IsNull": false }, 33, { "IsNull": false }, 35, { "IsNull": false }]));
@@ -82,7 +82,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, key: 'existingproperty', confirm: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    await command.action(logger, { options: { debug: false, key: 'existingproperty', confirm: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
         assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
@@ -95,9 +95,9 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     });
   });
 
-  it('prompts before removing tenant property when confirmation argument not passed', (done) => {
+  it('prompts before removing tenant property when confirmation argument not passed', async () => {
 
-    command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    await command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -114,12 +114,12 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     });
   });
 
-  it('aborts removing property when prompt not confirmed', (done) => {
+  it('aborts removing property when prompt not confirmed', async () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    await command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert(postStub.notCalled);
         done();
@@ -130,7 +130,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     });
   });
 
-  it('removes tenant property when prompt confirmed', (done) => {
+  it('removes tenant property when prompt confirmed', async () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": null, "TraceCorrelationId": "4456299e-d09e-4000-ae61-ddde716daa27" }, 31, { "IsNull": false }, 33, { "IsNull": false }, 35, { "IsNull": false }]));
@@ -142,7 +142,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
-    command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    await command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
         assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
@@ -155,7 +155,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     });
   });
 
-  it('correctly reports when trying to remove an nonexistent property', (done) => {
+  it('correctly reports when trying to remove an nonexistent property', async () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([
@@ -174,7 +174,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
-    command.action(logger, { options: { debug: true, key: 'nonexistentproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: true, key: 'nonexistentproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any, (err?: any) => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
         assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
@@ -253,7 +253,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     assert.strictEqual(actual, 'Required option appCatalogUrl not specified');
   });
 
-  it('handles promise rejection', (done) => {
+  it('handles promise rejection', async () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
 
@@ -262,7 +262,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
       cb({ continue: true });
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: { debug: true, key: 'nonexistentproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }
     } as any, (err?: any) => {
       try {

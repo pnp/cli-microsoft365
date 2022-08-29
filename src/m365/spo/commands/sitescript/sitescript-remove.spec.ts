@@ -45,9 +45,9 @@ describe(commands.SITESCRIPT_REMOVE, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: true };
     });
   });
 
@@ -76,7 +76,7 @@ describe(commands.SITESCRIPT_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes the specified site script without prompting for confirmation when confirm option specified', (done) => {
+  it('removes the specified site script without prompting for confirmation when confirm option specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteScript`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -90,7 +90,7 @@ describe(commands.SITESCRIPT_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
+    await command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -101,8 +101,8 @@ describe(commands.SITESCRIPT_REMOVE, () => {
     });
   });
 
-  it('prompts before removing the specified site script when confirm option not passed', (done) => {
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
+  it('prompts before removing the specified site script when confirm option not passed', async () => {
+    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -119,10 +119,10 @@ describe(commands.SITESCRIPT_REMOVE, () => {
     });
   });
 
-  it('aborts removing site script when prompt not confirmed', (done) => {
+  it('aborts removing site script when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
+    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
       try {
         assert(postSpy.notCalled);
         done();
@@ -133,14 +133,14 @@ describe(commands.SITESCRIPT_REMOVE, () => {
     });
   });
 
-  it('removes the app when prompt confirmed', (done) => {
+  it('removes the app when prompt confirmed', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(() => Promise.resolve());
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
+    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
       try {
         assert(postStub.called);
         done();
@@ -151,12 +151,12 @@ describe(commands.SITESCRIPT_REMOVE, () => {
     });
   });
 
-  it('correctly handles error when site script not found', (done) => {
+  it('correctly handles error when site script not found', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
         done();

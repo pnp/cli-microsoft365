@@ -67,7 +67,7 @@ describe(commands.SITESCRIPT_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('lists available site scripts', (done) => {
+  it('lists available site scripts', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScripts`) > -1) {
         return Promise.resolve({
@@ -93,7 +93,7 @@ describe(commands.SITESCRIPT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
+    await command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -119,7 +119,7 @@ describe(commands.SITESCRIPT_LIST, () => {
     });
   });
 
-  it('lists available site scripts (debug)', (done) => {
+  it('lists available site scripts (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScripts`) > -1) {
         return Promise.resolve({
@@ -145,7 +145,7 @@ describe(commands.SITESCRIPT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
+    await command.action(logger, { options: { debug: true } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -171,7 +171,7 @@ describe(commands.SITESCRIPT_LIST, () => {
     });
   });
 
-  it('correctly handles no available site scripts', (done) => {
+  it('correctly handles no available site scripts', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteScripts`) > -1) {
         return Promise.resolve({ value: [] });
@@ -180,7 +180,7 @@ describe(commands.SITESCRIPT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
+    await command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -191,12 +191,12 @@ describe(commands.SITESCRIPT_LIST, () => {
     });
   });
 
-  it('correctly handles OData error when creating site script', (done) => {
+  it('correctly handles OData error when creating site script', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();

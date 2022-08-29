@@ -37,7 +37,7 @@ class SpoStorageEntityGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     spo
       .getSpoUrl(logger, this.debug)
       .then((spoUrl: string): Promise<TenantProperty> => {

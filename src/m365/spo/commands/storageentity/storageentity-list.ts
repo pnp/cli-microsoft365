@@ -44,7 +44,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving details for all tenant properties in ${args.options.appCatalogUrl}...`);
     }
