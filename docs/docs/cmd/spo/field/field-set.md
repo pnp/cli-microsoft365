@@ -25,9 +25,6 @@ m365 spo field set [options]
 `-t, --title [title]`
 : Title or internal name of the field to update. Specify `id` or `title` but not both
 
-`-n, --name [name]`
-: (deprecated. Use `title` instead) Title or internal name of the field to update. Specify `id` or `name` but not both
-
 `--updateExistingLists`
 : Set, to push the update to existing lists. Otherwise, the changes will apply to new lists only
 
