@@ -16,7 +16,6 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id?: string;
   title?: string;
-  name?: string;
   listId?: string;
   listTitle?: string;
   updateExistingLists?: boolean;
@@ -46,7 +45,6 @@ class SpoFieldSetCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         id: typeof args.options.id !== 'undefined',
         title: typeof args.options.title !== 'undefined',
-        name: typeof args.options.name !== 'undefined',
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
         updateExistingLists: !!args.options.updateExistingLists
@@ -67,9 +65,6 @@ class SpoFieldSetCommand extends SpoCommand {
       },
       {
         option: '-i, --id [id]'
-      },
-      {
-        option: '-n, --name [name]'
       },
       {
         option: '-t, --title [title]'
@@ -108,7 +103,7 @@ class SpoFieldSetCommand extends SpoCommand {
   }
 
   #initOptionSets(): void {
-  	this.optionSets.push(['id', 'title', 'name']);
+  	this.optionSets.push(['id', 'title']);
   }
 
   public allowUnknownOptions(): boolean | undefined {
@@ -116,10 +111,6 @@ class SpoFieldSetCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    if (args.options.name) {
-      this.warn(logger, `Option 'name' is deprecated. Please use 'title' instead.`);
-    }
-
     let requestDigest: string = '';
 
     spo
@@ -163,7 +154,7 @@ class SpoFieldSetCommand extends SpoCommand {
         // retrieve column CSOM object id
         const fieldQuery: string = args.options.id ?
           `<Method Id="663" ParentId="7" Name="GetById"><Parameters><Parameter Type="Guid">${formatting.escapeXml(args.options.id)}</Parameter></Parameters></Method>` :
-          `<Method Id="663" ParentId="7" Name="GetByInternalNameOrTitle"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.name || args.options.title)}</Parameter></Parameters></Method>`;
+          `<Method Id="663" ParentId="7" Name="GetByInternalNameOrTitle"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.title)}</Parameter></Parameters></Method>`;
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
@@ -213,7 +204,6 @@ class SpoFieldSetCommand extends SpoCommand {
       'listId',
       'listTitle',
       'id',
-      'name',
       'title',
       'updateExistingLists',
       'debug',
