@@ -100,103 +100,60 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('retrieves the details of an existing tenant property', async () => {
-    await command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Key: 'existingproperty',
-          Value: 'dolor',
-          Description: 'ipsum',
-          Comment: 'Lorem'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    assert(loggerLogSpy.calledWith({
+      Key: 'existingproperty',
+      Value: 'dolor',
+      Description: 'ipsum',
+      Comment: 'Lorem'
+    }));
   });
 
   it('retrieves the details of an existing tenant property without a description', async () => {
-    await command.action(logger, { options: { debug: true, key: 'propertywithoutdescription', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Key: 'propertywithoutdescription',
-          Value: 'dolor',
-          Description: undefined,
-          Comment: 'Lorem'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, key: 'propertywithoutdescription', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    assert(loggerLogSpy.calledWith({
+      Key: 'propertywithoutdescription',
+      Value: 'dolor',
+      Description: undefined,
+      Comment: 'Lorem'
+    }));
   });
 
   it('retrieves the details of an existing tenant property without a comment', async () => {
-    await command.action(logger, { options: { debug: false, key: 'propertywithoutcomments', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Key: 'propertywithoutcomments',
-          Value: 'dolor',
-          Description: 'ipsum',
-          Comment: undefined
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, key: 'propertywithoutcomments', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    assert(loggerLogSpy.calledWith({
+      Key: 'propertywithoutcomments',
+      Value: 'dolor',
+      Description: 'ipsum',
+      Comment: undefined
+    }));
   });
 
   it('handles a non-existent tenant property', async () => {
-    await command.action(logger, { options: { debug: false, key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      try {
-        assert.strictEqual(log.length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
   });
 
   it('handles a non-existent tenant property (debug)', async () => {
-    await command.action(logger, { options: { debug: true, key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      let correctValue: boolean = false;
-      log.forEach(l => {
-        if (l &&
-          typeof l === 'string' &&
-          l.indexOf('Property with key nonexistingproperty not found') > -1) {
-          correctValue = true;
-        }
-      });
-      try {
-        assert(correctValue);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: true, key: 'nonexistingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    let correctValue: boolean = false;
+    log.forEach(l => {
+      if (l &&
+        typeof l === 'string' &&
+        l.indexOf('Property with key nonexistingproperty not found') > -1) {
+        correctValue = true;
       }
     });
+    assert(correctValue);
   });
 
   it('escapes special characters in property name', async () => {
-    await command.action(logger, { options: { debug: true, key: '#myprop', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Key: '#myprop',
-          Value: 'dolor',
-          Description: 'ipsum',
-          Comment: undefined
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, key: '#myprop', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    assert(loggerLogSpy.calledWith({
+      Key: '#myprop',
+      Value: 'dolor',
+      Description: 'ipsum',
+      Comment: undefined
+    }));
   });
 
   it('supports debug mode', () => {
@@ -225,16 +182,6 @@ describe(commands.STORAGEENTITY_GET, () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('error'));
 
-    await command.action(logger, {
-      options: { options: { debug: true, key: '#myprop' }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, key: '#myprop' } } as any), new CommandError('error'));
   });
 });

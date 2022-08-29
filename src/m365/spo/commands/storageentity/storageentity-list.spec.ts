@@ -83,28 +83,21 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            Key: 'Property1',
-            Description: undefined,
-            Comment: undefined,
-            Value: 'dolor1'
-          },
-          {
-            Key: 'Property2',
-            Description: 'ipsum2',
-            Comment: 'Lorem2',
-            Value: 'dolor2'
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        Key: 'Property1',
+        Description: undefined,
+        Comment: undefined,
+        Value: 'dolor1'
+      },
+      {
+        Key: 'Property2',
+        Description: 'ipsum2',
+        Comment: 'Lorem2',
+        Value: 'dolor2'
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
   it('doesn\'t fail if no tenant properties have been configured', async () => {
@@ -119,15 +112,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      try {
-        assert.strictEqual(log.length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
   });
 
   it('doesn\'t fail if tenant properties web property value is empty', async () => {
@@ -142,25 +127,18 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      let correctResponse: boolean = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('No tenant properties found') > -1) {
-          correctResponse = true;
-        }
-      });
-      try {
-        assert(correctResponse, 'Incorrect response');
-        done();
+    await command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    let correctResponse: boolean = false;
+    log.forEach(l => {
+      if (!l || typeof l !== 'string') {
+        return;
       }
-      catch (e) {
-        done(e);
+
+      if (l.indexOf('No tenant properties found') > -1) {
+        correctResponse = true;
       }
     });
+    assert(correctResponse, 'Incorrect response');
   });
 
   it('doesn\'t fail if tenant properties web property value is empty JSON object', async () => {
@@ -175,15 +153,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      try {
-        assert.strictEqual(log.length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
   });
 
   it('doesn\'t fail if tenant properties web property value is empty JSON object (debug)', async () => {
@@ -198,25 +168,18 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
-      let correctResponse: boolean = false;
-      log.forEach(l => {
-        if (!l || typeof l !== 'string') {
-          return;
-        }
-
-        if (l.indexOf('No tenant properties found') > -1) {
-          correctResponse = true;
-        }
-      });
-      try {
-        assert(correctResponse, 'Incorrect response');
-        done();
+    await command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    let correctResponse: boolean = false;
+    log.forEach(l => {
+      if (!l || typeof l !== 'string') {
+        return;
       }
-      catch (e) {
-        done(e);
+
+      if (l.indexOf('No tenant properties found') > -1) {
+        correctResponse = true;
       }
     });
+    assert(correctResponse, 'Incorrect response');
   });
 
   it('doesn\'t fail if tenant properties web property value is invalid JSON', async () => {
@@ -231,15 +194,8 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    await command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unexpected token a in JSON at position 0')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    
+    await assert.rejects(command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any), new CommandError('Unexpected token a in JSON at position 0'));
   });
 
   it('supports debug mode', () => {
@@ -288,16 +244,6 @@ describe(commands.STORAGEENTITY_LIST, () => {
   it('handles promise rejection', async () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('error'));
 
-    await command.action(logger, {
-      options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any), new CommandError('error'));
   });
 });

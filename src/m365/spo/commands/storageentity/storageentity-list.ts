@@ -57,43 +57,38 @@ class SpoStorageEntityListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ storageentitiesindex?: string }>(requestOptions)
-      .then((web: { storageentitiesindex?: string }): void => {
-        try {
-          if (!web.storageentitiesindex ||
-            web.storageentitiesindex.trim().length === 0) {
-            if (this.verbose) {
-              logger.logToStderr('No tenant properties found');
-            }
-            cb();
-            return;
-          }
-
-          const properties: { [key: string]: TenantProperty } = JSON.parse(web.storageentitiesindex);
-          const keys: string[] = Object.keys(properties);
-          if (keys.length === 0) {
-            if (this.verbose) {
-              logger.logToStderr('No tenant properties found');
-            }
-          }
-          else {
-            logger.log(keys.map((key: string): any => {
-              const property: TenantProperty = properties[key];
-              return {
-                Key: key,
-                Value: property.Value,
-                Description: property.Description,
-                Comment: property.Comment
-              };
-            }));
-          }
-          cb();
+    try {
+      const web: { storageentitiesindex?: string } = await request.get<{ storageentitiesindex?: string }>(requestOptions);
+      if (!web.storageentitiesindex ||
+        web.storageentitiesindex.trim().length === 0) {
+        if (this.verbose) {
+          logger.logToStderr('No tenant properties found');
         }
-        catch (e) {
-          this.handleError(e, logger, cb);
+      }
+      else {
+        const properties: { [key: string]: TenantProperty } = JSON.parse(web.storageentitiesindex);
+        const keys: string[] = Object.keys(properties);
+        if (keys.length === 0) {
+          if (this.verbose) {
+            logger.logToStderr('No tenant properties found');
+          }
         }
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+        else {
+          logger.log(keys.map((key: string): any => {
+            const property: TenantProperty = properties[key];
+            return {
+              Key: key,
+              Value: property.Value,
+              Description: property.Description,
+              Comment: property.Comment
+            };
+          }));
+        }
+      }
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

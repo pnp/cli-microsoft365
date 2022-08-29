@@ -70,12 +70,13 @@ class SpoWebGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<WebPropertiesCollection>(requestOptions)
-      .then((webProperties: WebPropertiesCollection): void => {
-        logger.log(webProperties);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const webProperties: WebPropertiesCollection = await request.get<WebPropertiesCollection>(requestOptions);
+      logger.log(webProperties);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 
