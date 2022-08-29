@@ -62,7 +62,7 @@ describe(commands.HUBSITE_THEME_SYNC, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('syncs hub site theme to a web', (done) => {
+  it('syncs hub site theme to a web', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/SyncHubSiteTheme`) > -1) {
         return Promise.resolve({ "odata.null": true });
@@ -71,18 +71,11 @@ describe(commands.HUBSITE_THEME_SYNC, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('syncs hub site theme to a web (debug)', (done) => {
+  it('syncs hub site theme to a web (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/SyncHubSiteTheme`) > -1) {
         return Promise.resolve({
@@ -93,18 +86,11 @@ describe(commands.HUBSITE_THEME_SYNC, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('correctly handles error when hub site not found', (done) => {
+  it('correctly handles error when hub site not found', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
@@ -119,15 +105,8 @@ describe(commands.HUBSITE_THEME_SYNC, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } } as any),
+      new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown."));
   });
 
   it('supports debug mode', () => {

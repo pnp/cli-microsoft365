@@ -43,22 +43,25 @@ class SpoHubSiteThemeSyncCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (this.verbose) {
-      logger.logToStderr('Syncing hub site theme...');
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      if (this.verbose) {
+        logger.logToStderr('Syncing hub site theme...');
+      }
+  
+      const requestOptions: any = {
+        url: `${args.options.webUrl}/_api/web/SyncHubSiteTheme`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      await request.post(requestOptions);
     }
-
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/SyncHubSiteTheme`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    request
-      .post(requestOptions)
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 
