@@ -92,7 +92,7 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
 
   it('break role inheritance of subsite', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/resetroleinheritance') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/breakroleinheritance') > -1) {
         return Promise.resolve();
       }
 
@@ -118,7 +118,7 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
   it('web role inheritance break command handles reject request correctly', (done) => {
     const err = 'request rejected';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/resetroleinheritance') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/breakroleinheritance') > -1) {
         return Promise.reject(err);
       }
 
