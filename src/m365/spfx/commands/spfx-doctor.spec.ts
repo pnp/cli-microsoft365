@@ -85,8 +85,8 @@ describe(commands.DOCTOR, () => {
         case 'yo':
           callback(undefined, packageVersionResponse(packageName, '3.1.1'));
           break;
-        case 'gulp':
-          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
+        case 'gulp-cli':
+          callback(undefined, packageVersionResponse(packageName, '2.3.0'));
           break;
         case 'typescript':
           callback(undefined, '{}');
@@ -102,7 +102,7 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.22.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp-cli v2.3.0')), 'Invalid gulp-cli version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -124,8 +124,8 @@ describe(commands.DOCTOR, () => {
         case 'yo':
           callback(undefined, packageVersionResponse(packageName, '3.1.1'));
           break;
-        case 'gulp':
-          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
+        case 'gulp-cli':
+          callback(undefined, packageVersionResponse(packageName, '2.3.0'));
           break;
         case 'typescript':
           callback(undefined, '{}');
@@ -141,7 +141,7 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp-cli v2.3.0')), 'Invalid gulp-cli version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -167,8 +167,8 @@ describe(commands.DOCTOR, () => {
         case 'yo':
           callback(undefined, packageVersionResponse(packageName, '3.1.1'));
           break;
-        case 'gulp':
-          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
+        case 'gulp-cli':
+          callback(undefined, packageVersionResponse(packageName, '2.3.0'));
           break;
         case 'typescript':
           callback(undefined, '{}');
@@ -184,7 +184,7 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp-cli v2.3.0')), 'Invalid gulp-cli version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -210,8 +210,8 @@ describe(commands.DOCTOR, () => {
         case 'yo':
           callback(undefined, packageVersionResponse(packageName, '3.1.1'));
           break;
-        case 'gulp':
-          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
+        case 'gulp-cli':
+          callback(undefined, packageVersionResponse(packageName, '2.3.0'));
           break;
         case 'typescript':
           callback(undefined, '{}');
@@ -227,7 +227,7 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp-cli v2.3.0')), 'Invalid gulp-cli version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -253,8 +253,8 @@ describe(commands.DOCTOR, () => {
         case 'yo':
           callback(undefined, packageVersionResponse(packageName, '3.1.1'));
           break;
-        case 'gulp':
-          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
+        case 'gulp-cli':
+          callback(undefined, packageVersionResponse(packageName, '2.3.0'));
           break;
         case 'typescript':
           callback(undefined, '{}');
@@ -270,7 +270,7 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp-cli v2.3.0')), 'Invalid gulp-cli version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -292,8 +292,8 @@ describe(commands.DOCTOR, () => {
         case 'yo':
           callback(undefined, packageVersionResponse(packageName, '3.1.1'));
           break;
-        case 'gulp':
-          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
+        case 'gulp-cli':
+          callback(undefined, packageVersionResponse(packageName, '2.3.0'));
           break;
         case 'typescript':
           callback(undefined, '{}');
@@ -309,7 +309,7 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp-cli v2.3.0')), 'Invalid gulp-cli version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -331,8 +331,8 @@ describe(commands.DOCTOR, () => {
         case 'yo':
           callback(undefined, packageVersionResponse(packageName, '3.1.1'));
           break;
-        case 'gulp':
-          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
+        case 'gulp-cli':
+          callback(undefined, packageVersionResponse(packageName, '2.3.0'));
           break;
         case 'typescript':
           callback(undefined, '{}');
@@ -348,7 +348,7 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp-cli v2.3.0')), 'Invalid gulp-cli version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -374,8 +374,8 @@ describe(commands.DOCTOR, () => {
         case 'yo':
           callback(undefined, packageVersionResponse(packageName, '3.1.1'));
           break;
-        case 'gulp':
-          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
+        case 'gulp-cli':
+          callback(undefined, packageVersionResponse(packageName, '2.3.0'));
           break;
         case 'typescript':
           callback(undefined, '{}');
@@ -391,7 +391,7 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp-cli v2.3.0')), 'Invalid gulp-cli version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -417,8 +417,8 @@ describe(commands.DOCTOR, () => {
         case 'yo':
           callback(undefined, packageVersionResponse(packageName, '3.1.1'));
           break;
-        case 'gulp':
-          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
+        case 'gulp-cli':
+          callback(undefined, packageVersionResponse(packageName, '2.3.0'));
           break;
         case 'typescript':
           callback(undefined, '{}');
@@ -434,7 +434,7 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp-cli v2.3.0')), 'Invalid gulp-cli version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -460,8 +460,8 @@ describe(commands.DOCTOR, () => {
         case 'yo':
           callback(undefined, packageVersionResponse(packageName, '3.1.1'));
           break;
-        case 'gulp':
-          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
+        case 'gulp-cli':
+          callback(undefined, packageVersionResponse(packageName, '2.3.0'));
           break;
         case 'typescript':
           callback(undefined, '{}');
@@ -477,7 +477,7 @@ describe(commands.DOCTOR, () => {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp-cli v2.3.0')), 'Invalid gulp-cli version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
@@ -883,7 +883,7 @@ describe(commands.DOCTOR, () => {
     });
   });
 
-  it('passes gulp check when gulp found', (done) => {
+  it('passes gulp-cli check when gulp-cli found', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
 
@@ -893,8 +893,8 @@ describe(commands.DOCTOR, () => {
         case '@microsoft/sp-core-library':
           callback(null, packageVersionResponse(packageName, '1.10.0'), '');
           break;
-        case 'gulp':
-          callback(null, packageVersionResponse(packageName, '3.9.1'), '');
+        case 'gulp-cli':
+          callback(null, packageVersionResponse(packageName, '2.3.0'), '');
           break;
         default:
           callback(new Error(`${file} ENOENT`), '', '');
@@ -904,7 +904,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')));
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp-cli v2.3.0')));
         done();
       }
       catch (e) {
@@ -913,7 +913,7 @@ describe(commands.DOCTOR, () => {
     });
   });
 
-  it('fails gulp check when gulp not found', (done) => {
+  it('fails gulp-cli check when gulp-cli not found', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'exec').callsFake((file, callback: any) => {
@@ -930,8 +930,8 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'gulp not found')));
-        assert(loggerLogSpy.calledWith('- npm i -g gulp@3'), 'No fix provided');
+        assert(loggerLogSpy.calledWith(getStatus(1, 'gulp-cli not found')));
+        assert(loggerLogSpy.calledWith('- npm i -g gulp-cli@2'), 'No fix provided');
         done();
       }
       catch (e) {

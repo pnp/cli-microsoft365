@@ -1,6 +1,9 @@
 import * as chalk from 'chalk';
 import * as child_process from 'child_process';
+import { resolve } from 'dns';
+import { string } from 'easy-table';
 import { satisfies } from 'semver';
+import { version } from 'typescript';
 import { Logger } from '../../../cli';
 import { CommandError } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
@@ -452,13 +455,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
     this.#initTypes();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -466,7 +469,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -475,7 +478,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -485,11 +488,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
             return `${args.options.env} is not a valid SharePoint version. Valid versions are sp2016, sp2019 or spo`;
           }
         }
-    
+
         if (args.options.output && args.options.output !== 'text') {
           return `The output option only accepts the type 'text'`;
         }
-    
+
         return true;
       }
     );
@@ -744,14 +747,14 @@ class SpfxDoctorCommand extends AnonymousCommand {
         const responseString: string = stdout;
         try {
           const packageInfo: {
-            dependencies?: {
+            dependencies ?: {
               [packageName: string]: {
                 version: string;
               };
             };
           } = JSON.parse(responseString);
           if (packageInfo.dependencies &&
-            packageInfo.dependencies[packageName]) {
+                          packageInfo.dependencies[packageName]) {
             resolve(packageInfo.dependencies[packageName].version);
           }
           else {
@@ -783,8 +786,8 @@ class SpfxDoctorCommand extends AnonymousCommand {
 
   private getStatus(result: CheckStatus, message: string) {
     const primarySupported: boolean = process.platform !== 'win32' ||
-      process.env.CI === 'true' ||
-      process.env.TERM === 'xterm-256color';
+                          process.env.CI === 'true' ||
+                          process.env.TERM === 'xterm-256color';
     const success: string = primarySupported ? '✔' : '√';
     const failure: string = primarySupported ? '✖' : '×';
     return `${result === CheckStatus.Success ? chalk.green(success) : chalk.red(failure)} ${message}`;
