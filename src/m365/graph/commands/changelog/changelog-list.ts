@@ -193,7 +193,7 @@ class GraphChangelogListCommand extends AnonymousCommand {
         category: item.getElementsByTagName('category').item(1).textContent,
         title: item.getElementsByTagName('title').item(0).textContent,
         description: args.options.output === 'text' ? 
-          description.length > 50 && `${description.substring(0, 47)}...` :
+          description.length > 50 ? `${description.substring(0, 47)}...` : description : 
           description,
         pubDate: new Date(item.getElementsByTagName('pubDate').item(0).textContent)
       } as ChangelogItem);
