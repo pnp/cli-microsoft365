@@ -257,7 +257,7 @@ class AadAppAddCommand extends GraphCommand {
       // users to create AAD app in a different directory, we'll need to
       // adjust this
       appInfo.tenantId = accessToken.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
-      appInfo = await this.updateAppFromManifest(args, appInfo);
+      appInfo = await this.updateAppFromManifest(args, appInfo, logger);
       appInfo = await this.grantAdminConsent(appInfo, args.options.grantAdminConsent, logger);
       appInfo = await this.configureUri(args, appInfo, logger);
       appInfo = await this.configureSecret(args, appInfo, logger);
@@ -431,7 +431,7 @@ class AadAppAddCommand extends GraphCommand {
     return request.post<ServicePrincipalInfo>(requestOptions);
   }
 
-  private updateAppFromManifest(args: CommandArgs, appInfo: AppInfo): Promise<AppInfo> {
+  private updateAppFromManifest(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
     if (!args.options.manifest) {
       return Promise.resolve(appInfo);
     }
@@ -442,10 +442,14 @@ class AadAppAddCommand extends GraphCommand {
     delete v2Manifest.id;
     delete v2Manifest.appId;
     delete v2Manifest.publisherDomain;
+    
     // extract secrets from the manifest. Store them in a separate variable
-    // and remove them from the manifest because we need to create them
-    // separately
-    const secrets: { name: string, expirationDate: Date }[] = this.getSecretsFromManifest(v2Manifest);
+    let secrets: { name: string, expirationDate: Date }[] = this.getSecretsFromManifest(v2Manifest);
+
+    if (args.options.withSecret) {
+      secrets = [];
+    }
+    
     // Azure Portal returns v2 manifest whereas the Graph API expects a v1.6
 
     if (args.options.apisApplication || args.options.apisDelegated) {
@@ -453,7 +457,39 @@ class AadAppAddCommand extends GraphCommand {
       // otherwise, they will be skipped in the app update
       v2Manifest.requiredResourceAccess = appInfo.requiredResourceAccess;
     }
+
+    if (args.options.redirectUris) {
+      // take submitted redirectUris/platform as options
+      // otherwise, they will be removed from the app
+      v2Manifest.replyUrlsWithType = [];
+      
+      args.options.redirectUris.split(',').map(u => u.trim()).forEach(u => {
+        v2Manifest.replyUrlsWithType.push({ url: u, type: this.translatePlatformToType(args.options.platform!) });
+      });
+    }
+    logger.logToStderr(JSON.stringify(v2Manifest));
+
+    if (args.options.multitenant) {
+      // override manifest setting when using multitenant flag
+      v2Manifest.signInAudience = 'AzureADMultipleOrgs';
+    }
+
+    if (args.options.implicitFlow) {
+      // override manifest setting when using implicitFlow flag
+      v2Manifest.oauth2AllowIdTokenImplicitFlow = true;
+      v2Manifest.oauth2AllowImplicitFlow = true;
+    }
     
+    if (args.options.scopeName) {
+      // override manifest setting when using options.
+      delete v2Manifest.oauth2Permissions;
+    }
+
+    if (args.options.certificateFile || args.options.certificateBase64Encoded) {
+      // override manifest setting when using options.
+      delete v2Manifest.keyCredentials;
+    }
+
     const graphManifest = this.transformManifest(v2Manifest);
 
     const updateAppRequestOptions: any = {
@@ -491,7 +527,7 @@ class AadAppAddCommand extends GraphCommand {
     // delete the secrets from the manifest so that we won't try to set them
     // from the manifest
     delete manifest.passwordCredentials;
-
+    
     return secrets;
   }
 
@@ -727,19 +763,11 @@ class AadAppAddCommand extends GraphCommand {
               }
             });
           }
-          
-          if (typeof this.manifest?.requiredResourceAccess !== 'undefined' && this.manifest.requiredResourceAccess.length > 0) {
+          else if (this.manifest.requiredResourceAccess.length > 0) {
             const manifestApis = (this.manifest.requiredResourceAccess as RequiredResourceAccess[]);
 
             manifestApis.forEach(manifestApi => {
-              const requiredResource = resolvedApis.find(api => api.resourceAppId === manifestApi.resourceAppId);
-              if (requiredResource) {
-                // exclude if any duplicate required resources in both manifest and submitted options
-                requiredResource.resourceAccess.push(...manifestApi.resourceAccess.filter(manRes => !requiredResource.resourceAccess.some(res => res.id === manRes.id)));
-              }
-              else {
-                resolvedApis.push(manifestApi);
-              }
+              resolvedApis.push(manifestApi);
 
               const app = servicePrincipals.find(servicePrincipals => servicePrincipals.appId === manifestApi.resourceAppId);
 
@@ -858,6 +886,7 @@ class AadAppAddCommand extends GraphCommand {
       .createSecret({ appObjectId: appInfo.id })
       .then(secret => {
         appInfo.secret = secret.value;
+        appInfo.secrets = [{ displayName: secret.displayName, value: secret.value}];
         return Promise.resolve(appInfo);
       });
   }
@@ -956,6 +985,14 @@ class AadAppAddCommand extends GraphCommand {
     }
 
     return Promise.resolve(appInfo);
+  }
+
+  private translatePlatformToType(platform: string): string {
+    if (platform === 'publicClient') {
+      return "InstalledClient";
+    } 
+
+    return platform.charAt(0).toUpperCase() + platform.substring(1);    
   }
 }
 
