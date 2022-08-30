@@ -42,7 +42,7 @@ describe(commands.CHANGELOG_LIST, () => {
           <category>prd</category>
           <category>beta</category>
           <title>Security</title>
-          <description>Added something.</description>
+          <description>Added _wellKnownName_ and _userConfigurations_ properties to the **mailFolder** entity.</description>
           <pubDate>2019-02-01T00:00:00.000Z</pubDate>
         </item>
       </channel>
@@ -54,7 +54,24 @@ describe(commands.CHANGELOG_LIST, () => {
       guid: '7f1afeea-1c73-4e84-af08-8c9cd0fe27d5beta',
       category: 'beta',
       title: 'Security',
+      description: 'Added _wellKnownName_ and _userConfigurations_ properties to the **mailFolder** entity.',
+      pubDate: new Date('2019-02-01T00:00:00.000Z')
+    },
+    {
+      guid: '7f1afeea-1c73-4e84-af08-8c9cd0fe27d5v1.0',
+      category: 'v1.0',
+      title: 'Groups',
       description: 'Added something.',
+      pubDate: new Date('2019-01-01T00:00:00.000Z')
+    }
+  ];
+
+  const validChangelogText = [
+    {
+      guid: '7f1afeea-1c73-4e84-af08-8c9cd0fe27d5beta',
+      category: 'beta',
+      title: 'Security',
+      description: 'Added wellKnownName and userConfigurations prop...',
       pubDate: new Date('2019-02-01T00:00:00.000Z')
     },
     {
@@ -112,7 +129,7 @@ describe(commands.CHANGELOG_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['guid', 'category', 'title', 'description', 'pubDate']);
+    assert.deepStrictEqual(command.defaultProperties(), ['category', 'title', 'description']);
   });
 
   it('fails validation if versions contains an invalid value.', (done) => {
@@ -159,6 +176,17 @@ describe(commands.CHANGELOG_LIST, () => {
     const actual = command.validate({
       options: {
         endDate: 'invalid'
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if endDate is earlier than startDate.', (done) => {
+    const actual = command.validate({
+      options: {
+        endDate: '2018-11-01',
+        startDate: '2018-12-01'
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -224,6 +252,28 @@ describe(commands.CHANGELOG_LIST, () => {
     }, () => {
       try {
         assert(loggerLogSpy.calledWith(validChangelog));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('retrieves changelog list as text', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://developer.microsoft.com/en-us/graph/changelog/rss') {
+        return Promise.resolve(validRSSResponse);
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {output: 'text' }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(validChangelogText));
         done();
       }
       catch (e) {

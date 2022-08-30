@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
-import { validation } from '../../../../utils';
+import { md, validation } from '../../../../utils';
 import AnonymousCommand from '../../../base/AnonymousCommand';
 import { Changelog, ChangelogItem } from '../../Changelog';
 import commands from '../../commands';
@@ -41,7 +41,7 @@ class GraphChangelogListCommand extends AnonymousCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['guid', 'category', 'title', 'description', 'pubDate'];
+    return ['category', 'title', 'description'];
   }
 
   constructor() {
@@ -102,6 +102,10 @@ class GraphChangelogListCommand extends AnonymousCommand {
         if (args.options.endDate && !validation.isValidISODate(args.options.endDate)) {
           return 'The endDate is not a valid ISO date string';
         }
+    
+        if (args.options.endDate && args.options.startDate && new Date(args.options.endDate) < new Date(args.options.startDate)) {
+          return 'The endDate should be later than startDate';
+        }
 
         return true;
       }
@@ -126,7 +130,7 @@ class GraphChangelogListCommand extends AnonymousCommand {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(output.toString(), "text/xml");
 
-        const changelog = this.filterThroughOptions(args.options, this.mapChangelog(xmlDoc));
+        const changelog = this.filterThroughOptions(args.options, this.mapChangelog(xmlDoc, args));
         
         logger.log(changelog.items);
         cb();
@@ -169,7 +173,7 @@ class GraphChangelogListCommand extends AnonymousCommand {
     return changelog;
   }
 
-  private mapChangelog(xmlDoc: any): Changelog {
+  private mapChangelog(xmlDoc: any, args: CommandArgs): Changelog {
     const channel = xmlDoc.getElementsByTagName('channel').item(0);
     
     const changelog: Changelog = {
@@ -180,11 +184,17 @@ class GraphChangelogListCommand extends AnonymousCommand {
     } as Changelog;
 
     Array.from(xmlDoc.getElementsByTagName('item')).forEach((item: any) => {
+      const description: string = args.options.output === 'text' ? 
+        md.md2plain(item.getElementsByTagName('description').item(0).textContent, '') :
+        item.getElementsByTagName('description').item(0).textContent;
+
       changelog.items.push({
         guid: item.getElementsByTagName('guid').item(0).textContent,
         category: item.getElementsByTagName('category').item(1).textContent,
         title: item.getElementsByTagName('title').item(0).textContent,
-        description: item.getElementsByTagName('description').item(0).textContent,
+        description: args.options.output === 'text' ? 
+          description.length > 50 && `${description.substring(0, 47)}...` :
+          description,
         pubDate: new Date(item.getElementsByTagName('pubDate').item(0).textContent)
       } as ChangelogItem);
     });
