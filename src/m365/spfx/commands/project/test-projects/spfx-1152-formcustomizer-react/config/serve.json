@@ -1,0 +1,53 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/spfx-serve.schema.json",
+  "port": 4321,
+  "https": true,
+  "serveConfigurations": {
+    "default": {
+      "pageUrl": "https://contoso.sharepoint.com/sites/mySite/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "42d1d2f1-5853-4cca-ad1d-3387209ba076",
+        "PageType": 8,
+        "RootFolder": "/sites/mySite/Lists/MyList",
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "helloWorld_NewForm": {
+      "pageUrl": "https://contoso.sharepoint.com/sites/mySite/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "42d1d2f1-5853-4cca-ad1d-3387209ba076",
+        "PageType": 8,
+        "RootFolder": "/sites/mySite/Lists/MyList",
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "helloWorld_EditForm": {
+      "pageUrl": "https://contoso.sharepoint.com/sites/mySite/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "42d1d2f1-5853-4cca-ad1d-3387209ba076",
+        "PageType": 6,
+        "RootFolder": "/sites/mySite/Lists/MyList",
+        "ID": 1,
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "helloWorld_ViewForm": {
+      "pageUrl": "https://contoso.sharepoint.com/sites/mySite/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "42d1d2f1-5853-4cca-ad1d-3387209ba076",
+        "PageType": 4,
+        "RootFolder": "/sites/mySite/Lists/MyList",
+        "ID": 1,
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    }
+  }
+}

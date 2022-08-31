@@ -1,0 +1,20 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "whichFolder": "subdir",
+    "solutionName": "spfx",
+    "environment": "spo",
+    "skipFeatureDeployment": false,
+    "isDomainIsolated": false,
+    "componentType": "extension",
+    "extensionType": "ApplicationCustomizer",
+    "componentName": "HelloWorld",
+    "componentDescription": "HelloWorld",
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "version": "1.15.2",
+    "libraryName": "spfx",
+    "libraryId": "386af666-f576-46f4-8adc-287fdeb5ddf4",
+    "packageManager": "npm",
+    "solutionShortDescription": "spfx description"
+  }
+}
