@@ -791,6 +791,21 @@ describe(commands.PROJECT_DOCTOR, () => {
     });
   });
 
+  it('e2e: shows correct number of findings for a valid 1.16.0-beta.1 project', (done) => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1160beta1-webpart-react'));
+
+    command.action(logger, { options: { } } as any, () => {
+      try {
+        const findings: FindingToReport[] = log[0];
+        assert.strictEqual(findings.length, 0);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('supports debug mode', () => {
     const options = command.options;
     let containsOption = false;
