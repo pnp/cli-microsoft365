@@ -100,7 +100,7 @@ class RequestCommand extends Command {
         }
 
         if (args.options.filePath && !fs.existsSync(path.dirname(args.options.filePath))) {
-          return 'Specified filePath to save the file does not exist';
+          return 'The location specified in the filePath does not exist';
         }
 
         return true;
@@ -109,7 +109,7 @@ class RequestCommand extends Command {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    if (this.verbose) {
+    if (this.debug) {
       logger.logToStderr(`Preparing request...`);
     }
 

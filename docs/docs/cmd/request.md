@@ -65,3 +65,9 @@ Call the SharePoint API to update a site title.
 ```sh
 m365 request --method post --url "https://contoso.sharepoint.com/sites/project-x/_api/web" --body '{ "Title": "New title" }' --content-type "application/json" --x-http-method "PATCH"
 ```
+
+Call the Microsoft Graph to get a profile photo.
+
+```sh
+m365 request --url "https://graph.microsoft.com/beta/me/photo/\$value" --filePath ./profile-pic.jpg
+```
