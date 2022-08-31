@@ -63,49 +63,41 @@ class SpoSiteScriptRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeSiteScript: () => void = (): void => {
-      let spoUrl: string = '';
-
-      spo
-        .getSpoUrl(logger, this.debug)
-        .then((_spoUrl: string): Promise<ContextInfo> => {
-          spoUrl = _spoUrl;
-          return spo.getRequestDigest(spoUrl);
-        })
-        .then((res: ContextInfo): Promise<string> => {
-          const requestOptions: any = {
-            url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteScript`,
-            headers: {
-              'X-RequestDigest': res.FormDigestValue,
-              'content-type': 'application/json;charset=utf-8',
-              accept: 'application/json;odata=nometadata'
-            },
-            data: { id: args.options.id },
-            responseType: 'json'
-          };
-
-          return request.post(requestOptions);
-        })
-        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    const removeSiteScript: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+        const formDigest: ContextInfo = await spo.getRequestDigest(spoUrl);
+        const requestOptions: any = {
+          url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteScript`,
+          headers: {
+            'X-RequestDigest': formDigest.FormDigestValue,
+            'content-type': 'application/json;charset=utf-8',
+            accept: 'application/json;odata=nometadata'
+          },
+          data: { id: args.options.id },
+          responseType: 'json'
+        };
+        await request.post(requestOptions);
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeSiteScript();
+      await removeSiteScript();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the site script ${args.options.id}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeSiteScript();
-        }
       });
+      
+      if (result.continue) {
+        await removeSiteScript();
+      }
     }
   }
 }

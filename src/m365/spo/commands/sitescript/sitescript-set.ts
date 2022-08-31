@@ -94,48 +94,42 @@ class SpoSiteScriptSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    let spoUrl: string = '';
+    try {
+      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+      const formDigest: ContextInfo = await spo.getRequestDigest(spoUrl);
+      const updateInfo: any = {
+        Id: args.options.id
+      };
+      if (args.options.title) {
+        updateInfo.Title = args.options.title;
+      }
+      if (args.options.description) {
+        updateInfo.Description = args.options.description;
+      }
+      if (args.options.version) {
+        updateInfo.Version = parseInt(args.options.version);
+      }
+      if (args.options.content) {
+        updateInfo.Content = args.options.content;
+      }
 
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((_spoUrl: string): Promise<ContextInfo> => {
-        spoUrl = _spoUrl;
-        return spo.getRequestDigest(spoUrl);
-      })
-      .then((res: ContextInfo): Promise<string> => {
-        const updateInfo: any = {
-          Id: args.options.id
-        };
-        if (args.options.title) {
-          updateInfo.Title = args.options.title;
-        }
-        if (args.options.description) {
-          updateInfo.Description = args.options.description;
-        }
-        if (args.options.version) {
-          updateInfo.Version = parseInt(args.options.version);
-        }
-        if (args.options.content) {
-          updateInfo.Content = args.options.content;
-        }
+      const requestOptions: any = {
+        url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteScript`,
+        headers: {
+          'X-RequestDigest': formDigest.FormDigestValue,
+          'content-type': 'application/json;charset=utf-8',
+          accept: 'application/json;odata=nometadata'
+        },
+        data: { updateInfo: updateInfo },
+        responseType: 'json'
+      };
 
-        const requestOptions: any = {
-          url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteScript`,
-          headers: {
-            'X-RequestDigest': res.FormDigestValue,
-            'content-type': 'application/json;charset=utf-8',
-            accept: 'application/json;odata=nometadata'
-          },
-          data: { updateInfo: updateInfo },
-          responseType: 'json'
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res = await request.post(requestOptions);
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

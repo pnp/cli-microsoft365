@@ -62,50 +62,43 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeSiteDesign: () => void = (): void => {
-      let spoUrl: string = '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeSiteDesign: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+        const requestDigest: ContextInfo = await spo.getRequestDigest(spoUrl);
+        const requestOptions: any = {
+          url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteDesign`,
+          headers: {
+            'X-RequestDigest': requestDigest.FormDigestValue,
+            'content-type': 'application/json;charset=utf-8',
+            accept: 'application/json;odata=nometadata'
+          },
+          data: { id: args.options.id },
+          responseType: 'json'
+        };
 
-      spo
-        .getSpoUrl(logger, this.debug)
-        .then((_spoUrl: string): Promise<ContextInfo> => {
-          spoUrl = _spoUrl;
-          return spo.getRequestDigest(spoUrl);
-        })
-        .then((res: ContextInfo): Promise<void> => {
-          const requestOptions: any = {
-            url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.DeleteSiteDesign`,
-            headers: {
-              'X-RequestDigest': res.FormDigestValue,
-              'content-type': 'application/json;charset=utf-8',
-              accept: 'application/json;odata=nometadata'
-            },
-            data: { id: args.options.id },
-            responseType: 'json'
-          };
-
-          return request.post(requestOptions);
-        })
-        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        await request.post(requestOptions);
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeSiteDesign();
+      await removeSiteDesign();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the site design ${args.options.id}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeSiteDesign();
-        }
       });
+      
+      if (result.continue) {
+        await removeSiteDesign();
+      }
     }
   }
 }

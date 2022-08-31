@@ -74,7 +74,7 @@ class SpoSiteDesignRunListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const data: any = {};
     if (args.options.siteDesignId) {
       data.siteDesignId = args.options.siteDesignId;

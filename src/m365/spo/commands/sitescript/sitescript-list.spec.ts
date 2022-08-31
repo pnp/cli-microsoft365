@@ -93,30 +93,23 @@ describe(commands.SITESCRIPT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            Content: null,
-            Description: "description",
-            Id: "19b0e1b2-e3d1-473f-9394-f08c198ef43e",
-            Title: "script1",
-            Version: 1
-          },
-          {
-            Content: null,
-            Description: "Contoso theme script description",
-            Id: "449c0c6d-5380-4df2-b84b-622e0ac8ec24",
-            Title: "Contoso theme script",
-            Version: 1
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith([
+      {
+        Content: null,
+        Description: "description",
+        Id: "19b0e1b2-e3d1-473f-9394-f08c198ef43e",
+        Title: "script1",
+        Version: 1
+      },
+      {
+        Content: null,
+        Description: "Contoso theme script description",
+        Id: "449c0c6d-5380-4df2-b84b-622e0ac8ec24",
+        Title: "Contoso theme script",
+        Version: 1
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
   it('lists available site scripts (debug)', async () => {
@@ -145,30 +138,23 @@ describe(commands.SITESCRIPT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            Content: null,
-            Description: "description",
-            Id: "19b0e1b2-e3d1-473f-9394-f08c198ef43e",
-            Title: "script1",
-            Version: 1
-          },
-          {
-            Content: null,
-            Description: "Contoso theme script description",
-            Id: "449c0c6d-5380-4df2-b84b-622e0ac8ec24",
-            Title: "Contoso theme script",
-            Version: 1
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith([
+      {
+        Content: null,
+        Description: "description",
+        Id: "19b0e1b2-e3d1-473f-9394-f08c198ef43e",
+        Title: "script1",
+        Version: 1
+      },
+      {
+        Content: null,
+        Description: "Contoso theme script description",
+        Id: "449c0c6d-5380-4df2-b84b-622e0ac8ec24",
+        Title: "Contoso theme script",
+        Version: 1
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
   it('correctly handles no available site scripts', async () => {
@@ -180,15 +166,7 @@ describe(commands.SITESCRIPT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false } });
   });
 
   it('correctly handles OData error when creating site script', async () => {
@@ -196,15 +174,7 @@ describe(commands.SITESCRIPT_LIST, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

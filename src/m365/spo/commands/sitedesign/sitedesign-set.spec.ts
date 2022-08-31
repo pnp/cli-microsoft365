@@ -62,7 +62,7 @@ describe(commands.SITEDESIGN_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('updates site design title', (done) => {
+  it('updates site design title', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -88,7 +88,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'New title' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'New title' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Description": null,
@@ -110,7 +110,7 @@ describe(commands.SITEDESIGN_SET, () => {
     });
   });
 
-  it('updates site design web template to TeamSite', (done) => {
+  it('updates site design web template to TeamSite', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -136,7 +136,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', webTemplate: 'TeamSite' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', webTemplate: 'TeamSite' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Description": null,
@@ -158,7 +158,7 @@ describe(commands.SITEDESIGN_SET, () => {
     });
   });
 
-  it('updates site design web template to CommunicationSite', (done) => {
+  it('updates site design web template to CommunicationSite', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -184,7 +184,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', webTemplate: 'CommunicationSite' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', webTemplate: 'CommunicationSite' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Description": null,
@@ -206,7 +206,7 @@ describe(commands.SITEDESIGN_SET, () => {
     });
   });
 
-  it('updates site design site scripts (one script)', (done) => {
+  it('updates site design site scripts (one script)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -232,7 +232,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Description": null,
@@ -254,7 +254,7 @@ describe(commands.SITEDESIGN_SET, () => {
     });
   });
 
-  it('updates site design site scripts (multiple scripts)', (done) => {
+  it('updates site design site scripts (multiple scripts)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -280,7 +280,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24, 449c0c6d-5380-4df2-b84b-622e0ac8ec25' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24, 449c0c6d-5380-4df2-b84b-622e0ac8ec25' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Description": null,
@@ -302,7 +302,7 @@ describe(commands.SITEDESIGN_SET, () => {
     });
   });
 
-  it('updates site design description', (done) => {
+  it('updates site design description', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -328,7 +328,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', description: 'New description' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', description: 'New description' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Description": "New description",
@@ -350,7 +350,7 @@ describe(commands.SITEDESIGN_SET, () => {
     });
   });
 
-  it('updates site design previewImageUrl', (done) => {
+  it('updates site design previewImageUrl', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -376,7 +376,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', previewImageUrl: 'https://contoso.com/image.png' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', previewImageUrl: 'https://contoso.com/image.png' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Description": null,
@@ -398,7 +398,7 @@ describe(commands.SITEDESIGN_SET, () => {
     });
   });
 
-  it('updates site design previewImageAltText', (done) => {
+  it('updates site design previewImageAltText', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -424,7 +424,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', previewImageAltText: 'Logo image' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', previewImageAltText: 'Logo image' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Description": null,
@@ -446,7 +446,7 @@ describe(commands.SITEDESIGN_SET, () => {
     });
   });
 
-  it('updates site design thumbnailUrl', (done) => {
+  it('updates site design thumbnailUrl', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -472,7 +472,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', thumbnailUrl: 'https://contoso.com/assets/team-site-thumbnail.png' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', thumbnailUrl: 'https://contoso.com/assets/team-site-thumbnail.png' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Description": null,
@@ -494,7 +494,7 @@ describe(commands.SITEDESIGN_SET, () => {
     });
   });
 
-  it('updates site design version', (done) => {
+  it('updates site design version', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -520,7 +520,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', version: 2 } }, () => {
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', version: 2 } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Description": null,
@@ -542,7 +542,7 @@ describe(commands.SITEDESIGN_SET, () => {
     });
   });
 
-  it('makes site design default', (done) => {
+  it('makes site design default', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -568,7 +568,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', isDefault: 'true' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', isDefault: 'true' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Description": null,
@@ -590,7 +590,7 @@ describe(commands.SITEDESIGN_SET, () => {
     });
   });
 
-  it('makes site design not-default (explicit)', (done) => {
+  it('makes site design not-default (explicit)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -616,7 +616,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', isDefault: 'false' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', isDefault: 'false' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Description": null,
@@ -638,7 +638,7 @@ describe(commands.SITEDESIGN_SET, () => {
     });
   });
 
-  it('makes site design not-default (implicit)', (done) => {
+  it('makes site design not-default (implicit)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -663,7 +663,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c' } }, () => {
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Description": null,
@@ -685,7 +685,7 @@ describe(commands.SITEDESIGN_SET, () => {
     });
   });
 
-  it('updates all site design properties (debug)', (done) => {
+  it('updates all site design properties (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -721,7 +721,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', thumbnailUrl: "https://contoso.com/assets/team-site-thumbnail.png", previewImageAltText: 'Contoso team site preview', version: 2, isDefault: 'true' } }, () => {
+    await command.action(logger, { options: { debug: true, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', thumbnailUrl: "https://contoso.com/assets/team-site-thumbnail.png", previewImageAltText: 'Contoso team site preview', version: 2, isDefault: 'true' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Description": 'Contoso team site',
@@ -743,12 +743,12 @@ describe(commands.SITEDESIGN_SET, () => {
     });
   });
 
-  it('correctly handles OData error when updating site design', (done) => {
+  it('correctly handles OData error when updating site design', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', webTemplate: 'TeamSite', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', webTemplate: 'TeamSite', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();

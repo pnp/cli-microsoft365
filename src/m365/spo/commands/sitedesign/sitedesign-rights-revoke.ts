@@ -66,7 +66,7 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const revokePermissions: () => void = (): void => {
       let spoUrl: string = '';
 

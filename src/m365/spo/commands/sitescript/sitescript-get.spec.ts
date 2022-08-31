@@ -97,31 +97,24 @@ describe(commands.SITESCRIPT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Content": JSON.stringify({
-            "$schema": "schema.json",
-            "actions": [
-              {
-                "verb": "applyTheme",
-                "themeName": "Contoso Theme"
-              }
-            ],
-            "bindata": {},
-            "version": 1
-          }),
-          "Description": "My contoso script",
-          "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
-          "Title": "Contoso",
-          "Version": 1
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    assert(loggerLogSpy.calledWith({
+      "Content": JSON.stringify({
+        "$schema": "schema.json",
+        "actions": [
+          {
+            "verb": "applyTheme",
+            "themeName": "Contoso Theme"
+          }
+        ],
+        "bindata": {},
+        "version": 1
+      }),
+      "Description": "My contoso script",
+      "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
+      "Title": "Contoso",
+      "Version": 1
+    }));
   });
 
   it('gets information about the specified site script (debug)', async () => {
@@ -152,31 +145,24 @@ describe(commands.SITESCRIPT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Content": JSON.stringify({
-            "$schema": "schema.json",
-            "actions": [
-              {
-                "verb": "applyTheme",
-                "themeName": "Contoso Theme"
-              }
-            ],
-            "bindata": {},
-            "version": 1
-          }),
-          "Description": "My contoso script",
-          "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
-          "Title": "Contoso",
-          "Version": 1
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    assert(loggerLogSpy.calledWith({
+      "Content": JSON.stringify({
+        "$schema": "schema.json",
+        "actions": [
+          {
+            "verb": "applyTheme",
+            "themeName": "Contoso Theme"
+          }
+        ],
+        "bindata": {},
+        "version": 1
+      }),
+      "Description": "My contoso script",
+      "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
+      "Title": "Contoso",
+      "Version": 1
+    }));
   });
 
   it('correctly handles error when site script not found', async () => {
@@ -184,15 +170,7 @@ describe(commands.SITESCRIPT_GET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
   });
 
   it('supports debug mode', () => {

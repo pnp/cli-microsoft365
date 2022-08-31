@@ -64,7 +64,7 @@ describe(commands.SITEDESIGN_TASK_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['ID', 'SiteDesignID', 'LogonName']);
   });
 
-  it('gets information about site designs scheduled for execution on the specified site', (done) => {
+  it('gets information about site designs scheduled for execution on the specified site', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignTasks`) > -1) {
         return Promise.resolve({
@@ -82,7 +82,7 @@ describe(commands.SITEDESIGN_TASK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -100,7 +100,7 @@ describe(commands.SITEDESIGN_TASK_LIST, () => {
     });
   });
 
-  it('gets information about site designs scheduled for execution on the specified site (debug)', (done) => {
+  it('gets information about site designs scheduled for execution on the specified site (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignTasks`) > -1) {
         return Promise.resolve({
@@ -118,7 +118,7 @@ describe(commands.SITEDESIGN_TASK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -136,7 +136,7 @@ describe(commands.SITEDESIGN_TASK_LIST, () => {
     });
   });
 
-  it('outputs all information in JSON output mode', (done) => {
+  it('outputs all information in JSON output mode', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignTasks`) > -1) {
         return Promise.resolve({
@@ -154,7 +154,7 @@ describe(commands.SITEDESIGN_TASK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', output: 'json' } }, () => {
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', output: 'json' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -172,12 +172,12 @@ describe(commands.SITEDESIGN_TASK_LIST, () => {
     });
   });
 
-  it('correctly handles OData error when retrieving information about site designs', (done) => {
+  it('correctly handles OData error when retrieving information about site designs', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
