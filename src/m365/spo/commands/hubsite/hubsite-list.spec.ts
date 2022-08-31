@@ -66,7 +66,7 @@ describe(commands.HUBSITE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['ID', 'SiteUrl', 'Title']);
   });
 
-  it('lists hub sites', (done) => {
+  it('lists hub sites', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
         return Promise.resolve({
@@ -98,39 +98,32 @@ describe(commands.HUBSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "Description": null,
-            "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
-            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
-            "SiteId": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
-            "Targets": null,
-            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-            "Title": "Sales"
-          },
-          {
-            "Description": null,
-            "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
-            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
-            "SiteId": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
-            "Targets": null,
-            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-            "Title": "Travel Programs"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "Description": null,
+        "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
+        "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+        "SiteId": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
+        "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
+        "Targets": null,
+        "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+        "Title": "Sales"
+      },
+      {
+        "Description": null,
+        "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
+        "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+        "SiteId": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
+        "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
+        "Targets": null,
+        "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+        "Title": "Travel Programs"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists hub sites (debug)', (done) => {
+  it('lists hub sites (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
         return Promise.resolve({
@@ -162,39 +155,32 @@ describe(commands.HUBSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "Description": null,
-            "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
-            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
-            "SiteId": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
-            "Targets": null,
-            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-            "Title": "Sales"
-          },
-          {
-            "Description": null,
-            "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
-            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
-            "SiteId": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
-            "Targets": null,
-            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-            "Title": "Travel Programs"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "Description": null,
+        "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
+        "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+        "SiteId": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
+        "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
+        "Targets": null,
+        "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+        "Title": "Sales"
+      },
+      {
+        "Description": null,
+        "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
+        "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+        "SiteId": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
+        "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
+        "Targets": null,
+        "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+        "Title": "Travel Programs"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists hub sites with all properties', (done) => {
+  it('lists hub sites with all properties', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
         return Promise.resolve({
@@ -226,39 +212,32 @@ describe(commands.HUBSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, output: 'json' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "Description": null,
-            "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
-            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
-            "SiteId": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
-            "Targets": null,
-            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-            "Title": "Sales"
-          },
-          {
-            "Description": null,
-            "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
-            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
-            "SiteId": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
-            "Targets": null,
-            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-            "Title": "Travel Programs"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false, output: 'json' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "Description": null,
+        "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
+        "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+        "SiteId": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
+        "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
+        "Targets": null,
+        "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+        "Title": "Sales"
+      },
+      {
+        "Description": null,
+        "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
+        "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+        "SiteId": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
+        "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
+        "Targets": null,
+        "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+        "Title": "Travel Programs"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('correctly retrieves the associated sites in batches', (done) => {
+  it('correctly retrieves the associated sites in batches', async () => {
     // Cast the command class instance to any so we can set the private
     // property 'batchSize' to a small number for easier testing
     const newBatchSize = 3;
@@ -340,18 +319,11 @@ describe(commands.HUBSITE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, includeAssociatedSites: true, output: 'json' } }, () => {
-      try {
-        assert.strictEqual((firstPagedRequest && secondPagedRequest && thirdPagedRequest), true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, includeAssociatedSites: true, output: 'json' } });
+    assert.strictEqual((firstPagedRequest && secondPagedRequest && thirdPagedRequest), true);
   });
 
-  it('correctly retrieves the associated sites in batches (debug)', (done) => {
+  it('correctly retrieves the associated sites in batches (debug)', async () => {
     // Cast the command class instance to any so we can set the private
     // property 'batchSize' to a small number for easier testing
     const newBatchSize = 3;
@@ -433,18 +405,11 @@ describe(commands.HUBSITE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, includeAssociatedSites: true, output: 'json' } }, () => {
-      try {
-        assert.strictEqual((firstPagedRequest && secondPagedRequest && thirdPagedRequest), true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, includeAssociatedSites: true, output: 'json' } });
+    assert.strictEqual((firstPagedRequest && secondPagedRequest && thirdPagedRequest), true);
   });
 
-  it('lists hub sites, including associated sites, with all properties for JSON output', (done) => {
+  it('lists hub sites, including associated sites, with all properties for JSON output', async () => {
     sinon.stub(request, 'get').resolves({
       value: [
         {
@@ -583,63 +548,56 @@ describe(commands.HUBSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, includeAssociatedSites: true, output: 'json' } }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(log[0]), JSON.stringify([
+    await command.action(logger, { options: { debug: false, includeAssociatedSites: true, output: 'json' } });
+    assert.strictEqual(JSON.stringify(log[0]), JSON.stringify([
+      {
+        "Description": null,
+        "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
+        "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+        "SiteId": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
+        "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
+        "Targets": null,
+        "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+        "Title": "Sales",
+        "AssociatedSites": [
           {
-            "Description": null,
-            "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
-            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
-            "SiteId": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
-            "Targets": null,
-            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-            "Title": "Sales",
-            "AssociatedSites": [
-              {
-                "Title": "North",
-                "SiteUrl": "https://contoso.sharepoint.com/sites/north"
-              },
-              {
-                "Title": "South",
-                "SiteUrl": "https://contoso.sharepoint.com/sites/south"
-              }
-            ]
+            "Title": "North",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/north"
           },
           {
-            "Description": null,
-            "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
-            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
-            "SiteId": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
-            "Targets": null,
-            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-            "Title": "Travel Programs",
-            "AssociatedSites": [
-              {
-                "Title": "Europe",
-                "SiteUrl": "https://contoso.sharepoint.com/sites/europe"
-              },
-              {
-                "Title": "Asia",
-                "SiteUrl": "https://contoso.sharepoint.com/sites/asia"
-              },
-              {
-                "Title": "America",
-                "SiteUrl": "https://contoso.sharepoint.com/sites/america"
-              }
-            ]
+            "Title": "South",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/south"
           }
-        ]));
-        done();
+        ]
+      },
+      {
+        "Description": null,
+        "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
+        "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+        "SiteId": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
+        "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
+        "Targets": null,
+        "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+        "Title": "Travel Programs",
+        "AssociatedSites": [
+          {
+            "Title": "Europe",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/europe"
+          },
+          {
+            "Title": "Asia",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/asia"
+          },
+          {
+            "Title": "America",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/america"
+          }
+        ]
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('correctly handles empty result while retrieving associated sites in batches', (done) => {
+  it('correctly handles empty result while retrieving associated sites in batches', async () => {
     // Cast the command class instance to any so we can set the private
     // property 'batchSize' to a small number for easier testing
     const newBatchSize = 3;
@@ -689,34 +647,20 @@ describe(commands.HUBSITE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, includeAssociatedSites: true } }, () => {
-      try {
-        assert.strictEqual(firstPagedRequest, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, includeAssociatedSites: true } });
+    assert.strictEqual(firstPagedRequest, true);
   });
 
-  it('correctly handles OData error when retrieving hub sites', (done) => {
+  it('correctly handles OData error when retrieving hub sites', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError('An error has occurred'));
   });
 
-  it('correctly handles error in the first batch of associated sites', (done) => {
+  it('correctly handles error in the first batch of associated sites', async () => {
     // Cast the command class instance to any so we can set the private
     // property 'batchSize' to a small number for easier testing
     const newBatchSize = 3;
@@ -748,18 +692,11 @@ describe(commands.HUBSITE_LIST, () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
-    command.action(logger, { options: { debug: false, includeAssociatedSites: true, output: 'json' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, includeAssociatedSites: true, output: 'json' } } as any),
+      new CommandError('An error has occurred'));
   });
 
-  it('correctly handles error in a subsequent batch of associated sites', (done) => {
+  it('correctly handles error in a subsequent batch of associated sites', async () => {
     // Cast the command class instance to any so we can set the private
     // property 'batchSize' to a small number for easier testing
     const newBatchSize = 3;
@@ -812,15 +749,8 @@ describe(commands.HUBSITE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, includeAssociatedSites: true, output: 'json' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, includeAssociatedSites: true, output: 'json' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

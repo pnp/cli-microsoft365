@@ -79,45 +79,27 @@ class SpoHubSiteGetCommand extends SpoCommand {
   	this.optionSets.push(['id', 'title', 'url']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let hubSite: HubSite;
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const spoUrl = await spo.getSpoUrl(logger, this.debug);
+      const hubSite = args.options.id ? await this.getHubSiteById(spoUrl, args.options) : await this.getHubSite(spoUrl, args.options);
 
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((spoUrl: string): Promise<any> => {
-        if (args.options.id) {
-          return this.getHubSiteById(spoUrl, args.options);
-        }
-        else {
-          return this.getHubSite(spoUrl, args.options);
-        }
-      })
-      .then((res: HubSite): Promise<CommandOutput | void> => {
-        hubSite = res;
+      if (args.options.includeAssociatedSites && (args.options.output && args.options.output !== 'json')) {
+        throw Error('includeAssociatedSites option is only allowed with json output mode');
+      }
 
-        if (args.options.includeAssociatedSites && (args.options.output && args.options.output !== 'json')) {
-          throw Error('includeAssociatedSites option is only allowed with json output mode');
-        }
+      if (args.options.includeAssociatedSites === true && args.options.output && args.options.output === 'json') {
+        const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+        const associatedSitesCommandOutput = await this.getAssociatedSites(spoAdminUrl, hubSite.SiteId, logger, args);
+        const associatedSites: AssociatedSite[] = JSON.parse((associatedSitesCommandOutput as CommandOutput).stdout) as AssociatedSite[];
+        hubSite.AssociatedSites = associatedSites.filter(s => s.SiteId !== hubSite.SiteId);
+      }
 
-        if (args.options.includeAssociatedSites !== true || args.options.output && args.options.output !== 'json') {
-          return Promise.resolve();
-        }
-
-        return spo
-          .getSpoAdminUrl(logger, this.debug)
-          .then((spoAdminUrl: string): Promise<CommandOutput> => {
-            return this.getAssociatedSites(spoAdminUrl, hubSite.SiteId, logger, args);
-          });
-      })
-      .then((associatedSitesCommandOutput: CommandOutput | void): void => {
-        if (args.options.includeAssociatedSites) {
-          const associatedSites: AssociatedSite[] = JSON.parse((associatedSitesCommandOutput as CommandOutput).stdout) as AssociatedSite[];
-          hubSite.AssociatedSites = associatedSites.filter(s => s.SiteId !== hubSite.SiteId);
-        }
-
-        logger.log(hubSite);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(hubSite);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getAssociatedSites(spoAdminUrl: string, hubSiteId: string, logger: Logger, args: CommandArgs): Promise<CommandOutput> {

@@ -56,7 +56,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('uses correct API url', (done) => {
+  it('uses correct API url', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
         return Promise.resolve('Correct Url');
@@ -65,27 +65,14 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false
       }
-    }, () => {
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post
-        ]);
-      }
     });
   });
 
-  it('uses correct API url (debug)', (done) => {
+  it('uses correct API url (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
         return Promise.resolve('Correct Url');
@@ -93,27 +80,14 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true
-      }
-    }, () => {
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          request.post
-        ]);
       }
     });
   });
 
-  it('gets the current value of the HideDefaultThemes setting', (done) => {
+  it('gets the current value of the HideDefaultThemes setting', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
         if (opts.headers &&
@@ -125,21 +99,11 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, verbose: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(true), 'Invalid request');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await command.action(logger, { options: { debug: true, verbose: true } });
+    assert(loggerLogSpy.calledWith(true), 'Invalid request');
   });
 
-  it('gets the current value of the HideDefaultThemes setting - handle error', (done) => {
+  it('gets the current value of the HideDefaultThemes setting - handle error', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
         return Promise.reject('An error has occurred');
@@ -147,18 +111,8 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, verbose: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, verbose: true } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

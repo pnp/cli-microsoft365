@@ -1,7 +1,7 @@
 import { Cli, Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ContextInfo, spo, validation } from '../../../../utils';
+import { spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -56,42 +56,41 @@ class SpoHubSiteUnregisterCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const unregisterHubSite: () => void = (): void => {
-      spo
-        .getRequestDigest(args.options.url)
-        .then((res: ContextInfo): Promise<void> => {
-          const requestOptions: any = {
-            url: `${args.options.url}/_api/site/UnregisterHubSite`,
-            headers: {
-              'X-RequestDigest': res.FormDigestValue,
-              accept: 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const unregisterHubSite: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const res = await spo.getRequestDigest(args.options.url);
 
-          return request.post(requestOptions);
-        })
-        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        const requestOptions: any = {
+          url: `${args.options.url}/_api/site/UnregisterHubSite`,
+          headers: {
+            'X-RequestDigest': res.FormDigestValue,
+            accept: 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      unregisterHubSite();
+      await unregisterHubSite();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to unregister the site collection ${args.options.url} as a hub site?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          unregisterHubSite();
-        }
       });
+
+      if (result.continue) {
+        await unregisterHubSite();
+      }
     }
   }
 }

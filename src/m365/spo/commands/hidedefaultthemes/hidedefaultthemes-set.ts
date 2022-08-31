@@ -59,28 +59,29 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    spo
-      .getSpoAdminUrl(logger, this.debug)
-      .then((spoAdminUrl: string): Promise<void> => {
-        if (this.verbose) {
-          logger.logToStderr(`Setting the value of the HideDefaultThemes setting to ${args.options.hideDefaultThemes}...`);
-        }
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+      if (this.verbose) {
+        logger.logToStderr(`Setting the value of the HideDefaultThemes setting to ${args.options.hideDefaultThemes}...`);
+      }
 
-        const requestOptions: any = {
-          url: `${spoAdminUrl}/_api/thememanager/SetHideDefaultThemes`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          data: {
-            hideDefaultThemes: args.options.hideDefaultThemes
-          },
-          responseType: 'json'
-        };
+      const requestOptions: any = {
+        url: `${spoAdminUrl}/_api/thememanager/SetHideDefaultThemes`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        data: {
+          hideDefaultThemes: args.options.hideDefaultThemes
+        },
+        responseType: 'json'
+      };
 
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 
