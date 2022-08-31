@@ -1,5 +1,16 @@
 # Release notes
 
+## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
+
+### Changes
+
+- replaced validation with optionsets [#3218](https://github.com/pnp/cli-microsoft365/issues/3218)
+- added support for upgrading SPFx projects to v1.16.0-beta.1 [#3628](https://github.com/pnp/cli-microsoft365/issues/3628)
+- fixed command completion in PowerShell [#3394](https://github.com/pnp/cli-microsoft365/issues/3394)
+- fixed `spo listitem roleinheritance` docs [#3597](https://github.com/pnp/cli-microsoft365/issues/3597)
+- set default output in CLI runtime [#3445](https://github.com/pnp/cli-microsoft365/issues/3445)
+- fixed using unknown flags in 'aad user list' [#3059](https://github.com/pnp/cli-microsoft365/issues/3059)
+
 ## [v5.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.7.0)
 
 ### New commands
