@@ -7,6 +7,7 @@ export interface YoRcJson extends JsonFile {
     framework?: string;
     isCreatingSolution?: boolean;
     isDomainIsolated?: boolean;
+    nodeVersion?: string;
     packageManager?: string;
     template?: string;
     version?: string;
