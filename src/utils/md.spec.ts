@@ -53,7 +53,7 @@ describe('utils/md', () => {
   });
 
   it('converts code fences', () => {
-    assert(cliCompletionClinkUpdateHelpPlain.includes('  cli completion clink update > m365.lua'));
+    assert(cliCompletionClinkUpdateHelpPlain.includes('cli completion clink update > m365.lua'));
     assert(!cliCompletionClinkUpdateHelpPlain.includes('```'));
   });
 
