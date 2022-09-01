@@ -35,6 +35,7 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -106,32 +107,16 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
           }
         }
 
-        if (args.options.listId && args.options.listTitle) {
-          return 'Specify listId or listTitle, but not both';
-        }
-
-        if (!args.options.listId && !args.options.listTitle) {
-          return 'Specify listId or listTitle, one is required';
-        }
-
-        if (args.options.viewId && args.options.viewTitle) {
-          return 'Specify viewId or viewTitle, but not both';
-        }
-
-        if (!args.options.viewId && !args.options.viewTitle) {
-          return 'Specify viewId or viewTitle, one is required';
-        }
-
-        if (args.options.fieldId && args.options.fieldTitle) {
-          return 'Specify fieldId or fieldTitle, but not both';
-        }
-
-        if (!args.options.fieldId && !args.options.fieldTitle) {
-          return 'Specify fieldId or fieldTitle, one is required';
-        }
-
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['listId', 'listTitle'],
+      ['viewId', 'viewTitle'],
+      ['fieldId', 'fieldTitle']
     );
   }
 

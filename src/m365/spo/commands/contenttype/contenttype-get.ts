@@ -33,6 +33,7 @@ class SpoContentTypeGetCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initTypes();
+    this.#initOptionSets();
   }
   
   #initTelemetry(): void {
@@ -70,14 +71,6 @@ class SpoContentTypeGetCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
     
-        if (args.options.id && args.options.name) {
-          return 'Specify id or name, but not both';
-        }
-    
-        if (!args.options.id && !args.options.name) {
-          return 'Specify id or name, one is required';
-        }
-    
         return true;
       }
     );
@@ -85,6 +78,10 @@ class SpoContentTypeGetCommand extends SpoCommand {
 
   #initTypes(): void {
     this.types.string.push('id', 'i');
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'name']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {

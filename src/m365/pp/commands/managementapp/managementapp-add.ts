@@ -31,6 +31,7 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -53,19 +54,7 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {
-        if (!args.options.appId &&
-          !args.options.objectId &&
-          !args.options.name) {
-          return 'Specify either appId, objectId, or name';
-        }
-    
-        if ((args.options.appId && args.options.objectId) ||
-          (args.options.appId && args.options.name) ||
-          (args.options.objectId && args.options.name)) {
-          return 'Specify either appId, objectId, or name but not both';
-        }
-    
+      async (args: CommandArgs) => {    
         if (args.options.appId && !validation.isValidGuid(args.options.appId as string)) {
           return `${args.options.appId} is not a valid GUID`;
         }
@@ -77,6 +66,10 @@ class PpManagementAppAddCommand extends PowerPlatformCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['appId', 'objectId', 'name']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

@@ -266,7 +266,7 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'foo' } }, commandInfo);
+    const actual = await command.validate({ options: { webUrl: 'foo', id: 7 } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

@@ -57,6 +57,7 @@ class PlannerTaskAddCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -117,79 +118,70 @@ class PlannerTaskAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.planId && !args.options.planName && !args.options.planTitle) {
-	      return 'Specify either planId or planTitle';
-	    }
+        if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
+        }
 
-	    if (args.options.planId && (args.options.planName || args.options.planTitle)) {
-	      return 'Specify either planId or planTitle but not both';
-	    }
+        if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
+        }
 
-	    if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-	      return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
-	    }
+        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
+          return `${args.options.ownerGroupId} is not a valid GUID`;
+        }
 
-	    if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
-	      return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
-	    }
+        if (args.options.startDateTime && !validation.isValidISODateTime(args.options.startDateTime)) {
+          return 'The startDateTime is not a valid ISO date string';
+        }
 
-	    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-	      return `${args.options.ownerGroupId} is not a valid GUID`;
-	    }
+        if (args.options.dueDateTime && !validation.isValidISODateTime(args.options.dueDateTime)) {
+          return 'The dueDateTime is not a valid ISO date string';
+        }
 
-	    if (!args.options.bucketId && !args.options.bucketName) {
-	      return 'Specify either bucketId or bucketName';
-	    }
+        if (args.options.percentComplete && isNaN(args.options.percentComplete)) {
+          return `percentComplete is not a number`;
+        }
 
-	    if (args.options.bucketId && args.options.bucketName) {
-	      return 'Specify either bucketId or bucketName but not both';
-	    }
+        if (args.options.percentComplete && (args.options.percentComplete < 0 || args.options.percentComplete > 100)) {
+          return `percentComplete should be between 0 and 100`;
+        }
 
-	    if (args.options.startDateTime && !validation.isValidISODateTime(args.options.startDateTime)) {
-	      return 'The startDateTime is not a valid ISO date string';
-	    }
+        if (args.options.assignedToUserIds && !validation.isValidGuidArray(args.options.assignedToUserIds.split(','))) {
+          return 'assignedToUserIds contains invalid GUID';
+        }
 
-	    if (args.options.dueDateTime && !validation.isValidISODateTime(args.options.dueDateTime)) {
-	      return 'The dueDateTime is not a valid ISO date string';
-	    }
+        if (args.options.assignedToUserIds && args.options.assignedToUserNames) {
+          return 'Specify either assignedToUserIds or assignedToUserNames but not both';
+        }
 
-	    if (args.options.percentComplete && isNaN(args.options.percentComplete)) {
-	      return `percentComplete is not a number`;
-	    }
+        if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => this.allowedAppliedCategories.indexOf(category.toLocaleLowerCase()) < 0).length !== 0) {
+          return `The appliedCategories contains invalid value. Specify either ${this.allowedAppliedCategories.join(', ')} as properties`;
+        }
 
-	    if (args.options.percentComplete && (args.options.percentComplete < 0 || args.options.percentComplete > 100)) {
-	      return `percentComplete should be between 0 and 100`;
-	    }
+        if (args.options.previewType && this.allowedPreviewTypes.indexOf(args.options.previewType.toLocaleLowerCase()) === -1) {
+          return `${args.options.previewType} is not a valid preview type value. Allowed values are ${this.allowedPreviewTypes.join(', ')}`;
+        }
 
-	    if (args.options.assignedToUserIds && !validation.isValidGuidArray(args.options.assignedToUserIds.split(','))) {
-	      return 'assignedToUserIds contains invalid GUID';
-	    }
+        if (args.options.priority !== undefined) {
+          if (typeof args.options.priority === "number") {
+            if (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10 || !Number.isInteger(args.options.priority)) {
+              return 'priority should be an integer between 0 and 10.';
+            }
+          }
+          else if (taskPriority.priorityValues.map(l => l.toLowerCase()).indexOf(args.options.priority.toString().toLowerCase()) === -1) {
+            return `${args.options.priority} is not a valid priority value. Allowed values are ${taskPriority.priorityValues.join('|')}.`;
+          }
+        }
 
-	    if (args.options.assignedToUserIds && args.options.assignedToUserNames) {
-	      return 'Specify either assignedToUserIds or assignedToUserNames but not both';
-	    }
-
-	    if (args.options.appliedCategories && args.options.appliedCategories.split(',').filter(category => this.allowedAppliedCategories.indexOf(category.toLocaleLowerCase()) < 0).length !== 0) {
-	      return `The appliedCategories contains invalid value. Specify either ${this.allowedAppliedCategories.join(', ')} as properties`;
-	    }
-
-	    if (args.options.previewType && this.allowedPreviewTypes.indexOf(args.options.previewType.toLocaleLowerCase()) === -1) {
-	      return `${args.options.previewType} is not a valid preview type value. Allowed values are ${this.allowedPreviewTypes.join(', ')}`;
-	    }
-
-	    if (args.options.priority !== undefined) {
-	      if (typeof args.options.priority === "number") {
-	        if (isNaN(args.options.priority) || args.options.priority < 0 || args.options.priority > 10 || !Number.isInteger(args.options.priority)) {
-	          return 'priority should be an integer between 0 and 10.';
-	        }
-	      }
-	      else if (taskPriority.priorityValues.map(l => l.toLowerCase()).indexOf(args.options.priority.toString().toLowerCase()) === -1) {
-	        return `${args.options.priority} is not a valid priority value. Allowed values are ${taskPriority.priorityValues.join('|')}.`;
-	      }
-	    }
-
-	    return true;
+        return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['planId', 'planTitle'],
+      ['bucketId', 'bucketName']
     );
   }
 

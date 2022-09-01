@@ -32,6 +32,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -64,14 +65,6 @@ class TeamsChannelRemoveCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.channelId && args.options.channelName) {
-          return 'Specify channelId or channelName but not both';
-        }
-
-        if (!args.options.channelId && !args.options.channelName) {
-          return 'Specify channelId or channelName';
-        }
-
         if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
           return `${args.options.channelId} is not a valid Teams Channel Id`;
         }
@@ -83,6 +76,10 @@ class TeamsChannelRemoveCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['channelId', 'channelName']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {

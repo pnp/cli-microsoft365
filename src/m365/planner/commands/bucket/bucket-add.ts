@@ -41,6 +41,7 @@ class PlannerBucketAddCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -85,29 +86,25 @@ class PlannerBucketAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.planId && !args.options.planName && !args.options.planTitle) {
-	      return 'Specify either planId or planTitle';
-	    }
+        if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
+        }
 
-	    if (args.options.planId && (args.options.planName || args.options.planTitle)) {
-	      return 'Specify either planId or planTitle but not both';
-	    }
+        if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
+          return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
+        }
 
-	    if ((args.options.planName || args.options.planTitle) && !args.options.ownerGroupId && !args.options.ownerGroupName) {
-	      return 'Specify either ownerGroupId or ownerGroupName when using planTitle';
-	    }
+        if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
+          return `${args.options.ownerGroupId} is not a valid GUID`;
+        }
 
-	    if ((args.options.planName || args.options.planTitle) && args.options.ownerGroupId && args.options.ownerGroupName) {
-	      return 'Specify either ownerGroupId or ownerGroupName when using planTitle but not both';
-	    }
-
-	    if (args.options.ownerGroupId && !validation.isValidGuid(args.options.ownerGroupId as string)) {
-	      return `${args.options.ownerGroupId} is not a valid GUID`;
-	    }
-
-	    return true;
+        return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['planId', 'planTitle']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
