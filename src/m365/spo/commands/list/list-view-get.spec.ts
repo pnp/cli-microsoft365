@@ -60,7 +60,7 @@ describe(commands.LIST_VIEW_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('correctly handles error when the specified list doesn\'t exist', (done) => {
+  it('correctly handles error when the specified list doesn\'t exist', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
@@ -75,18 +75,11 @@ describe(commands.LIST_VIEW_GET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', viewTitle: 'All items' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("List does not exist.\n\nThe page you selected contains a list that does not exist. It may have been deleted by another user.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', viewTitle: 'All items' } } as any),
+      new CommandError("List does not exist.\n\nThe page you selected contains a list that does not exist. It may have been deleted by another user."));
   });
 
-  it('correctly handles error when the specified view doesn\'t exist', (done) => {
+  it('correctly handles error when the specified view doesn\'t exist', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
@@ -101,18 +94,11 @@ describe(commands.LIST_VIEW_GET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', viewTitle: 'All Items' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("The specified view is invalid.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', viewTitle: 'All Items' } } as any),
+      new CommandError("The specified view is invalid."));
   });
 
-  it('should successfully get the list view with specified its Id', (done) => {
+  it('should successfully get the list view with specified its Id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
 
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('List%201')/views/getById('ba84217c-8561-4234-aa95-265081e74be9')`) {
@@ -126,18 +112,11 @@ describe(commands.LIST_VIEW_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', viewId: 'ba84217c-8561-4234-aa95-265081e74be9' } }, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].Id, 'ba84217c-8561-4234-aa95-265081e74be9');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', viewId: 'ba84217c-8561-4234-aa95-265081e74be9' } });
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].Id, 'ba84217c-8561-4234-aa95-265081e74be9');
   });
 
-  it('should successfully get the list view with specified its name', (done) => {
+  it('should successfully get the list view with specified its name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === "https://contoso.sharepoint.com/_api/web/GetList('%2Flists%2FList1')/views/getByTitle('All%20Items')") {
         if (opts.headers &&
@@ -150,18 +129,11 @@ describe(commands.LIST_VIEW_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listUrl: 'lists/List1', viewTitle: 'All Items' } }, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].Title, 'All Items');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listUrl: 'lists/List1', viewTitle: 'All Items' } });
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].Title, 'All Items');
   });
 
-  it('should successfully get the list view with specified its name and list id', (done) => {
+  it('should successfully get the list view with specified its name and list id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === "https://contoso.sharepoint.com/_api/web/lists(guid'dac05e4a-5f6c-41dd-bba3-2be1104c711e')/views/getById('ba84217c-8561-4234-aa95-265081e74be9')") {
         if (opts.headers &&
@@ -174,15 +146,8 @@ describe(commands.LIST_VIEW_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', listId: 'dac05e4a-5f6c-41dd-bba3-2be1104c711e', viewId: 'ba84217c-8561-4234-aa95-265081e74be9' } }, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].Title, 'All Items');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', listId: 'dac05e4a-5f6c-41dd-bba3-2be1104c711e', viewId: 'ba84217c-8561-4234-aa95-265081e74be9' } });
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].Title, 'All Items');
   });
 
   it('supports debug mode', () => {

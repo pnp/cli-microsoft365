@@ -115,7 +115,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('reset role inheritance on list item by list title', (done) => {
+  it('reset role inheritance on list item by list title', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/items(8)/resetroleinheritance') > -1) {
         return Promise.resolve();
@@ -124,25 +124,17 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 8,
         listTitle: 'test'
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('reset role inheritance on list item by list id', (done) => {
+  it('reset role inheritance on list item by list id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid\'0cd891ef-afce-4e55-b836-fce03286cccf\')/items(8)/resetroleinheritance') > -1) {
         return Promise.resolve();
@@ -151,25 +143,17 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 8,
         listId: '0cd891ef-afce-4e55-b836-fce03286cccf'
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('correctly handles error when reseting list item role inheritance', (done) => {
+  it('correctly handles error when reseting list item role inheritance', async () => {
     const err = 'request rejected';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/items(8)/resetroleinheritance') > -1) {
@@ -179,21 +163,13 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 8,
         listTitle: 'test'
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 });

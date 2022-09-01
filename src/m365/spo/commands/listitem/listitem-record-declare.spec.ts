@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
@@ -144,7 +144,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('declares a record using list title is specified', (done) => {
+  it('declares a record using list title is specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -156,18 +156,11 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     };
 
     declareItemAsRecordFakeCalled = false;
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(declareItemAsRecordFakeCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(declareItemAsRecordFakeCalled);
   });
 
-  it('declares a record using list id is passed as an option', (done) => {
+  it('declares a record using list id is passed as an option', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -179,18 +172,11 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     };
 
     declareItemAsRecordFakeCalled = false;
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(declareItemAsRecordFakeCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(declareItemAsRecordFakeCalled);
   });
 
-  it('declares a record when specifying a date in debug mode', (done) => {
+  it('declares a record when specifying a date in debug mode', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -203,18 +189,11 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     };
 
     declareItemAsRecordFakeCalled = false;
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(declareItemAsRecordFakeCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(declareItemAsRecordFakeCalled);
   });
 
-  it('declares a record when specifying a date', (done) => {
+  it('declares a record when specifying a date', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -226,18 +205,11 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     };
 
     declareItemAsRecordFakeCalled = false;
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(declareItemAsRecordFakeCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(declareItemAsRecordFakeCalled);
   });
 
-  it('it reports an error correctly when an item is already declared', (done) => {
+  it('it reports an error correctly when an item is already declared', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -249,18 +221,10 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
       webUrl: `https://alreadydeclared.sharepoint.com/sites/project-y/`
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, 'This item has already been declared a record.');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('This item has already been declared a record.'));
   });
 
-  it('fails to get _ObjecttIdentity_ when an error is returned by the _ObjectIdentity_ CSOM request', (done) => {
+  it('fails to get _ObjecttIdentity_ when an error is returned by the _ObjectIdentity_ CSOM request', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -273,19 +237,11 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     };
 
     declareItemAsRecordFakeCalled = false;
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.notStrictEqual(declareItemAsRecordFakeCalled, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    await command.action(logger, { options: options } as any);
+    assert.notStrictEqual(declareItemAsRecordFakeCalled, true);
   });
 
-  it('fails to declare a list item as a record when an error is returned', (done) => {
+  it('fails to declare a list item as a record when an error is returned', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -297,15 +253,8 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     };
 
     declareItemAsRecordFakeCalled = false;
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.notStrictEqual(declareItemAsRecordFakeCalled, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.notStrictEqual(declareItemAsRecordFakeCalled, true);
   });
 
   it('supports debug mode', () => {

@@ -1,12 +1,9 @@
 import { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import {
-  CommandError
-} from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, IdentityResponse, spo, validation } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, formatting, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -105,7 +102,7 @@ class SpoListItemIsRecordCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     const listIdArgument: string = args.options.listId || '';
     const listTitleArgument: string = args.options.listTitle || '';
@@ -120,71 +117,69 @@ class SpoListItemIsRecordCommand extends SpoCommand {
       logger.logToStderr(`Retrieving access token for ${resource}...`);
     }
 
-    ((): Promise<{ Id: string; }> => {
+    try {
       if (typeof args.options.listId !== 'undefined') {
         if (this.verbose) {
           logger.logToStderr(`List Id passed in as an argument.`);
         }
 
-        return Promise.resolve({ Id: args.options.listId });
+        listId = args.options.listId;
       }
+      else {
+        if (this.verbose) {
+          logger.logToStderr(`Getting list id...`);
+        }
+        const requestOptions: any = {
+          url: `${listRestUrl}?$select=Id`,
+          headers: {
+            accept: 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+  
+        const list = await request.get<{ Id: string; }>(requestOptions);
+        listId = list.Id;
+      }
+
+      if (this.debug) {
+        logger.logToStderr(`Getting request digest for request`);
+      }
+
+      const reqDigest = await spo.getRequestDigest(args.options.webUrl);
+      formDigestValue = reqDigest.FormDigestValue;
+
+      const webIdentityResp = await spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
 
       if (this.verbose) {
-        logger.logToStderr(`Getting list id...`);
+        logger.logToStderr(`Checking if list item is a record in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
       }
+
+      const requestBody = this.getIsRecordRequestBody(webIdentityResp.objectIdentity, listId, args.options.id);
       const requestOptions: any = {
-        url: `${listRestUrl}?$select=Id`,
+        url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
-          accept: 'application/json;odata=nometadata'
+          'Content-Type': 'text/xml',
+          'X-RequestDigest': formDigestValue
         },
-        responseType: 'json'
+        data: requestBody
       };
 
-      return request.get(requestOptions);
-    })()
-      .then((res: { Id: string }): Promise<ContextInfo> => {
-        listId = res.Id;
+      const res = await request.post<string>(requestOptions);
 
-        if (this.debug) {
-          logger.logToStderr(`Getting request digest for request`);
-        }
+      const json: ClientSvcResponse = JSON.parse(res);
+      const response: ClientSvcResponseContents = json[0];
 
-        return spo.getRequestDigest(args.options.webUrl);
-      })
-      .then((res: ContextInfo): Promise<IdentityResponse> => {
-        formDigestValue = res.FormDigestValue;
-        return spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
-      })
-      .then((webIdentityResp: IdentityResponse): Promise<string> => {
-        if (this.verbose) {
-          logger.logToStderr(`Checking if list item is a record in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
-        }
-
-        const requestBody = this.getIsRecordRequestBody(webIdentityResp.objectIdentity, listId, args.options.id);
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'Content-Type': 'text/xml',
-            'X-RequestDigest': formDigestValue
-          },
-          data: requestBody
-        };
-
-        return request.post<string>(requestOptions);
-      })
-      .then((res: string): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-
-        if (response.ErrorInfo) {
-          cb(new CommandError(response.ErrorInfo.ErrorMessage));
-        }
-        else {
-          const result: boolean = json[json.length - 1];
-          logger.log(result);
-          cb();
-        }
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      if (response.ErrorInfo) {
+        throw response.ErrorInfo.ErrorMessage;
+      }
+      else {
+        const result: boolean = json[json.length - 1];
+        logger.log(result);
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
   }
 
   private getIsRecordRequestBody(webIdentity: string, listId: string, id: string): string {

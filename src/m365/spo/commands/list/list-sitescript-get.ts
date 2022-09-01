@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandError
-} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, urlUtil, validation } from '../../../../utils';
@@ -86,66 +83,62 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    if (this.verbose) {
-      const list: string = (args.options.listId ? args.options.listId : args.options.listTitle) as string;
-      logger.logToStderr(`Extracting Site Script from list ${list} in site at ${args.options.webUrl}...`);
-    }
-
-    let requestUrl: string = '';
-
-    if (args.options.listId) {
-      if (this.debug) {
-        logger.logToStderr(`Retrieving List Url from Id '${args.options.listId}'...`);
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      if (this.verbose) {
+        const list: string = (args.options.listId ? args.options.listId : args.options.listTitle) as string;
+        logger.logToStderr(`Extracting Site Script from list ${list} in site at ${args.options.webUrl}...`);
       }
-      requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')?$expand=RootFolder`;
-    }
-    else {
-      if (this.debug) {
-        logger.logToStderr(`Retrieving List Url from Title '${args.options.listTitle}'...`);
-      }
-      requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')?$expand=RootFolder`;
-    }
-
-    const requestOptions: any = {
-      url: requestUrl,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
-
-    request
-      .get<ListInstance>(requestOptions)
-      .then((listInstance: ListInstance): Promise<any> => {
-        const listAbsoluteUrl = urlUtil.getAbsoluteUrl(args.options.webUrl, listInstance.RootFolder.ServerRelativeUrl);
-        const requestUrl = `${args.options.webUrl}/_api/Microsoft_SharePoint_Utilities_WebTemplateExtensions_SiteScriptUtility_GetSiteScriptFromList`;
-        const requestOptions: any = {
-          url: requestUrl,
-          headers: {
-            'accept': 'application/json;odata=nometadata',
-            'content-type': 'application/json;odata=nometadata'
-          },
-          responseType: 'json',
-          data: {
-            listUrl: listAbsoluteUrl
-          }
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res: any): void => {
-        const siteScript: string | null = res.value;
-        if (!siteScript) {
-          cb(new CommandError(`An error has occurred, the site script could not be extracted from list '${args.options.listId || args.options.listTitle}'`));
-          return;
+  
+      let requestUrl: string = '';
+  
+      if (args.options.listId) {
+        if (this.debug) {
+          logger.logToStderr(`Retrieving List Url from Id '${args.options.listId}'...`);
         }
+        requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')?$expand=RootFolder`;
+      }
+      else {
+        if (this.debug) {
+          logger.logToStderr(`Retrieving List Url from Title '${args.options.listTitle}'...`);
+        }
+        requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')?$expand=RootFolder`;
+      }
 
-        logger.log(siteScript);
-        cb();
-      }, (err: any): void => {
-        this.handleRejectedODataJsonPromise(err, logger, cb);
-      });
+      let requestOptions: any = {
+        url: requestUrl,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      const listInstance = await request.get<ListInstance>(requestOptions);
+      const listAbsoluteUrl = urlUtil.getAbsoluteUrl(args.options.webUrl, listInstance.RootFolder.ServerRelativeUrl);
+      requestUrl = `${args.options.webUrl}/_api/Microsoft_SharePoint_Utilities_WebTemplateExtensions_SiteScriptUtility_GetSiteScriptFromList`;
+      requestOptions = {
+        url: requestUrl,
+        headers: {
+          'accept': 'application/json;odata=nometadata',
+          'content-type': 'application/json;odata=nometadata'
+        },
+        responseType: 'json',
+        data: {
+          listUrl: listAbsoluteUrl
+        }
+      };
+
+      const res = await request.post<any>(requestOptions);
+      const siteScript: string | null = res.value;
+      if (!siteScript) {
+        throw `An error has occurred, the site script could not be extracted from list '${args.options.listId || args.options.listTitle}'`;
+      }
+
+      logger.log(siteScript);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

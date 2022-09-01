@@ -37,9 +37,9 @@ describe(commands.LISTITEM_REMOVE, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
   });
 
@@ -66,59 +66,38 @@ describe(commands.LISTITEM_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing list item when confirmation argument not passed (id)', (done) => {
-    command.action(logger, { options: { debug: false, id: 1, webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents' } }, () => {
-      let promptIssued = false;
+  it('prompts before removing list item when confirmation argument not passed (id)', async () => {
+    await command.action(logger, { options: { debug: false, id: 1, webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('prompts before removing list item when confirmation argument not passed (title)', (done) => {
-    command.action(logger, { options: { debug: false, listTitle: 'My list', webUrl: 'https://contoso.sharepoint.com', id: 1 } }, () => {
-      let promptIssued = false;
+  it('prompts before removing list item when confirmation argument not passed (title)', async () => {
+    await command.action(logger, { options: { debug: false, listTitle: 'My list', webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('aborts removing list item when prompt not confirmed', (done) => {
+  it('aborts removing list item when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { debug: false, listTitle: 'My list', webUrl: 'https://contoso.sharepoint.com', id: 1 } }, () => {
-      try {
-        assert(requests.length === 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: { debug: false, listTitle: 'My list', webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+    assert(requests.length === 0);
   });
 
-  it('removes the list item when prompt confirmed', (done) => {
+  it('removes the list item when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -134,29 +113,23 @@ describe(commands.LISTITEM_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, listId: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com', id: 1 } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/lists(guid'`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, listId: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/web/lists(guid'`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    
+    assert(correctRequestIssued);
   });
 
-  it('recycles the list item when prompt confirmed', (done) => {
+  it('recycles the list item when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -172,29 +145,23 @@ describe(commands.LISTITEM_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, listId: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com', id: 1, recycle: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/recycle()`) > -1 &&
-          r.headers.accept &&
-          r.headers.accept.indexOf('application/json') === 0) {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, listId: 'b2307a39-e878-458b-bc90-03bc578531d6', webUrl: 'https://contoso.sharepoint.com', id: 1, recycle: true } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/recycle()`) > -1 &&
+        r.headers.accept &&
+        r.headers.accept.indexOf('application/json') === 0) {
+        correctRequestIssued = true;
       }
     });
+    
+    assert(correctRequestIssued);
   });
 
-  it('command correctly handles list get reject request', (done) => {
+  it('command correctly handles list get reject request', async () => {
     const err = 'Invalid request';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
@@ -206,25 +173,17 @@ describe(commands.LISTITEM_REMOVE, () => {
 
     const actionTitle: string = 'Documents';
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         title: actionTitle,
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
-  it('uses correct API url when id option is passed', (done) => {
+  it('uses correct API url when id option is passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
         return Promise.resolve('Correct Url');
@@ -235,27 +194,17 @@ describe(commands.LISTITEM_REMOVE, () => {
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
       }
-    }, () => {
-
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
-
   });
 
-  it('uses correct API url when recycle option is passed', (done) => {
+  it('uses correct API url when recycle option is passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/recycle()') > -1) {
         return Promise.resolve('Correct Url');
@@ -266,7 +215,7 @@ describe(commands.LISTITEM_REMOVE, () => {
 
     const actionId: number = 1;
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: actionId,
@@ -274,14 +223,6 @@ describe(commands.LISTITEM_REMOVE, () => {
         recycle: true,
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
-      }
-    }, () => {
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
       }
     });
   });

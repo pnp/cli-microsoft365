@@ -135,57 +135,53 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const listSelector: string = args.options.listId ? `(guid'${formatting.encodeQueryParameter(args.options.listId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
 
-    const removeFieldFromView: () => void = (): void => {
-      if (this.verbose) {
-        logger.logToStderr(`Getting field ${args.options.fieldId || args.options.fieldTitle}...`);
+    const removeFieldFromView: () => Promise<void> = async (): Promise<void> => {
+      try {
+        if (this.verbose) {
+          logger.logToStderr(`Getting field ${args.options.fieldId || args.options.fieldTitle}...`);
+        }
+
+        const field = await this.getField(args.options, listSelector);
+        if (this.verbose) {
+          logger.logToStderr(`Removing field ${args.options.fieldId || args.options.fieldTitle} from view ${args.options.viewId || args.options.viewTitle}...`);
+        }
+
+        const viewSelector: string = args.options.viewId ? `('${formatting.encodeQueryParameter(args.options.viewId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`;
+        const postRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/removeviewfield('${field.InternalName}')`;
+
+        const postRequestOptions: any = {
+          url: postRequestUrl,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+
+        await request.post(postRequestOptions);
+        // REST post call doesn't return anything
       }
-
-      this
-        .getField(args.options, listSelector)
-        .then((field: { InternalName: string; }): Promise<void> => {
-          if (this.verbose) {
-            logger.logToStderr(`Removing field ${args.options.fieldId || args.options.fieldTitle} from view ${args.options.viewId || args.options.viewTitle}...`);
-          }
-
-          const viewSelector: string = args.options.viewId ? `('${formatting.encodeQueryParameter(args.options.viewId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`;
-          const postRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/removeviewfield('${field.InternalName}')`;
-
-          const postRequestOptions: any = {
-            url: postRequestUrl,
-            headers: {
-              'accept': 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
-
-          return request.post(postRequestOptions);
-        })
-        .then((): void => {
-          // REST post call doesn't return anything
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeFieldFromView();
+      await removeFieldFromView();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the field ${args.options.fieldId || args.options.fieldTitle} from the view ${args.options.viewId || args.options.viewTitle} from list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeFieldFromView();
-        }
       });
+
+      if (result.continue) {
+        await removeFieldFromView();
+      }
     }
   }
 

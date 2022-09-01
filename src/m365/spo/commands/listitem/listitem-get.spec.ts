@@ -147,7 +147,7 @@ describe(commands.LISTITEM_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('returns listItemInstance object when list item is requested', (done) => {
+  it('returns listItemInstance object when list item is requested', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     command.allowUnknownOptions();
@@ -159,18 +159,11 @@ describe(commands.LISTITEM_GET, () => {
       id: expectedId
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(actualId, expectedId);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(actualId, expectedId);
   });
 
-  it('returns listItemInstance object when list item is requested with an output type of json, and a list of fields are specified', (done) => {
+  it('returns listItemInstance object when list item is requested with an output type of json, and a list of fields are specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     command.allowUnknownOptions();
@@ -184,18 +177,11 @@ describe(commands.LISTITEM_GET, () => {
       properties: "ID,Modified"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(actualId, expectedId);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(actualId, expectedId);
   });
 
-  it('returns listItemInstance object when list item is requested with an output type of json, a list of fields with lookup field are specified', (done) => {
+  it('returns listItemInstance object when list item is requested with an output type of json, a list of fields with lookup field are specified', async () => {
     sinon.stub(request, 'get').callsFake((opts: any) => {
       if ((opts.url as string).indexOf('&$expand=') > -1) {
         actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
@@ -223,22 +209,15 @@ describe(commands.LISTITEM_GET, () => {
       properties: "Title,Modified,Company/Title"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.deepStrictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify({
-          "Modified": "2018-03-15T10:43:10Z",
-          "Title": expectedTitle,
-          "Company": `{ "Title": "Contoso" }`
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.deepStrictEqual(JSON.stringify(loggerLogSpy.lastCall.args[0]), JSON.stringify({
+      "Modified": "2018-03-15T10:43:10Z",
+      "Title": expectedTitle,
+      "Company": `{ "Title": "Contoso" }`
+    }));
   });
 
-  it('returns listItemInstance object when list item is requested with an output type of text, and no list of fields', (done) => {
+  it('returns listItemInstance object when list item is requested with an output type of text, and no list of fields', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     command.allowUnknownOptions();
@@ -251,18 +230,11 @@ describe(commands.LISTITEM_GET, () => {
       output: "text"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(actualId, expectedId);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(actualId, expectedId);
   });
 
-  it('returns listItemInstance object when list item is requested with an output type of text, and a list of fields specified', (done) => {
+  it('returns listItemInstance object when list item is requested with an output type of text, and a list of fields specified', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     command.allowUnknownOptions();
@@ -275,18 +247,11 @@ describe(commands.LISTITEM_GET, () => {
       output: "json"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(actualId, expectedId);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert.strictEqual(actualId, expectedId);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     const options: any = {
@@ -297,14 +262,7 @@ describe(commands.LISTITEM_GET, () => {
       output: "json"
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('An error has occurred'));
   });
 });

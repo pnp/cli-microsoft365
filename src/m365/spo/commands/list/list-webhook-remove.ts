@@ -96,8 +96,8 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeWebhook: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeWebhook: () => Promise<void> = async (): Promise<void> => {
       if (this.verbose) {
         const list: string = (args.options.listId ? args.options.listId : args.options.listTitle) as string;
         logger.logToStderr(`Webhook ${args.options.id} is about to be removed from list ${list} located at site ${args.options.webUrl}...`);
@@ -121,33 +121,29 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      request
-        .delete(requestOptions)
-        .then((): void => {
-          // REST delete call doesn't return anything
-          cb();
-        }, (err: any): void => {
-          this.handleRejectedODataJsonPromise(err, logger, cb);
-        });
+      try {
+        await request.delete(requestOptions);
+        // REST delete call doesn't return anything
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeWebhook();
+      await removeWebhook();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove webhook ${args.options.id} from list ${args.options.listTitle || args.options.listId} located at site ${args.options.webUrl}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeWebhook();
-        }
       });
+
+      if (result.continue) {
+        await removeWebhook();
+      }
     }
   }
 }

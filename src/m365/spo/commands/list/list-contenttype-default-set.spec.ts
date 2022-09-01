@@ -61,7 +61,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('configures specified visible content type as default. List specified using Title. UniqueContentTypeOrder null', (done) => {
+  it('configures specified visible content type as default. List specified using Title. UniqueContentTypeOrder null', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder` &&
         opts.headers &&
@@ -99,24 +99,16 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         listTitle: 'My List',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
       }
-    }, (err) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', 'Command completed with an error');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('configures specified visible content type as default. List specified using Title. UniqueContentTypeOrder null. Debug', (done) => {
+  it('configures specified visible content type as default. List specified using Title. UniqueContentTypeOrder null. Debug', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder` &&
         opts.headers &&
@@ -154,26 +146,18 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         listTitle: 'My List',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
       }
-    }, (err) => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        assert.strictEqual(typeof err, 'undefined', 'Command completed with an error');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('configures specified visible content type as default. List specified using ID. UniqueContentTypeOrder not null', (done) => {
+  it('configures specified visible content type as default. List specified using ID. UniqueContentTypeOrder not null', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/RootFolder` &&
         opts.headers &&
@@ -218,24 +202,16 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
       }
-    }, (err) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', 'Command completed with an error');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('configures specified visible content type as default. List specified using ID. UniqueContentTypeOrder not null. Debug', (done) => {
+  it('configures specified visible content type as default. List specified using ID. UniqueContentTypeOrder not null. Debug', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/RootFolder` &&
         opts.headers &&
@@ -280,26 +256,18 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
       }
-    }, (err) => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        assert.strictEqual(typeof err, 'undefined', 'Command completed with an error');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('configures specified invisible content type as default. List specified using Title. UniqueContentTypeOrder null', (done) => {
+  it('configures specified invisible content type as default. List specified using Title. UniqueContentTypeOrder null', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder` &&
         opts.headers &&
@@ -347,24 +315,16 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         listTitle: 'My List',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
       }
-    }, (err) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', 'Command completed with an error');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('configures specified invisible content type as default. List specified using Title. UniqueContentTypeOrder null. Debug', (done) => {
+  it('configures specified invisible content type as default. List specified using Title. UniqueContentTypeOrder null. Debug', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder` &&
         opts.headers &&
@@ -412,26 +372,18 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         listTitle: 'My List',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
       }
-    }, (err) => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        assert.strictEqual(typeof err, 'undefined', 'Command completed with an error');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it(`doesn't configure content type as default if it's already set as default`, (done) => {
+  it(`doesn't configure content type as default if it's already set as default`, async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('Invalid request');
     });
@@ -453,24 +405,16 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         listTitle: 'My List',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
       }
-    }, (err) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', 'Command completed with an error');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it(`doesn't configure content type as default if it's already set as default. Debug`, (done) => {
+  it(`doesn't configure content type as default if it's already set as default. Debug`, async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('Invalid request');
     });
@@ -492,26 +436,18 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         listTitle: 'My List',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
       }
-    }, (err) => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        assert.strictEqual(typeof err, 'undefined', 'Command completed with an error');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it(`fails, if the specified web doesn't exist`, (done) => {
+  it(`fails, if the specified web doesn't exist`, async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('Invalid request');
     });
@@ -519,24 +455,16 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
       return Promise.reject('Request failed with status code 404');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         listTitle: 'My List',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
       }
-    }, (err) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Request failed with status code 404')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('Request failed with status code 404'));
   });
 
-  it(`fails, if the list specified by title doesn't exist`, (done) => {
+  it(`fails, if the list specified by title doesn't exist`, async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('Invalid request');
     });
@@ -544,24 +472,16 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
       return Promise.reject('Request failed with status code 404');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         listTitle: 'My List',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
       }
-    }, (err) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Request failed with status code 404')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('Request failed with status code 404'));
   });
 
-  it(`fails, if the specified content type not found in the list`, (done) => {
+  it(`fails, if the specified content type not found in the list`, async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('Invalid request');
     });
@@ -590,21 +510,13 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         listTitle: 'My List',
         webUrl: 'https://contoso.sharepoint.com',
         contentTypeId: '0x0104001A75DCE30BAC754AA5134C183CF7A92E'
       }
-    }, (err) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Content type 0x0104001A75DCE30BAC754AA5134C183CF7A92E missing in the list. Add the content type to the list first and try again.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('Content type 0x0104001A75DCE30BAC754AA5134C183CF7A92E missing in the list. Add the content type to the list first and try again.'));
   });
 
   it('fails validation if neither listId nor listTitle are not passed', async () => {

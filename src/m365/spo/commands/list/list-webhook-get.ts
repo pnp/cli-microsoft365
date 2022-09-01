@@ -91,7 +91,7 @@ class SpoListWebhookGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       const list: string = (args.options.listId ? args.options.listId : args.options.listTitle) as string;
       logger.logToStderr(`Retrieving information for webhook ${args.options.id} belonging to list ${list} in site at ${args.options.webUrl}...`);
@@ -115,18 +115,16 @@ class SpoListWebhookGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
-
-        cb();
-      }, (err: any): void => {
-        if (this.verbose) {
-          logger.logToStderr('Specified webhook not found');
-        }
-        this.handleRejectedODataJsonPromise(err, logger, cb);
-      });
+    try {
+      const res = await request.get<any>(requestOptions);
+      logger.log(res);
+    }
+    catch (err: any) {
+      if (this.verbose) {
+        logger.logToStderr('Specified webhook not found');
+      }
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

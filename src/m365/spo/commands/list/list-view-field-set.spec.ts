@@ -122,7 +122,7 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('move the field by title to the position index to viewTitle of listId', (done) => {
+  it('move the field by title to the position index to viewTitle of listId', async () => {
     stubAllGetRequests();
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -134,18 +134,11 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', fieldTitle: 'Created By', fieldPosition: 1 } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', fieldTitle: 'Created By', fieldPosition: 1 } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('move the field by title to the position index to viewId of listTitle (debug)', (done) => {
+  it('move the field by title to the position index to viewId of listTitle (debug)', async () => {
     stubAllGetRequests();
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -157,18 +150,11 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldTitle: 'Created By', fieldPosition: 1 } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldTitle: 'Created By', fieldPosition: 1 } });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('move the field by id to the position index to viewId of listTitle', (done) => {
+  it('move the field by id to the position index to viewId of listTitle', async () => {
     stubAllGetRequests();
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -180,18 +166,11 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldId: '1df5e554-ec7e-46a6-901d-d85a3881cb18', fieldPosition: 1 } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/ninja', listTitle: 'Documents', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81', fieldId: '1df5e554-ec7e-46a6-901d-d85a3881cb18', fieldPosition: 1 } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('move the field by id to the position index to viewTitle of listId (debug)', (done) => {
+  it('move the field by id to the position index to viewTitle of listId (debug)', async () => {
     stubAllGetRequests();
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -203,18 +182,11 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', fieldId: '1df5e554-ec7e-46a6-901d-d85a3881cb18', fieldPosition: 1 } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewTitle: 'MyView', fieldId: '1df5e554-ec7e-46a6-901d-d85a3881cb18', fieldPosition: 1 } });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('uses correct API url when list id option is passed', (done) => {
+  it('uses correct API url when list id option is passed', async () => {
     stubAllGetRequests();
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -225,7 +197,7 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         viewId: '0cd891ef-afce-4e55-b836-fce03286cccf',
@@ -234,19 +206,10 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
         listId: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         fieldPosition: 1
       }
-    }, () => {
-
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('uses correct API url when list title option is passed', (done) => {
+  it('uses correct API url when list title option is passed', async () => {
     stubAllGetRequests();
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -257,7 +220,7 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         viewId: '0cd891ef-afce-4e55-b836-fce03286cccf',
@@ -265,15 +228,6 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'Documents',
         fieldPosition: 1
-      }
-    }, () => {
-
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
       }
     });
   });

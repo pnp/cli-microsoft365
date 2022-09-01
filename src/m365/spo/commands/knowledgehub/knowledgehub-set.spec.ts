@@ -80,50 +80,36 @@ describe(commands.KNOWLEDGEHUB_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('sets the Knowledgehub Site', (done) => {
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/knowledgesite' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions> <ObjectPath Id="35" ObjectPathId="34" /> <Method Name="SetKnowledgeHubSite" Id="36" ObjectPathId="34"> <Parameters> <Parameter Type="String">https://contoso.sharepoint.com/sites/knowledgesite</Parameter> </Parameters> </Method> </Actions> <ObjectPaths> <Constructor Id="34" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /> </ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('sets the Knowledgehub Site', async () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/knowledgesite' } });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions> <ObjectPath Id="35" ObjectPathId="34" /> <Method Name="SetKnowledgeHubSite" Id="36" ObjectPathId="34"> <Parameters> <Parameter Type="String">https://contoso.sharepoint.com/sites/knowledgesite</Parameter> </Parameters> </Method> </Actions> <ObjectPaths> <Constructor Id="34" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /> </ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('sets the Knowledgehub Site (debug)', (done) => {
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/knowledgesite' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions> <ObjectPath Id="35" ObjectPathId="34" /> <Method Name="SetKnowledgeHubSite" Id="36" ObjectPathId="34"> <Parameters> <Parameter Type="String">https://contoso.sharepoint.com/sites/knowledgesite</Parameter> </Parameters> </Method> </Actions> <ObjectPaths> <Constructor Id="34" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /> </ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('sets the Knowledgehub Site (debug)', async () => {
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/knowledgesite' } });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions> <ObjectPath Id="35" ObjectPathId="34" /> <Method Name="SetKnowledgeHubSite" Id="36" ObjectPathId="34"> <Parameters> <Parameter Type="String">https://contoso.sharepoint.com/sites/knowledgesite</Parameter> </Parameters> </Method> </Actions> <ObjectPaths> <Constructor Id="34" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /> </ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
 
-  it('correctly handles an error when setting Knowledgehub Site', (done) => {
+  it('correctly handles an error when setting Knowledgehub Site', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
@@ -153,18 +139,8 @@ describe(commands.KNOWLEDGEHUB_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/knowledgesite' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/knowledgesite' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('passes validation when the url is a valid SharePoint URL', async () => {

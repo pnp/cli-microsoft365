@@ -85,7 +85,7 @@ class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
     this.optionSets.push(['listId', 'listTitle']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let requestUrl: string = `${args.options.webUrl}/_api/web/lists`;
 
     if (args.options.listId) {
@@ -105,9 +105,12 @@ class SpoListItemRoleInheritanceResetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .post(requestOptions)
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

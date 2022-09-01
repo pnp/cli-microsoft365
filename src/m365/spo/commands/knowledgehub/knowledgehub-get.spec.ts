@@ -69,7 +69,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('Get the Knowledgehub Site', (done) => {
+  it('Get the Knowledgehub Site', async () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -87,27 +87,20 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="5" ObjectPathId="4"/><Method Name="GetKnowledgeHubSite" Id="6" ObjectPathId="4"/></Actions><ObjectPaths><Constructor Id="4" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: false } });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="5" ObjectPathId="4"/><Method Name="GetKnowledgeHubSite" Id="6" ObjectPathId="4"/></Actions><ObjectPaths><Constructor Id="4" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('Get the Knowledgehub Site (debug)', (done) => {
+  it('Get the Knowledgehub Site (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -123,27 +116,20 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="5" ObjectPathId="4"/><Method Name="GetKnowledgeHubSite" Id="6" ObjectPathId="4"/></Actions><ObjectPaths><Constructor Id="4" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: true } });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="5" ObjectPathId="4"/><Method Name="GetKnowledgeHubSite" Id="6" ObjectPathId="4"/></Actions><ObjectPaths><Constructor Id="4" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('Get the Knowledgehub Site - Empty / NO URL Available', (done) => {
+  it('Get the Knowledgehub Site - Empty / NO URL Available', async () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -161,27 +147,20 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="5" ObjectPathId="4"/><Method Name="GetKnowledgeHubSite" Id="6" ObjectPathId="4"/></Actions><ObjectPaths><Constructor Id="4" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: false } });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="5" ObjectPathId="4"/><Method Name="GetKnowledgeHubSite" Id="6" ObjectPathId="4"/></Actions><ObjectPaths><Constructor Id="4" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('correctly handles an error when getting Knowledgehub Site', (done) => {
+  it('correctly handles an error when getting Knowledgehub Site', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
@@ -211,18 +190,8 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } }),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

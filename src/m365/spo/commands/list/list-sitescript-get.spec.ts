@@ -59,7 +59,7 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('extracts the site script from the given list if title option is passed (debug)', (done) => {
+  it('extracts the site script from the given list if title option is passed (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/Microsoft_SharePoint_Utilities_WebTemplateExtensions_SiteScriptUtility_GetSiteScriptFromList`) > -1) {
         return Promise.resolve({
@@ -147,94 +147,87 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary'
       }
-    }, () => {
-      try {
-        const expected = {
-          "actions": [
+    });
+    const expected = {
+      "actions": [
+        {
+          "verb": "createSPList",
+          "listName": "MyLibrary",
+          "templateType": 101,
+          "subactions": [
             {
-              "verb": "createSPList",
-              "listName": "MyLibrary",
-              "templateType": 101,
-              "subactions": [
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{47b1b86f-9f8a-4dbe-a75e-ca5d9b0f566c}\" Type=\"URL\" Name=\"_ShortcutUrl\" DisplayName=\"Shortcut URL\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUrl\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{2662ad77-2410-4938-b01c-e5e43321bad4}\" Type=\"Guid\" Name=\"_ShortcutSiteId\" DisplayName=\"Shortcut Site Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutSiteId\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{e2a3861f-c216-47d7-820f-7cb638862ab2}\" Type=\"Guid\" Name=\"_ShortcutWebId\" DisplayName=\"Shortcut Web Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutWebId\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{e8fea999-553d-4f45-be52-d941627e9fe5}\" Type=\"Guid\" Name=\"_ShortcutUniqueId\" DisplayName=\"Shortcut Unique Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUniqueId\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field DisplayName=\"MyText\" Format=\"Dropdown\" MaxLength=\"255\" Title=\"MyText\" Type=\"Text\" ID=\"{dbd0f8fa-5131-44ed-b7a1-23bfffc50ac8}\" StaticName=\"MyText\" Name=\"MyText\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field DisplayName=\"MyDate\" FriendlyDisplayFormat=\"Disabled\" Format=\"DateTime\" Title=\"MyDate\" Type=\"DateTime\" ID=\"{f98a4e28-5fb3-4737-9a24-3ad533552bf5}\" StaticName=\"MyDate\" Name=\"MyDate\"><Default>[today]</Default></Field>"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field Decimals=\"2\" DisplayName=\"MyNumber\" Format=\"Dropdown\" Percentage=\"FALSE\" Title=\"MyNumber\" Type=\"Number\" ID=\"{496aa48c-0cf7-4990-be49-d373aa327e0c}\" StaticName=\"MyNumber\" Name=\"MyNumber\"><Default>100</Default></Field>"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{e52012a0-51eb-4c0c-8dfb-9b8a0ebedcb6}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"Combine\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Merge\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Combine\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"EncodedAbsUrl\" /><FieldRef Name=\"TemplateUrl\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkCombine\" type=\"CHECKBOX\" title=\"Merge]]\" href=\"]]></HTML><Field Name=\"EncodedAbsUrl\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkUrl\" type=\"HIDDEN\" href=\"]]></HTML><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkProgID\" type=\"HIDDEN\" href=\"]]></HTML><MapToControl><HTML>|</HTML><GetFileExtension><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /></GetFileExtension></MapToControl><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{5d36727b-bcb2-47d2-a231-1f0bc63b7439}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"RepairDocument\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Relink\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"RepairDocument\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"ID\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkRepair\" type=\"CHECKBOX\" title=\"Relink\" docid=\"]]></HTML><Field Name=\"ID\" /><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
-                },
-                {
-                  "verb": "addSPView",
-                  "name": "All Documents",
-                  "viewFields": [
-                    "DocIcon",
-                    "LinkFilename",
-                    "MyText",
-                    "MyDate",
-                    "MyNumber"
-                  ],
-                  "query": "<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
-                  "rowLimit": 30,
-                  "isPaged": true,
-                  "makeDefault": true,
-                  "formatterJSON": ""
-                }
-              ]
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{47b1b86f-9f8a-4dbe-a75e-ca5d9b0f566c}\" Type=\"URL\" Name=\"_ShortcutUrl\" DisplayName=\"Shortcut URL\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUrl\" />"
             },
             {
-              "verb": "addNavLink",
-              "url": "MyLibrary/Forms/AllItems.aspx",
-              "displayName": "MyLibrary",
-              "isWebRelative": true
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{2662ad77-2410-4938-b01c-e5e43321bad4}\" Type=\"Guid\" Name=\"_ShortcutSiteId\" DisplayName=\"Shortcut Site Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutSiteId\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{e2a3861f-c216-47d7-820f-7cb638862ab2}\" Type=\"Guid\" Name=\"_ShortcutWebId\" DisplayName=\"Shortcut Web Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutWebId\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{e8fea999-553d-4f45-be52-d941627e9fe5}\" Type=\"Guid\" Name=\"_ShortcutUniqueId\" DisplayName=\"Shortcut Unique Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUniqueId\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field DisplayName=\"MyText\" Format=\"Dropdown\" MaxLength=\"255\" Title=\"MyText\" Type=\"Text\" ID=\"{dbd0f8fa-5131-44ed-b7a1-23bfffc50ac8}\" StaticName=\"MyText\" Name=\"MyText\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field DisplayName=\"MyDate\" FriendlyDisplayFormat=\"Disabled\" Format=\"DateTime\" Title=\"MyDate\" Type=\"DateTime\" ID=\"{f98a4e28-5fb3-4737-9a24-3ad533552bf5}\" StaticName=\"MyDate\" Name=\"MyDate\"><Default>[today]</Default></Field>"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field Decimals=\"2\" DisplayName=\"MyNumber\" Format=\"Dropdown\" Percentage=\"FALSE\" Title=\"MyNumber\" Type=\"Number\" ID=\"{496aa48c-0cf7-4990-be49-d373aa327e0c}\" StaticName=\"MyNumber\" Name=\"MyNumber\"><Default>100</Default></Field>"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{e52012a0-51eb-4c0c-8dfb-9b8a0ebedcb6}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"Combine\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Merge\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Combine\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"EncodedAbsUrl\" /><FieldRef Name=\"TemplateUrl\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkCombine\" type=\"CHECKBOX\" title=\"Merge]]\" href=\"]]></HTML><Field Name=\"EncodedAbsUrl\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkUrl\" type=\"HIDDEN\" href=\"]]></HTML><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkProgID\" type=\"HIDDEN\" href=\"]]></HTML><MapToControl><HTML>|</HTML><GetFileExtension><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /></GetFileExtension></MapToControl><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{5d36727b-bcb2-47d2-a231-1f0bc63b7439}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"RepairDocument\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Relink\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"RepairDocument\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"ID\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkRepair\" type=\"CHECKBOX\" title=\"Relink\" docid=\"]]></HTML><Field Name=\"ID\" /><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
+            },
+            {
+              "verb": "addSPView",
+              "name": "All Documents",
+              "viewFields": [
+                "DocIcon",
+                "LinkFilename",
+                "MyText",
+                "MyDate",
+                "MyNumber"
+              ],
+              "query": "<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
+              "rowLimit": 30,
+              "isPaged": true,
+              "makeDefault": true,
+              "formatterJSON": ""
             }
           ]
-        };
-        const actual = log[log.length - 1];
-        assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+        },
+        {
+          "verb": "addNavLink",
+          "url": "MyLibrary/Forms/AllItems.aspx",
+          "displayName": "MyLibrary",
+          "isWebRelative": true
+        }
+      ]
+    };
+    const actual = log[log.length - 1];
+    assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
   });
 
-  it('extracts the site script from the given list if title option is passed', (done) => {
+  it('extracts the site script from the given list if title option is passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/Microsoft_SharePoint_Utilities_WebTemplateExtensions_SiteScriptUtility_GetSiteScriptFromList`) > -1) {
         return Promise.resolve({
@@ -322,93 +315,86 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary'
       }
-    }, () => {
-      try {
-        const expected = {
-          "actions": [
+    });
+    const expected = {
+      "actions": [
+        {
+          "verb": "createSPList",
+          "listName": "MyLibrary",
+          "templateType": 101,
+          "subactions": [
             {
-              "verb": "createSPList",
-              "listName": "MyLibrary",
-              "templateType": 101,
-              "subactions": [
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{47b1b86f-9f8a-4dbe-a75e-ca5d9b0f566c}\" Type=\"URL\" Name=\"_ShortcutUrl\" DisplayName=\"Shortcut URL\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUrl\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{2662ad77-2410-4938-b01c-e5e43321bad4}\" Type=\"Guid\" Name=\"_ShortcutSiteId\" DisplayName=\"Shortcut Site Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutSiteId\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{e2a3861f-c216-47d7-820f-7cb638862ab2}\" Type=\"Guid\" Name=\"_ShortcutWebId\" DisplayName=\"Shortcut Web Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutWebId\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{e8fea999-553d-4f45-be52-d941627e9fe5}\" Type=\"Guid\" Name=\"_ShortcutUniqueId\" DisplayName=\"Shortcut Unique Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUniqueId\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field DisplayName=\"MyText\" Format=\"Dropdown\" MaxLength=\"255\" Title=\"MyText\" Type=\"Text\" ID=\"{dbd0f8fa-5131-44ed-b7a1-23bfffc50ac8}\" StaticName=\"MyText\" Name=\"MyText\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field DisplayName=\"MyDate\" FriendlyDisplayFormat=\"Disabled\" Format=\"DateTime\" Title=\"MyDate\" Type=\"DateTime\" ID=\"{f98a4e28-5fb3-4737-9a24-3ad533552bf5}\" StaticName=\"MyDate\" Name=\"MyDate\"><Default>[today]</Default></Field>"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field Decimals=\"2\" DisplayName=\"MyNumber\" Format=\"Dropdown\" Percentage=\"FALSE\" Title=\"MyNumber\" Type=\"Number\" ID=\"{496aa48c-0cf7-4990-be49-d373aa327e0c}\" StaticName=\"MyNumber\" Name=\"MyNumber\"><Default>100</Default></Field>"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{e52012a0-51eb-4c0c-8dfb-9b8a0ebedcb6}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"Combine\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Merge\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Combine\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"EncodedAbsUrl\" /><FieldRef Name=\"TemplateUrl\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkCombine\" type=\"CHECKBOX\" title=\"Merge]]\" href=\"]]></HTML><Field Name=\"EncodedAbsUrl\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkUrl\" type=\"HIDDEN\" href=\"]]></HTML><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkProgID\" type=\"HIDDEN\" href=\"]]></HTML><MapToControl><HTML>|</HTML><GetFileExtension><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /></GetFileExtension></MapToControl><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{5d36727b-bcb2-47d2-a231-1f0bc63b7439}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"RepairDocument\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Relink\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"RepairDocument\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"ID\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkRepair\" type=\"CHECKBOX\" title=\"Relink\" docid=\"]]></HTML><Field Name=\"ID\" /><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
-                },
-                {
-                  "verb": "addSPView",
-                  "name": "All Documents",
-                  "viewFields": [
-                    "DocIcon",
-                    "LinkFilename",
-                    "MyText",
-                    "MyDate",
-                    "MyNumber"
-                  ],
-                  "query": "<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
-                  "rowLimit": 30,
-                  "isPaged": true,
-                  "makeDefault": true,
-                  "formatterJSON": ""
-                }
-              ]
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{47b1b86f-9f8a-4dbe-a75e-ca5d9b0f566c}\" Type=\"URL\" Name=\"_ShortcutUrl\" DisplayName=\"Shortcut URL\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUrl\" />"
             },
             {
-              "verb": "addNavLink",
-              "url": "MyLibrary/Forms/AllItems.aspx",
-              "displayName": "MyLibrary",
-              "isWebRelative": true
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{2662ad77-2410-4938-b01c-e5e43321bad4}\" Type=\"Guid\" Name=\"_ShortcutSiteId\" DisplayName=\"Shortcut Site Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutSiteId\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{e2a3861f-c216-47d7-820f-7cb638862ab2}\" Type=\"Guid\" Name=\"_ShortcutWebId\" DisplayName=\"Shortcut Web Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutWebId\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{e8fea999-553d-4f45-be52-d941627e9fe5}\" Type=\"Guid\" Name=\"_ShortcutUniqueId\" DisplayName=\"Shortcut Unique Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUniqueId\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field DisplayName=\"MyText\" Format=\"Dropdown\" MaxLength=\"255\" Title=\"MyText\" Type=\"Text\" ID=\"{dbd0f8fa-5131-44ed-b7a1-23bfffc50ac8}\" StaticName=\"MyText\" Name=\"MyText\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field DisplayName=\"MyDate\" FriendlyDisplayFormat=\"Disabled\" Format=\"DateTime\" Title=\"MyDate\" Type=\"DateTime\" ID=\"{f98a4e28-5fb3-4737-9a24-3ad533552bf5}\" StaticName=\"MyDate\" Name=\"MyDate\"><Default>[today]</Default></Field>"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field Decimals=\"2\" DisplayName=\"MyNumber\" Format=\"Dropdown\" Percentage=\"FALSE\" Title=\"MyNumber\" Type=\"Number\" ID=\"{496aa48c-0cf7-4990-be49-d373aa327e0c}\" StaticName=\"MyNumber\" Name=\"MyNumber\"><Default>100</Default></Field>"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{e52012a0-51eb-4c0c-8dfb-9b8a0ebedcb6}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"Combine\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Merge\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Combine\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"EncodedAbsUrl\" /><FieldRef Name=\"TemplateUrl\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkCombine\" type=\"CHECKBOX\" title=\"Merge]]\" href=\"]]></HTML><Field Name=\"EncodedAbsUrl\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkUrl\" type=\"HIDDEN\" href=\"]]></HTML><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkProgID\" type=\"HIDDEN\" href=\"]]></HTML><MapToControl><HTML>|</HTML><GetFileExtension><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /></GetFileExtension></MapToControl><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{5d36727b-bcb2-47d2-a231-1f0bc63b7439}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"RepairDocument\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Relink\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"RepairDocument\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"ID\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkRepair\" type=\"CHECKBOX\" title=\"Relink\" docid=\"]]></HTML><Field Name=\"ID\" /><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
+            },
+            {
+              "verb": "addSPView",
+              "name": "All Documents",
+              "viewFields": [
+                "DocIcon",
+                "LinkFilename",
+                "MyText",
+                "MyDate",
+                "MyNumber"
+              ],
+              "query": "<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
+              "rowLimit": 30,
+              "isPaged": true,
+              "makeDefault": true,
+              "formatterJSON": ""
             }
           ]
-        };
-        const actual = log[log.length - 1];
-        assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+        },
+        {
+          "verb": "addNavLink",
+          "url": "MyLibrary/Forms/AllItems.aspx",
+          "displayName": "MyLibrary",
+          "isWebRelative": true
+        }
+      ]
+    };
+    const actual = log[log.length - 1];
+    assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
   });
 
-  it('extracts the site script from the given list if list id option is passed (debug)', (done) => {
+  it('extracts the site script from the given list if list id option is passed (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/Microsoft_SharePoint_Utilities_WebTemplateExtensions_SiteScriptUtility_GetSiteScriptFromList`) > -1) {
         return Promise.resolve({
@@ -496,94 +482,87 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'fb4b0cf8-c006-4802-a1ea-57e0e4852188'
       }
-    }, () => {
-      try {
-        const expected = {
-          "actions": [
+    });
+    const expected = {
+      "actions": [
+        {
+          "verb": "createSPList",
+          "listName": "MyLibrary",
+          "templateType": 101,
+          "subactions": [
             {
-              "verb": "createSPList",
-              "listName": "MyLibrary",
-              "templateType": 101,
-              "subactions": [
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{47b1b86f-9f8a-4dbe-a75e-ca5d9b0f566c}\" Type=\"URL\" Name=\"_ShortcutUrl\" DisplayName=\"Shortcut URL\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUrl\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{2662ad77-2410-4938-b01c-e5e43321bad4}\" Type=\"Guid\" Name=\"_ShortcutSiteId\" DisplayName=\"Shortcut Site Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutSiteId\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{e2a3861f-c216-47d7-820f-7cb638862ab2}\" Type=\"Guid\" Name=\"_ShortcutWebId\" DisplayName=\"Shortcut Web Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutWebId\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{e8fea999-553d-4f45-be52-d941627e9fe5}\" Type=\"Guid\" Name=\"_ShortcutUniqueId\" DisplayName=\"Shortcut Unique Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUniqueId\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field DisplayName=\"MyText\" Format=\"Dropdown\" MaxLength=\"255\" Title=\"MyText\" Type=\"Text\" ID=\"{dbd0f8fa-5131-44ed-b7a1-23bfffc50ac8}\" StaticName=\"MyText\" Name=\"MyText\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field DisplayName=\"MyDate\" FriendlyDisplayFormat=\"Disabled\" Format=\"DateTime\" Title=\"MyDate\" Type=\"DateTime\" ID=\"{f98a4e28-5fb3-4737-9a24-3ad533552bf5}\" StaticName=\"MyDate\" Name=\"MyDate\"><Default>[today]</Default></Field>"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field Decimals=\"2\" DisplayName=\"MyNumber\" Format=\"Dropdown\" Percentage=\"FALSE\" Title=\"MyNumber\" Type=\"Number\" ID=\"{496aa48c-0cf7-4990-be49-d373aa327e0c}\" StaticName=\"MyNumber\" Name=\"MyNumber\"><Default>100</Default></Field>"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{e52012a0-51eb-4c0c-8dfb-9b8a0ebedcb6}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"Combine\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Merge\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Combine\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"EncodedAbsUrl\" /><FieldRef Name=\"TemplateUrl\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkCombine\" type=\"CHECKBOX\" title=\"Merge]]\" href=\"]]></HTML><Field Name=\"EncodedAbsUrl\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkUrl\" type=\"HIDDEN\" href=\"]]></HTML><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkProgID\" type=\"HIDDEN\" href=\"]]></HTML><MapToControl><HTML>|</HTML><GetFileExtension><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /></GetFileExtension></MapToControl><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{5d36727b-bcb2-47d2-a231-1f0bc63b7439}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"RepairDocument\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Relink\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"RepairDocument\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"ID\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkRepair\" type=\"CHECKBOX\" title=\"Relink\" docid=\"]]></HTML><Field Name=\"ID\" /><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
-                },
-                {
-                  "verb": "addSPView",
-                  "name": "All Documents",
-                  "viewFields": [
-                    "DocIcon",
-                    "LinkFilename",
-                    "MyText",
-                    "MyDate",
-                    "MyNumber"
-                  ],
-                  "query": "<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
-                  "rowLimit": 30,
-                  "isPaged": true,
-                  "makeDefault": true,
-                  "formatterJSON": ""
-                }
-              ]
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{47b1b86f-9f8a-4dbe-a75e-ca5d9b0f566c}\" Type=\"URL\" Name=\"_ShortcutUrl\" DisplayName=\"Shortcut URL\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUrl\" />"
             },
             {
-              "verb": "addNavLink",
-              "url": "MyLibrary/Forms/AllItems.aspx",
-              "displayName": "MyLibrary",
-              "isWebRelative": true
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{2662ad77-2410-4938-b01c-e5e43321bad4}\" Type=\"Guid\" Name=\"_ShortcutSiteId\" DisplayName=\"Shortcut Site Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutSiteId\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{e2a3861f-c216-47d7-820f-7cb638862ab2}\" Type=\"Guid\" Name=\"_ShortcutWebId\" DisplayName=\"Shortcut Web Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutWebId\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{e8fea999-553d-4f45-be52-d941627e9fe5}\" Type=\"Guid\" Name=\"_ShortcutUniqueId\" DisplayName=\"Shortcut Unique Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUniqueId\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field DisplayName=\"MyText\" Format=\"Dropdown\" MaxLength=\"255\" Title=\"MyText\" Type=\"Text\" ID=\"{dbd0f8fa-5131-44ed-b7a1-23bfffc50ac8}\" StaticName=\"MyText\" Name=\"MyText\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field DisplayName=\"MyDate\" FriendlyDisplayFormat=\"Disabled\" Format=\"DateTime\" Title=\"MyDate\" Type=\"DateTime\" ID=\"{f98a4e28-5fb3-4737-9a24-3ad533552bf5}\" StaticName=\"MyDate\" Name=\"MyDate\"><Default>[today]</Default></Field>"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field Decimals=\"2\" DisplayName=\"MyNumber\" Format=\"Dropdown\" Percentage=\"FALSE\" Title=\"MyNumber\" Type=\"Number\" ID=\"{496aa48c-0cf7-4990-be49-d373aa327e0c}\" StaticName=\"MyNumber\" Name=\"MyNumber\"><Default>100</Default></Field>"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{e52012a0-51eb-4c0c-8dfb-9b8a0ebedcb6}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"Combine\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Merge\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Combine\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"EncodedAbsUrl\" /><FieldRef Name=\"TemplateUrl\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkCombine\" type=\"CHECKBOX\" title=\"Merge]]\" href=\"]]></HTML><Field Name=\"EncodedAbsUrl\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkUrl\" type=\"HIDDEN\" href=\"]]></HTML><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkProgID\" type=\"HIDDEN\" href=\"]]></HTML><MapToControl><HTML>|</HTML><GetFileExtension><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /></GetFileExtension></MapToControl><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{5d36727b-bcb2-47d2-a231-1f0bc63b7439}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"RepairDocument\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Relink\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"RepairDocument\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"ID\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkRepair\" type=\"CHECKBOX\" title=\"Relink\" docid=\"]]></HTML><Field Name=\"ID\" /><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
+            },
+            {
+              "verb": "addSPView",
+              "name": "All Documents",
+              "viewFields": [
+                "DocIcon",
+                "LinkFilename",
+                "MyText",
+                "MyDate",
+                "MyNumber"
+              ],
+              "query": "<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
+              "rowLimit": 30,
+              "isPaged": true,
+              "makeDefault": true,
+              "formatterJSON": ""
             }
           ]
-        };
-        const actual = log[log.length - 1];
-        assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+        },
+        {
+          "verb": "addNavLink",
+          "url": "MyLibrary/Forms/AllItems.aspx",
+          "displayName": "MyLibrary",
+          "isWebRelative": true
+        }
+      ]
+    };
+    const actual = log[log.length - 1];
+    assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
   });
 
-  it('extracts the site script from the given list if list id option is passed', (done) => {
+  it('extracts the site script from the given list if list id option is passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/Microsoft_SharePoint_Utilities_WebTemplateExtensions_SiteScriptUtility_GetSiteScriptFromList`) > -1) {
         return Promise.resolve({
@@ -671,93 +650,86 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'fb4b0cf8-c006-4802-a1ea-57e0e4852188'
       }
-    }, () => {
-      try {
-        const expected = {
-          "actions": [
+    });
+    const expected = {
+      "actions": [
+        {
+          "verb": "createSPList",
+          "listName": "MyLibrary",
+          "templateType": 101,
+          "subactions": [
             {
-              "verb": "createSPList",
-              "listName": "MyLibrary",
-              "templateType": 101,
-              "subactions": [
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{47b1b86f-9f8a-4dbe-a75e-ca5d9b0f566c}\" Type=\"URL\" Name=\"_ShortcutUrl\" DisplayName=\"Shortcut URL\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUrl\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{2662ad77-2410-4938-b01c-e5e43321bad4}\" Type=\"Guid\" Name=\"_ShortcutSiteId\" DisplayName=\"Shortcut Site Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutSiteId\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{e2a3861f-c216-47d7-820f-7cb638862ab2}\" Type=\"Guid\" Name=\"_ShortcutWebId\" DisplayName=\"Shortcut Web Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutWebId\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{e8fea999-553d-4f45-be52-d941627e9fe5}\" Type=\"Guid\" Name=\"_ShortcutUniqueId\" DisplayName=\"Shortcut Unique Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUniqueId\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field DisplayName=\"MyText\" Format=\"Dropdown\" MaxLength=\"255\" Title=\"MyText\" Type=\"Text\" ID=\"{dbd0f8fa-5131-44ed-b7a1-23bfffc50ac8}\" StaticName=\"MyText\" Name=\"MyText\" />"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field DisplayName=\"MyDate\" FriendlyDisplayFormat=\"Disabled\" Format=\"DateTime\" Title=\"MyDate\" Type=\"DateTime\" ID=\"{f98a4e28-5fb3-4737-9a24-3ad533552bf5}\" StaticName=\"MyDate\" Name=\"MyDate\"><Default>[today]</Default></Field>"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field Decimals=\"2\" DisplayName=\"MyNumber\" Format=\"Dropdown\" Percentage=\"FALSE\" Title=\"MyNumber\" Type=\"Number\" ID=\"{496aa48c-0cf7-4990-be49-d373aa327e0c}\" StaticName=\"MyNumber\" Name=\"MyNumber\"><Default>100</Default></Field>"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{e52012a0-51eb-4c0c-8dfb-9b8a0ebedcb6}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"Combine\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Merge\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Combine\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"EncodedAbsUrl\" /><FieldRef Name=\"TemplateUrl\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkCombine\" type=\"CHECKBOX\" title=\"Merge]]\" href=\"]]></HTML><Field Name=\"EncodedAbsUrl\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkUrl\" type=\"HIDDEN\" href=\"]]></HTML><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkProgID\" type=\"HIDDEN\" href=\"]]></HTML><MapToControl><HTML>|</HTML><GetFileExtension><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /></GetFileExtension></MapToControl><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
-                },
-                {
-                  "verb": "addSPFieldXml",
-                  "schemaXml": "<Field ID=\"{5d36727b-bcb2-47d2-a231-1f0bc63b7439}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"RepairDocument\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Relink\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"RepairDocument\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"ID\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkRepair\" type=\"CHECKBOX\" title=\"Relink\" docid=\"]]></HTML><Field Name=\"ID\" /><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
-                },
-                {
-                  "verb": "addSPView",
-                  "name": "All Documents",
-                  "viewFields": [
-                    "DocIcon",
-                    "LinkFilename",
-                    "MyText",
-                    "MyDate",
-                    "MyNumber"
-                  ],
-                  "query": "<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
-                  "rowLimit": 30,
-                  "isPaged": true,
-                  "makeDefault": true,
-                  "formatterJSON": ""
-                }
-              ]
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{47b1b86f-9f8a-4dbe-a75e-ca5d9b0f566c}\" Type=\"URL\" Name=\"_ShortcutUrl\" DisplayName=\"Shortcut URL\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUrl\" />"
             },
             {
-              "verb": "addNavLink",
-              "url": "MyLibrary/Forms/AllItems.aspx",
-              "displayName": "MyLibrary",
-              "isWebRelative": true
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{2662ad77-2410-4938-b01c-e5e43321bad4}\" Type=\"Guid\" Name=\"_ShortcutSiteId\" DisplayName=\"Shortcut Site Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutSiteId\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{e2a3861f-c216-47d7-820f-7cb638862ab2}\" Type=\"Guid\" Name=\"_ShortcutWebId\" DisplayName=\"Shortcut Web Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutWebId\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{e8fea999-553d-4f45-be52-d941627e9fe5}\" Type=\"Guid\" Name=\"_ShortcutUniqueId\" DisplayName=\"Shortcut Unique Id\" DisplaceOnUpgrade=\"TRUE\" Indexed=\"FALSE\" Required=\"FALSE\" Hidden=\"TRUE\" ReadOnlyField=\"TRUE\" ShowInEditForm=\"FALSE\" ShowInDisplayForm=\"FALSE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"_ShortcutUniqueId\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field DisplayName=\"MyText\" Format=\"Dropdown\" MaxLength=\"255\" Title=\"MyText\" Type=\"Text\" ID=\"{dbd0f8fa-5131-44ed-b7a1-23bfffc50ac8}\" StaticName=\"MyText\" Name=\"MyText\" />"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field DisplayName=\"MyDate\" FriendlyDisplayFormat=\"Disabled\" Format=\"DateTime\" Title=\"MyDate\" Type=\"DateTime\" ID=\"{f98a4e28-5fb3-4737-9a24-3ad533552bf5}\" StaticName=\"MyDate\" Name=\"MyDate\"><Default>[today]</Default></Field>"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field Decimals=\"2\" DisplayName=\"MyNumber\" Format=\"Dropdown\" Percentage=\"FALSE\" Title=\"MyNumber\" Type=\"Number\" ID=\"{496aa48c-0cf7-4990-be49-d373aa327e0c}\" StaticName=\"MyNumber\" Name=\"MyNumber\"><Default>100</Default></Field>"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{e52012a0-51eb-4c0c-8dfb-9b8a0ebedcb6}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"Combine\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Merge\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"Combine\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"EncodedAbsUrl\" /><FieldRef Name=\"TemplateUrl\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkCombine\" type=\"CHECKBOX\" title=\"Merge]]\" href=\"]]></HTML><Field Name=\"EncodedAbsUrl\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkUrl\" type=\"HIDDEN\" href=\"]]></HTML><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /><HTML><![CDATA[\">]]></HTML><HTML><![CDATA[<input id=\"chkProgID\" type=\"HIDDEN\" href=\"]]></HTML><MapToControl><HTML>|</HTML><GetFileExtension><Column Name=\"TemplateUrl\" HTMLEncode=\"TRUE\" /></GetFileExtension></MapToControl><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
+            },
+            {
+              "verb": "addSPFieldXml",
+              "schemaXml": "<Field ID=\"{5d36727b-bcb2-47d2-a231-1f0bc63b7439}\" ReadOnly=\"TRUE\" Type=\"Computed\" Name=\"RepairDocument\" DisplaceOnUpgrade=\"TRUE\" DisplayName=\"Relink\" Filterable=\"FALSE\" Sortable=\"FALSE\" Hidden=\"TRUE\" SourceID=\"http://schemas.microsoft.com/sharepoint/v3\" StaticName=\"RepairDocument\"><FieldRefs><FieldRef Name=\"FSObjType\" Key=\"Primary\" /><FieldRef Name=\"ID\" /></FieldRefs><DisplayPattern><IfEqual><Expr1><Field Name=\"FSObjType\" /></Expr1><Expr2>0</Expr2><Then><HTML><![CDATA[<input id=\"chkRepair\" type=\"CHECKBOX\" title=\"Relink\" docid=\"]]></HTML><Field Name=\"ID\" /><HTML><![CDATA[\">]]></HTML></Then></IfEqual></DisplayPattern></Field>"
+            },
+            {
+              "verb": "addSPView",
+              "name": "All Documents",
+              "viewFields": [
+                "DocIcon",
+                "LinkFilename",
+                "MyText",
+                "MyDate",
+                "MyNumber"
+              ],
+              "query": "<OrderBy><FieldRef Name=\"FileLeafRef\" /></OrderBy>",
+              "rowLimit": 30,
+              "isPaged": true,
+              "makeDefault": true,
+              "formatterJSON": ""
             }
           ]
-        };
-        const actual = log[log.length - 1];
-        assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+        },
+        {
+          "verb": "addNavLink",
+          "url": "MyLibrary/Forms/AllItems.aspx",
+          "displayName": "MyLibrary",
+          "isWebRelative": true
+        }
+      ]
+    };
+    const actual = log[log.length - 1];
+    assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
   });
 
-  it('correctly handles error when trying to extract site script if the server did not return generated site script (using listId)', (done) => {
+  it('correctly handles error when trying to extract site script if the server did not return generated site script (using listId)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/Microsoft_SharePoint_Utilities_WebTemplateExtensions_SiteScriptUtility_GetSiteScriptFromList`) > -1) {
         return Promise.resolve({
@@ -777,23 +749,15 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'fb4b0cf8-c006-4802-a1ea-57e0e4852188'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred, the site script could not be extracted from list 'fb4b0cf8-c006-4802-a1ea-57e0e4852188'")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError("An error has occurred, the site script could not be extracted from list 'fb4b0cf8-c006-4802-a1ea-57e0e4852188'"));
   });
 
-  it('correctly handles error when trying to extract site script if the server did not return generated site script (using listTitle)', (done) => {
+  it('correctly handles error when trying to extract site script if the server did not return generated site script (using listTitle)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/Microsoft_SharePoint_Utilities_WebTemplateExtensions_SiteScriptUtility_GetSiteScriptFromList`) > -1) {
         return Promise.resolve({
@@ -813,23 +777,15 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred, the site script could not be extracted from list 'MyLibrary'")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError("An error has occurred, the site script could not be extracted from list 'MyLibrary'"));
   });
 
-  it('correctly handles error when trying to extract site script from a list that doesn\'t exist', (done) => {
+  it('correctly handles error when trying to extract site script from a list that doesn\'t exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/Microsoft_SharePoint_Utilities_WebTemplateExtensions_SiteScriptUtility_GetSiteScriptFromList`) > -1) {
         return Promise.resolve({
@@ -848,23 +804,15 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('404 - "404 FILE NOT FOUND"')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('404 - "404 FILE NOT FOUND"'));
   });
 
-  it('uses correct API url when listId option is passed', (done) => {
+  it('uses correct API url when listId option is passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
         return Promise.resolve('Correct Url');
@@ -873,23 +821,14 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e85',
         debug: false
       }
-    }, () => {
-      try {
-        assert(1 === 1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
-
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {

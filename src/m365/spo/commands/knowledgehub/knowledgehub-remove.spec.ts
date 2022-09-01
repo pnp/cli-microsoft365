@@ -59,9 +59,9 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
       }
     };
     requests = [];
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     promptOptions = undefined;
   });
@@ -90,99 +90,63 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes Knowledge Hub settings from tenant without prompting with confirmation argument', (done) => {
-    command.action(logger, { options: { debug: false, confirm: true } }, () => {
-      let deleteRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="29" ObjectPathId="28"/><Method Name="RemoveKnowledgeHubSite" Id="30" ObjectPathId="28"/></Actions><ObjectPaths><Constructor Id="28" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
-          deleteRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(deleteRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('removes Knowledge Hub settings from tenant without prompting with confirmation argument', async () => {
+    await command.action(logger, { options: { debug: false, confirm: true } });
+    let deleteRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="29" ObjectPathId="28"/><Method Name="RemoveKnowledgeHubSite" Id="30" ObjectPathId="28"/></Actions><ObjectPaths><Constructor Id="28" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
+        deleteRequestIssued = true;
       }
     });
+
+    assert(deleteRequestIssued);
   });
 
-  it('removes Knowledge Hub settings from tenant without prompting with confirmation argument (debug)', (done) => {
-    command.action(logger, { options: { debug: true, confirm: true } }, () => {
-      let deleteRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="29" ObjectPathId="28"/><Method Name="RemoveKnowledgeHubSite" Id="30" ObjectPathId="28"/></Actions><ObjectPaths><Constructor Id="28" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
-          deleteRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(deleteRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('removes Knowledge Hub settings from tenant without prompting with confirmation argument (debug)', async () => {
+    await command.action(logger, { options: { debug: true, confirm: true } });
+    let deleteRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="29" ObjectPathId="28"/><Method Name="RemoveKnowledgeHubSite" Id="30" ObjectPathId="28"/></Actions><ObjectPaths><Constructor Id="28" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`) {
+        deleteRequestIssued = true;
       }
     });
+
+    assert(deleteRequestIssued);
   });
 
-  it('removes Knowledge Hub settings from tenant when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { debug: true } }, () => {
-      let promptIssued = false;
+  it('removes Knowledge Hub settings from tenant when confirmation argument not passed', async () => {
+    await command.action(logger, { options: { debug: true } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('aborts removing Knowledge Hub settings from tenant when prompt not confirmed', (done) => {
+  it('aborts removing Knowledge Hub settings from tenant when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(requests.length === 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: { debug: true } });
+    assert(requests.length === 0);
   });
 
-  it('removes removing Knowledge Hub settings from tenant when prompt confirmed', (done) => {
+  it('removes removing Knowledge Hub settings from tenant when prompt confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: true } }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: true } });
   });
 
-  it('correctly handles an error when removing Knowledge Hub settings from tenant', (done) => {
+  it('correctly handles an error when removing Knowledge Hub settings from tenant', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
@@ -212,38 +176,16 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it('correctly handles a random API error', (done) => {
+  it('correctly handles a random API error', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false, confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, confirm: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

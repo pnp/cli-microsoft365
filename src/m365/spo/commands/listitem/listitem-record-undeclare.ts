@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ContextInfo, formatting, IdentityResponse, spo, validation } from '../../../../utils';
+import { formatting, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -91,7 +91,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const listIdArgument: string = args.options.listId || '';
     const listTitleArgument: string = args.options.listTitle || '';
     const listRestUrl: string = (args.options.listId ?
@@ -101,58 +101,54 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
     let formDigestValue: string = '';
     let environmentListId: string = '';
 
-    ((): Promise<{ value: string; }> => {
+    try {
       if (typeof args.options.listId !== 'undefined') {
-        return Promise.resolve({ value: args.options.listId });
+        environmentListId = args.options.listId;
       }
+      else {
+        if (this.verbose) {
+          logger.logToStderr(`Getting list id...`);
+        }
+        const listRequestOptions: any = {
+          url: `${listRestUrl}/id`,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+  
+        const idResp = await request.get<{ value: string; }>(listRequestOptions);
+        environmentListId = idResp.value;
+      }
+
+      if (this.debug) {
+        logger.logToStderr(`getting request digest for request`);
+      }
+
+      const reqDigest = await spo.getRequestDigest(args.options.webUrl);
+      formDigestValue = reqDigest.FormDigestValue;
+
+      const objectIdentity = await spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
 
       if (this.verbose) {
-        logger.logToStderr(`Getting list id...`);
+        logger.logToStderr(`Undeclare list item as a record in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
       }
-      const listRequestOptions: any = {
-        url: `${listRestUrl}/id`,
+
+      const requestOptions: any = {
+        url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
-          'accept': 'application/json;odata=nometadata'
+          'Content-Type': 'text/xml',
+          'X-RequestDigest': formDigestValue
         },
-        responseType: 'json'
+        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><StaticMethod TypeId="{ea8e1356-5910-4e69-bc05-d0c30ed657fc}" Name="UndeclareItemAsRecord" Id="53"><Parameters><Parameter ObjectPathId="49" /></Parameters></StaticMethod></Actions><ObjectPaths><Identity Id="49" Name="${objectIdentity.objectIdentity}:list:${environmentListId}:item:${args.options.id},1" /></ObjectPaths></Request>`
       };
 
-      return request.get(listRequestOptions);
-    })()
-      .then((res: { value: string }): Promise<ContextInfo> => {
-        environmentListId = res.value;
-
-        if (this.debug) {
-          logger.logToStderr(`getting request digest for request`);
-        }
-
-        return spo.getRequestDigest(args.options.webUrl);
-      })
-      .then((res: ContextInfo): Promise<IdentityResponse> => {
-        formDigestValue = res.FormDigestValue;
-
-        return spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
-      })
-      .then((objectIdentity: IdentityResponse): Promise<void> => {
-        if (this.verbose) {
-          logger.logToStderr(`Undeclare list item as a record in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'Content-Type': 'text/xml',
-            'X-RequestDigest': formDigestValue
-          },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><StaticMethod TypeId="{ea8e1356-5910-4e69-bc05-d0c30ed657fc}" Name="UndeclareItemAsRecord" Id="53"><Parameters><Parameter ObjectPathId="49" /></Parameters></StaticMethod></Actions><ObjectPaths><Identity Id="49" Name="${objectIdentity.objectIdentity}:list:${environmentListId}:item:${args.options.id},1" /></ObjectPaths></Request>`
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((): void => {
-        // REST post call doesn't return anything
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      await request.post(requestOptions);
+      // REST post call doesn't return anything
+    }
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
   }
 }
 

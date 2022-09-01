@@ -114,7 +114,7 @@ class SpoListWebhookSetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Updating webhook ${args.options.id} belonging to list ${args.options.listId ? args.options.listId : args.options.listTitle} located at site ${args.options.webUrl}...`);
     }
@@ -146,14 +146,13 @@ class SpoListWebhookSetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .patch(requestOptions)
-      .then((): void => {
-        // REST patch call doesn't return anything
-        cb();
-      }, (err: any): void => {
-        this.handleRejectedODataJsonPromise(err, logger, cb);
-      });
+    try {
+      await request.patch(requestOptions);
+      // REST patch call doesn't return anything
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

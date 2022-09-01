@@ -105,7 +105,7 @@ class SpoListViewGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const baseRestUrl: string = `${args.options.webUrl}/_api/web`;
     let listRestUrl: string = '';
 
@@ -131,12 +131,13 @@ class SpoListViewGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get(requestOptions)
-      .then((result: any): void => {
-        logger.log(result);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const result = await request.get<any>(requestOptions);
+      logger.log(result);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

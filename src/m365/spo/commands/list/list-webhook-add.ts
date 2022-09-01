@@ -114,7 +114,7 @@ class SpoListWebhookAddCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Adding webhook to list ${args.options.listId ? args.options.listId : args.options.listTitle} located at site ${args.options.webUrl}...`);
     }
@@ -150,15 +150,13 @@ class SpoListWebhookAddCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .post(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
-
-        cb();
-      }, (err: any): void => {
-        this.handleRejectedODataJsonPromise(err, logger, cb);
-      });
+    try {
+      const res = await request.post<any>(requestOptions);
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

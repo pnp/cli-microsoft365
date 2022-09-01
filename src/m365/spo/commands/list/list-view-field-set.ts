@@ -139,7 +139,7 @@ class SpoListViewFieldSetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const listSelector: string = args.options.listId ? `(guid'${formatting.encodeQueryParameter(args.options.listId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
     const viewSelector: string = args.options.viewId ? `('${formatting.encodeQueryParameter(args.options.viewId)}')` : `/GetByTitle('${formatting.encodeQueryParameter(args.options.viewTitle as string)}')`;
 
@@ -147,31 +147,32 @@ class SpoListViewFieldSetCommand extends SpoCommand {
       logger.logToStderr(`Getting field ${args.options.fieldId || args.options.fieldTitle}...`);
     }
 
-    this
-      .getField(args.options, listSelector)
-      .then((field: { InternalName: string; }): Promise<void> => {
-        if (this.verbose) {
-          logger.logToStderr(`Moving the field ${args.options.fieldId || args.options.fieldTitle} in view ${args.options.viewId || args.options.viewTitle} to position ${args.options.fieldPosition}...`);
-        }
+    try {
+      const field = await this.getField(args.options, listSelector);
 
-        const moveRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/moveviewfieldto`;
+      if (this.verbose) {
+        logger.logToStderr(`Moving the field ${args.options.fieldId || args.options.fieldTitle} in view ${args.options.viewId || args.options.viewTitle} to position ${args.options.fieldPosition}...`);
+      }
 
-        const moveRequestOptions: any = {
-          url: moveRequestUrl,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          data: {
-            field: field.InternalName,
-            index: args.options.fieldPosition
-          },
-          responseType: 'json'
-        };
+      const moveRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/moveviewfieldto`;
 
-        return request.post(moveRequestOptions);
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const moveRequestOptions: any = {
+        url: moveRequestUrl,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        data: {
+          field: field.InternalName,
+          index: args.options.fieldPosition
+        },
+        responseType: 'json'
+      };
 
+      await request.post(moveRequestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getField(options: Options, listSelector: string): Promise<{ InternalName: string; }> {

@@ -1,11 +1,8 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandError
-} from "../../../../Command";
 import config from "../../../../config";
 import GlobalOptions from "../../../../GlobalOptions";
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, IdentityResponse, spo, validation } from "../../../../utils";
+import { ClientSvcResponse, ClientSvcResponseContents, formatting, spo, validation } from "../../../../utils";
 import SpoCommand from "../../../base/SpoCommand";
 import commands from "../../commands";
 
@@ -106,29 +103,26 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let formDigestValue: string = '';
     let webIdentity: string = '';
     let listId: string = '';
 
-    const listRestUrl: string = args.options.listId
-      ? `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`
-      : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+    try {
+      const listRestUrl: string = args.options.listId
+        ? `${args.options.webUrl}/_api/web/lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')`
+        : `${args.options.webUrl}/_api/web/lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
 
-    spo
-      .getRequestDigest(args.options.webUrl)
-      .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
-        formDigestValue = contextResponse.FormDigestValue;
+      const contextResponse = await spo.getRequestDigest(args.options.webUrl);
+      formDigestValue = contextResponse.FormDigestValue;
 
-        return spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
-      })
-      .then((webIdentityResp: IdentityResponse): Promise<{ Id: string }> => {
-        webIdentity = webIdentityResp.objectIdentity;
+      const webIdentityResp = await spo.getCurrentWebIdentity(args.options.webUrl, formDigestValue);
+      webIdentity = webIdentityResp.objectIdentity;
 
-        if (args.options.listId) {
-          return Promise.resolve({ Id: args.options.listId });
-        }
-
+      if (args.options.listId) {
+        listId = args.options.listId;
+      }
+      else {
         const requestOptions: any = {
           url: `${listRestUrl}?$select=Id`,
           headers: {
@@ -136,37 +130,37 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
           },
           responseType: 'json'
         };
+  
+        const list = await request.get<{ Id: string; }>(requestOptions);
+        listId = list.Id;
+      }
 
-        return request.get(requestOptions);
-      })
-      .then((res: { Id: string }): Promise<string> => {
-        listId = res.Id;
-        const requestBody: string = this.getDeclareRecordRequestBody(webIdentity, listId, args.options.id, args.options.date || '');
+      const requestBody: string = this.getDeclareRecordRequestBody(webIdentity, listId, args.options.id, args.options.date || '');
 
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'Content-Type': 'text/xml',
-            'X-RequestDigest': formDigestValue
-          },
-          data: requestBody
-        };
+      const requestOptions: any = {
+        url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
+        headers: {
+          'Content-Type': 'text/xml',
+          'X-RequestDigest': formDigestValue
+        },
+        data: requestBody
+      };
 
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
+      const res = await request.post<string>(requestOptions);
+      const json: ClientSvcResponse = JSON.parse(res);
+      const response: ClientSvcResponseContents = json[0];
 
-        if (response.ErrorInfo) {
-          cb(new CommandError(response.ErrorInfo.ErrorMessage));
-        }
-        else {
-          const result: boolean = json[json.length - 1];
-          logger.log(result);
-          cb();
-        }
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      if (response.ErrorInfo) {
+        throw response.ErrorInfo.ErrorMessage;
+      }
+      else {
+        const result: boolean = json[json.length - 1];
+        logger.log(result);
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
   }
 
   protected getDeclareRecordRequestBody(webIdentity: string, listId: string, id: string, date: string): string {
