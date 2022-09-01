@@ -32,6 +32,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -61,10 +62,6 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.appId && !args.options.displayName && !args.options.objectId) {
-          return 'Specify either appId, objectId or displayName';
-        }
-    
         if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
           return `${args.options.appId} is not a valid GUID`;
         }
@@ -73,17 +70,13 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
           return `${args.options.objectId} is not a valid GUID`;
         }
     
-        let optionsSpecified: number = 0;
-        optionsSpecified += args.options.appId ? 1 : 0;
-        optionsSpecified += args.options.displayName ? 1 : 0;
-        optionsSpecified += args.options.objectId ? 1 : 0;
-        if (optionsSpecified > 1) {
-          return 'Specify either appId, objectId or displayName';
-        }
-    
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['appId', 'objectId', 'displayName']);
   }
 
   public defaultProperties(): string[] | undefined {

@@ -31,6 +31,7 @@ class SpoGroupRemoveCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -68,14 +69,6 @@ class SpoGroupRemoveCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
     
-        if (args.options.id && args.options.name) {
-          return 'Specify id or name, but not both';
-        }
-    
-        if (!args.options.id && !args.options.name) {
-          return 'Specify id or name';
-        }
-    
         if (args.options.id && typeof args.options.id !== 'number') {
           return `${args.options.id} is not a number`;
         }
@@ -83,6 +76,10 @@ class SpoGroupRemoveCommand extends SpoCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'name']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

@@ -32,6 +32,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -82,14 +83,6 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
           }
         }
 
-        if (!args.options.id && !args.options.name) {
-          return 'Specify either the id or the name';
-        }
-
-        if (args.options.id && args.options.name) {
-          return 'Specify either the id or the name but not both';
-        }
-
         if (args.options.id && !validation.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
         }
@@ -101,6 +94,10 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'name']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

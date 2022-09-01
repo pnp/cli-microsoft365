@@ -45,6 +45,7 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -94,38 +95,12 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.teamId && args.options.teamName) {
-          return 'Specify either teamId or teamName, but not both';
-        }
-
-        if (!args.options.teamId && !args.options.teamName) {
-          return 'Specify teamId or teamName, one is required';
-        }
-
         if (args.options.teamId && !validation.isValidGuid(args.options.teamId)) {
           return `${args.options.teamId} is not a valid GUID`;
         }
 
-        if (args.options.channelId && args.options.channelName) {
-          return 'Specify either channelId or channelName, but not both';
-        }
-
-        if (!args.options.channelId && !args.options.channelName) {
-          return 'Specify channelId or channelName, one is required';
-        }
-
         if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId)) {
           return `${args.options.channelId} is not a valid Teams Channel ID`;
-        }
-
-        if ((args.options.userName && args.options.userId) ||
-          (args.options.userName && args.options.id) ||
-          (args.options.userId && args.options.id)) {
-          return 'Specify either userName, userId or id, but not multiple.';
-        }
-
-        if (!args.options.userName && !args.options.userId && !args.options.id) {
-          return 'Specify either userName, userId or id, one is required';
         }
 
         if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
@@ -138,6 +113,14 @@ class TeamsChannelMemberSetCommand extends GraphCommand {
 
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['teamId', 'teamName'],
+      ['channelId', 'channelName'],
+      ['userName', 'userId', 'id']
     );
   }
 

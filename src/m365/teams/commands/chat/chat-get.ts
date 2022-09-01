@@ -36,6 +36,7 @@ class TeamsChatGetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -65,19 +66,6 @@ class TeamsChatGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.id && !args.options.participants && !args.options.name) {
-          return 'Specify id or participants or name, one is required.';
-        }
-
-        let nrOfMutuallyExclusiveOptionsInUse = 0;
-        if (args.options.id) { nrOfMutuallyExclusiveOptionsInUse++; }
-        if (args.options.participants) { nrOfMutuallyExclusiveOptionsInUse++; }
-        if (args.options.name) { nrOfMutuallyExclusiveOptionsInUse++; }
-
-        if (nrOfMutuallyExclusiveOptionsInUse > 1) {
-          return 'Specify either id or participants or name, but not multiple.';
-        }
-
         if (args.options.id && !validation.isValidTeamsChatId(args.options.id)) {
           return `${args.options.id} is not a valid Teams ChatId.`;
         }
@@ -92,6 +80,10 @@ class TeamsChatGetCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'participants', 'name']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

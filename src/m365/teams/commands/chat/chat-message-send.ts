@@ -36,6 +36,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -68,19 +69,6 @@ class TeamsChatMessageSendCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.chatId && !args.options.userEmails && !args.options.chatName) {
-          return 'Specify chatId or userEmails or chatName, one is required.';
-        }
-
-        let nrOfMutuallyExclusiveOptionsInUse = 0;
-        if (args.options.chatId) { nrOfMutuallyExclusiveOptionsInUse++; }
-        if (args.options.userEmails) { nrOfMutuallyExclusiveOptionsInUse++; }
-        if (args.options.chatName) { nrOfMutuallyExclusiveOptionsInUse++; }
-
-        if (nrOfMutuallyExclusiveOptionsInUse > 1) {
-          return 'Specify either chatId or userEmails or chatName, but not multiple.';
-        }
-
         if (args.options.chatId && !validation.isValidTeamsChatId(args.options.chatId)) {
           return `${args.options.chatId} is not a valid Teams ChatId.`;
         }
@@ -95,6 +83,10 @@ class TeamsChatMessageSendCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['chatId', 'userEmails', 'chatName']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

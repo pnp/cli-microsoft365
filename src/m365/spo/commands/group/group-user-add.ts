@@ -36,12 +36,13 @@ class SpoGroupUserAddCommand extends SpoCommand {
 
   constructor() {
     super();
-  
+
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
-  
+
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
@@ -52,7 +53,7 @@ class SpoGroupUserAddCommand extends SpoCommand {
       });
     });
   }
-  
+
   #initOptions(): void {
     this.options.unshift(
       {
@@ -72,7 +73,7 @@ class SpoGroupUserAddCommand extends SpoCommand {
       }
     );
   }
-  
+
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
@@ -80,29 +81,20 @@ class SpoGroupUserAddCommand extends SpoCommand {
         if (isValidSharePointUrl !== true) {
           return isValidSharePointUrl;
         }
-    
-        if (!args.options.groupId && !args.options.groupName) {
-          return 'Specify either groupId or groupName';
-        }
-    
-        if (args.options.groupId && args.options.groupName) {
-          return 'Specify either groupId or groupName but not both';
-        }
-    
-        if (!args.options.userName && !args.options.email) {
-          return 'Specify either userName or email';
-        }
-    
-        if (args.options.userName && args.options.email) {
-          return 'Specify either userName or email but not both';
-        }
-    
+
         if (args.options.groupId && isNaN(args.options.groupId)) {
           return `Specified groupId ${args.options.groupId} is not a number`;
         }
-    
+
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['groupId', 'groupName'],
+      ['userName', 'email']
     );
   }
 

@@ -33,6 +33,7 @@ class SpoListItemRemoveCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -87,17 +88,13 @@ class SpoListItemRemoveCommand extends SpoCommand {
           return `${args.options.listId} is not a valid GUID`;
         }
 
-        if (args.options.listId && args.options.listTitle) {
-          return 'Specify id or title, but not both';
-        }
-
-        if (!args.options.listId && !args.options.listTitle) {
-          return 'Specify id or title';
-        }
-
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['listId', 'listTitle']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

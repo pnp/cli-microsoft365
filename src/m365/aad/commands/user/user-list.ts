@@ -1,5 +1,6 @@
 import { User } from '@microsoft/microsoft-graph-types';
 import { Logger } from '../../../../cli';
+import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { odata } from '../../../../utils';
 import GraphCommand from '../../../base/GraphCommand';
@@ -50,11 +51,18 @@ class AadUserListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+    let filter: string = '';
     const properties: string[] = args.options.properties ?
       args.options.properties.split(',').map(p => p.trim()) :
       ['userPrincipalName', 'displayName'];
-    const filter: string = this.getFilter(args.options);
+    try {
+      filter = this.getFilter(args.options);
+    }
+    catch (ex: any) {
+      cb(new CommandError(ex));
+      return;
+    }
     const endpoint: string = args.options.deleted ? 'directory/deletedItems/microsoft.graph.user' : 'users';
     const url: string = `${this.resource}/v1.0/${endpoint}?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
 
@@ -83,7 +91,11 @@ class AadUserListCommand extends GraphCommand {
 
     Object.keys(options).forEach(key => {
       if (excludeOptions.indexOf(key) === -1) {
-        filters[key] = encodeURIComponent(options[key].replace(/'/g, `''`));
+        if (typeof options[key] === 'boolean') {
+          throw `Specify value for the ${key} property`;
+        }
+
+        filters[key] = encodeURIComponent(options[key].toString().replace(/'/g, `''`));
       }
     });
     let filter: string = Object.keys(filters).map(key => `startsWith(${key}, '${filters[key]}')`).join(' and ');

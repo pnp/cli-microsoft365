@@ -30,6 +30,7 @@ class TeamsUserAppListCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -55,14 +56,6 @@ class TeamsUserAppListCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.userId && !args.options.userName) {
-          return `userId or userName need to be provided`;
-        }
-
-        if (args.options.userId && args.options.userName) {
-          return `Please specify either userId or userName, not both`;
-        }
-
         if (args.options.userId && !validation.isValidGuid(args.options.userId)) {
           return `${args.options.userId} is not a valid GUID`;
         }
@@ -74,6 +67,10 @@ class TeamsUserAppListCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['userId', 'userName']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

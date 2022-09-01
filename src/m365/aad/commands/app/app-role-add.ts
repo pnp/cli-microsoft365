@@ -47,6 +47,7 @@ class AadAppRoleAddCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -76,17 +77,7 @@ class AadAppRoleAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        const { appId, appObjectId, appName, allowedMembers, claim } = args.options;
-
-        if ((appId && appObjectId) ||
-          (appId && appName) ||
-          (appObjectId && appName)) {
-          return `Specify either appId, appObjectId or appName but not multiple`;
-        }
-
-        if (!appId && !appObjectId && !appName) {
-          return `Specify either appId, appObjectId or appName`;
-        }
+        const { allowedMembers, claim } = args.options;
 
         if (AadAppRoleAddCommand.allowedMembers.indexOf(allowedMembers) < 0) {
           return `${allowedMembers} is not a valid value for allowedMembers. Valid values are ${AadAppRoleAddCommand.allowedMembers.join(', ')}`;
@@ -107,6 +98,10 @@ class AadAppRoleAddCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['appId', 'appObjectId', 'appName']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

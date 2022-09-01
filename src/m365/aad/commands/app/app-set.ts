@@ -41,6 +41,7 @@ class AadAppSetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -81,42 +82,34 @@ class AadAppSetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.appId &&
-          !args.options.objectId &&
-          !args.options.name) {
-          return 'Specify either appId, objectId or name';
-        }
-    
-        if ((args.options.appId && args.options.objectId) ||
-          (args.options.appId && args.options.name) ||
-          (args.options.objectId && args.options.name)) {
-          return 'Specify either appId, objectId or name but not both';
-        }
-    
         if (args.options.certificateFile && args.options.certificateBase64Encoded) {
           return 'Specify either certificateFile or certificateBase64Encoded but not both';
         }
-    
+
         if (args.options.certificateDisplayName && !args.options.certificateFile && !args.options.certificateBase64Encoded) {
           return 'When you specify certificateDisplayName you also need to specify certificateFile or certificateBase64Encoded';
         }
-    
+
         if (args.options.certificateFile && !fs.existsSync(args.options.certificateFile as string)) {
           return 'Certificate file not found';
         }
-    
+
         if (args.options.redirectUris && !args.options.platform) {
           return `When you specify redirectUris you also need to specify platform`;
         }
-    
+
         if (args.options.platform &&
           AadAppSetCommand.aadApplicationPlatform.indexOf(args.options.platform) < 0) {
           return `${args.options.platform} is not a valid value for platform. Allowed values are ${AadAppSetCommand.aadApplicationPlatform.join(', ')}`;
         }
-    
+
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['appId', 'objectId', 'name']);
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

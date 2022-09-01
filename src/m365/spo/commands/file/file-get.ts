@@ -37,6 +37,7 @@ class SpoFileGetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -92,14 +93,6 @@ class SpoFileGetCommand extends SpoCommand {
           }
         }
     
-        if (args.options.id && args.options.url) {
-          return 'Specify id or url, but not both';
-        }
-    
-        if (!args.options.id && !args.options.url) {
-          return 'Specify id or url, one is required';
-        }
-    
         if (args.options.asFile && !args.options.path) {
           return 'The path should be specified when the --asFile option is used';
         }
@@ -123,6 +116,10 @@ class SpoFileGetCommand extends SpoCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'url']);
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

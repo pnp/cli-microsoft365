@@ -1,7 +1,7 @@
 function CLIMicrosoft365Completion {
   param($commandName, $wordToComplete, $cursorPosition)
 
-  $commands = Get-Content $(Join-Path $PSScriptRoot ".." "commands.json" -Resolve) | ConvertFrom-Json
+  $commands = Get-Content $(Join-Path -Path $PSScriptRoot -ChildPath ".." | Join-Path -ChildPath "commands.json" -Resolve) | ConvertFrom-Json
   $command = $commands
   $parent = $commands
   $replies = @{ }
