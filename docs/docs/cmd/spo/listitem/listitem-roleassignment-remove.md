@@ -1,6 +1,6 @@
 # spo listitem roleassignment remove
 
-Removes a role assignment to a listitem.
+Removes a role assignment from a listitem.
 
 ## Usage
 
