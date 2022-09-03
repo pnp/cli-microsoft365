@@ -148,7 +148,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let canvasContent: Control[];
 
     let layoutWebpartsContent: string = "";
@@ -168,21 +168,17 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       logger.logToStderr(`Retrieving page information...`);
     }
 
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')`,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
+    try {
+      let requestOptions: any = {
+        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-    request
-      .get<ClientSidePageProperties>(requestOptions)
-      .then((res: ClientSidePageProperties): Promise<ClientSidePageProperties> => {
-        if (res.IsPageCheckedOutToCurrentUser) {
-          return Promise.resolve(res);
-        }
-
+      const page = await request.get<ClientSidePageProperties>(requestOptions);
+      if (!page.IsPageCheckedOutToCurrentUser) {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
           headers: {
@@ -190,190 +186,189 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
           },
           responseType: 'json'
         };
+  
+        await request.post<ClientSidePageProperties>(requestOptions);
+      }
 
-        return request.post<ClientSidePageProperties>(requestOptions);
-      })
-      .then((res: ClientSidePageProperties): Promise<ClientSideWebpart> => {
-        if (res) {
-          layoutWebpartsContent = res.LayoutWebpartsContent;
-          authorByline = res.AuthorByline;
-          bannerImageUrl = res.BannerImageUrl;
-          description = res.Description;
-          title = res.Title;
-          topicHeader = res.TopicHeader;
-        }
+      if (page) {
+        layoutWebpartsContent = page.LayoutWebpartsContent;
+        authorByline = page.AuthorByline;
+        bannerImageUrl = page.BannerImageUrl;
+        description = page.Description;
+        title = page.Title;
+        topicHeader = page.TopicHeader;
+      }
 
-        if (this.verbose) {
-          logger.logToStderr(
-            `Retrieving definition for web part ${args.options.webPartId ||
-            args.options.standardWebPart}...`
-          );
-        }
+      if (this.verbose) {
+        logger.logToStderr(
+          `Retrieving definition for web part ${args.options.webPartId ||
+          args.options.standardWebPart}...`
+        );
+      }
 
-        canvasContent = JSON.parse(res.CanvasContent1 || "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]");
+      canvasContent = JSON.parse(page.CanvasContent1 || "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]");
 
-        // Get the WebPart according to arguments
-        return this.getWebPart(logger, args);
-      })
-      .then((webPart: ClientSideWebpart): Promise<void> => {
-        if (this.verbose) {
-          logger.logToStderr(`Setting client-side web part layout and properties...`);
-        }
+      // Get the WebPart according to arguments
+      const webPart = await this.getWebPart(logger, args);
+      if (this.verbose) {
+        logger.logToStderr(`Setting client-side web part layout and properties...`);
+      }
 
-        this.setWebPartProperties(webPart, logger, args);
+      this.setWebPartProperties(webPart, logger, args);
 
-        // if no section exists (canvasContent array only has 1 default object), add a default section (1 col)
-        if (canvasContent.length === 1) {
-          const defaultSection: Control = {
-            position: {
-              controlIndex: 1,
-              sectionIndex: 1,
-              zoneIndex: 1,
-              sectionFactor: 12,
-              layoutIndex: 1
-            },
-            emphasis: {},
-            displayMode: 2
-          };
-          canvasContent.unshift(defaultSection);
-        }
+      // if no section exists (canvasContent array only has 1 default object), add a default section (1 col)
+      if (canvasContent.length === 1) {
+        const defaultSection: Control = {
+          position: {
+            controlIndex: 1,
+            sectionIndex: 1,
+            zoneIndex: 1,
+            sectionFactor: 12,
+            layoutIndex: 1
+          },
+          emphasis: {},
+          displayMode: 2
+        };
+        canvasContent.unshift(defaultSection);
+      }
 
-        // get unique zoneIndex values given each section can have 1 or more
-        // columns each assigned to the zoneIndex of the corresponding section
-        const zoneIndices: number[] = canvasContent
-          .filter(c => c.position)
-          .map(c => c.position.zoneIndex)
-          .filter((value: number, index: number, array: number[]): boolean => {
-            return array.indexOf(value) === index;
-          })
+      // get unique zoneIndex values given each section can have 1 or more
+      // columns each assigned to the zoneIndex of the corresponding section
+      const zoneIndices: number[] = canvasContent
+        .filter(c => c.position)
+        .map(c => c.position.zoneIndex)
+        .filter((value: number, index: number, array: number[]): boolean => {
+          return array.indexOf(value) === index;
+        })
+        .sort((a, b) => a - b);
+
+      // get section number. if not specified, get the last section
+      const section: number = args.options.section || zoneIndices.length;
+      if (section > zoneIndices.length) {
+        return Promise.reject(`Invalid section '${section}'`);
+      }
+
+      // zoneIndex that represents the section where the web part should be added
+      const zoneIndex: number = zoneIndices[section - 1];
+
+      const column: number = args.options.column || 1;
+      // we need the index of the control in the array so that we know which
+      // item to replace or where to add the web part
+      const controlIndex: number = canvasContent
+        .findIndex(c => c.position &&
+          c.position.zoneIndex === zoneIndex &&
+          c.position.sectionIndex === column);
+      if (controlIndex === -1) {
+        return Promise.reject(`Invalid column '${args.options.column}'`);
+      }
+
+      // get the first control that matches section and column
+      // if it's a empty column, it should be replaced with the web part
+      // if it's a web part, then we need to determine if there are other
+      // web parts and where in the array the new web part should be put
+      const control: Control = canvasContent[controlIndex];
+      const webPartControl: Control = this.extend({
+        controlType: 3,
+        displayMode: 2,
+        id: webPart.id,
+        position: Object.assign({}, control.position),
+        webPartId: webPart.webPartId,
+        emphasis: {}
+      }, webPart);
+
+      if (!control.controlType) {
+        // it's an empty column so we need to replace it with the web part
+        // ignore the specified order
+        webPartControl.position.controlIndex = 1;
+        canvasContent.splice(controlIndex, 1, webPartControl);
+      }
+      else {
+        // it's a web part so we should find out where to put the web part in
+        // the array of page controls
+
+        // get web part index values to determine where to add the current
+        // web part
+        const controlIndices: number[] = canvasContent
+          .filter(c => c.position &&
+            c.position.zoneIndex === zoneIndex &&
+            c.position.sectionIndex === column)
+          .map(c => c.position.controlIndex as number)
           .sort((a, b) => a - b);
 
-        // get section number. if not specified, get the last section
-        const section: number = args.options.section || zoneIndices.length;
-        if (section > zoneIndices.length) {
-          return Promise.reject(`Invalid section '${section}'`);
-        }
+        // get the controlIndex of the web part before each the new web part
+        // should be added
+        if (!args.options.order ||
+          args.options.order > controlIndices.length) {
+          const controlIndex: number = controlIndices.pop() as number;
+          const webPartIndex: number = canvasContent
+            .findIndex(c => c.position &&
+              c.position.zoneIndex === zoneIndex &&
+              c.position.sectionIndex === column &&
+              c.position.controlIndex === controlIndex);
 
-        // zoneIndex that represents the section where the web part should be added
-        const zoneIndex: number = zoneIndices[section - 1];
-
-        const column: number = args.options.column || 1;
-        // we need the index of the control in the array so that we know which
-        // item to replace or where to add the web part
-        const controlIndex: number = canvasContent
-          .findIndex(c => c.position &&
-            c.position.zoneIndex === zoneIndex &&
-            c.position.sectionIndex === column);
-        if (controlIndex === -1) {
-          return Promise.reject(`Invalid column '${args.options.column}'`);
-        }
-
-        // get the first control that matches section and column
-        // if it's a empty column, it should be replaced with the web part
-        // if it's a web part, then we need to determine if there are other
-        // web parts and where in the array the new web part should be put
-        const control: Control = canvasContent[controlIndex];
-        const webPartControl: Control = this.extend({
-          controlType: 3,
-          displayMode: 2,
-          id: webPart.id,
-          position: Object.assign({}, control.position),
-          webPartId: webPart.webPartId,
-          emphasis: {}
-        }, webPart);
-
-        if (!control.controlType) {
-          // it's an empty column so we need to replace it with the web part
-          // ignore the specified order
-          webPartControl.position.controlIndex = 1;
-          canvasContent.splice(controlIndex, 1, webPartControl);
+          canvasContent.splice(webPartIndex + 1, 0, webPartControl);
         }
         else {
-          // it's a web part so we should find out where to put the web part in
-          // the array of page controls
-
-          // get web part index values to determine where to add the current
-          // web part
-          const controlIndices: number[] = canvasContent
-            .filter(c => c.position &&
+          const controlIndex: number = controlIndices[args.options.order - 1];
+          const webPartIndex: number = canvasContent
+            .findIndex(c => c.position &&
               c.position.zoneIndex === zoneIndex &&
-              c.position.sectionIndex === column)
-            .map(c => c.position.controlIndex as number)
-            .sort((a, b) => a - b);
+              c.position.sectionIndex === column &&
+              c.position.controlIndex === controlIndex);
 
-          // get the controlIndex of the web part before each the new web part
-          // should be added
-          if (!args.options.order ||
-            args.options.order > controlIndices.length) {
-            const controlIndex: number = controlIndices.pop() as number;
-            const webPartIndex: number = canvasContent
-              .findIndex(c => c.position &&
-                c.position.zoneIndex === zoneIndex &&
-                c.position.sectionIndex === column &&
-                c.position.controlIndex === controlIndex);
-
-            canvasContent.splice(webPartIndex + 1, 0, webPartControl);
-          }
-          else {
-            const controlIndex: number = controlIndices[args.options.order - 1];
-            const webPartIndex: number = canvasContent
-              .findIndex(c => c.position &&
-                c.position.zoneIndex === zoneIndex &&
-                c.position.sectionIndex === column &&
-                c.position.controlIndex === controlIndex);
-
-            canvasContent.splice(webPartIndex, 0, webPartControl);
-          }
-
-          // reset order to ensure there are no gaps
-          const webPartsInColumn: Control[] = canvasContent
-            .filter(c => c.position &&
-              c.position.zoneIndex === zoneIndex &&
-              c.position.sectionIndex === column);
-          let i: number = 1;
-          webPartsInColumn.forEach(w => {
-            w.position.controlIndex = i++;
-          });
+          canvasContent.splice(webPartIndex, 0, webPartControl);
         }
 
-        if (authorByline) {
-          pageData.AuthorByline = authorByline;
-        }
-        if (bannerImageUrl) {
-          pageData.BannerImageUrl = bannerImageUrl;
-        }
-        if (description) {
-          pageData.Description = description;
-        }
-        if (title) {
-          pageData.Title = title;
-        }
-        if (topicHeader) {
-          pageData.TopicHeader = topicHeader;
-        }
-        if (layoutWebpartsContent) {
-          pageData.LayoutWebpartsContent = layoutWebpartsContent;
-        }
-        if (canvasContent) {
-          pageData.CanvasContent1 = JSON.stringify(canvasContent);
-        }
+        // reset order to ensure there are no gaps
+        const webPartsInColumn: Control[] = canvasContent
+          .filter(c => c.position &&
+            c.position.zoneIndex === zoneIndex &&
+            c.position.sectionIndex === column);
+        let i: number = 1;
+        webPartsInColumn.forEach(w => {
+          w.position.controlIndex = i++;
+        });
+      }
 
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/SavePageAsDraft`,
-          headers: {
-            'X-HTTP-Method': 'MERGE',
-            'IF-MATCH': '*',
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata'
-          },
-          data: pageData,
-          responseType: 'json'
-        };
+      if (authorByline) {
+        pageData.AuthorByline = authorByline;
+      }
+      if (bannerImageUrl) {
+        pageData.BannerImageUrl = bannerImageUrl;
+      }
+      if (description) {
+        pageData.Description = description;
+      }
+      if (title) {
+        pageData.Title = title;
+      }
+      if (topicHeader) {
+        pageData.TopicHeader = topicHeader;
+      }
+      if (layoutWebpartsContent) {
+        pageData.LayoutWebpartsContent = layoutWebpartsContent;
+      }
+      if (canvasContent) {
+        pageData.CanvasContent1 = JSON.stringify(canvasContent);
+      }
 
-        return request.post(requestOptions);
-      })
-      .then(_ => cb())
-      .catch((err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      requestOptions = {
+        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/SavePageAsDraft`,
+        headers: {
+          'X-HTTP-Method': 'MERGE',
+          'IF-MATCH': '*',
+          'content-type': 'application/json;odata=nometadata',
+          accept: 'application/json;odata=nometadata'
+        },
+        data: pageData,
+        responseType: 'json'
+      };
+
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getWebPart(logger: Logger, args: CommandArgs): Promise<any> {

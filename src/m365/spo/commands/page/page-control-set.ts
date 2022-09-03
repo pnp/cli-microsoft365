@@ -101,135 +101,135 @@ class SpoPageControlSetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let pageName: string = args.options.name;
     if (args.options.name.indexOf('.aspx') < 0) {
       pageName += '.aspx';
     }
 
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/SitePages/Pages/GetByUrl('sitepages/${encodeURIComponent(pageName)}')`,
-      headers: {
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
+    try {
+      let requestOptions: any = {
+        url: `${args.options.webUrl}/_api/SitePages/Pages/GetByUrl('sitepages/${encodeURIComponent(pageName)}')`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-    request
-      .get<ClientSidePageProperties>(requestOptions)
-      .then((res: ClientSidePageProperties): Promise<ClientSidePageProperties> => {
-        if (!res.CanvasContent1) {
-          return Promise.reject(`Page ${pageName} doesn't contain canvas controls.`);
-        }
+      const res = await request.get<ClientSidePageProperties>(requestOptions);
 
-        const canvasContent: PageControl[] = JSON.parse(res.CanvasContent1);
-        const control: PageControl | undefined = canvasContent.find(control => control.id && control.id.toLowerCase() === args.options.id.toLowerCase());
+      if (!res.CanvasContent1) {
+        throw `Page ${pageName} doesn't contain canvas controls.`;
+      }
 
-        if (!control) {
-          return Promise.reject(`Control with ID ${args.options.id} not found on page ${pageName}`);
-        }
+      const canvasContent: PageControl[] = JSON.parse(res.CanvasContent1);
+      const control: PageControl | undefined = canvasContent.find(control => control.id && control.id.toLowerCase() === args.options.id.toLowerCase());
 
+      if (!control) {
+        throw `Control with ID ${args.options.id} not found on page ${pageName}`;
+      }
+
+      if (this.verbose) {
+        logger.logToStderr(`Control with ID ${args.options.id} found on the page`);
+      }
+
+      // Check out the page
+      const page = await Page.checkout(pageName, args.options.webUrl, logger, this.debug, this.verbose);
+
+      // Update the web part data
+      const canvasControls: ClientSideControl[] = JSON.parse(page.CanvasContent1);
+      if (this.debug) {
+        logger.logToStderr(canvasControls);
+      }
+
+      const canvasControl = canvasControls.find(c => c.id.toLowerCase() === args.options.id.toLowerCase());
+      if (!canvasControl) {
+        throw `Control with ID ${args.options.id} not found on page ${pageName}`;
+      }
+
+      if (args.options.webPartData) {
         if (this.verbose) {
-          logger.logToStderr(`Control with ID ${args.options.id} found on the page`);
+          logger.logToStderr('web part data:');
+          logger.logToStderr(args.options.webPartData);
+          logger.logToStderr('');
         }
 
-        // Check out the page
-        return Page.checkout(pageName, args.options.webUrl, logger, this.debug, this.verbose);
-      })
-      .then((page: ClientSidePageProperties) => {
-        // Update the web part data
-        const canvasContent: ClientSideControl[] = JSON.parse(page.CanvasContent1);
-        if (this.debug) {
-          logger.logToStderr(canvasContent);
-        }
-
-        const canvasControl = canvasContent.find(c => c.id.toLowerCase() === args.options.id.toLowerCase());
-        if (!canvasControl) {
-          return Promise.reject(`Control with ID ${args.options.id} not found on page ${pageName}`);
-        }
-
-        if (args.options.webPartData) {
-          if (this.verbose) {
-            logger.logToStderr('web part data:');
-            logger.logToStderr(args.options.webPartData);
-            logger.logToStderr('');
-          }
-
-          const webPartData = JSON.parse(args.options.webPartData);
-          canvasControl.webPartData = {
-            ...canvasControl.webPartData,
-            ...webPartData,
-            id: canvasControl.webPartData.id,
-            instanceId: canvasControl.webPartData.instanceId
-          };
-
-          if (this.verbose) {
-            logger.logToStderr('Updated web part data:');
-            logger.logToStderr(canvasControl.webPartData);
-            logger.logToStderr('');
-          }
-        }
-
-        if (args.options.webPartProperties) {
-          if (this.verbose) {
-            logger.logToStderr('web part properties data:');
-            logger.logToStderr(args.options.webPartProperties);
-            logger.logToStderr('');
-          }
-
-          const webPartProperties = JSON.parse(args.options.webPartProperties);
-          canvasControl.webPartData.properties = {
-            ...canvasControl.webPartData.properties,
-            ...webPartProperties
-          };
-
-          if (this.verbose) {
-            logger.logToStderr('Updated web part properties:');
-            logger.logToStderr(canvasControl.webPartData.properties);
-            logger.logToStderr('');
-          }
-        }
-
-        const pageData: any = {};
-
-        if (page.AuthorByline) {
-          pageData.AuthorByline = page.AuthorByline;
-        }
-        if (page.BannerImageUrl) {
-          pageData.BannerImageUrl = page.BannerImageUrl;
-        }
-        if (page.Description) {
-          pageData.Description = page.Description;
-        }
-        if (page.Title) {
-          pageData.Title = page.Title;
-        }
-        if (page.TopicHeader) {
-          pageData.TopicHeader = page.TopicHeader;
-        }
-        if (page.LayoutWebpartsContent) {
-          pageData.LayoutWebpartsContent = page.LayoutWebpartsContent;
-        }
-        if (canvasContent) {
-          pageData.CanvasContent1 = JSON.stringify(canvasContent);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageName)}')/SavePageAsDraft`,
-          headers: {
-            'X-HTTP-Method': 'MERGE',
-            'IF-MATCH': '*',
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata'
-          },
-          data: pageData,
-          responseType: 'json'
+        const webPartData = JSON.parse(args.options.webPartData);
+        canvasControl.webPartData = {
+          ...canvasControl.webPartData,
+          ...webPartData,
+          id: canvasControl.webPartData.id,
+          instanceId: canvasControl.webPartData.instanceId
         };
 
-        return request.post(requestOptions);
-      })
-      .then(_ => cb())
-      .catch((err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        if (this.verbose) {
+          logger.logToStderr('Updated web part data:');
+          logger.logToStderr(canvasControl.webPartData);
+          logger.logToStderr('');
+        }
+      }
+
+      if (args.options.webPartProperties) {
+        if (this.verbose) {
+          logger.logToStderr('web part properties data:');
+          logger.logToStderr(args.options.webPartProperties);
+          logger.logToStderr('');
+        }
+
+        const webPartProperties = JSON.parse(args.options.webPartProperties);
+        canvasControl.webPartData.properties = {
+          ...canvasControl.webPartData.properties,
+          ...webPartProperties
+        };
+
+        if (this.verbose) {
+          logger.logToStderr('Updated web part properties:');
+          logger.logToStderr(canvasControl.webPartData.properties);
+          logger.logToStderr('');
+        }
+      }
+
+      const pageData: any = {};
+
+      if (page.AuthorByline) {
+        pageData.AuthorByline = page.AuthorByline;
+      }
+      if (page.BannerImageUrl) {
+        pageData.BannerImageUrl = page.BannerImageUrl;
+      }
+      if (page.Description) {
+        pageData.Description = page.Description;
+      }
+      if (page.Title) {
+        pageData.Title = page.Title;
+      }
+      if (page.TopicHeader) {
+        pageData.TopicHeader = page.TopicHeader;
+      }
+      if (page.LayoutWebpartsContent) {
+        pageData.LayoutWebpartsContent = page.LayoutWebpartsContent;
+      }
+      if (canvasContent) {
+        pageData.CanvasContent1 = JSON.stringify(canvasContent);
+      }
+
+      requestOptions = {
+        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageName)}')/SavePageAsDraft`,
+        headers: {
+          'X-HTTP-Method': 'MERGE',
+          'IF-MATCH': '*',
+          'content-type': 'application/json;odata=nometadata',
+          accept: 'application/json;odata=nometadata'
+        },
+        data: pageData,
+        responseType: 'json'
+      };
+
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

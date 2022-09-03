@@ -67,7 +67,7 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('returns a result with a thumbnail', (done) => {
+  it('returns a result with a thumbnail', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([
@@ -106,22 +106,15 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, verbose: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Url: '/sites/sitedesigns',
-          Libraries:
-            [{ DisplayName: 'Site Assets', LibraryUrl: 'sites/sitedesigns/SiteAssets', ListId: '/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)/', ThumbnailUrl: 'SiteAssets/__siteIcon__.jpg' }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, verbose: true } });
+    assert(loggerLogSpy.calledWith({
+      Url: '/sites/sitedesigns',
+      Libraries:
+        [{ DisplayName: 'Site Assets', LibraryUrl: 'sites/sitedesigns/SiteAssets', ListId: '/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)/', ThumbnailUrl: 'SiteAssets/__siteIcon__.jpg' }]
+    }));
   });
 
-  it('returns multiple results', (done) => {
+  it('returns multiple results', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([
@@ -172,21 +165,14 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, verbose: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Url: '/sites/sitedesigns', Libraries:
-            [{ DisplayName: 'Site Assets', LibraryUrl: 'sites/sitedesigns/SiteAssets', ListId: '/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)/', ThumbnailUrl: 'SiteAssets/__siteIcon__.jpg' }, { DisplayName: 'Site Assets 2', LibraryUrl: 'sites/sitedesigns/SiteAssets2', ListId: '/Guid(86c2e234-c996-4877-b3a6-8aebd8ab45b6)/', ThumbnailUrl: null }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, verbose: true } });
+    assert(loggerLogSpy.calledWith({
+      Url: '/sites/sitedesigns', Libraries:
+        [{ DisplayName: 'Site Assets', LibraryUrl: 'sites/sitedesigns/SiteAssets', ListId: '/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)/', ThumbnailUrl: 'SiteAssets/__siteIcon__.jpg' }, { DisplayName: 'Site Assets 2', LibraryUrl: 'sites/sitedesigns/SiteAssets2', ListId: '/Guid(86c2e234-c996-4877-b3a6-8aebd8ab45b6)/', ThumbnailUrl: null }]
+    }));
   });
 
-  it('returns a result without a thumbnail', (done) => {
+  it('returns a result without a thumbnail', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([
@@ -222,22 +208,15 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, verbose: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          Url: '/sites/sitedesigns',
-          Libraries:
-            [{ DisplayName: 'Site Assets', LibraryUrl: 'sites/sitedesigns/SiteAssets', ListId: '/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)/', ThumbnailUrl: null }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, verbose: true } });
+    assert(loggerLogSpy.calledWith({
+      Url: '/sites/sitedesigns',
+      Libraries:
+        [{ DisplayName: 'Site Assets', LibraryUrl: 'sites/sitedesigns/SiteAssets', ListId: '/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)/', ThumbnailUrl: null }]
+    }));
   });
 
-  it('handles no library set correctly', (done) => {
+  it('handles no library set correctly', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([{
@@ -373,22 +352,15 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith('No libraries in Organization Assets'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(loggerLogSpy.calledWith('No libraries in Organization Assets'));
   });
 
-  it('handles error getting request', (done) => {
+  it('handles error getting request', async () => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([
@@ -403,34 +375,19 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert(svcListRequest.called);
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
+    assert(svcListRequest.called);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {} } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

@@ -90,7 +90,7 @@ describe(commands.PAGE_HEADER_SET, () => {
     assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['imageUrl']);
   });
 
-  it('checks out page if not checked out by the current user', (done) => {
+  it('checks out page if not checked out by the current user', async () => {
     sinonUtil.restore([request.get, request.post]);
     let checkedOut = false;
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -117,24 +117,17 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         pageName: 'home',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter'
       }
-    }, () => {
-      try {
-        assert.strictEqual(checkedOut, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(checkedOut, true);
   });
 
-  it('doesn\'t check out page if not checked out by the current user', (done) => {
+  it('doesn\'t check out page if not checked out by the current user', async () => {
     sinonUtil.restore([request.get, request.post]);
     let checkingOut = false;
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -161,74 +154,46 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         pageName: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter'
       }
-    }, () => {
-      try {
-        assert.deepStrictEqual(checkingOut, false);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.deepStrictEqual(checkingOut, false);
   });
 
-  it('sets page header to default when no type specified', (done) => {
+  it('sets page header to default when no type specified', async () => {
     const mockData = {
       LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.4","properties":{"imageSourceType":4,"layoutType":"FullWidthImage","textAlignment":"Left","showTopicHeader":false,"showPublishDate":false,"topicHeader":""}}]',
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    command.action(logger, { options: { debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+    assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
-  it('sets page header to default when default type specified', (done) => {
+  it('sets page header to default when default type specified', async () => {
     const mockData = {
       LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.4","properties":{"imageSourceType":4,"layoutType":"FullWidthImage","textAlignment":"Left","showTopicHeader":false,"showPublishDate":false,"topicHeader":""}}]',
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default' } }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default' } });
+    assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
-  it('sets page header to none when none specified', (done) => {
+  it('sets page header to none when none specified', async () => {
     const mockData = {
       LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.4","properties":{"imageSourceType":4,"layoutType":"NoImage","textAlignment":"Left","showTopicHeader":false,"showPublishDate":false,"topicHeader":""}}]',
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } });
+    assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
-  it('check when no CanvasContent1 is provided', (done) => {
+  it('check when no CanvasContent1 is provided', async () => {
     const mockData = {
       LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.4","properties":{"title":"Page","imageSourceType":4,"layoutType":"NoImage","textAlignment":"Left","showTopicHeader":false,"showPublishDate":false,"topicHeader":""}}]',
       Title: 'Page',
@@ -270,18 +235,11 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } });
+    assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
-  it('sets page header to custom when custom type specified', (done) => {
+  it('sets page header to custom when custom type specified', async () => {
     const mockData = {
       LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{"imageSource":"/sites/team-a/siteassets/hero.jpg"},"links":{},"customMetadata":{"imageSource":{"siteId":"c7678ab2-c9dc-454b-b2ee-7fcffb983d4e","webId":"0df4d2d2-5ecf-45e9-94f5-c638106bfc65","listId":"e1557527-d333-49f2-9d60-ea8a3003fda8","uniqueId":"102f496d-23a2-415f-803a-232b8a6c7613"}}},"dataVersion":"1.4","properties":{"imageSourceType":2,"layoutType":"FullWidthImage","textAlignment":"Left","showTopicHeader":false,"showPublishDate":false,"topicHeader":"","authors":[],"altText":"","webId":"0df4d2d2-5ecf-45e9-94f5-c638106bfc65","siteId":"c7678ab2-c9dc-454b-b2ee-7fcffb983d4e","listId":"e1557527-d333-49f2-9d60-ea8a3003fda8","uniqueId":"102f496d-23a2-415f-803a-232b8a6c7613","translateX":42.3837520042758,"translateY":56.4285714285714}}]',
       CanvasContent1: '<div>just some test content</div>'
@@ -322,18 +280,11 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } });
+    assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
-  it('sets page header to custom when custom type specified (debug)', (done) => {
+  it('sets page header to custom when custom type specified (debug)', async () => {
     const mockData = {
       LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{"imageSource":"/sites/team-a/siteassets/hero.jpg"},"links":{},"customMetadata":{"imageSource":{"siteId":"c7678ab2-c9dc-454b-b2ee-7fcffb983d4e","webId":"0df4d2d2-5ecf-45e9-94f5-c638106bfc65","listId":"e1557527-d333-49f2-9d60-ea8a3003fda8","uniqueId":"102f496d-23a2-415f-803a-232b8a6c7613"}}},"dataVersion":"1.4","properties":{"imageSourceType":2,"layoutType":"FullWidthImage","textAlignment":"Left","showTopicHeader":false,"showPublishDate":false,"topicHeader":"","authors":[],"altText":"","webId":"0df4d2d2-5ecf-45e9-94f5-c638106bfc65","siteId":"c7678ab2-c9dc-454b-b2ee-7fcffb983d4e","listId":"e1557527-d333-49f2-9d60-ea8a3003fda8","uniqueId":"102f496d-23a2-415f-803a-232b8a6c7613","translateX":42.3837520042758,"translateY":56.4285714285714}}]',
       CanvasContent1: '<div>just some test content</div>'
@@ -374,35 +325,21 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } });
+    assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
-  it('sets image to empty when header set to custom and no image specified', (done) => {
+  it('sets image to empty when header set to custom and no image specified', async () => {
     const mockData = {
       LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{"imageSource":""},"links":{},"customMetadata":{"imageSource":{"siteId":"","webId":"","listId":"","uniqueId":""}}},"dataVersion":"1.4","properties":{"imageSourceType":2,"layoutType":"FullWidthImage","textAlignment":"Left","showTopicHeader":false,"showPublishDate":false,"topicHeader":"","authors":[],"altText":"","webId":"","siteId":"","listId":"","uniqueId":"","translateX":0,"translateY":0}}]',
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom' } }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom' } });
+    assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
-  it('sets focus coordinates to 0 0 if none specified', (done) => {
+  it('sets focus coordinates to 0 0 if none specified', async () => {
     const mockData = {
       LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{"imageSource":"/sites/team-a/siteassets/hero.jpg"},"links":{},"customMetadata":{"imageSource":{"siteId":"c7678ab2-c9dc-454b-b2ee-7fcffb983d4e","webId":"0df4d2d2-5ecf-45e9-94f5-c638106bfc65","listId":"e1557527-d333-49f2-9d60-ea8a3003fda8","uniqueId":"102f496d-23a2-415f-803a-232b8a6c7613"}}},"dataVersion":"1.4","properties":{"imageSourceType":2,"layoutType":"FullWidthImage","textAlignment":"Left","showTopicHeader":false,"showPublishDate":false,"topicHeader":"","authors":[],"altText":"","webId":"0df4d2d2-5ecf-45e9-94f5-c638106bfc65","siteId":"c7678ab2-c9dc-454b-b2ee-7fcffb983d4e","listId":"e1557527-d333-49f2-9d60-ea8a3003fda8","uniqueId":"102f496d-23a2-415f-803a-232b8a6c7613","translateX":0,"translateY":0}}]',
       CanvasContent1: '<div>just some test content</div>'
@@ -443,117 +380,67 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg' } }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg' } });
+    assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
-  it('centers text when textAlignment set to Center', (done) => {
+  it('centers text when textAlignment set to Center', async () => {
     const mockData = {
       LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.4","properties":{"imageSourceType":4,"layoutType":"FullWidthImage","textAlignment":"Center","showTopicHeader":false,"showPublishDate":false,"topicHeader":""}}]',
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', textAlignment: 'Center' } }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', textAlignment: 'Center' } });
+    assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
-  it('shows topicHeader with the specified topicHeader text', (done) => {
+  it('shows topicHeader with the specified topicHeader text', async () => {
     const mockData = {
       LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.4","properties":{"imageSourceType":4,"layoutType":"FullWidthImage","textAlignment":"Left","showTopicHeader":true,"showPublishDate":false,"topicHeader":"Team Awesome"}}]',
       TopicHeader: 'Team Awesome',
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showTopicHeader: true, topicHeader: 'Team Awesome' } }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showTopicHeader: true, topicHeader: 'Team Awesome' } });
+    assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
-  it('shows publish date', (done) => {
+  it('shows publish date', async () => {
     const mockData = {
       LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"dataVersion":"1.4","properties":{"imageSourceType":4,"layoutType":"FullWidthImage","textAlignment":"Left","showTopicHeader":false,"showPublishDate":true,"topicHeader":""}}]',
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showPublishDate: true } }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showPublishDate: true } });
+    assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
-  it('shows page authors', (done) => {
+  it('shows page authors', async () => {
     const mockData = {
       LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{"imageSource":""},"links":{},"customMetadata":{"imageSource":{"siteId":"","webId":"","listId":"","uniqueId":""}}},"dataVersion":"1.4","properties":{"imageSourceType":2,"layoutType":"FullWidthImage","textAlignment":"Left","showTopicHeader":false,"showPublishDate":false,"topicHeader":"","authors":[],"altText":"","webId":"","siteId":"","listId":"","uniqueId":"","translateX":0,"translateY":0}}]',
       AuthorByline: ['Joe Doe', 'Jane Doe'],
       CanvasContent1: '<div>just some test content</div>'
     };
 
-    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', authors: 'Joe Doe, Jane Doe' } }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', authors: 'Joe Doe, Jane Doe' } });
+    assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
   });
 
-  it('automatically appends the .aspx extension', (done) => {
-    command.action(logger, { options: { debug: false, pageName: 'page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('automatically appends the .aspx extension', async () => {
+    await command.action(logger, { options: { debug: false, pageName: 'page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any);
   });
 
-  it('correctly handles OData error when retrieving modern page', (done) => {
+  it('correctly handles OData error when retrieving modern page', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any),
+      new CommandError('An error has occurred'));
   });
 
-  it('correctly handles error when the specified image doesn\'t exist', (done) => {
+  it('correctly handles error when the specified image doesn\'t exist', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
@@ -586,15 +473,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

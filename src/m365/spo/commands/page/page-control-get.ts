@@ -60,7 +60,7 @@ class SpoPageControlGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let pageName: string = args.options.name;
     if (args.options.name.indexOf('.aspx') < 0) {
       pageName += '.aspx';
@@ -74,36 +74,37 @@ class SpoPageControlGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<ClientSidePageProperties>(requestOptions)
-      .then((clientSidePage: ClientSidePageProperties): void => {
-        const canvasData: Control[] = clientSidePage.CanvasContent1 ? JSON.parse(clientSidePage.CanvasContent1) : [];
-        const control: Control | undefined = canvasData.find(c => c.id?.toLowerCase() === args.options.id.toLowerCase());
+    try {
+      const clientSidePage = await request.get<ClientSidePageProperties>(requestOptions);
 
-        if (control) {
-          const controlData = {
-            id: control.id,
-            type: getControlTypeDisplayName(
-              control.controlType || 0
-            ),
-            title: control.webPartData?.title,
-            controlType: control.controlType,
-            order: control.position.sectionIndex,
-            controlData: {
-              ...control
-            }
-          };
+      const canvasData: Control[] = clientSidePage.CanvasContent1 ? JSON.parse(clientSidePage.CanvasContent1) : [];
+      const control: Control | undefined = canvasData.find(c => c.id?.toLowerCase() === args.options.id.toLowerCase());
 
-          logger.log(controlData);
-        }
-        else {
-          if (this.verbose) {
-            logger.logToStderr(`Control with ID ${args.options.id} not found on page ${args.options.name}`);
+      if (control) {
+        const controlData = {
+          id: control.id,
+          type: getControlTypeDisplayName(
+            control.controlType || 0
+          ),
+          title: control.webPartData?.title,
+          controlType: control.controlType,
+          order: control.position.sectionIndex,
+          controlData: {
+            ...control
           }
-        }
+        };
 
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        logger.log(controlData);
+      }
+      else {
+        if (this.verbose) {
+          logger.logToStderr(`Control with ID ${args.options.id} not found on page ${args.options.name}`);
+        }
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

@@ -49,7 +49,7 @@ class SpoPageTemplateListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving templates...`);
     }
@@ -62,25 +62,21 @@ class SpoPageTemplateListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<PageTemplateResponse>(requestOptions)
-      .then((res: PageTemplateResponse): void => {
-        if (res.value && res.value.length > 0) {
-          logger.log(res.value);
-        }
+    try {
+      const res = await request.get<PageTemplateResponse>(requestOptions);
+      if (res.value && res.value.length > 0) {
+        logger.log(res.value);
+      }
+    }
+    catch (err: any) {
+      // The API returns a 404 when no templates are created on the site collection
+      if (err && err.response && err.response.status && err.response.status === 404) {
+        logger.log([]);
+        return;
+      }
 
-        cb();
-      })
-      .catch((err: any): void => {
-        // The API returns a 404 when no templates are created on the site collection
-        if (err && err.response && err.response.status && err.response.status === 404) {
-          logger.log([]);
-          cb();
-          return;
-        }
-
-        return this.handleRejectedODataJsonPromise(err, logger, cb);
-      });
+      return this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

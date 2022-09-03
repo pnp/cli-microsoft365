@@ -65,7 +65,7 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Title', 'FileName', 'Id', 'PageLayoutType', 'Url']);
   });
 
-  it('list all page templates', (done) => {
+  it('list all page templates', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/templates`) > -1) {
         return Promise.resolve(templatesMock);
@@ -74,18 +74,11 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([...templatesMock.value]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+    assert(loggerLogSpy.calledWith([...templatesMock.value]));
   });
 
-  it('list all page templates (debug)', (done) => {
+  it('list all page templates (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/templates`) > -1) {
         return Promise.resolve(templatesMock);
@@ -94,18 +87,11 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([...templatesMock.value]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+    assert(loggerLogSpy.calledWith([...templatesMock.value]));
   });
 
-  it('correctly handles no page templates', (done) => {
+  it('correctly handles no page templates', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/templates`) > -1) {
         return Promise.resolve({ value: [] });
@@ -114,47 +100,26 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles OData error when retrieving page templates', (done) => {
+  it('correctly handles OData error when retrieving page templates', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any),
+      new CommandError('An error has occurred'));
   });
 
-  it('correctly handles error when retrieving page templates on a site which does not have any', (done) => {
+  it('correctly handles error when retrieving page templates on a site which does not have any', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ response: { status: 404 } });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith([]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any);
+    assert(loggerLogSpy.calledWith([]));
   });
 
   it('supports debug mode', () => {
