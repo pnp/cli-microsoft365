@@ -2,6 +2,16 @@
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
+**OneNote:**
+
+- [onenote notebook list](../cmd/onenote/notebook/notebook-list.md) - retrieves a list of notebooks [#3097](https://github.com/pnp/cli-microsoft365/issues/3097)
+
+**SharePoint:**
+
+- [spo web roleassignment add](../cmd/spo/web/web-roleassignment-add.md) - adds a role assignment to web permissions [#3549](https://github.com/pnp/cli-microsoft365/issues/3549)
+- [spo web roleassignment remove](../cmd/spo/web/web-roleassignment-remove.md) - adds a role assignment to list permissions [#3550](https://github.com/pnp/cli-microsoft365/issues/3550)
+- [spo listitem roleassignment remove](../cmd/spo/listitem/listitem-roleassignment-remove.md) - removes a role assignment from web permissions [#3543](https://github.com/pnp/cli-microsoft365/issues/3543)
+
 ### Changes
 
 - replaced validation with optionsets [#3218](https://github.com/pnp/cli-microsoft365/issues/3218)
@@ -10,6 +20,9 @@
 - fixed `spo listitem roleinheritance` docs [#3597](https://github.com/pnp/cli-microsoft365/issues/3597)
 - set default output in CLI runtime [#3445](https://github.com/pnp/cli-microsoft365/issues/3445)
 - fixed using unknown flags in 'aad user list' [#3059](https://github.com/pnp/cli-microsoft365/issues/3059)
+- fixed ensure site assets library sample (https://github.com/pnp/cli-microsoft365/issues/3616)
+- removes PowerShell examples from adaptive card docs (https://github.com/pnp/cli-microsoft365/issues/3631)
+- adds additional validation options for 'planner task get' (https://github.com/pnp/cli-microsoft365/issues/3433)
 
 ## [v5.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.7.0)
 
