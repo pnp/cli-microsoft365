@@ -5,7 +5,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import { SinonSandbox } from 'sinon';
-import { Cli, Logger } from './cli';
+import { Cli } from './cli';
 import Command from './Command';
 import { sinonUtil } from './utils';
 
@@ -16,9 +16,7 @@ class SimpleCommand extends Command {
   public get description(): string {
     return 'Mock command';
   }
-  public commandAction(logger: Logger, args: any, cb: () => void): void {
-    cb();
-  }
+  public async commandAction(): Promise<void> { }
 }
 
 class CommandWithOptions extends Command {
@@ -37,9 +35,7 @@ class CommandWithOptions extends Command {
       }
     );
   }
-  public commandAction(logger: Logger, args: any, cb: () => void): void {
-    cb();
-  }
+  public async commandAction(): Promise<void> { }
 }
 
 class CommandWithAlias extends Command {
@@ -52,9 +48,7 @@ class CommandWithAlias extends Command {
   public alias(): string[] | undefined {
     return ['cli alias'];
   }
-  public commandAction(logger: Logger, args: any, cb: () => void): void {
-    cb();
-  }
+  public async commandAction(): Promise<void> { }
 }
 
 describe('autocomplete', () => {
