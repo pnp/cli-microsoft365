@@ -70,7 +70,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('approves the specified permission request (debug)', (done) => {
+  it('approves the specified permission request (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -95,25 +95,18 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
-          ConsentType: "AllPrincipals",
-          ObjectId: "50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA",
-          Resource: "Microsoft Graph",
-          ResourceId: "0e721cc4-302b-4644-bc51-91b41b24d9f0",
-          Scope: "Calendars.ReadWrite"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } });
+    assert(loggerLogSpy.calledWith({
+      ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
+      ConsentType: "AllPrincipals",
+      ObjectId: "50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA",
+      Resource: "Microsoft Graph",
+      ResourceId: "0e721cc4-302b-4644-bc51-91b41b24d9f0",
+      Scope: "Calendars.ReadWrite"
+    }));
   });
 
-  it('approves the specified permission request', (done) => {
+  it('approves the specified permission request', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -138,25 +131,18 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
-          ConsentType: "AllPrincipals",
-          ObjectId: "50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA",
-          Resource: "Microsoft Graph",
-          ResourceId: "0e721cc4-302b-4644-bc51-91b41b24d9f0",
-          Scope: "Calendars.ReadWrite"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } });
+    assert(loggerLogSpy.calledWith({
+      ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
+      ConsentType: "AllPrincipals",
+      ObjectId: "50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA",
+      Resource: "Microsoft Graph",
+      ResourceId: "0e721cc4-302b-4644-bc51-91b41b24d9f0",
+      Scope: "Calendars.ReadWrite"
+    }));
   });
 
-  it('correctly handles error when approving permission request', (done) => {
+  it('correctly handles error when approving permission request', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
@@ -166,28 +152,14 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
         }
       ]));
     });
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Permission entry already exists.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError('Permission entry already exists.'));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('defines alias', () => {
