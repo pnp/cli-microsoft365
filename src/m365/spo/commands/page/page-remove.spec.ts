@@ -57,9 +57,9 @@ describe(commands.PAGE_REMOVE, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
   });
 
@@ -87,9 +87,9 @@ describe(commands.PAGE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes a modern page without confirm prompt', (done) => {
+  it('removes a modern page without confirm prompt', async () => {
     fakeRestCalls();
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -97,22 +97,13 @@ describe(commands.PAGE_REMOVE, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           confirm: true
         }
-      },
-      () => {
-        try {
-          assert(loggerLogSpy.notCalled);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('removes a modern page (debug) without confirm prompt', (done) => {
+  it('removes a modern page (debug) without confirm prompt', async () => {
     fakeRestCalls();
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: true,
@@ -120,20 +111,11 @@ describe(commands.PAGE_REMOVE, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           confirm: true
         }
-      },
-      () => {
-        try {
-          assert(loggerLogToStderrSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('removes a modern page (debug) without confirm prompt on root of tenant', (done) => {
+  it('removes a modern page (debug) without confirm prompt on root of tenant', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sitepages/page.aspx')`) > -1) {
         return Promise.resolve();
@@ -142,7 +124,7 @@ describe(commands.PAGE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: true,
@@ -150,134 +132,89 @@ describe(commands.PAGE_REMOVE, () => {
           webUrl: 'https://contoso.sharepoint.com',
           confirm: true
         }
-      },
-      () => {
-        try {
-          assert(loggerLogToStderrSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('removes a modern page with confirm prompt', (done) => {
+  it('removes a modern page with confirm prompt', async () => {
     fakeRestCalls();
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: true });
+      return { continue: true };
     });
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,
           name: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a'
         }
-      },
-      () => {
-        try {
-          assert(loggerLogSpy.notCalled);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('removes a modern page (debug) with confirm prompt', (done) => {
+  it('removes a modern page (debug) with confirm prompt', async () => {
     fakeRestCalls();
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: true });
+      return { continue: true };
     });
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: true,
           name: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a'
         }
-      },
-      () => {
-        try {
-          assert(loggerLogToStderrSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('should prompt before removing page when confirmation argument not passed', (done) => {
+  it('should prompt before removing page when confirmation argument not passed', async () => {
     fakeRestCalls();
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: true,
           name: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a'
         }
-      },
-      () => {
-        let promptIssued = false;
+      });
+    let promptIssued = false;
 
-        if (promptOptions && promptOptions.type === 'confirm') {
-          promptIssued = true;
-        }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-        try {
-          assert(promptIssued);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+    assert(promptIssued);
   });
 
-  it('should abort page removal when prompt not confirmed', (done) => {
+  it('should abort page removal when prompt not confirmed', async () => {
     const postCallSpy = fakeRestCalls();
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger,
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger,
       {
         options: {
           debug: true,
           name: 'page.aspx',
           webUrl: 'https://contoso.sharepoint.com/sites/team-a'
         }
-      },
-      () => {
-        try {
-          assert(postCallSpy.notCalled === true);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      });
+    assert(postCallSpy.notCalled === true);
   });
 
-  it('automatically appends the .aspx extension', (done) => {
+  it('automatically appends the .aspx extension', async () => {
     fakeRestCalls();
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger,
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger,
       {
         options: {
           debug: false,
@@ -285,29 +222,20 @@ describe(commands.PAGE_REMOVE, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           confirm: true
         }
-      },
-      () => {
-        try {
-          assert(loggerLogSpy.notCalled);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles OData error when removing modern page', (done) => {
+  it('correctly handles OData error when removing modern page', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger,
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await assert.rejects(command.action(logger,
       {
         options: {
           debug: false,
@@ -315,17 +243,7 @@ describe(commands.PAGE_REMOVE, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           confirm: true
         }
-      },
-      (err?: any) => {
-        try {
-          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      }), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

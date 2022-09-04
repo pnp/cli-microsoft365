@@ -1,11 +1,8 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandError
-} from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, spo } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -73,69 +70,58 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
     return [commands.SP_SET];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const enabled: boolean = args.options.enabled === 'true';
 
-    const toggleServicePrincipal: () => void = (): void => {
-      let spoAdminUrl: string = '';
+    const toggleServicePrincipal: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+        const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
-      spo
-        .getSpoAdminUrl(logger, this.debug)
-        .then((_spoAdminUrl: string): Promise<ContextInfo> => {
-          spoAdminUrl = _spoAdminUrl;
+        if (this.verbose) {
+          logger.logToStderr(`${(enabled ? 'Enabling' : 'Disabling')} service principal...`);
+        }
 
-          return spo.getRequestDigest(spoAdminUrl);
-        })
-        .then((res: ContextInfo): Promise<string> => {
-          if (this.verbose) {
-            logger.logToStderr(`${(enabled ? 'Enabling' : 'Disabling')} service principal...`);
-          }
+        const requestOptions: any = {
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'X-RequestDigest': reqDigest.FormDigestValue
+          },
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="28" ObjectPathId="27" /><SetProperty Id="29" ObjectPathId="27" Name="AccountEnabled"><Parameter Type="Boolean">${enabled}</Parameter></SetProperty><Method Name="Update" Id="30" ObjectPathId="27" /><Query Id="31" ObjectPathId="27"><Query SelectAllProperties="true"><Properties><Property Name="AccountEnabled" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="27" TypeId="{104e8f06-1e00-4675-99c6-1b9b504ed8d8}" /></ObjectPaths></Request>`
+        };
 
-          const requestOptions: any = {
-            url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': res.FormDigestValue
-            },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="28" ObjectPathId="27" /><SetProperty Id="29" ObjectPathId="27" Name="AccountEnabled"><Parameter Type="Boolean">${enabled}</Parameter></SetProperty><Method Name="Update" Id="30" ObjectPathId="27" /><Query Id="31" ObjectPathId="27"><Query SelectAllProperties="true"><Properties><Property Name="AccountEnabled" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="27" TypeId="{104e8f06-1e00-4675-99c6-1b9b504ed8d8}" /></ObjectPaths></Request>`
-          };
+        const res = await request.post<string>(requestOptions);
+        const json: ClientSvcResponse = JSON.parse(res);
+        const response: ClientSvcResponseContents = json[0];
+        if (response.ErrorInfo) {
+          throw response.ErrorInfo.ErrorMessage;
+        }
+        else {
+          const output: any = json[json.length - 1];
+          delete output._ObjectType_;
 
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            cb(new CommandError(response.ErrorInfo.ErrorMessage));
-            return;
-          }
-          else {
-            const output: any = json[json.length - 1];
-            delete output._ObjectType_;
-
-            logger.log(output);
-          }
-
-          cb();
-        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+          logger.log(output);
+        }
+      }
+      catch (err: any) {
+        this.handleRejectedPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      toggleServicePrincipal();
+      await toggleServicePrincipal();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to ${enabled ? 'enable' : 'disable'} the service principal?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          toggleServicePrincipal();
-        }
       });
+
+      if (result.continue) {
+        await toggleServicePrincipal();
+      }
     }
   }
 }

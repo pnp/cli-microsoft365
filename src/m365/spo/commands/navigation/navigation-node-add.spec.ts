@@ -64,7 +64,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
     assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['url']);
   });
 
-  it('adds new navigation node to the top navigation', (done) => {
+  it('adds new navigation node to the top navigation', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -87,26 +87,19 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Id": 2001,
-          "IsDocLib": true,
-          "IsExternal": false,
-          "IsVisible": true,
-          "ListTemplateType": 0,
-          "Title": "About",
-          "Url": "/sites/team-a/sitepages/about.aspx"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } });
+    assert(loggerLogSpy.calledWith({
+      "Id": 2001,
+      "IsDocLib": true,
+      "IsExternal": false,
+      "IsVisible": true,
+      "ListTemplateType": 0,
+      "Title": "About",
+      "Url": "/sites/team-a/sitepages/about.aspx"
+    }));
   });
 
-  it('adds new navigation node to the top navigation (debug)', (done) => {
+  it('adds new navigation node to the top navigation (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
         return Promise.resolve(
@@ -124,26 +117,19 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Id": 2001,
-          "IsDocLib": true,
-          "IsExternal": false,
-          "IsVisible": true,
-          "ListTemplateType": 0,
-          "Title": "About",
-          "Url": "/sites/team-a/sitepages/about.aspx"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } });
+    assert(loggerLogSpy.calledWith({
+      "Id": 2001,
+      "IsDocLib": true,
+      "IsExternal": false,
+      "IsVisible": true,
+      "ListTemplateType": 0,
+      "Title": "About",
+      "Url": "/sites/team-a/sitepages/about.aspx"
+    }));
   });
 
-  it('adds new navigation node pointing to an external URL to the quick launch', (done) => {
+  it('adds new navigation node pointing to an external URL to the quick launch', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/quicklaunch`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -166,26 +152,19 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch', title: 'About us', url: 'https://contoso.com/about-us', isExternal: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Id": 2001,
-          "IsDocLib": true,
-          "IsExternal": true,
-          "IsVisible": true,
-          "ListTemplateType": 0,
-          "Title": "About us",
-          "Url": "https://contoso.com/about-us"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'QuickLaunch', title: 'About us', url: 'https://contoso.com/about-us', isExternal: true } });
+    assert(loggerLogSpy.calledWith({
+      "Id": 2001,
+      "IsDocLib": true,
+      "IsExternal": true,
+      "IsVisible": true,
+      "ListTemplateType": 0,
+      "Title": "About us",
+      "Url": "https://contoso.com/about-us"
+    }));
   });
 
-  it('adds new navigation node below an existing node', (done) => {
+  it('adds new navigation node below an existing node', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/GetNodeById(1000)/Children`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -208,26 +187,19 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', parentNodeId: 1000, title: 'About', url: '/sites/team-a/sitepages/about.aspx' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Id": 2001,
-          "IsDocLib": true,
-          "IsExternal": false,
-          "IsVisible": true,
-          "ListTemplateType": 0,
-          "Title": "About",
-          "Url": "/sites/team-a/sitepages/about.aspx"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', parentNodeId: 1000, title: 'About', url: '/sites/team-a/sitepages/about.aspx' } });
+    assert(loggerLogSpy.calledWith({
+      "Id": 2001,
+      "IsDocLib": true,
+      "IsExternal": false,
+      "IsVisible": true,
+      "ListTemplateType": 0,
+      "Title": "About",
+      "Url": "/sites/team-a/sitepages/about.aspx"
+    }));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
         return Promise.reject({ error: 'An error has occurred' });
@@ -236,18 +208,10 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('correctly handles random API error (string error)', (done) => {
+  it('correctly handles random API error (string error)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1) {
         return Promise.reject('An error has occurred');
@@ -256,15 +220,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', location: 'TopNavigationBar', title: 'About', url: '/sites/team-a/sitepages/about.aspx' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

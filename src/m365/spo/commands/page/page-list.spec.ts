@@ -65,7 +65,7 @@ describe(commands.PAGE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Name', 'Title']);
   });
 
-  it('lists all modern pages', (done) => {
+  it('lists all modern pages', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages?$orderby=Title`) > -1) {
         return Promise.resolve({ value: mockPageListData });
@@ -78,18 +78,11 @@ describe(commands.PAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(mockPagesListOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+    assert(loggerLogSpy.calledWith(mockPagesListOutput));
   });
 
-  it('lists all modern pages (debug)', (done) => {
+  it('lists all modern pages (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages?$orderby=Title`) > -1) {
         return Promise.resolve({ value: mockPageListData });
@@ -102,18 +95,11 @@ describe(commands.PAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(mockPagesListOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+    assert(loggerLogSpy.calledWith(mockPagesListOutput));
   });
 
-  it('correctly handles no modern pages', (done) => {
+  it('correctly handles no modern pages', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages?$orderby=Title`) > -1) {
         return Promise.resolve({ value: [] });
@@ -126,31 +112,17 @@ describe(commands.PAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles OData error when retrieving pages', (done) => {
+  it('correctly handles OData error when retrieving pages', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

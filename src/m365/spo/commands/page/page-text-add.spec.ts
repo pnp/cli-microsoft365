@@ -72,7 +72,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds text to an empty modern page', (done) => {
+  it('adds text to an empty modern page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
@@ -148,7 +148,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    await command.action(logger, 
       {
         options: {
           debug: false,
@@ -156,20 +156,11 @@ describe(commands.PAGE_TEXT_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
         }
-      },
-      () => {
-        try {
-          assert(loggerLogSpy.notCalled);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('adds text to an empty modern page (debug)', (done) => {
+  it('adds text to an empty modern page (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
@@ -245,7 +236,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    await command.action(logger, 
       {
         options: {
           debug: true,
@@ -253,20 +244,11 @@ describe(commands.PAGE_TEXT_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
         }
-      },
-      () => {
-        try {
-          assert(loggerLogToStderrSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('adds text to an empty modern page on root of tenant (debug)', (done) => {
+  it('adds text to an empty modern page on root of tenant (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/_api/web/getfilebyserverrelativeurl('/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
@@ -342,7 +324,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    await command.action(logger, 
       {
         options: {
           debug: true,
@@ -350,20 +332,11 @@ describe(commands.PAGE_TEXT_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com',
           text: 'Hello world'
         }
-      },
-      () => {
-        try {
-          assert(loggerLogToStderrSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('appends text to a modern page which already had some text', (done) => {
+  it('appends text to a modern page which already had some text', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (
         (opts.url as string).indexOf(
@@ -443,7 +416,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    await command.action(logger, 
       {
         options: {
           debug: false,
@@ -451,20 +424,11 @@ describe(commands.PAGE_TEXT_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
         }
-      },
-      () => {
-        try {
-          assert(loggerLogSpy.notCalled);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('adds text in the specified order to a modern page which already had some text', (done) => {
+  it('adds text in the specified order to a modern page which already had some text', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (
         (opts.url as string).indexOf(
@@ -544,7 +508,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    await command.action(logger, 
       {
         options: {
           debug: false,
@@ -553,20 +517,11 @@ describe(commands.PAGE_TEXT_ADD, () => {
           text: 'Hello world 1.1',
           order: 2
         }
-      },
-      () => {
-        try {
-          assert(loggerLogSpy.notCalled);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('adds text to a modern page without specifying the page file extension', (done) => {
+  it('adds text to a modern page without specifying the page file extension', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (
         (opts.url as string).indexOf(
@@ -646,7 +601,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    await command.action(logger, 
       {
         options: {
           debug: false,
@@ -654,20 +609,11 @@ describe(commands.PAGE_TEXT_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
         }
-      },
-      () => {
-        try {
-          assert(loggerLogSpy.notCalled);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles OData error when adding text to a non-existing page', (done) => {
+  it('correctly handles OData error when adding text to a non-existing page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/foo.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.reject({ error: { 'odata.error': { message: { value: 'The file /sites/team-a/SitePages/foo.aspx does not exist' } } } });
@@ -676,7 +622,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    await assert.rejects(command.action(logger, 
       {
         options: {
           debug: false,
@@ -684,20 +630,10 @@ describe(commands.PAGE_TEXT_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
         }
-      },
-      (err?: any) => {
-        try {
-          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The file /sites/team-a/SitePages/foo.aspx does not exist')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      }), new CommandError('The file /sites/team-a/SitePages/foo.aspx does not exist'));
   });
 
-  it('correctly handles OData error when adding text to a page', (done) => {
+  it('correctly handles OData error when adding text to a page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
@@ -768,7 +704,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, 
+    await assert.rejects(command.action(logger, 
       {
         options: {
           debug: false,
@@ -776,20 +712,10 @@ describe(commands.PAGE_TEXT_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
         }
-      },
-      (err?: any) => {
-        try {
-          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      }), new CommandError('An error has occurred'));
   });
 
-  it('correctly handles error if target page is not a modern page', (done) => {
+  it('correctly handles error if target page is not a modern page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
@@ -848,7 +774,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    await assert.rejects(command.action(logger, 
       {
         options: {
           debug: false,
@@ -856,20 +782,10 @@ describe(commands.PAGE_TEXT_ADD, () => {
           webUrl: 'https://contoso.sharepoint.com/sites/team-a',
           text: 'Hello world'
         }
-      },
-      (err?: any) => {
-        try {
-          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Page page.aspx is not a modern page.`)));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      }), new CommandError(`Page page.aspx is not a modern page.`));
   });
 
-  it('correctly handles invalid section error when adding text to modern page', (done) => {
+  it('correctly handles invalid section error when adding text to modern page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
@@ -936,7 +852,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    await assert.rejects(command.action(logger, 
       {
         options: {
           debug: false,
@@ -945,20 +861,10 @@ describe(commands.PAGE_TEXT_ADD, () => {
           text: 'Hello world',
           section: 8
         }
-      },
-      (err?: any) => {
-        try {
-          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Invalid section '8'")));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      }), new CommandError("Invalid section '8'"));
   });
 
-  it('correctly handles invalid column error when adding text to modern page', (done) => {
+  it('correctly handles invalid column error when adding text to modern page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
@@ -1025,7 +931,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    await assert.rejects(command.action(logger, 
       {
         options: {
           debug: false,
@@ -1035,20 +941,10 @@ describe(commands.PAGE_TEXT_ADD, () => {
           section: 1,
           column: 7
         }
-      },
-      (err?: any) => {
-        try {
-          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Invalid column '7'")));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      }), new CommandError("Invalid column '7'"));
   });
 
-  it('correctly handles error when parsing modern page contents', (done) => {
+  it('correctly handles error when parsing modern page contents', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')?$expand=ListItemAllFields/ClientSideApplicationId`) > -1) {
         return Promise.resolve({
@@ -1115,7 +1011,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, 
+    await assert.rejects(command.action(logger, 
       {
         options: {
           debug: false,
@@ -1125,17 +1021,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
           section: 1,
           column: 1
         }
-      },
-      (err?: any) => {
-        try {
-          assert.strictEqual(JSON.stringify(new CommandError("Unexpected end of JSON input")), JSON.stringify(err));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }
-    );
+      }), new CommandError("Unexpected end of JSON input"));
   });
 
   it('supports debug mode', () => {

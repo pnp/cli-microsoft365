@@ -70,7 +70,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('revokes the specified permission grant (debug)', (done) => {
+  it('revokes the specified permission grant (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -95,18 +95,11 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, grantId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, grantId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('revokes the specified permission grant', (done) => {
+  it('revokes the specified permission grant', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
         opts.headers &&
@@ -131,18 +124,11 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, grantId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, grantId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles error when revoking permission request', (done) => {
+  it('correctly handles error when revoking permission request', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
@@ -152,28 +138,14 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
         }
       ]));
     });
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The given key was not present in the dictionary.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError('The given key was not present in the dictionary.'));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('defines alias', () => {
