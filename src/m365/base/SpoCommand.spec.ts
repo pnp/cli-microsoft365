@@ -106,7 +106,7 @@ describe('SpoCommand', () => {
       logToStderr: () => { }
     };
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
-    await command.action(logger, { options: {} });
+    await assert.rejects(command.action(logger, { options: {} }));
     assert(commandCommandActionSpy.notCalled);
   });
 

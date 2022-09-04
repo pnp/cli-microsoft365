@@ -179,20 +179,14 @@ describe('Command', () => {
   });
 
   it('displays error message when it\'s serialized in the error property', () => {
-    try {
-      const mock = new MockCommand2();
-      mock.handlePromiseError({
-        error: JSON.stringify({
-          error: {
-            message: 'An error has occurred'
-          }
-        })
-      });
-      assert.fail('No exception was thrown.');
-    }
-    catch (err: any) {
-      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-    }
+    const mock = new MockCommand2();
+    assert.throws(() => mock.handlePromiseError({
+      error: JSON.stringify({
+        error: {
+          message: 'An error has occurred'
+        }
+      })
+    }), new CommandError('An error has occurred'));
   });
 
   it('displays the raw error message when the serialized value from the error property is not an error object', () => {
@@ -254,87 +248,46 @@ describe('Command', () => {
     }
   });
 
-  it('logs command name in the telemetry when command name used', async (done) => {
-    try {
-      const mock = new MockCommand1();
-      await mock.action(logger, { options: {} });
+  it('logs command name in the telemetry when command name used', async() => {
+    const mock = new MockCommand1();
+    await mock.action(logger, { options: {} });
 
-      assert.strictEqual(telemetry.name, 'mock-command');
-      done();
-    }
-    catch (err: any) {
-      done(err);
-    }
+    assert.strictEqual(telemetry.name, 'mock-command');
   });
 
-  it('logs command alias in the telemetry when command alias used', async (done) => {
-    try {
-      cli.currentCommandName = 'mc1';
-      const mock = new MockCommand1();
-      await mock.action(logger, { options: {} });
+  it('logs command alias in the telemetry when command alias used', async () => {
+    cli.currentCommandName = 'mc1';
+    const mock = new MockCommand1();
+    await mock.action(logger, { options: {} });
 
-      assert.strictEqual(telemetry.name, 'mc1');
-      done();
-    }
-    catch (err: any) {
-      done(err);
-    }
+    assert.strictEqual(telemetry.name, 'mc1');
   });
 
-  it('logs empty command name in telemetry when command called using something else than name or alias', async (done) => {
-    try {
-      cli.currentCommandName = 'foo';
-      const mock = new MockCommand1();
-      await mock.action(logger, { options: {} });
+  it('logs empty command name in telemetry when command called using something else than name or alias', async () => {
+    cli.currentCommandName = 'foo';
+    const mock = new MockCommand1();
+    await mock.action(logger, { options: {} });
 
-      assert.strictEqual(telemetry.name, '');
-      done();
-    }
-    catch (err: any) {
-      done(err);
-    }
+    assert.strictEqual(telemetry.name, '');
   });
 
-  it('correctly handles error when instance of error returned from the promise', (done) => {
+  it('correctly handles error when instance of error returned from the promise', () => {
     const cmd = new MockCommand3();
-    (cmd as any).handleRejectedODataPromise(new Error('An error has occurred'), undefined, (msg: any): void => {
-      try {
-        assert.strictEqual(JSON.stringify(msg), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert.throws(() => (cmd as any).handleRejectedODataPromise(new Error('An error has occurred')), new CommandError('An error has occurred'));
   });
 
-  it('correctly handles graph response (code) from the promise', (done) => {
+  it('correctly handles graph response (code) from the promise', () => {
     const errorMessage = "forbidden-message";
     const errorCode = "Access Denied";
     const cmd = new MockCommand3();
-    (cmd as any).handleRejectedODataPromise({ error: { error: { message: errorMessage, code: errorCode } } }, undefined, (msg: any): void => {
-      try {
-        assert.strictEqual(JSON.stringify(msg), JSON.stringify(new CommandError(errorCode + " - " + errorMessage)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert.throws(() => (cmd as any).handleRejectedODataPromise({ error: { error: { message: errorMessage, code: errorCode } } }),
+      new CommandError(errorCode + " - " + errorMessage));
   });
 
-  it('correctly handles graph response error (without code) from the promise', (done) => {
+  it('correctly handles graph response error (without code) from the promise', () => {
     const errorMessage = "forbidden-message";
     const cmd = new MockCommand3();
-    (cmd as any).handleRejectedODataPromise({ error: { error: { message: errorMessage } } }, undefined, (msg: any): void => {
-      try {
-        assert.strictEqual(JSON.stringify(msg), JSON.stringify(new CommandError(errorMessage)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert.throws(() => (cmd as any).handleRejectedODataPromise({ error: { error: { message: errorMessage } } }), new CommandError(errorMessage));
   });
 
   it('tracks the use of unknown options in telemetry', () => {
@@ -366,14 +319,8 @@ describe('Command', () => {
     assert.strictEqual(JSON.stringify(actual), expected);
   });
 
-  it('catches exception thrown by commandAction', async (done) => {
-    try {
-      const command = new MockCommand4();
-      await command.action(logger, { options: {} });
-    }
-    catch (err: any) {
-      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Exception')));
-      done();
-    }
+  it('catches exception thrown by commandAction', async() => {
+    const command = new MockCommand4();
+    await assert.rejects(command.action(logger, { options: {} }), new CommandError('Exception'));
   });
 });

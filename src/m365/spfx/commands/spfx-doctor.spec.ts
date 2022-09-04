@@ -533,7 +533,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: { debug: false, env: 'sp2019' } });
+    await assert.rejects(command.action(logger, { options: { debug: false, env: 'sp2019' } }));
     assert(loggerLogSpy.calledWith(getStatus(1, 'Not supported in SP2019')));
     assert(loggerLogSpy.calledWith('- Use SharePoint Framework v1.4.1'), 'No fix provided');
   });
@@ -568,7 +568,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    await command.action(logger, { options: { debug: false, env: 'sp2016' } });
+    await assert.rejects(command.action(logger, { options: { debug: false, env: 'sp2016' } }));
     assert(loggerLogSpy.calledWith(getStatus(1, 'Not supported in SP2016')));
     assert(loggerLogSpy.calledWith('- Use SharePoint Framework v1.1'), 'No fix provided');
   });

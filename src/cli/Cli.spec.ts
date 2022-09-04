@@ -126,7 +126,8 @@ class MockCommandWithOutput extends AnonymousCommand {
   public get description(): string {
     return 'Mock command with output';
   }
-  public async commandAction(): Promise<void> {
+  public async commandAction(logger: Logger): Promise<void> {
+    logger.log('Command output');
   }
 }
 

@@ -86,7 +86,9 @@ class PlannerPlanListCommand extends GraphCommand {
     try {
       const groupId = await this.getGroupId(args);
       const result = await planner.getPlansByGroupId(groupId);
-      logger.log(result);
+      if (result && result.length > 0) {
+        logger.log(result);
+      }
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

@@ -56,7 +56,7 @@ describe('GraphCommand', () => {
       logToStderr: () => { }
     };
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
-    await command.action(logger, { options: {} });
+    await assert.rejects(command.action(logger, { options: {} }));
     assert(commandCommandActionSpy.notCalled);
   });
 
@@ -70,7 +70,7 @@ describe('GraphCommand', () => {
     };
     auth.service.connected = false;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
-    await command.action(logger, { options: {} });
+    await assert.rejects(command.action(logger, { options: {} }));
     assert(commandCommandActionSpy.notCalled);
   });
 

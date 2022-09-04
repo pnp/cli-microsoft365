@@ -386,7 +386,7 @@ describe(commands.PLAN_GET, () => {
       ownerGroupId: validOwnerGroupId
     };
 
-    await command.action(logger, { options: options } as any);
+    await assert.rejects(command.action(logger, { options: options } as any));
     assert(loggerLogSpy.notCalled);
   });
 

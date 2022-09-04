@@ -61,7 +61,10 @@ export default abstract class AppCommand extends Command {
 
       this.m365rcJson = JSON.parse(m365rcJsonContents) as M365RcJson;
     }
-    catch (e) {
+    catch (err) {
+      if (err instanceof CommandError) {
+        throw err;
+      }
       throw new CommandError(`Could not parse file: ${m365rcJsonPath}`);
     }
 

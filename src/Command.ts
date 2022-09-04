@@ -299,7 +299,11 @@ export default abstract class Command {
             throw new CommandError(graphResponseError.error.message);
           }
         }
-        catch {
+        catch (err: any) {
+          if (err instanceof CommandError) {
+            throw err;
+          }
+
           throw new CommandError(res.error);
         }
       }
@@ -354,7 +358,10 @@ export default abstract class Command {
         throw new CommandError(response.error);
       }
     }
-    catch {
+    catch (err: any) {
+      if (err instanceof CommandError) {
+        throw err;
+      }
       throw new CommandError(response.error);
     }
   }

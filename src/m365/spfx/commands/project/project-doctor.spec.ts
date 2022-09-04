@@ -115,7 +115,7 @@ describe(commands.PROJECT_DOCTOR, () => {
 
     await assert.rejects(command.action(logger, { options: {} } as any), (err) => {
       (command as any).supportedVersions.splice(1, 1);
-      assert(JSON.stringify(err).indexOf("Cannot find module './project-doctor/doctor-0'") > -1);
+      return JSON.stringify(err).indexOf("Cannot find module './project-doctor/doctor-0'") > -1;
     });
   });
 
