@@ -168,7 +168,7 @@ class AadO365GroupAddCommand extends GraphCommand {
       resourceBehaviorOptionsCollection.push("welcomeEmailDisabled");
     }
 
-    let requestOptions: any = {
+    const requestOptions: any = {
       url: `${this.resource}/v1.0/groups`,
       headers: {
         'accept': 'application/json;odata.metadata=none'
@@ -197,28 +197,27 @@ class AadO365GroupAddCommand extends GraphCommand {
         if (this.debug) {
           logger.logToStderr('logoPath not set. Skipping');
         }
-
-        return Promise.resolve();
+      }
+      else {
+        const fullPath: string = path.resolve(args.options.logoPath);
+        if (this.verbose) {
+          logger.logToStderr(`Setting group logo ${fullPath}...`);
+        }
+  
+        const requestOptionsPhoto: any = {
+          url: `${this.resource}/v1.0/groups/${group.id}/photo/$value`,
+          headers: {
+            'content-type': this.getImageContentType(fullPath)
+          },
+          data: fs.readFileSync(fullPath)
+        };
+  
+        await new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
+          this.setGroupLogo(requestOptionsPhoto, AadO365GroupAddCommand.numRepeat, resolve, reject, logger);
+        });
       }
 
-      const fullPath: string = path.resolve(args.options.logoPath);
-      if (this.verbose) {
-        logger.logToStderr(`Setting group logo ${fullPath}...`);
-      }
-
-      requestOptions = {
-        url: `${this.resource}/v1.0/groups/${group.id}/photo/$value`,
-        headers: {
-          'content-type': this.getImageContentType(fullPath)
-        },
-        data: fs.readFileSync(fullPath)
-      };
-
-      await new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
-        this.setGroupLogo(requestOptions, AadO365GroupAddCommand.numRepeat, resolve, reject, logger);
-      });
-
-      if (ownerIds.length > 0) {
+      if (ownerIds.length !== 0) {
         await Promise.all(ownerIds.map(ownerId => request.post<void>({
           url: `${this.resource}/v1.0/groups/${group.id}/owners/$ref`,
           headers: {
@@ -230,8 +229,8 @@ class AadO365GroupAddCommand extends GraphCommand {
           }
         })));
       }
-
-      if (memberIds.length > 0) {
+      
+      if (memberIds.length !== 0) {
         await Promise.all(memberIds.map(memberId => request.post<void>({
           url: `${this.resource}/v1.0/groups/${group.id}/members/$ref`,
           headers: {
@@ -245,7 +244,7 @@ class AadO365GroupAddCommand extends GraphCommand {
       }
 
       logger.log(group);
-    }
+    } 
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

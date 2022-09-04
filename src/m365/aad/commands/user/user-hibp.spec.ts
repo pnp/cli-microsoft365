@@ -169,10 +169,7 @@ describe(commands.USER_HIBP, () => {
 
   it('correctly handles unauthorized request', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject({
-        "statusCode": 401,
-        "message": "Access denied due to improperly formed hibp-api-key."
-      });
+      return Promise.reject("Access denied due to improperly formed hibp-api-key.");
     });
 
     await assert.rejects(command.action(logger, { options: { debug: false, userName: 'account-notexists@hibp-integration-tests.com' } } as any),

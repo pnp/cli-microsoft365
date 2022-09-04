@@ -260,28 +260,15 @@ describe(commands.O365GROUP_USER_ADD, () => {
   });
 
   it('correctly skips adding member or owner when user is not found', async () => {
-    let addMemberRequestIssued = false;
-
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews.not.found%40contoso.onmicrosoft.com/id`) {
-        return Promise.reject({
-          "message": "Resource 'anne.matthews.not.found%40contoso.onmicrosoft.com' does not exist or one of its queried reference-property objects are not present."
-        });
+        return Promise.reject("Resource 'anne.matthews.not.found%40contoso.onmicrosoft.com' does not exist or one of its queried reference-property objects are not present.");
       }
 
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/$ref`) {
-        addMemberRequestIssued = true;
-      }
-
-      return Promise.resolve();
-    });
-
-    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews.not.found@contoso.onmicrosoft.com" } });
-    assert(addMemberRequestIssued === false);
+    await assert.rejects(command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews.not.found@contoso.onmicrosoft.com" } } as any), new CommandError("Resource 'anne.matthews.not.found%40contoso.onmicrosoft.com' does not exist or one of its queried reference-property objects are not present."));
   });
 
   it('correctly handles error when user cannot be retrieved', async () => {

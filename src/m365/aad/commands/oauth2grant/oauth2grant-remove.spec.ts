@@ -146,7 +146,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
+      { continue: false }
     ));
 
     await command.action(logger, { options: { debug: false, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });
@@ -158,7 +158,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
 
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
+      { continue: false }
     ));
 
     await command.action(logger, { options: { debug: true, grantId: 'YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek' } });

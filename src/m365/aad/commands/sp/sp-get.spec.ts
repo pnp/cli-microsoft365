@@ -127,23 +127,6 @@ describe(commands.SP_GET, () => {
     assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
-  it('correctly handles no service principal found', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/myorganization/servicePrincipals?api-version=1.6&$filter=displayName eq 'Foo'`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({ value: [] });
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, { options: { debug: false, displayName: 'Foo' } });
-    assert(loggerLogSpy.notCalled);
-  });
-
   it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({

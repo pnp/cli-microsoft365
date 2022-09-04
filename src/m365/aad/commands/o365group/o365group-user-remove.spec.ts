@@ -248,11 +248,9 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
         return Promise.reject({
-          "err": {
-            "response": {
-              "status": 404
-            } 
-          }
+          "response": {
+            "status": 404
+          } 
         });
       }
 
@@ -306,11 +304,9 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000001/$ref`) {
         return Promise.reject({
-          "err": {
-            "response": {
-              "status": 404
-            } 
-          }
+          "response": {
+            "status": 404
+          } 
         });
       }
 
@@ -352,21 +348,17 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
         return Promise.resolve({
-          "err": {
-            "response": {
-              "status": 404
-            } 
-          }
+          "response": {
+            "status": 404
+          } 
         });
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000001/$ref`) {
         return Promise.reject({
-          "err": {
-            "response": {
-              "status": 404
-            } 
-          }
+          "response": {
+            "status": 404
+          } 
         });
       }
 
@@ -410,21 +402,17 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       // for example... you must have at least one owner
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners/00000000-0000-0000-0000-000000000001/$ref`) {
         return Promise.resolve({
-          "err": {
-            "response": {
-              "status": 400
-            } 
-          }
+          "response": {
+            "status": 400
+          } 
         });
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/00000000-0000-0000-0000-000000000001/$ref`) {
         return Promise.reject({
-          "err": {
-            "response": {
-              "status": 404
-            } 
-          }
+          "response": {
+            "status": 404
+          } 
         });
       }
 
@@ -558,20 +546,15 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   it('correctly skips execution when specified user is not found', async () => {
-    let memberDeleteCallIssued = false;
-
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews.not.found%40contoso.onmicrosoft.com/id`) {
-        return Promise.reject({
-          "message": "Resource 'anne.matthews.not.found%40contoso.onmicrosoft.com' does not exist or one of its queried reference-property objects are not present."
-        });
+        return Promise.reject("Resource 'anne.matthews.not.found%40contoso.onmicrosoft.com' does not exist or one of its queried reference-property objects are not present.");
       }
 
       return Promise.reject('Invalid request');
     });
 
     sinon.stub(request, 'delete').callsFake(() => {
-      memberDeleteCallIssued = true;
       return Promise.resolve();
     });
 
@@ -580,8 +563,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       { continue: true }
     ));
 
-    await command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
-    assert(memberDeleteCallIssued === false);
+    await assert.rejects(command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any), new CommandError("Invalid request"));
   });
 
   it('supports debug mode', () => {

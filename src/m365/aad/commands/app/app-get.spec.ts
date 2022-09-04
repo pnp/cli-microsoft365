@@ -123,23 +123,17 @@ describe(commands.APP_GET, () => {
   it('handles error when retrieving information about app through appId failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
 
-    await command.action(logger, {
-      options: {
-        debug: false,
-        appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f'
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      appId: '9b1b1e42-794b-4c71-93ac-5ed92488b67f' } } as any), new CommandError('An error has occurred'));
   });
 
   it('handles error when retrieving information about app through name failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('An error has occurred'));
 
-    await command.action(logger, {
-      options: {
-        debug: false,
-        name: 'My app'
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      name: 'My app' } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if appId and objectId specified', async () => {

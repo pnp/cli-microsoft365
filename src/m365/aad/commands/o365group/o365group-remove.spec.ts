@@ -143,7 +143,7 @@ describe(commands.O365GROUP_REMOVE, () => {
     const postStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
+      { continue: true }
     ));
     await command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(postStub.called);
@@ -153,7 +153,7 @@ describe(commands.O365GROUP_REMOVE, () => {
     const postStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
+      { continue: true }
     ));
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } });
     assert(postStub.called);
@@ -175,7 +175,7 @@ describe(commands.O365GROUP_REMOVE, () => {
     });
     sinonUtil.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: false }
+      { continue: true }
     ));
     await command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848', skipRecycleBin: true } });
     assert(groupPermDeleteCallIssued);

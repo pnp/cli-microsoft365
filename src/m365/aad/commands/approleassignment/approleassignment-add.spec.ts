@@ -110,7 +110,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All', output: 'json' } });
+    await command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All', output: 'json' } });
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
     assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');

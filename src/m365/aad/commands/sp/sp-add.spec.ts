@@ -158,23 +158,6 @@ describe(commands.SP_ADD, () => {
       new CommandError('An error has occurred'));
   });
 
-  it('correctly handles no service principal found', async () => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/servicePrincipals`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({ value: [] });
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    await command.action(logger, { options: { debug: false, appName: 'Foo' } });
-    assert(loggerLogSpy.notCalled);
-  });
-
   it('fails when the specified Azure AD app does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/applications?$filter=id eq `) > -1) {

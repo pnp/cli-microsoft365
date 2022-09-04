@@ -86,8 +86,6 @@ describe(commands.OAUTH2GRANT_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants`) > -1) {
         if (opts.headers &&
-          opts.headers.authorization &&
-          (opts.headers.authorization as string).indexOf('Bearer ') === 0 &&
           opts.headers['content-type'] &&
           (opts.headers['content-type'] as string).indexOf('application/json') === 0 &&
           opts.data.clientId === '6a7b1395-d313-4682-8ed4-65a6265a6320' &&
