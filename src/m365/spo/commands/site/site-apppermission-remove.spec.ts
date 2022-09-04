@@ -203,52 +203,37 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appDisplayName: 'Foo'
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    assert(promptIssued);
   });
 
   it('aborts removing the site apppermission when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
 
     await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appDisplayName: 'Foo'
       }
-    }, () => {
-      try {
-        assert(deleteRequestStub.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(deleteRequestStub.notCalled);
   });
 
   it('removes site apppermission when prompt confirmed (debug)', async () => {
     sinonUtil.restore(Cli.prompt);
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
@@ -273,23 +258,16 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         permissionId: 'aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0'
       }
-    }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(deleteRequestStub.called);
   });
 
   it('removes site apppermission with specified appId', async () => {
     sinonUtil.restore(Cli.prompt);
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));    
 
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
@@ -314,23 +292,16 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
         appId: '89ea5c94-7736-4e25-95ad-3fa95f62b66e',
         confirm: true
       }
-    }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(deleteRequestStub.called);
   });
 
   it('removes site apppermission with specified appDisplayName', async () => {
     sinonUtil.restore(Cli.prompt);
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));    
 
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
@@ -355,15 +326,8 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
         appDisplayName: 'Foo',
         confirm: true
       }
-    }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(deleteRequestStub.called);
   });
 
   it('supports debug mode', () => {

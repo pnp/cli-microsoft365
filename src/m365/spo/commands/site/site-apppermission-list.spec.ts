@@ -219,15 +219,8 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(transposed));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(transposed));
   });
 
   it('returns non-filtered list of permissions (json)', async () => {
@@ -335,28 +328,21 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         output: 'json'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            appDisplayName: 'Selected',
-            appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c',
-            permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
-            roles: ['read']
-          },
-          {
-            appDisplayName: 'SPRestSample',
-            appId: 'd05a2ddb-1f33-4de3-9335-3bfbe50411c5',
-            permissionId: 'aTowaS50fG1zLnNwLmV4dHxkMDVhMmRkYi0xZjMzLTRkZTMtOTMzNS0zYmZiZTUwNDExYzVAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
-            roles: ['read']
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        appDisplayName: 'Selected',
+        appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c',
+        permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
+        roles: ['read']
+      },
+      {
+        appDisplayName: 'SPRestSample',
+        appId: 'd05a2ddb-1f33-4de3-9335-3bfbe50411c5',
+        permissionId: 'aTowaS50fG1zLnNwLmV4dHxkMDVhMmRkYi0xZjMzLTRkZTMtOTMzNS0zYmZiZTUwNDExYzVAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
+        roles: ['read']
+      }
+    ]));
   });
 
   it('fails with incorrect request to the permissions endpoint', async () => {
@@ -399,19 +385,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         return Promise.reject(error);
       });
 
-    await command.action(logger, {
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Provided identifier is malformed - site collection id is not valid")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name' } } as any), new CommandError('Provided identifier is malformed - site collection id is not valid'));
   });
 
   it('fails when passing a site that does not exist', async () => {
@@ -433,19 +407,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
       return Promise.reject(siteError);
     });
 
-    await command.action(logger, {
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Requested site could not be found")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing' } } as any), new CommandError('Requested site could not be found'));
   });
 
   it('returns list of permissions filtered by appDisplayName', async () => {
@@ -520,20 +482,13 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         output: 'json',
         appDisplayName: 'Selected'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          appDisplayName: 'Selected',
-          appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c',
-          permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
-          roles: ['read']
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([{
+      appDisplayName: 'Selected',
+      appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c',
+      permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
+      roles: ['read']
+    }]));
   });
 
   it('returns list of permissions filtered by appId (json)', async () => {
@@ -608,20 +563,13 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         output: 'json',
         appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          appDisplayName: 'Selected',
-          appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c',
-          permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
-          roles: ['read']
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([{
+      appDisplayName: 'Selected',
+      appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c',
+      permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
+      roles: ['read']
+    }]));
   });
 
   it('correctly handles error when fails to get permission details', async () => {
@@ -686,21 +634,10 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         return Promise.reject('Invalid request');
       });
 
-    await command.action(logger, {
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        output: 'json',
-        appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Item not found')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      output: 'json',
+      appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c' } } as any), new CommandError('Item not found'));
   });
 
   it('supports debug mode', () => {

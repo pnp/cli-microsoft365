@@ -193,10 +193,12 @@ class SpoSiteChromeSetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .post(requestOptions)
-      .then(_ => cb(),
-        (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      await request.post(requestOptions);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

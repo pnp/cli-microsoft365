@@ -101,14 +101,7 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/site' } }, () => {
-      try {
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/site' } });
   });
 
   it('creates site collection app catalog (debug=true)', async () => {
@@ -142,15 +135,8 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/site' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/site' } });
+    assert(loggerLogToStderrSpy.called);
   });
 
   it('correctly handles error when creating site collection app catalog', async () => {
@@ -174,29 +160,13 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/site' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Unknown Error")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/site' } } as any), new CommandError('Unknown Error'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/site' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/site' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

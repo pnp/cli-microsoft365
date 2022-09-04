@@ -139,20 +139,13 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
         permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
         output: 'json'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          appDisplayName: 'Selected',
-          appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c',
-          permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
-          roles: "write"
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([{
+      appDisplayName: 'Selected',
+      appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c',
+      permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
+      roles: "write"
+    }]));
   });
 
   it('fails when passing a site that does not exist', async () => {
@@ -174,19 +167,7 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
       return Promise.reject(siteError);
     });
 
-    await command.action(logger, {
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Requested site could not be found")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing' } } as any), new CommandError('Requested site could not be found'));
   });
 
   it('supports debug mode', () => {

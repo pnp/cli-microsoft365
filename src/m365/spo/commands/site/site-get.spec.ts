@@ -115,15 +115,8 @@ describe(commands.SITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(siteProperties));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert(loggerLogSpy.calledWith(siteProperties));
   });
 
   it('retrieves the information for the specified site (debug)', async () => {
@@ -181,15 +174,8 @@ describe(commands.SITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(siteProperties));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert(loggerLogSpy.calledWith(siteProperties));
   });
 
   it('correctly handles error when getting information for a site that doesn\'t exist', async () => {
@@ -201,15 +187,7 @@ describe(commands.SITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('404 - "404 FILE NOT FOUND"')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } } as any), new CommandError('404 - "404 FILE NOT FOUND"'));
   });
 
   it('supports debug mode', () => {

@@ -62,7 +62,7 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const enabled: boolean = args.options.enabled.toLocaleLowerCase() === 'true';
 
     const requestOptions: any = {
@@ -81,9 +81,12 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
       logger.logToStderr(`${enabled ? 'Activating' : 'Deactivating'} in-place records management for site ${args.options.siteUrl}`);
     }
 
-    request
-      .post(requestOptions)
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      await request.post(requestOptions);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

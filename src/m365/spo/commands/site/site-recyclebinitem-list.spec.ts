@@ -106,20 +106,9 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, {
-      options: {
-        debug: true,
-        siteUrl: 'https://contoso.sharepoint.com'
-      }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      siteUrl: 'https://contoso.sharepoint.com' } } as any), new CommandError(err));
   });
 
   it('retrieves all items from recycle bin', async () => {
@@ -160,37 +149,30 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [{
-            "AuthorEmail": "test.onmicrosoft.com",
-            "AuthorName": "test test",
-            "DeletedByEmail": "test.onmicrosoft.com",
-            "DeletedByName": "test test",
-            "DeletedDate": "2021-11-20T20:48:16Z",
-            "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
-            "DirName": "sites/test/Shared Documents",
-            "DirNamePath": {
-              "DecodedUrl": "sites/test/Shared Documents"
-            },
-            "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
-            "ItemState": 1,
-            "ItemType": 1,
-            "LeafName": "Document.docx",
-            "LeafNamePath": {
-              "DecodedUrl": "Document.docx"
-            },
-            "Size": "41939",
-            "Title": "Document.docx"
-          }]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [{
+        "AuthorEmail": "test.onmicrosoft.com",
+        "AuthorName": "test test",
+        "DeletedByEmail": "test.onmicrosoft.com",
+        "DeletedByName": "test test",
+        "DeletedDate": "2021-11-20T20:48:16Z",
+        "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
+        "DirName": "sites/test/Shared Documents",
+        "DirNamePath": {
+          "DecodedUrl": "sites/test/Shared Documents"
+        },
+        "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
+        "ItemState": 1,
+        "ItemType": 1,
+        "LeafName": "Document.docx",
+        "LeafNamePath": {
+          "DecodedUrl": "Document.docx"
+        },
+        "Size": "41939",
+        "Title": "Document.docx"
+      }]
+    ));
   });
 
   it('retrieves all items from secondary recycle bin', async () => {
@@ -232,37 +214,30 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [{
-            "AuthorEmail": "test.onmicrosoft.com",
-            "AuthorName": "test test",
-            "DeletedByEmail": "test.onmicrosoft.com",
-            "DeletedByName": "test test",
-            "DeletedDate": "2021-11-20T20:48:16Z",
-            "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
-            "DirName": "sites/test/Shared Documents",
-            "DirNamePath": {
-              "DecodedUrl": "sites/test/Shared Documents"
-            },
-            "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
-            "ItemState": 2,
-            "ItemType": 1,
-            "LeafName": "Document.docx",
-            "LeafNamePath": {
-              "DecodedUrl": "Document.docx"
-            },
-            "Size": "41939",
-            "Title": "Document.docx"
-          }]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [{
+        "AuthorEmail": "test.onmicrosoft.com",
+        "AuthorName": "test test",
+        "DeletedByEmail": "test.onmicrosoft.com",
+        "DeletedByName": "test test",
+        "DeletedDate": "2021-11-20T20:48:16Z",
+        "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
+        "DirName": "sites/test/Shared Documents",
+        "DirNamePath": {
+          "DecodedUrl": "sites/test/Shared Documents"
+        },
+        "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
+        "ItemState": 2,
+        "ItemType": 1,
+        "LeafName": "Document.docx",
+        "LeafNamePath": {
+          "DecodedUrl": "Document.docx"
+        },
+        "Size": "41939",
+        "Title": "Document.docx"
+      }]
+    ));
   });
 
   it('retrieves all items from recycle bin filtered by type', async () => {
@@ -304,37 +279,30 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [{
-            "AuthorEmail": "test.onmicrosoft.com",
-            "AuthorName": "test test",
-            "DeletedByEmail": "test.onmicrosoft.com",
-            "DeletedByName": "test test",
-            "DeletedDate": "2021-11-20T20:48:16Z",
-            "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
-            "DirName": "sites/test/Shared Documents",
-            "DirNamePath": {
-              "DecodedUrl": "sites/test/Shared Documents"
-            },
-            "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
-            "ItemState": 1,
-            "ItemType": 5,
-            "LeafName": "Document.docx",
-            "LeafNamePath": {
-              "DecodedUrl": "Document.docx"
-            },
-            "Size": "41939",
-            "Title": "Document.docx"
-          }]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [{
+        "AuthorEmail": "test.onmicrosoft.com",
+        "AuthorName": "test test",
+        "DeletedByEmail": "test.onmicrosoft.com",
+        "DeletedByName": "test test",
+        "DeletedDate": "2021-11-20T20:48:16Z",
+        "DeletedDateLocalFormatted": "11/20/2021 12:48 PM",
+        "DirName": "sites/test/Shared Documents",
+        "DirNamePath": {
+          "DecodedUrl": "sites/test/Shared Documents"
+        },
+        "Id": "ae6f97a7-280e-48d6-b481-0ea986c323da",
+        "ItemState": 1,
+        "ItemType": 5,
+        "LeafName": "Document.docx",
+        "LeafNamePath": {
+          "DecodedUrl": "Document.docx"
+        },
+        "Size": "41939",
+        "Title": "Document.docx"
+      }]
+    ));
   });
 
   it('does not retrieve items from recycle bin filtered by type', async () => {
@@ -356,15 +324,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([]));
   });
 });

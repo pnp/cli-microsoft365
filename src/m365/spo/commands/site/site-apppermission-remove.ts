@@ -163,45 +163,38 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeSiteAppPermission: () => void = (): void => {
-      this
-        .getSpoSiteId(args)
-        .then((siteId: string): Promise<string[]> => {
-          this.siteId = siteId;
-          return this.getPermissionIds(args);
-        })
-        .then((permissionIdsToRemove: string[]): Promise<void[]> => {
-          const tasks: Promise<void>[] = [];
+    const removeSiteAppPermission: () => Promise<void> = async (): Promise<void> => {
+      try {
+        this.siteId = await this.getSpoSiteId(args);
+        const permissionIdsToRemove: string[] = await this.getPermissionIds(args);
+        const tasks: Promise<void>[] = [];
 
-          for (const permissionId of permissionIdsToRemove) {
-            tasks.push(this.removePermissions(permissionId));
-          }
+        for (const permissionId of permissionIdsToRemove) {
+          tasks.push(this.removePermissions(permissionId));
+        }
 
-          return Promise.all(tasks);
-        })
-        .then((res: any): void => {
-          logger.log(res);
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        const res = await Promise.all(tasks);
+        logger.log(res);
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeSiteAppPermission();
+      await removeSiteAppPermission();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the specified application permission from site ${args.options.siteUrl}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeSiteAppPermission();
-        }
       });
+      
+      if (result.continue) {
+        await removeSiteAppPermission();
+      }
     }
   }
 }

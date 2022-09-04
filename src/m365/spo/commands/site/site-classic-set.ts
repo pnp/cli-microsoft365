@@ -185,152 +185,133 @@ class SpoSiteClassicSetCommand extends SpoCommand {
 
     this.dots = '';
 
-    spo
-      .getTenantId(logger, this.debug)
-      .then((_tenantId: string): Promise<string> => {
-        this.tenantId = _tenantId;
+    try {
+      this.tenantId = await spo.getTenantId(logger, this.debug);
+      this.spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+      this.context = await spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
 
-        return spo.getSpoAdminUrl(logger, this.debug);
-      })
-      .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
-        this.spoAdminUrl = _spoAdminUrl;
+      if (this.verbose) {
+        logger.logToStderr(`Setting basic properties ${args.options.url}...`);
+      }
 
-        return spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
-      })
-      .then((res: FormDigestInfo): Promise<string> => {
-        this.context = res;
-        if (this.verbose) {
-          logger.logToStderr(`Setting basic properties ${args.options.url}...`);
+      const basicProperties: string[] = [
+        'title',
+        'sharing',
+        'resourceQuota',
+        'resourceQuotaWarningLevel',
+        'storageQuota',
+        'storageQuotaWarningLevel',
+        'allowSelfServiceUpgrade',
+        'noScriptSite'
+      ];
+
+      let updateBasicProperties: boolean = false;
+      for (let i: number = 0; i < basicProperties.length; i++) {
+        if (typeof (args.options as any)[basicProperties[i]] !== 'undefined') {
+          updateBasicProperties = true;
+          break;
+        }
+      }
+
+      if (!updateBasicProperties) {
+        return Promise.resolve(undefined as any);
+      }
+
+      let i: number = 0;
+      const updates: string[] = [];
+
+      if (args.options.title) {
+        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="Title"><Parameter Type="String">${formatting.escapeXml(args.options.title)}</Parameter></SetProperty>`);
+      }
+      if (args.options.sharing) {
+        const sharing: number = ['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly'].indexOf(args.options.sharing);
+        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="SharingCapability"><Parameter Type="Enum">${sharing}</Parameter></SetProperty>`);
+      }
+      if (args.options.resourceQuota) {
+        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="UserCodeMaximumLevel"><Parameter Type="Double">${args.options.resourceQuota}</Parameter></SetProperty>`);
+      }
+      if (args.options.resourceQuotaWarningLevel) {
+        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="UserCodeWarningLevel"><Parameter Type="Double">${args.options.resourceQuotaWarningLevel}</Parameter></SetProperty>`);
+      }
+      if (args.options.storageQuota) {
+        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="StorageMaximumLevel"><Parameter Type="Int64">${args.options.storageQuota}</Parameter></SetProperty>`);
+      }
+      if (args.options.storageQuotaWarningLevel) {
+        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="StorageWarningLevel"><Parameter Type="Int64">${args.options.storageQuotaWarningLevel}</Parameter></SetProperty>`);
+      }
+      if (typeof args.options.allowSelfServiceUpgrade !== 'undefined') {
+        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="AllowSelfServiceUpgrade"><Parameter Type="Boolean">${args.options.allowSelfServiceUpgrade}</Parameter></SetProperty>`);
+      }
+      if (typeof args.options.noScriptSite !== 'undefined') {
+        const noScriptSite: number = args.options.noScriptSite === 'true' ? 2 : 1;
+        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="DenyAddAndCustomizePages"><Parameter Type="Enum">${noScriptSite}</Parameter></SetProperty>`);
+      }
+
+      const pos: number = (this.tenantId as string).indexOf('|') + 1;
+
+      const requestOptions: any = {
+        url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+        headers: {
+          'X-RequestDigest': this.context.FormDigestValue
+        },
+        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${updates.join('')}<ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|${(this.tenantId as string).substr(pos, (this.tenantId as string).indexOf('&') - pos)}&#xA;SiteProperties&#xA;${encodeURIComponent(args.options.url)}" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`
+      };
+
+      const res: string = await request.post(requestOptions);
+
+      await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+        if (!res) {
+          resolve();
+          return;
         }
 
-        const basicProperties: string[] = [
-          'title',
-          'sharing',
-          'resourceQuota',
-          'resourceQuotaWarningLevel',
-          'storageQuota',
-          'storageQuotaWarningLevel',
-          'allowSelfServiceUpgrade',
-          'noScriptSite'
-        ];
-
-        let updateBasicProperties: boolean = false;
-        for (let i: number = 0; i < basicProperties.length; i++) {
-          if (typeof (args.options as any)[basicProperties[i]] !== 'undefined') {
-            updateBasicProperties = true;
-            break;
-          }
+        const json: ClientSvcResponse = JSON.parse(res);
+        const response: ClientSvcResponseContents = json[0];
+        if (response.ErrorInfo) {
+          reject(response.ErrorInfo.ErrorMessage);
         }
-
-        if (!updateBasicProperties) {
-          return Promise.resolve(undefined as any);
-        }
-
-        let i: number = 0;
-        const updates: string[] = [];
-
-        if (args.options.title) {
-          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="Title"><Parameter Type="String">${formatting.escapeXml(args.options.title)}</Parameter></SetProperty>`);
-        }
-        if (args.options.sharing) {
-          const sharing: number = ['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly'].indexOf(args.options.sharing);
-          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="SharingCapability"><Parameter Type="Enum">${sharing}</Parameter></SetProperty>`);
-        }
-        if (args.options.resourceQuota) {
-          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="UserCodeMaximumLevel"><Parameter Type="Double">${args.options.resourceQuota}</Parameter></SetProperty>`);
-        }
-        if (args.options.resourceQuotaWarningLevel) {
-          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="UserCodeWarningLevel"><Parameter Type="Double">${args.options.resourceQuotaWarningLevel}</Parameter></SetProperty>`);
-        }
-        if (args.options.storageQuota) {
-          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="StorageMaximumLevel"><Parameter Type="Int64">${args.options.storageQuota}</Parameter></SetProperty>`);
-        }
-        if (args.options.storageQuotaWarningLevel) {
-          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="StorageWarningLevel"><Parameter Type="Int64">${args.options.storageQuotaWarningLevel}</Parameter></SetProperty>`);
-        }
-        if (typeof args.options.allowSelfServiceUpgrade !== 'undefined') {
-          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="AllowSelfServiceUpgrade"><Parameter Type="Boolean">${args.options.allowSelfServiceUpgrade}</Parameter></SetProperty>`);
-        }
-        if (typeof args.options.noScriptSite !== 'undefined') {
-          const noScriptSite: number = args.options.noScriptSite === 'true' ? 2 : 1;
-          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="DenyAddAndCustomizePages"><Parameter Type="Enum">${noScriptSite}</Parameter></SetProperty>`);
-        }
-
-        const pos: number = (this.tenantId as string).indexOf('|') + 1;
-
-        const requestOptions: any = {
-          url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'X-RequestDigest': this.context.FormDigestValue
-          },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${updates.join('')}<ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|${(this.tenantId as string).substr(pos, (this.tenantId as string).indexOf('&') - pos)}&#xA;SiteProperties&#xA;${encodeURIComponent(args.options.url)}" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res?: string): Promise<void> => {
-        return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-          if (!res) {
+        else {
+          const operation: SpoOperation = json[json.length - 1];
+          const isComplete: boolean = operation.IsComplete;
+          if (!args.options.wait || isComplete) {
             resolve();
             return;
           }
 
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            reject(response.ErrorInfo.ErrorMessage);
-          }
-          else {
-            const operation: SpoOperation = json[json.length - 1];
-            const isComplete: boolean = operation.IsComplete;
-            if (!args.options.wait || isComplete) {
-              resolve();
-              return;
-            }
-
-            setTimeout(() => {
-              spo.waitUntilFinished({
-                operationId: JSON.stringify(operation._ObjectIdentity_),
-                siteUrl: this.spoAdminUrl as string,
-                resolve,
-                reject,
-                logger,
-                currentContext: this.context as FormDigestInfo,
-                dots: this.dots,
-                debug: this.debug,
-                verbose: this.verbose
-              });
-            }, operation.PollingInterval);
-          }
-        });
-      })
-      .then(_ => spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug))
-      .then((res: FormDigestInfo): Promise<void> => {
-        this.context = res;
-        return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-          if (!args.options.owners) {
-            resolve();
-            return;
-          }
-
-          Promise.all(args.options.owners.split(',').map(o => {
-            return this.setAdmin(logger, args.options.url, o.trim());
-          }))
-            .then((): void => {
-              resolve();
-            }, (err: any): void => {
-              reject(err);
+          setTimeout(() => {
+            spo.waitUntilFinished({
+              operationId: JSON.stringify(operation._ObjectIdentity_),
+              siteUrl: this.spoAdminUrl as string,
+              resolve,
+              reject,
+              logger,
+              currentContext: this.context as FormDigestInfo,
+              dots: this.dots,
+              debug: this.debug,
+              verbose: this.verbose
             });
-        });
-      })
-      .then(_ => spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug))
-      .then((res: FormDigestInfo): Promise<void> => {
-        this.context = res;
+          }, operation.PollingInterval);
+        }
+      });
 
-        if (!args.options.description) {
-          return Promise.resolve(undefined as any);
+      this.context = await spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
+      await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+        if (!args.options.owners) {
+          resolve();
+          return;
         }
 
+        Promise.all(args.options.owners.split(',').map(o => {
+          return this.setAdmin(logger, args.options.url, o.trim());
+        }))
+          .then((): void => {
+            resolve();
+          }, (err: any): void => {
+            reject(err);
+          });
+      });
+
+      if (args.options.description) {
         const requestOptions: any = {
           url: `${args.options.url}/_api/web`,
           headers: {
@@ -345,14 +326,12 @@ class SpoSiteClassicSetCommand extends SpoCommand {
           },
           json: true
         };
-
-        return request.post(requestOptions);
-      })
-      .then((): Promise<string> => {
-        if (!args.options.lockState) {
-          return Promise.resolve(undefined as any);
-        }
-
+  
+        await request.post(requestOptions);
+      }
+      
+      let query: string;
+      if (args.options.lockState) {
         const requestOptions: any = {
           url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
@@ -361,45 +340,48 @@ class SpoSiteClassicSetCommand extends SpoCommand {
           data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="7" ObjectPathId="5" Name="LockState"><Parameter Type="String">${formatting.escapeXml(args.options.lockState)}</Parameter></SetProperty><ObjectPath Id="9" ObjectPathId="8" /><ObjectIdentityQuery Id="10" ObjectPathId="5" /><Query Id="11" ObjectPathId="8"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="5" ParentId="3" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.url)}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="8" ParentId="5" Name="Update" /><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
         };
 
-        return request.post(requestOptions);
-      })
-      .then((res?: string): Promise<void> => {
-        return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-          if (!res) {
+        query = await request.post(requestOptions);
+      }
+
+      await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+        if (!query) {
+          resolve();
+          return;
+        }
+
+        const json: ClientSvcResponse = JSON.parse(query);
+        const response: ClientSvcResponseContents = json[0];
+        if (response.ErrorInfo) {
+          reject(response.ErrorInfo.ErrorMessage);
+        }
+        else {
+          const operation: SpoOperation = json[json.length - 1];
+          const isComplete: boolean = operation.IsComplete;
+          if (!args.options.wait || isComplete) {
             resolve();
             return;
           }
 
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            reject(response.ErrorInfo.ErrorMessage);
-          }
-          else {
-            const operation: SpoOperation = json[json.length - 1];
-            const isComplete: boolean = operation.IsComplete;
-            if (!args.options.wait || isComplete) {
-              resolve();
-              return;
-            }
+          setTimeout(() => {
+            spo.waitUntilFinished({
+              operationId: JSON.stringify(operation._ObjectIdentity_),
+              siteUrl: this.spoAdminUrl as string,
+              resolve,
+              reject,
+              logger,
+              currentContext: this.context as FormDigestInfo,
+              dots: this.dots,
+              debug: this.debug,
+              verbose: this.verbose
+            });
+          }, operation.PollingInterval);
+        }
+      });
 
-            setTimeout(() => {
-              spo.waitUntilFinished({
-                operationId: JSON.stringify(operation._ObjectIdentity_),
-                siteUrl: this.spoAdminUrl as string,
-                resolve,
-                reject,
-                logger,
-                currentContext: this.context as FormDigestInfo,
-                dots: this.dots,
-                debug: this.debug,
-                verbose: this.verbose
-              });
-            }, operation.PollingInterval);
-          }
-        });
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
+    } 
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
   }
 
   private setAdmin(logger: Logger, siteUrl: string, principal: string): Promise<void> {

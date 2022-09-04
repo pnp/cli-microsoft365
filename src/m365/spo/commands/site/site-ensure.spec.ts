@@ -88,15 +88,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', alias: 'team1', title: 'Team 1' } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', alias: 'team1', title: 'Team 1' } } as any);
   });
 
   it('creates modern communication site if no site found (debug)', async () => {
@@ -127,15 +119,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/comms', title: 'Comms', type: 'CommunicationSite', debug: true } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', `Error: ${JSON.stringify(err)}`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/comms', title: 'Comms', type: 'CommunicationSite', debug: true } } as any);
   });
 
   it('updates modern team site if existing modern team site found (no type specified)', async () => {
@@ -218,15 +202,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', alias: 'team1', title: 'Team 1' } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', alias: 'team1', title: 'Team 1' } } as any);
   });
 
   it('updates modern team site if existing modern team site found (type specified)', async () => {
@@ -309,15 +285,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', alias: 'team1', title: 'Team 1', type: 'TeamSite' } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', alias: 'team1', title: 'Team 1', type: 'TeamSite' } } as any);
   });
 
   it('updates modern communication site if existing modern communication site found (no type specified; debug)', async () => {
@@ -400,15 +368,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/commsite1', title: 'CommSite1', debug: true } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/commsite1', title: 'CommSite1', debug: true } } as any);
   });
 
   it('updates modern communication site if existing modern communication site found (type specified)', async () => {
@@ -491,15 +451,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/commsite1', title: 'CommSite1', type: 'CommunicationSite' } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/commsite1', title: 'CommSite1', type: 'CommunicationSite' } } as any);
   });
 
   it('updates classic site if an existing classic site found (type specified)', async () => {
@@ -582,15 +534,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/classic', title: 'Classic', type: 'ClassicSite' } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/classic', title: 'Classic', type: 'ClassicSite' } } as any);
   });
 
   it(`updates site's visibility and sharing options`, async () => {
@@ -674,16 +618,8 @@ describe(commands.SITE_ENSURE, () => {
 
       return Promise.reject(new CommandError('Unknown case'));
     });
-
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', alias: 'team1', title: 'Team 1', isPublic: true, shareByEmailEnabled: true } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', `Error: ${JSON.stringify(err)}`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', alias: 'team1', title: 'Team 1', isPublic: true, shareByEmailEnabled: true } } as any);
   });
 
   it('returns error when validation of options for creating site failed', async () => {
@@ -697,15 +633,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1' } } as any, (err: any) => {
-      try {
-        assert.notStrictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1' } } as any);
   });
 
   it('returns error when an error has occurred when checking if a site exists at the specified URL', async () => {
@@ -719,15 +647,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1' } } as any, (err: any) => {
-      try {
-        assert.notStrictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1' } } as any);
   });
 
   it('returns error when the specified site type is invalid', async () => {
@@ -794,15 +714,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/classic', title: 'Classic', type: 'Invalid' } } as any, (err: any) => {
-      try {
-        assert.notStrictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/classic', title: 'Classic', type: 'Invalid' } } as any);
   });
 
   it('returns error when a communication site expected but a team site found', async () => {
@@ -869,15 +781,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1', type: 'CommunicationSite' } } as any, (err: any) => {
-      try {
-        assert.notStrictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1', type: 'CommunicationSite' } } as any);
   });
 
   it('returns error when no properties to update specified', async () => {
@@ -944,15 +848,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1' } } as any, (err: any) => {
-      try {
-        assert.notStrictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1' } } as any);
   });
 
   it('supports debug mode', () => {

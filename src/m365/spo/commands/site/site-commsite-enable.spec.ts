@@ -81,15 +81,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com' } } as any);
   });
 
   it('enables communication site features on the specified site (debug)', async () => {
@@ -105,15 +97,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any);
   });
 
   it('escapes XML in user input', async () => {
@@ -129,15 +113,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com>' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com>' } } as any);
   });
 
   it('correctly handles a generic error when setting tenant property', async () => {
@@ -156,29 +132,13 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any), new CommandError('An error has occurred'));
   });
 
   it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

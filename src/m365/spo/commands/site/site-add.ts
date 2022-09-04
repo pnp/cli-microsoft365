@@ -1,8 +1,5 @@
 import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
-import {
-  CommandError
-} from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -326,242 +323,220 @@ class SpoSiteAddCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const isClassicSite: boolean = args.options.type === 'ClassicSite';
+    
+    try {
+      if (isClassicSite) {
+        await this.createClassicSite(logger, args);
+      }
+      else {
+        await this.createModernSite(logger, args);
+      }
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
+    
+  }
 
-    if (isClassicSite) {
-      this.createClassicSite(logger, args, cb);
+  private async createModernSite(logger: Logger, args: CommandArgs): Promise<void> {
+    const isTeamSite: boolean = args.options.type !== 'CommunicationSite';
+
+    const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+
+    if (args.options.allowFileSharingForGuestUsers && this.verbose) {
+      logger.logToStderr(chalk.yellow(`Option 'allowFileSharingForGuestUsers' is deprecated. Please use 'shareByEmailEnabled' instead`));
+    }
+
+    if (this.verbose) {
+      logger.logToStderr(`Creating new site...`);
+    }
+
+    let requestOptions: any = {};
+
+    if (isTeamSite) {
+      requestOptions = {
+        url: `${spoUrl}/_api/GroupSiteManager/CreateGroupEx`,
+        headers: {
+          'content-type': 'application/json; odata=verbose; charset=utf-8',
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json',
+        data: {
+          displayName: args.options.title,
+          alias: args.options.alias,
+          isPublic: args.options.isPublic,
+          optionalParams: {
+            Description: args.options.description || '',
+            CreationOptions: {
+              results: [],
+              Classification: args.options.classification || ''
+            }
+          }
+        }
+      };
+
+      if (args.options.lcid) {
+        requestOptions.data.optionalParams.CreationOptions.results.push(`SPSiteLanguage:${args.options.lcid}`);
+      }
+
+      if (args.options.owners) {
+        requestOptions.data.optionalParams.Owners = {
+          results: args.options.owners.split(',').map(o => o.trim())
+        };
+      }
     }
     else {
-      this.createModernSite(logger, args, cb);
+      let siteDesignId: string = '';
+      if (args.options.siteDesignId) {
+        siteDesignId = args.options.siteDesignId;
+      }
+      else {
+        if (args.options.siteDesign) {
+          switch (args.options.siteDesign) {
+            case 'Topic':
+              siteDesignId = '00000000-0000-0000-0000-000000000000';
+              break;
+            case 'Showcase':
+              siteDesignId = '6142d2a0-63a5-4ba0-aede-d9fefca2c767';
+              break;
+            case 'Blank':
+              siteDesignId = 'f6cc5403-0d63-442e-96c0-285923709ffc';
+              break;
+          }
+        }
+        else {
+          siteDesignId = '00000000-0000-0000-0000-000000000000';
+        }
+      }
+
+      requestOptions = {
+        url: `${spoUrl}/_api/SPSiteManager/Create`,
+        headers: {
+          'content-type': 'application/json;odata=nometadata',
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json',
+        data: {
+          request: {
+            Title: args.options.title,
+            Url: args.options.url,
+            ShareByEmailEnabled: args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers,
+            Description: args.options.description || '',
+            Classification: args.options.classification || '',
+            WebTemplate: 'SITEPAGEPUBLISHING#0',
+            SiteDesignId: siteDesignId
+          }
+        }
+      };
+
+      if (args.options.lcid) {
+        requestOptions.data.request.Lcid = args.options.lcid;
+      }
+
+      if (args.options.owners) {
+        requestOptions.data.request.Owner = args.options.owners;
+      }
+    }
+
+    const res: CreateGroupExResponse = await request.post(requestOptions);
+
+    if (isTeamSite) {
+      if (res.ErrorMessage !== null) {
+        throw res.ErrorMessage;
+        return;
+      }
+      else {
+        logger.log(res.SiteUrl);
+      }
+    }
+    else {
+      if (res.SiteStatus === 2) {
+        logger.log(res.SiteUrl);
+      }
+      else {
+        throw 'An error has occurred while creating the site';
+      }
     }
   }
 
-  private createModernSite(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    const isTeamSite: boolean = args.options.type !== 'CommunicationSite';
-    let spoUrl: string = '';
-
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((_spoUrl: string): Promise<CreateGroupExResponse> => {
-        spoUrl = _spoUrl;
-
-        if (args.options.allowFileSharingForGuestUsers && this.verbose) {
-          logger.logToStderr(chalk.yellow(`Option 'allowFileSharingForGuestUsers' is deprecated. Please use 'shareByEmailEnabled' instead`));
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(`Creating new site...`);
-        }
-
-        let requestOptions: any = {};
-
-        if (isTeamSite) {
-          requestOptions = {
-            url: `${spoUrl}/_api/GroupSiteManager/CreateGroupEx`,
-            headers: {
-              'content-type': 'application/json; odata=verbose; charset=utf-8',
-              accept: 'application/json;odata=nometadata'
-            },
-            responseType: 'json',
-            data: {
-              displayName: args.options.title,
-              alias: args.options.alias,
-              isPublic: args.options.isPublic,
-              optionalParams: {
-                Description: args.options.description || '',
-                CreationOptions: {
-                  results: [],
-                  Classification: args.options.classification || ''
-                }
-              }
-            }
-          };
-
-          if (args.options.lcid) {
-            requestOptions.data.optionalParams.CreationOptions.results.push(`SPSiteLanguage:${args.options.lcid}`);
-          }
-
-          if (args.options.owners) {
-            requestOptions.data.optionalParams.Owners = {
-              results: args.options.owners.split(',').map(o => o.trim())
-            };
-          }
-        }
-        else {
-          let siteDesignId: string = '';
-          if (args.options.siteDesignId) {
-            siteDesignId = args.options.siteDesignId;
-          }
-          else {
-            if (args.options.siteDesign) {
-              switch (args.options.siteDesign) {
-                case 'Topic':
-                  siteDesignId = '00000000-0000-0000-0000-000000000000';
-                  break;
-                case 'Showcase':
-                  siteDesignId = '6142d2a0-63a5-4ba0-aede-d9fefca2c767';
-                  break;
-                case 'Blank':
-                  siteDesignId = 'f6cc5403-0d63-442e-96c0-285923709ffc';
-                  break;
-              }
-            }
-            else {
-              siteDesignId = '00000000-0000-0000-0000-000000000000';
-            }
-          }
-
-          requestOptions = {
-            url: `${spoUrl}/_api/SPSiteManager/Create`,
-            headers: {
-              'content-type': 'application/json;odata=nometadata',
-              accept: 'application/json;odata=nometadata'
-            },
-            responseType: 'json',
-            data: {
-              request: {
-                Title: args.options.title,
-                Url: args.options.url,
-                ShareByEmailEnabled: args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers,
-                Description: args.options.description || '',
-                Classification: args.options.classification || '',
-                WebTemplate: 'SITEPAGEPUBLISHING#0',
-                SiteDesignId: siteDesignId
-              }
-            }
-          };
-
-          if (args.options.lcid) {
-            requestOptions.data.request.Lcid = args.options.lcid;
-          }
-
-          if (args.options.owners) {
-            requestOptions.data.request.Owner = args.options.owners;
-          }
-        }
-
-        return request.post(requestOptions);
-      })
-      .then((res: CreateGroupExResponse): void => {
-        if (isTeamSite) {
-          if (res.ErrorMessage !== null) {
-            cb(new CommandError(res.ErrorMessage));
-            return;
-          }
-          else {
-            logger.log(res.SiteUrl);
-          }
-        }
-        else {
-          if (res.SiteStatus === 2) {
-            logger.log(res.SiteUrl);
-          }
-          else {
-            cb(new CommandError('An error has occurred while creating the site'));
-            return;
-          }
-        }
-        cb();
-      }, (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
-  }
-
-  public createClassicSite(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async createClassicSite(logger: Logger, args: CommandArgs): Promise<void> {
     this.dots = '';
 
-    spo
-      .getSpoAdminUrl(logger, this.debug)
-      .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
-        this.spoAdminUrl = _spoAdminUrl;
+    this.spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+    this.context = await spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
 
-        return spo.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
-      })
-      .then((res: FormDigestInfo): Promise<boolean> => {
-        this.context = res;
+    if (args.options.removeDeletedSite) {
+      await this.siteExistsInTheRecycleBin(args.options.url as string, logger);
 
-        if (args.options.removeDeletedSite) {
-          return this.siteExistsInTheRecycleBin(args.options.url as string, logger);
+      if (this.verbose) {
+        logger.logToStderr('Site exists in the recycle bin');
+      }
+
+      await this.deleteSiteFromTheRecycleBin(args.options.url as string, args.options.wait, logger);
+    }
+    else {
+      // assume site doesn't exist
+      if (this.verbose) {
+        logger.logToStderr('Site not found');
+      }
+
+      return;
+    }
+
+    this.context = await spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
+
+    if (this.verbose) {
+      logger.logToStderr(`Creating site collection ${args.options.url}...`);
+    }
+
+    const lcid: number = typeof args.options.lcid === 'number' ? args.options.lcid : 1033;
+    const storageQuota: number = typeof args.options.storageQuota === 'number' ? args.options.storageQuota : 100;
+    const storageQuotaWarningLevel: number = typeof args.options.storageQuotaWarningLevel === 'number' ? args.options.storageQuotaWarningLevel : 100;
+    const resourceQuota: number = typeof args.options.resourceQuota === 'number' ? args.options.resourceQuota : 0;
+    const resourceQuotaWarningLevel: number = typeof args.options.resourceQuotaWarningLevel === 'number' ? args.options.resourceQuotaWarningLevel : 0;
+    const webTemplate: string = args.options.webTemplate || 'STS#0';
+
+    const requestOptions: any = {
+      url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
+      headers: {
+        'X-RequestDigest': this.context.FormDigestValue
+      },
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query><Query Id="8" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="CreateSite"><Parameters><Parameter TypeId="{11f84fff-b8cf-47b6-8b50-34e692656606}"><Property Name="CompatibilityLevel" Type="Int32">0</Property><Property Name="Lcid" Type="UInt32">${lcid}</Property><Property Name="Owner" Type="String">${formatting.escapeXml(args.options.owners)}</Property><Property Name="StorageMaximumLevel" Type="Int64">${storageQuota}</Property><Property Name="StorageWarningLevel" Type="Int64">${storageQuotaWarningLevel}</Property><Property Name="Template" Type="String">${formatting.escapeXml(webTemplate)}</Property><Property Name="TimeZoneId" Type="Int32">${args.options.timeZone}</Property><Property Name="Title" Type="String">${formatting.escapeXml(args.options.title)}</Property><Property Name="Url" Type="String">${formatting.escapeXml(args.options.url)}</Property><Property Name="UserCodeMaximumLevel" Type="Double">${resourceQuota}</Property><Property Name="UserCodeWarningLevel" Type="Double">${resourceQuotaWarningLevel}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
+    };
+
+    const res: string = await request.post(requestOptions);
+
+    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+      const json: ClientSvcResponse = JSON.parse(res);
+      const response: ClientSvcResponseContents = json[0];
+      if (response.ErrorInfo) {
+        throw response.ErrorInfo.ErrorMessage;
+      }
+      else {
+        const operation: SpoOperation = json[json.length - 1];
+        const isComplete: boolean = operation.IsComplete;
+        if (!args.options.wait || isComplete) {
+          resolve();
+          return;
         }
-        else {
-          // assume site doesn't exist
-          return Promise.resolve(false);
-        }
-      })
-      .then((exists: boolean): Promise<void> => {
-        if (exists) {
-          if (this.verbose) {
-            logger.logToStderr('Site exists in the recycle bin');
-          }
 
-          return this.deleteSiteFromTheRecycleBin(args.options.url as string, args.options.wait, logger);
-        }
-        else {
-          if (this.verbose) {
-            logger.logToStderr('Site not found');
-          }
-
-          return Promise.resolve();
-        }
-      })
-      .then((): Promise<FormDigestInfo> => {
-        return spo.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
-      })
-      .then((res: FormDigestInfo): Promise<string> => {
-        this.context = res;
-
-        if (this.verbose) {
-          logger.logToStderr(`Creating site collection ${args.options.url}...`);
-        }
-
-        const lcid: number = typeof args.options.lcid === 'number' ? args.options.lcid : 1033;
-        const storageQuota: number = typeof args.options.storageQuota === 'number' ? args.options.storageQuota : 100;
-        const storageQuotaWarningLevel: number = typeof args.options.storageQuotaWarningLevel === 'number' ? args.options.storageQuotaWarningLevel : 100;
-        const resourceQuota: number = typeof args.options.resourceQuota === 'number' ? args.options.resourceQuota : 0;
-        const resourceQuotaWarningLevel: number = typeof args.options.resourceQuotaWarningLevel === 'number' ? args.options.resourceQuotaWarningLevel : 0;
-        const webTemplate: string = args.options.webTemplate || 'STS#0';
-
-        const requestOptions: any = {
-          url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'X-RequestDigest': this.context.FormDigestValue
-          },
-          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query></Query><Query Id="8" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="CreateSite"><Parameters><Parameter TypeId="{11f84fff-b8cf-47b6-8b50-34e692656606}"><Property Name="CompatibilityLevel" Type="Int32">0</Property><Property Name="Lcid" Type="UInt32">${lcid}</Property><Property Name="Owner" Type="String">${formatting.escapeXml(args.options.owners)}</Property><Property Name="StorageMaximumLevel" Type="Int64">${storageQuota}</Property><Property Name="StorageWarningLevel" Type="Int64">${storageQuotaWarningLevel}</Property><Property Name="Template" Type="String">${formatting.escapeXml(webTemplate)}</Property><Property Name="TimeZoneId" Type="Int32">${args.options.timeZone}</Property><Property Name="Title" Type="String">${formatting.escapeXml(args.options.title)}</Property><Property Name="Url" Type="String">${formatting.escapeXml(args.options.url)}</Property><Property Name="UserCodeMaximumLevel" Type="Double">${resourceQuota}</Property><Property Name="UserCodeWarningLevel" Type="Double">${resourceQuotaWarningLevel}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res: string): Promise<void> => {
-        return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            reject(response.ErrorInfo.ErrorMessage);
-          }
-          else {
-            const operation: SpoOperation = json[json.length - 1];
-            const isComplete: boolean = operation.IsComplete;
-            if (!args.options.wait || isComplete) {
-              resolve();
-              return;
-            }
-
-            setTimeout(() => {
-              spo.waitUntilFinished({
-                operationId: JSON.stringify(operation._ObjectIdentity_),
-                siteUrl: this.spoAdminUrl as string,
-                resolve,
-                reject,
-                logger,
-                currentContext: this.context as FormDigestInfo,
-                dots: this.dots,
-                verbose: this.verbose,
-                debug: this.debug
-              });
-            }, operation.PollingInterval);
-          }
-        });
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
+        setTimeout(() => {
+          spo.waitUntilFinished({
+            operationId: JSON.stringify(operation._ObjectIdentity_),
+            siteUrl: this.spoAdminUrl as string,
+            resolve,
+            reject,
+            logger,
+            currentContext: this.context as FormDigestInfo,
+            dots: this.dots,
+            verbose: this.verbose,
+            debug: this.debug
+          });
+        }, operation.PollingInterval);
+      }
+    });
   }
 
   private siteExistsInTheRecycleBin(url: string, logger: Logger): Promise<boolean> {

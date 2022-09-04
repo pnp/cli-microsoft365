@@ -67,15 +67,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } });
   });
 
   it(`sends a request without any data when no options were specified`, async () => {
@@ -89,15 +81,8 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test' } }, () => {
-      try {
-        assert.strictEqual(Object.keys(data).length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test' } });
+    assert.strictEqual(Object.keys(data).length, 0);
   });
 
   it('disables mega menu', async () => {
@@ -111,15 +96,8 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', disableMegaMenu: "true" } }, () => {
-      try {
-        assert.strictEqual(data.megaMenuEnabled, false);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', disableMegaMenu: "true" } });
+    assert.strictEqual(data.megaMenuEnabled, false);
   });
 
   it('disables footer', async () => {
@@ -133,15 +111,8 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', disableFooter: "true" } }, () => {
-      try {
-        assert.strictEqual(data.footerEnabled, false);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', disableFooter: "true" } });
+    assert.strictEqual(data.footerEnabled, false);
   });
 
   it('disables title in the header', async () => {
@@ -155,15 +126,8 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', hideTitleInHeader: "true" } }, () => {
-      try {
-        assert.strictEqual(data.hideTitleInHeader, true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', hideTitleInHeader: "true" } });
+    assert.strictEqual(data.hideTitleInHeader, true);
   });
 
   it('configures chrome with enum values', async () => {
@@ -177,19 +141,12 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', headerLayout: "Extended", headerEmphasis: "Light", logoAlignment: "Center", footerLayout: "Extended", footerEmphasis: "Light" } }, () => {
-      try {
-        assert.strictEqual(data.headerLayout, 4);
-        assert.strictEqual(data.headerEmphasis, 1);
-        assert.strictEqual(data.logoAlignment, 1);
-        assert.strictEqual(data.footerLayout, 2);
-        assert.strictEqual(data.footerEmphasis, 2);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', headerLayout: "Extended", headerEmphasis: "Light", logoAlignment: "Center", footerLayout: "Extended", footerEmphasis: "Light" } });
+    assert.strictEqual(data.headerLayout, 4);
+    assert.strictEqual(data.headerEmphasis, 1);
+    assert.strictEqual(data.logoAlignment, 1);
+    assert.strictEqual(data.footerLayout, 2);
+    assert.strictEqual(data.footerEmphasis, 2);
   });
 
   it('correctly handles OData error when setting site chrome settings', async () => {
@@ -197,15 +154,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', footerEmphasis: 'Light' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', footerEmphasis: 'Light' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

@@ -142,22 +142,11 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
       return Promise.reject(siteError);
     });
 
-    await command.action(logger, {
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing',
-        permission: "write",
-        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
-        appDisplayName: "Foo App"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Requested site could not be found")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing',
+      permission: "write",
+      appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
+      appDisplayName: "Foo App" } } as any), new CommandError('Requested site could not be found'));
   });
 
   it('fails to get Azure AD app when Azure AD app does not exists', async () => {
@@ -185,22 +174,11 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
         return Promise.reject('The specified Azure AD app does not exist');
       });
 
-    await command.action(logger, {
-      options: {
-        debug: true,
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        permission: "write",
-        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified Azure AD app does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      permission: "write",
+      appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e" } } as any), new CommandError('The specified Azure AD app does not exist'));
   });
 
   it('fails when multiple Azure AD apps with same name exists', async () => {
@@ -387,21 +365,10 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
         return Promise.reject('Multiple Azure AD app with displayName Foo App found: 3166f9d8-f4e9-4b56-b634-dafcc9ecba8e,9bd7b7c0-e4a7-4b85-b0c6-20aaca0e25b7');
       });
 
-    await command.action(logger, {
-      options: {
-        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
-        permission: "write",
-        appDisplayName: "Foo App"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple Azure AD app with displayName Foo App found: 3166f9d8-f4e9-4b56-b634-dafcc9ecba8e,9bd7b7c0-e4a7-4b85-b0c6-20aaca0e25b7`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+      permission: "write",
+      appDisplayName: "Foo App" } } as any), new CommandError('Multiple Azure AD app with displayName Foo App found: 3166f9d8-f4e9-4b56-b634-dafcc9ecba8e,9bd7b7c0-e4a7-4b85-b0c6-20aaca0e25b7'));
   });
 
   it('Adds an application permission to the site by appId', async () => {
@@ -542,28 +509,21 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
         appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
         output: "json"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
-          "roles": [
-            "write"
-          ],
-          "grantedToIdentities": [
-            {
-              "application": {
-                "displayName": "Foo App",
-                "id": "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
-              }
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
+      "roles": [
+        "write"
+      ],
+      "grantedToIdentities": [
+        {
+          "application": {
+            "displayName": "Foo App",
+            "id": "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
+          }
+        }
+      ]
+    }));
   });
 
   it('Adds an application permission to the site by appDisplayName', async () => {
@@ -704,28 +664,21 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
         appDisplayName: "Foo App",
         output: "json"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
-          "roles": [
-            "write"
-          ],
-          "grantedToIdentities": [
-            {
-              "application": {
-                "displayName": "Foo App",
-                "id": "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
-              }
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
+      "roles": [
+        "write"
+      ],
+      "grantedToIdentities": [
+        {
+          "application": {
+            "displayName": "Foo App",
+            "id": "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
+          }
+        }
+      ]
+    }));
   });
 
   it('Adds an application permission to the site by appId and appDisplayName', async () => {
@@ -773,28 +726,21 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
         appDisplayName: "Foo App",
         output: "json"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
-          "roles": [
-            "write"
-          ],
-          "grantedToIdentities": [
-            {
-              "application": {
-                "displayName": "Foo App",
-                "id": "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
-              }
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      "id": "aTowaS50fG1zLnNwLmV4dHxjY2EwMDE2OS1kMzhiLTQ2MmYtYTNiNC1mMzU2NmIxNjJmMmRAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0",
+      "roles": [
+        "write"
+      ],
+      "grantedToIdentities": [
+        {
+          "application": {
+            "displayName": "Foo App",
+            "id": "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
+          }
+        }
+      ]
+    }));
   });
 
   it('supports debug mode', () => {
