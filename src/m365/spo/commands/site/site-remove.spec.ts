@@ -79,8 +79,8 @@ describe(commands.SITE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('aborts removing site when prompt not confirmed', (done) => {
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', debug: true, verbose: true } }, () => {
+  it('aborts removing site when prompt not confirmed', async () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', debug: true, verbose: true } }, () => {
       try {
         assert(requests.length === 0);
         done();
@@ -91,7 +91,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes the site when prompt confirmed', (done) => {
+  it('removes the site when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -149,7 +149,7 @@ describe(commands.SITE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', debug: true, verbose: true } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', debug: true, verbose: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -190,7 +190,7 @@ describe(commands.SITE_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('removes site. doesn\'t wait for completion (debug)', (done) => {
+  it('removes site. doesn\'t wait for completion (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -243,7 +243,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -254,7 +254,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site. doesn\'t wait for completion', (done) => {
+  it('removes site. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -307,7 +307,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -318,7 +318,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site, skip recycle bin doesn\'t wait for completion (debug)', (done) => {
+  it('removes site, skip recycle bin doesn\'t wait for completion (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -393,7 +393,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true, skipRecycleBin: true } } as any, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true, skipRecycleBin: true } } as any, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -404,7 +404,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site, skip recycle bin doesn\'t wait for completion', (done) => {
+  it('removes site, skip recycle bin doesn\'t wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -479,7 +479,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, skipRecycleBin: true } } as any, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, skipRecycleBin: true } } as any, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -490,7 +490,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site from recycle bin doesn\'t wait for completion (debug)', (done) => {
+  it('removes site from recycle bin doesn\'t wait for completion (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -543,7 +543,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true, debug: true } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true, debug: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -554,7 +554,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site from recycle bin doesn\'t wait for completion', (done) => {
+  it('removes site from recycle bin doesn\'t wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -607,7 +607,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -618,7 +618,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site from recycle bin, wait for completion (debug)', (done) => {
+  it('removes site from recycle bin, wait for completion (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -684,7 +684,7 @@ describe(commands.SITE_REMOVE, () => {
       fn();
       return {} as any;
     });
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true, debug: true, wait: true } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true, debug: true, wait: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -695,7 +695,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site from recycle bin, wait for completion, error occured', (done) => {
+  it('removes site from recycle bin, wait for completion, error occured', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -736,7 +736,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true, debug: true, wait: true } } as any, (err?: any) => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true, debug: true, wait: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -747,7 +747,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site. wait for completion (debug)', (done) => {
+  it('removes site. wait for completion (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -814,7 +814,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true, wait: true } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true, wait: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -825,7 +825,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site. wait for completion (verbose)', (done) => {
+  it('removes site. wait for completion (verbose)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -892,7 +892,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, verbose: true, wait: true } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, verbose: true, wait: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -903,7 +903,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site. wait for completion', (done) => {
+  it('removes site. wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -971,7 +971,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: false, wait: true } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: false, wait: true } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -982,7 +982,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes the site - Groupified Site - Entered with \'fromRecycleBin\' OR \'skipRecycleBin\' ', (done) => {
+  it('removes the site - Groupified Site - Entered with \'fromRecycleBin\' OR \'skipRecycleBin\' ', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
         return Promise.resolve({
@@ -1077,7 +1077,7 @@ describe(commands.SITE_REMOVE, () => {
       cb({ continue: true });
     });
     
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, skipRecycleBin: true } }, (err?: any) => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, skipRecycleBin: true } }, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -1091,7 +1091,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes the site - Groupified Site - Entered with \'wait\'', (done) => {
+  it('removes the site - Groupified Site - Entered with \'wait\'', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
         return Promise.resolve({
@@ -1191,7 +1191,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, wait: true } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, wait: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -1202,7 +1202,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes the site - Groupified Site, group is permanently deleted', (done) => {
+  it('removes the site - Groupified Site, group is permanently deleted', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -1263,7 +1263,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true, wait: true } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true, wait: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -1274,7 +1274,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('does not remove the site - Groupified Site, bad request (getting the site group)', (done) => {
+  it('does not remove the site - Groupified Site, bad request (getting the site group)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -1316,7 +1316,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -1327,7 +1327,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('does not remove the site - Groupified Site, group is in the deleted groups', (done) => {
+  it('does not remove the site - Groupified Site, group is in the deleted groups', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -1382,7 +1382,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, skipRecycleBin: true, confirm: true, wait: true } }, (err: any) => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, skipRecycleBin: true, confirm: true, wait: true } }, (err: any) => {
       try {
         // assert(loggerLogToStderrSpy.called);
         assert.deepStrictEqual(err, new CommandError("Site group still exists in the deleted groups. The site won't be removed."));
@@ -1394,7 +1394,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('does not remove the site - Groupified Site, bad request (getting the site group in the deleted groups)', (done) => {
+  it('does not remove the site - Groupified Site, bad request (getting the site group in the deleted groups)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -1446,7 +1446,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -1460,7 +1460,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site. wait for completion, error occured', (done) => {
+  it('removes site. wait for completion, error occured', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -1528,7 +1528,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: false, wait: true } } as any, (err?: any) => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: false, wait: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -1539,7 +1539,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site, error occured', (done) => {
+  it('removes site, error occured', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -1580,7 +1580,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true } } as any, (err?: any) => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -1591,7 +1591,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('Get Group ID - Error Occurred', (done) => {
+  it('Get Group ID - Error Occurred', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeinvalid</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -1614,7 +1614,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Cannot get site https://contoso.sharepoint.com/sites/demositeinvalid.');
     });
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeinvalid', confirm: true, debug: true } }, (err?: any) => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeinvalid', confirm: true, debug: true } }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Cannot get site https://contoso.sharepoint.com/sites/demositeinvalid.')));
         done();

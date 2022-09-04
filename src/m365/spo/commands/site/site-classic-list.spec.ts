@@ -67,7 +67,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Title', 'Url']);
   });
 
-  it('retrieves list of sites when no type and no filter specified', (done) => {
+  it('retrieves list of sites when no type and no filter specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -97,7 +97,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
+    await command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -114,7 +114,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
     });
   });
 
-  it('retrieves list of sites when no type and no filter specified (debug)', (done) => {
+  it('retrieves list of sites when no type and no filter specified (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -144,7 +144,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
+    await command.action(logger, { options: { debug: true } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -161,7 +161,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
     });
   });
 
-  it('retrieves list of all sites when results returned in multiple pages', (done) => {
+  it('retrieves list of all sites when results returned in multiple pages', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -214,7 +214,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
+    await command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -236,7 +236,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
     });
   });
 
-  it('includes all properties for json output', (done) => {
+  it('includes all properties for json output', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -266,7 +266,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, output: 'json', webTemplate: 'STS#0' } }, () => {
+    await command.action(logger, { options: { debug: false, output: 'json', webTemplate: 'STS#0' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -283,7 +283,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
     });
   });
 
-  it('retrieves list of sites when STS#0 type and no filter specified', (done) => {
+  it('retrieves list of sites when STS#0 type and no filter specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -313,7 +313,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webTemplate: 'STS#0' } }, () => {
+    await command.action(logger, { options: { debug: true, webTemplate: 'STS#0' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -330,7 +330,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
     });
   });
 
-  it('retrieves list of sites when no type and filter specified', (done) => {
+  it('retrieves list of sites when no type and filter specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -360,7 +360,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, filter: "Url -like 'ctest'" } }, () => {
+    await command.action(logger, { options: { debug: true, filter: "Url -like 'ctest'" } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -377,7 +377,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
     });
   });
 
-  it('retrieves list of sites when no type, no filter and include OneDrive sites specified', (done) => {
+  it('retrieves list of sites when no type, no filter and include OneDrive sites specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -407,7 +407,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, includeOneDriveSites: '1' } }, () => {
+    await command.action(logger, { options: { debug: true, includeOneDriveSites: '1' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -424,7 +424,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
     });
   });
 
-  it('retrieves list of sites when STS#0 type and filter specified', (done) => {
+  it('retrieves list of sites when STS#0 type and filter specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -454,7 +454,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webTemplate: 'STS#0', filter: "Url -like 'ctest'" } }, () => {
+    await command.action(logger, { options: { debug: true, webTemplate: 'STS#0', filter: "Url -like 'ctest'" } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -471,7 +471,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
     });
   });
 
-  it('escapes XML in the filter', (done) => {
+  it('escapes XML in the filter', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -501,7 +501,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, filter: "Url -like '<ctest>'" } }, () => {
+    await command.action(logger, { options: { debug: true, filter: "Url -like '<ctest>'" } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -518,7 +518,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
     });
   });
 
-  it('correctly handles error when retrieving sites', (done) => {
+  it('correctly handles error when retrieving sites', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -538,7 +538,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, filter: "Url like 'ctest'" } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: true, filter: "Url like 'ctest'" } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Syntax error in the filter expression 'Url like 'test''.")));
         done();
@@ -549,10 +549,10 @@ describe(commands.SITE_CLASSIC_LIST, () => {
     });
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: true, filter: "Url like 'ctest'" } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: true, filter: "Url like 'ctest'" } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
         done();

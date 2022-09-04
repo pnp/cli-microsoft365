@@ -88,65 +88,37 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, confirm: true, taskId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, confirm: true, taskId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    assert(loggerLogSpy.notCalled);
   });
 
   it('prompts before removing the specified site design task when confirm option not passed', async () => {
-    await command.action(logger, { options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
-      let promptIssued = false;
+    await command.action(logger, { options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
   it('aborts removing site design task when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
-    await command.action(logger, { options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+    assert(postSpy.notCalled);
   });
 
   it('removes the site design task when prompt confirmed', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(() => Promise.resolve());
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    await command.action(logger, { options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
-      try {
-        assert(postStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } });
+    assert(postStub.called);
   });
 
   it('supports debug mode', () => {

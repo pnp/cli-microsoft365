@@ -41,7 +41,7 @@ class SpoSiteGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const requestOptions: any = {
       url: `${args.options.url}/_api/site`,
       headers: {

@@ -88,26 +88,19 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'New title' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "ThumbnailUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "New title",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'New title' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "New title",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
   it('updates site design web template to TeamSite', async () => {
@@ -136,26 +129,19 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', webTemplate: 'TeamSite' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "ThumbnailUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Title",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', webTemplate: 'TeamSite' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Title",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
   it('updates site design web template to CommunicationSite', async () => {
@@ -184,26 +170,19 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', webTemplate: 'CommunicationSite' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "ThumbnailUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Title",
-          "Version": 1,
-          "WebTemplate": 68
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', webTemplate: 'CommunicationSite' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Title",
+      "Version": 1,
+      "WebTemplate": 68
+    }));
   });
 
   it('updates site design site scripts (one script)', async () => {
@@ -232,26 +211,19 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "ThumbnailUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Title",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Title",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
   it('updates site design site scripts (multiple scripts)', async () => {
@@ -280,26 +252,19 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24, 449c0c6d-5380-4df2-b84b-622e0ac8ec25' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "ThumbnailUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24", "449c0c6d-5380-4df2-b84b-622e0ac8ec25"],
-          "Title": "Title",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24, 449c0c6d-5380-4df2-b84b-622e0ac8ec25' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24", "449c0c6d-5380-4df2-b84b-622e0ac8ec25"],
+      "Title": "Title",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
   it('updates site design description', async () => {
@@ -328,26 +293,19 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', description: 'New description' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": "New description",
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "ThumbnailUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Title",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', description: 'New description' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": "New description",
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Title",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
   it('updates site design previewImageUrl', async () => {
@@ -376,26 +334,19 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', previewImageUrl: 'https://contoso.com/image.png' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": "https://contoso.com/image.png",
-          "ThumbnailUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Title",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', previewImageUrl: 'https://contoso.com/image.png' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": "https://contoso.com/image.png",
+      "ThumbnailUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Title",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
   it('updates site design previewImageAltText', async () => {
@@ -424,26 +375,19 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', previewImageAltText: 'Logo image' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": "Logo image",
-          "PreviewImageUrl": null,
-          "ThumbnailUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Title",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', previewImageAltText: 'Logo image' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": "Logo image",
+      "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Title",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
   it('updates site design thumbnailUrl', async () => {
@@ -472,26 +416,19 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', thumbnailUrl: 'https://contoso.com/assets/team-site-thumbnail.png' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageUrl": null,
-          "PreviewImageAltText": null,
-          "ThumbnailUrl": "https://contoso.com/assets/team-site-thumbnail.png",
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Title",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', thumbnailUrl: 'https://contoso.com/assets/team-site-thumbnail.png' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageUrl": null,
+      "PreviewImageAltText": null,
+      "ThumbnailUrl": "https://contoso.com/assets/team-site-thumbnail.png",
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Title",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
   it('updates site design version', async () => {
@@ -520,26 +457,19 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', version: 2 } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "ThumbnailUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Title",
-          "Version": 2,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', version: 2 } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Title",
+      "Version": 2,
+      "WebTemplate": 64
+    }));
   });
 
   it('makes site design default', async () => {
@@ -568,26 +498,19 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', isDefault: 'true' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": true,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "ThumbnailUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Title",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', isDefault: 'true' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": true,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Title",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
   it('makes site design not-default (explicit)', async () => {
@@ -616,26 +539,19 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', isDefault: 'false' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "ThumbnailUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Title",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', isDefault: 'false' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Title",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
   it('makes site design not-default (implicit)', async () => {
@@ -663,26 +579,19 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": null,
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": false,
-          "PreviewImageAltText": null,
-          "PreviewImageUrl": null,
-          "ThumbnailUrl": null,
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Title",
-          "Version": 1,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": null,
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": false,
+      "PreviewImageAltText": null,
+      "PreviewImageUrl": null,
+      "ThumbnailUrl": null,
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Title",
+      "Version": 1,
+      "WebTemplate": 64
+    }));
   });
 
   it('updates all site design properties (debug)', async () => {
@@ -721,26 +630,19 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', thumbnailUrl: "https://contoso.com/assets/team-site-thumbnail.png", previewImageAltText: 'Contoso team site preview', version: 2, isDefault: 'true' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Description": 'Contoso team site',
-          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-          "IsDefault": true,
-          "PreviewImageAltText": 'Contoso team site preview',
-          "PreviewImageUrl": 'https://contoso.com/assets/team-site-preview.png',
-          "ThumbnailUrl": "https://contoso.com/assets/team-site-thumbnail.png",
-          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
-          "Title": "Contoso",
-          "Version": 2,
-          "WebTemplate": 64
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', thumbnailUrl: "https://contoso.com/assets/team-site-thumbnail.png", previewImageAltText: 'Contoso team site preview', version: 2, isDefault: 'true' } });
+    assert(loggerLogSpy.calledWith({
+      "Description": 'Contoso team site',
+      "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+      "IsDefault": true,
+      "PreviewImageAltText": 'Contoso team site preview',
+      "PreviewImageUrl": 'https://contoso.com/assets/team-site-preview.png',
+      "ThumbnailUrl": "https://contoso.com/assets/team-site-thumbnail.png",
+      "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+      "Title": "Contoso",
+      "Version": 2,
+      "WebTemplate": 64
+    }));
   });
 
   it('correctly handles OData error when updating site design', async () => {
@@ -748,15 +650,11 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', webTemplate: 'TeamSite', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false, 
+      id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', 
+      webTemplate: 'TeamSite', 
+      siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

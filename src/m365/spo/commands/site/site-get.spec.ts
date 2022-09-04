@@ -60,7 +60,7 @@ describe(commands.SITE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves the information for the specified site', (done) => {
+  it('retrieves the information for the specified site', async () => {
     const siteProperties = {
       "AllowCreateDeclarativeWorkflow": true,
       "AllowDesigner": true,
@@ -115,7 +115,7 @@ describe(commands.SITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
         assert(loggerLogSpy.calledWith(siteProperties));
         done();
@@ -126,7 +126,7 @@ describe(commands.SITE_GET, () => {
     });
   });
 
-  it('retrieves the information for the specified site (debug)', (done) => {
+  it('retrieves the information for the specified site (debug)', async () => {
     const siteProperties = {
       "AllowCreateDeclarativeWorkflow": true,
       "AllowDesigner": true,
@@ -181,7 +181,7 @@ describe(commands.SITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
         assert(loggerLogSpy.calledWith(siteProperties));
         done();
@@ -192,7 +192,7 @@ describe(commands.SITE_GET, () => {
     });
   });
 
-  it('correctly handles error when getting information for a site that doesn\'t exist', (done) => {
+  it('correctly handles error when getting information for a site that doesn\'t exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/site') > -1) {
         return Promise.reject(new Error("404 - \"404 FILE NOT FOUND\""));
@@ -201,7 +201,7 @@ describe(commands.SITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('404 - "404 FILE NOT FOUND"')));
         done();

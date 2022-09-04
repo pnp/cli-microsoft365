@@ -377,7 +377,7 @@ describe(commands.SITE_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('updates title of the specified site', (done) => {
+  it('updates title of the specified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -411,7 +411,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'New title', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, title: 'New title', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -423,7 +423,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site title. doesn\'t wait for completion (debug)', (done) => {
+  it('updates site title. doesn\'t wait for completion (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -457,7 +457,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } }, (err?: any) => {
       try {
         assert(loggerLogToStderrSpy.called);
         assert.strictEqual(typeof err, 'undefined');
@@ -469,7 +469,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site title. wait for completion', (done) => {
+  it('updates site title. wait for completion', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -518,7 +518,7 @@ describe(commands.SITE_SET, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -530,7 +530,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site title. wait for completion (debug)', (done) => {
+  it('updates site title. wait for completion (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -579,7 +579,7 @@ describe(commands.SITE_SET, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, (err?: any) => {
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, (err?: any) => {
       try {
         assert(loggerLogToStderrSpy.called);
         assert.strictEqual(typeof err, 'undefined');
@@ -591,7 +591,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site title. wait for completion (verbose)', (done) => {
+  it('updates site title. wait for completion (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -640,7 +640,7 @@ describe(commands.SITE_SET, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { debug: false, verbose: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, verbose: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, (err?: any) => {
       try {
         assert(loggerLogToStderrSpy.called);
         assert.strictEqual(typeof err, 'undefined');
@@ -652,7 +652,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates title of the specified groupified site', (done) => {
+  it('updates title of the specified groupified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -676,7 +676,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'New title', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, title: 'New title', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -687,7 +687,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site description.', (done) => {
+  it('updates site description.', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -711,7 +711,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', description: 'New description' } }, (err) => {
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', description: 'New description' } }, (err) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -722,7 +722,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates isPublic property of the specified groupified site', (done) => {
+  it('updates isPublic property of the specified groupified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -742,7 +742,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, isPublic: true, description: 'Some description', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, isPublic: true, description: 'Some description', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
       try {
         const options = {
           id: 'e10a459e-60c8-4000-8240-a68d6a12d39e',
@@ -761,7 +761,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site lockState. doesn\'t wait for completion', (done) => {
+  it('updates site lockState. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -795,7 +795,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -807,7 +807,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site lockState. doesn\'t wait for completion (debug)', (done) => {
+  it('updates site lockState. doesn\'t wait for completion (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -841,7 +841,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } }, (err?: any) => {
       try {
         assert(loggerLogToStderrSpy.called);
         assert.strictEqual(typeof err, 'undefined');
@@ -853,7 +853,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site lockState. wait for completion', (done) => {
+  it('updates site lockState. wait for completion', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -899,7 +899,7 @@ describe(commands.SITE_SET, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -911,7 +911,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site lockState. wait for completion. error while polling', (done) => {
+  it('updates site lockState. wait for completion. error while polling', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -956,7 +956,7 @@ describe(commands.SITE_SET, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -967,7 +967,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site lockState. wait for completion two rounds', (done) => {
+  it('updates site lockState. wait for completion two rounds', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1024,7 +1024,7 @@ describe(commands.SITE_SET, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1036,7 +1036,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site lockState. wait for completion, immediate complete', (done) => {
+  it('updates site lockState. wait for completion, immediate complete', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1070,7 +1070,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1082,7 +1082,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates all properties. wait for completion, immediately complete', (done) => {
+  it('updates all properties. wait for completion, immediately complete', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1137,7 +1137,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', sharingCapability: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: 'true', noScriptSite: 'true', owners: 'admin@contoso.com', lockState: 'NoAccess', wait: true } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', sharingCapability: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: 'true', noScriptSite: 'true', owners: 'admin@contoso.com', lockState: 'NoAccess', wait: true } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1149,7 +1149,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site sharing mode. doesn\'t wait for completion', (done) => {
+  it('updates site sharing mode. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1183,7 +1183,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', sharing: 'Disabled' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', sharing: 'Disabled' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1195,7 +1195,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site resourceQuota. doesn\'t wait for completion', (done) => {
+  it('updates site resourceQuota. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1229,7 +1229,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', resourceQuota: 100 } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', resourceQuota: 100 } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1241,7 +1241,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site resourceQuotaWarningLevel. doesn\'t wait for completion', (done) => {
+  it('updates site resourceQuotaWarningLevel. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1275,7 +1275,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', resourceQuotaWarningLevel: 100 } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', resourceQuotaWarningLevel: 100 } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1287,7 +1287,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site storageQuota. doesn\'t wait for completion', (done) => {
+  it('updates site storageQuota. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1321,7 +1321,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', storageQuota: 100 } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', storageQuota: 100 } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1333,7 +1333,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site storageQuotaWarningLevel. doesn\'t wait for completion', (done) => {
+  it('updates site storageQuotaWarningLevel. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1367,7 +1367,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', storageQuotaWarningLevel: 100 } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', storageQuotaWarningLevel: 100 } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1379,7 +1379,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site allowSelfServiceUpgrade. doesn\'t wait for completion', (done) => {
+  it('updates site allowSelfServiceUpgrade. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1413,7 +1413,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'true' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'true' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1425,7 +1425,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site noScriptSite to true. doesn\'t wait for completion', (done) => {
+  it('updates site noScriptSite to true. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1459,7 +1459,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'true' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'true' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1471,7 +1471,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site noScriptSite to false. doesn\'t wait for completion', (done) => {
+  it('updates site noScriptSite to false. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1505,7 +1505,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'false' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'false' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1517,7 +1517,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates site title. waits for completion, immediately complete', (done) => {
+  it('updates site title. waits for completion, immediately complete', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1551,7 +1551,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1563,7 +1563,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates the classification of the specified site', (done) => {
+  it('updates the classification of the specified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1587,7 +1587,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, classification: 'HBI', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, classification: 'HBI', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1599,7 +1599,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates the classification of the specified site (debug)', (done) => {
+  it('updates the classification of the specified site (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1623,7 +1623,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, classification: 'HBI', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+    await command.action(logger, { options: { debug: true, classification: 'HBI', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
         assert(loggerLogToStderrSpy.calledWith('Site is not group connected'));
         done();
@@ -1634,7 +1634,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates the classification of the specified groupified site', (done) => {
+  it('updates the classification of the specified groupified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1658,7 +1658,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, classification: 'HBI', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, classification: 'HBI', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1670,7 +1670,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates the classification of the specified groupified site (debug)', (done) => {
+  it('updates the classification of the specified groupified site (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1694,7 +1694,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, classification: 'HBI', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+    await command.action(logger, { options: { debug: true, classification: 'HBI', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
         assert(loggerLogToStderrSpy.calledWith(`Site attached to group e10a459e-60c8-4000-8240-a68d6a12d39e`));
         done();
@@ -1705,7 +1705,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates the classification, disableFlows and shareByEmailEnabled of the specified site', (done) => {
+  it('updates the classification, disableFlows and shareByEmailEnabled of the specified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1729,7 +1729,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, classification: 'HBI', disableFlows: 'true', shareByEmailEnabled: 'true', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, classification: 'HBI', disableFlows: 'true', shareByEmailEnabled: 'true', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1741,7 +1741,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates owners of the specified site', (done) => {
+  it('updates owners of the specified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1775,7 +1775,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1787,7 +1787,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates owners of the specified site (verbose)', (done) => {
+  it('updates owners of the specified site (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1821,7 +1821,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, verbose: true, owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, verbose: true, owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -1833,7 +1833,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates owners of the specified groupified site with one owner', (done) => {
+  it('updates owners of the specified groupified site with one owner', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1860,7 +1860,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -1871,7 +1871,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates owners of the specified groupified site with one owner (debug)', (done) => {
+  it('updates owners of the specified groupified site with one owner (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1898,7 +1898,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+    await command.action(logger, { options: { debug: true, owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
         assert(loggerLogToStderrSpy.calledWith('Retrieving user information to set group owners...'));
         done();
@@ -1909,7 +1909,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates owners of the specified groupified site with multiple owners', (done) => {
+  it('updates owners of the specified groupified site with multiple owners', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1940,7 +1940,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -1951,7 +1951,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('updates owners of the specified groupified site with multiple owners with extra spaces', (done) => {
+  it('updates owners of the specified groupified site with multiple owners with extra spaces', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1982,7 +1982,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, owners: ' admin1@contoso.onmicrosoft.com , admin2@contoso.onmicrosoft.com ', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, owners: ' admin1@contoso.onmicrosoft.com , admin2@contoso.onmicrosoft.com ', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -1993,7 +1993,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('resets the classification of the specified site', (done) => {
+  it('resets the classification of the specified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2017,7 +2017,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, classification: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, classification: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -2029,7 +2029,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('resets the classification of the specified groupified site', (done) => {
+  it('resets the classification of the specified groupified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2053,7 +2053,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, classification: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, classification: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -2065,7 +2065,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('sets disableFlows to true for the specified site', (done) => {
+  it('sets disableFlows to true for the specified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2089,7 +2089,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, disableFlows: 'true', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, disableFlows: 'true', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -2101,7 +2101,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('sets disableFlows to true for the specified groupified site', (done) => {
+  it('sets disableFlows to true for the specified groupified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2125,7 +2125,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, disableFlows: 'true', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, disableFlows: 'true', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -2137,7 +2137,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('sets disableFlows to false for the specified site', (done) => {
+  it('sets disableFlows to false for the specified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2161,7 +2161,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, disableFlows: 'false', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, disableFlows: 'false', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -2173,7 +2173,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('sets shareByEmailEnabled to true for the specified site', (done) => {
+  it('sets shareByEmailEnabled to true for the specified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2197,7 +2197,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, shareByEmailEnabled: 'true', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, shareByEmailEnabled: 'true', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -2209,7 +2209,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('sets shareByEmailEnabled to true for the specified groupified site', (done) => {
+  it('sets shareByEmailEnabled to true for the specified groupified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2233,7 +2233,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, shareByEmailEnabled: 'true', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, shareByEmailEnabled: 'true', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -2245,7 +2245,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('sets shareByEmailEnabled to false for the specified site', (done) => {
+  it('sets shareByEmailEnabled to false for the specified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2269,7 +2269,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, shareByEmailEnabled: 'false', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, shareByEmailEnabled: 'false', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -2281,7 +2281,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('sets shareByEmailEnabled to false for the specified groupified site', (done) => {
+  it('sets shareByEmailEnabled to false for the specified groupified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2305,7 +2305,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, shareByEmailEnabled: 'false', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, shareByEmailEnabled: 'false', id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -2317,7 +2317,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('sets sharingCapabilities for Site - Disabled', (done) => {
+  it('sets sharingCapabilities for Site - Disabled', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2355,7 +2355,7 @@ describe(commands.SITE_SET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: false, sharingCapability: 'Disabled', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, sharingCapability: 'Disabled', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);
@@ -2367,7 +2367,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('sets sharingCapabilities for Site - (Debug) -  Disabled', (done) => {
+  it('sets sharingCapabilities for Site - (Debug) -  Disabled', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2406,7 +2406,7 @@ describe(commands.SITE_SET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, sharingCapability: 'Disabled', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: true, sharingCapability: 'Disabled', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert(loggerLogToStderrSpy.called);
         assert.strictEqual(typeof err, 'undefined');
@@ -2418,7 +2418,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('throws error when trying to update isPublic property on a non-groupified site', (done) => {
+  it('throws error when trying to update isPublic property on a non-groupified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2430,7 +2430,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err: any) => {
+    await command.action(logger, { options: { debug: false, isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The isPublic option can't be set on a site that is not groupified`)));
         done();
@@ -2441,7 +2441,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('correctly handles error when updating title of the specified site', (done) => {
+  it('correctly handles error when updating title of the specified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2471,7 +2471,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, title: 'New title', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err: any) => {
+    await command.action(logger, { options: { debug: false, title: 'New title', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
@@ -2482,7 +2482,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('correctly handles error while updating isPublic property of the specified groupified site', (done) => {
+  it('correctly handles error while updating isPublic property of the specified groupified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2495,7 +2495,7 @@ describe(commands.SITE_SET, () => {
     });
     executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.reject(new CommandError('An error has occurred')));
 
-    command.action(logger, { options: { debug: false, isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -2506,7 +2506,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('skips users that could not be resolves when setting groupified site owners', (done) => {
+  it('skips users that could not be resolves when setting groupified site owners', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2533,7 +2533,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -2544,7 +2544,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('fails silently if could not resolve users when setting groupified site owners', (done) => {
+  it('fails silently if could not resolve users when setting groupified site owners', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2562,7 +2562,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -2573,7 +2573,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('applies site design to the specified site', (done) => {
+  it('applies site design to the specified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2586,7 +2586,7 @@ describe(commands.SITE_SET, () => {
     });
     executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
 
-    command.action(logger, { options: { debug: false, siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+    await command.action(logger, { options: { debug: false, siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
         const options = {
           webUrl: 'https://contoso.sharepoint.com/sites/Sales',
@@ -2605,7 +2605,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('applies site design to the specified groupified site', (done) => {
+  it('applies site design to the specified groupified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2618,7 +2618,7 @@ describe(commands.SITE_SET, () => {
     });
     executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
 
-    command.action(logger, { options: { debug: false, siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+    await command.action(logger, { options: { debug: false, siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
         const options = {
           webUrl: 'https://contoso.sharepoint.com/sites/Sales',
@@ -2637,7 +2637,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('applies site relative logo url to the specified site', (done) => {
+  it('applies site relative logo url to the specified site', async () => {
     let data: any = {};
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -2660,7 +2660,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "/sites/logo/SiteAssets/parker-ms-1200.png" } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "/sites/logo/SiteAssets/parker-ms-1200.png" } }, () => {
       try {
         assert.strictEqual(data.relativeLogoUrl, "/sites/logo/SiteAssets/parker-ms-1200.png");
         done();
@@ -2671,7 +2671,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('applies site absolute logo url to the specified site', (done) => {
+  it('applies site absolute logo url to the specified site', async () => {
     let data: any = {};
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -2694,7 +2694,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "https://contoso.sharepoint.com/sites/logo/SiteAssets/parker-ms-1200.png" } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "https://contoso.sharepoint.com/sites/logo/SiteAssets/parker-ms-1200.png" } }, () => {
       try {
         assert.strictEqual(data.relativeLogoUrl, "/sites/logo/SiteAssets/parker-ms-1200.png");
         done();
@@ -2705,7 +2705,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('correctly handles unsetting the logo from the specified site', (done) => {
+  it('correctly handles unsetting the logo from the specified site', async () => {
     let data: any = {};
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -2728,7 +2728,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "" } }, () => {
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "" } }, () => {
       try {
         assert.strictEqual(data.relativeLogoUrl, "");
         done();
@@ -2739,7 +2739,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('correctly handles error when applying site design to the specified site', (done) => {
+  it('correctly handles error when applying site design to the specified site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2752,7 +2752,7 @@ describe(commands.SITE_SET, () => {
     });
     executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.reject(new CommandError('An error has occurred')));
 
-    command.action(logger, { options: { debug: false, siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err: any) => {
+    await command.action(logger, { options: { debug: false, siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -2763,7 +2763,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('correctly handles site not found error', (done) => {
+  it('correctly handles site not found error', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.reject(new Error("404 - \"404 FILE NOT FOUND\""));
@@ -2772,7 +2772,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', classification: 'HBI' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', classification: 'HBI' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("404 - \"404 FILE NOT FOUND\"")));
         done();
@@ -2783,7 +2783,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('correctly handles API error while updating shared properties', (done) => {
+  it('correctly handles API error while updating shared properties', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2808,7 +2808,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', classification: 'HBI' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', classification: 'HBI' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
@@ -2819,7 +2819,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('correctly handles API error while updating sharingCapability properties', (done) => {
+  it('correctly handles API error while updating sharingCapability properties', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2844,7 +2844,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', sharingCapability: 'Invalid' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', sharingCapability: 'Invalid' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
@@ -2855,7 +2855,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('correctly handles Generic API error', (done) => {
+  it('correctly handles Generic API error', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2874,7 +2874,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', sharingCapability: 'Disabled' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', sharingCapability: 'Disabled' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -2952,7 +2952,7 @@ describe(commands.SITE_SET, () => {
     assert(containsOption);
   });
 
-  it('handles error while adding site admin', (done) => {
+  it('handles error while adding site admin', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -2982,7 +2982,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
@@ -2993,7 +2993,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('handles generic error while adding site admin', (done) => {
+  it('handles generic error while adding site admin', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -3017,7 +3017,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
@@ -3028,7 +3028,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('handles error while updating site lockState', (done) => {
+  it('handles error while updating site lockState', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -3059,7 +3059,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
@@ -3070,7 +3070,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('escapes XML in the request', (done) => {
+  it('escapes XML in the request', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -3125,7 +3125,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title>', sharing: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: 'true', noScriptSite: 'true', owners: 'admin@contoso.com>', lockState: 'NoAccess', wait: true } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title>', sharing: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: 'true', noScriptSite: 'true', owners: 'admin@contoso.com>', lockState: 'NoAccess', wait: true } }, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
         assert.strictEqual(err, undefined);

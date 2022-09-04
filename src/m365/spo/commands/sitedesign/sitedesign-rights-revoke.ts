@@ -67,52 +67,45 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const revokePermissions: () => void = (): void => {
-      let spoUrl: string = '';
+    const revokePermissions: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+        const requestDigest: ContextInfo = await spo.getRequestDigest(spoUrl);
+        const requestOptions: any = {
+          url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`,
+          headers: {
+            'X-RequestDigest': requestDigest.FormDigestValue,
+            'content-type': 'application/json;charset=utf-8',
+            accept: 'application/json;odata=nometadata'
+          },
+          data: {
+            id: args.options.id,
+            principalNames: args.options.principals.split(',').map(p => p.trim())
+          },
+          responseType: 'json'
+        };
 
-      spo
-        .getSpoUrl(logger, this.debug)
-        .then((_spoUrl: string): Promise<ContextInfo> => {
-          spoUrl = _spoUrl;
-          return spo.getRequestDigest(spoUrl);
-        })
-        .then((res: ContextInfo): Promise<void> => {
-          const requestOptions: any = {
-            url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`,
-            headers: {
-              'X-RequestDigest': res.FormDigestValue,
-              'content-type': 'application/json;charset=utf-8',
-              accept: 'application/json;odata=nometadata'
-            },
-            data: {
-              id: args.options.id,
-              principalNames: args.options.principals.split(',').map(p => p.trim())
-            },
-            responseType: 'json'
-          };
-
-          return request.post(requestOptions);
-        })
-        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        return request.post(requestOptions);
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      revokePermissions();
+      await revokePermissions();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to revoke access to site design ${args.options.id} from the specified users?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          revokePermissions();
-        }
       });
+      
+      if (result.continue) {
+        await revokePermissions();
+      }
     }
   }
 }

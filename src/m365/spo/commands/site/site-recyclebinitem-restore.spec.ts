@@ -104,7 +104,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('restores specified items from the recycle bin', (done) => {
+  it('restores specified items from the recycle bin', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/site/RecycleBin/RestoreByIds') > -1) {
         return Promise.resolve();
@@ -113,7 +113,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
-    const result = command.action(logger, {
+    const result = await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
@@ -132,12 +132,12 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     assert.equal(result, undefined);
   });
 
-  it('catches error when restores all items from recyclebin', (done) => {
+  it('catches error when restores all items from recyclebin', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
@@ -155,7 +155,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     });
   });
 
-  it('verifies that the command will fail when one of the promises fails', (done) => {
+  it('verifies that the command will fail when one of the promises fails', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.data.ids).filter((chunk: string) => chunk === 'fail').length > 0) {
         return Promise.reject('Invalid item');
@@ -164,7 +164,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
@@ -182,7 +182,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
     });
   });
 
-  it('restores specified items from the recycle bin in multiple chunks', (done) => {
+  it('restores specified items from the recycle bin in multiple chunks', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/site/RecycleBin/RestoreByIds') > -1) {
         return Promise.resolve();
@@ -191,7 +191,7 @@ describe(commands.SITE_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
-    const result = command.action(logger, {
+    const result = await command.action(logger, {
       options: {
         output: 'json',
         debug: true,

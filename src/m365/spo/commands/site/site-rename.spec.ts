@@ -75,7 +75,7 @@ describe(commands.SITE_RENAME, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('creates a site rename job using new url parameter', (done) => {
+  it('creates a site rename job using new url parameter', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
         return Promise.resolve({
@@ -99,7 +99,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', verbose: true } }, () => {
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', verbose: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -110,7 +110,7 @@ describe(commands.SITE_RENAME, () => {
     });
   });
 
-  it('creates a site rename job - json output', (done) => {
+  it('creates a site rename job - json output', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
         return Promise.resolve({
@@ -134,7 +134,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { output: 'json', siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed' } }, () => {
+    await command.action(logger, { options: { output: 'json', siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Option": 0,
@@ -160,7 +160,7 @@ describe(commands.SITE_RENAME, () => {
     });
   });
 
-  it('creates a site rename job using new url parameter - suppressMarketplaceAppCheck flag', (done) => {
+  it('creates a site rename job using new url parameter - suppressMarketplaceAppCheck flag', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1
         && opts.data.Option === 8) {
@@ -185,7 +185,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressMarketplaceAppCheck: true, verbose: true } }, () => {
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressMarketplaceAppCheck: true, verbose: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -196,7 +196,7 @@ describe(commands.SITE_RENAME, () => {
     });
   });
 
-  it('creates a site rename job using new url parameter - suppressWorkflow2013Check flag', (done) => {
+  it('creates a site rename job using new url parameter - suppressWorkflow2013Check flag', async () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1
@@ -222,7 +222,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressWorkflow2013Check: true, verbose: true } }, () => {
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressWorkflow2013Check: true, verbose: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -233,7 +233,7 @@ describe(commands.SITE_RENAME, () => {
     });
   });
 
-  it('creates a site rename job using new url parameter - both supress flags', (done) => {
+  it('creates a site rename job using new url parameter - both supress flags', async () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1
@@ -259,7 +259,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', newSiteTitle: "RenamedSite", suppressWorkflow2013Check: true, suppressMarketplaceAppCheck: true, verbose: true } }, () => {
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', newSiteTitle: "RenamedSite", suppressWorkflow2013Check: true, suppressMarketplaceAppCheck: true, verbose: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -270,7 +270,7 @@ describe(commands.SITE_RENAME, () => {
     });
   });
 
-  it('creates a site rename job - wait for completion', (done) => {
+  it('creates a site rename job - wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
         return Promise.resolve({
@@ -357,7 +357,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', wait: true, debug: true, verbose: true } } as any, () => {
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', wait: true, debug: true, verbose: true } } as any, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -368,7 +368,7 @@ describe(commands.SITE_RENAME, () => {
     });
   });
 
-  it('handles API error - delayed failure - valid response', (done) => {
+  it('handles API error - delayed failure - valid response', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
         return Promise.resolve({
@@ -422,7 +422,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/site1-reject",
         newSiteUrl: "https://contoso.sharepoint.com/sites/site1-reject-renamed",
@@ -440,7 +440,7 @@ describe(commands.SITE_RENAME, () => {
     });
   });
 
-  it('handles API error - delayed failure - service error', (done) => {
+  it('handles API error - delayed failure - service error', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
         return Promise.resolve({
@@ -468,7 +468,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/site1-reject",
         newSiteUrl: "https://contoso.sharepoint.com/sites/site1-reject-renamed",
@@ -486,7 +486,7 @@ describe(commands.SITE_RENAME, () => {
     });
   });
 
-  it('handles API error - immediate failure on creation', (done) => {
+  it('handles API error - immediate failure on creation', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1) {
 
@@ -512,7 +512,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/old",
         newSiteUrl: "https://contoso.sharepoint.com/sites/new",

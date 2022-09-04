@@ -96,7 +96,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
     assert(actual);
   });
 
-  it('command handles retrieving all items from recycle bin reject request', (done) => {
+  it('command handles retrieving all items from recycle bin reject request', async () => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/site/RecycleBin?$filter=(ItemState eq 1)') > -1) {
@@ -106,7 +106,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com'
@@ -122,7 +122,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
     });
   });
 
-  it('retrieves all items from recycle bin', (done) => {
+  it('retrieves all items from recycle bin', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/site/RecycleBin?$filter=(ItemState eq 1)') > -1) {
         return Promise.resolve(
@@ -154,7 +154,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
@@ -193,7 +193,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
     });
   });
 
-  it('retrieves all items from secondary recycle bin', (done) => {
+  it('retrieves all items from secondary recycle bin', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/site/RecycleBin?$filter=(ItemState eq 2)') > -1) {
         return Promise.resolve(
@@ -225,7 +225,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         secondary: true,
@@ -265,7 +265,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
     });
   });
 
-  it('retrieves all items from recycle bin filtered by type', (done) => {
+  it('retrieves all items from recycle bin filtered by type', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/site/RecycleBin?$filter=(ItemState eq 1) and (ItemType eq 1)') > -1) {
         return Promise.resolve(
@@ -297,7 +297,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         type: 'files',
@@ -337,7 +337,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
     });
   });
 
-  it('does not retrieve items from recycle bin filtered by type', (done) => {
+  it('does not retrieve items from recycle bin filtered by type', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/site/RecycleBin?$filter=(ItemState eq 1)') > -1) {
         return Promise.resolve(
@@ -349,7 +349,7 @@ describe(commands.SITE_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         type: 'something',

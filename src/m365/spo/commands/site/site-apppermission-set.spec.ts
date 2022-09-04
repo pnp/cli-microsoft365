@@ -122,7 +122,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails when passing a site that does not exist', (done) => {
+  it('fails when passing a site that does not exist', async () => {
     const siteError = {
       "error": {
         "code": "itemNotFound",
@@ -141,7 +141,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
       return Promise.reject(siteError);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing',
         permission: "write",
@@ -159,7 +159,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     });
   });
 
-  it('fails to get Azure AD app when Azure AD app does not exists', (done) => {
+  it('fails to get Azure AD app when Azure AD app does not exists', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
@@ -184,7 +184,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
         return Promise.reject('The specified app permission does not exist');
       });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
@@ -202,7 +202,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     });
   });
 
-  it('fails when multiple Azure AD apps with same name exists', (done) => {
+  it('fails when multiple Azure AD apps with same name exists', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
@@ -252,7 +252,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
         return Promise.reject('Multiple app permissions with displayName Foo found: 89ea5c94-7736-4e25-95ad-3fa95f62b66e,cca00169-d38b-462f-a3b4-f3566b162f2d7');
       });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         permission: "write",
@@ -269,7 +269,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     });
   });
 
-  it('Updates an application permission to the site by appId', (done) => {
+  it('Updates an application permission to the site by appId', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
@@ -339,7 +339,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
         permission: "write",
@@ -369,7 +369,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     });
   });
 
-  it('Updates an application permission to the site by appDisplayName', (done) => {
+  it('Updates an application permission to the site by appDisplayName', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
@@ -439,7 +439,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
         permission: "write",
@@ -469,7 +469,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     });
   });
 
-  it('Updates an application permission to the site by permissionId', (done) => {
+  it('Updates an application permission to the site by permissionId', async () => {
     const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
@@ -505,7 +505,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
         permission: "write",

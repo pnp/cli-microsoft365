@@ -74,7 +74,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('updates site title. doesn\'t wait for completion', (done) => {
+  it('updates site title. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -98,7 +98,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -109,7 +109,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site description.', (done) => {
+  it('updates site description.', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team/_api/web`) > -1) {
         if (opts.headers &&
@@ -123,7 +123,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', description: 'New description' } }, (err) => {
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', description: 'New description' } }, (err) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -134,7 +134,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site title. doesn\'t wait for completion (debug)', (done) => {
+  it('updates site title. doesn\'t wait for completion (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -158,7 +158,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } }, () => {
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -169,7 +169,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site sharing mode. doesn\'t wait for completion', (done) => {
+  it('updates site sharing mode. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -193,7 +193,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', sharing: 'Disabled' } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', sharing: 'Disabled' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -204,7 +204,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site resourceQuota. doesn\'t wait for completion', (done) => {
+  it('updates site resourceQuota. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -228,7 +228,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', resourceQuota: 100 } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', resourceQuota: 100 } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -239,7 +239,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site resourceQuotaWarningLevel. doesn\'t wait for completion', (done) => {
+  it('updates site resourceQuotaWarningLevel. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -263,7 +263,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', resourceQuotaWarningLevel: 100 } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', resourceQuotaWarningLevel: 100 } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -274,7 +274,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site storageQuota. doesn\'t wait for completion', (done) => {
+  it('updates site storageQuota. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -298,7 +298,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', storageQuota: 100 } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', storageQuota: 100 } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -309,7 +309,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site storageQuotaWarningLevel. doesn\'t wait for completion', (done) => {
+  it('updates site storageQuotaWarningLevel. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -333,7 +333,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', storageQuotaWarningLevel: 100 } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', storageQuotaWarningLevel: 100 } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -344,7 +344,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site allowSelfServiceUpgrade. doesn\'t wait for completion', (done) => {
+  it('updates site allowSelfServiceUpgrade. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -368,7 +368,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'true' } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'true' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -379,7 +379,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site noScriptSite to true. doesn\'t wait for completion', (done) => {
+  it('updates site noScriptSite to true. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -403,7 +403,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'true' } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'true' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -414,7 +414,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site noScriptSite to false. doesn\'t wait for completion', (done) => {
+  it('updates site noScriptSite to false. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -438,7 +438,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'false' } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'false' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -449,7 +449,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('handles error while updating basic properties', (done) => {
+  it('handles error while updating basic properties', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -469,7 +469,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
@@ -480,7 +480,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site title. waits for completion, immediately complete', (done) => {
+  it('updates site title. waits for completion, immediately complete', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -504,7 +504,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -515,7 +515,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('adds site admin', (done) => {
+  it('adds site admin', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -535,7 +535,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -546,7 +546,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('adds site admin (debug)', (done) => {
+  it('adds site admin (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -566,7 +566,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } }, () => {
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -577,7 +577,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('handles error while adding site admin', (done) => {
+  it('handles error while adding site admin', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -597,7 +597,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
@@ -608,7 +608,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('handles generic error while adding site admin', (done) => {
+  it('handles generic error while adding site admin', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -622,7 +622,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
@@ -633,7 +633,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site lockState. doesn\'t wait for completion', (done) => {
+  it('updates site lockState. doesn\'t wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -657,7 +657,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -668,7 +668,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site lockState. doesn\'t wait for completion (debug)', (done) => {
+  it('updates site lockState. doesn\'t wait for completion (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -692,7 +692,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } }, () => {
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -703,7 +703,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('handles error while updating site lockState', (done) => {
+  it('handles error while updating site lockState', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -723,7 +723,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
@@ -734,7 +734,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site lockState. wait for completion, immediate complete', (done) => {
+  it('updates site lockState. wait for completion, immediate complete', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -758,7 +758,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -769,7 +769,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates all properties. wait for completion, immediately complete', (done) => {
+  it('updates all properties. wait for completion, immediately complete', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="1" ObjectPathId="5" Name="Title"><Parameter Type="String">New title</Parameter></SetProperty><SetProperty Id="2" ObjectPathId="5" Name="SharingCapability"><Parameter Type="Enum">0</Parameter></SetProperty><SetProperty Id="3" ObjectPathId="5" Name="UserCodeMaximumLevel"><Parameter Type="Double">100</Parameter></SetProperty><SetProperty Id="4" ObjectPathId="5" Name="UserCodeWarningLevel"><Parameter Type="Double">100</Parameter></SetProperty><SetProperty Id="5" ObjectPathId="5" Name="StorageMaximumLevel"><Parameter Type="Int64">100</Parameter></SetProperty><SetProperty Id="6" ObjectPathId="5" Name="StorageWarningLevel"><Parameter Type="Int64">100</Parameter></SetProperty><SetProperty Id="7" ObjectPathId="5" Name="AllowSelfServiceUpgrade"><Parameter Type="Boolean">true</Parameter></SetProperty><SetProperty Id="8" ObjectPathId="5" Name="DenyAddAndCustomizePages"><Parameter Type="Enum">2</Parameter></SetProperty><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SiteProperties&#xA;https%3A%2F%2Fcontoso.sharepoint.com%2Fsites%2Fteam" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`) {
@@ -814,7 +814,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', sharing: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: 'true', noScriptSite: 'true', owners: 'admin@contoso.com', lockState: 'NoAccess', wait: true } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', sharing: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: 'true', noScriptSite: 'true', owners: 'admin@contoso.com', lockState: 'NoAccess', wait: true } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -825,7 +825,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site title. wait for completion', (done) => {
+  it('updates site title. wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -864,7 +864,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -875,7 +875,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site title. wait for completion (debug)', (done) => {
+  it('updates site title. wait for completion (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -914,7 +914,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -925,7 +925,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site title. wait for completion (verbose)', (done) => {
+  it('updates site title. wait for completion (verbose)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -964,7 +964,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { debug: false, verbose: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
+    await command.action(logger, { options: { debug: false, verbose: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -975,7 +975,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site lockState. wait for completion', (done) => {
+  it('updates site lockState. wait for completion', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="7" ObjectPathId="5" Name="LockState"><Parameter Type="String">NoAccess</Parameter></SetProperty><ObjectPath Id="9" ObjectPathId="8" /><ObjectIdentityQuery Id="10" ObjectPathId="5" /><Query Id="11" ObjectPathId="8"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="5" ParentId="3" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/team</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="8" ParentId="5" Name="Update" /><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
@@ -1011,7 +1011,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -1022,7 +1022,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site lockState. wait for completion. error while polling', (done) => {
+  it('updates site lockState. wait for completion. error while polling', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="7" ObjectPathId="5" Name="LockState"><Parameter Type="String">NoAccess</Parameter></SetProperty><ObjectPath Id="9" ObjectPathId="8" /><ObjectIdentityQuery Id="10" ObjectPathId="5" /><Query Id="11" ObjectPathId="8"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="5" ParentId="3" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/team</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="8" ParentId="5" Name="Update" /><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
@@ -1057,7 +1057,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -1068,7 +1068,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('updates site lockState. wait for completion two rounds', (done) => {
+  it('updates site lockState. wait for completion two rounds', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="7" ObjectPathId="5" Name="LockState"><Parameter Type="String">NoAccess</Parameter></SetProperty><ObjectPath Id="9" ObjectPathId="8" /><ObjectIdentityQuery Id="10" ObjectPathId="5" /><Query Id="11" ObjectPathId="8"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Method Id="5" ParentId="3" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/team</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="8" ParentId="5" Name="Update" /><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
@@ -1115,7 +1115,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -1126,7 +1126,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('escapes XML in the request', (done) => {
+  it('escapes XML in the request', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="1" ObjectPathId="5" Name="Title"><Parameter Type="String">New title&gt;</Parameter></SetProperty><SetProperty Id="2" ObjectPathId="5" Name="SharingCapability"><Parameter Type="Enum">0</Parameter></SetProperty><SetProperty Id="3" ObjectPathId="5" Name="UserCodeMaximumLevel"><Parameter Type="Double">100</Parameter></SetProperty><SetProperty Id="4" ObjectPathId="5" Name="UserCodeWarningLevel"><Parameter Type="Double">100</Parameter></SetProperty><SetProperty Id="5" ObjectPathId="5" Name="StorageMaximumLevel"><Parameter Type="Int64">100</Parameter></SetProperty><SetProperty Id="6" ObjectPathId="5" Name="StorageWarningLevel"><Parameter Type="Int64">100</Parameter></SetProperty><SetProperty Id="7" ObjectPathId="5" Name="AllowSelfServiceUpgrade"><Parameter Type="Boolean">true</Parameter></SetProperty><SetProperty Id="8" ObjectPathId="5" Name="DenyAddAndCustomizePages"><Parameter Type="Enum">2</Parameter></SetProperty><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023&#xA;SiteProperties&#xA;https%3A%2F%2Fcontoso.sharepoint.com%2Fsites%2Fteam" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`) {
@@ -1171,7 +1171,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title>', sharing: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: 'true', noScriptSite: 'true', owners: 'admin@contoso.com>', lockState: 'NoAccess', wait: true } }, () => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title>', sharing: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: 'true', noScriptSite: 'true', owners: 'admin@contoso.com>', lockState: 'NoAccess', wait: true } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();

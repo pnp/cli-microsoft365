@@ -74,9 +74,9 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
       }
     };
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
 
     promptOptions = undefined;
@@ -197,8 +197,8 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('prompts before removing the site apppermission when confirm option not passed', (done) => {
-    command.action(logger, {
+  it('prompts before removing the site apppermission when confirm option not passed', async () => {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appDisplayName: 'Foo'
@@ -220,14 +220,14 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
     });
   });
 
-  it('aborts removing the site apppermission when prompt not confirmed', (done) => {
+  it('aborts removing the site apppermission when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
 
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appDisplayName: 'Foo'
@@ -243,7 +243,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
     });
   });
 
-  it('removes site apppermission when prompt confirmed (debug)', (done) => {
+  it('removes site apppermission when prompt confirmed (debug)', async () => {
     sinonUtil.restore(Cli.prompt);
 
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
@@ -267,7 +267,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
         return Promise.reject('Invalid request');
       });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
@@ -284,7 +284,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
     });
   });
 
-  it('removes site apppermission with specified appId', (done) => {
+  it('removes site apppermission with specified appId', async () => {
     sinonUtil.restore(Cli.prompt);
 
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
@@ -308,7 +308,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
         return Promise.reject('Invalid request');
       });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appId: '89ea5c94-7736-4e25-95ad-3fa95f62b66e',
@@ -325,7 +325,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
     });
   });
 
-  it('removes site apppermission with specified appDisplayName', (done) => {
+  it('removes site apppermission with specified appDisplayName', async () => {
     sinonUtil.restore(Cli.prompt);
 
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
@@ -349,7 +349,7 @@ describe(commands.SITE_APPPERMISSION_REMOVE, () => {
         return Promise.reject('Invalid request');
       });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         appDisplayName: 'Foo',

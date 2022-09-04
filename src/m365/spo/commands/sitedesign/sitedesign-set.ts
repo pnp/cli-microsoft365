@@ -131,58 +131,57 @@ class SpoSiteDesignSetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((spoUrl: string): Promise<any> => {
-        const updateInfo: any = {
-          Id: args.options.id
-        };
+    try {
+      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+      const updateInfo: any = {
+        Id: args.options.id
+      };
 
-        if (args.options.title) {
-          updateInfo.Title = args.options.title;
-        }
-        if (args.options.description) {
-          updateInfo.Description = args.options.description;
-        }
-        if (args.options.siteScripts) {
-          updateInfo.SiteScriptIds = args.options.siteScripts.split(',').map(i => i.trim());
-        }
-        if (args.options.previewImageUrl) {
-          updateInfo.PreviewImageUrl = args.options.previewImageUrl;
-        }
-        if (args.options.previewImageAltText) {
-          updateInfo.PreviewImageAltText = args.options.previewImageAltText;
-        }
-        if (args.options.thumbnailUrl) {
-          updateInfo.ThumbnailUrl = args.options.thumbnailUrl;
-        }
-        if (args.options.webTemplate) {
-          updateInfo.WebTemplate = args.options.webTemplate === 'TeamSite' ? '64' : '68';
-        }
-        if (args.options.version) {
-          updateInfo.Version = args.options.version;
-        }
-        if (typeof args.options.isDefault !== 'undefined') {
-          updateInfo.IsDefault = args.options.isDefault === 'true';
-        }
+      if (args.options.title) {
+        updateInfo.Title = args.options.title;
+      }
+      if (args.options.description) {
+        updateInfo.Description = args.options.description;
+      }
+      if (args.options.siteScripts) {
+        updateInfo.SiteScriptIds = args.options.siteScripts.split(',').map(i => i.trim());
+      }
+      if (args.options.previewImageUrl) {
+        updateInfo.PreviewImageUrl = args.options.previewImageUrl;
+      }
+      if (args.options.previewImageAltText) {
+        updateInfo.PreviewImageAltText = args.options.previewImageAltText;
+      }
+      if (args.options.thumbnailUrl) {
+        updateInfo.ThumbnailUrl = args.options.thumbnailUrl;
+      }
+      if (args.options.webTemplate) {
+        updateInfo.WebTemplate = args.options.webTemplate === 'TeamSite' ? '64' : '68';
+      }
+      if (args.options.version) {
+        updateInfo.Version = args.options.version;
+      }
+      if (typeof args.options.isDefault !== 'undefined') {
+        updateInfo.IsDefault = args.options.isDefault === 'true';
+      }
 
-        const requestOptions: any = {
-          url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`,
-          headers: {
-            'content-type': 'application/json;charset=utf-8',
-            accept: 'application/json;odata=nometadata',
-            responseType: 'json'
-          },
-          data: { updateInfo: updateInfo },
+      const requestOptions: any = {
+        url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`,
+        headers: {
+          'content-type': 'application/json;charset=utf-8',
+          accept: 'application/json;odata=nometadata',
           responseType: 'json'
-        };
+        },
+        data: { updateInfo: updateInfo },
+        responseType: 'json'
+      };
 
-        return request.post(requestOptions);
-      })
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res: any = await request.post(requestOptions);
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

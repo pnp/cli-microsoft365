@@ -58,7 +58,7 @@ describe(commands.SITE_CHROME_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it(`doesn't return error on a valid request`, (done) => {
+  it(`doesn't return error on a valid request`, async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/Sales/_api/web/SetChromeOptions`) {
         return Promise.resolve();
@@ -67,7 +67,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -78,7 +78,7 @@ describe(commands.SITE_CHROME_SET, () => {
     });
   });
 
-  it(`sends a request without any data when no options were specified`, (done) => {
+  it(`sends a request without any data when no options were specified`, async () => {
     let data: any = {};
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/SetChromeOptions`) {
@@ -89,7 +89,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test' } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test' } }, () => {
       try {
         assert.strictEqual(Object.keys(data).length, 0);
         done();
@@ -100,7 +100,7 @@ describe(commands.SITE_CHROME_SET, () => {
     });
   });
 
-  it('disables mega menu', (done) => {
+  it('disables mega menu', async () => {
     let data: any = {};
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/SetChromeOptions`) {
@@ -111,7 +111,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', disableMegaMenu: "true" } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', disableMegaMenu: "true" } }, () => {
       try {
         assert.strictEqual(data.megaMenuEnabled, false);
         done();
@@ -122,7 +122,7 @@ describe(commands.SITE_CHROME_SET, () => {
     });
   });
 
-  it('disables footer', (done) => {
+  it('disables footer', async () => {
     let data: any = {};
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/SetChromeOptions`) {
@@ -133,7 +133,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', disableFooter: "true" } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', disableFooter: "true" } }, () => {
       try {
         assert.strictEqual(data.footerEnabled, false);
         done();
@@ -144,7 +144,7 @@ describe(commands.SITE_CHROME_SET, () => {
     });
   });
 
-  it('disables title in the header', (done) => {
+  it('disables title in the header', async () => {
     let data: any = {};
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/SetChromeOptions`) {
@@ -155,7 +155,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', hideTitleInHeader: "true" } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', hideTitleInHeader: "true" } }, () => {
       try {
         assert.strictEqual(data.hideTitleInHeader, true);
         done();
@@ -166,7 +166,7 @@ describe(commands.SITE_CHROME_SET, () => {
     });
   });
 
-  it('configures chrome with enum values', (done) => {
+  it('configures chrome with enum values', async () => {
     let data: any = {};
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/sites/test/_api/web/SetChromeOptions`) {
@@ -177,7 +177,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', headerLayout: "Extended", headerEmphasis: "Light", logoAlignment: "Center", footerLayout: "Extended", footerEmphasis: "Light" } }, () => {
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', headerLayout: "Extended", headerEmphasis: "Light", logoAlignment: "Center", footerLayout: "Extended", footerEmphasis: "Light" } }, () => {
       try {
         assert.strictEqual(data.headerLayout, 4);
         assert.strictEqual(data.headerEmphasis, 1);
@@ -192,12 +192,12 @@ describe(commands.SITE_CHROME_SET, () => {
     });
   });
 
-  it('correctly handles OData error when setting site chrome settings', (done) => {
+  it('correctly handles OData error when setting site chrome settings', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', footerEmphasis: 'Light' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', footerEmphasis: 'Light' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();

@@ -164,7 +164,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.dots = '';
     this.showDeprecationWarning(logger, commands.SITE_CLASSIC_ADD, commands.SITE_ADD);
 

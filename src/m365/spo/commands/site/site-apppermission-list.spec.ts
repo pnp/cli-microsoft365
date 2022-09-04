@@ -100,7 +100,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('returns non-filtered list of permissions', (done) => {
+  it('returns non-filtered list of permissions', async () => {
     const site = {
       "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
       "displayName": "OneDrive Team Site",
@@ -215,7 +215,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         return Promise.reject('Invalid request');
       });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name'
       }
@@ -230,7 +230,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
     });
   });
 
-  it('returns non-filtered list of permissions (json)', (done) => {
+  it('returns non-filtered list of permissions (json)', async () => {
     const site = {
       "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
       "displayName": "OneDrive Team Site",
@@ -330,7 +330,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         return Promise.reject('Invalid request');
       });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         output: 'json'
@@ -359,7 +359,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
     });
   });
 
-  it('fails with incorrect request to the permissions endpoint', (done) => {
+  it('fails with incorrect request to the permissions endpoint', async () => {
 
     const site = {
       "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
@@ -399,7 +399,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         return Promise.reject(error);
       });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name'
       }
@@ -414,7 +414,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
     });
   });
 
-  it('fails when passing a site that does not exist', (done) => {
+  it('fails when passing a site that does not exist', async () => {
     const siteError = {
       "error": {
         "code": "itemNotFound",
@@ -433,7 +433,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
       return Promise.reject(siteError);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing'
       }
@@ -448,7 +448,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
     });
   });
 
-  it('returns list of permissions filtered by appDisplayName', (done) => {
+  it('returns list of permissions filtered by appDisplayName', async () => {
     const site = {
       "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
       "displayName": "OneDrive Team Site",
@@ -514,7 +514,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         return Promise.reject('Invalid request');
       });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         output: 'json',
@@ -536,7 +536,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
     });
   });
 
-  it('returns list of permissions filtered by appId (json)', (done) => {
+  it('returns list of permissions filtered by appId (json)', async () => {
     const site = {
       "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
       "displayName": "OneDrive Team Site",
@@ -602,7 +602,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         return Promise.reject('Invalid request');
       });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         output: 'json',
@@ -624,7 +624,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
     });
   });
 
-  it('correctly handles error when fails to get permission details', (done) => {
+  it('correctly handles error when fails to get permission details', async () => {
     const site = {
       "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
       "displayName": "OneDrive Team Site",
@@ -686,7 +686,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         return Promise.reject('Invalid request');
       });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         output: 'json',

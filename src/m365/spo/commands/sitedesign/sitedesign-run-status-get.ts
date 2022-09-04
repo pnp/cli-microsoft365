@@ -77,11 +77,13 @@ class SpoSiteDesignRunStatusGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request.post<{ value: any[] }>(requestOptions)
-      .then((res: { value: any[] }): void => {
-        logger.log(res.value);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const res: { value: any[] } = await request.post<{ value: any[] }>(requestOptions);
+      logger.log(res.value);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

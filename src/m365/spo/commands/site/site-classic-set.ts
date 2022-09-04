@@ -180,7 +180,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this.showDeprecationWarning(logger, commands.SITE_CLASSIC_SET, commands.SITE_SET);
 
     this.dots = '';

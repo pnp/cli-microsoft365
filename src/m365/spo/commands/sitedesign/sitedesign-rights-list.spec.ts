@@ -95,26 +95,19 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "DisplayName": "MOD Administrator",
-            "PrincipalName": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
-            "Rights": "View"
-          },
-          {
-            "DisplayName": "Patti Fernandez",
-            "PrincipalName": "i:0#.f|membership|pattif@contoso.onmicrosoft.com",
-            "Rights": "View"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "DisplayName": "MOD Administrator",
+        "PrincipalName": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+        "Rights": "View"
+      },
+      {
+        "DisplayName": "Patti Fernandez",
+        "PrincipalName": "i:0#.f|membership|pattif@contoso.onmicrosoft.com",
+        "Rights": "View"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
   it('gets information about permissions granted for the specified site design (debug)', async () => {
@@ -143,26 +136,19 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "DisplayName": "MOD Administrator",
-            "PrincipalName": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
-            "Rights": "View"
-          },
-          {
-            "DisplayName": "Patti Fernandez",
-            "PrincipalName": "i:0#.f|membership|pattif@contoso.onmicrosoft.com",
-            "Rights": "View"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "DisplayName": "MOD Administrator",
+        "PrincipalName": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+        "Rights": "View"
+      },
+      {
+        "DisplayName": "Patti Fernandez",
+        "PrincipalName": "i:0#.f|membership|pattif@contoso.onmicrosoft.com",
+        "Rights": "View"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
   it('returns original value for unknown permissions', async () => {
@@ -191,26 +177,19 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "DisplayName": "MOD Administrator",
-            "PrincipalName": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
-            "Rights": "View"
-          },
-          {
-            "DisplayName": "Patti Fernandez",
-            "PrincipalName": "i:0#.f|membership|pattif@contoso.onmicrosoft.com",
-            "Rights": "2"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "DisplayName": "MOD Administrator",
+        "PrincipalName": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+        "Rights": "View"
+      },
+      {
+        "DisplayName": "Patti Fernandez",
+        "PrincipalName": "i:0#.f|membership|pattif@contoso.onmicrosoft.com",
+        "Rights": "2"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
   it('correctly handles error when site script not found', async () => {
@@ -218,15 +197,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    await command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any), new CommandError('File Not Found.'));
   });
 
   it('supports debug mode', () => {

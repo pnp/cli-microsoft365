@@ -157,7 +157,7 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
     return requestBody;
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this
       .getSpoSiteId(args)
       .then((siteId: string): Promise<AppInfo> => {

@@ -61,7 +61,7 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Restoring items from recycle bin at ${args.options.siteUrl}...`);
     }

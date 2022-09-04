@@ -94,32 +94,25 @@ describe(commands.SITEDESIGN_RUN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          "ID": "b4411557-308b-4545-a3c4-55297d5cd8c8",
-          "SiteDesignID": "6ec3ca5b-d04b-4381-b169-61378556d76e",
-          "SiteDesignTitle": "Contoso Team Site",
-          "SiteDesignVersion": 1,
-          "SiteID": "24cea241-ad89-44b8-8669-d60d88d38575",
-          "StartTime": new Date(1548960114000).toLocaleString(),
-          "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
-        },
-        {
-          "ID": "e15d5b37-fe95-4667-96f7-bee41aa1ccdf",
-          "SiteDesignID": "2b5cb6bc-a176-472a-b59a-d1289d720414",
-          "SiteDesignTitle": "Contoso Communication Site",
-          "SiteDesignVersion": 1,
-          "SiteID": "24cea241-ad89-44b8-8669-d60d88d38575",
-          "StartTime": new Date(1548959800000).toLocaleString(),
-          "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } });
+    assert(loggerLogSpy.calledWith([{
+      "ID": "b4411557-308b-4545-a3c4-55297d5cd8c8",
+      "SiteDesignID": "6ec3ca5b-d04b-4381-b169-61378556d76e",
+      "SiteDesignTitle": "Contoso Team Site",
+      "SiteDesignVersion": 1,
+      "SiteID": "24cea241-ad89-44b8-8669-d60d88d38575",
+      "StartTime": new Date(1548960114000).toLocaleString(),
+      "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
+    },
+    {
+      "ID": "e15d5b37-fe95-4667-96f7-bee41aa1ccdf",
+      "SiteDesignID": "2b5cb6bc-a176-472a-b59a-d1289d720414",
+      "SiteDesignTitle": "Contoso Communication Site",
+      "SiteDesignVersion": 1,
+      "SiteID": "24cea241-ad89-44b8-8669-d60d88d38575",
+      "StartTime": new Date(1548959800000).toLocaleString(),
+      "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
+    }]));
   });
 
   it('gets information about the specified site design applied to the specified site', async () => {
@@ -143,23 +136,16 @@ describe(commands.SITEDESIGN_RUN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', siteDesignId: 'b4411557-308b-4545-a3c4-55297d5cd8c8' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          "ID": "b4411557-308b-4545-a3c4-55297d5cd8c8",
-          "SiteDesignID": "6ec3ca5b-d04b-4381-b169-61378556d76e",
-          "SiteDesignTitle": "Contoso Team Site",
-          "SiteDesignVersion": 1,
-          "SiteID": "24cea241-ad89-44b8-8669-d60d88d38575",
-          "StartTime": new Date(1548960114000).toLocaleString(),
-          "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', siteDesignId: 'b4411557-308b-4545-a3c4-55297d5cd8c8' } });
+    assert(loggerLogSpy.calledWith([{
+      "ID": "b4411557-308b-4545-a3c4-55297d5cd8c8",
+      "SiteDesignID": "6ec3ca5b-d04b-4381-b169-61378556d76e",
+      "SiteDesignTitle": "Contoso Team Site",
+      "SiteDesignVersion": 1,
+      "SiteID": "24cea241-ad89-44b8-8669-d60d88d38575",
+      "StartTime": new Date(1548960114000).toLocaleString(),
+      "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
+    }]));
   });
 
   it('outputs all information in JSON output mode', async () => {
@@ -192,34 +178,27 @@ describe(commands.SITEDESIGN_RUN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', output: 'json' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "ID": "b4411557-308b-4545-a3c4-55297d5cd8c8",
-            "SiteDesignID": "6ec3ca5b-d04b-4381-b169-61378556d76e",
-            "SiteDesignTitle": "Contoso Team Site",
-            "SiteDesignVersion": 1,
-            "SiteID": "24cea241-ad89-44b8-8669-d60d88d38575",
-            "StartTime": "1548960114000",
-            "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
-          },
-          {
-            "ID": "e15d5b37-fe95-4667-96f7-bee41aa1ccdf",
-            "SiteDesignID": "2b5cb6bc-a176-472a-b59a-d1289d720414",
-            "SiteDesignTitle": "Contoso Communication Site",
-            "SiteDesignVersion": 1,
-            "SiteID": "24cea241-ad89-44b8-8669-d60d88d38575",
-            "StartTime": "1548959800000",
-            "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', output: 'json' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "ID": "b4411557-308b-4545-a3c4-55297d5cd8c8",
+        "SiteDesignID": "6ec3ca5b-d04b-4381-b169-61378556d76e",
+        "SiteDesignTitle": "Contoso Team Site",
+        "SiteDesignVersion": 1,
+        "SiteID": "24cea241-ad89-44b8-8669-d60d88d38575",
+        "StartTime": "1548960114000",
+        "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
+      },
+      {
+        "ID": "e15d5b37-fe95-4667-96f7-bee41aa1ccdf",
+        "SiteDesignID": "2b5cb6bc-a176-472a-b59a-d1289d720414",
+        "SiteDesignTitle": "Contoso Communication Site",
+        "SiteDesignVersion": 1,
+        "SiteID": "24cea241-ad89-44b8-8669-d60d88d38575",
+        "StartTime": "1548959800000",
+        "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
   it('correctly handles OData error when retrieving information about site designs', async () => {
@@ -227,15 +206,7 @@ describe(commands.SITEDESIGN_RUN_LIST, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

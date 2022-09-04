@@ -63,42 +63,40 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    const removeSiteDesignTask: () => void = (): void => {
-      spo
-        .getSpoUrl(logger, this.debug)
-        .then((spoUrl: string): Promise<any> => {
-          const requestOptions: any = {
-            url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RemoveSiteDesignTask`,
-            headers: {
-              accept: 'application/json;odata=nometadata'
-            },
-            data: {
-              taskId: args.options.taskId
-            },
-            responseType: 'json'
-          };
+    const removeSiteDesignTask: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+        const requestOptions: any = {
+          url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RemoveSiteDesignTask`,
+          headers: {
+            accept: 'application/json;odata=nometadata'
+          },
+          data: {
+            taskId: args.options.taskId
+          },
+          responseType: 'json'
+        };
 
-          return request.post(requestOptions);
-        })
-        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        await request.post(requestOptions);
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
     if (args.options.confirm) {
-      removeSiteDesignTask();
+      await removeSiteDesignTask();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the site design task ${args.options.taskId}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeSiteDesignTask();
-        }
       });
+      
+      if (result.continue) {
+        await removeSiteDesignTask();
+      }
     }
   }
 }

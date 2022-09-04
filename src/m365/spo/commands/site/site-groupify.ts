@@ -79,7 +79,7 @@ class SpoSiteGroupifyCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const optionalParams: any = {};
     const payload: any = {
       displayName: args.options.displayName,

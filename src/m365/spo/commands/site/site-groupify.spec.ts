@@ -60,7 +60,7 @@ describe(commands.SITE_GROUPIFY, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('connects site to an Microsoft 365 Group', (done) => {
+  it('connects site to an Microsoft 365 Group', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/GroupSiteManager/CreateGroupForSite' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -81,7 +81,7 @@ describe(commands.SITE_GROUPIFY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
@@ -98,7 +98,7 @@ describe(commands.SITE_GROUPIFY, () => {
     });
   });
 
-  it('connects site to an Microsoft 365 Group (debug)', (done) => {
+  it('connects site to an Microsoft 365 Group (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/GroupSiteManager/CreateGroupForSite' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -119,7 +119,7 @@ describe(commands.SITE_GROUPIFY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
+    await command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
@@ -136,7 +136,7 @@ describe(commands.SITE_GROUPIFY, () => {
     });
   });
 
-  it('connects site to a public Microsoft 365 Group', (done) => {
+  it('connects site to a public Microsoft 365 Group', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/GroupSiteManager/CreateGroupForSite' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -157,7 +157,7 @@ describe(commands.SITE_GROUPIFY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', isPublic: true } }, () => {
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', isPublic: true } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
@@ -174,7 +174,7 @@ describe(commands.SITE_GROUPIFY, () => {
     });
   });
 
-  it('setts Microsoft 365 Group description', (done) => {
+  it('setts Microsoft 365 Group description', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/GroupSiteManager/CreateGroupForSite' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -197,7 +197,7 @@ describe(commands.SITE_GROUPIFY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', description: 'Team A space' } }, () => {
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', description: 'Team A space' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
@@ -214,7 +214,7 @@ describe(commands.SITE_GROUPIFY, () => {
     });
   });
 
-  it('sets Microsoft 365 Group classification', (done) => {
+  it('sets Microsoft 365 Group classification', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/GroupSiteManager/CreateGroupForSite' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -237,7 +237,7 @@ describe(commands.SITE_GROUPIFY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', classification: 'HBI' } }, () => {
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', classification: 'HBI' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
@@ -254,7 +254,7 @@ describe(commands.SITE_GROUPIFY, () => {
     });
   });
 
-  it('keeps the old home page', (done) => {
+  it('keeps the old home page', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/GroupSiteManager/CreateGroupForSite' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -277,7 +277,7 @@ describe(commands.SITE_GROUPIFY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', keepOldHomepage: true } }, () => {
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', keepOldHomepage: true } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
@@ -294,7 +294,7 @@ describe(commands.SITE_GROUPIFY, () => {
     });
   });
 
-  it('handles error when a group with the specified alias already exists', (done) => {
+  it('handles error when a group with the specified alias already exists', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
@@ -309,7 +309,7 @@ describe(commands.SITE_GROUPIFY, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The group alias already exists.')));
         done();
@@ -320,7 +320,7 @@ describe(commands.SITE_GROUPIFY, () => {
     });
   });
 
-  it('handles error when the specified site already is connected to a group', (done) => {
+  it('handles error when the specified site already is connected to a group', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
@@ -335,7 +335,7 @@ describe(commands.SITE_GROUPIFY, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This site already has an O365 Group attached.')));
         done();
@@ -346,12 +346,12 @@ describe(commands.SITE_GROUPIFY, () => {
     });
   });
 
-  it('correctly handles OData error when creating site script', (done) => {
+  it('correctly handles OData error when creating site script', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any, (err?: any) => {
+    await command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();

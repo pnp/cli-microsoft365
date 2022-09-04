@@ -142,7 +142,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     this
       .getWeb(args, logger)
       .then((getWebOutput: CommandOutput): Promise<CommandOutput> => {
