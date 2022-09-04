@@ -75,23 +75,28 @@ class SpoSiteRecycleBinItemRestoreCommand extends SpoCommand {
       idsChunks.push(ids.splice(0, 20));
     }
 
-    Promise.all(
-      idsChunks.map((idsChunk: string[]) => {
-        const requestOptions: any = {
-          url: requestUrl,
-          headers: {
-            'accept': 'application/json;odata=nometadata',
-            'content-type': 'application/json'
-          },
-          responseType: 'json',
-          data: {
-            ids: idsChunk
-          }
-        };
-
-        return request.post(requestOptions);
-      })
-    ).then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+    try {
+      await Promise.all(
+        idsChunks.map((idsChunk: string[]) => {
+          const requestOptions: any = {
+            url: requestUrl,
+            headers: {
+              'accept': 'application/json;odata=nometadata',
+              'content-type': 'application/json'
+            },
+            responseType: 'json',
+            data: {
+              ids: idsChunk
+            }
+          };
+  
+          return request.post(requestOptions);
+        })
+      );
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

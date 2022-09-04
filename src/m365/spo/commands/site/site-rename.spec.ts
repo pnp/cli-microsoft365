@@ -99,15 +99,8 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', verbose: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', verbose: true } });
+    assert(loggerLogToStderrSpy.called);
   });
 
   it('creates a site rename job - json output', async () => {
@@ -134,30 +127,23 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { output: 'json', siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "Option": 0,
-          "Reserve": null,
-          "OperationId": "00000000-0000-0000-0000-000000000000",
-          "SkipGestures": "",
-          "SourceSiteUrl": "https://contoso.sharepoint.com/sites/site1",
-          "TargetSiteTitle": null,
-          "TargetSiteUrl": "https://contoso.sharepoint.com/sites/site1-renamed",
-          "ErrorCode": 0,
-          "ErrorDescription": null,
-          "JobId": "76b7d932-1fb5-4fca-a336-fcceb03e157b",
-          "JobState": "Success",
-          "ParentId": "00000000-0000-0000-0000-000000000000",
-          "SiteId": "18f8cd3b-c000-0000-0000-48bfd83e50c1",
-          "TriggeredBy": "user@contoso.onmicrosoft.com"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { output: 'json', siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed' } });
+    assert(loggerLogSpy.calledWith({
+      "Option": 0,
+      "Reserve": null,
+      "OperationId": "00000000-0000-0000-0000-000000000000",
+      "SkipGestures": "",
+      "SourceSiteUrl": "https://contoso.sharepoint.com/sites/site1",
+      "TargetSiteTitle": null,
+      "TargetSiteUrl": "https://contoso.sharepoint.com/sites/site1-renamed",
+      "ErrorCode": 0,
+      "ErrorDescription": null,
+      "JobId": "76b7d932-1fb5-4fca-a336-fcceb03e157b",
+      "JobState": "Success",
+      "ParentId": "00000000-0000-0000-0000-000000000000",
+      "SiteId": "18f8cd3b-c000-0000-0000-48bfd83e50c1",
+      "TriggeredBy": "user@contoso.onmicrosoft.com"
+    }));
   });
 
   it('creates a site rename job using new url parameter - suppressMarketplaceAppCheck flag', async () => {
@@ -185,15 +171,8 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressMarketplaceAppCheck: true, verbose: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressMarketplaceAppCheck: true, verbose: true } });
+    assert(loggerLogToStderrSpy.called);
   });
 
   it('creates a site rename job using new url parameter - suppressWorkflow2013Check flag', async () => {
@@ -222,15 +201,8 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressWorkflow2013Check: true, verbose: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressWorkflow2013Check: true, verbose: true } });
+    assert(loggerLogToStderrSpy.called);
   });
 
   it('creates a site rename job using new url parameter - both supress flags', async () => {
@@ -259,15 +231,8 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', newSiteTitle: "RenamedSite", suppressWorkflow2013Check: true, suppressMarketplaceAppCheck: true, verbose: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', newSiteTitle: "RenamedSite", suppressWorkflow2013Check: true, suppressMarketplaceAppCheck: true, verbose: true } });
+    assert(loggerLogToStderrSpy.called);
   });
 
   it('creates a site rename job - wait for completion', async () => {
@@ -357,15 +322,8 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', wait: true, debug: true, verbose: true } } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', wait: true, debug: true, verbose: true } } as any);
+    assert(loggerLogToStderrSpy.called);
   });
 
   it('handles API error - delayed failure - valid response', async () => {
@@ -422,22 +380,14 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/site1-reject",
         newSiteUrl: "https://contoso.sharepoint.com/sites/site1-reject-renamed",
         wait: true,
         verbose: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError("An error has occurred"));
   });
 
   it('handles API error - delayed failure - service error', async () => {
@@ -468,22 +418,14 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/site1-reject",
         newSiteUrl: "https://contoso.sharepoint.com/sites/site1-reject-renamed",
         wait: true,
         verbose: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Invalid request")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError("Invalid request"));
   });
 
   it('handles API error - immediate failure on creation', async () => {
@@ -512,21 +454,13 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/old",
         newSiteUrl: "https://contoso.sharepoint.com/sites/new",
         wait: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError("An error has occurred"));
   });
 
   it('supports debug mode', () => {
