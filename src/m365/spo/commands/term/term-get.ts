@@ -152,8 +152,8 @@ class SpoTermGetCommand extends SpoCommand {
         data: data
       };
 
-      const res2: string = await request.post(requestOptions);
-      const json: ClientSvcResponse = JSON.parse(res2);
+      const processQuery: string = await request.post(requestOptions);
+      const json: ClientSvcResponse = JSON.parse(processQuery);
       const response: ClientSvcResponseContents = json[0];
       if (response.ErrorInfo) {
         throw response.ErrorInfo.ErrorMessage;

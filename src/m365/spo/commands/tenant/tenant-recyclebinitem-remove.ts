@@ -83,8 +83,8 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
           data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="16" ObjectPathId="15" /><Query Id="17" ObjectPathId="15"><Query SelectAllProperties="false"><Properties><Property Name="PollingInterval" ScalarProperty="true" /><Property Name="IsComplete" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="15" ParentId="1" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.url)}</Parameter></Parameters></Method><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
         };
 
-        const res2: string = await request.post(requestOptions);
-        const json: ClientSvcResponse = JSON.parse(res2);
+        const processQuery: string = await request.post(requestOptions);
+        const json: ClientSvcResponse = JSON.parse(processQuery);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
           throw response.ErrorInfo.ErrorMessage;

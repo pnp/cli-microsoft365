@@ -94,8 +94,8 @@ class SpoTermGroupAddCommand extends SpoCommand {
         data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectIdentityQuery Id="5" ObjectPathId="3" /><ObjectPath Id="7" ObjectPathId="6" /><ObjectIdentityQuery Id="8" ObjectPathId="6" /><Query Id="9" ObjectPathId="6"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><StaticMethod Id="3" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" /><Method Id="6" ParentId="3" Name="GetDefaultSiteCollectionTermStore" /></ObjectPaths></Request>`
       };
 
-      const res2: string = await request.post(requestOptionsPost);
-      const json: ClientSvcResponse = JSON.parse(res2);
+      const processQuery: string = await request.post(requestOptionsPost);
+      const json: ClientSvcResponse = JSON.parse(processQuery);
       const response: ClientSvcResponseContents = json[0];
       if (response.ErrorInfo) {
         throw response.ErrorInfo.ErrorMessage;
@@ -116,8 +116,8 @@ class SpoTermGroupAddCommand extends SpoCommand {
         data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="13" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="Name" ScalarProperty="true" /><Property Name="Id" ScalarProperty="true" /><Property Name="Description" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="13" ParentId="6" Name="CreateGroup"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.name)}</Parameter><Parameter Type="Guid">{${termGroupId}}</Parameter></Parameters></Method><Identity Id="6" Name="${termStore._ObjectIdentity_}" /></ObjectPaths></Request>`
       };
 
-      const res3: string = await request.post(requestOptions);
-      const json2: ClientSvcResponse = JSON.parse(res3);
+      const terms: string = await request.post(requestOptions);
+      const json2: ClientSvcResponse = JSON.parse(terms);
       const response2: ClientSvcResponseContents = json[0];
       if (response2.ErrorInfo) {
         throw response2.ErrorInfo.ErrorMessage;

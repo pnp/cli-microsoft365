@@ -114,9 +114,9 @@ class SpoThemeApplyCommand extends SpoCommand {
         };
       }
 
-      const res2: string = await request.post(requestOptions);
+      const processQuery: string = await request.post(requestOptions);
       if (isSharePointTheme) {
-        const json: any = JSON.parse(res2);
+        const json: any = JSON.parse(processQuery);
 
         if (json.error) {
           throw json.error;
@@ -127,7 +127,7 @@ class SpoThemeApplyCommand extends SpoCommand {
         }
       }
       else {
-        const json: ClientSvcResponse = JSON.parse(res2);
+        const json: ClientSvcResponse = JSON.parse(processQuery);
         const response: ClientSvcResponseContents = json[0];
 
         if (response.ErrorInfo) {

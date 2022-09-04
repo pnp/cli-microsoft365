@@ -78,8 +78,8 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
           data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="31" ObjectPathId="30" /><ObjectPath Id="33" ObjectPathId="32" /><ObjectPath Id="35" ObjectPathId="34" /><Method Name="RemoveStorageEntity" Id="36" ObjectPathId="34"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.key)}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="30" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="32" ParentId="30" Name="GetSiteByUrl"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.appCatalogUrl)}</Parameter></Parameters></Method><Property Id="34" ParentId="32" Name="RootWeb" /></ObjectPaths></Request>`
         };
 
-        const res2: string = await request.post(requestOptions);
-        const json: ClientSvcResponse = JSON.parse(res2);
+        const processQuery: string = await request.post(requestOptions);
+        const json: ClientSvcResponse = JSON.parse(processQuery);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
           throw response.ErrorInfo.ErrorMessage;

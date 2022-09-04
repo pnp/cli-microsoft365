@@ -34,8 +34,8 @@ class SpoTenantRecycleBinItemListCommand extends SpoCommand {
         data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties><Property Name="Url" ScalarProperty="true" /><Property Name="SiteId" ScalarProperty="true" /><Property Name="DaysRemaining" ScalarProperty="true" /><Property Name="Status" ScalarProperty="true" /></Properties></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetDeletedSitePropertiesFromSharePoint"><Parameters><Parameter Type="String">0</Parameter></Parameters></Method></ObjectPaths></Request>`
       };
 
-      const res2: string = await request.post(requestOptions);
-      const json: ClientSvcResponse = JSON.parse(res2);
+      const processQuery: string = await request.post(requestOptions);
+      const json: ClientSvcResponse = JSON.parse(processQuery);
       const response: ClientSvcResponseContents = json[0];
       if (response.ErrorInfo) {
         throw response.ErrorInfo.ErrorMessage;

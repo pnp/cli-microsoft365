@@ -193,8 +193,8 @@ class SpoTermAddCommand extends SpoCommand {
         data: data
       };
 
-      const res2: string = await request.post(requestOptionsPost);
-      const json: ClientSvcResponse = JSON.parse(res2);
+      const processQuery: string = await request.post(requestOptionsPost);
+      const json: ClientSvcResponse = JSON.parse(processQuery);
       const response: ClientSvcResponseContents = json[0];
       if (response.ErrorInfo) {
         throw response.ErrorInfo.ErrorMessage;
@@ -252,9 +252,9 @@ class SpoTermAddCommand extends SpoCommand {
         data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${properties.join('')}<Method Name="CommitAll" Id="131" ObjectPathId="109" /></Actions><ObjectPaths><Identity Id="117" Name="${term._ObjectIdentity_}" /><Identity Id="109" Name="${termStoreObjectIdentity}" /></ObjectPaths></Request>`
       };
 
-      const res3: string = await request.post(requestOptions);
-      if (res3) {
-        const json: ClientSvcResponse = JSON.parse(res3);
+      const terms: string = await request.post(requestOptions);
+      if (terms) {
+        const json: ClientSvcResponse = JSON.parse(terms);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
           throw response.ErrorInfo.ErrorMessage;

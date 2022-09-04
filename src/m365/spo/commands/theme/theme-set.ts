@@ -89,8 +89,8 @@ class SpoThemeSetCommand extends SpoCommand {
         data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.name)}</Parameter><Parameter Type="String">{"isInverted":${isInverted},"name":"${formatting.escapeXml(args.options.name)}","palette":${JSON.stringify(palette)}}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`
       };
 
-      const res2: string = await request.post(requestOptions);
-      const json: ClientSvcResponse = JSON.parse(res2);
+      const processQuery: string = await request.post(requestOptions);
+      const json: ClientSvcResponse = JSON.parse(processQuery);
       const contents: ClientSvcResponseContents = json.find(x => { return x['ErrorInfo']; });
 
       if (contents && contents.ErrorInfo) {

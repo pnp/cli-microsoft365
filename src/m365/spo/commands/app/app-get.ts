@@ -137,8 +137,8 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
         responseType: 'json'
       };
 
-      const res2 = request.get<AppMetadata>(requestOptions);
-      logger.log(res2);
+      const availableApps = request.get<AppMetadata>(requestOptions);
+      logger.log(availableApps);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

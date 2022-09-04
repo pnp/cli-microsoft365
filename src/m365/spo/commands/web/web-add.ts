@@ -155,10 +155,10 @@ class SpoWebAddCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      const res2: any = await request.get(requestOptionsPer);
+      const effectivebasepermissions: any = await request.get(requestOptionsPer);
       const permissions: BasePermissions = new BasePermissions();
-      permissions.high = res2.High as number;
-      permissions.low = res2.Low as number;
+      permissions.high = effectivebasepermissions.High as number;
+      permissions.low = effectivebasepermissions.Low as number;
 
       /// Detects if the site in question has no script enabled or not. 
       /// Detection is done by verifying if the AddAndCustomizePages permission is missing.
@@ -173,12 +173,12 @@ class SpoWebAddCommand extends SpoCommand {
         return siteInfo;
       }
 
-      const res3: ContextInfo = await spo.getRequestDigest(subsiteFullUrl);
+      const digest: ContextInfo = await spo.getRequestDigest(subsiteFullUrl);
 
       const requestOptionsQuery: any = {
         url: `${subsiteFullUrl}/_vti_bin/client.svc/ProcessQuery`,
         headers: {
-          'X-RequestDigest': res3.FormDigestValue
+          'X-RequestDigest': digest.FormDigestValue
         },
         data: `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="1" ObjectPathId="0" /><ObjectPath Id="3" ObjectPathId="2" /><ObjectPath Id="5" ObjectPathId="4" /><SetProperty Id="6" ObjectPathId="4" Name="UseShared"><Parameter Type="Boolean">true</Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="2" ParentId="0" Name="Web" /><Property Id="4" ParentId="2" Name="Navigation" /></ObjectPaths></Request>`
       };
