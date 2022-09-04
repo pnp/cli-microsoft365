@@ -29,6 +29,8 @@
 - fixed ensure site assets library sample [#3616](https://github.com/pnp/cli-microsoft365/issues/3616)
 - removed PowerShell examples from adaptive card docs [#3631](https://github.com/pnp/cli-microsoft365/issues/3631)
 - added additional validation options for 'planner task get' [#3433](https://github.com/pnp/cli-microsoft365/issues/3433)
+- added gulp-cli checks to spfx doctor [#3541](https://github.com/pnp/cli-microsoft365/issues/3541)
+- extended spfx project doctor with support for 1.16.0-beta.1 [#3634](https://github.com/pnp/cli-microsoft365/issues/3634)
 
 ## [v5.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.7.0)
 
