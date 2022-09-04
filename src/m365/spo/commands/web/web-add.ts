@@ -183,9 +183,9 @@ class SpoWebAddCommand extends SpoCommand {
         data: `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="1" ObjectPathId="0" /><ObjectPath Id="3" ObjectPathId="2" /><ObjectPath Id="5" ObjectPathId="4" /><SetProperty Id="6" ObjectPathId="4" Name="UseShared"><Parameter Type="Boolean">true</Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="2" ParentId="0" Name="Web" /><Property Id="4" ParentId="2" Name="Navigation" /></ObjectPaths></Request>`
       };
 
-      const res4: string = await request.post(requestOptionsQuery);
+      const query: string = await request.post(requestOptionsQuery);
 
-      const json: ClientSvcResponse = JSON.parse(res4);
+      const json: ClientSvcResponse = JSON.parse(query);
       const response: ClientSvcResponseContents = json[0];
       if (response.ErrorInfo) {
         throw response.ErrorInfo.ErrorMessage;

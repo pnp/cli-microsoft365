@@ -141,9 +141,9 @@ class SpoTermGroupAddCommand extends SpoCommand {
         data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="51" ObjectPathId="45" Name="Description"><Parameter Type="String">${formatting.escapeXml(args.options.description)}</Parameter></SetProperty></Actions><ObjectPaths><Identity Id="45" Name="${termGroup._ObjectIdentity_}" /></ObjectPaths></Request>`
       };
 
-      const res4: string = await request.post(requestOptionsQuery);
-      if (res4) {
-        const json: ClientSvcResponse = JSON.parse(res4);
+      const termGroups: string = await request.post(requestOptionsQuery);
+      if (termGroups) {
+        const json: ClientSvcResponse = JSON.parse(termGroups);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
           throw response.ErrorInfo.ErrorMessage;
