@@ -110,6 +110,6 @@ export default abstract class SpoCommand extends Command {
       throw new CommandError(`SharePoint does not support authentication using client ID and secret. Please use a different login type to use SharePoint commands.`);
     }
 
-    super.action(logger, args);
+    await super.action(logger, args);
   }
 }

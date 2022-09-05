@@ -67,7 +67,7 @@ describe(commands.LIST, () => {
   });
 
   it('correctly handles random API error', async () => {
-    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').callsFake(async () => { throw 'An error has occurred'; });
 
     await assert.rejects(command.action(logger, { options: { debug: true } } as any), new CommandError("An error has occurred"));
   });

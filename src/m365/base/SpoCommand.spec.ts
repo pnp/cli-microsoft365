@@ -70,7 +70,8 @@ describe('SpoCommand', () => {
     sinonUtil.restore([
       request.get,
       request.post,
-      auth.storeConnectionInfo
+      auth.storeConnectionInfo,
+      auth.restoreAuth
     ]);
     auth.service.spoUrl = undefined;
     auth.service.tenantId = undefined;

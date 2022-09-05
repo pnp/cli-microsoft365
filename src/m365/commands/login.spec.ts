@@ -89,7 +89,7 @@ describe(commands.LOGIN, () => {
   it('logs in to Microsoft 365 using certificate when authType certificate set and certificateFile is provided', async () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
 
-    await command.action(logger, { options: { debug: false, authType: 'certificate', certificateFile: 'certificate' } });
+    await assert.rejects(command.action(logger, { options: { debug: false, authType: 'certificate', certificateFile: 'certificate' } }));
     assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
     assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
   });
@@ -97,7 +97,7 @@ describe(commands.LOGIN, () => {
   it('logs in to Microsoft 365 using certificate when authType certificate set with thumbprint', async () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
 
-    await command.action(logger, { options: { debug: false, authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } });
+    await assert.rejects(command.action(logger, { options: { debug: false, authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } }));
     assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
     assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
     assert.strictEqual(auth.service.thumbprint, 'thumbprint', 'Incorrect thumbprint set');
@@ -106,7 +106,7 @@ describe(commands.LOGIN, () => {
   it('logs in to Microsoft 365 using certificate when authType certificate set and certificateBase64Encoded is provided', async () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
 
-    await command.action(logger, { options: { debug: false, authType: 'certificate', certificateBase64Encoded: 'certificate', thumbprint: 'thumbprint' } });
+    await assert.rejects(command.action(logger, { options: { debug: false, authType: 'certificate', certificateBase64Encoded: 'certificate', thumbprint: 'thumbprint' } }));
     assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
     assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
     assert.strictEqual(auth.service.thumbprint, 'thumbprint', 'Incorrect thumbprint set');

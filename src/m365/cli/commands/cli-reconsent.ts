@@ -35,7 +35,7 @@ class CliReconsentCommand extends AnonymousCommand {
     }
 
     try {
-      (this._open as typeof open)(url);
+      await (this._open as typeof open)(url);
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

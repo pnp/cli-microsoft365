@@ -116,7 +116,7 @@ describe('AppCommand', () => {
     const cliPromptStub = sinon.stub(Cli, 'prompt').callsFake(async () => (
       { appIdIndex: 0 }
     ));
-    await cmd.action(logger, { options: {} });
+    await assert.rejects(cmd.action(logger, { options: {} }));
     assert(cliPromptStub.called);
   });
 
@@ -137,7 +137,7 @@ describe('AppCommand', () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { appIdIndex: 1 }
     ));
-    await cmd.action(logger, { options: {} });
+    await assert.rejects(cmd.action(logger, { options: {} }));
     assert.strictEqual((cmd as any).appId, '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d');
   });
 
@@ -155,7 +155,7 @@ describe('AppCommand', () => {
         }
       ]
     }));
-    await cmd.action(logger, { options: { appId: '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d' } });
+    await assert.rejects(cmd.action(logger, { options: { appId: '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d' } }));
     assert.strictEqual((cmd as any).appId, '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d');
   });
 
@@ -169,7 +169,7 @@ describe('AppCommand', () => {
         }
       ]
     }));
-    await cmd.action(logger, { options: {} });
+    await assert.rejects(cmd.action(logger, { options: {} }));
     assert.strictEqual((cmd as any).appId, 'e23d235c-fcdf-45d1-ac5f-24ab2ee0695d');
   });
 

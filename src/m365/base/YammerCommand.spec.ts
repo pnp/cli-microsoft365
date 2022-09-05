@@ -61,7 +61,7 @@ describe('YammerCommand', () => {
       logToStderr: () => { }
     };
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
-    await command.action(logger, { options: {} });
+    await assert.rejects(command.action(logger, { options: {} }));
     assert(commandCommandActionSpy.notCalled);
   });
 
@@ -75,7 +75,7 @@ describe('YammerCommand', () => {
     };
     auth.service.connected = false;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
-    await command.action(logger, { options: {} });
+    await assert.rejects(command.action(logger, { options: {} }));
     assert(commandCommandActionSpy.notCalled);
   });
 
@@ -115,16 +115,16 @@ describe('YammerCommand', () => {
   });
 
   it('displays error message not from Yammer (1)', () => {
+    const error = { error: 'not from Yammer' };
     const mock = new MockCommand();
-    assert.throws(() => mock.handlePromiseError({
-      error: 'not from Yammer'
-    }), new CommandError('not from Yammer'));
+    assert.throws(() => mock.handlePromiseError(error),
+      new CommandError(error as any));
   });
 
   it('displays error message not from Yammer (2)', () => {
+    const error = { message: "test" };
     const mock = new MockCommand();
-    assert.throws(() => mock.handlePromiseError({
-      message: "test"
-    }), new CommandError('test'));
+    assert.throws(() => mock.handlePromiseError(error),
+      new CommandError(error as any));
   });
 });
