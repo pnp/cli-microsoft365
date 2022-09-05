@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import auth from '../../../../Auth';
+import auth, { Auth } from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
@@ -18,6 +18,10 @@ describe(commands.MAIL_SEND, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    auth.service.accessTokens[auth.defaultResource] = {
+      expiresOn: 'abc',
+      accessToken: 'abc'
+    };
     commandInfo = Cli.getCommandInfo(command);
   });
 
@@ -35,11 +39,13 @@ describe(commands.MAIL_SEND, () => {
       }
     };
     (command as any).items = [];
+    sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => false);   
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      Auth.isAppOnlyAuth
     ]);
   });
 
@@ -49,6 +55,7 @@ describe(commands.MAIL_SEND, () => {
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
+    auth.service.accessTokens = {};
   });
 
   it('has correct name', () => {
@@ -279,5 +286,87 @@ describe(commands.MAIL_SEND, () => {
       }
     });
     assert(containsOption);
+  });
+
+  it('sends email using a specified group mailbox', (done) => {
+    let actual: string = '';
+    const expected: string = JSON.stringify({
+      message: {
+        subject: 'Lorem ipsum',
+        body: {
+          contentType: 'Text',
+          content: 'Lorem ipsum'
+        },
+        toRecipients: [{ emailAddress: { address: 'mail@domain.com' } }],
+        from: { emailAddress: { address: 'sales@domain.com' } }
+      },
+      saveToSentItems: undefined
+    });
+    sinon.stub(request, 'post').callsFake((opts) => {
+      actual = JSON.stringify(opts.data);
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/sendMail`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', mailbox: 'sales@domain.com', bodyContents: 'Lorem ipsum' } }, () => {
+      try {
+        assert.strictEqual(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sends email using a specified sender', (done) => {
+    let actual: string = '';
+    const expected: string = JSON.stringify({
+      message: {
+        subject: 'Lorem ipsum',
+        body: {
+          contentType: 'Text',
+          content: 'Lorem ipsum'
+        },
+        toRecipients: [{ emailAddress: { address: 'mail@domain.com' } }]
+      },
+      saveToSentItems: undefined
+    });
+    sinon.stub(request, 'post').callsFake((opts) => {
+      actual = JSON.stringify(opts.data);
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/${encodeURIComponent('some-user@domain.com')}/sendMail`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', sender: 'some-user@domain.com', bodyContents: 'Lorem ipsum' } }, () => {
+      try {
+        assert.strictEqual(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('throws an error when the sender is not defined when signed in using app only authentication', (done) => {
+    sinonUtil.restore([ Auth.isAppOnlyAuth ]);
+    sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => true);
+   
+    command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any, (err?: any) => {
+      try {
+        assert.deepStrictEqual(err, new CommandError(`Specify a upn or user id in the 'sender' option when using app only authentication.`));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 });
