@@ -71,7 +71,7 @@ Once you've got the .csv file from the script above, filter it to your needs to 
             }
             else{
                 Write-Host "Adding $($UserToAdd) to $($site.Title). " -f Magenta
-                m365 spo site classic set --url $site.Url --owners $UserToAdd
+                m365 spo site set --url $site.Url --owners $UserToAdd
             }
     }
     ```

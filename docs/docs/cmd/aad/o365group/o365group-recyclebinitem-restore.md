@@ -8,12 +8,6 @@ Restores a deleted Microsoft 365 Group
 m365 aad o365group recyclebinitem restore [options]
 ```
 
-## Alias
-
-```sh
-m365 aad o365group restore [options]
-```
-
 ## Options
 
 `-i, --id [id]`
