@@ -8,12 +8,6 @@ Remove the specified member from the specified Microsoft Teams private or shared
 m365 teams channel member remove [options]
 ```
 
-## Alias
-
-```sh
-m365 teams conversationmember remove [options]
-```
-
 ## Options
 
 `--teamId [teamId]`

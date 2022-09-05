@@ -27,10 +27,6 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
     return 'Restores a deleted Microsoft 365 Group';
   }
 
-  public alias(): string[] | undefined {
-    return [commands.O365GROUP_RESTORE];
-  }
-
   constructor() {
     super();
 
