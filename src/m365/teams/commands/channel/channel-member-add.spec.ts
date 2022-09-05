@@ -251,11 +251,6 @@ describe(commands.CHANNEL_MEMBER_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.strictEqual((alias && alias.indexOf(commands.CONVERSATIONMEMBER_ADD) !== -1), true);
-  });
-
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
     assert.deepStrictEqual(optionSets, [[ 'teamId', 'teamName' ], [ 'channelId', 'channelName' ], [ 'userId', 'userDisplayName' ]]);

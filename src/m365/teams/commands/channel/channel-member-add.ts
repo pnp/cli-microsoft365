@@ -35,10 +35,6 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
     return 'Adds a conversation member in a private channel.';
   }
 
-  public alias(): string[] | undefined {
-    return [commands.CONVERSATIONMEMBER_ADD];
-  }
-
   constructor() {
     super();
 
@@ -113,8 +109,6 @@ class TeamsChannelMemberAddCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this.showDeprecationWarning(logger, commands.CONVERSATIONMEMBER_ADD, commands.CHANNEL_MEMBER_ADD);
-
     let teamId: string = '';
     let channelId: string = '';
 

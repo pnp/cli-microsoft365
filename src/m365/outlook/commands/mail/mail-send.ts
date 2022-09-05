@@ -25,10 +25,6 @@ class OutlookMailSendCommand extends GraphCommand {
     return 'Sends e-mail on behalf of the current user';
   }
 
-  public alias(): string[] | undefined {
-    return [commands.SENDMAIL];
-  }
-
   constructor() {
     super();
 

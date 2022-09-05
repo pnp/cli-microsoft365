@@ -55,11 +55,6 @@ describe(commands.MAIL_SEND, () => {
     assert.strictEqual(command.name.startsWith(commands.MAIL_SEND), true);
   });
 
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.strictEqual((alias && alias.indexOf(commands.SENDMAIL) > -1), true);
-  });
-
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });

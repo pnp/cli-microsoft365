@@ -1,4 +1,4 @@
-# aad o365group restore
+# aad o365group recyclebinitem restore
 
 Restores a deleted Microsoft 365 Group
 
@@ -6,12 +6,6 @@ Restores a deleted Microsoft 365 Group
 
 ```sh
 m365 aad o365group recyclebinitem restore [options]
-```
-
-## Alias
-
-```sh
-m365 aad o365group restore [options]
 ```
 
 ## Options

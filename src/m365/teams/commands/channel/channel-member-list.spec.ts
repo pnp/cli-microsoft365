@@ -60,11 +60,6 @@ describe(commands.CHANNEL_MEMBER_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
   it('fails validation if both teamId and teamName options are not passed', async () => {
     const actual = await command.validate({
       options: {

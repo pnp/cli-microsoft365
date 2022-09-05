@@ -1,4 +1,4 @@
-# outlook sendmail
+# outlook mail send
 
 Sends e-mail on behalf of the current user
 
@@ -6,12 +6,6 @@ Sends e-mail on behalf of the current user
 
 ```sh
 m365 outlook mail send [options]
-```
-
-## Alias
-
-```sh
-m365 outlook sendmail [options]
 ```
 
 ## Options
