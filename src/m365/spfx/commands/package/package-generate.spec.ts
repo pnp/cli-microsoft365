@@ -178,7 +178,7 @@ describe(commands.PACKAGE_GENERATE, () => {
     sinonUtil.restore(fs.mkdtempSync);
     sinon.stub(fs, 'mkdtempSync').throws(new Error('An error has occurred'));
     const archiveWriteZipSpy = sinon.spy(admZipMock, 'writeZip');
-    await command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -188,13 +188,13 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'all',
         debug: false
       }
-    });
+    }), (err) => err === 'An error has occurred');
     assert(archiveWriteZipSpy.notCalled);
   });
 
   it('handles error when creating the package failed', async () => {
     sinon.stub(admZipMock, 'writeZip').throws(new Error('An error has occurred'));
-    await command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -204,7 +204,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'all',
         debug: false
       }
-    });
+    }), (err) => err === 'An error has occurred');
   });
 
   it('removes the temp directory after the package has been created', async () => {
@@ -228,7 +228,7 @@ describe(commands.PACKAGE_GENERATE, () => {
     sinonUtil.restore(fs.rmdirSync);
     const fsrmdirSyncSpy = sinon.stub(fs, 'rmdirSync').callsFake(_ => { });
     sinon.stub(admZipMock, 'writeZip').throws(new Error('An error has occurred'));
-    await command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webPartTitle: 'Amsterdam weather',
         webPartDescription: 'Shows weather in Amsterdam',
@@ -238,7 +238,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'all',
         debug: false
       }
-    });
+    }));
     assert(fsrmdirSyncSpy.called);
   });
 
@@ -255,7 +255,7 @@ describe(commands.PACKAGE_GENERATE, () => {
         enableForTeams: 'all',
         debug: false
       }
-    }), 'An error has occurred while removing the temp folder at /tmp/abc. Please remove it manually.');
+    }), (err) => err === 'An error has occurred while removing the temp folder at /tmp/abc. Please remove it manually.');
   });
 
   it('leaves unknown token as-is', async () => {

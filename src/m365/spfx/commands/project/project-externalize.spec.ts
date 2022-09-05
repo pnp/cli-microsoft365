@@ -72,12 +72,12 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   });
 
   it('calls telemetry', async () => {
-    await command.action(logger, { options: {} });
+    await assert.rejects(command.action(logger, { options: {} }));
     assert(trackEvent.called);
   });
 
   it('logs correct telemetry event', async () => {
-    await command.action(logger, { options: {} });
+    await assert.rejects(command.action(logger, { options: {} }));
     assert.strictEqual(telemetry.name, commands.PROJECT_EXTERNALIZE);
   });
 
@@ -160,7 +160,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    await command.action(logger, { options: {} } as any);
+    await assert.rejects(command.action(logger, { options: {} } as any));
     assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '0.4.1');
   });
 
@@ -286,7 +286,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    await command.action(logger, { options: { toVersion: '1.4.1' } } as any);
+    await command.action(logger, { options: {  } } as any);
     assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
   });
 
@@ -302,7 +302,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    await command.action(logger, { options: { toVersion: '1.4.1' } } as any);
+    await command.action(logger, { options: {  } } as any);
     assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, undefined);
   });
 
@@ -535,7 +535,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    await command.action(logger, { options: { output: 'json', debug: true } } as any);
+    await assert.rejects(command.action(logger, { options: { output: 'json', debug: true } } as any));
   });
   //#endregion
 

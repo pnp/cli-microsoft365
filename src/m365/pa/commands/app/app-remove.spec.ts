@@ -214,7 +214,7 @@ describe(commands.APP_REMOVE, () => {
         debug: false,
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
-    } as any), `App 'e0c89645-7f00-4877-a290-cbaf6e060da1' does not exist`);
+    } as any), new CommandError(`App 'e0c89645-7f00-4877-a290-cbaf6e060da1' does not exist`));
   });
 
   it('correctly handles no Microsoft Power App found when confirm specified', async () => {
@@ -229,7 +229,7 @@ describe(commands.APP_REMOVE, () => {
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         confirm: true
       }
-    } as any), `App 'e0c89645-7f00-4877-a290-cbaf6e060da1' does not exist`);
+    } as any), new CommandError(`App 'e0c89645-7f00-4877-a290-cbaf6e060da1' does not exist`));
   });
 
   it('correctly handles Microsoft Power App found when prompt confirmed', async () => {

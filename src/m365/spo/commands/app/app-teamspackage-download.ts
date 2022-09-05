@@ -110,18 +110,18 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    this.appCatalogUrl = args.options.appCatalogUrl;
-    const appInfo: AppInfo = {
-      id: args.options.appItemId ?? undefined,
-      packageFileName: args.options.fileName ?? undefined
-    };
-    if (this.debug) {
-      logger.logToStderr(`appInfo: ${JSON.stringify(appInfo)}`);
-    }
-
     try {
+      this.appCatalogUrl = args.options.appCatalogUrl;
+      const appInfo: AppInfo = {
+        id: args.options.appItemId ?? undefined,
+        packageFileName: args.options.fileName ?? undefined
+      };
+      if (this.debug) {
+        logger.logToStderr(`appInfo: ${JSON.stringify(appInfo)}`);
+      }
+
       await this.ensureAppInfo(logger, args, appInfo);
-      
+
       if (this.debug) {
         logger.logToStderr(`ensureAppInfo: ${JSON.stringify(appInfo)}`);
       }
@@ -139,11 +139,9 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
       const file = await request.get<any>(requestOptions);
 
       const writer = fs.createWriteStream(appInfo.packageFileName as string);
-
       file.data.pipe(writer);
-
       writer.on('error', err => {
-        throw(err);
+        throw err;
       });
       writer.on('close', () => {
         const fileName = appInfo.packageFileName as string;

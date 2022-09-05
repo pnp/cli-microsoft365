@@ -289,7 +289,11 @@ export default abstract class Command {
         const err: ODataError = JSON.parse(res.error);
         throw new CommandError(err['odata.error'].message.value);
       }
-      catch {
+      catch (err: any) {
+        if (err instanceof CommandError) {
+          throw err;
+        }
+        
         try {
           const graphResponseError: GraphResponseError = res.error;
           if (graphResponseError.error.code) {

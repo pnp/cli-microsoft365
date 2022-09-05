@@ -1662,13 +1662,13 @@ describe(commands.CONVERT_PDF, () => {
       sinonUtil.restore(fs.unlinkSync);
       unlinkSyncStub = sinon.stub(fs, 'unlinkSync').callsFake(_ => { throw 'An error has occurred'; });
 
-      await command.action(logger, {
+      await assert.rejects(command.action(logger, {
         options: {
           debug: true,
           sourceFile: 'file.docx',
           targetFile: 'https://contoso.sharepoint.com/Shared Documents/file.pdf'
         }
-      });
+      }), new CommandError('An error has occurred'));
       assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
       assert(unlinkSyncStub.calledOnce, 'Did not remove local file');
     });

@@ -6,6 +6,7 @@ import * as url from 'url';
 import { v4 } from 'uuid';
 import auth, { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli';
+import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -137,6 +138,10 @@ class FileConvertPdfCommand extends GraphCommand {
       }
     }
     catch (err: any) {
+      if (err instanceof CommandError) {
+        throw err;
+      }
+      
       this.handleRejectedODataJsonPromise(err);
     }
   }

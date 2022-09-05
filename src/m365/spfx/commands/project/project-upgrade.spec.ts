@@ -83,12 +83,12 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('calls telemetry', async () => {
-    await command.action(logger, { options: {} });
+    await assert.rejects(command.action(logger, { options: {} }));
     assert(trackEvent.called);
   });
 
   it('logs correct telemetry event', async () => {
-    await command.action(logger, { options: {} });
+    await assert.rejects(command.action(logger, { options: {} }));
     assert.strictEqual(telemetry.name, commands.PROJECT_UPGRADE);
   });
 
@@ -137,8 +137,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       }
     });
 
-    await command.action(logger, { options: {} } as any);
-    assert(true);
+    await assert.rejects(command.action(logger, { options: {} } as any));
   });
 
   it('determines the current version from .yo-rc.json when available', async () => {
@@ -383,7 +382,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    await command.action(logger, { options: { toVersion: '1.4.1' } } as any);
+    await assert.rejects(command.action(logger, { options: { toVersion: '1.4.1' } } as any));
     assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, undefined);
   });
 
@@ -990,9 +989,8 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     await assert.rejects(command.action(logger, { options: { toVersion: '1.0.1', output: 'json' } } as any), (err) => {
       (command as any).supportedVersions.splice(1, 1);
-      assert(JSON.stringify(err).indexOf("Cannot find module './project-upgrade/upgrade-0'") > -1);
+      return JSON.stringify(err).indexOf("Cannot find module './project-upgrade/upgrade-0'") > -1;
     });
-    
   });
 
   //#region 1.0.0

@@ -1,4 +1,5 @@
 import { Cli, Logger } from '../../../../cli';
+import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -82,7 +83,7 @@ class PaAppRemoveCommand extends PowerAppsCommand {
       }
       catch (err: any) {
         if (err.response && err.response.status === 403) {
-          throw `App '${args.options.name}' does not exist`;
+          throw new CommandError(`App '${args.options.name}' does not exist`);
         }
         else {
           this.handleRejectedODataJsonPromise(err);

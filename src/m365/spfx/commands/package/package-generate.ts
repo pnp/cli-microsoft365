@@ -212,9 +212,15 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
           }
           fs.rmdirSync(tmpDir, { recursive: true });
         }
-        throw error;
+        if (error) {
+          throw error;
+        }
       }
-      catch (ex) {
+      catch (ex: any) {
+        if (ex === error) {
+          throw ex;
+        }
+
         throw `An error has occurred while removing the temp folder at ${tmpDir}. Please remove it manually.`;
       }
     }
