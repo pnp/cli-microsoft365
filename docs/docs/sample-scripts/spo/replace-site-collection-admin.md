@@ -21,7 +21,7 @@ The script removes a user from a site collection and adds a new one as site coll
     }
 
     m365 spo user remove --webUrl $webUrl --loginName "i:0#.f|membership|$userToRemove" --confirm
-    m365 spo site classic set --url $webUrl --owners $userToAdd
+    m365 spo site set --url $webUrl --owners $userToAdd
     ```
 
 Keywords

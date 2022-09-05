@@ -62,7 +62,7 @@ Changing the URL of a site results in a new site type: a Redirect Site. However 
       sitestoremove+=("$siteUrl")
     fi
 
-    done < <(m365 spo site classic list --t "REDIRECTSITE#0" -o json | jq -c '.[]')
+    done < <(m365 spo site list --webTemplate "REDIRECTSITE#0" -o json | jq -c '.[]')
 
     if [ ${#sitestoremove[@]} = 0 ]; then
       exit 1
@@ -76,7 +76,7 @@ Changing the URL of a site results in a new site type: a Redirect Site. However 
       siteUrl=$(echo ${site} | jq -r '.Url')
       echo "Deleting site..."
       echo $siteUrl
-      m365 spo site classic remove --url $siteUrl
+      m365 spo site remove --url $siteUrl
     done
     ```
 
