@@ -12,6 +12,10 @@
 
 - [onenote notebook list](../cmd/onenote/notebook/notebook-list.md) - retrieves a list of notebooks [#3097](https://github.com/pnp/cli-microsoft365/issues/3097)
 
+**Microsoft Graph:**
+
+- [graph changelog list](../cmd/graph/changelog/changelog-list.md) - retrieves an overview of specific API-level changes in Microsoft Graph v1.0 and beta [#2061](https://github.com/pnp/cli-microsoft365/issues/2061)
+
 **SharePoint:**
 
 - [spo web roleassignment add](../cmd/spo/web/web-roleassignment-add.md) - adds a role assignment to web permissions [#3549](https://github.com/pnp/cli-microsoft365/issues/3549)
