@@ -20,7 +20,7 @@ When you delete Microsoft 365 groups, the modern group-connected team sites get 
         $progress++
         write-host $progress / $total":" $site.Title
         write-host $site.Url
-        m365 spo site classic remove --url $site.Url
+        m365 spo site remove --url $site.Url
     }
     ```
 
@@ -63,7 +63,7 @@ When you delete Microsoft 365 groups, the modern group-connected team sites get 
       siteUrl=$(echo ${site} | jq -r '.Url')
       echo "Deleting site..."
       echo $siteUrl
-      m365 spo site classic remove --url $siteUrl
+      m365 spo site remove --url $siteUrl
     done
     ```
 
