@@ -1,4 +1,4 @@
-# outlook sendmail
+# outlook mail send
 
 Sends an e-mail
 
@@ -6,12 +6,6 @@ Sends an e-mail
 
 ```sh
 m365 outlook mail send [options]
-```
-
-## Alias
-
-```sh
-m365 outlook sendmail [options]
 ```
 
 ## Options

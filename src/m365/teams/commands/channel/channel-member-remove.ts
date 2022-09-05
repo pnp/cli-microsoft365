@@ -39,10 +39,6 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
     return 'Updates the role of the specified member in the specified Microsoft Teams private team channel';
   }
 
-  public alias(): string[] | undefined {
-    return [commands.CONVERSATIONMEMBER_REMOVE];
-  }
-
   constructor() {
     super();
 
@@ -125,8 +121,6 @@ class TeamsChannelMemberRemoveCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this.showDeprecationWarning(logger, commands.CONVERSATIONMEMBER_REMOVE, commands.CHANNEL_MEMBER_REMOVE);
-
     const removeMember: () => void = (): void => {
       this
         .removeMemberFromChannel(args)

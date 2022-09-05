@@ -8,12 +8,6 @@ Adds a specified member in the specified Microsoft Teams private team channel
 m365 teams channel member add [options]
 ```
 
-## Alias
-
-```sh
-m365 teams conversationmember add [options]
-```
-
 ## Options
 
 `-i, --teamId [teamId]`

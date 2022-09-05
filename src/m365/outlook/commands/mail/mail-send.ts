@@ -29,10 +29,6 @@ class OutlookMailSendCommand extends GraphCommand {
     return 'Sends an e-mail';
   }
 
-  public alias(): string[] | undefined {
-    return [commands.SENDMAIL];
-  }
-
   constructor() {
     super();
 

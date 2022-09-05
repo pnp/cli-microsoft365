@@ -11,12 +11,6 @@ Connects site collection to an Microsoft 365 Group
 m365 spo site groupify [options]
 ```
 
-## Alias
-
-```sh
-m365 spo site groupify
-```
-
 ## Options
 
 `-u, --url <url>`

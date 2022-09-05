@@ -35,10 +35,6 @@ class TeamsChannelMemberListCommand extends GraphCommand {
     return 'Lists members of the specified Microsoft Teams team channel';
   }
 
-  public alias(): string[] | undefined {
-    return [commands.CONVERSATIONMEMBER_LIST];
-  }
-
   public defaultProperties(): string[] | undefined {
     return ['id', 'roles', 'displayName', 'userId', 'email'];
   }
@@ -115,8 +111,6 @@ class TeamsChannelMemberListCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this.showDeprecationWarning(logger, commands.CONVERSATIONMEMBER_LIST, commands.CHANNEL_MEMBER_LIST);
-
     this
       .getTeamId(args)
       .then((teamId: string): Promise<string> => {
