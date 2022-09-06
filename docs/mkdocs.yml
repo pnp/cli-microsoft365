@@ -207,7 +207,7 @@ nav:
         - plan remove: 'cmd/planner/plan/plan-remove.md'
       - task:
         - task add: 'cmd/planner/task/task-add.md'
-        - task checklistitem add: 'cmd/planner/task/task-checklistitem-add.md'        
+        - task checklistitem add: 'cmd/planner/task/task-checklistitem-add.md'
         - task checklistitem list: 'cmd/planner/task/task-checklistitem-list.md'
         - task checklistitem remove: 'cmd/planner/task/task-checklistitem-remove.md'
         - task details get: 'cmd/planner/task/task-get.md'
@@ -733,6 +733,8 @@ nav:
       - 'Inventory Flows By Owner' : 'sample-scripts/flow/inventory-flows-by-author.md'
       - 'Resubmit all failed flow runs for a flow in an environment': 'sample-scripts/flow/resubmit-all-failed-flow-runs.md'
       - 'Search flows for connections' : 'sample-scripts/flow/search-flows-for-connection.md'
+    - Power Platform:
+      - 'List all Power Platform Environments and their Flows and Apps': 'sample-scripts/powerplatform/list-environments-flows-apps.md'
     - SharePoint Online:
       - 'Add App Catalog to SharePoint site': 'sample-scripts/spo/add-app-catalog.md'
       - 'Add custom client-side web part to modern page': 'sample-scripts/spo/add-custom-clientside-webpart-to-modern-page.md'
@@ -811,7 +813,7 @@ nav:
     - License: 'about/license.md'
 theme:
     name: 'material'
-    palette:        
+    palette:
         - media: "(prefers-color-scheme: light)"
           scheme: default
           primary: 'red'
@@ -820,7 +822,7 @@ theme:
             icon: material/weather-sunny
             name: Switch to dark mode
         - media: "(prefers-color-scheme: dark)"
-          scheme: slate 
+          scheme: slate
           primary: 'red'
           toggle:
             icon: material/weather-night
@@ -842,7 +844,7 @@ markdown_extensions:
     - pymdownx.snippets
     - pymdownx.superfences
     - pymdownx.tabbed:
-        alternate_style: true 
+        alternate_style: true
     - pymdownx.tabbed
     - pymdownx.emoji:
           emoji_index: !!python/name:materialx.emoji.twemoji
