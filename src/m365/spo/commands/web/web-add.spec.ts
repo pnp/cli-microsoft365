@@ -76,7 +76,7 @@ describe(commands.WEB_ADD, () => {
     let configuredNavigation: boolean = false;
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/webinfos/add') {
         return Promise.resolve({
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
@@ -129,7 +129,7 @@ describe(commands.WEB_ADD, () => {
     let configuredNavigation: boolean = false;
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('_api/web/webinfos/add') > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/webinfos/add') {
         return Promise.resolve({
           Configuration: 0,
           Created: "2018-01-24T18:24:20",

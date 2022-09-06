@@ -98,6 +98,14 @@ describe(commands.WEB_REMOVE, () => {
   });
 
   it('should prompt before deleting subsite when confirmation argument not passed', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if ((opts.url as string).indexOf('_api/web') > -1) {
+        return Promise.resolve(true);
+      }
+      return Promise.reject('Invalid request');
+    });
+    
     await command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/subsite' } });
     let promptIssued = false;
 

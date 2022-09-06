@@ -145,49 +145,49 @@ class SpoTermSetAddCommand extends SpoCommand {
 
       termSet = json[json.length - 1];
 
-      if (!args.options.description &&
-        !args.options.customProperties) {
-        return Promise.resolve();
-      }
-
-      let termStoreObjectIdentity: string = '';
-      // get term store object identity
-      for (let i: number = 0; i < json.length; i++) {
-        if (json[i] !== 39) {
-          continue;
+      let terms: string = undefined as any;
+      if (!(!args.options.description &&
+        !args.options.customProperties)) {
+        let termStoreObjectIdentity: string = '';
+        // get term store object identity
+        for (let i: number = 0; i < json.length; i++) {
+          if (json[i] !== 39) {
+            continue;
+          }
+  
+          termStoreObjectIdentity = json[i + 1]._ObjectIdentity_;
+          break;
         }
-
-        termStoreObjectIdentity = json[i + 1]._ObjectIdentity_;
-        break;
+  
+        if (this.verbose) {
+          logger.logToStderr(`Setting term set properties...`);
+        }
+  
+        const properties: string[] = [];
+        let i: number = 127;
+        if (args.options.description) {
+          properties.push(`<SetProperty Id="${i++}" ObjectPathId="117" Name="Description"><Parameter Type="String">${formatting.escapeXml(args.options.description)}</Parameter></SetProperty>`);
+          termSet.Description = args.options.description;
+        }
+        if (args.options.customProperties) {
+          const customProperties: any = JSON.parse(args.options.customProperties);
+          Object.keys(customProperties).forEach(k => {
+            properties.push(`<Method Name="SetCustomProperty" Id="${i++}" ObjectPathId="117"><Parameters><Parameter Type="String">${formatting.escapeXml(k)}</Parameter><Parameter Type="String">${formatting.escapeXml(customProperties[k])}</Parameter></Parameters></Method>`);
+          });
+          termSet.CustomProperties = customProperties;
+        }
+  
+        const requestOptions: any = {
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'X-RequestDigest': formDigest
+          },
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${properties.join('')}<Method Name="CommitAll" Id="131" ObjectPathId="109" /></Actions><ObjectPaths><Identity Id="117" Name="${termSet._ObjectIdentity_}" /><Identity Id="109" Name="${termStoreObjectIdentity}" /></ObjectPaths></Request>`
+        };
+  
+        terms = await request.post(requestOptions);
       }
 
-      if (this.verbose) {
-        logger.logToStderr(`Setting term set properties...`);
-      }
-
-      const properties: string[] = [];
-      let i: number = 127;
-      if (args.options.description) {
-        properties.push(`<SetProperty Id="${i++}" ObjectPathId="117" Name="Description"><Parameter Type="String">${formatting.escapeXml(args.options.description)}</Parameter></SetProperty>`);
-        termSet.Description = args.options.description;
-      }
-      if (args.options.customProperties) {
-        const customProperties: any = JSON.parse(args.options.customProperties);
-        Object.keys(customProperties).forEach(k => {
-          properties.push(`<Method Name="SetCustomProperty" Id="${i++}" ObjectPathId="117"><Parameters><Parameter Type="String">${formatting.escapeXml(k)}</Parameter><Parameter Type="String">${formatting.escapeXml(customProperties[k])}</Parameter></Parameters></Method>`);
-        });
-        termSet.CustomProperties = customProperties;
-      }
-
-      const requestOptions: any = {
-        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-        headers: {
-          'X-RequestDigest': formDigest
-        },
-        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${properties.join('')}<Method Name="CommitAll" Id="131" ObjectPathId="109" /></Actions><ObjectPaths><Identity Id="117" Name="${termSet._ObjectIdentity_}" /><Identity Id="109" Name="${termStoreObjectIdentity}" /></ObjectPaths></Request>`
-      };
-
-      const terms: string = await request.post(requestOptions);
       if (terms) {
         const json: ClientSvcResponse = JSON.parse(terms);
         const response: ClientSvcResponseContents = json[0];

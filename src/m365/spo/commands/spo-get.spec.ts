@@ -76,7 +76,7 @@ describe(commands.GET, () => {
   it('gets SPO URL when other URL was get previously', async () => {
     auth.service.spoUrl = 'https://northwind.sharepoint.com';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true

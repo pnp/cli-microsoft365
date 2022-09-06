@@ -80,11 +80,10 @@ class SpoThemeApplyCommand extends SpoCommand {
     try {
       const spoAdminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
 
-      if (isSharePointTheme) {
-        return Promise.resolve(undefined as any);
+      let res: ContextInfo = undefined as any;
+      if (!isSharePointTheme) {
+        res = await spo.getRequestDigest(spoAdminUrl);
       }
-
-      const res: ContextInfo = await spo.getRequestDigest(spoAdminUrl);
 
       if (this.verbose) {
         logger.logToStderr(`Applying theme ${args.options.name} to the ${args.options.webUrl} site...`);
@@ -120,7 +119,6 @@ class SpoThemeApplyCommand extends SpoCommand {
 
         if (json.error) {
           throw json.error;
-          return;
         }
         else {
           logger.log(json.value);
@@ -132,7 +130,6 @@ class SpoThemeApplyCommand extends SpoCommand {
 
         if (response.ErrorInfo) {
           throw response.ErrorInfo.ErrorMessage;
-          return;
         }
         else {
           const result: boolean = json[json.length - 1];

@@ -125,23 +125,23 @@ class SpoTermGroupAddCommand extends SpoCommand {
 
       termGroup = json2[json2.length - 1];
 
-      if (!args.options.description) {
-        return Promise.resolve();
+      let termGroups: string = undefined as any;
+      if (args.options.description) {
+        if (this.verbose) {
+          logger.logToStderr(`Setting taxonomy term group description...`);
+        }
+  
+        const requestOptionsQuery: any = {
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'X-RequestDigest': formDigest
+          },
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="51" ObjectPathId="45" Name="Description"><Parameter Type="String">${formatting.escapeXml(args.options.description)}</Parameter></SetProperty></Actions><ObjectPaths><Identity Id="45" Name="${termGroup._ObjectIdentity_}" /></ObjectPaths></Request>`
+        };
+  
+        termGroups = await request.post(requestOptionsQuery);
       }
-
-      if (this.verbose) {
-        logger.logToStderr(`Setting taxonomy term group description...`);
-      }
-
-      const requestOptionsQuery: any = {
-        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-        headers: {
-          'X-RequestDigest': formDigest
-        },
-        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="51" ObjectPathId="45" Name="Description"><Parameter Type="String">${formatting.escapeXml(args.options.description)}</Parameter></SetProperty></Actions><ObjectPaths><Identity Id="45" Name="${termGroup._ObjectIdentity_}" /></ObjectPaths></Request>`
-      };
-
-      const termGroups: string = await request.post(requestOptionsQuery);
+      
       if (termGroups) {
         const json: ClientSvcResponse = JSON.parse(termGroups);
         const response: ClientSvcResponseContents = json[0];

@@ -99,6 +99,7 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   it('uninstalls app from the specified site without prompting with confirmation argument', async () => {
+    sinonUtil.restore([ request.post ]);
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -130,6 +131,7 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   it('uninstalls app from the specified site installed from the site collection app catalog', async () => {
+    sinonUtil.restore([ request.post ]);
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -180,6 +182,7 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   it('uninstalls an app when prompt confirmed', async () => {
+    sinonUtil.restore([ request.post ]);
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -215,6 +218,7 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   it('correctly handles failure when app not found in app catalog', async () => {
+    sinonUtil.restore([ request.post ]);
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -248,6 +252,7 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   it('correctly handles failure when app is already being uninstalled', async () => {
+    sinonUtil.restore([ request.post ]);
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -280,6 +285,7 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   it('correctly handles random API error', async () => {
+    sinonUtil.restore([ request.post ]);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');
@@ -301,6 +307,7 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   it('correctly handles random API error (error message is not ODataError)', async () => {
+    sinonUtil.restore([ request.post ]);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');
@@ -322,6 +329,7 @@ describe(commands.APP_UNINSTALL, () => {
   });
 
   it('correctly handles API OData error', async () => {
+    sinonUtil.restore([ request.post ]);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/common/oauth2/token') > -1) {
         return Promise.resolve('abc');

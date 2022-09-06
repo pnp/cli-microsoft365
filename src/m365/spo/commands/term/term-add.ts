@@ -202,57 +202,57 @@ class SpoTermAddCommand extends SpoCommand {
 
       term = json[json.length - 1];
 
-      if (!args.options.description &&
+      let terms: string = undefined as any;
+      if (!(!args.options.description &&
         !args.options.customProperties &&
-        !args.options.localCustomProperties) {
-        return Promise.resolve();
-      }
-
-      if (this.verbose) {
-        logger.logToStderr(`Setting term properties...`);
-      }
-
-      const properties: string[] = [];
-      let i: number = 127;
-      if (args.options.description) {
-        properties.push(`<Method Name="SetDescription" Id="${i++}" ObjectPathId="117"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.description)}</Parameter><Parameter Type="Int32">1033</Parameter></Parameters></Method>`);
-        term.Description = args.options.description;
-      }
-      if (args.options.customProperties) {
-        const customProperties: any = JSON.parse(args.options.customProperties);
-        Object.keys(customProperties).forEach(k => {
-          properties.push(`<Method Name="SetCustomProperty" Id="${i++}" ObjectPathId="117"><Parameters><Parameter Type="String">${formatting.escapeXml(k)}</Parameter><Parameter Type="String">${formatting.escapeXml(customProperties[k])}</Parameter></Parameters></Method>`);
-        });
-        term.CustomProperties = customProperties;
-      }
-      if (args.options.localCustomProperties) {
-        const localCustomProperties: any = JSON.parse(args.options.localCustomProperties);
-        Object.keys(localCustomProperties).forEach(k => {
-          properties.push(`<Method Name="SetLocalCustomProperty" Id="${i++}" ObjectPathId="117"><Parameters><Parameter Type="String">${formatting.escapeXml(k)}</Parameter><Parameter Type="String">${formatting.escapeXml(localCustomProperties[k])}</Parameter></Parameters></Method>`);
-        });
-        term.LocalCustomProperties = localCustomProperties;
-      }
-
-      let termStoreObjectIdentity: string = '';
-      // get term store object identity
-      for (let i: number = 0; i < json.length; i++) {
-        if (json[i] !== 8) {
-          continue;
+        !args.options.localCustomProperties)) {
+        if (this.verbose) {
+          logger.logToStderr(`Setting term properties...`);
         }
-
-        termStoreObjectIdentity = json[i + 1]._ObjectIdentity_;
-        break;
+  
+        const properties: string[] = [];
+        let i: number = 127;
+        if (args.options.description) {
+          properties.push(`<Method Name="SetDescription" Id="${i++}" ObjectPathId="117"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.description)}</Parameter><Parameter Type="Int32">1033</Parameter></Parameters></Method>`);
+          term.Description = args.options.description;
+        }
+        if (args.options.customProperties) {
+          const customProperties: any = JSON.parse(args.options.customProperties);
+          Object.keys(customProperties).forEach(k => {
+            properties.push(`<Method Name="SetCustomProperty" Id="${i++}" ObjectPathId="117"><Parameters><Parameter Type="String">${formatting.escapeXml(k)}</Parameter><Parameter Type="String">${formatting.escapeXml(customProperties[k])}</Parameter></Parameters></Method>`);
+          });
+          term.CustomProperties = customProperties;
+        }
+        if (args.options.localCustomProperties) {
+          const localCustomProperties: any = JSON.parse(args.options.localCustomProperties);
+          Object.keys(localCustomProperties).forEach(k => {
+            properties.push(`<Method Name="SetLocalCustomProperty" Id="${i++}" ObjectPathId="117"><Parameters><Parameter Type="String">${formatting.escapeXml(k)}</Parameter><Parameter Type="String">${formatting.escapeXml(localCustomProperties[k])}</Parameter></Parameters></Method>`);
+          });
+          term.LocalCustomProperties = localCustomProperties;
+        }
+  
+        let termStoreObjectIdentity: string = '';
+        // get term store object identity
+        for (let i: number = 0; i < json.length; i++) {
+          if (json[i] !== 8) {
+            continue;
+          }
+  
+          termStoreObjectIdentity = json[i + 1]._ObjectIdentity_;
+          break;
+        }
+  
+        const requestOptions: any = {
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'X-RequestDigest': formDigest
+          },
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${properties.join('')}<Method Name="CommitAll" Id="131" ObjectPathId="109" /></Actions><ObjectPaths><Identity Id="117" Name="${term._ObjectIdentity_}" /><Identity Id="109" Name="${termStoreObjectIdentity}" /></ObjectPaths></Request>`
+        };
+  
+        terms = await request.post(requestOptions);
       }
 
-      const requestOptions: any = {
-        url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-        headers: {
-          'X-RequestDigest': formDigest
-        },
-        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${properties.join('')}<Method Name="CommitAll" Id="131" ObjectPathId="109" /></Actions><ObjectPaths><Identity Id="117" Name="${term._ObjectIdentity_}" /><Identity Id="109" Name="${termStoreObjectIdentity}" /></ObjectPaths></Request>`
-      };
-
-      const terms: string = await request.post(requestOptions);
       if (terms) {
         const json: ClientSvcResponse = JSON.parse(terms);
         const response: ClientSvcResponseContents = json[0];

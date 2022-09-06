@@ -95,7 +95,7 @@ class SpoWebReindexCommand extends SpoCommand {
       await SpoPropertyBagBaseCommand.setProperty('vti_searchversion', searchVersion.toString(), args.options.webUrl, requestDigest, webIdentityResp, logger, this.debug);
     } 
     catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
+      this.handleRejectedPromise(err);
     }
   }
 
@@ -121,7 +121,7 @@ class SpoWebReindexCommand extends SpoCommand {
           return Promise.all(promises);
         })
         .then((): void => {
-          reject(undefined);
+          resolve();
         }, (err: any) => reject(err));
     });
   }

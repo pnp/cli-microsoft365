@@ -172,7 +172,7 @@ describe(commands.USER_REMOVE, () => {
   it('removes user by login name successfully without prompting with confirmation argument', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf(`_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cjohn.doe%40mytenant.onmicrosoft.com')`) > -1) {
+      if (opts.url === "https://contoso.sharepoint.com/subsite/_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cparker%40tenant.onmicrosoft.com')") {
         return Promise.resolve(true);
       }
       return Promise.reject('Invalid request');

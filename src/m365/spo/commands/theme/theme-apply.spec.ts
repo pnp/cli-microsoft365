@@ -474,12 +474,7 @@ describe(commands.THEME_APPLY, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
-        return Promise.resolve(JSON.stringify({
-          "error": {
-            "code": "-2147024891, System.UnauthorizedAccessException",
-            "message": "Access denied. You do not have permission to perform this action or access this resource."
-          }
-        }));
+        return Promise.resolve(JSON.stringify("Access denied. You do not have permission to perform this action or access this resource."));
       }
 
       return Promise.reject('Invalid request');

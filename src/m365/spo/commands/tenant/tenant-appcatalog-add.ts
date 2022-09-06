@@ -1,5 +1,5 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
-import Command, { CommandError, CommandErrorWithOutput } from '../../../../Command';
+import Command from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
@@ -104,17 +104,17 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
   
         //Using JSON.parse
         await this.ensureNoExistingSite(appCatalogUrl, args.options.force, logger); 
-        await this.ensureNoExistingSite(args.options.url, args.options.force, logger);
-        await this.createAppCatalog(args.options, logger);  
       }
+      await this.ensureNoExistingSite(args.options.url, args.options.force, logger);
+      await this.createAppCatalog(args.options, logger);  
     } 
     catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
+      this.handleRejectedPromise(err);
     } 
   }
 
   private ensureNoExistingSite(url: string, force: boolean, logger: Logger): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (err: CommandError) => void): void => {
+    return new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
       if (this.verbose) {
         logger.logToStderr(`Checking if site ${url} exists...`);
       }
@@ -127,6 +127,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
           _: []
         }
       };
+
       Cli
         .executeCommandWithOutput(spoSiteGetCommand as Command, siteGetOptions)
         .then(() => {
@@ -135,7 +136,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
           }
 
           if (!force) {
-            return reject(new CommandError(`Another site exists at ${url}`));
+            reject(`Another site exists at ${url}`);
           }
 
           if (this.verbose) {
@@ -151,12 +152,12 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
           };
           Cli
             .executeCommand(spoSiteRemoveCommand as Command, { options: { ...siteRemoveOptions, _: [] } })
-            .then(() => resolve(), (err: CommandError) => reject(err));
-        }, (err: CommandErrorWithOutput) => {
+            .then(() => resolve(), (err) => reject(err));
+        }, (err: any) => {
           if (err.error.message !== 'File Not Found.' && err.error.message !== '404 FILE NOT FOUND') {
             // some other error occurred
-            return reject(err.error);
-          }
+            return reject(err.error.message);
+          } 
 
           if (this.verbose) {
             logger.logToStderr(`No site found at ${url}`);

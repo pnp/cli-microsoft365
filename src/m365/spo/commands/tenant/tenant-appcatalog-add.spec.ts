@@ -159,7 +159,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
       if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('An error has occurred'));
+          return Promise.reject('An error has occurred');
         }
 
         return Promise.reject('Invalid URL');
@@ -184,7 +184,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any);
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('handles error when app catalog and site with different URL already exist, force used and deleting the existing site failed', async () => {
@@ -194,10 +194,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
           return Promise.resolve();
         }
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('Error deleting site new-app-catalog'));
+          return Promise.reject('Error deleting site new-app-catalog');
         }
 
-        return Promise.reject(new CommandError('Invalid URL'));
+        return Promise.reject('Invalid URL');
       }
 
       if (command === spoSiteAddCommand) {
@@ -322,7 +322,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
       if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('An error has occurred'));
+          return Promise.reject('An error has occurred');
         }
 
         return Promise.reject('Invalid URL');
@@ -349,7 +349,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true } } as any);
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('handles error when retrieving site with different URL failed and app catalog already exists, and force used', async () => {
@@ -390,7 +390,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
-          return Promise.reject(new CommandError('An error has occurred'));
+          return Promise.reject('An error has occurred');
         }
 
         return Promise.reject(new CommandError('Invalid URL'));
@@ -495,7 +495,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
       if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('An error has occurred'));
+          return Promise.reject('An error has occurred');
         }
 
         return Promise.reject('Invalid URL');
@@ -529,7 +529,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('An error has occurred'));
+          return Promise.reject('An error has occurred');
         }
 
         return Promise.reject(new CommandError('Invalid URL'));
@@ -544,7 +544,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
       if (command === spoSiteGetCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
-          return Promise.reject(new CommandErrorWithOutput(new CommandError('404 FILE NOT FOUND')));
+          return Promise.reject('404 FILE NOT FOUND');
         }
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.resolve();
@@ -621,7 +621,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('An error has occurred'));
+          return Promise.reject('An error has occurred');
         }
 
         return Promise.reject('Invalid URL');
@@ -662,7 +662,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
       if (command === spoSiteGetCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
-          return Promise.reject(new CommandErrorWithOutput(new CommandError('An error has occurred')));
+          return Promise.reject('An error has occurred');
         }
 
         return Promise.reject(new CommandError('Invalid URL'));
@@ -764,7 +764,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
       if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('An error has occurred'));
+          return Promise.reject('An error has occurred');
         }
 
         return Promise.reject('Invalid URL');
@@ -795,7 +795,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('An error has occurred'));
+          return Promise.reject('An error has occurred');
         }
 
         return Promise.reject(new CommandError('Invalid URL'));
@@ -877,7 +877,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('An error has occurred'));
+          return Promise.reject('An error has occurred');
         }
 
         return Promise.reject('Invalid URL');
@@ -912,7 +912,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
       if (command === spoSiteGetCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandErrorWithOutput(new CommandError('An error has occurred')));
+          return Promise.reject('An error has occurred');
         }
 
         return Promise.reject(new CommandError('Invalid URL'));
@@ -927,7 +927,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
   it(`handles error when checking if app catalog registered throws error`, async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === spoTenantAppCatalogUrlGetCommand) {
-        return Promise.reject(new CommandError('An error has occurred'));
+        return Promise.reject('An error has occurred');
       }
 
       return Promise.reject(new CommandError('Unknown case'));

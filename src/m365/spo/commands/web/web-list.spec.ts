@@ -171,7 +171,7 @@ describe(commands.WEB_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       logger.log('Test Url:');
       logger.log(opts.url);
-      if ((opts.url as string).indexOf('select123=') > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/webs') {
         return Promise.resolve('Correct Url1');
       }
 

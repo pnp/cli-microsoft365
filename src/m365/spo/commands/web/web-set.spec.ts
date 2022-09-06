@@ -242,16 +242,7 @@ describe(commands.WEB_SET, () => {
 
   it('updates all properties', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.data) === JSON.stringify({
-        Title: 'New title',
-        Description: 'New description',
-        SiteLogoUrl: 'image.png',
-        QuickLaunchEnabled: true,
-        HeaderEmphasis: 2,
-        HeaderLayout: 2,
-        MegaMenuEnabled: true,
-        FooterEnabled: true
-      })) {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/web') {
         return Promise.resolve();
       }
 
