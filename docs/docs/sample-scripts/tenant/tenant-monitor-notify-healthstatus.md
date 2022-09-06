@@ -1,7 +1,6 @@
 ---
 tags:
-  - Usage
-  - Analytics
+  - Reports
 ---
 
 # Monitor and notify Microsoft 365 health status

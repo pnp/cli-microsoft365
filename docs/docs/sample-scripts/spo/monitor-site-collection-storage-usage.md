@@ -1,7 +1,6 @@
 ---
 tags:
-  - Analytics
-  - Usage
+  - Reports
 ---
 
 # Monitor Site Collections Storage Usage

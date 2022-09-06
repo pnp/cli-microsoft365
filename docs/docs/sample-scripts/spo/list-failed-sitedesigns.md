@@ -1,6 +1,7 @@
 ---
 tags:
-  - Analytics
+  - Reports
+  - Failures
 ---
 
 # List all failed site design for all sites

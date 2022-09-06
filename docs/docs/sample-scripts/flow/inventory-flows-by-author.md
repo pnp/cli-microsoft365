@@ -1,6 +1,6 @@
 ---
 tags:  
-  - Usage
+  - Reports
 ---
 
 # Inventory Flows By Creator  

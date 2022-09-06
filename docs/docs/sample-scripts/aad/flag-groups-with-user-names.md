@@ -1,6 +1,7 @@
 ---
 tags:  
-  - Governance
+  - Users
+  - Reports
 ---
 
 # Scan for Microsoft 365 Groups created with user's first or last name

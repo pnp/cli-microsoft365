@@ -1,6 +1,7 @@
 ---
 tags:
   - Migration  
+  - Tasks
 ---
 
 # Add multiple tasks in Planner

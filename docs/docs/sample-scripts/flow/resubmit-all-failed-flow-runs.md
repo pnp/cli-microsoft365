@@ -1,6 +1,6 @@
 ---
 tags:  
-  - Miscelaneous
+  - Failures
 ---
 
 # Resubmit all failed flow runs for a flow in an environment

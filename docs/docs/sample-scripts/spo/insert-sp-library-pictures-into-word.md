@@ -1,6 +1,6 @@
 ---
 tags:
-  - Miscelaneous
+  - Lists
 ---
 
 # Insert pictures in a SharePoint Document Library into a Word document

@@ -1,6 +1,6 @@
 ---
 tags:
-  - Permission management
+  - Security
   - Users
 ---
 

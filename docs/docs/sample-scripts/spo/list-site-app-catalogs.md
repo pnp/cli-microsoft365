@@ -1,6 +1,6 @@
 ---
 tags:
-  - Analytics
+  - Reports
 ---
 
 # Lists active SharePoint site collection application catalogs

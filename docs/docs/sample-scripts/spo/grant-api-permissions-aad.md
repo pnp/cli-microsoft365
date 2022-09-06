@@ -1,6 +1,6 @@
 ---
 tags:
-  - Permission management
+  - Security
 ---
 
 # Grant API permissions to SharePoint Azure AD Application

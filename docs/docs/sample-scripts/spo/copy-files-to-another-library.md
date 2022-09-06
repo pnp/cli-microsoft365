@@ -1,6 +1,7 @@
 ---
 tags:
   - Files
+  - Migration
 ---
 
 # Copy files to another SharePoint Library in another site

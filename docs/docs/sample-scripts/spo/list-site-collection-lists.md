@@ -1,6 +1,6 @@
 ---
 tags:
-  - Analytics
+  - Reports
 ---
 
 # List site collections and their lists

@@ -1,6 +1,6 @@
 ---
 tags:
-  - Usage
+  - Reports
 ---
 
 # List app usage in Microsoft Teams

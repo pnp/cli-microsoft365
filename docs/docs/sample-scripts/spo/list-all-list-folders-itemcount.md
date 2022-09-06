@@ -1,7 +1,7 @@
 ---
 tags:
   - Files  
-  - Analytics
+  - Reports
 ---
 
 # Lists number of files in all lists and folders for the given site

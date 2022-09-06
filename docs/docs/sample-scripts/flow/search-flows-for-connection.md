@@ -1,6 +1,6 @@
 ---
 tags:  
-  - Miscelaneous
+  - Reports
 ---
 
 # Search flows for connections

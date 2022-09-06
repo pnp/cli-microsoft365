@@ -1,7 +1,7 @@
 ---
 tags:
   - Files
-  - Analytics
+  - Reports
 ---
 
 # List all large files within a SharePoint Site

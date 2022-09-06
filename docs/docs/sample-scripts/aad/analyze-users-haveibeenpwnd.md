@@ -1,7 +1,6 @@
 ---
 tags:  
   - Privacy
-  - Miscelaneous
   - Users
 ---
 

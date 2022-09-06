@@ -1,7 +1,6 @@
 ---
 tags:
-  - Provisioning
-  - Customizations
+  - Reports
 ---
 
 # List all application customizers in a tenant

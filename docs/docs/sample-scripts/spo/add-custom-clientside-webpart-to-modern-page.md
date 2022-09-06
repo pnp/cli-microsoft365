@@ -1,7 +1,7 @@
 ---
 tags:
   - Provisioning
-  - Pages
+  - Migration
 ---
 
 # Add custom client-side web part to modern page

@@ -1,7 +1,7 @@
 ---
 tags:  
   - Users
-  - Permission management
+  - Security
 ---
 
 # Replace an owner in a Microsoft 365 Group or Microsoft Team

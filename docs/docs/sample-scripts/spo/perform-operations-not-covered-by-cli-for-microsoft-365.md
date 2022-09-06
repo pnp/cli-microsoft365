@@ -1,8 +1,3 @@
----
-tags:
-  - Miscelaneous
----
-
 # How to perform operations if a command is not covered by the CLI for Microsoft 365
 
 Author: [Joseph Velliah](https://blog.josephvelliah.com/spol-download-attachments-from-list-items-using-cli-for-microsoft-365)

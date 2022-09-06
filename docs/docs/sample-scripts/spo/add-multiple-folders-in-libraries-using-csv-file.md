@@ -1,6 +1,7 @@
 ---
 tags:
   - Files
+  - Provisioning
 ---
 
 # Add multiple folders in libraries using a csv file

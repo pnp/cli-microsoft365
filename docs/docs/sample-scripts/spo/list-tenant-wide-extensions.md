@@ -1,6 +1,6 @@
 ---
 tags:
-  - Analytics
+  - Reports
 ---
 
 # List all tenant-wide extensions

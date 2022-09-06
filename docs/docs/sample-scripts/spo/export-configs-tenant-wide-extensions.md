@@ -1,6 +1,6 @@
 ---
 tags:
-  - Governance
+  - Reports
 ---
 
 # Export Configurations of Tenant Wide Extensions

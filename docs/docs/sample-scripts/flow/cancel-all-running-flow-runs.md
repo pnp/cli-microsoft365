@@ -1,6 +1,6 @@
 ---
 tags:  
-  - Miscelaneous
+  - Cleanup
 ---
 
 # Cancel all running flow runs for a flow in an environment

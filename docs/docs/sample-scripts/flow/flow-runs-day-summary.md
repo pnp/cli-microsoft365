@@ -1,6 +1,6 @@
 ---
 tags:  
-  - Usage
+  - Reports
 ---
 
 # Flow runs day summary report

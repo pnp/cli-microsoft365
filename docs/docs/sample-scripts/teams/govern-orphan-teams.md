@@ -1,6 +1,7 @@
 ---
 tags:
-  - Governance
+  - Users
+  - Security
 ---
 
 # Govern orphaned Microsoft Teams

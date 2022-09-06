@@ -1,8 +1,8 @@
 ---
 tags:
-  - Analytics
+  - Reports
   - Users
-  - Permission management
+  - Security
 ---
 
 # List site collection owners

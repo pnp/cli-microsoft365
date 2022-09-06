@@ -1,7 +1,7 @@
 ---
 tags:
   - Users
-  - Permission management
+  - Security
 ---
 
 # Add users to the Associated SharePoint Groups of a site from a CSV File

@@ -1,6 +1,7 @@
 ---
 tags:  
   - Cleanup
+  - Sites
 ---
 
 # Delete all Microsoft 365 groups and SharePoint sites

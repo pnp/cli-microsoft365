@@ -1,7 +1,7 @@
 ---
 tags:
   - Users
-  - Analytics
+  - Reports
 ---
 
 # List all team members in Microsoft Teams teams in the tenant

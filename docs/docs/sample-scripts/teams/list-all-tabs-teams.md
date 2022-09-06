@@ -1,6 +1,6 @@
 ---
 tags:
-  - Analytics
+  - Reports
 ---
 
 # List all tabs in Microsoft Teams teams in the tenant

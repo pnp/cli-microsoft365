@@ -1,7 +1,6 @@
 ---
 tags:
-  - Usage
-  - Analytics
+  - Reports
 ---
 
 # List Microsoft Teams teams, channels, and tabs in the tenant

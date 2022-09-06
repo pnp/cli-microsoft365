@@ -1,7 +1,7 @@
 ---
 tags:
   - Users
-  - Permission management
+  - Security
 ---
 
 # Change group membership of all SharePoint Online sites
