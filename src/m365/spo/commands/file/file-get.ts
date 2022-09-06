@@ -173,24 +173,28 @@ class SpoFileGetCommand extends SpoCommand {
     };
 
     try {
+      const file = await request.get<any>(requestOptions);
+      
       if (args.options.asFile && args.options.path) {
-        const file = await request.get<any>(requestOptions);
-        const writer = fs.createWriteStream(args.options.path as string);
+        // Not possible to use async/await for this promise
+        await new Promise<void>((resolve, reject) => {
+          const writer = fs.createWriteStream(args.options.path as string);
 
-        file.data.pipe(writer);
+          file.data.pipe(writer);
 
-        writer.on('error', err => {
-          throw err;
-        });
-        writer.on('close', () => {
-          const file = args.options.path as string;
-          if (this.verbose) {
-            logger.logToStderr(`File saved to path ${file}`);
-          }
+          writer.on('error', err => {
+            reject(err);
+          });
+          writer.on('close', () => {
+            const filePath = args.options.path as string;
+            if (this.verbose) {
+              logger.logToStderr(`File saved to path ${filePath}`);
+            }
+            return resolve();
+          });
         });
       }
       else {
-        const file = await request.get<string>(requestOptions);
         if (args.options.asString) {
           logger.log(file.toString());
         }

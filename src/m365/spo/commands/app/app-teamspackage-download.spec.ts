@@ -476,7 +476,8 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { appItemId: 2 } }), new CommandError('Item does not exist. It may have been deleted by another user.'));
+    await assert.rejects(command.action(logger, { options: { appItemId: 2 } }),
+      new CommandError('Item does not exist. It may have been deleted by another user.'));
   });
 
   it(`handles error when the specified appName doesn't exist`, async () => {
@@ -502,7 +503,8 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg' } }), new CommandError('File Not Found.'));
+    await assert.rejects(command.action(logger, { options: { appName: 'm365-spfx-wellbeing.sppkg' } }),
+      new CommandError('File Not Found.'));
   });
 
   it(`handles error when the package doesn't support syncing to Teams`, async () => {
@@ -526,7 +528,8 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { appItemId: 2 } }), new CommandError('Request failed with status code 404'));
+    await assert.rejects(command.action(logger, { options: { appItemId: 2 } }),
+      new CommandError('Request failed with status code 404'));
   });
 
   it(`handles error when saving the package to file fails`, async () => {
@@ -564,7 +567,8 @@ describe(commands.APP_TEAMSPACKAGE_DOWNLOAD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, { options: { appItemId: 2 } }), new CommandError('An error has occurred'));
+    await assert.rejects(command.action(logger, { options: { appItemId: 2 } }),
+      new CommandError('An error has occurred'));
   });
 
   it('fails validation if the appCatalogUrl option is not a valid SharePoint site URL', async () => {

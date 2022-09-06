@@ -138,16 +138,22 @@ class SpoAppTeamsPackageDownloadCommand extends SpoAppBaseCommand {
 
       const file = await request.get<any>(requestOptions);
 
-      const writer = fs.createWriteStream(appInfo.packageFileName as string);
-      file.data.pipe(writer);
-      writer.on('error', err => {
-        throw err;
-      });
-      writer.on('close', () => {
-        const fileName = appInfo.packageFileName as string;
-        if (this.verbose) {
-          logger.logToStderr(`Package saved to ${fileName}`);
-        }
+      // Not possible to use async/await for this promise
+      await new Promise<void>((resolve, reject) => {
+        const writer = fs.createWriteStream(appInfo.packageFileName as string);
+
+        file.data.pipe(writer);
+
+        writer.on('error', err => {
+          return reject(err);
+        });
+        writer.on('close', () => {
+          const fileName = appInfo.packageFileName as string;
+          if (this.verbose) {
+            logger.logToStderr(`Package saved to ${fileName}`);
+          }
+          return resolve();
+        });
       });
     }
     catch (err: any) {
