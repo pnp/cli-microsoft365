@@ -383,6 +383,9 @@ class SpoSiteClassicAddCommand extends SpoCommand {
               });
             }, operation.PollingInterval);
           }
+        })
+        .catch((e) => {
+          reject(e);
         });
     });
   }
