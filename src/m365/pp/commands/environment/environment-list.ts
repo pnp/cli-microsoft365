@@ -43,7 +43,7 @@ class PpEnvironmentListCommand extends PowerPlatformCommand {
   #initOptions(): void {
     this.options.unshift(
       {
-        option: '-a, --asAdmin [teamId]'
+        option: '-a, --asAdmin'
       }
     );
   }

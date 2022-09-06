@@ -26,10 +26,10 @@ m365 spo list roleassignment remove [options]
 : SharePoint ID of principal it may be either user id or group id we want to remove permissions Specify principalId only when upn or groupName are not used.
 
 `--upn [upn]`
-: upn/email of user. Specify either upn or princpialId.
+: upn/email of user. Specify either upn or principalId.
 
 `--groupName [groupName]`
-: enter group name of Azure AD or SharePoint group. Specify either groupName or princpialId.
+: enter group name of Azure AD or SharePoint group. Specify either groupName or principalId.
 
 `--confirm`
 : Don't prompt for confirming removing the role assignment
