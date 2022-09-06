@@ -149,7 +149,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
 
   it('correctly handles OData error when granting rights', async () => {
     sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
+      return Promise.reject('An error has occurred');
     });
 
     await assert.rejects(command.action(logger, { options: {

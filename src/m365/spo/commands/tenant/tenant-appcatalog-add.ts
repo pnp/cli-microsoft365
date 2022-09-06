@@ -1,5 +1,5 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError, CommandErrorWithOutput } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
@@ -89,32 +89,27 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
       logger.logToStderr('Checking for existing app catalog URL...');
     }
 
-    try {
-      const spoTenantAppCatalogUrlGetCommandOutput: CommandOutput = await Cli.executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { output: 'text', _: [] } });
-      const appCatalogUrl: string | undefined = spoTenantAppCatalogUrlGetCommandOutput.stdout;
-      if (!appCatalogUrl) {
-        if (this.verbose) {
-          logger.logToStderr('No app catalog URL found');
-        }
-      } 
-      else {
-        if (this.verbose) {
-          logger.logToStderr(`Found app catalog URL ${appCatalogUrl}`);
-        }
-  
-        //Using JSON.parse
-        await this.ensureNoExistingSite(appCatalogUrl, args.options.force, logger); 
+    const spoTenantAppCatalogUrlGetCommandOutput: CommandOutput = await Cli.executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { output: 'text', _: [] } });
+    const appCatalogUrl: string | undefined = spoTenantAppCatalogUrlGetCommandOutput.stdout;
+    if (!appCatalogUrl) {
+      if (this.verbose) {
+        logger.logToStderr('No app catalog URL found');
       }
-      await this.ensureNoExistingSite(args.options.url, args.options.force, logger);
-      await this.createAppCatalog(args.options, logger);  
     } 
-    catch (err: any) {
-      this.handleRejectedPromise(err);
-    } 
+    else {
+      if (this.verbose) {
+        logger.logToStderr(`Found app catalog URL ${appCatalogUrl}`);
+      }
+
+      //Using JSON.parse
+      await this.ensureNoExistingSite(appCatalogUrl, args.options.force, logger); 
+    }
+    await this.ensureNoExistingSite(args.options.url, args.options.force, logger);
+    await this.createAppCatalog(args.options, logger);  
   }
 
   private ensureNoExistingSite(url: string, force: boolean, logger: Logger): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
+    return new Promise<void>((resolve: () => void, reject: (err: CommandError) => void): void => {
       if (this.verbose) {
         logger.logToStderr(`Checking if site ${url} exists...`);
       }
@@ -127,7 +122,6 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
           _: []
         }
       };
-
       Cli
         .executeCommandWithOutput(spoSiteGetCommand as Command, siteGetOptions)
         .then(() => {
@@ -136,7 +130,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
           }
 
           if (!force) {
-            reject(`Another site exists at ${url}`);
+            return reject(new CommandError(`Another site exists at ${url}`));
           }
 
           if (this.verbose) {
@@ -152,12 +146,12 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
           };
           Cli
             .executeCommand(spoSiteRemoveCommand as Command, { options: { ...siteRemoveOptions, _: [] } })
-            .then(() => resolve(), (err) => reject(err));
-        }, (err: any) => {
+            .then(() => resolve(), (err: CommandError) => reject(err));
+        }, (err: CommandErrorWithOutput) => {
           if (err.error.message !== 'File Not Found.' && err.error.message !== '404 FILE NOT FOUND') {
             // some other error occurred
-            return reject(err.error.message);
-          } 
+            return reject(err.error);
+          }
 
           if (this.verbose) {
             logger.logToStderr(`No site found at ${url}`);

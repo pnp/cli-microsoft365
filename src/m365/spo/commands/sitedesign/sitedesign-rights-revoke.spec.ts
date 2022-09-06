@@ -182,7 +182,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
 
   it('correctly handles error when site script not found', async () => {
     sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
+      return Promise.reject('File Not Found.' );
     });
 
     await assert.rejects(command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } } as any), new CommandError('File Not Found.'));
