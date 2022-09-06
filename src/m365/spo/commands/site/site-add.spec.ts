@@ -334,7 +334,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, type: 'CommunicationSite', title: expected } });
+    await assert.rejects(command.action(logger, { options: { debug: false, type: 'CommunicationSite', title: expected } }));
     assert.strictEqual(actual, expected);
   });
 
@@ -350,13 +350,13 @@ describe(commands.SITE_ADD, () => {
     await command.action(logger, { options: { debug: false, type: 'CommunicationSite' } });
   });
 
-  it('sets specified title for communication site when owners is passed', async () => {
+  it('sets specified title for communication site when owners option is passed', async () => {
     const expected = 'Marketing';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.Title;
-        return Promise.resolve({});
+        return Promise.resolve({ SiteStatus: 2});
       }
 
       return Promise.reject('Invalid request');
@@ -372,7 +372,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.Url;
-        return Promise.resolve({});
+        return Promise.resolve({ SiteStatus: 2});
       }
 
       return Promise.reject('Invalid request');
@@ -388,7 +388,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.ShareByEmailEnabled;
-        return Promise.resolve({});
+        return Promise.resolve({ SiteStatus: 2});
       }
 
       return Promise.reject('Invalid request');
@@ -404,7 +404,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.ShareByEmailEnabled;
-        return Promise.resolve({});
+        return Promise.resolve({ SiteStatus: 2});
       }
 
       return Promise.reject('Invalid request');
@@ -416,7 +416,7 @@ describe(commands.SITE_ADD, () => {
 
   it('shows deprecation warning when allowFileSharingForGuestUsers used in verbose mode', async () => {
     sinon.stub(request, 'post').callsFake(() => {
-      return Promise.resolve({});
+      return Promise.resolve({ SiteStatus: 2});
     });
 
     await command.action(logger, { options: { verbose: true, type: 'CommunicationSite', allowFileSharingForGuestUsers: true } });
@@ -429,7 +429,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.ShareByEmailEnabled;
-        return Promise.resolve({});
+        return Promise.resolve({ SiteStatus: 2});
       }
 
       return Promise.reject('Invalid request');
@@ -445,7 +445,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.Description;
-        return Promise.resolve({});
+        return Promise.resolve({ SiteStatus: 2});
       }
 
       return Promise.reject('Invalid request');
@@ -461,7 +461,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.Description;
-        return Promise.resolve({});
+        return Promise.resolve({ SiteStatus: 2});
       }
 
       return Promise.reject('Invalid request');
@@ -477,7 +477,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.Classification;
-        return Promise.resolve({});
+        return Promise.resolve({ SiteStatus: 2});
       }
 
       return Promise.reject('Invalid request');
@@ -491,9 +491,9 @@ describe(commands.SITE_ADD, () => {
     const expected = '';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/GroupSiteManager/CreateGroupEx`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.Classification;
-        return Promise.resolve({});
+        return Promise.resolve({ SiteStatus: 2});
       }
 
       return Promise.reject('Invalid request');
@@ -509,7 +509,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.SiteDesignId;
-        return Promise.resolve({});
+        return Promise.resolve({ SiteStatus: 2});
       }
 
       return Promise.reject('Invalid request');
@@ -525,7 +525,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.SiteDesignId;
-        return Promise.resolve({});
+        return Promise.resolve({ SiteStatus: 2});
       }
 
       return Promise.reject('Invalid request');
@@ -541,7 +541,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.SiteDesignId;
-        return Promise.resolve({});
+        return Promise.resolve({ SiteStatus: 2});
       }
 
       return Promise.reject('Invalid request');
@@ -557,7 +557,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.SiteDesignId;
-        return Promise.resolve({});
+        return Promise.resolve({ SiteStatus: 2});
       }
 
       return Promise.reject('Invalid request');
@@ -573,7 +573,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.SiteDesignId;
-        return Promise.resolve({});
+        return Promise.resolve({ SiteStatus: 2});
       }
 
       return Promise.reject('Invalid request');
@@ -589,7 +589,7 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
         actual = opts.data.request.Lcid;
-        return Promise.resolve({});
+        return Promise.resolve({ SiteStatus: 2});
       }
 
       return Promise.reject('Invalid request');
