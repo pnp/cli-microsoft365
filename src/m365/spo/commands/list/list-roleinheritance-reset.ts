@@ -1,3 +1,4 @@
+import { Cli } from '../../../../cli/Cli';
 import { Logger } from '../../../../cli/Logger';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -14,6 +15,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listId?: string;
   listTitle?: string;
+  confirm?: boolean;
 }
 
 class SpoListRoleInheritanceResetCommand extends SpoCommand {
@@ -38,7 +40,8 @@ class SpoListRoleInheritanceResetCommand extends SpoCommand {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
-        listTitle: typeof args.options.listTitle !== 'undefined'
+        listTitle: typeof args.options.listTitle !== 'undefined',
+        confirm: (!(!args.options.confirm)).toString()
       });
     });
   }
@@ -53,6 +56,9 @@ class SpoListRoleInheritanceResetCommand extends SpoCommand {
       },
       {
         option: '-t, --listTitle [listTitle]'
+      },
+      {
+        option: '--confirm'
       }
     );
   }
@@ -83,30 +89,48 @@ class SpoListRoleInheritanceResetCommand extends SpoCommand {
       logger.logToStderr(`Restore role inheritance of list in site at ${args.options.webUrl}...`);
     }
 
-    let requestUrl: string = `${args.options.webUrl}/_api/web/lists`;
+    const resetListRoleInheritance: () => Promise<void> = async (): Promise<void> => {
+      try {
+        let requestUrl: string = `${args.options.webUrl}/_api/web/lists`;
 
-    if (args.options.listId) {
-      requestUrl += `(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
-    }
-    else {
-      requestUrl += `/getbytitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
-    }
+        if (args.options.listId) {
+          requestUrl += `(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+        }
+        else {
+          requestUrl += `/getbytitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+        }
 
-    const requestOptions: any = {
-      url: `${requestUrl}/resetroleinheritance`,
-      method: 'POST',
-      headers: {
-        'accept': 'application/json;odata=nometadata',
-        'content-type': 'application/json'
-      },
-      responseType: 'json'
+        const requestOptions: any = {
+          url: `${requestUrl}/resetroleinheritance`,
+          method: 'POST',
+          headers: {
+            'accept': 'application/json;odata=nometadata',
+            'content-type': 'application/json'
+          },
+          responseType: 'json'
+        };
+
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
-    try {
-      await request.post(requestOptions);
+    if (args.options.confirm) {
+      await resetListRoleInheritance();
     }
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
+    else {
+      const result = await Cli.prompt<{ continue: boolean }>({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to reset the role inheritance of ${args.options.listId ?? args.options.listTitle}?`
+      });
+      
+      if (result.continue) {
+        await resetListRoleInheritance();
+      }
     }
   }
 }
