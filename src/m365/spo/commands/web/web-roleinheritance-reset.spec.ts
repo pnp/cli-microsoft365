@@ -13,6 +13,8 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let requests: any[];
+  let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -34,11 +36,17 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
         log.push(msg);
       }
     };
+    requests = [];
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -102,7 +110,8 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
     command.action(logger, {
       options: {
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com',
+        confirm: true
       }
     }, (err: any) => {
       try {
@@ -128,11 +137,85 @@ describe(commands.WEB_ROLEINHERITANCE_RESET, () => {
     command.action(logger, {
       options: {
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com',
+        confirm: true
       }
     }, (error?: any) => {
       try {
         assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('aborts resetting role inheritance when prompt not confirmed', (done) => {
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: false });
+    });
+    command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    }, () => {
+      try {
+        assert(requests.length === 0);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('prompts before resetting role inheritance when confirmation argument not passed', (done) => {
+    command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('reset role inheritance when prompt confirmed', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/web/resetroleinheritance') > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    });
+    command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    }, (err: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {

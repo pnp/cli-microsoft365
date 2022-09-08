@@ -1,4 +1,4 @@
-import { Logger } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { formatting, validation } from '../../../../utils';
@@ -15,6 +15,7 @@ interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   clearExistingPermissions?: boolean;
+  confirm?: boolean;
 }
 
 class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
@@ -40,7 +41,8 @@ class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
       Object.assign(this.telemetryProperties, {
         listId: typeof args.options.listId !== 'undefined',
         listTitle: typeof args.options.listTitle !== 'undefined',
-        clearExistingPermissions: args.options.clearExistingPermissions === true
+        clearExistingPermissions: args.options.clearExistingPermissions === true,
+        confirm: (!(!args.options.confirm)).toString()
       });
     });
   }
@@ -61,6 +63,9 @@ class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
       },
       {
         option: '-c, --clearExistingPermissions'
+      },
+      {
+        option: '--confirm'
       }
     );
   }
@@ -95,33 +100,54 @@ class SpoListItemRoleInheritanceBreakCommand extends SpoCommand {
       logger.logToStderr(`Breaking role inheritance of list item in site at ${args.options.webUrl}...`);
     }
 
-    let requestUrl: string = `${args.options.webUrl}/_api/web/lists`;
+    const breakListItemRoleInheritance = (): void => {
+      let requestUrl: string = `${args.options.webUrl}/_api/web/lists`;
 
-    if (args.options.listId) {
-      requestUrl += `(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+      if (args.options.listId) {
+        requestUrl += `(guid'${formatting.encodeQueryParameter(args.options.listId)}')`;
+      }
+      else {
+        requestUrl += `/getbytitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+      }
+  
+      let keepExistingPermissions: boolean = true;
+      if (args.options.clearExistingPermissions) {
+        keepExistingPermissions = !args.options.clearExistingPermissions;
+      }
+  
+      const requestOptions: any = {
+        url: `${requestUrl}/items(${args.options.listItemId})/breakroleinheritance(${keepExistingPermissions})`,
+        method: 'POST',
+        headers: {
+          'accept': 'application/json;odata=nometadata',
+          'content-type': 'application/json'
+        },
+        responseType: 'json'
+      };
+  
+      request
+        .post(requestOptions)
+        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    };
+    
+    if (args.options.confirm) {
+      breakListItemRoleInheritance();
     }
     else {
-      requestUrl += `/getbytitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')`;
+      Cli.prompt({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to break the role inheritance of ${args.options.listItemId} in list ${args.options.listId ?? args.options.listTitle}?`
+      }, (result: { continue: boolean }): void => {
+        if (!result.continue) {
+          cb();
+        }
+        else {
+          breakListItemRoleInheritance();
+        }
+      });
     }
-
-    let keepExistingPermissions: boolean = true;
-    if (args.options.clearExistingPermissions) {
-      keepExistingPermissions = !args.options.clearExistingPermissions;
-    }
-
-    const requestOptions: any = {
-      url: `${requestUrl}/items(${args.options.listItemId})/breakroleinheritance(${keepExistingPermissions})`,
-      method: 'POST',
-      headers: {
-        'accept': 'application/json;odata=nometadata',
-        'content-type': 'application/json'
-      },
-      responseType: 'json'
-    };
-
-    request
-      .post(requestOptions)
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 }
 

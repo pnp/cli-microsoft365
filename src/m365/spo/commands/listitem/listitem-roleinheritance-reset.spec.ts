@@ -13,6 +13,8 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let requests: any[];
+  let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -34,11 +36,17 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
         log.push(msg);
       }
     };
+    requests = [];
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -129,7 +137,8 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 8,
-        listTitle: 'test'
+        listTitle: 'test',
+        confirm: true
       }
     }, (err: any) => {
       try {
@@ -156,7 +165,8 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 8,
-        listId: '0cd891ef-afce-4e55-b836-fce03286cccf'
+        listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
+        confirm: true
       }
     }, (err: any) => {
       try {
@@ -184,11 +194,116 @@ describe(commands.LISTITEM_ROLEINHERITANCE_RESET, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 8,
-        listTitle: 'test'
+        listTitle: 'test',
+        confirm: true
       }
     }, (error?: any) => {
       try {
         assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('aborts resetting role inheritance when prompt not confirmed', (done) => {
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: false });
+    });
+    command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listItemId: 8,
+        listTitle: 'test'
+      }
+    }, () => {
+      try {
+        assert(requests.length === 0);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('prompts before resetting role inheritance when confirmation argument not passed (Title)', (done) => {
+    command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listItemId: 8,
+        listTitle: 'test'
+      }
+    }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('prompts before resetting role inheritance when confirmation argument not passed (id)', (done) => {
+    command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listItemId: 8,
+        listId: '202b8199-b9de-43fd-9737-7f213f51c991'
+      }
+    }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('reset role inheritance when prompt confirmed', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/items(8)/resetroleinheritance') > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    });
+    command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listItemId: 8,
+        listTitle: 'test'
+      }
+    }, (err: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
