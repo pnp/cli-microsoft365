@@ -33,6 +33,9 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
     this.options.unshift(
       {
         option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--confirm'
       }
     );
   }
