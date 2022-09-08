@@ -22,6 +22,9 @@ m365 spo listitem roleinheritance reset [options]
 `--listTitle [listTitle]`
 : Title of the list. Specify listId or listTitle but not both
 
+`--confirm`
+: Do not prompt for confirmation before resetting role inheritance.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
@@ -36,4 +39,10 @@ Restore role inheritance of list item with id 8 from list with title _test_ loca
 
 ```sh
 m365 spo listitem roleinheritance reset --webUrl https://contoso.sharepoint.com/sites/project-x --listItemId 8 --listTitle test
+```
+
+Restore role inheritance of list item with id 8 from list with title _test_ located in site _https://contoso.sharepoint.com/sites/project-x_ without prompting for confirmation
+
+```sh
+m365 spo listitem roleinheritance reset --webUrl https://contoso.sharepoint.com/sites/project-x --listItemId 8 --listTitle test --confirm
 ```
