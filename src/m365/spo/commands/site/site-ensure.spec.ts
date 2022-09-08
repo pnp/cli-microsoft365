@@ -633,7 +633,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1' } } as any);
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1' } } as any));
   });
 
   it('returns error when an error has occurred when checking if a site exists at the specified URL', async () => {
@@ -647,7 +647,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1' } } as any);
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1' } } as any));
   });
 
   it('returns error when the specified site type is invalid', async () => {
@@ -714,7 +714,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/classic', title: 'Classic', type: 'Invalid' } } as any);
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/classic', title: 'Classic', type: 'Invalid' } } as any));
   });
 
   it('returns error when a communication site expected but a team site found', async () => {
@@ -781,7 +781,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1', type: 'CommunicationSite' } } as any);
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1', title: 'Team 1', type: 'CommunicationSite' } } as any));
   });
 
   it('returns error when no properties to update specified', async () => {
@@ -848,7 +848,7 @@ describe(commands.SITE_ENSURE, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1' } } as any);
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/team1' } } as any));
   });
 
   it('supports debug mode', () => {

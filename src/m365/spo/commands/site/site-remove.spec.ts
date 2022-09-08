@@ -1197,7 +1197,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true } });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true } }));
     assert(loggerLogToStderrSpy.called);
   });
 
@@ -1312,7 +1312,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true } });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true } }));
     assert(loggerLogToStderrSpy.called);
   });
 

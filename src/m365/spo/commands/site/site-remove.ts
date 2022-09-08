@@ -80,18 +80,12 @@ class SpoSiteRemoveCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeSite: () => Promise<void> = async (): Promise<void> => {
-      this.dots = '';
-
-      if (args.options.fromRecycleBin) {
-        try {
+      try {
+        this.dots = '';
+        if (args.options.fromRecycleBin) {
           await this.deleteSiteWithoutGroup(logger, args);
         }
-        catch (err: any) {
-          this.handleRejectedPromise(err);
-        }
-      }
-      else {
-        try {
+        else {
           const groupId = await this.getSiteGroupId(args.options.url, logger);
           if (groupId === '00000000-0000-0000-0000-000000000000') {
             if (this.debug) {
@@ -112,6 +106,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
               }
 
               await this.deleteGroup(group.id, logger);
+              await this.deleteSite(args.options.url, args.options.wait, logger);
             }
             catch (err: any) {
               if (this.verbose) {
@@ -127,19 +122,18 @@ class SpoSiteRemoveCommand extends SpoCommand {
                 if (args.options.wait) {
                   logger.logToStderr(chalk.yellow(`Entered site is a groupified site. Hence, the parameter 'wait' will not be applicable.`));
                 }
+
+                await this.deleteOrphanedSite(logger, args.options.url);
               }
               else {
                 throw `Site group still exists in the deleted groups. The site won't be removed.`;
               }
-              await this.deleteOrphanedSite(logger, args.options.url);
             }
-
-            await this.deleteSite(args.options.url, args.options.wait, logger);
           }
         }
-        catch (err: any) {
-          this.handleRejectedPromise(err);
-        }
+      }
+      catch (err: any) {
+        this.handleRejectedPromise(err);
       }
     };
 

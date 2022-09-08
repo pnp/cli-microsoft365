@@ -37,11 +37,16 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
     loggerLogSpy = sinon.spy(logger, 'log');
   });
 
+  afterEach(() => {
+    sinonUtil.restore([
+      request.get,
+      request.post
+    ]);
+  });
+
   after(() => {
     sinonUtil.restore([
       auth.restoreAuth,
-      request.get,
-      request.post,
       appInsights.trackEvent
     ]);
     auth.service.connected = false;

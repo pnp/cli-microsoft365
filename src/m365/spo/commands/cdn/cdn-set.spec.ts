@@ -109,7 +109,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables public CDN when Public type specified and enabled set to true without default origins (debug)', async () => {
-    await command.action(logger, { options: { debug: true, enabled: 'true', type: 'Public', noDefaultOrigins: true } });
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'true', type: 'Public', noDefaultOrigins: true } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -123,7 +123,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables public CDN when no type specified and enabled set to true', async () => {
-    await command.action(logger, { options: { debug: false, enabled: true } });
+    await assert.rejects(command.action(logger, { options: { debug: false, enabled: true } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -137,7 +137,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables private CDN when Private type specified and enabled set to true (debug)', async () => {
-    await command.action(logger, { options: { debug: true, enabled: 'true', type: 'Private' } });
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'true', type: 'Private' } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -151,7 +151,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables private CDN when Private type specified and enabled set to true without default origins (debug)', async () => {
-    await command.action(logger, { options: { debug: true, enabled: 'true', type: 'Private', noDefaultOrigins: true } });
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'true', type: 'Private', noDefaultOrigins: true } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -165,7 +165,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables both CDN\'s when Both type specified and enabled set to true (debug)', async () => {
-    await command.action(logger, { options: { debug: true, enabled: 'true', type: 'Both' } });
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'true', type: 'Both' } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -179,7 +179,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables both CDN\'s when Both type specified and enabled set to true, with default origins', async () => {
-    await command.action(logger, { options: { enabled: 'true', type: 'Both', noDefaultOrigins: false } });
+    await assert.rejects(command.action(logger, { options: { enabled: 'true', type: 'Both', noDefaultOrigins: false } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -193,7 +193,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables both CDN\'s when Both type specified and enabled set to true, with origins (debug)', async () => {
-    await command.action(logger, { options: { debug: true, enabled: 'true', type: 'Both', noDefaultOrigins: false } });
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'true', type: 'Both', noDefaultOrigins: false } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -207,7 +207,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables both CDN\'s when Both type specified and enabled set to true, without Default Origins', async () => {
-    await command.action(logger, { options: { enabled: 'true', type: 'Both', noDefaultOrigins: true } });
+    await assert.rejects(command.action(logger, { options: { enabled: 'true', type: 'Both', noDefaultOrigins: true } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -221,7 +221,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables both CDN\'s when Both type specified and enabled set to true, without default origins (debug)', async () => {
-    await command.action(logger, { options: { debug: true, enabled: 'true', type: 'Both', noDefaultOrigins: true } });
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'true', type: 'Both', noDefaultOrigins: true } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -235,7 +235,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disable both CDN\'s when Both type specified and enabled set to false, with default (debug)', async () => {
-    await command.action(logger, { options: { debug: true, enabled: 'false', type: 'Both', noDefaultOrigins: false } });
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'false', type: 'Both', noDefaultOrigins: false } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -249,7 +249,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disable both CDN\'s when Both type specified and enabled set to false, without default origins (debug)', async () => {
-    await command.action(logger, { options: { debug: true, enabled: 'false', type: 'Both', noDefaultOrigins: true } });
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'false', type: 'Both', noDefaultOrigins: true } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -263,7 +263,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables both CDN\'s when Both type specified and enabled set to false', async () => {
-    await command.action(logger, { options: { debug: false, enabled: 'false', type: 'Both' } });
+    await assert.rejects(command.action(logger, { options: { debug: false, enabled: 'false', type: 'Both' } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -277,7 +277,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables both CDN\'s when Both type specified and enabled set to false (debug)', async () => {
-    await command.action(logger, { options: { debug: true, enabled: 'false', type: 'Both' } });
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'false', type: 'Both' } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -291,7 +291,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables public CDN when Public type specified and enabled set to false (debug)', async () => {
-    await command.action(logger, { options: { debug: true, enabled: 'false', type: 'Public' } });
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'false', type: 'Public' } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -305,7 +305,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables public CDN when Public type specified and enabled set to false and noDefaultOrigins is passed (debug)', async () => {
-    await command.action(logger, { options: { debug: true, enabled: 'false', type: 'Public', noDefaultOrigins: true } });
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'false', type: 'Public', noDefaultOrigins: true } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -319,7 +319,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables public CDN when Public type specified and enabled set to false and noDefaultOrigins is passed', async () => {
-    await command.action(logger, { options: { debug: false, enabled: 'false', type: 'Public', noDefaultOrigins: true } });
+    await assert.rejects(command.action(logger, { options: { debug: false, enabled: 'false', type: 'Public', noDefaultOrigins: true } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -333,7 +333,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables public CDN when Public type specified and enabled set to false', async () => {
-    await command.action(logger, { options: { debug: false, enabled: 'false', type: 'Public' } });
+    await assert.rejects(command.action(logger, { options: { debug: false, enabled: 'false', type: 'Public' } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -347,7 +347,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables Private CDN when Private type specified and enabled set to false (debug)', async () => {
-    await command.action(logger, { options: { debug: true, enabled: 'false', type: 'Private' } });
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'false', type: 'Private' } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -361,7 +361,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables Private CDN when Private type specified and enabled set to false and noDefaultOrigins is passed (debug)', async () => {
-    await command.action(logger, { options: { debug: true, enabled: 'false', type: 'Private', noDefaultOrigins: true } });
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'false', type: 'Private', noDefaultOrigins: true } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -375,7 +375,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables Private CDN when Private type specified and enabled set to false and noDefaultOrigins is passed', async () => {
-    await command.action(logger, { options: { debug: false, enabled: 'false', type: 'Private', noDefaultOrigins: true } });
+    await assert.rejects(command.action(logger, { options: { debug: false, enabled: 'false', type: 'Private', noDefaultOrigins: true } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -389,7 +389,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables Private CDN when Private type specified and enabled set to false', async () => {
-    await command.action(logger, { options: { debug: false, enabled: 'false', type: 'Private' } });
+    await assert.rejects(command.action(logger, { options: { debug: false, enabled: 'false', type: 'Private' } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
