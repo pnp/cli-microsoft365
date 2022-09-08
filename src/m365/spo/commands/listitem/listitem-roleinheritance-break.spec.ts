@@ -16,6 +16,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -38,11 +39,16 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         log.push(msg);
       }
     };
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
+      promptOptions = options;
+      return { continue: false };
+    });
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -87,7 +93,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
 
   it('defines correct option sets', () => {
     const optionSets = command.optionSets;
-    assert.deepStrictEqual(optionSets, [[ 'listId', 'listTitle' ]]);
+    assert.deepStrictEqual(optionSets, [['listId', 'listTitle']]);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
@@ -134,7 +140,8 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
-        listItemId: 1
+        listItemId: 1,
+        confirm: true
       }
     });
   });
@@ -154,7 +161,8 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
         listItemId: 1,
-        clearExistingPermissions: true
+        clearExistingPermissions: true,
+        confirm: true
       }
     });
   });
@@ -173,7 +181,8 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 1,
-        listId: '202b8199-b9de-43fd-9737-7f213f51c991'
+        listId: '202b8199-b9de-43fd-9737-7f213f51c991',
+        confirm: true
       }
     });
   });
@@ -193,7 +202,8 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '202b8199-b9de-43fd-9737-7f213f51c991',
         listItemId: 1,
-        clearExistingPermissions: true
+        clearExistingPermissions: true,
+        confirm: true
       }
     });
   });
@@ -213,8 +223,87 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 1,
-        listTitle: 'test'
+        listTitle: 'test',
+        confirm: true
       }
     }), new CommandError(err));
+  });
+
+  it('aborts breaking role inheritance when prompt not confirmed', async () => {
+    const postSpy = sinon.spy(request, 'post');
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listItemId: 8,
+        listTitle: 'test'
+      }
+    });
+    assert(postSpy.notCalled);
+  });
+
+  it('prompts before breaking role inheritance when confirmation argument not passed (Title)', async () => {
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listItemId: 8,
+        listTitle: 'test'
+      }
+    });
+
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
+  });
+
+  it('prompts before breaking role inheritance when confirmation argument not passed (id)', async () => {
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listItemId: 8,
+        listId: '202b8199-b9de-43fd-9737-7f213f51c991'
+      }
+    });
+
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
+  });
+
+  it('break role inheritance when prompt confirmed', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/items(8)/breakroleinheritance(true)') > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listItemId: 8,
+        listTitle: 'test'
+      }
+    });
   });
 });

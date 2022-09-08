@@ -22,6 +22,9 @@ m365 spo list roleinheritance break [options]
 `-c, --clearExistingPermissions`
 : Flag if used clears all roles from the list
 
+`--confirm`
+: Do not prompt for confirmation before breaking role inheritance.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -52,4 +55,10 @@ Break inheritance of list with ID _202b8199-b9de-43fd-9737-7f213f51c991_ located
 
 ```sh
 m365 spo list roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --listId "202b8199-b9de-43fd-9737-7f213f51c991" --clearExistingPermissions
+```
+
+Break inheritance of list with ID _202b8199-b9de-43fd-9737-7f213f51c991_ located in site _https://contoso.sharepoint.com/sites/project-x_ with clearing permissions without prompting for confirmation
+
+```sh
+m365 spo list roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --listId "202b8199-b9de-43fd-9737-7f213f51c991" --clearExistingPermissions --confirm
 ```

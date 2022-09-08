@@ -16,6 +16,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
+  let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -38,11 +39,16 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
         log.push(msg);
       }
     };
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
+      promptOptions = options;
+      return { continue: false };
+    });
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -123,7 +129,8 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        listTitle: 'test'
+        listTitle: 'test',
+        confirm: true
       }
     });
   });
@@ -142,7 +149,8 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
-        clearExistingPermissions: true
+        clearExistingPermissions: true,
+        confirm: true
       }
     });
   });
@@ -160,7 +168,8 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        listId: '202b8199-b9de-43fd-9737-7f213f51c991'
+        listId: '202b8199-b9de-43fd-9737-7f213f51c991',
+        confirm: true
       }
     });
   });
@@ -179,7 +188,8 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '202b8199-b9de-43fd-9737-7f213f51c991',
-        clearExistingPermissions: true
+        clearExistingPermissions: true,
+        confirm: true
       }
     });
   });
@@ -198,8 +208,79 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        listTitle: 'test'
+        listTitle: 'test',
+        confirm: true
       }
     }), new CommandError(err));
+  });
+
+  it('aborts breaking role inheritance when prompt not confirmed', async () => {
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => {
+      return { continue: false };
+    });
+    const postSpy = sinon.spy(request, 'post');
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listTitle: 'test'
+      }
+    });
+    assert(postSpy.notCalled);
+  });
+
+  it('prompts before breaking role inheritance when confirmation argument not passed (Title)', async () => {
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listTitle: 'test'
+      }
+    });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    assert(promptIssued);
+  });
+
+  it('prompts before breaking role inheritance when confirmation argument not passed (id)', async () => {
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listId: '202b8199-b9de-43fd-9737-7f213f51c991'
+      }
+    });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    assert(promptIssued);
+  });
+
+  it('break role inheritance when prompt confirmed', async () => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/breakroleinheritance(true)') > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        listTitle: 'test'
+      }
+    });
   });
 });
