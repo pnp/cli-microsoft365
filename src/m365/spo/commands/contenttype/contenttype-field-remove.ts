@@ -87,11 +87,11 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const removeFieldLink: () => Promise<void> = async (): Promise<void> => {
-      if (this.debug) {
-        logger.logToStderr(`Get SiteId required by ProcessQuery endpoint.`);
-      }
-
       try {
+        if (this.debug) {
+          logger.logToStderr(`Get SiteId required by ProcessQuery endpoint.`);
+        }
+  
         // GET SiteId
         let requestOptions: any = {
           url: `${args.options.webUrl}/_api/site?$select=Id`,
@@ -100,7 +100,9 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           },
           responseType: 'json'
         };
-        const siteId = await request.get<{ Id: string }>(requestOptions);
+
+        const site = await request.get<{ Id: string }>(requestOptions);
+        const siteId = site.Id;
 
         if (this.debug) {
           logger.logToStderr(`SiteId: ${siteId}`);
@@ -116,17 +118,18 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           responseType: 'json'
         };
 
-        const webId = await request.get<{ Id: string }>(requestOptions);
+        const web = await request.get<{ Id: string }>(requestOptions);
+        const webId = web.Id;
 
         if (this.debug) {
           logger.logToStderr(`WebId: ${webId}`);
         }
 
+        let listId: string | undefined = undefined;
         // If ListTitle is provided
-        let listId: string = '';
         if (args.options.listTitle) {
           // Request for the ListId
-          requestOptions = {
+          const requestOptions: any = {
             url: `${args.options.webUrl}/_api/lists/GetByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')?$select=Id`,
             headers: {
               accept: 'application/json;odata=nometadata'
@@ -141,7 +144,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
             logger.logToStderr(`ListId: ${listId}`);
           }
         }
-
+        
         const reqDigest = await spo.getRequestDigest(args.options.webUrl);
         const requestDigest: string = reqDigest.FormDigestValue;
 

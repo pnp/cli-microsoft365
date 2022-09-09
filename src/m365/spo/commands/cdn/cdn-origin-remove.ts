@@ -75,13 +75,11 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const cdnTypeString: string = args.options.type || 'Public';
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
-    let spoAdminUrl: string = '';
-    let tenantId: string = '';
 
     const removeCdnOrigin: () => Promise<void> = async (): Promise<void> => {
       try {
-        tenantId = await spo.getTenantId(logger, this.debug);
-        spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+        const tenantId = await spo.getTenantId(logger, this.debug);
+        const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
         const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
         if (this.verbose) {

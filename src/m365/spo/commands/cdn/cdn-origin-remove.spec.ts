@@ -107,7 +107,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('removes existing CDN origin from the private CDN when Private type specified without prompting with confirmation argument', async () => {
-    await command.action(logger, { options: { debug: false, origin: '*/cdn', confirm: true, type: 'Private' } });
+    await assert.rejects(command.action(logger, { options: { debug: false, origin: '*/cdn', confirm: true, type: 'Private' } }));
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -121,7 +121,7 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
   });
 
   it('removes existing CDN origin from the private CDN when Private type specified without prompting with confirmation argument (debug)', async () => {
-    await command.action(logger, { options: { debug: true, origin: '*/cdn', confirm: true, type: 'Private' } });
+    await assert.rejects(command.action(logger, { options: { debug: true, origin: '*/cdn', confirm: true, type: 'Private' } }));
     let deleteRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&

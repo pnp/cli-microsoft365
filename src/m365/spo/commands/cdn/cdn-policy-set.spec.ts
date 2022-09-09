@@ -96,7 +96,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('sets IncludeFileExtensions CDN policy on the private CDN when Private type specified', async () => {
-    await command.action(logger, { options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF', type: 'Private' } });
+    await assert.rejects(command.action(logger, { options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF', type: 'Private' } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -124,7 +124,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('sets ExcludeRestrictedSiteClassifications CDN policy on the public CDN when no type specified', async () => {
-    await command.action(logger, { options: { debug: false, policy: 'ExcludeRestrictedSiteClassifications', value: 'foo' } });
+    await assert.rejects(command.action(logger, { options: { debug: false, policy: 'ExcludeRestrictedSiteClassifications', value: 'foo' } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&

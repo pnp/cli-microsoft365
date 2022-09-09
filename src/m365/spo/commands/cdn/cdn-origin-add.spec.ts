@@ -103,7 +103,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   it('sets CDN origin on the private CDN when Private type specified', async () => {
-    await command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Private' } });
+    await assert.rejects(command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Private' } }));
     let setRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
