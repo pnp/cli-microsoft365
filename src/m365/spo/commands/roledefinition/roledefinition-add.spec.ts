@@ -81,7 +81,7 @@ describe(commands.ROLEDEFINITION_ADD, () => {
 
   it('fails if non existing PermissionKind rights specified', async () => {
     const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'abc', rights: 'abc' } }, commandInfo);
-    assert.strictEqual(actual, `Rights option 'abc' is not recognized as valid PermissionKind choice. Please note it is case sensitive`);
+    assert.strictEqual(actual, `Rights option 'abc' is not recognized as valid PermissionKind choice. Please note it is case-sensitive. Allowed values are EmptyMask|ViewListItems|AddListItems|EditListItems|DeleteListItems|ApproveItems|OpenItems|ViewVersions|DeleteVersions|CancelCheckout|ManagePersonalViews|ManageLists|ViewFormPages|AnonymousSearchAccessList|Open|ViewPages|AddAndCustomizePages|ApplyThemeAndBorder|ApplyStyleSheets|ViewUsageData|CreateSSCSite|ManageSubwebs|CreateGroups|ManagePermissions|BrowseDirectories|BrowseUserInfo|AddDelPrivateWebParts|UpdatePersonalWebParts|ManageWeb|AnonymousSearchAccessWebLists|UseClientIntegration|UseRemoteAPIs|ManageAlerts|CreateAlerts|EditMyUserInfo|EnumeratePermissions|FullMask.`);
   });
 
   it('has correct PermissionKind rights specified', async () => {
@@ -102,7 +102,7 @@ describe(commands.ROLEDEFINITION_ADD, () => {
 
   it('adds role definition to web with name, description and right', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/roledefinitions') > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/roledefinitions') {
         return Promise.resolve();
       }
       return Promise.reject('Invalid request');
@@ -129,7 +129,7 @@ describe(commands.ROLEDEFINITION_ADD, () => {
 
   it('adds role definition to web with name', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/roledefinitions') > -1) {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/web/roledefinitions') {
         return Promise.resolve();
       }
       return Promise.reject('Invalid request');

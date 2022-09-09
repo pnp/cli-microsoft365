@@ -14,6 +14,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   name: string;
   description?: string;
+  rights?: string;
 }
 
 class SpoRoleDefinitionAddCommand extends SpoCommand {
@@ -81,7 +82,7 @@ class SpoRoleDefinitionAddCommand extends SpoCommand {
             const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
     
             if (!kind) {
-              return `Rights option '${item}' is not recognized as valid PermissionKind choice. Please note it is case sensitive`;
+              return `Rights option '${item}' is not recognized as valid PermissionKind choice. Please note it is case-sensitive. Allowed values are ${this.permissionsKindMap.join('|')}.`;
             }
           }
         }
