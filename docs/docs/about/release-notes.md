@@ -35,6 +35,8 @@
 - added additional validation options for 'planner task get' [#3433](https://github.com/pnp/cli-microsoft365/issues/3433)
 - added gulp-cli checks to spfx doctor [#3541](https://github.com/pnp/cli-microsoft365/issues/3541)
 - extended spfx project doctor with support for 1.16.0-beta.1 [#3634](https://github.com/pnp/cli-microsoft365/issues/3634)
+- fixed typo's in docs (https://github.com/pnp/cli-microsoft365/issues/3652)
+- added 'report environment script' sample (https://github.com/pnp/cli-microsoft365/issues/3651)
 
 ## [v5.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.7.0)
 
