@@ -213,51 +213,51 @@ class SpoSiteClassicSetCommand extends SpoCommand {
         }
       }
 
-      if (!updateBasicProperties) {
-        return Promise.resolve(undefined as any);
-      }
+      let res: string;
 
-      let i: number = 0;
-      const updates: string[] = [];
-
-      if (args.options.title) {
-        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="Title"><Parameter Type="String">${formatting.escapeXml(args.options.title)}</Parameter></SetProperty>`);
+      if (updateBasicProperties) {
+        let i: number = 0;
+        const updates: string[] = [];
+  
+        if (args.options.title) {
+          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="Title"><Parameter Type="String">${formatting.escapeXml(args.options.title)}</Parameter></SetProperty>`);
+        }
+        if (args.options.sharing) {
+          const sharing: number = ['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly'].indexOf(args.options.sharing);
+          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="SharingCapability"><Parameter Type="Enum">${sharing}</Parameter></SetProperty>`);
+        }
+        if (args.options.resourceQuota) {
+          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="UserCodeMaximumLevel"><Parameter Type="Double">${args.options.resourceQuota}</Parameter></SetProperty>`);
+        }
+        if (args.options.resourceQuotaWarningLevel) {
+          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="UserCodeWarningLevel"><Parameter Type="Double">${args.options.resourceQuotaWarningLevel}</Parameter></SetProperty>`);
+        }
+        if (args.options.storageQuota) {
+          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="StorageMaximumLevel"><Parameter Type="Int64">${args.options.storageQuota}</Parameter></SetProperty>`);
+        }
+        if (args.options.storageQuotaWarningLevel) {
+          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="StorageWarningLevel"><Parameter Type="Int64">${args.options.storageQuotaWarningLevel}</Parameter></SetProperty>`);
+        }
+        if (typeof args.options.allowSelfServiceUpgrade !== 'undefined') {
+          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="AllowSelfServiceUpgrade"><Parameter Type="Boolean">${args.options.allowSelfServiceUpgrade}</Parameter></SetProperty>`);
+        }
+        if (typeof args.options.noScriptSite !== 'undefined') {
+          const noScriptSite: number = args.options.noScriptSite === 'true' ? 2 : 1;
+          updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="DenyAddAndCustomizePages"><Parameter Type="Enum">${noScriptSite}</Parameter></SetProperty>`);
+        }
+  
+        const pos: number = (this.tenantId as string).indexOf('|') + 1;
+  
+        const requestOptions: any = {
+          url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'X-RequestDigest': this.context.FormDigestValue
+          },
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${updates.join('')}<ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|${(this.tenantId as string).substr(pos, (this.tenantId as string).indexOf('&') - pos)}&#xA;SiteProperties&#xA;${encodeURIComponent(args.options.url)}" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`
+        };
+  
+        res = await request.post(requestOptions);
       }
-      if (args.options.sharing) {
-        const sharing: number = ['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly'].indexOf(args.options.sharing);
-        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="SharingCapability"><Parameter Type="Enum">${sharing}</Parameter></SetProperty>`);
-      }
-      if (args.options.resourceQuota) {
-        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="UserCodeMaximumLevel"><Parameter Type="Double">${args.options.resourceQuota}</Parameter></SetProperty>`);
-      }
-      if (args.options.resourceQuotaWarningLevel) {
-        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="UserCodeWarningLevel"><Parameter Type="Double">${args.options.resourceQuotaWarningLevel}</Parameter></SetProperty>`);
-      }
-      if (args.options.storageQuota) {
-        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="StorageMaximumLevel"><Parameter Type="Int64">${args.options.storageQuota}</Parameter></SetProperty>`);
-      }
-      if (args.options.storageQuotaWarningLevel) {
-        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="StorageWarningLevel"><Parameter Type="Int64">${args.options.storageQuotaWarningLevel}</Parameter></SetProperty>`);
-      }
-      if (typeof args.options.allowSelfServiceUpgrade !== 'undefined') {
-        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="AllowSelfServiceUpgrade"><Parameter Type="Boolean">${args.options.allowSelfServiceUpgrade}</Parameter></SetProperty>`);
-      }
-      if (typeof args.options.noScriptSite !== 'undefined') {
-        const noScriptSite: number = args.options.noScriptSite === 'true' ? 2 : 1;
-        updates.push(`<SetProperty Id="${++i}" ObjectPathId="5" Name="DenyAddAndCustomizePages"><Parameter Type="Enum">${noScriptSite}</Parameter></SetProperty>`);
-      }
-
-      const pos: number = (this.tenantId as string).indexOf('|') + 1;
-
-      const requestOptions: any = {
-        url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-        headers: {
-          'X-RequestDigest': this.context.FormDigestValue
-        },
-        data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions>${updates.join('')}<ObjectPath Id="14" ObjectPathId="13" /><ObjectIdentityQuery Id="15" ObjectPathId="5" /><Query Id="16" ObjectPathId="13"><Query SelectAllProperties="false"><Properties><Property Name="IsComplete" ScalarProperty="true" /><Property Name="PollingInterval" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="53d8499e-d0d2-5000-cb83-9ade5be42ca4|${(this.tenantId as string).substr(pos, (this.tenantId as string).indexOf('&') - pos)}&#xA;SiteProperties&#xA;${encodeURIComponent(args.options.url)}" /><Method Id="13" ParentId="5" Name="Update" /></ObjectPaths></Request>`
-      };
-
-      const res: string = await request.post(requestOptions);
 
       await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
         if (!res) {

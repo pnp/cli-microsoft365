@@ -140,8 +140,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.data).indexOf(`&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;\\"><div data-sp-rte=\\"\\"><p>Hello world</p></div></div></div>"}`) > -1) {
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
         return Promise.resolve({});
       }
 
@@ -408,8 +407,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.data).endsWith(`&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;2,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;"><div data-sp-rte=""><p>Hello world 2</p></div></div></div>`)) {
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
         return Promise.resolve({});
       }
 
@@ -500,8 +498,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.data).endsWith(`position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;3,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;"><div data-sp-rte=""><p>Hello world 2</p></div></div></div>`)) {
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
         return Promise.resolve({});
       }
 
@@ -593,8 +590,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/page.aspx')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.data).endsWith(`position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;\"><div data-sp-rte=\"\"><p>Hello world</p></div></div></div>`)) {
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
         return Promise.resolve({});
       }
 

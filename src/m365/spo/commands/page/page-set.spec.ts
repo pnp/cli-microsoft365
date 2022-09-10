@@ -131,10 +131,23 @@ describe(commands.PAGE_SET, () => {
     sinonUtil.restore([request.post]);
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          PageLayoutType: 'Home'
-        })) {
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage") {
+        return Promise.resolve({
+          Title: "article",
+          Id: 1,
+          TopicHeader: "TopicHeader",
+          AuthorByline: "AuthorByline",
+          Description: "Description",
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          LayoutWebpartsContent: "{}"
+        });
+      }
+
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields") {
         return Promise.resolve();
       }
 
@@ -282,7 +295,25 @@ describe(commands.PAGE_SET, () => {
     sinonUtil.restore([request.post]);
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(true)`) > -1) {
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage") {
+        return Promise.resolve({
+          Title: "article",
+          Id: 1,
+          TopicHeader: "TopicHeader",
+          AuthorByline: "AuthorByline",
+          Description: "Description",
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          LayoutWebpartsContent: "{}"
+        });
+      }
+
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields" ||
+        opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(true)" ||
+        opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/SitePages/Pages(1)/SavePageAsDraft") {
         return Promise.resolve();
       }
 

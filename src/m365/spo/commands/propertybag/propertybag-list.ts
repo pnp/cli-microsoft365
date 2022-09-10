@@ -67,8 +67,9 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
       if (opts.folder) {
         propertyBagData = await this.getFolderPropertyBag(identityResp, opts.webUrl, opts.folder, logger);
       }
-
-      propertyBagData = await this.getWebPropertyBag(identityResp, opts.webUrl, logger);
+      else {
+        propertyBagData = await this.getWebPropertyBag(identityResp, opts.webUrl, logger);
+      }
 
       logger.log(this.formatOutput(propertyBagData));
     }
