@@ -269,14 +269,14 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses(null, fileNotFoundResp);
 
-    await command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
         path: 'C:\Users\Velin\Desktop\MS365.jpg',
         checkOut: true
       }
-    });
+    }));
     assert.strictEqual(loggerLogSpy.notCalled, true);
   });
 

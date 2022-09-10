@@ -433,7 +433,7 @@ describe(commands.FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn>', Description: 'My column' } });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn>', Description: 'My column' } }));
     assert(loggerLogSpy.notCalled);
   });
 
@@ -471,7 +471,7 @@ describe(commands.FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column>' } });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', title: 'MyColumn', Description: 'My column>' } }));
     assert(loggerLogSpy.notCalled);
   });
 
