@@ -137,6 +137,10 @@ describe(commands.PAGE_HEADER_SET, () => {
           Title: 'Page'
         });
       }
+      
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')?$expand=ListItemAllFields`) > -1) {
+        return Promise.resolve({ CanvasContent1: mockCanvasContent });
+      }
 
       return Promise.reject('Invalid request');
     });

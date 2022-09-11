@@ -187,7 +187,6 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       const checkOutPostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`;
-      const savePagePostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`;
 
       if ((opts.url as string).indexOf(checkOutPostUrl) > -1) {
         return Promise.resolve(mockPageData);
@@ -218,7 +217,6 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       const checkOutPostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`;
-      const savePagePostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`;
 
       if ((opts.url as string).indexOf(checkOutPostUrl) > -1) {
         return Promise.resolve(mockPageData);
@@ -249,7 +247,6 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       const checkOutPostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`;
-      const savePagePostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`;
 
       if ((opts.url as string).indexOf(checkOutPostUrl) > -1) {
         return Promise.resolve(mockPageData);
