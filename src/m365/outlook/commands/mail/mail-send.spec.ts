@@ -152,6 +152,72 @@ describe(commands.MAIL_SEND, () => {
     assert.strictEqual(actual, expected);
   });
 
+  it('sends email to multiple cc recipients', async () => {
+    let actual: string = '';
+    const expected: string = JSON.stringify({
+      message: {
+        subject: 'Lorem ipsum',
+        body: {
+          contentType: 'Text',
+          content: 'Lorem ipsum'
+        },
+        toRecipients: [
+          { emailAddress: { address: 'mail@domain.com' } },
+          { emailAddress: { address: 'mail2@domain.com' } }
+        ],
+        ccRecipients: [
+          { emailAddress: { address: 'mail3@domain.com' } },
+          { emailAddress: { address: 'mail4@domain.com' } }
+        ]
+      },
+      saveToSentItems: undefined
+    });
+    sinon.stub(request, 'post').callsFake((opts) => {
+      actual = JSON.stringify(opts.data);
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/sendMail`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', cc: 'mail3@domain.com,mail4@domain.com', bodyContents: 'Lorem ipsum' } });
+    assert.strictEqual(actual, expected);
+  });
+
+  it('sends email to multiple bcc recipients', async () => {
+    let actual: string = '';
+    const expected: string = JSON.stringify({
+      message: {
+        subject: 'Lorem ipsum',
+        body: {
+          contentType: 'Text',
+          content: 'Lorem ipsum'
+        },
+        toRecipients: [
+          { emailAddress: { address: 'mail@domain.com' } },
+          { emailAddress: { address: 'mail2@domain.com' } }
+        ],
+        bccRecipients: [
+          { emailAddress: { address: 'mail3@domain.com' } },
+          { emailAddress: { address: 'mail4@domain.com' } }
+        ]
+      },
+      saveToSentItems: undefined
+    });
+    sinon.stub(request, 'post').callsFake((opts) => {
+      actual = JSON.stringify(opts.data);
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/sendMail`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bcc: 'mail3@domain.com,mail4@domain.com', bodyContents: 'Lorem ipsum' } });
+    assert.strictEqual(actual, expected);
+  });
+
   it('doesn\'t store email in sent items', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
@@ -204,6 +270,11 @@ describe(commands.MAIL_SEND, () => {
 
   it('fails validation if saveToSentItems is invalid', async () => {
     const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'Invalid' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if importance is invalid', async () => {
+    const actual = await command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', importance: 'Invalid' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 

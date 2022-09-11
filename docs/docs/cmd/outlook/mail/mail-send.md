@@ -1,6 +1,6 @@
 # outlook sendmail
 
-Sends an e-mail
+Sends an email
 
 ## Usage
 
@@ -17,10 +17,16 @@ m365 outlook sendmail [options]
 ## Options
 
 `-s, --subject <subject>`
-: E-mail subject
+: Email subject
 
 `-t, --to <to>`
-: Comma-separated list of e-mails to send the message to
+: Comma-separated list of emails to send the message to.
+
+`--cc [cc]`
+: Comma-separated list of CC recipients for the message.
+
+`--bcc [bcc]`
+: Comma-separated list of BCC recipients for the message.
 
 `--sender [sender]`
 : Optional upn or user id to specify what account to send the message from. Also see the remarks section.
@@ -29,13 +35,16 @@ m365 outlook sendmail [options]
 : Specify this option to send the email on behalf of another mailbox, for example a shared mailbox, group or distribution list. The sender needs to be a delegate on the specified mailbox. Also see the remarks section.
 
 `--bodyContents <bodyContents>`
-: String containing the body of the e-mail to send
+: String containing the body of the email to send.
 
 `--bodyContentType [bodyContentType]`
-: Type of the body content. Available options: `Text,HTML`. Default `Text`
+: Type of the body content. Available options: `Text,HTML`. Default `Text`.
+
+`--importance [importance]`
+: The importance of the message. Available options: `low`, `normal` or `high`. Default is `normal`.
 
 `--saveToSentItems [saveToSentItems]`
-: Save e-mail in the sent items folder. Default `true`
+: Save email in the sent items folder. Default `true`.
 
 --8<-- "docs/cmd/_global.md"
 
@@ -60,25 +69,25 @@ The sent email can optionally be saved in the sent folder of that user account. 
 
 ## Examples
 
-Send a text e-mail to the specified e-mail address
+Send a text email to the specified email address
 
 ```sh
 m365 outlook mail send --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the team site"
 ```
 
-Send an HTML e-mail to the specified e-mail addresses
+Send an HTML email to the specified email addresses
 
 ```sh
 m365 outlook mail send --to "chris@contoso.com,brian@contoso.com" --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the <a href='https://contoso.sharepoint.com/sites/marketing'>team site</a>" --bodyContentType HTML
 ```
 
-Send an HTML e-mail to the specified e-mail address loading e-mail contents from a file on disk
+Send an HTML email to the specified email address loading email contents from a file on disk
 
 ```sh
 m365 outlook mail send --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContents @email.html --bodyContentType HTML
 ```
 
-Send a text e-mail to the specified e-mail address. Don't store the e-mail in sent items
+Send a text email to the specified email address. Don't store the email in sent items
 
 ```sh
 m365 outlook mail send --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the team site" --saveToSentItems false
@@ -100,4 +109,10 @@ Send an email as another user, on behalf of a shared mailbox
 
 ```sh
 m365 outlook mail send --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the team site" --sender svc_project@contoso.com --mailbox sales@contoso.com
+```
+
+Send an email with cc and bcc recipients marked as important
+
+```sh
+m365 outlook mail send --to chris@contoso.com --cc claire@contoso.com --bcc randy@contoso.com --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the team site" --importance high
 ```
