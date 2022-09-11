@@ -19,6 +19,9 @@
 - updated classic references to spo site list [#3522](https://github.com/pnp/cli-microsoft365/issues/3522)
 - removed unnecessary aliases [#3644](https://github.com/pnp/cli-microsoft365/issues/3644)
 - added upgrade guidance [#3481](https://github.com/pnp/cli-microsoft365/issues/3481)
+- added confirm option to 'spo roleinheritance break and reset' commands [#3658](https://github.com/pnp/cli-microsoft365/issues/3658)
+- removed secret option from 'aad app add' command [#3136](https://github.com/pnp/cli-microsoft365/issues/3136)
+- removed name option from 'spo field set' command [#3419](https://github.com/pnp/cli-microsoft365/issues/3419)
 
 ## [v5.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.9.0)
 
