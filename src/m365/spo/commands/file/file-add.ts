@@ -159,7 +159,7 @@ class SpoFileAddCommand extends SpoCommand {
     const fileName: string = fsUtil.getSafeFileName(path.basename(fullPath));
 
     let isCheckedOut: boolean = false;
-    let listSettings: ListSettings | undefined;
+    let listSettings: ListSettings;
 
     if (this.debug) {
       logger.logToStderr(`folder path: ${folderPath}...`);
@@ -215,7 +215,7 @@ class SpoFileAddCommand extends SpoCommand {
 
         // initiate chunked upload session
         const uploadId: string = v4();
-        let requestOptions: any = {
+        const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files/GetByPathOrAddStub(DecodedUrl='${encodeURIComponent(fileName)}')/StartUpload(uploadId=guid'${uploadId}')`,
           headers: {
             'accept': 'application/json;odata=nometadata'
@@ -266,11 +266,13 @@ class SpoFileAddCommand extends SpoCommand {
             throw err;
           }
         }
+      }
+      else {
         // upload small file in a single request
         const fileBody: Buffer = fs.readFileSync(fullPath);
         const bodyLength: number = fileBody.byteLength;
 
-        requestOptions = {
+        const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files/Add(url='${encodeURIComponent(fileName)}', overwrite=true)`,
           data: fileBody,
           headers: {
@@ -281,74 +283,74 @@ class SpoFileAddCommand extends SpoCommand {
         };
 
         await request.post(requestOptions);
+      }
 
-        if (args.options.contentType || args.options.publish || args.options.approve) {
-          listSettings = await this.getFileParentList(fileName, args.options.webUrl, folderPath, logger);
-          
-          if (args.options.contentType) {
-            await this.listHasContentType(args.options.contentType, args.options.webUrl, listSettings, logger);
-          }
-        }
-
-        // check if there are unknown options
-        // and map them as fields to update
-        const fieldsToUpdate: FieldValue[] = this.mapUnknownOptionsAsFieldValue(args.options);
-
+      if (args.options.contentType || args.options.publish || args.options.approve) {
+        listSettings = await this.getFileParentList(fileName, args.options.webUrl, folderPath, logger);
+        
         if (args.options.contentType) {
-          fieldsToUpdate.push({
-            FieldName: 'ContentType',
-            FieldValue: args.options.contentType
-          });
+          await this.listHasContentType(args.options.contentType, args.options.webUrl, listSettings, logger);
+        }
+      }
+
+      // check if there are unknown options
+      // and map them as fields to update
+      const fieldsToUpdate: FieldValue[] = this.mapUnknownOptionsAsFieldValue(args.options);
+
+      if (args.options.contentType) {
+        fieldsToUpdate.push({
+          FieldName: 'ContentType',
+          FieldValue: args.options.contentType
+        });
+      }
+
+      if (fieldsToUpdate.length > 0) {
+        // perform list item update and checkin
+        await this.validateUpdateListItem(args.options.webUrl, folderPath, fileName, fieldsToUpdate, logger, args.options.checkInComment);
+      }
+      else if (isCheckedOut) {
+        // perform checkin
+        await this.fileCheckIn(args, fileName);
+      }
+
+      // approve and publish cannot be used together
+      // when approve is used it will automatically publish the file
+      // so then no need to publish afterwards
+      if (args.options.approve) {
+        if (this.verbose) {
+          logger.logToStderr(`Approve file ${fileName}`);
         }
 
-        if (fieldsToUpdate.length > 0) {
-          // perform list item update and checkin
-          await this.validateUpdateListItem(args.options.webUrl, folderPath, fileName, fieldsToUpdate, logger, args.options.checkInComment);
+        // approve the existing file with given comment
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/approve(comment='${encodeURIComponent(args.options.approveComment || '')}')`,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+
+        await request.post(requestOptions);
+      }
+      else if (args.options.publish) {
+        if (listSettings!.EnableModeration && listSettings!.EnableMinorVersions) {
+          throw 'The file cannot be published without approval. Moderation for this list is enabled. Use the --approve option instead of --publish to approve and publish the file';
         }
-        else if (isCheckedOut) {
-          // perform checkin
-          await this.fileCheckIn(args, fileName);
+
+        if (this.verbose) {
+          logger.logToStderr(`Publish file ${fileName}`);
         }
 
-        // approve and publish cannot be used together
-        // when approve is used it will automatically publish the file
-        // so then no need to publish afterwards
-        if (args.options.approve) {
-          if (this.verbose) {
-            logger.logToStderr(`Approve file ${fileName}`);
-          }
+        // publish the existing file with given comment
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/publish(comment='${encodeURIComponent(args.options.publishComment || '')}')`,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
 
-          // approve the existing file with given comment
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/approve(comment='${encodeURIComponent(args.options.approveComment || '')}')`,
-            headers: {
-              'accept': 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
-
-          await request.post(requestOptions);
-        }
-        else if (args.options.publish) {
-          if (listSettings?.EnableModeration && listSettings.EnableMinorVersions) {
-            throw 'The file cannot be published without approval. Moderation for this list is enabled. Use the --approve option instead of --publish to approve and publish the file';
-          }
-
-          if (this.verbose) {
-            logger.logToStderr(`Publish file ${fileName}`);
-          }
-
-          // publish the existing file with given comment
-          const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/publish(comment='${encodeURIComponent(args.options.publishComment || '')}')`,
-            headers: {
-              'accept': 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
-
-          await request.post(requestOptions);
-        }
+        await request.post(requestOptions);
       }
     }
     catch (err: any) {
@@ -362,7 +364,6 @@ class SpoFileAddCommand extends SpoCommand {
 
         try {
           await request.post(requestOptions);
-          this.handleRejectedODataJsonPromise(err);
         }
         catch (err: any) {
           if (this.verbose) {
@@ -370,13 +371,10 @@ class SpoFileAddCommand extends SpoCommand {
             logger.logToStderr(err);
             logger.logToStderr('');
           }
-
-          this.handleRejectedODataJsonPromise(err);
         }
       }
-      else {
-        this.handleRejectedODataJsonPromise(err);
-      }
+
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 

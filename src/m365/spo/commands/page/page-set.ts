@@ -128,7 +128,6 @@ class SpoPageSetCommand extends SpoCommand {
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
-    let requestDigest: string = '';
     let pageName: string = args.options.name;
     const fileNameWithoutExtension: string = pageName.replace('.aspx', '');
     let bannerImageUrl: string = '';
@@ -148,9 +147,8 @@ class SpoPageSetCommand extends SpoCommand {
     const needsToSavePage = !!args.options.title || !!args.options.description;
 
     try {
-      const reqDigest = await spo.getRequestDigest(args.options.webUrl);
-      requestDigest = reqDigest.FormDigestValue;
-
+      const requestDigestResult = await spo.getRequestDigest(args.options.webUrl);
+      const requestDigest = requestDigestResult.FormDigestValue;
       const page = await Page.checkout(args.options.name, args.options.webUrl, logger, this.debug, this.verbose);
 
       if (page) {
@@ -189,7 +187,7 @@ class SpoPageSetCommand extends SpoCommand {
           };
         }
   
-        return request.post(requestOptions);
+        await request.post(requestOptions);
       }
 
       if (args.options.promoteAs) {
@@ -235,12 +233,12 @@ class SpoPageSetCommand extends SpoCommand {
             break;
         }
 
-        const res = await request.post<{ Id: string }>(requestOptions);
+        const pageRes = await request.post<{ Id: string }>(requestOptions);
 
         if (args.options.promoteAs === 'Template') {
           const requestOptions: any = {
             responseType: 'json',
-            url: `${args.options.webUrl}/_api/SitePages/Pages(${res.Id})/SavePageAsTemplate`,
+            url: `${args.options.webUrl}/_api/SitePages/Pages(${pageRes.Id})/SavePageAsTemplate`,
             headers: {
               'X-RequestDigest': requestDigest,
               'content-type': 'application/json;odata=nometadata',
@@ -250,54 +248,50 @@ class SpoPageSetCommand extends SpoCommand {
             }
           };
   
-          const temp = await request.post<{ Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }>(requestOptions);
+          const res = await request.post<{ Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }>(requestOptions);
           if (fileNameWithoutExtension) {
             pageData.Title = fileNameWithoutExtension;
           }
           if (pageDescription) {
             pageData.Description = pageDescription;
           }
-          if (temp.BannerImageUrl) {
-            pageData.BannerImageUrl = temp.BannerImageUrl;
+          if (res.BannerImageUrl) {
+            pageData.BannerImageUrl = res.BannerImageUrl;
           }
-          if (temp.LayoutWebpartsContent) {
-            pageData.LayoutWebpartsContent = temp.LayoutWebpartsContent;
+          if (res.LayoutWebpartsContent) {
+            pageData.LayoutWebpartsContent = res.LayoutWebpartsContent;
           }
-          if (temp.CanvasContent1) {
-            pageData.CanvasContent1 = temp.CanvasContent1;
-          }
-
-          pageId = temp.Id;
-        }
-        else {
-          if (pageTitle) {
-            pageData.Title = pageTitle;
-          }
-          if (pageDescription) {
-            pageData.Description = pageDescription;
-          }
-          if (bannerImageUrl) {
-            pageData.BannerImageUrl = bannerImageUrl;
-          }
-          if (canvasContent1) {
-            pageData.CanvasContent1 = canvasContent1;
-          }
-          if (layoutWebpartsContent) {
-            pageData.LayoutWebpartsContent = layoutWebpartsContent;
-          }
-          if (topicHeader) {
-            pageData.TopicHeader = topicHeader;
-          }
-          if (authorByline) {
-            pageData.AuthorByline = authorByline;
+          if (res.CanvasContent1) {
+            pageData.CanvasContent1 = res.CanvasContent1;
           }
 
-          // Needs to be at the end, as the data is still needed in the last step
-          if (!needsToSavePage) {
-            return Promise.resolve();
-          }
+          pageId = res.Id;
         }
       }
+      if (args.options.promoteAs !== 'Template') {
+        if (pageTitle) {
+          pageData.Title = pageTitle;
+        }
+        if (pageDescription) {
+          pageData.Description = pageDescription;
+        }
+        if (bannerImageUrl) {
+          pageData.BannerImageUrl = bannerImageUrl;
+        }
+        if (canvasContent1) {
+          pageData.CanvasContent1 = canvasContent1;
+        }
+        if (layoutWebpartsContent) {
+          pageData.LayoutWebpartsContent = layoutWebpartsContent;
+        }
+        if (topicHeader) {
+          pageData.TopicHeader = topicHeader;
+        }
+        if (authorByline) {
+          pageData.AuthorByline = authorByline;
+        }
+      }
+
       if (needsToSavePage) {
         const requestOptions: any = {
           responseType: 'json',
@@ -350,7 +344,7 @@ class SpoPageSetCommand extends SpoCommand {
 
       if (!args.options.publish) {
         if (args.options.promoteAs === 'Template' || !pageId) {
-          return Promise.resolve();
+          return;
         }
 
         requestOptions = {

@@ -362,7 +362,7 @@ describe(commands.FILE_ADD, () => {
 
     const folderServerRelativePath: string = '/sites/project-x/Shared%20Documents/t1';
 
-    await command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: folderServerRelativePath,
@@ -370,7 +370,7 @@ describe(commands.FILE_ADD, () => {
         contentType: 'abc',
         debug: true
       }
-    });
+    }));
     assert.strictEqual(loggerLogToStderrSpy.calledWith(`folder path: ${folderServerRelativePath}...`), true);
   });
 
@@ -380,7 +380,7 @@ describe(commands.FILE_ADD, () => {
 
     const unsafePath: string = '/Users/user/Projects/TEST\'FOLDER/TEST\'FILE.txt';
 
-    await command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -388,7 +388,7 @@ describe(commands.FILE_ADD, () => {
         contentType: 'abc',
         debug: true
       }
-    });
+    }));
     assert.strictEqual(loggerLogToStderrSpy.calledWith(`file name: TEST''FILE.txt...`), true);
   });
 

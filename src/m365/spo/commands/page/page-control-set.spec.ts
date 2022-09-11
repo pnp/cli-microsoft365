@@ -166,6 +166,10 @@ describe(commands.PAGE_CONTROL_SET, () => {
         return Promise.resolve(mockPageData);
       }
 
+      if (opts.url?.endsWith(`_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`)) {
+        return Promise.resolve();
+      }
+
       return Promise.reject('Invalid request');
     });
 
@@ -191,6 +195,10 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
       if ((opts.url as string).indexOf(savePagePostUrl) > -1) {
         return Promise.resolve({});
+      }
+
+      if (opts.url?.endsWith(`_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`)) {
+        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
@@ -220,6 +228,10 @@ describe(commands.PAGE_CONTROL_SET, () => {
         return Promise.resolve({});
       }
 
+      if (opts.url?.endsWith(`_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`)) {
+        return Promise.resolve();
+      }
+
       return Promise.reject('Invalid request');
     });
 
@@ -245,6 +257,10 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
       if ((opts.url as string).indexOf(savePagePostUrl) > -1) {
         return Promise.resolve({});
+      }
+
+      if (opts.url?.endsWith(`_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`)) {
+        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');

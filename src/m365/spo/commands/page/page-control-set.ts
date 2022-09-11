@@ -117,13 +117,12 @@ class SpoPageControlSetCommand extends SpoCommand {
       };
 
       const res = await request.get<ClientSidePageProperties>(requestOptions);
-
       if (!res.CanvasContent1) {
         throw `Page ${pageName} doesn't contain canvas controls.`;
       }
 
-      const canvasContent: PageControl[] = JSON.parse(res.CanvasContent1);
-      const control: PageControl | undefined = canvasContent.find(control => control.id && control.id.toLowerCase() === args.options.id.toLowerCase());
+      const pageControls: PageControl[] = JSON.parse(res.CanvasContent1);
+      const control: PageControl | undefined = pageControls.find(control => control.id && control.id.toLowerCase() === args.options.id.toLowerCase());
 
       if (!control) {
         throw `Control with ID ${args.options.id} not found on page ${pageName}`;
@@ -135,14 +134,13 @@ class SpoPageControlSetCommand extends SpoCommand {
 
       // Check out the page
       const page = await Page.checkout(pageName, args.options.webUrl, logger, this.debug, this.verbose);
-
       // Update the web part data
-      const canvasControls: ClientSideControl[] = JSON.parse(page.CanvasContent1);
+      const canvasContent: ClientSideControl[] = JSON.parse(page.CanvasContent1);
       if (this.debug) {
-        logger.logToStderr(canvasControls);
+        logger.logToStderr(canvasContent);
       }
 
-      const canvasControl = canvasControls.find(c => c.id.toLowerCase() === args.options.id.toLowerCase());
+      const canvasControl = canvasContent.find(c => c.id.toLowerCase() === args.options.id.toLowerCase());
       if (!canvasControl) {
         throw `Control with ID ${args.options.id} not found on page ${pageName}`;
       }

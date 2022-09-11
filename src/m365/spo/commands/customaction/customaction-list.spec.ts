@@ -200,7 +200,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
     };
 
     try {
-      await command.action(logger, { options: options } as any);
+      await assert.rejects(command.action(logger, { options: options } as any));
       assert(searchAllScopesSpy.calledWith(sinon.match(
         {
           url: 'https://contoso.sharepoint.com'
