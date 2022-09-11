@@ -166,6 +166,10 @@ describe(commands.PAGE_CONTROL_SET, () => {
         return Promise.resolve(mockPageData);
       }
 
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft") {
+        return Promise.resolve();
+      }
+
       return Promise.reject('Invalid request');
     });
 
@@ -183,14 +187,13 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       const checkOutPostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`;
-      const savePagePostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`;
 
       if ((opts.url as string).indexOf(checkOutPostUrl) > -1) {
         return Promise.resolve(mockPageData);
       }
 
-      if ((opts.url as string).indexOf(savePagePostUrl) > -1) {
-        return Promise.resolve({});
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft") {
+        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
@@ -210,14 +213,13 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       const checkOutPostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`;
-      const savePagePostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`;
 
       if ((opts.url as string).indexOf(checkOutPostUrl) > -1) {
         return Promise.resolve(mockPageData);
       }
 
-      if ((opts.url as string).indexOf(savePagePostUrl) > -1) {
-        return Promise.resolve({});
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft") {
+        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
@@ -237,14 +239,13 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       const checkOutPostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`;
-      const savePagePostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`;
 
       if ((opts.url as string).indexOf(checkOutPostUrl) > -1) {
         return Promise.resolve(mockPageData);
       }
 
-      if ((opts.url as string).indexOf(savePagePostUrl) > -1) {
-        return Promise.resolve({});
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft") {
+        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');

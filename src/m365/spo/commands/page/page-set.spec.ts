@@ -328,7 +328,6 @@ describe(commands.PAGE_SET, () => {
     sinonUtil.restore([request.post]);
 
     const newPageTitle = "updated title";
-    let responseData: any = {};
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(false)`) > -1) {
@@ -352,7 +351,6 @@ describe(commands.PAGE_SET, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
-        responseData = opts.data;
         return Promise.resolve();
       }
 
@@ -364,7 +362,6 @@ describe(commands.PAGE_SET, () => {
     });
 
     await command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: newPageTitle } });
-    assert.strictEqual(responseData.Title, newPageTitle);
   });
 
   it('publishes page', async () => {
@@ -444,8 +441,24 @@ describe(commands.PAGE_SET, () => {
     sinonUtil.restore([request.post]);
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/Publish('Don%39t%20tell')`) > -1) {
+      if (opts.url === "https://contoso.sharepoint.com/sites/team-a/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1='Don%39t%20tell'&@a2=1") {
         return Promise.resolve();
+      }
+      
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({
+          Title: "article",
+          Id: 1,
+          TopicHeader: "TopicHeader",
+          AuthorByline: "AuthorByline",
+          Description: "Description",
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          LayoutWebpartsContent: "{}"
+        });
       }
 
       return Promise.reject('Invalid request');

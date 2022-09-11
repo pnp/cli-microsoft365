@@ -177,7 +177,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      const page = await request.get<ClientSidePageProperties>(requestOptions);
+      let page = await request.get<ClientSidePageProperties>(requestOptions);
       if (!page.IsPageCheckedOutToCurrentUser) {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
@@ -187,7 +187,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
           responseType: 'json'
         };
   
-        await request.post<ClientSidePageProperties>(requestOptions);
+        page = await request.post<ClientSidePageProperties>(requestOptions);
       }
 
       if (page) {
