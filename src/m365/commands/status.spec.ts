@@ -92,9 +92,9 @@ describe(commands.STATUS, () => {
 
     auth.service.connected = true;
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error')); });
-    command.action(logger, { options: {} }, () => {
+    command.action(logger, { options: {} }, (err: Error) => {
       try {
-        assert(loggerLogSpy.calledWith('Your login has expired. Sign in again to continue.'));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Your login has expired. Sign in again to continue. Error`)));
         done();
       }
       catch (e) {
