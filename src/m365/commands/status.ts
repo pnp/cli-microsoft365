@@ -37,9 +37,8 @@ class StatusCommand extends Command {
             logger.logToStderr(rej);
           }
 
-          logger.log('Your login has expired. Sign in again to continue.');
           auth.service.logout();
-          cb(new CommandError(rej.message));
+          cb(new CommandError(`Your login has expired. Sign in again to continue. ${rej.message}`));
         });
     }
     else {
