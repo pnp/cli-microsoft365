@@ -328,7 +328,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     assert(correctRequestIssued);
   });
 
-  it('removes the viewTitle from listId when prompt confirmed (debug)', async () => {
+  it('removes the viewId from listId when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -387,7 +387,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/ninja', listId: '0cd891ef-afce-4e55-b836-fce03286cccf', viewId: 'cc27a922-8224-4296-90a5-ebbc54da2e81' } });
     let correctRequestIssued = false;
     requests.forEach(r => {
       if (r.url.indexOf(`/_api/web/lists(guid'0cd891ef-afce-4e55-b836-fce03286cccf')/views(guid'cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1 &&
@@ -421,7 +421,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
 
   it('uses correct API url when list title option is passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('Documents')/views(guid'0cd891ef-afce-4e55-b836-fce03286cccf')`) {
         return Promise.resolve('Correct Url');
       }
 

@@ -138,14 +138,14 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         pageName: 'home',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
       }
-    });
+    }));
     assert.deepEqual(checkedOut, true);
   });
 
@@ -201,14 +201,14 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         pageName: 'home',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
         webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
       }
-    });
+    }));
     assert.deepEqual(checkedOut, true);
   });
 
@@ -560,7 +560,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger,
+    await command.action(logger,
       {
         options: {
           debug: false,

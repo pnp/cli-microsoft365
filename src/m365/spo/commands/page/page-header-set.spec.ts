@@ -158,12 +158,12 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    await assert.rejects(command.action(logger, {
+    await command.action(logger, {
       options: {
         pageName: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter'
       }
-    }));
+    });
     assert.deepStrictEqual(checkingOut, false);
   });
 

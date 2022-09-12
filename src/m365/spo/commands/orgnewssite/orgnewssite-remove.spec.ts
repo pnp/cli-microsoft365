@@ -113,7 +113,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { continue: true }
     ));
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         verbose: true,
