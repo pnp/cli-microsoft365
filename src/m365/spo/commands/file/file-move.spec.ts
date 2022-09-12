@@ -215,9 +215,9 @@ describe(commands.FILE_MOVE, () => {
             }
           });
         }
-        return Promise.reject(new CommandError('Invalid URL'));
+        return Promise.reject('Invalid URL');
       }
-      return Promise.reject(new CommandError('Unknown case'));
+      return Promise.reject('Unknown case');
     });
 
     command.action(logger, {
