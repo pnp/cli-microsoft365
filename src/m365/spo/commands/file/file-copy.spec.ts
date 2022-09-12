@@ -222,7 +222,6 @@ describe(commands.FILE_COPY, () => {
       return Promise.reject('Unknown case');
     });
 
-
     command.action(logger, {
       options: {
         debug: true,

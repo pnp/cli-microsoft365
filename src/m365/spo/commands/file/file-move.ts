@@ -181,25 +181,26 @@ class SpoFileMoveCommand extends SpoCommand {
     // since the target WebFullUrl is unknown we can use getRequestDigest
     // to get it from target folder absolute url.
     // Similar approach used here Microsoft.SharePoint.Client.Web.WebUrlFromFolderUrlDirect
-    return this.getWebFullUrl(targetFolderAbsoluteUrl, logger).then((webFullUrl: string) => {
-      const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(webFullUrl, targetUrl)}/${filename}`;
-      const removeOptions: SpoFileRemoveOptions = {
-        webUrl: webFullUrl,
-        url: targetFileServerRelativeUrl,
-        recycle: true,
-        confirm: true,
-        debug: this.debug,
-        verbose: this.verbose
-      };
+    return this.getWebFullUrl(targetFolderAbsoluteUrl, logger)
+      .then((webFullUrl: string) => {
+        const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(webFullUrl, targetUrl)}/${filename}`;
+        const removeOptions: SpoFileRemoveOptions = {
+          webUrl: webFullUrl,
+          url: targetFileServerRelativeUrl,
+          recycle: true,
+          confirm: true,
+          debug: this.debug,
+          verbose: this.verbose
+        };
 
-      return Cli.executeCommandWithOutput(removeCommand as Command, { options: { ...removeOptions, _: [] } })
-        .catch((err: FileDeleteError) => {
-          if (err.error !== null && err.error.message !== null && err.error.message.includes('does not exist')) {
-            return Promise.resolve();
-          }
-          return Promise.reject(err);
-        });
-    });
+        return Cli.executeCommandWithOutput(removeCommand as Command, { options: { ...removeOptions, _: [] } })
+          .catch((err: FileDeleteError) => {
+            if (err.error !== null && err.error.message !== null && err.error.message.includes('does not exist')) {
+              return Promise.resolve();
+            }
+            return Promise.reject(err);
+          });
+      });
   }
 
   private getWebFullUrl(targetFolderAbsoluteUrl: string, logger: Logger): Promise<string> {

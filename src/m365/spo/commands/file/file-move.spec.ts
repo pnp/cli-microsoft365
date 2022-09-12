@@ -236,6 +236,7 @@ describe(commands.FILE_MOVE, () => {
       }
     });
   });
+  
   it('should show error when recycleFile rejects with error', (done) => {
     const fileDeleteError: FileDeleteError = {
       error: {
