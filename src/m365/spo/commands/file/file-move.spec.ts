@@ -207,17 +207,15 @@ describe(commands.FILE_MOVE, () => {
     stubAllPostRequests();
     stubAllGetRequests();
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
-      if (command === fileRemoveCommand) {
-        if (args.options.webUrl === 'https://contoso.sharepoint.com') {
-          return Promise.reject({
-            error: {
-              message: 'File does not exist'
-            }
-          });
-        }
-        return Promise.reject('Invalid URL');
+      if (command === fileRemoveCommand &&
+        args.options.webUrl === 'https://contoso.sharepoint.com') {
+        return Promise.reject({
+          error: {
+            message: 'File does not exist'
+          }
+        });
       }
-      return Promise.reject('Unknown case');
+      return Promise.reject(('Unknown case'));
     });
 
     command.action(logger, {
@@ -310,7 +308,7 @@ describe(commands.FILE_MOVE, () => {
     });
     stubAllPostRequests(null, waitForJobResult);
     stubAllGetRequests();
-    
+
     command.action(logger, {
       options: {
         verbose: true,

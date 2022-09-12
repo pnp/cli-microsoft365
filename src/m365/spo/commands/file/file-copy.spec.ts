@@ -213,16 +213,10 @@ describe(commands.FILE_COPY, () => {
     stubAllGetRequests();
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args) : Promise<any> => {
-      if (command === fileRemoveCommand) {
-        if (args.options.webUrl === 'https://contoso.sharepoint.com/sites/portal') {
-          return Promise.resolve();
-        }
-
-        if (args.options.url === '/sites/portal/Shared Documents/def.pdf') {
-          return Promise.resolve();
-        }
-
-        return Promise.reject('Invalid URL');
+      if (command === fileRemoveCommand &&
+        args.options.webUrl === 'https://contoso.sharepoint.com/sites/portal' ||
+        args.options.url === '/sites/portal/Shared Documents/def.pdf') {
+        return Promise.resolve();
       }
 
       return Promise.reject('Unknown case');
@@ -253,15 +247,13 @@ describe(commands.FILE_COPY, () => {
     stubAllGetRequests();
 
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
-      if (command === fileRemoveCommand) {
-        if (args.options.webUrl === 'https://contoso.sharepoint.com') {
-          return Promise.reject({
-            error: {
-              message: 'File does not exist'
-            }
-          });
-        }
-        return Promise.reject('Invalid URL');
+      if (command === fileRemoveCommand &&
+        args.options.webUrl === 'https://contoso.sharepoint.com') {
+        return Promise.reject({
+          error: {
+            message: 'File does not exist'
+          }
+        });
       }
       return Promise.reject('Unknown case');
     });

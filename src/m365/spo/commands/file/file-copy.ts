@@ -193,7 +193,7 @@ class SpoFileCopyCommand extends SpoCommand {
       
       return Cli.executeCommandWithOutput(removeCommand as Command, { options: { ...removeOptions, _: [] } })
         .catch((err: FileDeleteError) => {
-          logger.log(err);
+          logger.logToStderr(err);
           if (err.error !== null && err.error.message !== null && err.error.message.includes('does not exist')) {
             return Promise.resolve();
           }
