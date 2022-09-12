@@ -7,7 +7,9 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
+import { FileDeleteError } from './file-rename';
 const command: Command = require('./file-copy');
+const fileRemoveCommand: Command = require('./file-remove');
 
 describe(commands.FILE_COPY, () => {
   let log: any[];
@@ -16,18 +18,10 @@ describe(commands.FILE_COPY, () => {
   let commandInfo: CommandInfo;
 
   const stubAllPostRequests: any = (
-    recycleFile: any = null,
     createCopyJobs: any = null,
     waitForJobResult: any = null
   ) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/recycle()') > -1) {
-        if (recycleFile) {
-          return recycleFile;
-        }
-        return Promise.resolve();
-      }
-
       if ((opts.url as string).indexOf('/_api/site/CreateCopyJobs') > -1) {
         if (createCopyJobs) {
           return createCopyJobs;
@@ -98,7 +92,8 @@ describe(commands.FILE_COPY, () => {
   afterEach(() => {
     sinonUtil.restore([
       request.post,
-      request.get
+      request.get,
+      Cli.executeCommandWithOutput
     ]);
   });
 
@@ -217,6 +212,23 @@ describe(commands.FILE_COPY, () => {
     stubAllPostRequests();
     stubAllGetRequests();
 
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args) : Promise<any> => {
+      if (command === fileRemoveCommand) {
+        if (args.options.webUrl === 'https://contoso.sharepoint.com/sites/portal') {
+          return Promise.resolve();
+        }
+
+        if (args.options.url === '/sites/portal/Shared Documents/def.pdf') {
+          return Promise.resolve();
+        }
+
+        return Promise.reject(new CommandError('Invalid URL'));
+      }
+
+      return Promise.reject(new CommandError('Unknown case'));
+    });
+
+
     command.action(logger, {
       options: {
         debug: true,
@@ -237,11 +249,22 @@ describe(commands.FILE_COPY, () => {
   });
 
   it('should succeed when run with option --deleteIfAlreadyExists and response 404', (done) => {
-    const recycleFile404 = new Promise<any>((resolve, reject) => {
-      return reject({ statusCode: 404 });
-    });
-    stubAllPostRequests(recycleFile404);
+    stubAllPostRequests();
     stubAllGetRequests();
+
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+      if (command === fileRemoveCommand) {
+        if (args.options.webUrl === 'https://contoso.sharepoint.com') {
+          return Promise.reject({
+            error: {
+              message: 'File does not exist'
+            }
+          });
+        }
+        return Promise.reject(new CommandError('Invalid URL'));
+      }
+      return Promise.reject(new CommandError('Unknown case'));
+    });
 
     command.action(logger, {
       options: {
@@ -263,11 +286,16 @@ describe(commands.FILE_COPY, () => {
   });
 
   it('should show error when recycleFile rejects with error', (done) => {
-    const recycleFile = new Promise<any>((resolve, reject) => {
-      return reject('abc');
-    });
-    stubAllPostRequests(recycleFile);
+    const fileDeleteError: FileDeleteError = {
+      error: {
+        message: 'Locked for use'
+      },
+      stderr: ''
+    };
+    stubAllPostRequests();
     stubAllGetRequests();
+    
+    sinon.stub(Cli, 'executeCommandWithOutput').returns(Promise.reject(fileDeleteError));
 
     command.action(logger, {
       options: {
@@ -278,33 +306,7 @@ describe(commands.FILE_COPY, () => {
       }
     } as any, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('should recycleFile format target url', (done) => {
-    const recycleFile = new Promise<any>((resolve, reject) => {
-      return reject('abc');
-    });
-    stubAllPostRequests(recycleFile);
-    stubAllGetRequests();
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: '/abc/',
-        deleteIfAlreadyExists: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(fileDeleteError.error));
         done();
       }
       catch (e) {
@@ -352,7 +354,7 @@ describe(commands.FILE_COPY, () => {
       const log = JSON.stringify({ Event: 'JobError', Message: 'error1' });
       return resolve({ Logs: [log] });
     });
-    stubAllPostRequests(null, null, waitForJobResult);
+    stubAllPostRequests(null, waitForJobResult);
     stubAllGetRequests();
 
     command.action(logger, {
@@ -360,8 +362,7 @@ describe(commands.FILE_COPY, () => {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc',
-        deleteIfAlreadyExists: true
+        targetUrl: 'abc'
       }
     } as any, (err?: any) => {
       try {
@@ -379,7 +380,7 @@ describe(commands.FILE_COPY, () => {
       const log = JSON.stringify({ Event: 'JobFatalError', Message: 'error2' });
       return resolve({ JobState: 0, Logs: [log] });
     });
-    stubAllPostRequests(null, null, waitForJobResult);
+    stubAllPostRequests(null, waitForJobResult);
     stubAllGetRequests();
 
     command.action(logger, {
@@ -387,8 +388,7 @@ describe(commands.FILE_COPY, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc',
-        deleteIfAlreadyExists: true
+        targetUrl: 'abc'
       }
     } as any, (err?: any) => {
       try {

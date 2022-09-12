@@ -1,10 +1,14 @@
 import * as url from 'url';
-import { Logger } from '../../../../cli';
+import { Cli, CommandOutput, Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { ContextInfo, spo, urlUtil, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { Options as SpoFileRemoveOptions } from './file-remove';
+import Command from '../../../../Command';
+import { FileDeleteError } from './file-rename';
+const removeCommand: Command = require('./file-remove');
 
 interface CommandArgs {
   options: Options;
@@ -90,7 +94,7 @@ class SpoFileCopyCommand extends SpoCommand {
     // the user can receive misleading error message.
     this
       .fileExists(tenantUrl, webUrl, args.options.sourceUrl)
-      .then((): Promise<void> => {
+      .then((): Promise<void | CommandOutput> => {
         if (args.options.deleteIfAlreadyExists) {
           // try delete target file, if deleteIfAlreadyExists flag is set
           const filename = args.options.sourceUrl.replace(/^.*[\\\/]/, '');
@@ -170,58 +174,43 @@ class SpoFileCopyCommand extends SpoCommand {
   /**
    * Moves file in the site recycle bin
    */
-  private recycleFile(tenantUrl: string, targetUrl: string, filename: string, logger: Logger): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      const targetFolderAbsoluteUrl: string = urlUtil.urlCombine(tenantUrl, targetUrl);
+  private recycleFile(tenantUrl: string, targetUrl: string, filename: string, logger: Logger): Promise<void | CommandOutput> {
+    const targetFolderAbsoluteUrl: string = urlUtil.urlCombine(tenantUrl, targetUrl);
 
-      // since the target WebFullUrl is unknown we can use getRequestDigestForSite
-      // to get it from target folder absolute url.
-      // Similar approach used here Microsoft.SharePoint.Client.Web.WebUrlFromFolderUrlDirect
-      spo
-        .getRequestDigest(targetFolderAbsoluteUrl)
-        .then((contextResponse: ContextInfo): void => {
-          if (this.debug) {
-            logger.logToStderr(`contextResponse.WebFullUrl: ${contextResponse.WebFullUrl}`);
+    // since the target WebFullUrl is unknown we can use getRequestDigestForSite
+    // to get it from target folder absolute url.
+    // Similar approach used here Microsoft.SharePoint.Client.Web.WebUrlFromFolderUrlDirect
+    return this.getWebFullUrl(targetFolderAbsoluteUrl, logger).then((webFullUrl: string) => {
+      const targetFileServerRelativeUrl: string = `${urlUtil.getServerRelativePath(webFullUrl, targetUrl)}/${filename}`;
+      const removeOptions: SpoFileRemoveOptions = {
+        webUrl: webFullUrl,
+        url: targetFileServerRelativeUrl,
+        recycle: true,
+        confirm: true,
+        debug: this.debug,
+        verbose: this.verbose
+      };
+      
+      return Cli.executeCommandWithOutput(removeCommand as Command, { options: { ...removeOptions, _: [] } })
+        .catch((err: FileDeleteError) => {
+          logger.log(err);
+          if (err.error !== null && err.error.message !== null && err.error.message.includes('does not exist')) {
+            return Promise.resolve();
           }
-
-          if (targetUrl.charAt(0) !== '/') {
-            targetUrl = `/${targetUrl}`;
-          }
-          if (targetUrl.lastIndexOf('/') !== targetUrl.length - 1) {
-            targetUrl = `${targetUrl}/`;
-          }
-
-          const requestUrl: string = `${contextResponse.WebFullUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(`${targetUrl}${filename}`)}')/recycle()`;
-          const requestOptions: any = {
-            url: requestUrl,
-            method: 'POST',
-            headers: {
-              'X-HTTP-Method': 'DELETE',
-              'If-Match': '*',
-              'accept': 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
-
-          request.post(requestOptions)
-            .then((): void => {
-              resolve();
-            })
-            .catch((err: any): any => {
-              if (err.statusCode === 404) {
-                // file does not exist so can proceed
-                return resolve();
-              }
-
-              if (this.debug) {
-                logger.logToStderr(`recycleFile error...`);
-                logger.logToStderr(err);
-              }
-
-              reject(err);
-            });
-        }, (e: any) => reject(e));
+          return Promise.reject(err);
+        });
     });
+
+  }
+
+  private getWebFullUrl(targetFolderAbsoluteUrl: string, logger: Logger): Promise<string> {
+    return spo.getRequestDigest(targetFolderAbsoluteUrl)
+      .then((contextResponse: ContextInfo): Promise<string> => {
+        if (this.debug) {
+          logger.logToStderr(`contextResponse.WebFullUrl: ${contextResponse.WebFullUrl}`);
+        }
+        return Promise.resolve(contextResponse.WebFullUrl);
+      });
   }
 }
 
