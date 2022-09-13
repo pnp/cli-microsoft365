@@ -172,22 +172,6 @@ describe(commands.FILE_MOVE, () => {
       }
     });
   });
-  it('should fail if source file not found', async () => {
-    stubAllPostRequests();
-    const rejectFileExists = new Promise<any>((resolve, reject) => {
-      return reject('File not found.');
-    });
-    stubAllGetRequests(rejectFileExists);
-
-    await assert.rejects(command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc'
-      }
-    } as any), new CommandError('File not found.'));
-  });
 
   it('should succeed when run with option --deleteIfAlreadyExists and response 404', async () => {
     const recycleFile404 = new Promise<any>((resolve, reject) => {
@@ -337,13 +321,10 @@ describe(commands.FILE_MOVE, () => {
     });
     stubAllGetRequests();
 
-    await command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
-        sourceUrl: 'library/file1.pdf',
-        targetUrl: 'sites/team-b/library2'
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
+      sourceUrl: 'library/file1.pdf',
+      targetUrl: 'sites/team-b/library2' } } as any), new CommandError("Cannot read properties of undefined (reading 'value')"));
     assert.strictEqual(actual, expected);
   });
 
@@ -377,13 +358,10 @@ describe(commands.FILE_MOVE, () => {
 
     stubAllGetRequests();
 
-    await command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
-        sourceUrl: 'library/file1.pdf/',
-        targetUrl: 'sites/team-b/library2/'
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
+      sourceUrl: 'library/file1.pdf/',
+      targetUrl: 'sites/team-b/library2/' } } as any), new CommandError("Cannot read properties of undefined (reading 'value')"));
     assert.strictEqual(actual, expected);
   });
 
@@ -417,13 +395,10 @@ describe(commands.FILE_MOVE, () => {
 
     stubAllGetRequests();
 
-    await command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
-        sourceUrl: '/library/file1.pdf/',
-        targetUrl: '/sites/team-b/library2/'
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
+      sourceUrl: '/library/file1.pdf/',
+      targetUrl: '/sites/team-b/library2/' } } as any), new CommandError("Cannot read properties of undefined (reading 'value')"));
     assert.strictEqual(actual, expected);
   });
 

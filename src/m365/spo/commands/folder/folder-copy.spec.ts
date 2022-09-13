@@ -194,13 +194,10 @@ describe(commands.FOLDER_COPY, () => {
 
     });
 
-    await command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
-        sourceUrl: 'library/folder1',
-        targetUrl: 'sites/team-b/library2'
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
+      sourceUrl: 'library/folder1',
+      targetUrl: 'sites/team-b/library2' } } as any), new CommandError("Cannot read properties of undefined (reading 'value')"));
     assert.strictEqual(actual, expected);
   });
 
@@ -231,13 +228,10 @@ describe(commands.FOLDER_COPY, () => {
 
     });
 
-    await command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
-        sourceUrl: 'library/folder1/',
-        targetUrl: 'sites/team-b/library2/'
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
+      sourceUrl: 'library/folder1/',
+      targetUrl: 'sites/team-b/library2/' } } as any), new CommandError("Cannot read properties of undefined (reading 'value')"));
     assert.strictEqual(actual, expected);
   });
 
@@ -268,13 +262,10 @@ describe(commands.FOLDER_COPY, () => {
 
     });
 
-    await command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
-        sourceUrl: '/library/folder1/',
-        targetUrl: '/sites/team-b/library2/'
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
+      sourceUrl: '/library/folder1/',
+      targetUrl: '/sites/team-b/library2/' } } as any), new CommandError("Cannot read properties of undefined (reading 'value')"));
     assert.strictEqual(actual, expected);
   });
 

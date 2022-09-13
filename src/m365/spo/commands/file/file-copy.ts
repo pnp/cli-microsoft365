@@ -118,12 +118,12 @@ class SpoFileCopyCommand extends SpoCommand {
       };
 
       const jobInfo = await request.post<any>(requestOptions);
-      this.dots = '';
-
-      const copyJobInfo: any = jobInfo.value[0];
-      const progressPollInterval: number = 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
 
       await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+        this.dots = '';
+        const copyJobInfo: any = jobInfo.value[0];
+        const progressPollInterval: number = 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
+
         setTimeout(() => {
           spo.waitUntilCopyJobFinished({
             copyJobInfo,

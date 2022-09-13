@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -92,4 +92,11 @@ describe(commands.REPORT_OFFICE365ACTIVATIONSUSERDETAIL, () => {
     assert(loggerLogSpy.calledWith([{"Report Refresh Date":"2021-05-25","User Principal Name":"user1@contoso.onmicrosoft.com","Display Name":"User1","Product Type":"MICROSOFT 365 APPS FOR ENTERPRISE","Last Activated Date":"","Windows":0,"Mac":0,"Windows 10 Mobile":0,"iOS":0,"Android":0,"Activated On Shared Computer":"False"},{"Report Refresh Date":"2021-05-25","User Principal Name":"user1@contoso.onmicrosoft.com","Display Name":"User1","Product Type":"MICROSOFT EXCEL ADVANCED ANALYTICS","Last Activated Date":"","Windows":0,"Mac":0,"Windows 10 Mobile":0,"iOS":0,"Android":0,"Activated On Shared Computer":"False"}]));
   });
 
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
+  });
 });

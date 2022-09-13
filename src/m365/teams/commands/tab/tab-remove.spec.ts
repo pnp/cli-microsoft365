@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -225,6 +225,18 @@ describe(commands.TAB_REMOVE, () => {
     });
   });
 
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'delete').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: { 
+      debug: false,
+      channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+      teamId: '00000000-0000-0000-0000-000000000000',
+      tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+      confirm: true } } as any), new CommandError('An error has occurred'));
+  });
 
   it('supports debug mode', () => {
     const options = command.options;

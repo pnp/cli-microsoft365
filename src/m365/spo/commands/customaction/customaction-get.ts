@@ -95,8 +95,10 @@ class SpoCustomActionGetCommand extends SpoCommand {
       if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
         customAction = await this.getCustomAction(args.options);
       }
+      else {
+        customAction = await this.searchAllScopes(args.options);
+      }
 
-      customAction = await this.searchAllScopes(args.options);
 
       if (customAction["odata.null"] === true) {
         if (this.verbose) {
