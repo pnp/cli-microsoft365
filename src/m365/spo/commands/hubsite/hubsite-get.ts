@@ -85,7 +85,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
       const hubSite = args.options.id ? await this.getHubSiteById(spoUrl, args.options) : await this.getHubSite(spoUrl, args.options);
 
       if (args.options.includeAssociatedSites && (args.options.output && args.options.output !== 'json')) {
-        throw Error('includeAssociatedSites option is only allowed with json output mode');
+        throw 'includeAssociatedSites option is only allowed with json output mode';
       }
 
       if (args.options.includeAssociatedSites === true && args.options.output && args.options.output === 'json') {

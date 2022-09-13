@@ -87,7 +87,7 @@ describe(commands.HOMESITE_GET, () => {
 
   it(`doesn't output anything when information about the Home Site is not available`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SP.SPHSite/Details') {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/SP.SPHSite/Details') {
         return Promise.resolve({
           "odata.null": true
         });

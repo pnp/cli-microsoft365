@@ -185,6 +185,7 @@ describe(commands.FOLDER_MOVE, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       actual = JSON.stringify(opts.data);
+
       if (
         opts.data.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/folder1' &&
         opts.data.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&

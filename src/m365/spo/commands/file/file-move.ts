@@ -124,17 +124,21 @@ class SpoFileMoveCommand extends SpoCommand {
       const copyJobInfo: any = jobInfo.value[0];
       const progressPollInterval: number = 1800; // 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
 
-      setTimeout(async () => {
-        await spo.waitUntilCopyJobFinished({
-          copyJobInfo,
-          siteUrl: webUrl,
-          pollingInterval: progressPollInterval,
-          logger,
-          dots: this.dots,
-          debug: this.debug,
-          verbose: this.verbose
-        });
-      }, progressPollInterval);
+      await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+        setTimeout(() => {
+          spo.waitUntilCopyJobFinished({
+            copyJobInfo,
+            siteUrl: webUrl,
+            pollingInterval: progressPollInterval,
+            resolve,
+            reject,
+            logger,
+            dots: this.dots,
+            debug: this.debug,
+            verbose: this.verbose
+          });
+        }, progressPollInterval);
+      });
     }
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

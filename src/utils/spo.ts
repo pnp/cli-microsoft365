@@ -162,7 +162,7 @@ export const spo = {
       });
   },
 
-  async waitUntilCopyJobFinished({ copyJobInfo, siteUrl, pollingInterval, logger, dots, debug, verbose }: { copyJobInfo: any, siteUrl: string, pollingInterval: number, logger: Logger, dots?: string, debug: boolean, verbose: boolean }): Promise<void> {
+  waitUntilCopyJobFinished({ copyJobInfo, siteUrl, pollingInterval, resolve, reject, logger, dots, debug, verbose }: { copyJobInfo: any, siteUrl: string, pollingInterval: number, resolve: () => void, reject: (error: any) => void, logger: Logger, dots?: string, debug: boolean, verbose: boolean }): void {
     const requestUrl: string = `${siteUrl}/_api/site/GetCopyJobProgress`;
     const requestOptions: any = {
       url: requestUrl,
@@ -178,36 +178,40 @@ export const spo = {
       process.stdout.write(`\r${dots}`);
     }
 
-    const resp = await request.post<{ JobState?: number, Logs: string[] }>(requestOptions);
+    request
+      .post<{ JobState?: number, Logs: string[] }>(requestOptions)
+      .then((resp: { JobState?: number, Logs: string[] }): void => {
+        if (debug) {
+          logger.logToStderr('getCopyJobProgress response...');
+          logger.logToStderr(resp);
+        }
 
-    if (debug) {
-      logger.logToStderr('getCopyJobProgress response...');
-      logger.logToStderr(resp);
-    }
+        for (const item of resp.Logs) {
+          const log: { Event: string; Message: string } = JSON.parse(item);
 
-    for (const item of resp.Logs) {
-      const log: { Event: string; Message: string } = JSON.parse(item);
+          // reject if progress error
+          if (log.Event === "JobError" || log.Event === "JobFatalError") {
+            return reject(log.Message);
+          }
+        }
 
-      // reject if progress error
-      if (log.Event === "JobError" || log.Event === "JobFatalError") {
-        throw log.Message;
-      }
-    }
+        // two possible scenarios
+        // job done = success promise returned
+        // job in progress = recursive call using setTimeout returned
+        if (resp.JobState === 0) {
+          // job done
+          if (verbose) {
+            process.stdout.write('\n');
+          }
 
-    // two possible scenarios
-    // job done = success promise returned
-    // job in progress = recursive call using setTimeout returned
-    if (resp.JobState === 0) {
-      // job done
-      if (verbose) {
-        process.stdout.write('\n');
-      }
-    }
-    else {
-      setTimeout(async () => {
-        await spo.waitUntilCopyJobFinished({ copyJobInfo, siteUrl, pollingInterval, logger, dots, debug, verbose });
-      }, pollingInterval);
-    }
+          resolve();
+        }
+        else {
+          setTimeout(() => {
+            spo.waitUntilCopyJobFinished({ copyJobInfo, siteUrl, pollingInterval, resolve, reject, logger, dots, debug, verbose });
+          }, pollingInterval);
+        }
+      });
   },
 
   getSpoUrl(logger: Logger, debug: boolean): Promise<string> {

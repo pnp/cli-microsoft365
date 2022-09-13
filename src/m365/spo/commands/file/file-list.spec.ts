@@ -565,6 +565,31 @@ describe(commands.FILE_LIST, () => {
         return Promise.resolve('Correct Url1');
       }
 
+      if ((opts.url as string).indexOf('/_api/web/GetFolderByServerRelativeUrl') > -1) {
+        return Promise.resolve(
+          {
+            "Files": [
+              {
+                "UniqueId": "f65deb00-4d0e-44cc-a9db-027d54039b4d",
+                "Name": "Level2-Test.docx",
+                "ServerRelativeUrl": "/sites/project-x/Shared documents/Level1-Folder/Level2-Folder/Level2-Test.docx"
+              }
+            ],
+            "Folders": [],
+            "Exists": true,
+            "IsWOPIEnabled": false,
+            "ItemCount": 3,
+            "Name": "Level2-Folder",
+            "ProgID": null,
+            "ServerRelativeUrl": "/sites/project-x/Shared Documents/Level1-Folder/Level2-Folder",
+            "TimeCreated": "2021-05-22T08:58:37Z",
+            "TimeLastModified": "2021-05-22T09:00:33Z",
+            "UniqueId": "dee34261-95f0-49c0-9090-f8d2d581787c",
+            "WelcomePage": ""
+          }
+        );
+      }
+
       return Promise.reject('Invalid request');
     });
 
