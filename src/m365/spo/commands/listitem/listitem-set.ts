@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, formatting, spo, validation } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { ListItemInstance } from './ListItemInstance';
@@ -138,9 +138,10 @@ class SpoListItemSetCommand extends SpoCommand {
           responseType: 'json'
         };
 
-        const dataReturned = await request.get<any>(listRequestOptions);
+        const dataReturned: any = await request.get(listRequestOptions);
         environmentListId = dataReturned.value;
       }
+      
       if (args.options.contentType) {
         if (this.verbose) {
           logger.logToStderr(`Getting content types for list...`);
@@ -154,7 +155,8 @@ class SpoListItemSetCommand extends SpoCommand {
           responseType: 'json'
         };
 
-        const contentTypes = await request.get<any>(requestOptions);
+        const contentTypes: any = await request.get(requestOptions);
+
         if (this.debug) {
           logger.logToStderr('content type lookup response...');
           logger.logToStderr(contentTypes);
@@ -188,108 +190,114 @@ class SpoListItemSetCommand extends SpoCommand {
           logger.logToStderr(`using content type name: ${contentTypeName}`);
         }
       }
+
+      let res: ContextInfo = undefined as any;
+
       if (args.options.systemUpdate) {
         if (this.debug) {
           logger.logToStderr(`getting request digest for systemUpdate request`);
         }
 
-        const reqDigest = await spo.getRequestDigest(args.options.webUrl);
-        formDigestValue = reqDigest.FormDigestValue;
+        res = await spo.getRequestDigest(args.options.webUrl);
+      }
 
-        if (this.verbose) {
-          logger.logToStderr(`Updating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+      if (this.verbose) {
+        logger.logToStderr(`Updating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+      }
+
+      formDigestValue = args.options.systemUpdate ? res['FormDigestValue'] : '';
+      let objectIdentity: string = '';
+
+      if (args.options.systemUpdate) {
+        objectIdentity = await this.requestObjectIdentity(args.options.webUrl, logger, formDigestValue);
+      }
+
+      const additionalContentType: string = (args.options.systemUpdate && args.options.contentType && contentTypeName !== '') ? `
+            <Parameters>
+              <Parameter Type="String">ContentType</Parameter>
+              <Parameter Type="String">${contentTypeName}</Parameter>
+            </Parameters>`
+        : ``;
+
+      const requestBody: any = args.options.systemUpdate ?
+        `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">
+          <Actions>
+            <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">${this.mapRequestBody(args.options).join()}${additionalContentType}
+            </Method>
+            <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />
+          </Actions>
+          <ObjectPaths>
+            <Identity Id="147" Name="${objectIdentity}:list:${environmentListId}:item:${args.options.id},1" />
+          </ObjectPaths>
+        </Request>`
+        : {
+          formValues: this.mapRequestBody(args.options)
+        };
+
+      if (args.options.contentType && contentTypeName !== '' && !args.options.systemUpdate) {
+        if (this.debug) {
+          logger.logToStderr(`Specifying content type name [${contentTypeName}] in request body`);
         }
 
-        if (args.options.systemUpdate) {
-          const objectIdentity = await this.requestObjectIdentity(args.options.webUrl, logger, formDigestValue);
+        requestBody.formValues.push({
+          FieldName: 'ContentType',
+          FieldValue: contentTypeName
+        });
+      }
 
-          const additionalContentType: string = (args.options.systemUpdate && args.options.contentType && contentTypeName !== '') ? `
-              <Parameters>
-                <Parameter Type="String">ContentType</Parameter>
-                <Parameter Type="String">${contentTypeName}</Parameter>
-              </Parameters>`
-            : ``;
+      const requestOptions: any = args.options.systemUpdate ?
+        {
+          url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'Content-Type': 'text/xml',
+            'X-RequestDigest': formDigestValue
+          },
+          data: requestBody
+        } :
+        {
+          url: `${listRestUrl}/items(${args.options.id})/ValidateUpdateListItem()`,
+          headers: {
+            'accept': 'application/json;odata=nometadata'
+          },
+          data: requestBody,
+          responseType: 'json'
+        };
 
-          const requestBody: any = args.options.systemUpdate ?
-            `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">
-              <Actions>
-                <Method Name="ParseAndSetFieldValue" Id="1" ObjectPathId="147">${this.mapRequestBody(args.options).join()}${additionalContentType}
-                </Method>
-                <Method Name="SystemUpdate" Id="2" ObjectPathId="147" />
-              </Actions>
-              <ObjectPaths>
-                <Identity Id="147" Name="${objectIdentity}:list:${environmentListId}:item:${args.options.id},1" />
-              </ObjectPaths>
-            </Request>`
-            : {
-              formValues: this.mapRequestBody(args.options)
-            };
+      const response: any = await request.post(requestOptions);
+      let itemId: number = 0;
 
-          if (args.options.contentType && contentTypeName !== '' && !args.options.systemUpdate) {
-            if (this.debug) {
-              logger.logToStderr(`Specifying content type name [${contentTypeName}] in request body`);
-            }
-
-            requestBody.formValues.push({
-              FieldName: 'ContentType',
-              FieldValue: contentTypeName
-            });
-          }
-
-          let requestOptions: any = args.options.systemUpdate ?
-            {
-              url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-              headers: {
-                'Content-Type': 'text/xml',
-                'X-RequestDigest': formDigestValue
-              },
-              data: requestBody
-            } :
-            {
-              url: `${listRestUrl}/items(${args.options.id})/ValidateUpdateListItem()`,
-              headers: {
-                'accept': 'application/json;odata=nometadata'
-              },
-              data: requestBody,
-              responseType: 'json'
-            };
-
-          const response = await request.post<any>(requestOptions);
-          let itemId: number = 0;
-
-          if (args.options.systemUpdate) {
-            if (response.indexOf("ErrorMessage") > -1) {
-              throw `Error occurred in systemUpdate operation - ${response}`;
-            }
-            else {
-              itemId = Number(args.options.id);
-            }
-          }
-          else {
-            // Response is from /ValidateUpdateListItem POST call, perform get on updated item to get all field values
-            const returnedData: any = response.value;
-
-            if (!returnedData[0].ItemId) {
-              return Promise.reject(`Item didn't update successfully`);
-            }
-            else {
-              itemId = returnedData[0].ItemId;
-            }
-          }
-
-          requestOptions = {
-            url: `${listRestUrl}/items(${itemId})`,
-            headers: {
-              'accept': 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
-
-          const item = await request.get<ListItemInstance>(requestOptions);
-          logger.log(item);
+      if (args.options.systemUpdate) {
+        if (response.indexOf("ErrorMessage") > -1) {
+          throw `Error occurred in systemUpdate operation - ${response}`;
+        }
+        else {
+          itemId = Number(args.options.id);
         }
       }
-    }
+      else {
+        // Response is from /ValidateUpdateListItem POST call, perform get on updated item to get all field values
+        const returnedData: any = response.value;
+
+        if (!returnedData[0].ItemId) {
+          throw `Item didn't update successfully`;
+        }
+        else {
+          itemId = returnedData[0].ItemId;
+        }
+      }
+
+      const requestOptionsItems: any = {
+        url: `${listRestUrl}/items(${itemId})`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      const itemsResponse = await request.get(requestOptionsItems);
+      logger.log(<ListItemInstance>itemsResponse);
+
+    } 
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

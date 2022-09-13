@@ -198,6 +198,7 @@ describe(commands.LISTITEM_REMOVE, () => {
       options: {
         debug: false,
         id: actionId,
+        listId: '12345',
         webUrl: 'https://contoso.sharepoint.com',
         confirm: true
       }

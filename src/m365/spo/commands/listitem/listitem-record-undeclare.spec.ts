@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
@@ -127,7 +127,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
       webUrl: 'https://returnerror.com/sites/project-y'
     };
 
-    await command.action(logger, { options: options } as any);
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('ClientSvc unknown error'));
   });
 
   it('correctly undeclares list item as a record when listTitle is passes', async () => {
@@ -171,7 +171,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
       webUrl: 'https://rejectme.com/sites/project-y'
     };
 
-    await command.action(logger, { options: options } as any);
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('Failed request'));
   });
 
   it('supports debug mode', () => {

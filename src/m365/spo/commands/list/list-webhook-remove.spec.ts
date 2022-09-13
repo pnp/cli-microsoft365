@@ -181,7 +181,7 @@ describe(commands.LIST_WEBHOOK_REMOVE, () => {
 
   it('uses correct API url when list title option is passed', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
+      if (opts.url === "https://contoso.sharepoint.com/_api/web/lists/GetByTitle('Documents')/Subscriptions('0cd891ef-afce-4e55-b836-fce03286cccf')") {
         return Promise.resolve('Correct Url');
       }
 

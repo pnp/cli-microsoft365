@@ -26,9 +26,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
         }
 
         if ((opts.url as string).indexOf('returnerror.sharepoint.com') > -1) {
-          return Promise.reject(JSON.stringify(
-            [{ "ErrorInfo": "error occurred" }]
-          ));
+          return Promise.reject("error occurred");
         }
 
         return Promise.resolve(JSON.stringify(
@@ -237,7 +235,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     };
 
     declareItemAsRecordFakeCalled = false;
-    await command.action(logger, { options: options } as any);
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('error occurred'));
     assert.notStrictEqual(declareItemAsRecordFakeCalled, true);
   });
 
@@ -253,7 +251,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     };
 
     declareItemAsRecordFakeCalled = false;
-    await command.action(logger, { options: options } as any);
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('Failed request'));
     assert.notStrictEqual(declareItemAsRecordFakeCalled, true);
   });
 

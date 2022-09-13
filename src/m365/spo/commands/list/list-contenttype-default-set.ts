@@ -112,10 +112,13 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
     }
 
     try {
-      const contentTypeOrder = await this.getContentTypeOrder(baseUrl, logger);
+      const contentTypeOrder: StringValue[] = await this.getContentTypeOrder(baseUrl, logger);
+
       // see if the specified content type is among the registered content types
       // if it is, it means it's visible
       const contentTypeIndex: number = contentTypeOrder.findIndex(ct => ct.StringValue.toUpperCase() === args.options.contentTypeId.toUpperCase());
+      let res: any;
+
       if (contentTypeIndex > -1) {
         if (this.debug) {
           logger.logToStderr(`Content type ${args.options.contentTypeId} is visible in the list`);
@@ -126,7 +129,6 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
           if (this.verbose) {
             logger.logToStderr(`Content type ${args.options.contentTypeId} is already set as default`);
           }
-          // content type is already set as default. we're done
         }
         else {
           if (this.verbose) {
@@ -140,9 +142,10 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
             StringValue: args.options.contentTypeId
           });
   
-          await this.updateContentTypeOrder(baseUrl, contentTypeOrder);
+          res = await this.updateContentTypeOrder(baseUrl, contentTypeOrder);
         }
-  
+      }
+      else {
         if (this.debug) {
           logger.logToStderr(`Content type ${args.options.contentTypeId} is not visible in the list`);
         }
@@ -150,26 +153,25 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
         if (this.verbose) {
           logger.logToStderr('Retrieving list content types...');
         }
-  
-        // content type is not visible...
-        // check if content type exists in the list
-        const contentTypes = await this.getListContentTypes(baseUrl);
 
+        const contentTypes: string[] = await this.getListContentTypes(baseUrl);
         if (!contentTypes.find(ct => ct.toUpperCase() === args.options.contentTypeId.toUpperCase())) {
           throw `Content type ${args.options.contentTypeId} missing in the list. Add the content type to the list first and try again.`;
         }
-  
+
         if (this.verbose) {
           logger.logToStderr(`Setting content type ${args.options.contentTypeId} as default...`);
         }
-  
+
         contentTypeOrder.unshift({
           StringValue: args.options.contentTypeId
         });
-  
-        await this.updateContentTypeOrder(baseUrl, contentTypeOrder);
+
+        res = await this.updateContentTypeOrder(baseUrl, contentTypeOrder);
       }
-    }
+
+      logger.log(res);
+    } 
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);
     }

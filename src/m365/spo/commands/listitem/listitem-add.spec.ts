@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
@@ -178,7 +178,7 @@ describe(commands.LISTITEM_ADD, () => {
       Title: "fail adding me"
     };
 
-    await command.action(logger, { options: options } as any);
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Item didn't add successfully"));
     assert.strictEqual(actualId, 0);
   });
 
@@ -241,8 +241,7 @@ describe(commands.LISTITEM_ADD, () => {
       Title: expectedTitle
     };
 
-    await command.action(logger, { options: options } as any);
-    assert(expectedContentType === actualContentType);
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Specified content type 'Unexpected content type' doesn't exist on the target list"));
   });
 
   it('should call ensure folder when folder arg specified', async () => {

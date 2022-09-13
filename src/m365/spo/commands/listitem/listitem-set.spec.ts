@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
@@ -233,7 +233,7 @@ describe(commands.LISTITEM_SET, () => {
       Title: "fail updating me"
     };
 
-    await command.action(logger, { options: options } as any);
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Item didn't update successfully"));
     assert.strictEqual(actualId, 0);
   });
 
@@ -302,8 +302,7 @@ describe(commands.LISTITEM_SET, () => {
       Title: expectedTitle
     };
 
-    await command.action(logger, { options: options } as any);
-    assert(expectedContentType === actualContentType);
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Specified content type 'Unexpected content type' doesn't exist on the target list"));
   });
 
 
@@ -341,8 +340,7 @@ describe(commands.LISTITEM_SET, () => {
       systemUpdate: true
     };
 
-    await command.action(logger, { options: options } as any);
-    assert(actualId !== expectedId);
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError("Failed request"));
   });
 
   it('fails to get _ObjecttIdentity_ when an error is returned by the _ObjectIdentity_ CSOM request and systemUpdate parameter is specified', async () => {
@@ -360,7 +358,7 @@ describe(commands.LISTITEM_SET, () => {
       systemUpdate: true
     };
 
-    await command.action(logger, { options: options } as any);
+    await assert.rejects(command.action(logger, { options:options } as any), new CommandError('ClientSvc unknown error'));
     assert(actualId !== expectedId);
   });
 
@@ -380,7 +378,7 @@ describe(commands.LISTITEM_SET, () => {
       systemUpdate: true
     };
 
-    await command.action(logger, { options: options } as any);
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('Error occurred in systemUpdate operation - ErrorMessage": "systemUpdate error"}'));
     assert(actualId !== expectedId);
   });
 

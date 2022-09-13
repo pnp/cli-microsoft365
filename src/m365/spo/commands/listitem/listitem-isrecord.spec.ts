@@ -21,9 +21,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
     if (opts.data.indexOf('Name="Current"') > -1) {
       if ((opts.url as string).indexOf('returnerror.sharepoint.com') > -1) {
         logger.log("Returns error from requestObjectIdentity");
-        return Promise.reject(JSON.stringify(
-          [{ "ErrorInfo": "error occurred" }]
-        ));
+        return Promise.reject("error occurred");
       }
 
       return Promise.resolve(JSON.stringify(
@@ -197,7 +195,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
       webUrl: `https://returnerror.sharepoint.com/sites/project-y/`
     };
 
-    await command.action(logger, { options: options } as any);
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('error occurred'));
     assert(loggerLogSpy.calledWith("Returns error from requestObjectIdentity"));
   });
 

@@ -63,19 +63,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
 
   it('configures specified visible content type as default. List specified using Title. UniqueContentTypeOrder null', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder` &&
-        opts.headers &&
-        opts.headers['x-http-method'] === 'MERGE' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          UniqueContentTypeOrder: [
-            {
-              "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E"
-            },
-            {
-              "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550"
-            }
-          ]
-        })) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder`) {
         return Promise.resolve('');
       }
 
@@ -96,6 +84,19 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
         });
       }
 
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/ContentTypes?$select=Id`) {
+        return Promise.resolve({
+          value: [
+            {
+              Id: { "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E" }
+            },
+            {
+              Id: { "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550" }
+            }
+          ]
+        });
+      }
+
       return Promise.reject('Invalid request');
     });
 
@@ -110,19 +111,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
 
   it('configures specified visible content type as default. List specified using Title. UniqueContentTypeOrder null. Debug', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder` &&
-        opts.headers &&
-        opts.headers['x-http-method'] === 'MERGE' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          UniqueContentTypeOrder: [
-            {
-              "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E"
-            },
-            {
-              "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550"
-            }
-          ]
-        })) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder`) {
         return Promise.resolve('');
       }
 
@@ -140,6 +129,19 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
             }
           ],
           "UniqueContentTypeOrder": null
+        });
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/ContentTypes?$select=Id`) {
+        return Promise.resolve({
+          value: [
+            {
+              Id: { "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E" }
+            },
+            {
+              Id: { "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550" }
+            }
+          ]
         });
       }
 
@@ -159,19 +161,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
 
   it('configures specified visible content type as default. List specified using ID. UniqueContentTypeOrder not null', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/RootFolder` &&
-        opts.headers &&
-        opts.headers['x-http-method'] === 'MERGE' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          UniqueContentTypeOrder: [
-            {
-              "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E"
-            },
-            {
-              "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550"
-            }
-          ]
-        })) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/RootFolder`) {
         return Promise.resolve('');
       }
 
@@ -199,6 +189,19 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
         });
       }
 
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/ContentTypes?$select=Id`) {
+        return Promise.resolve({
+          value: [
+            {
+              Id: { "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E" }
+            },
+            {
+              Id: { "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550" }
+            }
+          ]
+        });
+      }
+
       return Promise.reject('Invalid request');
     });
 
@@ -213,19 +216,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
 
   it('configures specified visible content type as default. List specified using ID. UniqueContentTypeOrder not null. Debug', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/RootFolder` &&
-        opts.headers &&
-        opts.headers['x-http-method'] === 'MERGE' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          UniqueContentTypeOrder: [
-            {
-              "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E"
-            },
-            {
-              "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550"
-            }
-          ]
-        })) {
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/RootFolder`) {
         return Promise.resolve('');
       }
 
@@ -248,6 +239,19 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
             },
             {
               "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E"
+            }
+          ]
+        });
+      }
+
+      if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/ContentTypes?$select=Id`) {
+        return Promise.resolve({
+          value: [
+            {
+              Id: { "StringValue": "0x0104001A75DCE30BAC754AA5134C183CF7A92E" }
+            },
+            {
+              Id: { "StringValue": "0x01009C993C306A41A9419C8F5267B74D414F00FD8183595A9B79489F81D6075ADFB550" }
             }
           ]
         });
