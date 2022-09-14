@@ -75,7 +75,7 @@ describe(commands.APP_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('creates AAD app reg with just the name', async () => {
+  it('creates AAD app reg with just the name', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -152,20 +152,28 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app'
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+          objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-      tenantId: ''
-    }));
   });
 
-  it('creates multitenant AAD app reg', async () => {
+  it('creates multitenant AAD app reg', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -242,21 +250,29 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         multitenant: true
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '62f0f128-987f-47f2-827a-be50d0d894c7',
+          objectId: '9b1e2c08-6e35-4134-a0ac-16ab154cd05a',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: '62f0f128-987f-47f2-827a-be50d0d894c7',
-      objectId: '9b1e2c08-6e35-4134-a0ac-16ab154cd05a',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg for a web app with the specified redirect URIs', async () => {
+  it('creates AAD app reg for a web app with the specified redirect URIs', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -342,22 +358,30 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         redirectUris: 'https://myapp.azurewebsites.net,http://localhost:4000',
         platform: 'web'
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: 'd2941a3b-aad4-49e0-8a1d-b82de0b46067',
+          objectId: 'ff520671-4810-4d25-a10f-e565fc62a5ec',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: 'd2941a3b-aad4-49e0-8a1d-b82de0b46067',
-      objectId: 'ff520671-4810-4d25-a10f-e565fc62a5ec',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg for a desktop app with the specified redirect URI', async () => {
+  it('creates AAD app reg for a desktop app with the specified redirect URI', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -441,22 +465,30 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         redirectUris: 'https://login.microsoftonline.com/common/oauth2/nativeclient',
         platform: 'publicClient'
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '1ce0287c-9ccc-457e-a0cf-3ec5b734c092',
+          objectId: 'f1bb2138-bff1-491e-b082-9f447f3742b8',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: '1ce0287c-9ccc-457e-a0cf-3ec5b734c092',
-      objectId: 'f1bb2138-bff1-491e-b082-9f447f3742b8',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg with a secret', async () => {
+  it('creates AAD app reg with a secret', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -546,22 +578,30 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         withSecret: true
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '3c5bd51d-f1ac-4344-bd16-43396cadff14',
+          objectId: '4d24b0c6-ad07-47c6-9bd8-9c167f9f758e',
+          secret: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: '3c5bd51d-f1ac-4344-bd16-43396cadff14',
-      objectId: '4d24b0c6-ad07-47c6-9bd8-9c167f9f758e',
-      secret: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg with a secret (debug)', async () => {
+  it('creates AAD app reg with a secret (debug)', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -651,33 +691,41 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: true,
         name: 'My AAD app',
         withSecret: true
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '3c5bd51d-f1ac-4344-bd16-43396cadff14',
+          objectId: '4d24b0c6-ad07-47c6-9bd8-9c167f9f758e',
+          secret: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: '3c5bd51d-f1ac-4344-bd16-43396cadff14',
-      objectId: '4d24b0c6-ad07-47c6-9bd8-9c167f9f758e',
-      secret: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg for a deamon app with specified Microsoft Graph application permissions', async () => {
+  it('creates AAD app reg for a deamon app with specified Microsoft Graph application permissions', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
         });
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
         return Promise.resolve({
           value: mocks.aadSp
         });
@@ -802,34 +850,42 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         withSecret: true,
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
+          objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
+          secret: 'vP2K-_K-N6EI-E5z0yOTsz443grfM_pyvv',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
-      objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
-      secret: 'vP2K-_K-N6EI-E5z0yOTsz443grfM_pyvv',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg for a deamon app with specified Microsoft Graph application and delegated permissions', async () => {
+  it('creates AAD app reg for a deamon app with specified Microsoft Graph application and delegated permissions', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
         });
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
         return Promise.resolve({
           value: mocks.aadSp
         });
@@ -962,7 +1018,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
@@ -970,27 +1026,35 @@ describe(commands.APP_ADD, () => {
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All',
         apisDelegated: 'https://graph.microsoft.com/Directory.Read.All'
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', `Error: ${JSON.stringify(err, null, 2)}`);
+        assert(loggerLogSpy.calledWith({
+          appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
+          objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
+          secret: 'vP2K-_K-N6EI-E5z0yOTsz443grfM_pyvv',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
-      objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
-      secret: 'vP2K-_K-N6EI-E5z0yOTsz443grfM_pyvv',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg for a single-page app with specified Microsoft Graph delegated permissions', async () => {
+  it('creates AAD app reg for a single-page app with specified Microsoft Graph delegated permissions', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
         });
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
         return Promise.resolve({
           value: mocks.aadSp
         });
@@ -1117,7 +1181,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
@@ -1126,26 +1190,34 @@ describe(commands.APP_ADD, () => {
         apisDelegated: 'https://graph.microsoft.com/Calendars.Read,https://graph.microsoft.com/Directory.Read.All',
         implicitFlow: true
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: 'c505d465-9e4e-4bb4-b653-7b36d77cc94a',
+          objectId: 'f51ff52f-8f04-4924-91d0-636349eed65c',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: 'c505d465-9e4e-4bb4-b653-7b36d77cc94a',
-      objectId: 'f51ff52f-8f04-4924-91d0-636349eed65c',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg for a single-page app with specified Microsoft Graph delegated permissions (debug)', async () => {
+  it('creates AAD app reg for a single-page app with specified Microsoft Graph delegated permissions (debug)', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
         });
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
         return Promise.resolve({
           value: mocks.aadSp
         });
@@ -1272,7 +1344,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: true,
         name: 'My AAD app',
@@ -1281,15 +1353,23 @@ describe(commands.APP_ADD, () => {
         apisDelegated: 'https://graph.microsoft.com/Calendars.Read,https://graph.microsoft.com/Directory.Read.All',
         implicitFlow: true
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: 'c505d465-9e4e-4bb4-b653-7b36d77cc94a',
+          objectId: 'f51ff52f-8f04-4924-91d0-636349eed65c',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: 'c505d465-9e4e-4bb4-b653-7b36d77cc94a',
-      objectId: 'f51ff52f-8f04-4924-91d0-636349eed65c',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg with Application ID URI set to a fixed value', async () => {
+  it('creates AAD app reg with Application ID URI set to a fixed value', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/c0e63919-057c-4e6b-be6c-8662e7aec4eb' &&
@@ -1377,21 +1457,29 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         uri: 'https://contoso.onmicrosoft.com/myapp'
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: 'b08d9318-5612-4f87-9f94-7414ef6f0c8a',
+          objectId: 'c0e63919-057c-4e6b-be6c-8662e7aec4eb',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: 'b08d9318-5612-4f87-9f94-7414ef6f0c8a',
-      objectId: 'c0e63919-057c-4e6b-be6c-8662e7aec4eb',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg with Application ID URI set to a fixed value (debug)', async () => {
+  it('creates AAD app reg with Application ID URI set to a fixed value (debug)', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/c0e63919-057c-4e6b-be6c-8662e7aec4eb' &&
@@ -1479,21 +1567,29 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: true,
         name: 'My AAD app',
         uri: 'https://contoso.onmicrosoft.com/myapp'
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: 'b08d9318-5612-4f87-9f94-7414ef6f0c8a',
+          objectId: 'c0e63919-057c-4e6b-be6c-8662e7aec4eb',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: 'b08d9318-5612-4f87-9f94-7414ef6f0c8a',
-      objectId: 'c0e63919-057c-4e6b-be6c-8662e7aec4eb',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg with Application ID URI set to a value with the appId token and a custom scope that can be consented by admins', async () => {
+  it('creates AAD app reg with Application ID URI set to a value with the appId token and a custom scope that can be consented by admins', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/fe45ba27-a692-4b11-adf8-f4ec184ea3a5') {
@@ -1595,7 +1691,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
@@ -1605,15 +1701,23 @@ describe(commands.APP_ADD, () => {
         scopeAdminConsentDisplayName: 'Access as a user',
         scopeConsentBy: 'admins'
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', `Error: ${JSON.stringify(err)}`);
+        assert(loggerLogSpy.calledWith({
+          appId: '13e11551-2967-4985-8c55-cd2aaa6b80ad',
+          objectId: 'fe45ba27-a692-4b11-adf8-f4ec184ea3a5',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: '13e11551-2967-4985-8c55-cd2aaa6b80ad',
-      objectId: 'fe45ba27-a692-4b11-adf8-f4ec184ea3a5',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg with Application ID URI set to a value with the appId token and a custom scope that can be consented by admins and users', async () => {
+  it('creates AAD app reg with Application ID URI set to a value with the appId token and a custom scope that can be consented by admins and users', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/fe45ba27-a692-4b11-adf8-f4ec184ea3a5') {
@@ -1715,7 +1819,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
@@ -1725,15 +1829,23 @@ describe(commands.APP_ADD, () => {
         scopeAdminConsentDisplayName: 'Access as a user',
         scopeConsentBy: 'adminsAndUsers'
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', `Error: ${JSON.stringify(err)}`);
+        assert(loggerLogSpy.calledWith({
+          appId: '13e11551-2967-4985-8c55-cd2aaa6b80ad',
+          objectId: 'fe45ba27-a692-4b11-adf8-f4ec184ea3a5',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: '13e11551-2967-4985-8c55-cd2aaa6b80ad',
-      objectId: 'fe45ba27-a692-4b11-adf8-f4ec184ea3a5',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg with a certificate using certificate file', async () => {
+  it('creates AAD app reg with a certificate using certificate file', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -1818,22 +1930,30 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => "somecertificatebase64string");
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         certificateDisplayName: 'some certificate',
         certificateFile: 'C:\\temp\\some-certificate.cer'
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+          objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg with a certificate using base64 string', async () => {
+  it('creates AAD app reg with a certificate using base64 string', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -1916,22 +2036,199 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         certificateDisplayName: 'some certificate',
         certificateBase64Encoded: 'somecertificatebase64string'
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+          objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-      tenantId: ''
-    }));
   });
 
-  it('returns error when retrieving information about service principals failed', async () => {
+  it('creates AAD app reg for a deamon app with specified Microsoft Graph permissions, including admin consent', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.microsoftGraphSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                  "type": "Role"
+                }
+              ]
+            }
+          ]
+        })) {
+        return Promise.resolve({
+          "id": "b63c4be1-9c78-40b7-8619-de7172eed8de",
+          "deletedDateTime": null,
+          "appId": "dbfdad7a-5105-45fc-8290-eb0b0b24ac58",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T15:02:42.8048505Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "M365x271534.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                  "type": "Role"
+                }
+              ]
+            }
+          ],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals') {
+        return Promise.resolve({
+          "id": "59e617e5-e447-4adc-8b88-00af644d7c92",
+          "appId": "dbfdad7a-5105-45fc-8290-eb0b0b24ac58",
+          "displayName": "My AAD app",
+          "appRoles": [],
+          "oauth2PermissionScopes": [],
+          "servicePrincipalNames": [
+            "f1bd758f-4a1a-4b71-aa20-a248a22a8928"
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/oauth2PermissionGrants') {
+        return Promise.resolve();
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals/59e617e5-e447-4adc-8b88-00af644d7c92/appRoleAssignments') {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals('59e617e5-e447-4adc-8b88-00af644d7c92')/appRoleAssignments/$entity",
+          "id": "vAolND43WUinlI9oBu_ynaoJXWsFy9tInKpeHJBShh4",
+          "deletedDateTime": null,
+          "appRoleId": "62a82d76-70ea-41e2-9197-370581804d09",
+          "createdDateTime": "2022-06-08T16:09:29.4885458Z",
+          "principalDisplayName": "myapp",
+          "principalId": "24448e9c-d0fa-43d1-a1dd-e279720969a0",
+          "principalType": "ServicePrincipal",
+          "resourceDisplayName": "Microsoft Graph",
+          "resourceId": "f75121cb-5156-42f0-916e-341ea2ecaa22"
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+
+    command.action(logger, {
+      options: {
+        name: 'My AAD app',
+        apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All',
+        grantAdminConsent: true,
+        debug: true
+      }
+    }, (err: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', `Error: ${JSON.stringify(err)}`);
+        assert(loggerLogSpy.calledWith({
+          appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
+          objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns error when retrieving information about service principals failed', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject({
       error: {
         message: `An error has occurred`
@@ -1940,28 +2237,36 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(_ => Promise.reject('Issued POST request'));
 
-    await assert.rejects(command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         withSecret: true,
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
       }
-    }), new CommandError('An error has occurred'));
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
-  it('returns error when non-existent service principal specified in the APIs', async () => {
+  it('returns error when non-existent service principal specified in the APIs', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
         });
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
         return Promise.resolve({
           value: mocks.aadSp
         });
@@ -2088,7 +2393,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await assert.rejects(command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
@@ -2096,21 +2401,29 @@ describe(commands.APP_ADD, () => {
         apisDelegated: 'https://myapi.onmicrosoft.com/access_as_user',
         implicitFlow: true
       }
-    }), new CommandError('Service principal https://myapi.onmicrosoft.com not found'));
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Service principal https://myapi.onmicrosoft.com not found')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
-  it('returns error when non-existent permission scope specified in the APIs', async () => {
+  it('returns error when non-existent permission scope specified in the APIs', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.microsoftGraphSp
           ]
         });
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
         return Promise.resolve({
           value: mocks.aadSp
         });
@@ -2237,7 +2550,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await assert.rejects(command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
@@ -2245,10 +2558,18 @@ describe(commands.APP_ADD, () => {
         apisDelegated: 'https://graph.microsoft.com/Read.Everything',
         implicitFlow: true
       }
-    }), new CommandError('Permission Read.Everything for service principal https://graph.microsoft.com not found'));
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Permission Read.Everything for service principal https://graph.microsoft.com not found')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
-  it('returns error when configuring secret failed', async () => {
+  it('returns error when configuring secret failed', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -2333,16 +2654,24 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await assert.rejects(command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         withSecret: true
       }
-    }), new CommandError('An error has occurred'));
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
-  it('returns error when creating the AAD app reg failed', async () => {
+  it('returns error when creating the AAD app reg failed', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(_ => Promise.reject({
@@ -2351,15 +2680,23 @@ describe(commands.APP_ADD, () => {
       }
     }));
 
-    await assert.rejects(command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app'
       }
-    }), new CommandError('An error has occurred'));
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
-  it('returns error when setting Application ID URI failed', async () => {
+  it('returns error when setting Application ID URI failed', (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject({
       error: {
@@ -2440,41 +2777,57 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await assert.rejects(command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         uri: 'https://contoso.onmicrosoft.com/myapp'
       }
-    }), new CommandError('An error has occurred'));
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
-  it('returns error when certificate file cannot be read', async () => {
+  it('returns error when certificate file cannot be read', (done) => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error("An error has occurred"); });
 
-    await assert.rejects(command.action(logger, {
+    command.action(logger, {
       options: {
         debug: true,
         name: 'My AAD app',
         certificateDisplayName: 'some certificate',
         certificateFile: 'C:\\temp\\some-certificate.cer'
       }
-    }), new CommandError(`Error reading certificate file: Error: An error has occurred. Please add the certificate using base64 option '--certificateBase64Encoded'.`));
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(err.message, `Error reading certificate file: Error: An error has occurred. Please add the certificate using base64 option '--certificateBase64Encoded'.`);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
-  it('creates AAD app reg for a web app with service principal name with trailing slash', async () => {
+  it('creates AAD app reg for a web app with service principal name with trailing slash', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
-          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
           "value": [
             mocks.mockCrmSp
           ]
         });
       }
 
-      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
         return Promise.resolve({
           value: mocks.aadSp
         });
@@ -2586,7 +2939,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
@@ -2594,16 +2947,41 @@ describe(commands.APP_ADD, () => {
         redirectUris: 'https://global.consent.azure-apim.net/redirect',
         apisDelegated: 'https://admin.services.crm.dynamics.com/user_impersonation'
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '702e65ba-cacb-4a2f-aa5c-e6460967bc20',
+          objectId: '1cd23c5f-2cb4-4bd0-a582-d5b00f578dcd',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: '702e65ba-cacb-4a2f-aa5c-e6460967bc20',
-      objectId: '1cd23c5f-2cb4-4bd0-a582-d5b00f578dcd',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg for a web app from a manifest', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+  it('creates AAD app reg for a web app from a manifest', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.mockCrmSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/3a0388de-2988-4a97-a068-ff4e2b218752' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -2673,7 +3051,18 @@ describe(commands.APP_ADD, () => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
-          "signInAudience": "AzureADMyOrg"
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000007-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "78ce3f0f-a1ce-49c2-8cde-64b5c0896db4",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
         })) {
         return Promise.resolve({
           "id": "3a0388de-2988-4a97-a068-ff4e2b218752",
@@ -2809,21 +3198,46 @@ describe(commands.APP_ADD, () => {
     };
 
     (command as any).manifest = manifest;
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest)
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '689d2d97-7b80-4283-9185-ee24b5648607',
+          objectId: '3a0388de-2988-4a97-a068-ff4e2b218752',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: '689d2d97-7b80-4283-9185-ee24b5648607',
-      objectId: '3a0388de-2988-4a97-a068-ff4e2b218752',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg for a web app from a manifest without info URLs', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+  it('creates AAD app reg for a web app from a manifest without info URLs', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.mockCrmSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/3a0388de-2988-4a97-a068-ff4e2b218752' &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -2887,7 +3301,18 @@ describe(commands.APP_ADD, () => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
-          "signInAudience": "AzureADMyOrg"
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000007-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "78ce3f0f-a1ce-49c2-8cde-64b5c0896db4",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
         })) {
         return Promise.resolve({
           "id": "3a0388de-2988-4a97-a068-ff4e2b218752",
@@ -3016,21 +3441,46 @@ describe(commands.APP_ADD, () => {
     };
 
     (command as any).manifest = manifest;
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest)
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '689d2d97-7b80-4283-9185-ee24b5648607',
+          objectId: '3a0388de-2988-4a97-a068-ff4e2b218752',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: '689d2d97-7b80-4283-9185-ee24b5648607',
-      objectId: '3a0388de-2988-4a97-a068-ff4e2b218752',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg for a web app from a manifest with pre-authorized apps', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+  it('creates AAD app reg for a web app from a manifest with pre-authorized apps', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.mockCrmSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -3138,7 +3588,18 @@ describe(commands.APP_ADD, () => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
-          "signInAudience": "AzureADMyOrg"
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
         })) {
         return Promise.resolve({
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
@@ -3309,21 +3770,46 @@ describe(commands.APP_ADD, () => {
     };
 
     (command as any).manifest = manifest;
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest)
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg for a web app from a manifest with public client flows enabled', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+  it('creates AAD app reg for a web app from a manifest with public client flows enabled', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.mockCrmSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -3431,7 +3917,18 @@ describe(commands.APP_ADD, () => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
-          "signInAudience": "AzureADMyOrg"
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
         })) {
         return Promise.resolve({
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
@@ -3602,21 +4099,46 @@ describe(commands.APP_ADD, () => {
     };
 
     (command as any).manifest = manifest;
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest)
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg for a web app from a manifest with public client flows disabled', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+  it('creates AAD app reg for a web app from a manifest with public client flows disabled', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.mockCrmSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -3724,7 +4246,18 @@ describe(commands.APP_ADD, () => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
-          "signInAudience": "AzureADMyOrg"
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
         })) {
         return Promise.resolve({
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
@@ -3895,21 +4428,46 @@ describe(commands.APP_ADD, () => {
     };
 
     (command as any).manifest = manifest;
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest)
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
-      tenantId: ''
-    }));
   });
 
-  it('creates AAD app reg for a web app from a manifest with secrets', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+  it('creates AAD app reg for a web app from a manifest with secrets', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.mockCrmSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -3995,7 +4553,18 @@ describe(commands.APP_ADD, () => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
-          "signInAudience": "AzureADMyOrg"
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
         })) {
         return Promise.resolve({
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
@@ -4177,25 +4746,50 @@ describe(commands.APP_ADD, () => {
     };
 
     (command as any).manifest = manifest;
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest)
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+          tenantId: '',
+          secrets: [{
+            "displayName": "mysecret",
+            "value": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5"
+          }]
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
-      tenantId: '',
-      secrets: [{
-        "displayName": "mysecret",
-        "value": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5"
-      }]
-    }));
   });
 
-  it('creates AAD app reg for a web app from a manifest with app roles', async () => {
-    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
+  it('creates AAD app reg for a web app from a manifest with app roles', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.mockCrmSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
         if (JSON.stringify(opts.data) === JSON.stringify({
@@ -4315,7 +4909,18 @@ describe(commands.APP_ADD, () => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
         JSON.stringify(opts.data) === JSON.stringify({
           "displayName": "My app",
-          "signInAudience": "AzureADMyOrg"
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
         })) {
         return Promise.resolve({
           "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
@@ -4499,20 +5104,425 @@ describe(commands.APP_ADD, () => {
     };
 
     (command as any).manifest = manifest;
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest)
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(loggerLogSpy.calledWith({
-      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
-      tenantId: ''
-    }));
   });
 
-  it(`creates AAD app reg with just the name. Doesn't save the app info if not requested`, async () => {
+  it('creates AAD app reg for a web app from a manifest with app roles and specified Microsoft Graph application permissions', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.microsoftGraphSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId%2cappRoles%2cid%2coauth2PermissionScopes%2cservicePrincipalNames&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
+    sinon.stub(request, 'patch').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/bcac8603-cf65-479b-a4e5-8d45d3d05379') {
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "addIns": [],
+          "appRoles": [
+            {
+              "allowedMemberTypes": [
+                "User"
+              ],
+              "description": "myAppRole",
+              "displayName": "myAppRole",
+              "id": "d212e66a-8927-469d-be76-f121e287ffb0",
+              "isEnabled": true,
+              "origin": "Application",
+              "value": "123"
+            }
+          ],
+          "createdDateTime": "2022-02-07T08:51:18Z",
+          "description": null,
+          "certification": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [
+            "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+          ],
+          "keyCredentials": [],
+          "notes": null,
+          "optionalClaims": null,
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                  "type": "Role"
+                },
+                {
+                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                  "type": "Role"
+                },
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "oauth2PermissionScopes": [
+              {
+                "adminConsentDescription": "Access as a user",
+                "adminConsentDisplayName": "Access as a user",
+                "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+                "isEnabled": true,
+                "type": "User",
+                "userConsentDescription": null,
+                "userConsentDisplayName": null,
+                "value": "access_as_user"
+              }
+            ]
+          },
+          "info": {
+            "termsOfServiceUrl": null,
+            "supportUrl": null,
+            "privacyStatementUrl": null,
+            "marketingUrl": null,
+            "logoUrl": null
+          },
+          "web": {
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            },
+            "redirectUris": [],
+            "logoutUrl": null,
+            "homePageUrl": null
+          },
+          "spa": {
+            "redirectUris": [
+              "http://localhost/auth",
+              "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth"
+            ]
+          },
+          "isFallbackPublicClient": null,
+          "displayName": "My app"
+        })) {
+          return Promise.resolve();
+        }
+
+        if (JSON.stringify(opts.data) === JSON.stringify({
+          "api": {
+            "preAuthorizedApplications": [
+              {
+                "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              },
+              {
+                "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+                "delegatedPermissionIds": [
+                  "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+                ]
+              }
+            ]
+          }
+        })) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject(`Invalid PATCH request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My app",
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                  "type": "Role"
+                },
+                {
+                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                  "type": "Role"
+                },
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ]
+        })) {
+        return Promise.resolve({
+          "id": "bcac8603-cf65-479b-a4e5-8d45d3d05379",
+          "deletedDateTime": null,
+          "appId": "19180b97-8f30-43ac-8a22-19565de0b064",
+          "applicationTemplateId": null,
+          "disabledByMicrosoftStatus": null,
+          "createdDateTime": "2022-02-10T08:06:59.5299702Z",
+          "displayName": "Angular Teams app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "publisherDomain": "M365x61791022.onmicrosoft.com",
+          "serviceManagementReference": null,
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "defaultRedirectUri": null,
+          "certification": null,
+          "optionalClaims": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000003-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "62a82d76-70ea-41e2-9197-370581804d09",
+                  "type": "Role"
+                },
+                {
+                  "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                  "type": "Role"
+                },
+                {
+                  "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          },
+          "spa": {
+            "redirectUris": []
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+
+    const manifest = {
+      "id": "95cfe30d-ed44-4f9d-b73d-c66560f72e83",
+      "acceptMappedClaims": null,
+      "accessTokenAcceptedVersion": null,
+      "addIns": [],
+      "allowPublicClient": null,
+      "appId": "ff254847-12c7-44cf-921e-8883dbd622a7",
+      "appRoles": [
+        {
+          "allowedMemberTypes": [
+            "User"
+          ],
+          "description": "myAppRole",
+          "displayName": "myAppRole",
+          "id": "d212e66a-8927-469d-be76-f121e287ffb0",
+          "isEnabled": true,
+          "lang": null,
+          "origin": "Application",
+          "value": "123"
+        }
+      ],
+      "oauth2AllowUrlPathMatching": false,
+      "createdDateTime": "2022-02-07T08:51:18Z",
+      "description": null,
+      "certification": null,
+      "disabledByMicrosoftStatus": null,
+      "groupMembershipClaims": null,
+      "identifierUris": [
+        "api://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/ff254847-12c7-44cf-921e-8883dbd622a7"
+      ],
+      "informationalUrls": {
+        "termsOfService": null,
+        "support": null,
+        "privacy": null,
+        "marketing": null
+      },
+      "keyCredentials": [],
+      "knownClientApplications": [],
+      "logoUrl": null,
+      "logoutUrl": null,
+      "name": "My app",
+      "notes": null,
+      "oauth2AllowIdTokenImplicitFlow": false,
+      "oauth2AllowImplicitFlow": false,
+      "oauth2Permissions": [
+        {
+          "adminConsentDescription": "Access as a user",
+          "adminConsentDisplayName": "Access as a user",
+          "id": "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5",
+          "isEnabled": true,
+          "lang": null,
+          "origin": "Application",
+          "type": "User",
+          "userConsentDescription": null,
+          "userConsentDisplayName": null,
+          "value": "access_as_user"
+        }
+      ],
+      "oauth2RequirePostResponse": false,
+      "optionalClaims": null,
+      "orgRestrictions": [],
+      "parentalControlSettings": {
+        "countriesBlockedForMinors": [],
+        "legalAgeGroupRule": "Allow"
+      },
+      "passwordCredentials": [],
+      "preAuthorizedApplications": [
+        {
+          "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
+          "permissionIds": [
+            "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+          ]
+        },
+        {
+          "appId": "1fec8e78-bce4-4aaf-ab1b-5451cc387264",
+          "permissionIds": [
+            "cf38eb5b-8fcd-4697-9bd5-d80b7f98dfc5"
+          ]
+        }
+      ],
+      "publisherDomain": "contoso.onmicrosoft.com",
+      "replyUrlsWithType": [
+        {
+          "url": "http://localhost/auth",
+          "type": "Spa"
+        },
+        {
+          "url": "https://24c4-2001-1c00-80c-d00-e5da-977c-7c52-5197.ngrok.io/auth",
+          "type": "Spa"
+        }
+      ],
+      "requiredResourceAccess": [
+        {
+          "resourceAppId": "00000003-0000-0000-c000-000000000000",
+          "resourceAccess": [
+            {
+              "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+              "type": "Scope"
+            },
+            {
+              "id": "62a82d76-70ea-41e2-9197-370581804d09",
+              "type": "Role"
+            },
+            {
+              "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+              "type": "Role"
+            }
+          ]
+        }
+      ],
+      "samlMetadataUrl": null,
+      "serviceManagementReference": null,
+      "signInUrl": null,
+      "signInAudience": "AzureADMyOrg",
+      "tags": [],
+      "tokenEncryptionKeyId": null
+    };
+
+    (command as any).manifest = manifest;
+    command.action(logger, {
+      options: {
+        debug: false,
+        manifest: JSON.stringify(manifest),
+        apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`creates AAD app reg with just the name. Doesn't save the app info if not requested`, (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -4590,16 +5600,24 @@ describe(commands.APP_ADD, () => {
     });
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app'
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(fsWriteFileSyncSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(fsWriteFileSyncSpy.notCalled);
   });
 
-  it(`saves app info in the .m365rc.json file in the current folder when requested. Creates the file it doesn't exist`, async () => {
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Creates the file it doesn't exist`, (done) => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
@@ -4683,23 +5701,31 @@ describe(commands.APP_ADD, () => {
       fileContents = contents as string;
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         save: true
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [{
+            appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+            name: 'My AAD app'
+          }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert.strictEqual(filePath, '.m365rc.json');
-    assert.strictEqual(fileContents, JSON.stringify({
-      apps: [{
-        appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-        name: 'My AAD app'
-      }]
-    }, null, 2));
   });
 
-  it(`saves app info in the .m365rc.json file in the current folder when requested. Writes to the existing empty file`, async () => {
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Writes to the existing empty file`, (done) => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
@@ -4784,23 +5810,31 @@ describe(commands.APP_ADD, () => {
       fileContents = contents as string;
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         save: true
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [{
+            appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+            name: 'My AAD app'
+          }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert.strictEqual(filePath, '.m365rc.json');
-    assert.strictEqual(fileContents, JSON.stringify({
-      apps: [{
-        appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-        name: 'My AAD app'
-      }]
-    }, null, 2));
   });
 
-  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents`, async () => {
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents`, (done) => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
@@ -4892,28 +5926,36 @@ describe(commands.APP_ADD, () => {
       fileContents = contents as string;
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         save: true
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [
+            {
+              "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+              "name": "M365 app"
+            },
+            {
+              appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+              name: 'My AAD app'
+            }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert.strictEqual(filePath, '.m365rc.json');
-    assert.strictEqual(fileContents, JSON.stringify({
-      apps: [
-        {
-          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
-          "name": "M365 app"
-        },
-        {
-          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-          name: 'My AAD app'
-        }]
-    }, null, 2));
   });
 
-  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents (debug)`, async () => {
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents (debug)`, (done) => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
@@ -5005,28 +6047,36 @@ describe(commands.APP_ADD, () => {
       fileContents = contents as string;
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: true,
         name: 'My AAD app',
         save: true
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [
+            {
+              "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+              "name": "M365 app"
+            },
+            {
+              appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+              name: 'My AAD app'
+            }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert.strictEqual(filePath, '.m365rc.json');
-    assert.strictEqual(fileContents, JSON.stringify({
-      apps: [
-        {
-          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
-          "name": "M365 app"
-        },
-        {
-          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-          name: 'My AAD app'
-        }]
-    }, null, 2));
   });
 
-  it(`doesn't save app info in the .m365rc.json file when there was error reading file contents`, async () => {
+  it(`doesn't save app info in the .m365rc.json file when there was error reading file contents`, (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -5106,17 +6156,25 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         save: true
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(fsWriteFileSyncSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(fsWriteFileSyncSpy.notCalled);
   });
 
-  it(`doesn't save app info in the .m365rc.json file when file has invalid JSON`, async () => {
+  it(`doesn't save app info in the .m365rc.json file when file has invalid JSON`, (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -5196,17 +6254,25 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => '{');
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         save: true
       }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(fsWriteFileSyncSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
-    assert(fsWriteFileSyncSpy.notCalled);
   });
 
-  it(`doesn't fail execution when error occurred while saving app info`, async () => {
+  it(`doesn't fail execution when error occurred while saving app info`, (done) => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -5285,11 +6351,19 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => false);
     sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('Error occurred while saving app info'); });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        done();
+      }
+      catch (e) {
+        done(e);
       }
     });
   });

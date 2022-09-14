@@ -35,6 +35,7 @@ class TeamsTeamGetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -60,14 +61,6 @@ class TeamsTeamGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.id && args.options.name) {
-          return 'Specify either teamId or teamName, but not both.';
-        }
-
-        if (!args.options.id && !args.options.name) {
-          return 'Specify teamId or teamName, one is required';
-        }
-
         if (args.options.id && !validation.isValidGuid(args.options.id as string)) {
           return `${args.options.id} is not a valid GUID`;
         }
@@ -75,6 +68,10 @@ class TeamsTeamGetCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'name']);
   }
 
   private getTeamId(args: CommandArgs): Promise<string> {

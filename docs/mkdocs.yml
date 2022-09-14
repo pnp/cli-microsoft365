@@ -23,6 +23,7 @@ nav:
   - Commands:
     - login: 'cmd/login.md'
     - logout: 'cmd/logout.md'
+    - request: 'cmd/request.md'
     - status: 'cmd/status.md'
     - version: 'cmd/version.md'
     - Azure Active Directory (aad):
@@ -97,6 +98,10 @@ nav:
         - user signin list: 'cmd/aad/user/user-signin-list.md'
     - Adaptive Card (adaptivecard):
       - send: 'cmd/adaptivecard/adaptivecard-send.md'
+    - Bookings (booking):
+      - business:
+        - business get: 'cmd/booking/business/business-get.md'
+        - business list: 'cmd/booking/business/business-list.md'
     - CLI (cli):
       - consent: 'cmd/cli/cli-consent.md'
       - doctor: 'cmd/cli/cli-doctor.md'
@@ -142,6 +147,8 @@ nav:
         - serviceannouncement message get: 'cmd/tenant/serviceannouncement/serviceannouncement-message-get.md'
         - serviceannouncement message list: 'cmd/tenant/serviceannouncement/serviceannouncement-message-list.md'
     - Microsoft Graph (graph):
+      - changelog:
+        - changelog list: 'cmd/graph/changelog/changelog-list.md'
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
         - schemaextension get: 'cmd/graph/schemaextension/schemaextension-get.md'
@@ -160,6 +167,9 @@ nav:
         - report usageaccountdetail: 'cmd/onedrive/report/report-usageaccountdetail.md'
         - report usagefilecounts: 'cmd/onedrive/report/report-usagefilecounts.md'
         - report usagestorage: 'cmd/onedrive/report/report-usagestorage.md'
+    - OneNote (onenote):
+      - notebook:
+        - notebook list: 'cmd/onenote/notebook/notebook-list.md'
     - Outlook (outlook):
       - mail:
         - mail send: 'cmd/outlook/mail/mail-send.md'
@@ -197,7 +207,7 @@ nav:
         - plan remove: 'cmd/planner/plan/plan-remove.md'
       - task:
         - task add: 'cmd/planner/task/task-add.md'
-        - task checklistitem add: 'cmd/planner/task/task-checklistitem-add.md'        
+        - task checklistitem add: 'cmd/planner/task/task-checklistitem-add.md'
         - task checklistitem list: 'cmd/planner/task/task-checklistitem-list.md'
         - task checklistitem remove: 'cmd/planner/task/task-checklistitem-remove.md'
         - task details get: 'cmd/planner/task/task-get.md'
@@ -258,6 +268,7 @@ nav:
         - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
         - externalconnection get: 'cmd/search/externalconnection/externalconnection-get.md'
         - externalconnection list: 'cmd/search/externalconnection/externalconnection-list.md'
+        - externalconnection remove: 'cmd/search/externalconnection/externalconnection-remove.md'
     - Skype (skype):
       - report:
         - report activitycounts: 'cmd/skype/report/report-activitycounts.md'
@@ -386,6 +397,8 @@ nav:
         - list get: 'cmd/spo/list/list-get.md'
         - list list: 'cmd/spo/list/list-list.md'
         - list remove: 'cmd/spo/list/list-remove.md'
+        - list roleassignment remove: 'cmd/spo/list/list-roleassignment-remove.md'
+        - list roleassignment add: 'cmd/spo/list/list-roleassignment-add.md'
         - list roleinheritance break: 'cmd/spo/list/list-roleinheritance-break.md'
         - list roleinheritance reset: 'cmd/spo/list/list-roleinheritance-reset.md'
         - list set: 'cmd/spo/list/list-set.md'
@@ -416,6 +429,7 @@ nav:
         - listitem isrecord: 'cmd/spo/listitem/listitem-isrecord.md'
         - listitem list: 'cmd/spo/listitem/listitem-list.md'
         - listitem remove: 'cmd/spo/listitem/listitem-remove.md'
+        - listitem roleassignment remove: 'cmd/spo/listitem/listitem-roleassignment-remove.md'
         - listitem roleinheritance break: 'cmd/spo/listitem/listitem-roleinheritance-break.md'
         - listitem roleinheritance reset: 'cmd/spo/listitem/listitem-roleinheritance-reset.md'
         - listitem set: 'cmd/spo/listitem/listitem-set.md'
@@ -570,6 +584,9 @@ nav:
         - web list: 'cmd/spo/web/web-list.md'
         - web reindex: 'cmd/spo/web/web-reindex.md'
         - web remove: 'cmd/spo/web/web-remove.md'
+        - web roleassignment add: 'cmd/spo/web/web-roleassignment-add.md'
+        - web roleassignment remove: 'cmd/spo/web/web-roleassignment-remove.md'
+        - web roleinheritance reset: 'cmd/spo/web/web-roleinheritance-reset.md'
         - web set: 'cmd/spo/web/web-set.md'
     - Teams (teams):
       - app:
@@ -716,6 +733,8 @@ nav:
       - 'Inventory Flows By Owner' : 'sample-scripts/flow/inventory-flows-by-author.md'
       - 'Resubmit all failed flow runs for a flow in an environment': 'sample-scripts/flow/resubmit-all-failed-flow-runs.md'
       - 'Search flows for connections' : 'sample-scripts/flow/search-flows-for-connection.md'
+    - Power Platform:
+      - 'List all Power Platform Environments and their Flows and Apps': 'sample-scripts/powerplatform/list-environments-flows-apps.md'
     - SharePoint Online:
       - 'Add App Catalog to SharePoint site': 'sample-scripts/spo/add-app-catalog.md'
       - 'Add custom client-side web part to modern page': 'sample-scripts/spo/add-custom-clientside-webpart-to-modern-page.md'
@@ -790,11 +809,24 @@ nav:
     - 'Why this CLI': 'about/why-cli.md'
     - 'Comparison to SharePoint and Microsoft 365 PowerShell': 'about/comparison-powershell.md'
     - 'Release notes': 'about/release-notes.md'
+    - 'Team': 'about/team.md'
     - License: 'about/license.md'
 theme:
     name: 'material'
     palette:
-        primary: 'red'
+        - media: "(prefers-color-scheme: light)"
+          scheme: default
+          primary: 'red'
+          accent: 'indigo'
+          toggle:
+            icon: material/weather-sunny
+            name: Switch to dark mode
+        - media: "(prefers-color-scheme: dark)"
+          scheme: slate
+          primary: 'red'
+          toggle:
+            icon: material/weather-night
+            name: Switch to light mode
     logo: 'images/pnp-cli-microsoft365-white.svg'
     features:
         - navigation.tabs
@@ -805,12 +837,18 @@ extra_css:
     - 'css/styles2.css'
 markdown_extensions:
     - admonition
+    - meta
     - toc:
           permalink: true
     - pymdownx.highlight
     - pymdownx.snippets
     - pymdownx.superfences
+    - pymdownx.tabbed:
+        alternate_style: true
     - pymdownx.tabbed
+    - pymdownx.emoji:
+          emoji_index: !!python/name:materialx.emoji.twemoji
+          emoji_generator: !!python/name:materialx.emoji.to_svg
     - def_list
 extra:
     social:
@@ -824,3 +862,7 @@ extra:
           link: 'https://aka.ms/sppnp'
 repo_url: http://github.com/pnp/cli-microsoft365
 edit_uri: blob/main/docs/docs
+plugins:
+    - search
+    - tags:
+        tags_file: doc-tags.md

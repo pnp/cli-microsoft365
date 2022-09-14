@@ -29,6 +29,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -54,14 +55,6 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.groupId && args.options.mailNickname) {
-          return 'Specify either groupId or mailNickname, but not both.';
-        }
-
-        if (!args.options.groupId && !args.options.mailNickname) {
-          return 'Specify groupId or mailNickname, one is required';
-        }
-
         if (args.options.groupId && !validation.isValidGuid(args.options.groupId)) {
           return `${args.options.groupId} is not a valid GUID`;
         }
@@ -69,6 +62,10 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['groupId', 'mailNickname']);
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {

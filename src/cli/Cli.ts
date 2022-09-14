@@ -145,7 +145,7 @@ export class Cli {
 
     // if output not specified, set the configured output value (if any)
     if (optionsWithoutShorts.options.output === undefined) {
-      optionsWithoutShorts.options.output = this.getSettingWithDefaultValue<string | undefined>(settingsNames.output, undefined);
+      optionsWithoutShorts.options.output = this.getSettingWithDefaultValue<string | undefined>(settingsNames.output, 'json');
     }
 
     const validationResult = await this.commandToExecute.command.validate(optionsWithoutShorts, this.commandToExecute);

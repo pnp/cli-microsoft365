@@ -69,8 +69,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
       options: {
         siteUrl: 'https;//contoso,sharepoint:com/sites/sitecollection-name',
         permission: "write",
-        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
-        appDisplayName: "Foo App"
+        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -81,8 +80,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/sitecollection-name",
         permission: "write",
-        appId: "123",
-        appDisplayName: "Foo App"
+        appId: "123"
       }
     }, commandInfo);
 
@@ -104,8 +102,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         permission: "write",
-        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
-        appDisplayName: "Foo App"
+        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
       }
     }, commandInfo);
     assert.strictEqual(actual, true);
@@ -116,8 +113,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
         permission: "Invalid",
-        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
-        appDisplayName: "Foo App"
+        appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e"
       }
     }, commandInfo);
     assert.notStrictEqual(actual, true);
@@ -145,8 +141,7 @@ describe(commands.SITE_APPPERMISSION_ADD, () => {
     await assert.rejects(command.action(logger, { options: {
       siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name-non-existing',
       permission: "write",
-      appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e",
-      appDisplayName: "Foo App" } } as any), new CommandError('Requested site could not be found'));
+      appId: "89ea5c94-7736-4e25-95ad-3fa95f62b66e" } } as any), new CommandError('Requested site could not be found'));
   });
 
   it('fails to get Azure AD app when Azure AD app does not exists', async () => {

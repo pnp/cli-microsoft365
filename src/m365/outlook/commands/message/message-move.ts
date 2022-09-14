@@ -32,7 +32,7 @@ class OutlookMessageMoveCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
-    this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -70,31 +70,10 @@ class OutlookMessageMoveCommand extends GraphCommand {
     );
   }
 
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!args.options.sourceFolderId &&
-          !args.options.sourceFolderName) {
-          return 'Specify sourceFolderId or sourceFolderName';
-        }
-    
-        if (args.options.sourceFolderId &&
-          args.options.sourceFolderName) {
-          return 'Specify either sourceFolderId or sourceFolderName but not both';
-        }
-    
-        if (!args.options.targetFolderId &&
-          !args.options.targetFolderName) {
-          return 'Specify targetFolderId or targetFolderName';
-        }
-    
-        if (args.options.targetFolderId &&
-          args.options.targetFolderName) {
-          return 'Specify either targetFolderId or targetFolderName but not both';
-        }
-    
-        return true;
-      }
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['sourceFolderId', 'sourceFolderName'],
+      ['targetFolderId', 'targetFolderName']
     );
   }
 

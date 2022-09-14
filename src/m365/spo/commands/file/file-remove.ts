@@ -32,6 +32,7 @@ class SpoFileRemoveCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -78,17 +79,13 @@ class SpoFileRemoveCommand extends SpoCommand {
           return `${args.options.id} is not a valid GUID`;
         }
     
-        if (args.options.id && args.options.url) {
-          return 'Specify id or url, but not both';
-        }
-    
-        if (!args.options.id && !args.options.url) {
-          return 'Specify id or url';
-        }
-    
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'url']);
   }
 
   protected getExcludedOptionsWithUrls(): string[] | undefined {

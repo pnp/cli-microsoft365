@@ -1,6 +1,6 @@
 # spo hubsite unregister
 
-Unregisters the specifies site collection as a hub site
+Unregisters the specified site collection as a hub site
 
 ## Usage
 
@@ -33,7 +33,7 @@ Unregister the site collection with URL _https://contoso.sharepoint.com/sites/sa
 m365 spo hubsite unregister --url https://contoso.sharepoint.com/sites/sales
 ```
 
-Unregister the site collection with URL _https://contoso.sharepoint.com/sites/sales_ as a hub site without prompting for confirmation
+Unregister the site collection with URL _https://contoso.sharepoint.com/sites/sales_ as a hub site without prompting for confirmation.
 
 ```sh
 m365 spo hubsite unregister --url https://contoso.sharepoint.com/sites/sales --confirm

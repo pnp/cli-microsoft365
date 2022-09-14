@@ -20,7 +20,6 @@ interface Options extends GlobalOptions {
 }
 
 class AadAppRoleRemoveCommand extends GraphCommand {
-
   public get name(): string {
     return commands.APP_ROLE_REMOVE;
   }
@@ -39,6 +38,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -68,33 +68,7 @@ class AadAppRoleRemoveCommand extends GraphCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {
-        const { appId, appObjectId, appName, name, id, claim } = args.options;
-
-        if ((appId && appObjectId) ||
-          (appId && appName) ||
-          (appObjectId && appName)) {
-          return `Specify either appId, appObjectId or appName but not multiple`;
-        }
-    
-        if ((name && claim) ||
-          (name && id) ||
-          (claim && id)) {
-          return `Specify either name, claim or id of the role but not multiple`;
-        }
-    
-        if (!appId &&
-          !appObjectId &&
-          !appName) {
-          return `Specify either appId, appObjectId or appName`;
-        }
-    
-        if (!name &&
-          !claim &&
-          !id) {
-          return `Specify either name, claim or id of the role`;
-        }
-    
+      async (args: CommandArgs) => {    
         if (args.options.id) {
           if (!validation.isValidGuid(args.options.id)) {
             return `${args.options.id} is not a valid GUID`;
@@ -103,6 +77,13 @@ class AadAppRoleRemoveCommand extends GraphCommand {
     
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['appId', 'appObjectId', 'appName'],
+      ['name', 'claim', 'id']
     );
   }
 

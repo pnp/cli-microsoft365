@@ -36,23 +36,23 @@ By default, when breaking permissions inheritance, the list item will retain exi
 Break inheritance of list item _1_ in list _someList_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo listitem roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --listTitle "_someList_" --id 1
+m365 spo listitem roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --listTitle "_someList_" --listItemId 1
 ```
 
 Break inheritance of list item _1_ in list with ID _202b8199-b9de-43fd-9737-7f213f51c991_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo listitem roleinheritance break --webUrl https://contoso.sharepoint.com/sites/project-x --listId 202b8199-b9de-43fd-9737-7f213f51c991 --id 1
+m365 spo listitem roleinheritance break --webUrl https://contoso.sharepoint.com/sites/project-x --listId 202b8199-b9de-43fd-9737-7f213f51c991 --listItemId 1
 ```
 
-Break inheritance of list item _1_ in list _someList_ located in site _https://contoso.sharepoint.com/sites/project-x_ with clearing permissions 
+Break inheritance of list item _1_ in list _someList_ located in site _https://contoso.sharepoint.com/sites/project-x_ with clearing permissions
 
 ```sh
-m365 spo listitem roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --listTitle "_someList_" --id 1 --clearExistingPermissions
+m365 spo listitem roleinheritance break --webUrl "https://contoso.sharepoint.com/sites/project-x" --listTitle "_someList_" --listItemId 1 --clearExistingPermissions
 ```
 
-Break inheritance of list item _1_ in list with ID _202b8199-b9de-43fd-9737-7f213f51c991_ located in site _https://contoso.sharepoint.com/sites/project-x_ with clearing permissions 
+Break inheritance of list item _1_ in list with ID _202b8199-b9de-43fd-9737-7f213f51c991_ located in site _https://contoso.sharepoint.com/sites/project-x_ with clearing permissions
 
 ```sh
-m365 spo listitem roleinheritance break --webUrl https://contoso.sharepoint.com/sites/project-x --listId 202b8199-b9de-43fd-9737-7f213f51c991 --id 1 --clearExistingPermissions
+m365 spo listitem roleinheritance break --webUrl https://contoso.sharepoint.com/sites/project-x --listId 202b8199-b9de-43fd-9737-7f213f51c991 --listItemId 1 --clearExistingPermissions
 ```

@@ -31,6 +31,7 @@ class SpoTermGroupGetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -56,14 +57,6 @@ class SpoTermGroupGetCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.id && !args.options.name) {
-          return 'Specify either id or name';
-        }
-
-        if (args.options.id && args.options.name) {
-          return 'Specify either id or name but not both';
-        }
-
         if (args.options.id) {
           if (!validation.isValidGuid(args.options.id)) {
             return `${args.options.id} is not a valid GUID`;
@@ -73,6 +66,10 @@ class SpoTermGroupGetCommand extends SpoCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['id', 'name']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

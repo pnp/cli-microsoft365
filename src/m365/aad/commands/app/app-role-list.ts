@@ -30,7 +30,7 @@ class AadAppRoleListCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
-    this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -51,24 +51,8 @@ class AadAppRoleListCommand extends GraphCommand {
     );
   }
 
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        const { appId, appObjectId, appName } = args.options;
-
-        if ((appId && appObjectId) ||
-          (appId && appName) ||
-          (appObjectId && appName)) {
-          return `Specify either appId, appObjectId or appName but not multiple`;
-        }
-    
-        if (!appId && !appObjectId && !appName) {
-          return `Specify either appId, appObjectId or appName`;
-        }
-    
-        return true;
-      }
-    );
+  #initOptionSets(): void {
+    this.optionSets.push(['appId', 'appObjectId', 'appName']);
   }
 
   public defaultProperties(): string[] | undefined {

@@ -7,12 +7,14 @@ import { md } from './md';
 describe('utils/md', () => {
   let cliCompletionClinkUpdateHelp: string;
   let cliCompletionClinkUpdateHelpPlain: string;
+  let mdMixedLineEndings: string;
   let loginHelp: string;
   let loginHelpPlain: string;
 
   before(() => {
     cliCompletionClinkUpdateHelp = fs.readFileSync(path.join(__dirname, '..', '..', 'docs', 'docs', 'cmd', 'cli', 'completion', 'completion-clink-update.md'), 'utf8');
     cliCompletionClinkUpdateHelpPlain = md.md2plain(cliCompletionClinkUpdateHelp, path.join(__dirname, '..', '..', 'docs'));
+    mdMixedLineEndings = '\n```sh\nnix\n```\n\r\n```sh\r\nWindows\r\n```\r\n';
     loginHelp = fs.readFileSync(path.join(__dirname, '..', '..', 'docs', 'docs', 'cmd', 'login.md'), 'utf8');
     loginHelpPlain = md.md2plain(loginHelp, path.join(__dirname, '..', '..', 'docs'));
   });
@@ -37,8 +39,8 @@ describe('utils/md', () => {
   });
 
   it('keeps only label when hyperlink label and URL are the same', () => {
-    assert(cliCompletionClinkUpdateHelpPlain.includes('https://pnp.github.io/cli-microsoft365/concepts/completion/'));
-    assert(!cliCompletionClinkUpdateHelpPlain.includes('(https://pnp.github.io/cli-microsoft365/concepts/completion/)'));
+    assert(cliCompletionClinkUpdateHelpPlain.includes('https://pnp.github.io/cli-microsoft365/user-guide/completion/'));
+    assert(!cliCompletionClinkUpdateHelpPlain.includes('(https://pnp.github.io/cli-microsoft365/user-guide/completion/)'));
   });
 
   it('keeps only label when hyperlink URL is relative', () => {
@@ -53,8 +55,14 @@ describe('utils/md', () => {
   });
 
   it('converts code fences', () => {
-    assert(cliCompletionClinkUpdateHelpPlain.includes('  cli completion clink update > m365.lua'));
+    assert(cliCompletionClinkUpdateHelpPlain.includes('cli completion clink update > m365.lua'));
     assert(!cliCompletionClinkUpdateHelpPlain.includes('```'));
+  });
+
+  it('converts code fences with mixed line endings', () => {
+    const plain = md.md2plain(mdMixedLineEndings, path.join(__dirname, '..', '..', 'docs'));
+    const expected = `\n  nix\n${EOL}\r\n  Windows\r\n${EOL}`;
+    assert.strictEqual(plain, expected);
   });
 
   it('converts inline markup', () => {

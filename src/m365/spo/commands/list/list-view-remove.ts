@@ -33,6 +33,7 @@ class SpoListViewRemoveCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -90,24 +91,15 @@ class SpoListViewRemoveCommand extends SpoCommand {
           }
         }
 
-        if (args.options.listId && args.options.listTitle) {
-          return 'Specify listId or listTitle, but not both';
-        }
-
-        if (!args.options.listId && !args.options.listTitle) {
-          return 'Specify listId or listTitle, one is required';
-        }
-
-        if (args.options.viewId && args.options.viewTitle) {
-          return 'Specify viewId or viewTitle, but not both';
-        }
-
-        if (!args.options.viewId && !args.options.viewTitle) {
-          return 'Specify viewId or viewTitle, one is required';
-        }
-
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['listId', 'listTitle'],
+      ['viewId', 'viewTitle']
     );
   }
 

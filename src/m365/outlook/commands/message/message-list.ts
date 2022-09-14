@@ -31,7 +31,7 @@ class OutlookMessageListCommand extends GraphCommand {
 
     this.#initTelemetry();
     this.#initOptions();
-    this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -56,22 +56,8 @@ class OutlookMessageListCommand extends GraphCommand {
     );
   }
 
-  #initValidators(): void {
-    this.validators.push(
-      async (args: CommandArgs) => {
-        if (!args.options.folderId &&
-          !args.options.folderName) {
-          return 'Specify folderId or folderName';
-        }
-    
-        if (args.options.folderId &&
-          args.options.folderName) {
-          return 'Specify either folderId or folderName but not both';
-        }
-    
-        return true;
-      }
-    );
+  #initOptionSets(): void {
+    this.optionSets.push(['folderId', 'folderName']);
   }
 
   public defaultProperties(): string[] | undefined {

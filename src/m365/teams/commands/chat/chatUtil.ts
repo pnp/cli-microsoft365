@@ -37,18 +37,5 @@ export const chatUtil = {
   async findExistingGroupChatsByName(name: string): Promise<Chat[]> {
     const endpoint = `https://graph.microsoft.com/v1.0/chats?$filter=topic eq '${encodeURIComponent(name).replace("'", "''")}'&$expand=members&$select=id,topic,createdDateTime,chatType`;
     return odata.getAllItems<Chat>(endpoint);    
-  },
-  
-  /**
-   * Converts a comma or space separated string into an array.
-   * @param value the string to convert
-   */
-  convertParticipantStringToArray(value: string): string[] {
-    if (value.indexOf(',') === -1) {
-      return value.trim().toLowerCase().split(' ').filter(e => e && e !== '');
-    } 
-    else {
-      return value.trim().toLowerCase().split(',').filter(e => e && e !== '');
-    }
   }
 };

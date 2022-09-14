@@ -255,6 +255,18 @@ describe(commands.USER_LIST, () => {
     await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
+  it('handles error when option to filter by specified without a value (flag)', (done) => {
+    command.action(logger, { options: { debug: false, surname: true } } as any, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specify value for the surname property')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('allows unknown properties', () => {
     const allowUnknownOptions = command.allowUnknownOptions();
     assert.strictEqual(allowUnknownOptions, true);

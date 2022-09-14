@@ -30,6 +30,7 @@ class AadSpGetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -59,14 +60,6 @@ class AadSpGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        let optionsSpecified: number = 0;
-        optionsSpecified += args.options.appId ? 1 : 0;
-        optionsSpecified += args.options.displayName ? 1 : 0;
-        optionsSpecified += args.options.objectId ? 1 : 0;
-        if (optionsSpecified !== 1) {
-          return 'Specify either appId, objectId or displayName';
-        }
-    
         if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
           return `${args.options.appId} is not a valid appId GUID`;
         }
@@ -78,6 +71,10 @@ class AadSpGetCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['appId', 'displayName', 'objectId']);
   }
 
   private getSpId(args: CommandArgs): Promise<string> {

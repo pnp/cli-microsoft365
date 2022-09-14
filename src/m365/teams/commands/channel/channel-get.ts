@@ -41,6 +41,7 @@ class TeamsChannelGetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -78,36 +79,8 @@ class TeamsChannelGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.teamId && args.options.teamName) {
-          return 'Specify either teamId or teamName, but not both.';
-        }
-
-        if (!args.options.teamId && !args.options.teamName) {
-          return 'Specify teamId or teamName, one is required';
-        }
-
         if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
           return `${args.options.teamId} is not a valid GUID`;
-        }
-
-        if (args.options.channelId && args.options.channelName && args.options.primary) {
-          return 'Specify channelId, channelName or primary';
-        }
-
-        if (!args.options.channelId && args.options.channelName && args.options.primary) {
-          return 'Specify channelId, channelName or primary.';
-        }
-
-        if (args.options.channelId && !args.options.channelName && args.options.primary) {
-          return 'Specify channelId, channelName or primary.';
-        }
-
-        if (args.options.channelId && args.options.channelName && !args.options.primary) {
-          return 'Specify channelId, channelName or primary.';
-        }
-
-        if (!args.options.channelId && !args.options.channelName && !args.options.primary) {
-          return 'Specify channelId, channelName or primary, one is required';
         }
 
         if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
@@ -116,6 +89,13 @@ class TeamsChannelGetCommand extends GraphCommand {
 
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['teamId', 'teamName'],
+      ['channelId', 'channelName', 'primary']
     );
   }
 

@@ -31,6 +31,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
 
   let log: string[];
   let logger: Logger;
+  let loggerLogSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -91,6 +92,7 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
         log.push(msg);
       }
     };
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -284,25 +286,43 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
     assert(containsOption);
   });
 
-  it('sends chat message using chatId', async () => {
-    await command.action(logger, {
+  it('sends chat message using chatId', (done) => {
+    command.action(logger, {
       options: {
         chatId: "19:82fe7758-5bb3-4f0d-a43f-e555fd399c6f_8c0a1a67-50ce-4114-bb6c-da9c5dbcf6ca@unq.gbl.spaces",
         message: "Hello World"
       }
-    });
-  });
-
-  it('sends chat message using chatName', async () => {
-    await command.action(logger, {
-      options: {
-        chatName: "Just a conversation",
-        message: "Hello World"
+    }, (err?: any) => {
+      try {
+        assert(loggerLogSpy.notCalled);
+        assert.strictEqual(err, undefined);
+        done();
+      }
+      catch (e) {
+        done(e);
       }
     });
   });
 
-  it('sends chat message using userEmails (single)', async () => {
+  it('sends chat message using chatName', (done) => {
+    command.action(logger, {
+      options: {
+        chatName: "Just a conversation",
+        message: "Hello World"
+      }
+    }, (err?: any) => {
+      try {
+        assert(loggerLogSpy.notCalled);
+        assert.strictEqual(err, undefined);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sends chat message using userEmails (single)', (done) => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats`) {
@@ -315,37 +335,42 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         userEmails: "AlexW@M365x214355.onmicrosoft.com",
         message: "Hello World"
       }
+    }, (err?: any) => {
+      try {
+        assert(loggerLogSpy.notCalled);
+        assert.strictEqual(err, undefined);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
   });
 
-  it('sends chat message to existing conversation using userEmails (multiple)', async () => {
-    await command.action(logger, {
+  it('sends chat message to existing conversation using userEmails (multiple)', (done) => {
+    command.action(logger, {
       options: {
         userEmails: "AndrewK@M365x214355.onmicrosoft.com,DaveK@M365x214355.onmicrosoft.com",
         message: "Hello World"
       }
-    });
-  });
-
-  /*
-   * In PowerShell, when not using double quotes with your string array, the comma is interpreted by powershell.
-   * The string input is split and concatenated with a space. Hence we test the same participant string using a space.
-   */
-  it('sends chat message to existing conversation using userEmails (multiple) - PowerShell version', async () => {
-    await command.action(logger, {
-      options: {
-        userEmails: "AndrewK@M365x214355.onmicrosoft.com DaveK@M365x214355.onmicrosoft.com",
-        message: "Hello World"
+    }, (err?: any) => {
+      try {
+        assert(loggerLogSpy.notCalled);
+        assert.strictEqual(err, undefined);
+        done();
+      }
+      catch (e) {
+        done(e);
       }
     });
   });
 
-  it('sends chat message to new conversation using userEmails (multiple)', async () => {
+  it('sends chat message to new conversation using userEmails (multiple)', (done) => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats`) {
@@ -358,40 +383,88 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         userEmails: "AlexW@M365x214355.onmicrosoft.com,DaveK@M365x214355.onmicrosoft.com",
         message: "Hello World"
       }
+    }, (err?: any) => {
+      try {
+        assert(loggerLogSpy.notCalled);
+        assert.strictEqual(err, undefined);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
   });
 
-  it('fails sending message with nonexistent chatName', async () => {
-    await assert.rejects(command.action(logger, { options: {
-      chatName: "Nonexistent conversation name",
-      message: "Hello World" } } as any), new CommandError('No chat conversation was found with this name.'));
+  it('fails sending message with nonexistent chatName', (done) => {
+    command.action(logger, {
+      options: {
+        chatName: "Nonexistent conversation name",
+        message: "Hello World"
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(
+          JSON.stringify(err),
+          JSON.stringify(new CommandError(`No chat conversation was found with this name.`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
-  it('fails sending message with multiple found chat conversations by chatName', async () => {
-    await assert.rejects(command.action(logger, { options: {
-      chatName: "Just a conversation with same name",
-      message: "Hello World" } } as any), new CommandError(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${[
-      `- 19:309128478c1743b19bebd08efc390efb@thread.v2 - ${new Date("2021-09-14T07:44:11.5Z").toLocaleString()} - AlexW@M365x214355.onmicrosoft.com, MeganB@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`,
-      `- 19:650081f4700a4414ac15cd7993129f80@thread.v2 - ${new Date("2020-06-26T08:27:55.154Z").toLocaleString()} - MeganB@M365x214355.onmicrosoft.com, AlexW@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`
-    ].join(os.EOL)}`));
+  it('fails sending message with multiple found chat conversations by chatName', (done) => {
+    command.action(logger, {
+      options: {
+        chatName: "Just a conversation with same name",
+        message: "Hello World"
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(
+          JSON.stringify(err),
+          JSON.stringify(new CommandError(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${[
+            `- 19:309128478c1743b19bebd08efc390efb@thread.v2 - ${new Date("2021-09-14T07:44:11.5Z").toLocaleString()} - AlexW@M365x214355.onmicrosoft.com, MeganB@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`,
+            `- 19:650081f4700a4414ac15cd7993129f80@thread.v2 - ${new Date("2020-06-26T08:27:55.154Z").toLocaleString()} - MeganB@M365x214355.onmicrosoft.com, AlexW@M365x214355.onmicrosoft.com, NateG@M365x214355.onmicrosoft.com`
+          ].join(os.EOL)}`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
-  it('fails sending message with multiple found chat conversations by userEmails', async () => {
-    await assert.rejects(command.action(logger, { options: {
-      userEmails: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com",
-      message: "Hello World" } } as any), new CommandError(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${[
-      `- 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2 - Megan Bowen_Alex Wilber_Sundar Ganesan_ArchivedChat - ${new Date("2021-12-22T13:13:11.023Z").toLocaleString()}`,
-      `- 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2 - CC Call v3 - ${new Date("2021-10-18T16:56:30.205Z").toLocaleString()}`
-    ].join(os.EOL)}`));
+  it('fails sending message with multiple found chat conversations by userEmails', (done) => {
+    command.action(logger, {
+      options: {
+        userEmails: "AlexW@M365x214355.onmicrosoft.com,NateG@M365x214355.onmicrosoft.com",
+        message: "Hello World"
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(
+          JSON.stringify(err),
+          JSON.stringify(new CommandError(`Multiple chat conversations with this name found. Please disambiguate:${os.EOL}${[
+            `- 19:35bd5bc75e604da8a64e6cba7cfcf175@thread.v2 - Megan Bowen_Alex Wilber_Sundar Ganesan_ArchivedChat - ${new Date("2021-12-22T13:13:11.023Z").toLocaleString()}`,
+            `- 19:5fb8d18dd38b40a4ae0209888adf5c38@thread.v2 - CC Call v3 - ${new Date("2021-10-18T16:56:30.205Z").toLocaleString()}`
+          ].join(os.EOL)}`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   // The following test is used to test the retry mechanism in use because of an intermittent Graph issue.
-  it('sends chat message using userEmails with single retry because of 404 intermittent failure', async () => {
+  it('sends chat message using userEmails with single retry because of 404 intermittent failure', (done) => {
     sinonUtil.restore(request.post);
     let retries: number = 0;
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -411,16 +484,25 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
       return Promise.reject('Invalid Request');
     });
 
-    await command.action(logger, {
+    command.action(logger, {
       options: {
         userEmails: "AlexW@M365x214355.onmicrosoft.com",
         message: "Hello World"
+      }
+    }, (err?: any) => {
+      try {
+        assert(loggerLogSpy.notCalled);
+        assert.strictEqual(err, undefined);
+        done();
+      }
+      catch (e) {
+        done(e);
       }
     });
   });
 
   // The following test is used to test the retry mechanism in use because of an intermittent Graph issue.
-  it('fails sending chat message when maximum of 3 retries with 404 intermittent failure have occurred', async () => {
+  it('fails sending chat message when maximum of 3 retries with 404 intermittent failure have occurred', (done) => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats`) {
@@ -429,9 +511,22 @@ describe(commands.CHAT_MESSAGE_SEND, () => {
 
       return Promise.reject('Invalid Request');
     });
-    
-    await assert.rejects(command.action(logger, { options: {
-      userEmails: "AlexW@M365x214355.onmicrosoft.com",
-      message: "Hello World" } } as any), new CommandError('Request failed with status code 404'));
+
+    command.action(logger, {
+      options: {
+        userEmails: "AlexW@M365x214355.onmicrosoft.com",
+        message: "Hello World"
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(
+          JSON.stringify(err),
+          JSON.stringify(new CommandError(`Request failed with status code 404`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 });

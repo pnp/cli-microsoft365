@@ -46,6 +46,7 @@ class SpoListItemAddCommand extends SpoCommand {
     this.#initOptions();
     this.#initValidators();
     this.#initTypes();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -87,14 +88,6 @@ class SpoListItemAddCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (!args.options.listId && !args.options.listTitle) {
-          return `Specify listId or listTitle`;
-        }
-
-        if (args.options.listId && args.options.listTitle) {
-          return `Specify listId or listTitle but not both`;
-        }
-
         if (args.options.listId &&
           !validation.isValidGuid(args.options.listId)) {
           return `${args.options.listId} in option listId is not a valid GUID`;
@@ -113,6 +106,10 @@ class SpoListItemAddCommand extends SpoCommand {
       'contentType',
       'folder'
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['listId', 'listTitle']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

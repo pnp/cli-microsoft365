@@ -36,6 +36,7 @@ class SpoListViewSetCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -77,25 +78,9 @@ class SpoListViewSetCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (!args.options.listId && !args.options.listTitle) {
-          return `Specify listId or listTitle`;
-        }
-
-        if (args.options.listId && args.options.listTitle) {
-          return `Specify listId or listTitle but not both`;
-        }
-
         if (args.options.listId &&
           !validation.isValidGuid(args.options.listId)) {
           return `${args.options.listId} in option listId is not a valid GUID`;
-        }
-
-        if (!args.options.viewId && !args.options.viewTitle) {
-          return `Specify viewId or viewTitle`;
-        }
-
-        if (args.options.viewId && args.options.viewTitle) {
-          return `Specify viewId or viewTitle but not both`;
         }
 
         if (args.options.viewId &&
@@ -105,6 +90,13 @@ class SpoListViewSetCommand extends SpoCommand {
 
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['listId', 'listTitle'],
+      ['viewId', 'viewTitle']
     );
   }
 

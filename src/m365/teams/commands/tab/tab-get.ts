@@ -48,6 +48,7 @@ class TeamsTabGetCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -89,44 +90,28 @@ class TeamsTabGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (args.options.teamId && args.options.teamName) {
-	      return 'Specify either teamId or teamName, but not both.';
-	    }
+        if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
+          return `${args.options.teamId} is not a valid GUID`;
+        }
 
-	    if (!args.options.teamId && !args.options.teamName) {
-	      return 'Specify teamId or teamName, one is required';
-	    }
+        if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
+          return `${args.options.channelId} is not a valid Teams ChannelId`;
+        }
 
-	    if (args.options.teamId && !validation.isValidGuid(args.options.teamId as string)) {
-	      return `${args.options.teamId} is not a valid GUID`;
-	    }
+        if (args.options.tabId && !validation.isValidGuid(args.options.tabId as string)) {
+          return `${args.options.tabId} is not a valid GUID`;
+        }
 
-	    if (args.options.channelId && args.options.channelName) {
-	      return 'Specify either channelId or channelName, but not both.';
-	    }
-
-	    if (!args.options.channelId && !args.options.channelName) {
-	      return 'Specify channelId or channelName, one is required';
-	    }
-
-	    if (args.options.channelId && !validation.isValidTeamsChannelId(args.options.channelId as string)) {
-	      return `${args.options.channelId} is not a valid Teams ChannelId`;
-	    }
-
-	    if (args.options.tabId && args.options.tabName) {
-	      return 'Specify either tabId or tabName, but not both.';
-	    }
-
-	    if (!args.options.tabId && !args.options.tabName) {
-	      return 'Specify tabId or tabName, one is required';
-	    }
-
-	    if (args.options.tabId && !validation.isValidGuid(args.options.tabId as string)) {
-	      return `${args.options.tabId} is not a valid GUID`;
-	    }
-
-	    return true;
+        return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['teamId', 'teamName'],
+      ['channelId', 'channelName'],
+      ['tabId', 'tabName']
     );
   }
 

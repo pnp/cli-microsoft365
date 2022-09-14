@@ -100,6 +100,8 @@ export default {
   LIST_LABEL_SET: `${prefix} list label set`,
   LIST_LIST: `${prefix} list list`,
   LIST_REMOVE: `${prefix} list remove`,
+  LIST_ROLEASSIGNMENT_REMOVE: `${prefix} list roleassignment remove`,
+  LIST_ROLEASSIGNMENT_ADD: `${prefix} list roleassignment add`,
   LIST_ROLEINHERITANCE_BREAK: `${prefix} list roleinheritance break`,
   LIST_ROLEINHERITANCE_RESET: `${prefix} list roleinheritance reset`,
   LIST_SET: `${prefix} list set`,
@@ -125,6 +127,7 @@ export default {
   LISTITEM_RECORD_DECLARE: `${prefix} listitem record declare`,
   LISTITEM_RECORD_UNDECLARE: `${prefix} listitem record undeclare`,
   LISTITEM_REMOVE: `${prefix} listitem remove`,
+  LISTITEM_ROLEASSIGNMENT_REMOVE: `${prefix} listitem roleassignment remove`,
   LISTITEM_ROLEINHERITANCE_BREAK: `${prefix} listitem roleinheritance break`,
   LISTITEM_ROLEINHERITANCE_RESET: `${prefix} listitem roleinheritance reset`,
   LISTITEM_SET: `${prefix} listitem set`,
@@ -267,5 +270,8 @@ export default {
   WEB_LIST: `${prefix} web list`,
   WEB_REINDEX: `${prefix} web reindex`,
   WEB_REMOVE: `${prefix} web remove`,
+  WEB_ROLEASSIGNMENT_REMOVE: `${prefix} web roleassignment remove`,
+  WEB_ROLEASSIGNMENT_ADD: `${prefix} web roleassignment add`,
+  WEB_ROLEINHERITANCE_RESET: `${prefix} web roleinheritance reset`,
   WEB_SET: `${prefix} web set`
 };

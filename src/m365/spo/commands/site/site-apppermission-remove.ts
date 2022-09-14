@@ -35,6 +35,7 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -71,16 +72,6 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.appId && !args.options.appDisplayName && !args.options.permissionId) {
-          return `Specify appId, appDisplayName, or permissionId. One is required`;
-        }
-
-        if ((args.options.appId && args.options.appDisplayName) ||
-          (args.options.appId && args.options.permissionId) ||
-          (args.options.permissionId && args.options.appDisplayName)) {
-          return 'Use either appId, appDisplayName, or permissionId, but not multiple';
-        }
-
         if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
           return `${args.options.appId} is not a valid GUID`;
         }
@@ -88,6 +79,10 @@ class SpoSiteAppPermissionRemoveCommand extends GraphCommand {
         return validation.isValidSharePointUrl(args.options.siteUrl);
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['appId', 'appDisplayName', 'permissionId']);
   }
 
   private getSpoSiteId(args: CommandArgs): Promise<string> {

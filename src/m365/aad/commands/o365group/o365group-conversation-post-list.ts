@@ -31,6 +31,7 @@ class AadO365GroupConversationPostListCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -59,13 +60,6 @@ class AadO365GroupConversationPostListCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.groupId &&
-          !args.options.groupDisplayName) {
-          return 'Specify either groupId or groupDisplayName';
-        }
-        if (args.options.groupId && args.options.groupDisplayName) {
-          return 'Specify either groupId or groupDisplayName, but not both';
-        }
         if (args.options.groupId && !validation.isValidGuid(args.options.groupId as string)) {
           return `${args.options.groupId} is not a valid GUID`;
         }
@@ -73,6 +67,10 @@ class AadO365GroupConversationPostListCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['groupId', 'groupDisplayName']);
   }
 
   public defaultProperties(): string[] | undefined {

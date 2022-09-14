@@ -33,6 +33,7 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -73,14 +74,6 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
           return isValidSharePointUrl;
         }
 
-        if (!args.options.listId && !args.options.listTitle) {
-          return `Specify listId or listTitle`;
-        }
-
-        if (args.options.listId && args.options.listTitle) {
-          return `Specify listId or listTitle but not both`;
-        }
-
         if (args.options.listId && !validation.isValidGuid(args.options.listId)) {
           return `${args.options.listId} in option listId is not a valid GUID`;
         }
@@ -101,6 +94,10 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['listId', 'listTitle']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {

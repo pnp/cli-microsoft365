@@ -37,6 +37,7 @@ class SpoTermListCommand extends SpoCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -70,26 +71,10 @@ class SpoTermListCommand extends SpoCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.termGroupId && !args.options.termGroupName) {
-          return 'Specify either termGroupId or termGroupName';
-        }
-
-        if (args.options.termGroupId && args.options.termGroupName) {
-          return 'Specify either termGroupId or termGroupName but not both';
-        }
-
         if (args.options.termGroupId) {
           if (!validation.isValidGuid(args.options.termGroupId)) {
             return `${args.options.termGroupId} is not a valid GUID`;
           }
-        }
-
-        if (!args.options.termSetId && !args.options.termSetName) {
-          return 'Specify either termSetId or termSetName';
-        }
-
-        if (args.options.termSetId && args.options.termSetName) {
-          return 'Specify either termSetId or termSetName but not both';
         }
 
         if (args.options.termSetId) {
@@ -100,6 +85,13 @@ class SpoTermListCommand extends SpoCommand {
 
         return true;
       }
+    );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(
+      ['termGroupId', 'termGroupName'],
+      ['termSetId', 'termSetName']
     );
   }
 

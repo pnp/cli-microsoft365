@@ -36,6 +36,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -68,25 +69,12 @@ class TeamsChatMessageSendCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.chatId && !args.options.userEmails && !args.options.chatName) {
-          return 'Specify chatId or userEmails or chatName, one is required.';
-        }
-
-        let nrOfMutuallyExclusiveOptionsInUse = 0;
-        if (args.options.chatId) { nrOfMutuallyExclusiveOptionsInUse++; }
-        if (args.options.userEmails) { nrOfMutuallyExclusiveOptionsInUse++; }
-        if (args.options.chatName) { nrOfMutuallyExclusiveOptionsInUse++; }
-
-        if (nrOfMutuallyExclusiveOptionsInUse > 1) {
-          return 'Specify either chatId or userEmails or chatName, but not multiple.';
-        }
-
         if (args.options.chatId && !validation.isValidTeamsChatId(args.options.chatId)) {
           return `${args.options.chatId} is not a valid Teams ChatId.`;
         }
 
         if (args.options.userEmails) {
-          const userEmails = chatUtil.convertParticipantStringToArray(args.options.userEmails);
+          const userEmails = args.options.userEmails.trim().toLowerCase().split(',').filter(e => e && e !== '');
           if (!userEmails || userEmails.length === 0 || userEmails.some(e => !validation.isValidUserPrincipalName(e))) {
             return `${args.options.userEmails} contains one or more invalid email addresses.`;
           }
@@ -95,6 +83,10 @@ class TeamsChatMessageSendCommand extends GraphCommand {
         return true;
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['chatId', 'userEmails', 'chatName']);
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
@@ -118,7 +110,7 @@ class TeamsChatMessageSendCommand extends GraphCommand {
   }
 
   private async ensureChatIdByUserEmails(userEmailsOption: string): Promise<string> {
-    const userEmails = chatUtil.convertParticipantStringToArray(userEmailsOption);
+    const userEmails = userEmailsOption.trim().toLowerCase().split(',').filter(e => e && e !== '');
     const currentUserEmail = accessToken.getUserNameFromAccessToken(auth.service.accessTokens[this.resource].accessToken).toLowerCase();
     const existingChats = await chatUtil.findExistingChatsByParticipants([currentUserEmail, ...userEmails]);
 

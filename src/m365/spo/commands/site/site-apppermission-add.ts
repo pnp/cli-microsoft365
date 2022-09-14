@@ -38,6 +38,7 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
     this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+    this.#initOptionSets();
   }
 
   #initTelemetry(): void {
@@ -69,21 +70,21 @@ class SpoSiteAppPermissionAddCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
-        if (!args.options.appId && !args.options.appDisplayName) {
-	      return `Specify appId or appDisplayName, one is required`;
-	    }
+        if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
+          return `${args.options.appId} is not a valid GUID`;
+        }
 
-	    if (args.options.appId && !validation.isValidGuid(args.options.appId)) {
-	      return `${args.options.appId} is not a valid GUID`;
-	    }
+        if (['read', 'write', 'owner'].indexOf(args.options.permission) === -1) {
+          return `${args.options.permission} is not a valid permission value. Allowed values are read|write|owner`;
+        }
 
-	    if (['read', 'write', 'owner'].indexOf(args.options.permission) === -1) {
-	      return `${args.options.permission} is not a valid permission value. Allowed values are read|write|owner`;
-	    }
-
-	    return validation.isValidSharePointUrl(args.options.siteUrl);
+        return validation.isValidSharePointUrl(args.options.siteUrl);
       }
     );
+  }
+
+  #initOptionSets(): void {
+    this.optionSets.push(['appId', 'appDisplayName']);
   }
 
   private getSpoSiteId(args: CommandArgs): Promise<string> {
