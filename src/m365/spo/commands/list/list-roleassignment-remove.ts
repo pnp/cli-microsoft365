@@ -22,6 +22,7 @@ interface Options extends GlobalOptions {
   principalId?: number;
   upn?: string;
   groupName?: string;
+  confirm?: boolean;
 }
 
 class SpoListRoleAssignmentRemoveCommand extends SpoCommand {
@@ -49,7 +50,8 @@ class SpoListRoleAssignmentRemoveCommand extends SpoCommand {
         listUrl: typeof args.options.listUrl !== 'undefined',
         principalId: typeof args.options.principalId !== 'undefined',
         upn: typeof args.options.upn !== 'undefined',
-        groupName: typeof args.options.groupName !== 'undefined'    
+        groupName: typeof args.options.groupName !== 'undefined',
+        confirm: (!(!args.options.confirm)).toString()
       });
     });
   }
@@ -76,6 +78,9 @@ class SpoListRoleAssignmentRemoveCommand extends SpoCommand {
       },
       {
         option: '--groupName [groupName]'
+      },
+      {
+        option: '--confirm'
       }
     );
   }
@@ -101,9 +106,17 @@ class SpoListRoleAssignmentRemoveCommand extends SpoCommand {
           return `Specify either list id or title or list url`;
         }
 
+        if (listOptions.filter(item => item !== undefined).length === 0) {
+          return `Specify at least list id or title or list url`;
+        }
+
         const principalOptions: any[] = [args.options.principalId, args.options.upn, args.options.groupName];
         if (principalOptions.some(item => item !== undefined) && principalOptions.filter(item => item !== undefined).length > 1) {
           return `Specify either principalId id or upn or groupName`;
+        }
+
+        if (principalOptions.filter(item => item !== undefined).length === 0) {
+          return `Specify at least principalId id or upn or groupName`;
         }
 
         return true;
@@ -112,38 +125,59 @@ class SpoListRoleAssignmentRemoveCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (this.verbose) {
-      logger.logToStderr(`Removing role assignment frm list in site at ${args.options.webUrl}...`);
-    }
+    const removeRoleAssignment: () => void = (): void => {
+      if (this.verbose) {
+        logger.logToStderr(`Removing role assignment from list in site at ${args.options.webUrl}...`);
+      }
 
-    let requestUrl: string = `${args.options.webUrl}/_api/web/`;
-    if (args.options.listId) {
-      requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
-    }
-    else if (args.options.listTitle) {
-      requestUrl += `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/`;
-    }
-    else if (args.options.listUrl) {
-      const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
-      requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
-    }
+      let requestUrl: string = `${args.options.webUrl}/_api/web/`;
+      if (args.options.listId) {
+        requestUrl += `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
+      }
+      else if (args.options.listTitle) {
+        requestUrl += `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle)}')/`;
+      }
+      else if (args.options.listUrl) {
+        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+        requestUrl += `GetList('${formatting.encodeQueryParameter(listServerRelativeUrl)}')/`;
+      }
 
-    if (args.options.upn) {
-      this.GetUserPrincipalId(args.options)
-        .then((userPrincipalId: number) => {
-          args.options.principalId = userPrincipalId;
-          this.RemoveRoleAssignment(requestUrl, logger, args.options, cb);
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-    }
-    else if (args.options.groupName) {
-      this.GetGroupPrincipalId(args.options)
-        .then((groupPrincipalId: number) => {
-          args.options.principalId = groupPrincipalId;
-          this.RemoveRoleAssignment(requestUrl, logger, args.options, cb);
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      if (args.options.upn) {
+        this.GetUserPrincipalId(args.options)
+          .then((userPrincipalId: number) => {
+            args.options.principalId = userPrincipalId;
+            this.RemoveRoleAssignment(requestUrl, logger, args.options, cb);
+          }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }
+      else if (args.options.groupName) {
+        this.GetGroupPrincipalId(args.options)
+          .then((groupPrincipalId: number) => {
+            args.options.principalId = groupPrincipalId;
+            this.RemoveRoleAssignment(requestUrl, logger, args.options, cb);
+          }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }
+      else {
+        this.RemoveRoleAssignment(requestUrl, logger, args.options, cb);
+      }
+    };
+
+    if (args.options.confirm) {
+      removeRoleAssignment();
     }
     else {
-      this.RemoveRoleAssignment(requestUrl, logger, args.options, cb);
+      Cli.prompt({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to remove role assignment from list ${args.options.listId || args.options.listTitle} from site ${args.options.webUrl}?`
+      }, (result: { continue: boolean }): void => {
+        if (!result.continue) {
+          cb();
+        }
+        else {
+          removeRoleAssignment();
+        }
+      });
     }
   }
 

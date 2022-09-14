@@ -182,6 +182,16 @@ describe(commands.TASK_GET, () => {
     assert.deepStrictEqual(optionSets, [['id', 'title']]);
   });
 
+  it('fails validation when bucket name is used without id', async () => {
+    const actual = await command.validate({
+      options: {
+        id: validTaskId,
+        bucketName: validBucketName
+      }
+    }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('fails validation when title is used without bucket id', async () => {
     const actual = await command.validate({
       options: {
