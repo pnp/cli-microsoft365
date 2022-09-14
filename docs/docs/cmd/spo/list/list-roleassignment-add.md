@@ -26,10 +26,10 @@ m365 spo list roleassignment add [options]
 : SharePoint ID of principal it may be either user id or group id we want to add permissions to. Specify principalId only when upn or groupName are not used.
 
 `--upn [upn]`
-: Upn/email of user to assign role to. Specify either upn or princpialId
+: Upn/email of user to assign role to. Specify either upn or principalId
 
 `--groupName [groupName]`
-: Enter group name of Azure AD or SharePoint group.. Specify either groupName or princpialId
+: Enter group name of Azure AD or SharePoint group.. Specify either groupName or principalId
 
 `--roleDefinitionId [roleDefinitionId]`
 : ID of role definition. Specify either roleDefinitionId or roleDefinitionName but not both

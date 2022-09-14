@@ -207,6 +207,12 @@ const contributors = [
     twitter: 'Dips_365'
   },
   {
+    name: 'Don Kirkham',
+    company: 'Probitas Data Solutions',
+    github: 'DonKirkham',
+    twitter: 'donkirkham'
+  },
+  {
     name: 'Douglas Romão',
     company: '',
     github: '',

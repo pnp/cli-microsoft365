@@ -2,6 +2,26 @@
 
 ## [v5.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.8.0)
 
+### New commands
+
+**global:**
+
+- [request](../cmd/request.md) - executes the specified web request using CLI for Microsoft 365 [#3512](https://github.com/pnp/cli-microsoft365/issues/3512)
+
+**OneNote:**
+
+- [onenote notebook list](../cmd/onenote/notebook/notebook-list.md) - retrieves a list of notebooks [#3097](https://github.com/pnp/cli-microsoft365/issues/3097)
+
+**Microsoft Graph:**
+
+- [graph changelog list](../cmd/graph/changelog/changelog-list.md) - retrieves an overview of specific API-level changes in Microsoft Graph v1.0 and beta [#2061](https://github.com/pnp/cli-microsoft365/issues/2061)
+
+**SharePoint:**
+
+- [spo web roleassignment add](../cmd/spo/web/web-roleassignment-add.md) - adds a role assignment to web permissions [#3549](https://github.com/pnp/cli-microsoft365/issues/3549)
+- [spo web roleassignment remove](../cmd/spo/web/web-roleassignment-remove.md) - removes a role assignment from web permissions [#3550](https://github.com/pnp/cli-microsoft365/issues/3550)
+- [spo listitem roleassignment remove](../cmd/spo/listitem/listitem-roleassignment-remove.md) - removes a role assignment from a listitem [#3543](https://github.com/pnp/cli-microsoft365/issues/3543)
+
 ### Changes
 
 - replaced validation with optionsets [#3218](https://github.com/pnp/cli-microsoft365/issues/3218)
@@ -10,6 +30,16 @@
 - fixed `spo listitem roleinheritance` docs [#3597](https://github.com/pnp/cli-microsoft365/issues/3597)
 - set default output in CLI runtime [#3445](https://github.com/pnp/cli-microsoft365/issues/3445)
 - fixed using unknown flags in 'aad user list' [#3059](https://github.com/pnp/cli-microsoft365/issues/3059)
+- fixed ensure site assets library sample [#3616](https://github.com/pnp/cli-microsoft365/issues/3616)
+- removed PowerShell examples from adaptive card docs [#3631](https://github.com/pnp/cli-microsoft365/issues/3631)
+- added additional validation options for 'planner task get' [#3433](https://github.com/pnp/cli-microsoft365/issues/3433)
+- added gulp-cli checks to spfx doctor [#3541](https://github.com/pnp/cli-microsoft365/issues/3541)
+- extended spfx project doctor with support for 1.16.0-beta.1 [#3634](https://github.com/pnp/cli-microsoft365/issues/3634)
+- fixed typo's in docs [#3652](https://github.com/pnp/cli-microsoft365/issues/3652)
+- added 'report environment script' sample [#3651](https://github.com/pnp/cli-microsoft365/issues/3651)
+- resolved file creation suggestion for PS and CMD [#3497](https://github.com/pnp/cli-microsoft365/issues/3497)
+- added ability to send emails from a specified account or mailbox [#3589](https://github.com/pnp/cli-microsoft365/issues/3589)
+- fixed rendering code fences in md [#3636](https://github.com/pnp/cli-microsoft365/issues/3636)
 
 ## [v5.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.7.0)
 

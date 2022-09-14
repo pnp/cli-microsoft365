@@ -20,7 +20,7 @@ class SpoHubSiteUnregisterCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return 'Unregisters the specifies site collection as a hub site';
+    return 'Unregisters the specified site collection as a hub site';
   }
 
   constructor() {
