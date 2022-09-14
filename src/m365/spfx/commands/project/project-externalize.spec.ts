@@ -286,24 +286,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    await command.action(logger, { options: {  } } as any);
+    await command.action(logger, { options: { toVersion: '1.4.1' } } as any);
     assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
-  });
-
-  it('determining project version doesn\'t fail if package.json is empty', async () => {
-    const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
-      if (path.toString().endsWith('package.json')) {
-        return '';
-      }
-      else {
-        return originalReadFileSync(path, encoding);
-      }
-    });
-    const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
-
-    await command.action(logger, { options: {  } } as any);
-    assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, undefined);
   });
 
   it('loads config.json when available', () => {

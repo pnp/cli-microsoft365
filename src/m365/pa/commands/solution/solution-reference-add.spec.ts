@@ -66,12 +66,12 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
   });
 
   it('calls telemetry', async () => {
-    await command.action(logger, { options: {} });
+    await assert.rejects(command.action(logger, { options: {} }));
     assert(trackEvent.called);
   });
 
   it('logs correct telemetry event', async () => {
-    await command.action(logger, { options: {} });
+    await assert.rejects(command.action(logger, { options: {} }));
     assert.strictEqual(telemetry.name, commands.SOLUTION_REFERENCE_ADD);
   });
 
