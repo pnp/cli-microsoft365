@@ -148,6 +148,21 @@ describe(commands.LIST_ROLEASSIGNMENT_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation neither roleDefinitionId nor roleDefinitionName is specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', groupName: 'someGroup'} }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation neither groupName nor principalId or upn is specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Documents', roleDefinitionName: 'readers' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation neither listTitle nor listId or listUrl is specified', async () => {
+    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', groupName: 'someGroup', roleDefinitionName: 'readers' } }, commandInfo);
+    assert.notStrictEqual(actual, true);
+  });
+
   it('add role assignment on list by title and role definition id', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_api/web/lists/getByTitle(\'test\')/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {

@@ -81,6 +81,14 @@ class PlannerTaskGetCommand extends GraphCommand {
   #initValidators(): void {
     this.validators.push(
       async (args: CommandArgs) => {
+        if (args.options.id) {
+	      if (args.options.bucketId || args.options.bucketName ||
+          args.options.planId || args.options.planName || args.options.planTitle  || 
+          args.options.ownerGroupId || args.options.ownerGroupName) {
+	        return 'Don\'t specify bucketId, bucketName, planId, planTitle, ownerGroupId or ownerGroupName when using id';
+	      }
+	    }
+
         if (args.options.title && !args.options.bucketId && !args.options.bucketName) {
 	      return 'Specify either bucketId or bucketName when using title';
 	    }

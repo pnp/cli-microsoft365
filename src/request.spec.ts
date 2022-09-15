@@ -175,6 +175,33 @@ describe('Request', () => {
       });
   });
 
+  
+  it(`removes the resource header on distinguished resource requests`, (done) => {
+    sinon.stub(https, 'request').callsFake((options: any) => {
+      _options = options;
+      return new ClientRequest('', () => { });
+    });
+
+    _request
+      .get({
+        url: 'https://contoso.sharepoint.com/',
+        headers: {
+          'x-resource': 'https://contoso.sharepoint.com'
+        }
+      })
+      .then(() => {
+        done('Error expected');
+      }, () => {
+        try {
+          assert.strictEqual(typeof (_options as any).headers['x-resource'], 'undefined');
+          done();
+        }
+        catch (err) {
+          done(err);
+        }
+      });
+  });
+
   it('sets method to GET for a GET request', (done) => {
     sinon.stub(_request as any, 'req').callsFake((options) => {
       _options = options;
@@ -322,6 +349,26 @@ describe('Request', () => {
     _request
       .get({
         url: 'https://contoso.sharepoint.com/'
+      })
+      .then(() => {
+        done();
+      }, (err) => {
+        done(err);
+      });
+  });
+
+  it('returns response of a successful GET request, with overridden authorization', (done) => {
+    sinon.stub(_request as any, 'req').callsFake((options) => {
+      _options = options;
+      return Promise.resolve({ data: {} });
+    });
+
+    _request
+      .get({
+        url: 'https://contoso.sharepoint.com/',
+        headers: {
+          authorization: 'Bearer 123'
+        }
       })
       .then(() => {
         done();

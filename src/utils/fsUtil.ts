@@ -42,12 +42,10 @@ const addFileCommands = {
     addFileCommand: 'cat > [FILEPATH] << EOF [FILECONTENT]EOF'
   },
   powershell: {
-    addFileCommand: `@"[FILECONTENT]"@ | Out-File -FilePath "[FILEPATH]"
-    `
+    addFileCommand: `@"[FILECONTENT]"@ | Out-File -FilePath [FILEPATH]`
   },
   cmd: {
-    addFileCommand: `echo [FILECONTENT] > "[FILEPATH]"
-    `
+    addFileCommand: `echo [FILECONTENT] > [FILEPATH]`
   }
 };
 
