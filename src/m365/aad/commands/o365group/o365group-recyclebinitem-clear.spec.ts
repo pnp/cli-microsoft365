@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -68,7 +68,6 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
   });
 
   it('clears the recycle bin items without prompting for confirmation when --confirm option specified', async () => {
-
     const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
     // Stub representing the get deleted items operation
@@ -137,7 +136,6 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
   });
 
   it('clears the recycle bin items when deleted items data is served in pages and --confirm option specified', async () => {
-
     const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
     // Stub representing the get deleted items operation
@@ -289,7 +287,6 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
   });
 
   it('clears the O365 Group recycle bin items when prompt is confirmed', async () => {
-
     const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
     // Stub representing the get deleted items operation
@@ -363,7 +360,6 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
 
 
   it('clears the O365 Group recycle bin items when prompt is confirmed (debug)', async () => {
-
     const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
     // Stub representing the get deleted items operation
@@ -460,6 +456,12 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
     assert(deleteStub.calledThrice);
   });
 
+  it('handles random API error', async () => {
+    const errorMessage = 'Something went wrong';
+    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
+
+    await assert.rejects(command.action(logger, { options: { confirm: true } }), new CommandError(errorMessage));
+  });
 
   it('supports debug mode', () => {
     const options = command.options;

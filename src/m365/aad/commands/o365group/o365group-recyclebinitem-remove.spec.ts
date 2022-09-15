@@ -188,6 +188,23 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
     }), new CommandError(`Multiple groups with name '${validGroupMailNickname}' found: ${multipleGroupsResponse.value.map(x => x.id).join(',')}.`));
   });
 
+  it('correctly deletes group by id with confirm flag', async () => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/${validGroupId}`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    await command.action(logger, {
+      options: {
+        id: validGroupId,
+        confirm: true
+      }
+    });
+  });
+
   it('correctly deletes group by id', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/${validGroupId}`) {
@@ -250,10 +267,6 @@ describe(commands.O365GROUP_RECYCLEBINITEM_REMOVE, () => {
 
       return Promise.reject('Invalid Request');
     });
-    sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake(async () => (
-      { continue: true }
-    ));
 
     await command.action(logger, {
       options: {

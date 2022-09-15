@@ -125,8 +125,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
   
           await request.delete(requestOptions);
         }
-      
-      } 
+      }
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
       }

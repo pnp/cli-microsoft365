@@ -203,6 +203,18 @@ describe(commands.CHANNEL_REMOVE, () => {
     assert(postSpy.notCalled);
   });
 
+  it('removes specified channel when channelId is passed with confirm option', async () => {
+    sinon.stub(request, 'delete').returns(Promise.resolve());
+
+    await command.action(logger, {
+      options: {
+        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        confirm: true
+      }
+    });
+  });
+
   it('removes the specified channel by name when prompt confirmed (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'channelName'`) > -1) {

@@ -75,33 +75,28 @@ class PaAppGetCommand extends PowerAppsCommand {
   }
 
   public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
-    if (args.options.name) {
-      const requestOptions: any = {
-        url: `${this.resource}/providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
-        headers: {
-          accept: 'application/json'
-        },
-        responseType: 'json'
-      };
-
-      if (this.verbose) {
-        logger.logToStderr(`Retrieving information about Microsoft Power App with name '${args.options.name}'...`);
-      }
-
-      try {
+    try {
+      if (args.options.name) {
+        const requestOptions: any = {
+          url: `${this.resource}/providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+          headers: {
+            accept: 'application/json'
+          },
+          responseType: 'json'
+        };
+  
+        if (this.verbose) {
+          logger.logToStderr(`Retrieving information about Microsoft Power App with name '${args.options.name}'...`);
+        }
+  
         const res = await request.get<any>(requestOptions);
         logger.log(this.setProperties(res));
       }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
-    }
-    else {
-      if (this.verbose) {
-        logger.logToStderr(`Retrieving information about Microsoft Power App with displayName '${args.options.displayName}'...`);
-      }
-
-      try {
+      else {
+        if (this.verbose) {
+          logger.logToStderr(`Retrieving information about Microsoft Power App with displayName '${args.options.displayName}'...`);
+        }
+  
         const getAppsOutput = await this.getApps(args, logger);
 
         const allApps: any = JSON.parse(getAppsOutput.stdout);
@@ -124,9 +119,9 @@ class PaAppGetCommand extends PowerAppsCommand {
           }
         }
       }
-      catch (err: any) {
-        this.handleRejectedODataJsonPromise(err);
-      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 

@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -476,6 +476,14 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     ]
     ));
   });
+
+  it('handles random API error', async () => {
+    const errorMessage = 'Something went wrong';
+    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
+
+    await assert.rejects(command.action(logger, { options: { } }), new CommandError(errorMessage));
+  });
+
   it('passes validation if the owner is a valid GUID', async () => {
     const actual = await command.validate({ options: { owner: '68be84bf-a585-4776-80b3-30aa5207aa22' } }, commandInfo);
     assert.strictEqual(actual, true);

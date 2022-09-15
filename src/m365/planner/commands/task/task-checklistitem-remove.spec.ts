@@ -149,7 +149,32 @@ describe(commands.TASK_CHECKLISTITEM_REMOVE, () => {
     });
   });
 
-  it('fails validation when checklist item does not exists', async () => {
+  it('successfully remove checklist item with confirmation prompt', async () => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details?$select=checklist`) {
+        return Promise.resolve({
+          "@odata.etag": "TestEtag",
+          checklist: responseChecklistWithId
+        });
+      }
+      return Promise.reject('Invalid Request');
+    });
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details`) {
+        return Promise.resolve();
+      }
+      return Promise.reject('Invalid Request');
+    });
+
+    await command.action(logger, {
+      options: {
+        taskId: validTaskId,
+        id: validId
+      }
+    });
+  });
+
+  it('fails when checklist item does not exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/${encodeURIComponent(validTaskId)}/details?$select=checklist`) {
         return Promise.resolve({
