@@ -96,20 +96,22 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
             return;
           }
 
-          setTimeout(() => {
-            spo.waitUntilFinished({
-              operationId: JSON.stringify(operation._ObjectIdentity_),
-              siteUrl: this.spoAdminUrl as string,
-              resolve: () => null,
-              reject: (error) => { throw error; },
-              logger,
-              currentContext: this.context as FormDigestInfo,
-              dots: this.dots,
-              debug: this.debug,
-              verbose: this.verbose
-            });
-          }, operation.PollingInterval);
-        } 
+          await new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+            setTimeout(() => {
+              spo.waitUntilFinished({
+                operationId: JSON.stringify(operation._ObjectIdentity_),
+                siteUrl: this.spoAdminUrl as string,
+                resolve,
+                reject,
+                logger,
+                currentContext: this.context as FormDigestInfo,
+                dots: this.dots,
+                debug: this.debug,
+                verbose: this.verbose
+              });
+            }, operation.PollingInterval);
+          });
+        }
       } 
       catch (err: any) {
         this.handleRejectedODataJsonPromise(err);
