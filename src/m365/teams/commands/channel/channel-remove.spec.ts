@@ -242,6 +242,43 @@ describe(commands.CHANNEL_REMOVE, () => {
       }
     });
   });
+
+  it('removes the specified channel by name without prompt', async () => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'channelName'`) > -1) {
+        return Promise.resolve({
+          value: [
+            {
+              "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
+              "displayName": "channelName",
+              "description": null,
+              "email": "",
+              "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6%40thread.skype/%F0%9F%92%A1+Ideas?groupId=d66b8110-fcad-49e8-8159-0d488ddb7656&tenantId=eff8592e-e14a-4ae8-8771-d96d5c549e1c"
+            }
+          ]
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/d66b8110-fcad-49e8-8159-0d488ddb7656/channels/19%3Af3dcbb1674574677abcae89cb626f1e6%40thread.skype`) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, {
+      options: {
+        debug: true,
+        channelName: 'channelName',
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        confirm: true
+      }
+    });
+  });
+
   it('should handle Microsoft graph error response', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/d66b8110-fcad-49e8-8159-0d488ddb7656/channels/19%3Af3dcbb1674574677abcae89cb626f1e6%40thread.skype`) {

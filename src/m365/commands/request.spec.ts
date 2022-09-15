@@ -150,7 +150,7 @@ describe(commands.REQUEST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('correctly defaults to a GET request accepting a json response', (done) => {
+  it('correctly defaults to a GET request accepting a json response', async () => {
     sinon.stub(request, 'execute').callsFake((opts) => {
       if (opts.method === 'GET' && opts.headers!.accept === 'application/json') {
         return Promise.resolve(mockSPOWebJSONResponse);
@@ -159,22 +159,14 @@ describe(commands.REQUEST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         url: 'https://contoso.sharepoint.com/_api/web'
-      }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
       }
     });
   });
 
-  it('successfully executes a GET request to a SharePoint API endpoint', (done) => {
+  it('successfully executes a GET request to a SharePoint API endpoint', async () => {
     sinon.stub(request, 'execute').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web') {
         return Promise.resolve(mockSPOWebJSONResponse);
@@ -183,23 +175,16 @@ describe(commands.REQUEST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         url: 'https://contoso.sharepoint.com/_api/web',
         accept: 'application/json;odata=nometadata'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
   });
 
-  it('successfully executes a GET request to a SharePoint API endpoint accepting XML', (done) => {
+  it('successfully executes a GET request to a SharePoint API endpoint accepting XML', async () => {
     sinon.stub(request, 'execute').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web?$select=Title') {
         return Promise.resolve(mockSPOWebXMLResponse);
@@ -208,23 +193,16 @@ describe(commands.REQUEST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         url: 'https://contoso.sharepoint.com/_api/web?$select=Title',
         accept: 'application/xml'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(mockSPOWebXMLResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(mockSPOWebXMLResponse));
   });
 
-  it('successfully executes a GET request to a SharePoint API endpoint (debug)', (done) => {
+  it('successfully executes a GET request to a SharePoint API endpoint (debug)', async () => {
     sinon.stub(request, 'execute').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web') {
         return Promise.resolve(mockSPOWebJSONResponse);
@@ -233,24 +211,17 @@ describe(commands.REQUEST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         url: 'https://contoso.sharepoint.com/_api/web',
         accept: 'application/json;odata=nometadata',
         debug: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
   });
 
-  it('successfully executes a POST request to a SharePoint API endpoint', (done) => {
+  it('successfully executes a POST request to a SharePoint API endpoint', async () => {
     sinon.stub(request, 'execute').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web') {
         return Promise.resolve(mockSPOWebJSONResponse);
@@ -259,7 +230,7 @@ describe(commands.REQUEST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         url: 'https://contoso.sharepoint.com/_api/web',
         accept: 'application/json;odata=nometadata',
@@ -267,18 +238,11 @@ describe(commands.REQUEST, () => {
         'x-http-method': 'PATCH',
         method: 'post'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
   });
 
-  it('successfully executes a request with a manually specified resource', (done) => {
+  it('successfully executes a request with a manually specified resource', async () => {
     sinon.stub(request, 'execute').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web') {
         return Promise.resolve(mockSPOWebJSONResponse);
@@ -287,24 +251,17 @@ describe(commands.REQUEST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         url: 'https://contoso.sharepoint.com/_api/web',
         accept: 'application/json;odata=nometadata',
         resource: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
   });
 
-  it('successfully executes a request with a manually specified resource (debug)', (done) => {
+  it('successfully executes a request with a manually specified resource (debug)', async () => {
     sinon.stub(request, 'execute').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/web') {
         return Promise.resolve(mockSPOWebJSONResponse);
@@ -313,47 +270,29 @@ describe(commands.REQUEST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         url: 'https://contoso.sharepoint.com/_api/web',
         accept: 'application/json;odata=nometadata',
         resource: 'https://contoso.sharepoint.com',
         debug: true
       }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.called);
+    assert(loggerLogSpy.calledWith(mockSPOWebJSONResponse));
   });
 
-  it('correctly handles an API exception', (done) => {
+  it('correctly handles an API exception', async () => {
     sinon.stub(request, 'execute').callsFake(_ => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        url: 'https://contoso.sharepoint.com/_api/web'
-      }
-    }, (err: any) => {
-      try {
-        assert.deepStrictEqual(err, new CommandError('Invalid request'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      url: 'https://contoso.sharepoint.com/_api/web' } } as any), new CommandError('Invalid request'));
   });
 
 
-  it('writeFile called when option --asFile is specified (verbose)', (done) => {
+  it('writeFile called when option --asFile is specified (verbose)', async () => {
     const mockResponse = `{"data": 123}`;
     const responseStream = new PassThrough();
     responseStream.write(mockResponse);
@@ -385,24 +324,14 @@ describe(commands.REQUEST, () => {
       filePath: 'test1.docx'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert(fsStub.calledOnce);
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          fs.createWriteStream
-        ]);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(fsStub.calledOnce);
+    sinonUtil.restore([
+      fs.createWriteStream
+    ]);
   });
 
-  it('fails when empty file is created file with --asFile is specified', (done) => {
+  it('fails when empty file is created file with --asFile is specified', async () => {
     const mockResponse = `{"data": 123}`;
     const responseStream = new PassThrough();
     responseStream.write(mockResponse);
@@ -434,21 +363,11 @@ describe(commands.REQUEST, () => {
       filePath: 'test1.docx'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert(fsStub.calledOnce);
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Writestream throws error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore([
-          fs.createWriteStream
-        ]);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('Writestream throws error'));
+    assert(fsStub.calledOnce);
+    sinonUtil.restore([
+      fs.createWriteStream
+    ]);
   });
 
   it('supports debug mode', () => {

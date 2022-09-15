@@ -97,57 +97,58 @@ class SpoListLabelSetCommand extends SpoCommand {
     this.optionSets.push(['listId', 'listTitle', 'listUrl']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    ((): Promise<string> => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
       let listRestUrl: string = '';
+      let listServerRelativeUrl: string = '';
 
       if (args.options.listUrl) {
-        const listServerRelativeUrl: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
+        const listServerRelativeUrlFromPath: string = urlUtil.getServerRelativePath(args.options.webUrl, args.options.listUrl);
 
-        return Promise.resolve(listServerRelativeUrl);
-      }
-      else if (args.options.listId) {
-        listRestUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
+        listServerRelativeUrl = listServerRelativeUrlFromPath;
       }
       else {
-        listRestUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/`;
-      }
-
-      const requestOptions: any = {
-        url: `${args.options.webUrl}/_api/web/${listRestUrl}?$expand=RootFolder&$select=RootFolder`,
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-
-      return request
-        .get<ListInstance>(requestOptions)
-        .then((listInstance: ListInstance): Promise<string> => {
-          return Promise.resolve(listInstance.RootFolder.ServerRelativeUrl);
-        });
-    })()
-      .then((listServerRelativeUrl: string): Promise<void> => {
-        const listAbsoluteUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, listServerRelativeUrl);
-        const requestUrl: string = `${args.options.webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`;
+        if (args.options.listId) {
+          listRestUrl = `lists(guid'${formatting.encodeQueryParameter(args.options.listId)}')/`;
+        }
+        else {
+          listRestUrl = `lists/getByTitle('${formatting.encodeQueryParameter(args.options.listTitle as string)}')/`;
+        }
+  
         const requestOptions: any = {
-          url: requestUrl,
+          url: `${args.options.webUrl}/_api/web/${listRestUrl}?$expand=RootFolder&$select=RootFolder`,
           headers: {
             'accept': 'application/json;odata=nometadata'
-          },
-          data: {
-            listUrl: listAbsoluteUrl,
-            complianceTagValue: args.options.label,
-            blockDelete: args.options.blockDelete || false,
-            blockEdit: args.options.blockEdit || false,
-            syncToItems: args.options.syncToItems || false
           },
           responseType: 'json'
         };
 
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        const listInstance: ListInstance = await request.get<ListInstance>(requestOptions);
+        listServerRelativeUrl = listInstance.RootFolder.ServerRelativeUrl;
+      }
+
+      const listAbsoluteUrl: string = urlUtil.getAbsoluteUrl(args.options.webUrl, listServerRelativeUrl);
+      const requestUrl: string = `${args.options.webUrl}/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`;
+      const requestOptions: any = {
+        url: requestUrl,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        data: {
+          listUrl: listAbsoluteUrl,
+          complianceTagValue: args.options.label,
+          blockDelete: args.options.blockDelete || false,
+          blockEdit: args.options.blockEdit || false,
+          syncToItems: args.options.syncToItems || false
+        },
+        responseType: 'json'
+      };
+
+      await request.post(requestOptions);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

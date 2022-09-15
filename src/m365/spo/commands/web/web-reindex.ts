@@ -73,7 +73,7 @@ class SpoWebReindexCommand extends SpoCommand {
           logger.logToStderr(`Site is a no-script site. Reindexing lists instead...`);
         }
 
-        return this.reindexLists(args.options.webUrl, requestDigest, logger, webIdentityResp) as any;
+        await this.reindexLists(args.options.webUrl, requestDigest, logger, webIdentityResp) as any;
       }
 
       if (this.verbose) {

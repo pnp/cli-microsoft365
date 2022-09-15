@@ -89,7 +89,7 @@ class TeamsChannelSetCommand extends GraphCommand {
       const channelItem: Channel | undefined = res.value[0];
 
       if (!channelItem) {
-        return Promise.reject(`The specified channel does not exist in the Microsoft Teams team`);
+        throw `The specified channel does not exist in the Microsoft Teams team`;
       }
 
       const channelId: string = res.value[0].id;

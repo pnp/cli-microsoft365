@@ -226,6 +226,10 @@ describe(commands.WEB_REINDEX, () => {
           ]
         });
       }
+      
+      if ((opts.url as string).indexOf('/_api/web/allproperties') > -1) {
+        return Promise.resolve({});
+      }
 
       return Promise.reject('Invalid request');
     });
@@ -310,6 +314,10 @@ describe(commands.WEB_REINDEX, () => {
             }
           ]
         });
+      }
+      
+      if ((opts.url as string).indexOf('/_api/web/allproperties') > -1) {
+        return Promise.resolve({});
       }
 
       return Promise.reject('Invalid request');

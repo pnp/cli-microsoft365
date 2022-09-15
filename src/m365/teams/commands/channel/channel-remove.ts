@@ -111,7 +111,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
             responseType: 'json'
           };
 
-          return request.delete(requestOptionsDelete);
+          await request.delete(requestOptionsDelete);
         }
   
         if (args.options.channelId) {

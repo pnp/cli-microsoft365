@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
@@ -104,7 +104,7 @@ describe(commands.USERPROFILE_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    await await command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'text',
         userName: 'john.doe@contoso.onmicrosoft.com'
@@ -184,6 +184,16 @@ describe(commands.USERPROFILE_GET, () => {
       }
     });
     assert(containsOption);
+  });
+
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: { 
+      debug: false,
+      userName: 'john.doe@contoso.onmicrosoft.com' } } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if the user principal name is not a valid', async () => {

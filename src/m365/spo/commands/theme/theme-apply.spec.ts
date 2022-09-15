@@ -474,20 +474,19 @@ describe(commands.THEME_APPLY, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/ThemeManager/ApplyTheme`) > -1) {
-        return Promise.resolve(JSON.stringify("Access denied. You do not have permission to perform this action or access this resource."));
+        return Promise.resolve(JSON.stringify({
+          "error": "Access denied. You do not have permission to perform this action or access this resource."
+        }));
       }
 
       return Promise.reject('Invalid request');
     });
 
-    await command.action(logger, {
-      options: {
-        debug: true,
-        name: 'Some color',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        sharePointTheme: true
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      name: 'Some color',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      sharePointTheme: true } } as any), new CommandError('Access denied. You do not have permission to perform this action or access this resource.'));
     let correctRequestIssued = false;
 
     requests.forEach(r => {

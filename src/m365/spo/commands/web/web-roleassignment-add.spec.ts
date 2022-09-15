@@ -133,7 +133,7 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('add role assignment on web by role definition id', (done) => {
+  it('add role assignment on web by role definition id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -142,25 +142,17 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         principalId: 11,
         roleDefinitionId: 1073741827
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('add role assignment on web get principal id by upn', (done) => {
+  it('add role assignment on web get principal id by upn', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -179,25 +171,17 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         upn: 'someaccount@tenant.onmicrosoft.com',
         roleDefinitionId: 1073741827
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('correctly handles error when upn does not exist', (done) => {
+  it('correctly handles error when upn does not exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -215,25 +199,14 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        upn: 'someaccount@tenant.onmicrosoft.com',
-        roleDefinitionId: 1073741827
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      webUrl: 'https://contoso.sharepoint.com',
+      upn: 'someaccount@tenant.onmicrosoft.com',
+      roleDefinitionId: 1073741827 } } as any), new CommandError(error));
   });
 
-  it('add role assignment on web get principal id by group name', (done) => {
+  it('add role assignment on web get principal id by group name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -252,25 +225,17 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         groupName: 'someGroup',
         roleDefinitionId: 1073741827
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('correctly handles error when group does not exist', (done) => {
+  it('correctly handles error when group does not exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -287,26 +252,15 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
 
       return Promise.reject(new CommandError('Unknown case'));
     });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        groupName: 'someGroup',
-        roleDefinitionId: 1073741827
-      }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      webUrl: 'https://contoso.sharepoint.com',
+      groupName: 'someGroup',
+      roleDefinitionId: 1073741827 } } as any), new CommandError(error));
   });
 
-  it('add role assignment on web get role definition id by role definition name', (done) => {
+  it('add role assignment on web get role definition id by role definition name', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -325,25 +279,17 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         principalId: 11,
         roleDefinitionName: 'Full Control'
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('correctly handles error when role definition does not exist', (done) => {
+  it('correctly handles error when role definition does not exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/roleassignments/addroleassignment(principalid=\'11\',roledefid=\'1073741827\')') > -1) {
         return Promise.resolve();
@@ -361,21 +307,10 @@ describe(commands.WEB_ROLEASSIGNMENT_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        principalId: 11,
-        roleDefinitionName: 'Full Control'
-      }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      webUrl: 'https://contoso.sharepoint.com',
+      principalId: 11,
+      roleDefinitionName: 'Full Control' } } as any), new CommandError(error));
   });
 });

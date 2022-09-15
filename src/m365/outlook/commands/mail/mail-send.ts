@@ -1,6 +1,5 @@
 import auth, { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import { CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
@@ -100,51 +99,55 @@ class OutlookMailSendCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (error?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const bodyContents: string = args.options.bodyContents as string;
 
-    const isAppOnlyAuth: boolean | undefined = Auth.isAppOnlyAuth(auth.service.accessTokens[this.resource].accessToken);
-    if (isAppOnlyAuth === true && !args.options.sender) {
-      return cb(new CommandError(`Specify a upn or user id in the 'sender' option when using app only authentication.`));
-    }
-
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/${args.options.sender ? 'users/' + encodeURIComponent(args.options.sender) : 'me'}/sendMail`,
-      headers: {
-        accept: 'application/json;odata.metadata=none',
-        'content-type': 'application/json'
-      },
-      responseType: 'json',
-      data: {
-        message: {
-          subject: args.options.subject,
-          body: {
-            contentType: args.options.bodyContentType || 'Text',
-            content: bodyContents
-          },
-          toRecipients: args.options.to.split(',').map(e => {
-            return {
-              emailAddress: {
-                address: e.trim()
-              }
-            };
-          })
-        },
-        saveToSentItems: args.options.saveToSentItems
+    try {
+    
+      const isAppOnlyAuth: boolean | undefined = Auth.isAppOnlyAuth(auth.service.accessTokens[this.resource].accessToken);
+      if (isAppOnlyAuth === true && !args.options.sender) {
+        throw `Specify a upn or user id in the 'sender' option when using app only authentication.`;
       }
-    };
-
-    if (args.options.mailbox) {
-      requestOptions.data.message.from = {
-        emailAddress: {
-          address: args.options.mailbox
+  
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/${args.options.sender ? 'users/' + encodeURIComponent(args.options.sender) : 'me'}/sendMail`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          'content-type': 'application/json'
+        },
+        responseType: 'json',
+        data: {
+          message: {
+            subject: args.options.subject,
+            body: {
+              contentType: args.options.bodyContentType || 'Text',
+              content: bodyContents
+            },
+            toRecipients: args.options.to.split(',').map(e => {
+              return {
+                emailAddress: {
+                  address: e.trim()
+                }
+              };
+            })
+          },
+          saveToSentItems: args.options.saveToSentItems
         }
       };
+  
+      if (args.options.mailbox) {
+        requestOptions.data.message.from = {
+          emailAddress: {
+            address: args.options.mailbox
+          }
+        };
+      }
+  
+      await request.post(requestOptions);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
-
-    request
-      .post(requestOptions)
-      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 }
 
