@@ -240,22 +240,26 @@ export class Cli {
     try {
       await command.action(logger, args as any);
 
+      // restore the original command name
+      cli.currentCommandName = parentCommandName;
+      // restore the original logger
+      request.logger = currentLogger;
+
       return ({
         stdout: log.join(os.EOL),
         stderr: logErr.join(os.EOL)
       });
     }
     catch (err: any) {
-      throw {
-        error: err,
-        stderr: logErr.join(os.EOL)
-      };
-    }
-    finally {
       // restore the original command name
       cli.currentCommandName = parentCommandName;
       // restore the original logger
       request.logger = currentLogger;
+      
+      throw {
+        error: err,
+        stderr: logErr.join(os.EOL)
+      };
     }
   }
 
