@@ -74,6 +74,26 @@ describe(commands.APPPAGE_SET, () => {
       }), new CommandError(`Failed to update the single-part app page`));
   });
 
+  it("Update the single-part app pag", async () => {
+    sinon.stub(request, "post").callsFake(opts => {
+      if (
+        (opts.url as string).indexOf(`_api/sitepages/Pages/UpdateFullPageApp`) > -1 
+      ) {
+        return Promise.resolve();
+      }
+      return Promise.reject("Invalid request");
+    });
+    await command.action(logger, 
+      {
+        options: {
+          debug: false,
+          pageName: "demo",
+          webUrl: "https://contoso.sharepoint.com/",
+          webPartData: JSON.stringify({})
+        }
+      });
+  });
+
   it("supports debug mode", () => {
     const options = command.options;
     let containsOption = false;

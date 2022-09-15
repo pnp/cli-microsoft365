@@ -118,7 +118,7 @@ class SpoTermGroupAddCommand extends SpoCommand {
 
       const terms: string = await request.post(requestOptions);
       const json2: ClientSvcResponse = JSON.parse(terms);
-      const response2: ClientSvcResponseContents = json[0];
+      const response2: ClientSvcResponseContents = json2[0];
       if (response2.ErrorInfo) {
         throw response2.ErrorInfo.ErrorMessage;
       }

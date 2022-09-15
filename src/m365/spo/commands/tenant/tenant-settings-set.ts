@@ -638,7 +638,6 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
       const response: ClientSvcResponseContents = json[0];
       if (response.ErrorInfo) {
         throw response.ErrorInfo.ErrorMessage;
-        return;
       }
 
       if (args.options.EnableAzureADB2BIntegration === true) {

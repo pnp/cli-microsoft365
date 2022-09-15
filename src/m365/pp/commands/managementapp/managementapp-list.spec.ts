@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -117,6 +117,14 @@ describe(commands.MANAGEMENTAPP_LIST, () => {
     const actual = JSON.stringify(log[log.length - 1]);
     const expected = JSON.stringify([ {} ]);
     assert.strictEqual(actual, expected);
+  });
+
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: { } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

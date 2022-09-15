@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
@@ -141,6 +141,14 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
       }
     });
     assert(containsOption);
+  });
+
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'post').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6', confirm: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports specifying confirmation flag', () => {

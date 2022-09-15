@@ -17,15 +17,10 @@ class SpoGetCommand extends SpoCommand {
   }
 
   public async commandAction(logger: Logger): Promise<void> {
-    try {
-      const spoContext: SpoContext = {
-        SpoUrl: auth.service.spoUrl ? auth.service.spoUrl : ''
-      };
-      logger.log(spoContext);      
-    } 
-    catch (err: any) {
-      this.handleRejectedODataJsonPromise(err);
-    }
+    const spoContext: SpoContext = {
+      SpoUrl: auth.service.spoUrl ? auth.service.spoUrl : ''
+    };
+    logger.log(spoContext);    
   }
 }
 

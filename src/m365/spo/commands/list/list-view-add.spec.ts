@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import { sinonUtil, urlUtil } from '../../../../utils';
 import request from '../../../../request';
 import commands from '../../commands';
@@ -226,6 +226,19 @@ describe(commands.LIST_VIEW_ADD, () => {
       }
     });
     assert(loggerLogSpy.calledWith(viewCreationResponse));
+  });
+
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'post').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: {
+      webUrl: validWebUrl,
+      listUrl: validListUrl,
+      title: validTitle,
+      fields: validFieldsInput,
+      rowLimit: 100 } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

@@ -127,6 +127,15 @@ describe(commands.TASK_REFERENCE_LIST, () => {
     assert(loggerLogSpy.calledWith(references.references));
   });
 
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: { taskId: 'uBk5fK_MHkeyuPYlCo4OFpcAMowf' } } as any), new CommandError('An error has occurred'));
+  });
+
+
   it('supports debug mode', () => {
     const options = command.options;
     let containsOption = false;

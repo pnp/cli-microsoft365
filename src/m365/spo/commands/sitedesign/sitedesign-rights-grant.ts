@@ -82,7 +82,7 @@ class SpoSiteDesignRightsGrantCommand extends SpoCommand {
         responseType: 'json'
       };
 
-      return request.post(requestOptions);
+      await request.post(requestOptions);
     } 
     catch (err: any) {
       this.handleRejectedODataJsonPromise(err);

@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -230,6 +230,19 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
         fieldPosition: 1
       }
     });
+  });
+
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: {
+      webUrl: 'https://contoso.sharepoint.com/sites/ninja', 
+      listId: '0cd891ef-afce-4e55-b836-fce03286cccf', 
+      viewTitle: 'MyView', 
+      fieldTitle: 'Created By', 
+      fieldPosition: 1 } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

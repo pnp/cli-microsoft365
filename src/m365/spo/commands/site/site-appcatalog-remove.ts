@@ -67,7 +67,6 @@ class SpoSiteAppCatalogRemoveCommand extends SpoCommand {
       const response: ClientSvcResponseContents = json[0];
       if (response.ErrorInfo) {
         throw response.ErrorInfo.ErrorMessage;
-        return;
       }
       else {
         if (this.verbose) {

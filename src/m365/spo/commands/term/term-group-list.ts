@@ -40,7 +40,6 @@ class SpoTermGroupListCommand extends SpoCommand {
       const response: ClientSvcResponseContents = json[0];
       if (response.ErrorInfo) {
         throw response.ErrorInfo.ErrorMessage;
-        return;
       }
 
       const result: TermGroupCollection = json[json.length - 1];

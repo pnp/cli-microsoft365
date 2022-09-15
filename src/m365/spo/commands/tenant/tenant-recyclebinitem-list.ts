@@ -39,7 +39,6 @@ class SpoTenantRecycleBinItemListCommand extends SpoCommand {
       const response: ClientSvcResponseContents = json[0];
       if (response.ErrorInfo) {
         throw response.ErrorInfo.ErrorMessage;
-        return;
       }
 
       const results: DeletedSitePropertiesEnumerable = json[json.length - 1];

@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -711,6 +711,20 @@ describe(commands.LIST_VIEW_FIELD_ADD, () => {
         confirm: true
       }
     });
+  });
+
+  it('handles error correctly', async () => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.reject('An error has occurred');
+    });
+
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      viewId: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      fieldId: '330f29c5-5c4c-465f-9f4b-7903020ae1ce',
+      webUrl: 'https://contoso.sharepoint.com',
+      listTitle: 'Documents',
+      confirm: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {
