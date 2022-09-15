@@ -11,6 +11,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   webUrl: string;
+  confirm?: boolean;
 }
 
 class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
@@ -25,8 +26,17 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
   constructor() {
     super();
 
+    this.#initTelemetry();
     this.#initOptions();
     this.#initValidators();
+  }
+
+  #initTelemetry(): void {
+    this.telemetry.push((args: CommandArgs) => {
+      Object.assign(this.telemetryProperties, {
+        confirm: (!(!args.options.confirm)).toString()
+      });
+    });
   }
 
   #initOptions(): void {
@@ -42,9 +52,7 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => {
-        return validation.isValidSharePointUrl(args.options.webUrl);
-      }
+      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
     );
   }
 
@@ -66,7 +74,7 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
       request
         .post(requestOptions)
         .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-    }
+    };
     if (args.options.confirm) {
       breakroleInheritance();
     }
@@ -75,7 +83,7 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the subsite ${args.options.webUrl}`
+        message: `Are you sure you want to break the role inheritance of subsite ${args.options.webUrl}`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

@@ -11,7 +11,9 @@ const command: Command = require('./web-roleinheritance-break');
 
 describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
   let log: any[];
+  let requests: any[];
   let logger: Logger;
+  let promptOptions: any;
   let commandInfo: CommandInfo;
 
   before(() => {
@@ -34,11 +36,18 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
         log.push(msg);
       }
     };
+    requests = [];
+    promptOptions = undefined;
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
   });
 
   afterEach(() => {
     sinonUtil.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -90,6 +99,59 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('should prompt before deleting when confirmation argument not passed', (done) => {
+    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com' } }, () => {
+      let promptIssued = false;
+
+      if (promptOptions && promptOptions.type === 'confirm') {
+        promptIssued = true;
+      }
+
+      try {
+        assert(promptIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('Breack role inheritance successfully when prompt confirmed', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      requests.push(opts);
+      if ((opts.url as string).indexOf('/_api/web/breakroleinheritance') > -1) {
+        return Promise.resolve(true);
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    sinonUtil.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    });
+    command.action(logger, {
+      options: {
+        webUrl: "https://contoso.sharepoint.com"
+      }
+    }, () => {
+      let correctRequestIssued = false;
+      requests.forEach(r => {
+        if (r.url.indexOf(`/_api/web/breakroleinheritance`) > -1 &&
+          r.headers['accept'] === 'application/json;odata=nometadata') {
+          correctRequestIssued = true;
+        }
+      });
+      try {
+        assert(correctRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('break role inheritance of subsite', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/breakroleinheritance') > -1) {
@@ -102,7 +164,8 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     command.action(logger, {
       options: {
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com',
+        confirm: true
       }
     }, (err: any) => {
       try {
@@ -121,14 +184,14 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
       if ((opts.url as string).indexOf('/_api/web/breakroleinheritance') > -1) {
         return Promise.reject(err);
       }
-
       return Promise.reject('Invalid request');
     });
 
     command.action(logger, {
       options: {
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com'
+        webUrl: 'https://contoso.sharepoint.com',
+        confirm: true
       }
     }, (error?: any) => {
       try {
