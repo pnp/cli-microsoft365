@@ -4,7 +4,7 @@ import { Cli, CommandInfo, Logger } from '../../cli';
 import { sinonUtil } from '../../utils';
 import AppCommand from './AppCommand';
 import sinon = require('sinon');
-import { CommandError } from '../../Command';
+import Command, { CommandError } from '../../Command';
 
 class MockCommand extends AppCommand {
   public get name(): string {
@@ -137,8 +137,15 @@ describe('AppCommand', () => {
     sinon.stub(Cli, 'prompt').callsFake(async () => (
       { appIdIndex: 1 }
     ));
-    await assert.rejects(cmd.action(logger, { options: {} }));
-    assert.strictEqual((cmd as any).appId, '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d');
+    sinon.stub(Command.prototype, 'action').callsFake(async () => Promise.resolve());
+
+    try {
+      await cmd.action(logger, { options: {} });
+      assert.strictEqual((cmd as any).appId, '9c79078b-815e-4a3e-bb80-2aaf2d9e9b3d');
+    }
+    finally {
+      sinonUtil.restore(Command.prototype.action);
+    }
   });
 
   it(`uses app specified in the appId command option`, async () => {
