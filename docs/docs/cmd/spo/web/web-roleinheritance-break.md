@@ -13,12 +13,25 @@ m365 spo web roleinheritance break [options]
 `-u, --webUrl <webUrl>`
 : URL of the site
 
+`-c, --clearExistingPermissions`
+: Flag if used clears all roles from the web
+
+## Remarks
+
+By default, when breaking permissions inheritance, the web will retain existing permissions. To remove existing permissions, use the `--clearExistingPermissions` option.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
 
-Break role inheritance of subsite _https://contoso.sharepoint.com/sites/project-x_
+Break role inheritance of subsite _https://contoso.sharepoint.com/sites/project-x_ --confirm
 
 ```sh
-m365 spo web roleinheritance break --webUrl https://contoso.sharepoint.com/sites/project-x
+m365 spo web roleinheritance break --webUrl https://contoso.sharepoint.com/sites/project-x  --confirm
+```
+
+Break inheritance of web in site _https://contoso.sharepoint.com/sites/project-x_ with clearing permissions --confirm
+
+```sh
+m365 spo web roleinheritance break --webUrl https://contoso.sharepoint.com/sites/project-x --clearExistingPermissions --confirm
 ```

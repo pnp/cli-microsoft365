@@ -12,6 +12,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   webUrl: string;
   confirm?: boolean;
+  clearExistingPermissions?: boolean;
 }
 
 class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
@@ -34,6 +35,7 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
   #initTelemetry(): void {
     this.telemetry.push((args: CommandArgs) => {
       Object.assign(this.telemetryProperties, {
+        clearExistingPermissions: args.options.clearExistingPermissions === true,
         confirm: (!(!args.options.confirm)).toString()
       });
     });
@@ -45,6 +47,9 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
         option: '-u, --webUrl <webUrl>'
       },
       {
+        option: '-c, --clearExistingPermissions'
+      },
+      {
         option: '--confirm'
       }
     );
@@ -52,7 +57,13 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
 
   #initValidators(): void {
     this.validators.push(
-      async (args: CommandArgs) => validation.isValidSharePointUrl(args.options.webUrl)
+      async (args: CommandArgs) => {
+        const isValidSharePointUrl: boolean | string = validation.isValidSharePointUrl(args.options.webUrl);
+        if (isValidSharePointUrl !== true) {
+          return isValidSharePointUrl;
+        }
+        return true;
+      }
     );
   }
 
@@ -60,9 +71,15 @@ class SpoWebRoleInheritanceBreakCommand extends SpoCommand {
     if (this.verbose) {
       logger.logToStderr(`Break role inheritance of subsite at ${args.options.webUrl}...`);
     }
+
+    let keepExistingPermissions: boolean = true;
+    if (args.options.clearExistingPermissions) {
+      keepExistingPermissions = !args.options.clearExistingPermissions;
+    }
+
     const breakroleInheritance = (): void => {
       const requestOptions: any = {
-        url: `${args.options.webUrl}/_api/web/breakroleinheritance`,
+        url: `${args.options.webUrl}/_api/web/breakroleinheritance(${keepExistingPermissions})`,
         method: 'POST',
         headers: {
           'accept': 'application/json;odata=nometadata',

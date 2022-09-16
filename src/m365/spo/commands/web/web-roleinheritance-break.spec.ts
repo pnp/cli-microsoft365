@@ -78,29 +78,27 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     assert(containsDebugOption);
   });
 
-  it('supports specifying URL', () => {
-    const options = command.options;
-    let containsTypeOption = false;
-    options.forEach(o => {
-      if (o.option.indexOf('<webUrl>') > -1) {
-        containsTypeOption = true;
-      }
-    });
-    assert(containsTypeOption);
-  });
-
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {
     const actual = await command.validate({ options: { webUrl: 'foo' } }, commandInfo);
     assert.notStrictEqual(actual, true);
   });
 
+  // it('passes validation if the url option is a valid SharePoint site URL', async () => {
+  //   const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+  //   assert.strictEqual(actual, true);
+  // });
+
   it('passes validation if the url option is a valid SharePoint site URL', async () => {
-    const actual = await command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } }, commandInfo);
+    const actual = await command.validate({
+      options: {
+        webUrl: "https://contoso.sharepoint.com"
+      }
+    }, commandInfo);
     assert.strictEqual(actual, true);
   });
 
   it('should prompt before deleting when confirmation argument not passed', (done) => {
-    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com' } }, () => {
+    command.action(logger, { options: { webUrl: "https://contoso.sharepoint.com" } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -120,7 +118,7 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
   it('Breack role inheritance successfully when prompt confirmed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf('/_api/web/breakroleinheritance') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/breakroleinheritance(true)') > -1) {
         return Promise.resolve(true);
       }
       return Promise.reject('Invalid request');
@@ -137,7 +135,7 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
-        if (r.url.indexOf(`/_api/web/breakroleinheritance`) > -1 &&
+        if (r.url.indexOf(`/_api/web/breakroleinheritance(true)`) > -1 &&
           r.headers['accept'] === 'application/json;odata=nometadata') {
           correctRequestIssued = true;
         }
@@ -154,7 +152,7 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
 
   it('break role inheritance of subsite', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/breakroleinheritance') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/breakroleinheritance(true)') > -1) {
         return Promise.resolve();
       }
 
@@ -178,10 +176,38 @@ describe(commands.WEB_ROLEINHERITANCE_BREAK, () => {
     });
   });
 
+
+  it('break role inheritance on web clear all permissions', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/web/breakroleinheritance(false)') > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        clearExistingPermissions: true,
+        confirm: true
+      }
+    }, (err: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('web role inheritance break command handles reject request correctly', (done) => {
     const err = 'request rejected';
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/breakroleinheritance') > -1) {
+      if ((opts.url as string).indexOf('/_api/web/breakroleinheritance(true)') > -1) {
         return Promise.reject(err);
       }
       return Promise.reject('Invalid request');

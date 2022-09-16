@@ -1,7 +1,7 @@
 {
   "name": "@pnp/cli-microsoft365",
   "version": "5.8.0",
-  "lockfileVersion": 1,
+  "lockfileVersion": 2,
   "requires": true,
   "dependencies": {
     "@azure/abort-controller": {
