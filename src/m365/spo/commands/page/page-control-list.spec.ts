@@ -67,7 +67,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'type', 'title']);
   });
 
-  it('lists controls on the modern page', (done) => {
+  it('lists controls on the modern page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {      
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
         return Promise.resolve(mockControlListData);
@@ -76,18 +76,11 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(mockControlListDataOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } });
+    assert(loggerLogSpy.calledWith(mockControlListDataOutput));
   });
 
-  it('lists controls on the modern page (debug)', (done) => {
+  it('lists controls on the modern page (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
         return Promise.resolve(mockControlListData);
@@ -96,18 +89,11 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(mockControlListDataOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } });
+    assert(loggerLogSpy.calledWith(mockControlListDataOutput));
   });
 
-  it('lists controls on the modern page when the specified page name doesn\'t contain extension', (done) => {
+  it('lists controls on the modern page when the specified page name doesn\'t contain extension', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
         return Promise.resolve(mockControlListData);
@@ -116,18 +102,11 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(mockControlListDataOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home' } });
+    assert(loggerLogSpy.calledWith(mockControlListDataOutput));
   });
 
-  it('handles empty columns and unknown control types', (done) => {
+  it('handles empty columns and unknown control types', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
         return Promise.resolve(mockControlListDataWithUnknownType);
@@ -136,18 +115,11 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(mockControlListDataWithUnknownTypeOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } });
+    assert(loggerLogSpy.calledWith(mockControlListDataWithUnknownTypeOutput));
   });
 
-  it('handles text web part correctly', (done) => {
+  it('handles text web part correctly', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
         return Promise.resolve(mockControlListDataWithText);
@@ -156,34 +128,20 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(mockControlListDataWithTextOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any);
+    assert(loggerLogSpy.calledWith(mockControlListDataWithTextOutput));
   });
 
-  it('correctly handles page when CanvasContent1 is not defined', (done) => {
+  it('correctly handles page when CanvasContent1 is not defined', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve({ CanvasContent1: null });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, () => {
-      try {
-        assert([]);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any);
+    assert([]);
   });
 
-  it('correctly handles page not found', (done) => {
+  it('correctly handles page not found', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: {
         "odata.error": {
@@ -196,31 +154,17 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       } });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any),
+      new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.'));
   });
 
-  it('correctly handles OData error when retrieving pages', (done) => {
+  it('correctly handles OData error when retrieving pages', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

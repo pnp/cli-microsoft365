@@ -115,7 +115,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('break role inheritance of list item with id 1 on list by title', (done) => {
+  it('break role inheritance of list item with id 1 on list by title', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/items(1)/breakroleinheritance(true)') > -1) {
         return Promise.resolve();
@@ -124,25 +124,17 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
         listItemId: 1
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('break role inheritance of list item with id 1 on list by title and clear all permissions', (done) => {
+  it('break role inheritance of list item with id 1 on list by title and clear all permissions', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/items(1)/breakroleinheritance(false)') > -1) {
         return Promise.resolve();
@@ -151,7 +143,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -159,18 +151,10 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         listItemId: 1,
         clearExistingPermissions: true
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('break role inheritance of list item with id 1 on list by id', (done) => {
+  it('break role inheritance of list item with id 1 on list by id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid\'202b8199-b9de-43fd-9737-7f213f51c991\')/items(1)/breakroleinheritance(true)') > -1) {
         return Promise.resolve();
@@ -179,25 +163,17 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 1,
         listId: '202b8199-b9de-43fd-9737-7f213f51c991'
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('break role inheritance of list item with id 1 on list by id and clear all permissions', (done) => {
+  it('break role inheritance of list item with id 1 on list by id and clear all permissions', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid\'202b8199-b9de-43fd-9737-7f213f51c991\')/items(1)/breakroleinheritance(false)') > -1) {
         return Promise.resolve();
@@ -206,7 +182,7 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -214,18 +190,10 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
         listItemId: 1,
         clearExistingPermissions: true
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('list item role inheritance break command handles reject request correctly', (done) => {
+  it('list item role inheritance break command handles reject request correctly', async () => {
     const err = 'request rejected';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/items(1)/breakroleinheritance(true)') > -1) {
@@ -235,21 +203,13 @@ describe(commands.LISTITEM_ROLEINHERITANCE_BREAK, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listItemId: 1,
         listTitle: 'test'
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 });

@@ -64,7 +64,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['objectId', 'resourceId', 'scope']);
   });
 
-  it('retrieves OAuth2 permission grants for the specified service principal (debug)', (done) => {
+  it('retrieves OAuth2 permission grants for the specified service principal (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants?$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
         return Promise.resolve({
@@ -89,31 +89,24 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
-          "consentType": "AllPrincipals",
-          "principalId": null,
-          "resourceId": "1c444f1a-bba3-42f2-999f-4106c5b1c20c",
-          "scope": "Group.ReadWrite.All"
-        },
-        {
-          "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
-          "consentType": "AllPrincipals",
-          "principalId": null,
-          "resourceId": "dcf25ef3-e2df-4a77-839d-6b7857a11c78",
-          "scope": "MyFiles.Read"
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } });
+    assert(loggerLogSpy.calledWith([{
+      "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
+      "consentType": "AllPrincipals",
+      "principalId": null,
+      "resourceId": "1c444f1a-bba3-42f2-999f-4106c5b1c20c",
+      "scope": "Group.ReadWrite.All"
+    },
+    {
+      "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
+      "consentType": "AllPrincipals",
+      "principalId": null,
+      "resourceId": "dcf25ef3-e2df-4a77-839d-6b7857a11c78",
+      "scope": "MyFiles.Read"
+    }]));
   });
 
-  it('retrieves OAuth2 permission grants for the specified service principal', (done) => {
+  it('retrieves OAuth2 permission grants for the specified service principal', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants?$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
         return Promise.resolve({
@@ -143,37 +136,30 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
-          "consentType": "AllPrincipals",
-          "expiryTime": "9999-12-31T23:59:59.9999999",
-          "objectId": "50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw",
-          "principalId": null,
-          "resourceId": "1c444f1a-bba3-42f2-999f-4106c5b1c20c",
-          "scope": "Group.ReadWrite.All",
-          "startTime": "0001-01-01T00:00:00"
-        },
-        {
-          "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
-          "consentType": "AllPrincipals",
-          "expiryTime": "9999-12-31T23:59:59.9999999",
-          "objectId": "50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg",
-          "principalId": null,
-          "resourceId": "dcf25ef3-e2df-4a77-839d-6b7857a11c78",
-          "scope": "MyFiles.Read",
-          "startTime": "0001-01-01T00:00:00"
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } });
+    assert(loggerLogSpy.calledWith([{
+      "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
+      "consentType": "AllPrincipals",
+      "expiryTime": "9999-12-31T23:59:59.9999999",
+      "objectId": "50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw",
+      "principalId": null,
+      "resourceId": "1c444f1a-bba3-42f2-999f-4106c5b1c20c",
+      "scope": "Group.ReadWrite.All",
+      "startTime": "0001-01-01T00:00:00"
+    },
+    {
+      "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
+      "consentType": "AllPrincipals",
+      "expiryTime": "9999-12-31T23:59:59.9999999",
+      "objectId": "50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg",
+      "principalId": null,
+      "resourceId": "dcf25ef3-e2df-4a77-839d-6b7857a11c78",
+      "scope": "MyFiles.Read",
+      "startTime": "0001-01-01T00:00:00"
+    }]));
   });
 
-  it('outputs all properties when output is JSON', (done) => {
+  it('outputs all properties when output is JSON', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants?$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
         return Promise.resolve({
@@ -203,65 +189,45 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68', output: 'json' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{
-          "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
-          "consentType": "AllPrincipals",
-          "expiryTime": "9999-12-31T23:59:59.9999999",
-          "objectId": "50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw",
-          "principalId": null,
-          "resourceId": "1c444f1a-bba3-42f2-999f-4106c5b1c20c",
-          "scope": "Group.ReadWrite.All",
-          "startTime": "0001-01-01T00:00:00"
-        },
-        {
-          "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
-          "consentType": "AllPrincipals",
-          "expiryTime": "9999-12-31T23:59:59.9999999",
-          "objectId": "50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg",
-          "principalId": null,
-          "resourceId": "dcf25ef3-e2df-4a77-839d-6b7857a11c78",
-          "scope": "MyFiles.Read",
-          "startTime": "0001-01-01T00:00:00"
-        }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68', output: 'json' } });
+    assert(loggerLogSpy.calledWith([{
+      "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
+      "consentType": "AllPrincipals",
+      "expiryTime": "9999-12-31T23:59:59.9999999",
+      "objectId": "50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw",
+      "principalId": null,
+      "resourceId": "1c444f1a-bba3-42f2-999f-4106c5b1c20c",
+      "scope": "Group.ReadWrite.All",
+      "startTime": "0001-01-01T00:00:00"
+    },
+    {
+      "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
+      "consentType": "AllPrincipals",
+      "expiryTime": "9999-12-31T23:59:59.9999999",
+      "objectId": "50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg",
+      "principalId": null,
+      "resourceId": "dcf25ef3-e2df-4a77-839d-6b7857a11c78",
+      "scope": "MyFiles.Read",
+      "startTime": "0001-01-01T00:00:00"
+    }]));
   });
 
-  it('correctly handles no OAuth2 permission grants for the specified service principal found', (done) => {
+  it('correctly handles no OAuth2 permission grants for the specified service principal found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants?$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
-        if (opts.headers &&
-          opts.headers.authorization &&
-          (opts.headers.authorization as string).indexOf('Bearer ') === 0 &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({
-            value: []
-          });
-        }
+        return Promise.resolve({
+          value: []
+        });
       }
 
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
@@ -275,15 +241,8 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, spObjectId: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, spObjectId: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+      new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
   it('fails validation if the spObjectId is not a valid GUID', async () => {

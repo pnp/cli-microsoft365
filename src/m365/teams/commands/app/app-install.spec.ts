@@ -162,7 +162,7 @@ describe(commands.APP_INSTALL, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('adds app from the catalog to a Microsoft Team', (done) => {
+  it('adds app from the catalog to a Microsoft Team', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/c527a470-a882-481c-981c-ee6efaba85c7/installedApps` &&
         JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
@@ -172,23 +172,16 @@ describe(commands.APP_INSTALL, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         appId: '4440558e-8c73-4597-abc7-3644a64c4bce'
       }
-    }, (err) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(log.length, 0);
   });
 
-  it('installs app from the catalog the user specified with userId', (done) => {
+  it('installs app from the catalog the user specified with userId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq 'c527a470-a882-481c-981c-ee6efaba85c7'`) {
         return Promise.resolve({
@@ -223,23 +216,16 @@ describe(commands.APP_INSTALL, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         appId: '4440558e-8c73-4597-abc7-3644a64c4bce'
       }
-    }, (err) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(log.length, 0);
   });
 
-  it('installs app from the catalog the user specified with userId (debug)', (done) => {
+  it('installs app from the catalog the user specified with userId (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq 'c527a470-a882-481c-981c-ee6efaba85c7'`) {
         return Promise.resolve({
@@ -274,24 +260,16 @@ describe(commands.APP_INSTALL, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         appId: '4440558e-8c73-4597-abc7-3644a64c4bce',
         debug: true
       }
-    }, (err) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('installs app from the catalog the user specified with userName', (done) => {
+  it('installs app from the catalog the user specified with userName', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/steve%40contoso.com/teamwork/installedApps` &&
         JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
@@ -301,44 +279,26 @@ describe(commands.APP_INSTALL, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         userName: 'steve@contoso.com',
         appId: '4440558e-8c73-4597-abc7-3644a64c4bce'
       }
-    }, (err) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(log.length, 0);
   });
 
-  it('correctly handles error while installing Teams app', (done) => {
+  it('correctly handles error while installing Teams app', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        appId: '4440558e-8c73-4597-abc7-3644a64c4bce'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { 
+      teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+      appId: '4440558e-8c73-4597-abc7-3644a64c4bce' } } as any), new CommandError('An error has occurred'));
   });
 
-  it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user name)`, (done) => {
+  it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user name)`, async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -353,23 +313,10 @@ describe(commands.APP_INSTALL, () => {
       });
     });
 
-    command.action(logger, {
-      options: {
-        userName: 'steve@contoso.com',
-        appId: '4440558e-8c73-4597-abc7-3644a64c4bce'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Failed to find user with id 'steve@contoso.com' in the tenant")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { userName: 'steve@contoso.com', appId: '4440558e-8c73-4597-abc7-3644a64c4bce' } } as any), new CommandError("Failed to find user with id 'steve@contoso.com' in the tenant"));
   });
 
-  it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user ID)`, (done) => {
+  it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user ID)`, async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq 'c527a470-a882-481c-981c-ee6efaba85c7'`) {
         return Promise.reject({
@@ -388,24 +335,13 @@ describe(commands.APP_INSTALL, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'post').callsFake(() => Promise.reject('Invalid request'));
-
-    command.action(logger, {
-      options: {
-        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        appId: '4440558e-8c73-4597-abc7-3644a64c4bce'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("User with ID c527a470-a882-481c-981c-ee6efaba85c7 not found. Original error: Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    
+    await assert.rejects(command.action(logger, { options: { 
+      userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+      appId: '4440558e-8c73-4597-abc7-3644a64c4bce' } } as any), new CommandError("User with ID c527a470-a882-481c-981c-ee6efaba85c7 not found. Original error: Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present."));
   });
 
-  it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user ID; debug)`, (done) => {
+  it(`correctly handles error when trying to install an app for a user that doesn't exist (invalid user ID; debug)`, async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=id eq 'c527a470-a882-481c-981c-ee6efaba85c7'`) {
         return Promise.reject({
@@ -424,22 +360,11 @@ describe(commands.APP_INSTALL, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'post').callsFake(() => Promise.reject('Invalid request'));
-
-    command.action(logger, {
-      options: {
-        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        appId: '4440558e-8c73-4597-abc7-3644a64c4bce',
-        debug: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("User with ID c527a470-a882-481c-981c-ee6efaba85c7 not found. Original error: Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    
+    await assert.rejects(command.action(logger, { options: { 
+      userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+      appId: '4440558e-8c73-4597-abc7-3644a64c4bce',
+      debug: true } } as any), new CommandError("User with ID c527a470-a882-481c-981c-ee6efaba85c7 not found. Original error: Resource 'c527a470-a882-481c-981c-ee6efaba85c7' does not exist or one of its queried reference-property objects are not present."));
   });
 
   it('supports debug mode', () => {

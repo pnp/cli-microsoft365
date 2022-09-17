@@ -59,10 +59,10 @@ export default abstract class DateAndPeriodBasedReport extends PeriodBasedReport
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const periodParameter: string = args.options.period ? `${this.usageEndpoint}(period='${encodeURIComponent(args.options.period)}')` : '';
     const dateParameter: string = args.options.date ? `${this.usageEndpoint}(date=${encodeURIComponent(args.options.date)})` : '';
     const endpoint: string = `${this.resource}/v1.0/reports/${(args.options.period ? periodParameter : dateParameter)}`;
-    this.executeReport(endpoint, logger, args.options.output, cb);
+    await this.executeReport(endpoint, logger, args.options.output);
   }
 }

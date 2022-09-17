@@ -45,27 +45,28 @@ class PaConnectorListCommand extends PowerAppsCommand {
     );
   }
   
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const url = `${this.resource}/providers/Microsoft.PowerApps/apis?api-version=2016-11-01&$filter=environment%20eq%20%27${encodeURIComponent(args.options.environment)}%27%20and%20IsCustomApi%20eq%20%27True%27`;
 
-    odata
-      .getAllItems<Connector>(url)
-      .then((connectors: Connector[]): void => {
-        if (connectors.length > 0) {
-          connectors.forEach(c => {
-            c.displayName = c.properties.displayName;
-          });
+    try {
+      const connectors = await odata.getAllItems<Connector>(url);
 
-          logger.log(connectors);
-        }
-        else {
-          if (this.verbose) {
-            logger.logToStderr('No custom connectors found');
-          }
-        }
+      if (connectors.length > 0) {
+        connectors.forEach(c => {
+          c.displayName = c.properties.displayName;
+        });
 
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        logger.log(connectors);
+      }
+      else {
+        if (this.verbose) {
+          logger.logToStderr('No custom connectors found');
+        }
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

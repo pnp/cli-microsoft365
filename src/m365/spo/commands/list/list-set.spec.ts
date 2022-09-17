@@ -58,7 +58,7 @@ describe(commands.LIST_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('sets specified title for list', (done) => {
+  it('sets specified title for list', async () => {
     const expected = 'List 1';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -70,18 +70,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', title: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', title: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified description for list', (done) => {
+  it('sets specified description for list', async () => {
     const expected = 'List 1 description';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -93,18 +86,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', description: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', description: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified templateFeatureId for list', (done) => {
+  it('sets specified templateFeatureId for list', async () => {
     const expected = '00bfea71-de22-43b2-a848-c05709900100';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -116,18 +102,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', templateFeatureId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', templateFeatureId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified schemaXml for list', (done) => {
+  it('sets specified schemaXml for list', async () => {
     const expected = `<List Title=\'List 1' ID='BE9CE88C-EF3A-4A61-9A8E-F8C038442227'></List>`;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -139,18 +118,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', schemaXml: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', schemaXml: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified allowDeletion for list', (done) => {
+  it('sets specified allowDeletion for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -162,18 +134,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowDeletion: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowDeletion: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified allowEveryoneViewItems for list', (done) => {
+  it('sets specified allowEveryoneViewItems for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -185,18 +150,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowEveryoneViewItems: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowEveryoneViewItems: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified allowMultiResponses for list', (done) => {
+  it('sets specified allowMultiResponses for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -208,18 +166,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowMultiResponses: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowMultiResponses: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified contentTypesEnabled for list', (done) => {
+  it('sets specified contentTypesEnabled for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -231,18 +182,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', contentTypesEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', contentTypesEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified crawlNonDefaultViews for list', (done) => {
+  it('sets specified crawlNonDefaultViews for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -254,18 +198,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', crawlNonDefaultViews: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', crawlNonDefaultViews: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified defaultContentApprovalWorkflowId for list', (done) => {
+  it('sets specified defaultContentApprovalWorkflowId for list', async () => {
     const expected = '00bfea71-de22-43b2-a848-c05709900100';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -277,18 +214,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultContentApprovalWorkflowId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultContentApprovalWorkflowId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified defaultDisplayFormUrl for list', (done) => {
+  it('sets specified defaultDisplayFormUrl for list', async () => {
     const expected = '/sites/project-x/List%201/view.aspx';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -300,18 +230,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultDisplayFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultDisplayFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified defaultEditFormUrl for list', (done) => {
+  it('sets specified defaultEditFormUrl for list', async () => {
     const expected = '/sites/project-x/List%201/edit.aspx';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -323,18 +246,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultEditFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultEditFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified direction for list', (done) => {
+  it('sets specified direction for list', async () => {
     const expected = 'LTR';
     let actual = '';
 
@@ -347,18 +263,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', direction: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', direction: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified disableGridEditing for list', (done) => {
+  it('sets specified disableGridEditing for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -370,18 +279,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', disableGridEditing: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', disableGridEditing: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified draftVersionVisibility for list', (done) => {
+  it('sets specified draftVersionVisibility for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -393,18 +295,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', draftVersionVisibility: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', draftVersionVisibility: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified emailAlias for list', (done) => {
+  it('sets specified emailAlias for list', async () => {
     const expected = 'yourname@contoso.onmicrosoft.com';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -416,18 +311,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', emailAlias: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', emailAlias: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableAssignToEmail for list', (done) => {
+  it('sets specified enableAssignToEmail for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -439,18 +327,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAssignToEmail: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAssignToEmail: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableAttachments for list', (done) => {
+  it('sets specified enableAttachments for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -462,18 +343,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAttachments: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAttachments: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableDeployWithDependentList for list', (done) => {
+  it('sets specified enableDeployWithDependentList for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -485,18 +359,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableDeployWithDependentList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableDeployWithDependentList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableFolderCreation for list', (done) => {
+  it('sets specified enableFolderCreation for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -508,18 +375,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableFolderCreation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableFolderCreation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableMinorVersions for list', (done) => {
+  it('sets specified enableMinorVersions for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -531,18 +391,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableMinorVersions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableMinorVersions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableModeration for list', (done) => {
+  it('sets specified enableModeration for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -554,18 +407,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableModeration: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableModeration: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enablePeopleSelector for list', (done) => {
+  it('sets specified enablePeopleSelector for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -577,18 +423,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enablePeopleSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enablePeopleSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableResourceSelector for list', (done) => {
+  it('sets specified enableResourceSelector for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -600,18 +439,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableResourceSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableResourceSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableSchemaCaching for list', (done) => {
+  it('sets specified enableSchemaCaching for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -623,18 +455,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSchemaCaching: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSchemaCaching: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableSyndication for list', (done) => {
+  it('sets specified enableSyndication for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -646,18 +471,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSyndication: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSyndication: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableThrottling for list', (done) => {
+  it('sets specified enableThrottling for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -669,18 +487,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableThrottling: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableThrottling: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enableVersioning for list', (done) => {
+  it('sets specified enableVersioning for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -692,18 +503,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableVersioning: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableVersioning: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified enforceDataValidation for list', (done) => {
+  it('sets specified enforceDataValidation for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -715,18 +519,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enforceDataValidation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enforceDataValidation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified excludeFromOfflineClient for list', (done) => {
+  it('sets specified excludeFromOfflineClient for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -738,18 +535,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', excludeFromOfflineClient: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', excludeFromOfflineClient: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified fetchPropertyBagForListView for list', (done) => {
+  it('sets specified fetchPropertyBagForListView for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -761,18 +551,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', fetchPropertyBagForListView: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', fetchPropertyBagForListView: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified followable for list', (done) => {
+  it('sets specified followable for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -784,18 +567,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', followable: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', followable: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified forceCheckout for list', (done) => {
+  it('sets specified forceCheckout for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -807,18 +583,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceCheckout: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceCheckout: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified forceDefaultContentType for list', (done) => {
+  it('sets specified forceDefaultContentType for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -830,18 +599,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceDefaultContentType: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceDefaultContentType: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified hidden for list', (done) => {
+  it('sets specified hidden for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -853,18 +615,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', hidden: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', hidden: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified includedInMyFilesScope for list', (done) => {
+  it('sets specified includedInMyFilesScope for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -876,18 +631,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified irmEnabled for list', (done) => {
+  it('sets specified irmEnabled for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -899,18 +647,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified irmExpire for list', (done) => {
+  it('sets specified irmExpire for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -922,18 +663,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmExpire: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmExpire: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified irmReject for list', (done) => {
+  it('sets specified irmReject for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -945,18 +679,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmReject: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmReject: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified isApplicationList for list', (done) => {
+  it('sets specified isApplicationList for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -968,18 +695,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', isApplicationList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', isApplicationList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified listExperienceOptions for list', (done) => {
+  it('sets specified listExperienceOptions for list', async () => {
     const expected = 'NewExperience';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -991,18 +711,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', listExperienceOptions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', listExperienceOptions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified majorVersionLimit for list', (done) => {
+  it('sets specified majorVersionLimit for list', async () => {
     const expected = 34;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1014,18 +727,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorVersionLimit: expected, enableVersioning: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorVersionLimit: expected, enableVersioning: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified majorWithMinorVersionsLimit for list', (done) => {
+  it('sets specified majorWithMinorVersionsLimit for list', async () => {
     const expected = 20;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1037,18 +743,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorWithMinorVersionsLimit: expected, enableMinorVersions: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorWithMinorVersionsLimit: expected, enableMinorVersions: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified multipleDataList for list', (done) => {
+  it('sets specified multipleDataList for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1060,18 +759,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', multipleDataList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', multipleDataList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified navigateForFormsPages for list', (done) => {
+  it('sets specified navigateForFormsPages for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1083,18 +775,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', navigateForFormsPages: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', navigateForFormsPages: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified needUpdateSiteClientTag for list', (done) => {
+  it('sets specified needUpdateSiteClientTag for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1106,18 +791,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', needUpdateSiteClientTag: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', needUpdateSiteClientTag: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified noCrawl for list', (done) => {
+  it('sets specified noCrawl for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1129,18 +807,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', noCrawl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', noCrawl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified onQuickLaunch for list', (done) => {
+  it('sets specified onQuickLaunch for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1152,18 +823,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', onQuickLaunch: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', onQuickLaunch: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified ordered for list', (done) => {
+  it('sets specified ordered for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1175,18 +839,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', ordered: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', ordered: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified parserDisabled for list', (done) => {
+  it('sets specified parserDisabled for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1198,18 +855,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', parserDisabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', parserDisabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified readOnlyUI for list', (done) => {
+  it('sets specified readOnlyUI for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1221,18 +871,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readOnlyUI: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readOnlyUI: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified readSecurity for list', (done) => {
+  it('sets specified readSecurity for list', async () => {
     const expected = 2;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1244,18 +887,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified requestAccessEnabled for list', (done) => {
+  it('sets specified requestAccessEnabled for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1267,18 +903,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', requestAccessEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', requestAccessEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified restrictUserUpdates for list', (done) => {
+  it('sets specified restrictUserUpdates for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1290,18 +919,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', restrictUserUpdates: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', restrictUserUpdates: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified sendToLocationName for list', (done) => {
+  it('sets specified sendToLocationName for list', async () => {
     const expected = 'SendToLocation';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1313,18 +935,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', sendToLocationName: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', sendToLocationName: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified sendToLocationUrl for list', (done) => {
+  it('sets specified sendToLocationUrl for list', async () => {
     const expected = '/sites/project-x/SendToLocation.aspx';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1336,18 +951,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', sendToLocationUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', sendToLocationUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified showUser for list', (done) => {
+  it('sets specified showUser for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1359,18 +967,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', showUser: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', showUser: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified useFormsForDisplay for list', (done) => {
+  it('sets specified useFormsForDisplay for list', async () => {
     const expected = true;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1382,18 +983,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', useFormsForDisplay: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', useFormsForDisplay: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified validationFormula for list', (done) => {
+  it('sets specified validationFormula for list', async () => {
     const expected = `IF(fieldName=true);'truetest':'falsetest'`;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1405,18 +999,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', validationFormula: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', validationFormula: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified validationMessage for list', (done) => {
+  it('sets specified validationMessage for list', async () => {
     const expected = 'Error on field x';
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1428,18 +1015,11 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', validationMessage: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', validationMessage: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sets specified writeSecurity for list', (done) => {
+  it('sets specified writeSecurity for list', async () => {
     const expected = 4;
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -1451,31 +1031,16 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', writeSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', writeSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

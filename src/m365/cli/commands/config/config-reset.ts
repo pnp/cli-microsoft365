@@ -62,15 +62,13 @@ class CliConfigResetCommand extends AnonymousCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.key) {
       Cli.getInstance().config.delete(args.options.key);
     }
     else {
       Cli.getInstance().config.clear();
     }
-
-    cb();
   }
 }
 

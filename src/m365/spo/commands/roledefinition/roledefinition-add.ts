@@ -92,7 +92,7 @@ class SpoRoleDefinitionAddCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Adding role definition to ${args.options.webUrl}...`);
     }
@@ -126,9 +126,12 @@ class SpoRoleDefinitionAddCommand extends SpoCommand {
       }
     };
 
-    request
-      .post(requestOptions)
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

@@ -271,60 +271,39 @@ describe(commands.BUCKET_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('correctly lists planner buckets with planId', (done) => {
+  it('correctly lists planner buckets with planId', async () => {
     const options: any = {
       debug: false,
       planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(bucketListResponseValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(bucketListResponseValue));
   });
 
-  it('correctly lists planner buckets with planTitle and ownerGroupName', (done) => {
+  it('correctly lists planner buckets with planTitle and ownerGroupName', async () => {
     const options: any = {
       debug: false,
       planTitle: 'My Planner Plan',
       ownerGroupName: 'My Planner Group'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(bucketListResponseValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(bucketListResponseValue));
   });
 
-  it('correctly lists planner buckets with planTitle and ownerGroupId', (done) => {
+  it('correctly lists planner buckets with planTitle and ownerGroupId', async () => {
     const options: any = {
       debug: false,
       planTitle: 'My Planner Plan',
       ownerGroupId: '0d0402ee-970f-4951-90b5-2f24519d2e40'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(bucketListResponseValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(bucketListResponseValue));
   });
 
-  it('correctly lists planner buckets with deprecated planName and ownerGroupId', (done) => {
+  it('correctly lists planner buckets with deprecated planName and ownerGroupId', async () => {
     const options: any = {
       debug: false,
       planName: 'My Planner Plan',
@@ -332,19 +311,12 @@ describe(commands.BUCKET_LIST, () => {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(bucketListResponseValue));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(bucketListResponseValue));
   });
 
 
-  it('fails validation when ownerGroupName not found', (done) => {
+  it('fails validation when ownerGroupName not found', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
@@ -353,57 +325,33 @@ describe(commands.BUCKET_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         planTitle: 'My Planner Plan',
         ownerGroupName: 'foo'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified group 'foo' does not exist.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`The specified group 'foo' does not exist.`));
   });
 
-  it('fails validation when using app only access token', (done) => {
+  it('fails validation when using app only access token', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         planId: 'iVPMIgdku0uFlou-KLNg6MkAE1O2'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('This command does not support application permissions.'));
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject("An error has occurred.");
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError("An error has occurred."));
   });
 
   it('supports debug mode', () => {

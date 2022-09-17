@@ -1,7 +1,4 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandError
-} from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -26,9 +23,6 @@ interface Options extends GlobalOptions {
 }
 
 class SpoWebAddCommand extends SpoCommand {
-  // used to early break promises chain
-  private static DONE: string = 'DONE';
-
   public get name(): string {
     return commands.WEB_ADD;
   }
@@ -109,53 +103,46 @@ class SpoWebAddCommand extends SpoCommand {
     return ['webUrl'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let siteInfo: any = null;
     let subsiteFullUrl: string = '';
 
-    spo
-      .getRequestDigest(args.options.parentWebUrl)
-      .then((res: ContextInfo): Promise<any> => {
-        const requestOptions: any = {
-          url: `${args.options.parentWebUrl}/_api/web/webinfos/add`,
-          headers: {
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata',
-            'X-RequestDigest': res.FormDigestValue
-          },
-          responseType: 'json',
-          data: {
-            parameters: {
-              Url: args.options.webUrl,
-              Title: args.options.title,
-              Description: args.options.description,
-              Language: args.options.locale,
-              WebTemplate: args.options.webTemplate,
-              UseUniquePermissions: args.options.breakInheritance
-            }
+    try {
+      const res: ContextInfo = await spo.getRequestDigest(args.options.parentWebUrl);
+      const requestOptionsPost: any = {
+        url: `${args.options.parentWebUrl}/_api/web/webinfos/add`,
+        headers: {
+          'content-type': 'application/json;odata=nometadata',
+          accept: 'application/json;odata=nometadata',
+          'X-RequestDigest': res.FormDigestValue
+        },
+        responseType: 'json',
+        data: {
+          parameters: {
+            Url: args.options.webUrl,
+            Title: args.options.title,
+            Description: args.options.description,
+            Language: args.options.locale,
+            WebTemplate: args.options.webTemplate,
+            UseUniquePermissions: args.options.breakInheritance
           }
-        };
-
-        if (this.verbose) {
-          logger.logToStderr(`Creating subsite ${args.options.parentWebUrl}/${args.options.webUrl}...`);
         }
+      };
 
-        return request.post(requestOptions);
-      })
-      .then((res: any): Promise<any> => {
-        siteInfo = res;
+      if (this.verbose) {
+        logger.logToStderr(`Creating subsite ${args.options.parentWebUrl}/${args.options.webUrl}...`);
+      }
 
-        if (!args.options.inheritNavigation) {
-          return Promise.reject(SpoWebAddCommand.DONE);
-        }
+      siteInfo = await request.post(requestOptionsPost);
 
+      if (args.options.inheritNavigation) {
         if (this.verbose) {
           logger.logToStderr("Setting inheriting navigation from the parent site...");
         }
 
         subsiteFullUrl = `${args.options.parentWebUrl}/${encodeURIComponent(args.options.webUrl)}`;
 
-        const requestOptions: any = {
+        const requestOptionsPer: any = {
           url: `${subsiteFullUrl}/_api/web/effectivebasepermissions`,
           headers: {
             accept: 'application/json;odata=nometadata'
@@ -163,69 +150,47 @@ class SpoWebAddCommand extends SpoCommand {
           responseType: 'json'
         };
 
-        return request.get(requestOptions);
-      })
-      .then((res: any): Promise<ContextInfo> => {
+        const effectivebasepermissions: any = await request.get(requestOptionsPer);
         const permissions: BasePermissions = new BasePermissions();
-        permissions.high = res.High as number;
-        permissions.low = res.Low as number;
+        permissions.high = effectivebasepermissions.High as number;
+        permissions.low = effectivebasepermissions.Low as number;
 
         /// Detects if the site in question has no script enabled or not. 
         /// Detection is done by verifying if the AddAndCustomizePages permission is missing.
         /// 
         /// See https://support.office.com/en-us/article/Turn-scripting-capabilities-on-or-off-1f2c515f-5d7e-448a-9fd7-835da935584f
         /// for the effects of NoScript
-        if (!permissions.has(PermissionKind.AddAndCustomizePages)) {
+        if (permissions.has(PermissionKind.AddAndCustomizePages)) {
+          const digest: ContextInfo = await spo.getRequestDigest(subsiteFullUrl);
+  
+          const requestOptionsQuery: any = {
+            url: `${subsiteFullUrl}/_vti_bin/client.svc/ProcessQuery`,
+            headers: {
+              'X-RequestDigest': digest.FormDigestValue
+            },
+            data: `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="1" ObjectPathId="0" /><ObjectPath Id="3" ObjectPathId="2" /><ObjectPath Id="5" ObjectPathId="4" /><SetProperty Id="6" ObjectPathId="4" Name="UseShared"><Parameter Type="Boolean">true</Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="2" ParentId="0" Name="Web" /><Property Id="4" ParentId="2" Name="Navigation" /></ObjectPaths></Request>`
+          };
+  
+          const query: string = await request.post(requestOptionsQuery);
+  
+          const json: ClientSvcResponse = JSON.parse(query);
+          const response: ClientSvcResponseContents = json[0];
+        
+          if (response.ErrorInfo) {
+            throw response.ErrorInfo.ErrorMessage;
+          }
+        }
+        else {
           if (this.verbose) {
             logger.logToStderr("No script is enabled. Skipping the InheritParentNavigation settings.");
           }
-
-          return Promise.reject(SpoWebAddCommand.DONE);
         }
-
-        return spo.getRequestDigest(subsiteFullUrl);
-      })
-      .then((res: ContextInfo): Promise<string> => {
-        const requestOptions: any = {
-          url: `${subsiteFullUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'X-RequestDigest': res.FormDigestValue
-          },
-          data: `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="1" ObjectPathId="0" /><ObjectPath Id="3" ObjectPathId="2" /><ObjectPath Id="5" ObjectPathId="4" /><SetProperty Id="6" ObjectPathId="4" Name="UseShared"><Parameter Type="Boolean">true</Parameter></SetProperty></Actions><ObjectPaths><StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /><Property Id="2" ParentId="0" Name="Web" /><Property Id="4" ParentId="2" Name="Navigation" /></ObjectPaths></Request>`
-        };
-
-        return request.post(requestOptions);
-      })
-      .then((res: string): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          cb(new CommandError(response.ErrorInfo.ErrorMessage));
-          return;
-        }
-        else {
-          logger.log(siteInfo);
-        }
-
-        cb();
-      }, (err: any): void => {
-        if (err === SpoWebAddCommand.DONE) {
-          logger.log(siteInfo);
-
-
-          cb();
-          return;
-        }
-
-        if (err.error &&
-          err.error['odata.error'] &&
-          err.error['odata.error'].message) {
-          cb(new CommandError(err.error['odata.error'].message.value));
-        }
-        else {
-          this.handleRejectedPromise(err, logger, cb);
-        }
-      });
+      }
+      logger.log(siteInfo);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

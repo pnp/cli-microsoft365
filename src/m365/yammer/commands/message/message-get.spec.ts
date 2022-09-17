@@ -77,25 +77,20 @@ describe(commands.MESSAGE_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('calls the messaging endpoint with the right parameters', function (done) {
+  it('calls the messaging endpoint with the right parameters', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123123.json') {
         return Promise.resolve(firstMessage);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { id:10123190123123, debug: true } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 10123190123123);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { id:10123190123123, debug: true } } as any );
+
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 10123190123123);
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -104,33 +99,20 @@ describe(commands.MESSAGE_GET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
   });
 
-  it('calls the messaging endpoint with id and json and json', function (done) {
+  it('calls the messaging endpoint with id and json and json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123124.json') {
         return Promise.resolve(secondMessage);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, id:10123190123124, output: "json" } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 10123190123124);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await command.action(logger, { options: { debug: true, id:10123190123124, output: "json" } } as any);
+    
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 10123190123124);
   });
 
   it('passes validation with parameters', async () => {

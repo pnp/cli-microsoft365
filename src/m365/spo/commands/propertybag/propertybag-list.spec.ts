@@ -139,7 +139,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('should call getWebPropertyBag when folder is not specified', (done) => {
+  it('should call getWebPropertyBag when folder is not specified', async () => {
     stubAllPostRequests();
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
     const options = {
@@ -151,19 +151,12 @@ describe(commands.PROPERTYBAG_LIST, () => {
       serverRelativeUrl: "\u002fsites\u002fabc"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(getWebPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', logger));
-        assert(getWebPropertyBagSpy.calledOnce === true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(getWebPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', logger));
+    assert(getWebPropertyBagSpy.calledOnce === true);
   });
 
-  it('should call getFolderPropertyBag when folder is specified', (done) => {
+  it('should call getFolderPropertyBag when folder is specified', async () => {
     stubAllPostRequests();
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
     const options = {
@@ -176,19 +169,12 @@ describe(commands.PROPERTYBAG_LIST, () => {
       serverRelativeUrl: "\u002fsites\u002fabc"
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(getFolderPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', '/', logger));
-        assert(getFolderPropertyBagSpy.calledOnce === true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(getFolderPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', '/', logger));
+    assert(getFolderPropertyBagSpy.calledOnce === true);
   });
 
-  it('should correctly handle getFolderPropertyBag reject promise', (done) => {
+  it('should correctly handle getFolderPropertyBag reject promise', async () => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return reject('abc'); }));
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
     const options = {
@@ -196,19 +182,12 @@ describe(commands.PROPERTYBAG_LIST, () => {
       folder: '/'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert(getFolderPropertyBagSpy.calledOnce === true);
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('abc'));
+    assert(getFolderPropertyBagSpy.calledOnce === true);
   });
 
-  it('should correctly handle getWebPropertyBag reject promise', (done) => {
+  it('should correctly handle getWebPropertyBag reject promise', async () => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('abc1'); }));
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
     const options = {
@@ -216,19 +195,12 @@ describe(commands.PROPERTYBAG_LIST, () => {
       debug: false
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert(getWebPropertyBagSpy.calledOnce === true);
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc1')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('abc1'));
+    assert(getWebPropertyBagSpy.calledOnce === true);
   });
 
-  it('should correctly handle getFolderPropertyBag ClientSvc error response', (done) => {
+  it('should correctly handle getFolderPropertyBag ClientSvc error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "getFolderPropertyBag error" } }]);
     stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
@@ -238,19 +210,12 @@ describe(commands.PROPERTYBAG_LIST, () => {
       verbose: true
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert(getFolderPropertyBagSpy.calledOnce === true);
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getFolderPropertyBag error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('getFolderPropertyBag error'));
+    assert(getFolderPropertyBagSpy.calledOnce === true);
   });
 
-  it('should correctly handle getWebPropertyBag ClientSvc error response', (done) => {
+  it('should correctly handle getWebPropertyBag ClientSvc error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "getWebPropertyBag error" } }]);
     stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
@@ -258,19 +223,12 @@ describe(commands.PROPERTYBAG_LIST, () => {
       webUrl: 'https://contoso.sharepoint.com'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert(getWebPropertyBagSpy.calledOnce === true);
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getWebPropertyBag error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('getWebPropertyBag error'));
+    assert(getWebPropertyBagSpy.calledOnce === true);
   });
 
-  it('should correctly handle requestObjectIdentity error response', (done) => {
+  it('should correctly handle requestObjectIdentity error response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity error" } }]);
 
     stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }), null, null);
@@ -279,19 +237,12 @@ describe(commands.PROPERTYBAG_LIST, () => {
       webUrl: 'https://contoso.sharepoint.com'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert(requestObjectIdentitySpy.calledOnce === true);
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('requestObjectIdentity error'));
+    assert(requestObjectIdentitySpy.calledOnce === true);
   });
 
-  it('should correctly handle requestObjectIdentity ErrorMessage null response', (done) => {
+  it('should correctly handle requestObjectIdentity ErrorMessage null response', async () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": undefined } }]);
 
     stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }), null, null);
@@ -300,19 +251,12 @@ describe(commands.PROPERTYBAG_LIST, () => {
       webUrl: 'https://contoso.sharepoint.com'
     };
 
-    command.action(logger, { options: options } as any, (err?: any) => {
-      try {
-        assert(requestObjectIdentitySpy.calledOnce === true);
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any),
+      new CommandError('ClientSvc unknown error'));
+    assert(requestObjectIdentitySpy.calledOnce === true);
   });
 
-  it('should correctly format response output (text)', (done) => {
+  it('should correctly format response output (text)', async () => {
     stubAllPostRequests();
     const formatOutputSpy = sinon.spy((command as any), 'formatOutput');
     const options = {
@@ -320,42 +264,34 @@ describe(commands.PROPERTYBAG_LIST, () => {
       folder: '/'
     };
 
-    command.action(logger, { options: options } as any, () => {
+    await command.action(logger, { options: options } as any);
+    assert(formatOutputSpy.calledOnce === true);
 
-      try {
-        assert(formatOutputSpy.calledOnce === true);
+    const out = loggerLogSpy.lastCall.args[0];
+    const expectedDate = new Date(2017, 10, 7, 11, 29, 31, 0);
 
-        const out = loggerLogSpy.lastCall.args[0];
-        const expectedDate = new Date(2017, 10, 7, 11, 29, 31, 0);
-
-        assert.strictEqual(out[0].key, 'vti_folderitemcount');
-        assert.strictEqual(out[0].value, 0);
-        assert.strictEqual(out[1].key, 'vti_level');
-        assert.strictEqual(out[1].value, 1);
-        assert.strictEqual(out[2].key, 'vti_parentid');
-        assert.strictEqual(out[2].value, '{1C5271C8-DB93-459E-9C18-68FC33EFD856}');
-        assert.strictEqual(out[3].key, 'vti_winfileattribs');
-        assert.strictEqual(out[3].value, '00000012');
-        assert.strictEqual(out[4].key, 'vti_candeleteversion');
-        assert.strictEqual(out[4].value, true);
-        assert.strictEqual(out[5].key, 'vti_foldersubfolderitemcount');
-        assert.strictEqual(out[5].value, 0);
-        assert.strictEqual(out[6].key, 'vti_timelastmodified');
-        assert.strictEqual(Object.prototype.toString.call(out[6].value), '[object Date]');
-        assert.strictEqual((out[6].value as Date).getUTCMonth(), expectedDate.getUTCMonth(), 'getUTCMonth');
-        assert.strictEqual((out[6].value as Date).getUTCFullYear(), expectedDate.getUTCFullYear(), 'getUTCFullYear');
-        assert.strictEqual((out[6].value as Date).getUTCDate(), expectedDate.getUTCDate(), 'getUTCDate');
-        assert.strictEqual((out[6].value as Date).getUTCHours(), expectedDate.getUTCHours(), 'getUTCHours');
-        assert.strictEqual((out[6].value as Date).getUTCMinutes(), expectedDate.getUTCMinutes(), 'getUTCMinutes');
-        assert.strictEqual((out[6].value as Date).getSeconds(), expectedDate.getSeconds(), 'getSeconds');
-        assert.strictEqual(out[8].key, 'vti_isscriptable');
-        assert.strictEqual(out[8].value, false);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert.strictEqual(out[0].key, 'vti_folderitemcount');
+    assert.strictEqual(out[0].value, 0);
+    assert.strictEqual(out[1].key, 'vti_level');
+    assert.strictEqual(out[1].value, 1);
+    assert.strictEqual(out[2].key, 'vti_parentid');
+    assert.strictEqual(out[2].value, '{1C5271C8-DB93-459E-9C18-68FC33EFD856}');
+    assert.strictEqual(out[3].key, 'vti_winfileattribs');
+    assert.strictEqual(out[3].value, '00000012');
+    assert.strictEqual(out[4].key, 'vti_candeleteversion');
+    assert.strictEqual(out[4].value, true);
+    assert.strictEqual(out[5].key, 'vti_foldersubfolderitemcount');
+    assert.strictEqual(out[5].value, 0);
+    assert.strictEqual(out[6].key, 'vti_timelastmodified');
+    assert.strictEqual(Object.prototype.toString.call(out[6].value), '[object Date]');
+    assert.strictEqual((out[6].value as Date).getUTCMonth(), expectedDate.getUTCMonth(), 'getUTCMonth');
+    assert.strictEqual((out[6].value as Date).getUTCFullYear(), expectedDate.getUTCFullYear(), 'getUTCFullYear');
+    assert.strictEqual((out[6].value as Date).getUTCDate(), expectedDate.getUTCDate(), 'getUTCDate');
+    assert.strictEqual((out[6].value as Date).getUTCHours(), expectedDate.getUTCHours(), 'getUTCHours');
+    assert.strictEqual((out[6].value as Date).getUTCMinutes(), expectedDate.getUTCMinutes(), 'getUTCMinutes');
+    assert.strictEqual((out[6].value as Date).getSeconds(), expectedDate.getSeconds(), 'getSeconds');
+    assert.strictEqual(out[8].key, 'vti_isscriptable');
+    assert.strictEqual(out[8].value, false);
   });
 
   it('supports debug mode', () => {

@@ -64,7 +64,7 @@ describe(commands.SITEDESIGN_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Id', 'IsDefault', 'Title', 'Version', 'WebTemplate']);
   });
 
-  it('lists available site designs', (done) => {
+  it('lists available site designs', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
         return Promise.resolve({
@@ -102,45 +102,38 @@ describe(commands.SITEDESIGN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "Description": null,
-            "IsDefault": false,
-            "PreviewImageAltText": null,
-            "PreviewImageUrl": null,
-            "SiteScriptIds": [
-              "449c0c6d-5380-4df2-b84b-622e0ac8ec25"
-            ],
-            "Title": "Contoso REST",
-            "WebTemplate": "64",
-            "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
-            "Version": 1
-          },
-          {
-            "Description": null,
-            "IsDefault": false,
-            "PreviewImageAltText": null,
-            "PreviewImageUrl": null,
-            "SiteScriptIds": [
-              "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
-            ],
-            "Title": "REST test",
-            "WebTemplate": "64",
-            "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-            "Version": 1
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "Description": null,
+        "IsDefault": false,
+        "PreviewImageAltText": null,
+        "PreviewImageUrl": null,
+        "SiteScriptIds": [
+          "449c0c6d-5380-4df2-b84b-622e0ac8ec25"
+        ],
+        "Title": "Contoso REST",
+        "WebTemplate": "64",
+        "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
+        "Version": 1
+      },
+      {
+        "Description": null,
+        "IsDefault": false,
+        "PreviewImageAltText": null,
+        "PreviewImageUrl": null,
+        "SiteScriptIds": [
+          "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
+        ],
+        "Title": "REST test",
+        "WebTemplate": "64",
+        "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+        "Version": 1
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists available site designs (debug)', (done) => {
+  it('lists available site designs (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
         return Promise.resolve({
@@ -178,45 +171,38 @@ describe(commands.SITEDESIGN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "Description": null,
-            "IsDefault": false,
-            "PreviewImageAltText": null,
-            "PreviewImageUrl": null,
-            "SiteScriptIds": [
-              "449c0c6d-5380-4df2-b84b-622e0ac8ec25"
-            ],
-            "Title": "Contoso REST",
-            "WebTemplate": "64",
-            "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
-            "Version": 1
-          },
-          {
-            "Description": null,
-            "IsDefault": false,
-            "PreviewImageAltText": null,
-            "PreviewImageUrl": null,
-            "SiteScriptIds": [
-              "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
-            ],
-            "Title": "REST test",
-            "WebTemplate": "64",
-            "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-            "Version": 1
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: true } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "Description": null,
+        "IsDefault": false,
+        "PreviewImageAltText": null,
+        "PreviewImageUrl": null,
+        "SiteScriptIds": [
+          "449c0c6d-5380-4df2-b84b-622e0ac8ec25"
+        ],
+        "Title": "Contoso REST",
+        "WebTemplate": "64",
+        "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
+        "Version": 1
+      },
+      {
+        "Description": null,
+        "IsDefault": false,
+        "PreviewImageAltText": null,
+        "PreviewImageUrl": null,
+        "SiteScriptIds": [
+          "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
+        ],
+        "Title": "REST test",
+        "WebTemplate": "64",
+        "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+        "Version": 1
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('lists available site designs with all properties for JSON output', (done) => {
+  it('lists available site designs with all properties for JSON output', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`) > -1) {
         return Promise.resolve({
@@ -254,58 +240,43 @@ describe(commands.SITEDESIGN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, output: 'json' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "Description": null,
-            "IsDefault": false,
-            "PreviewImageAltText": null,
-            "PreviewImageUrl": null,
-            "SiteScriptIds": [
-              "449c0c6d-5380-4df2-b84b-622e0ac8ec25"
-            ],
-            "Title": "Contoso REST",
-            "WebTemplate": "64",
-            "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
-            "Version": 1
-          },
-          {
-            "Description": null,
-            "IsDefault": false,
-            "PreviewImageAltText": null,
-            "PreviewImageUrl": null,
-            "SiteScriptIds": [
-              "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
-            ],
-            "Title": "REST test",
-            "WebTemplate": "64",
-            "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
-            "Version": 1
-          }
-        ]));
-        done();
+    await command.action(logger, { options: { debug: false, output: 'json' } });
+    assert(loggerLogSpy.calledWith([
+      {
+        "Description": null,
+        "IsDefault": false,
+        "PreviewImageAltText": null,
+        "PreviewImageUrl": null,
+        "SiteScriptIds": [
+          "449c0c6d-5380-4df2-b84b-622e0ac8ec25"
+        ],
+        "Title": "Contoso REST",
+        "WebTemplate": "64",
+        "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
+        "Version": 1
+      },
+      {
+        "Description": null,
+        "IsDefault": false,
+        "PreviewImageAltText": null,
+        "PreviewImageUrl": null,
+        "SiteScriptIds": [
+          "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
+        ],
+        "Title": "REST test",
+        "WebTemplate": "64",
+        "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+        "Version": 1
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
-  it('correctly handles OData error when retrieving available site designs', (done) => {
+  it('correctly handles OData error when retrieving available site designs', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

@@ -210,26 +210,28 @@ class SpoCustomActionSetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    ((): Promise<CustomAction | undefined> => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      let customAction: CustomAction | undefined;
       if (!args.options.scope) {
         args.options.scope = 'All';
       }
-
       if (args.options.scope.toLowerCase() !== "all") {
-        return this.updateCustomAction(args.options);
+        customAction = await this.updateCustomAction(args.options);
+      }
+      else {
+        customAction = await this.searchAllScopes(args.options);
       }
 
-      return this.searchAllScopes(args.options);
-    })()
-      .then((customAction: CustomAction | undefined): void => {
-        if (this.verbose) {
-          if (customAction && customAction["odata.null"] === true) {
-            logger.logToStderr(`Custom action with id ${args.options.id} not found`);
-          }
+      if (this.verbose) {
+        if (customAction && customAction["odata.null"] === true) {
+          logger.logToStderr(`Custom action with id ${args.options.id} not found`);
         }
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedPromise(err);
+    }
   }
 
   private updateCustomAction(options: Options): Promise<undefined> {

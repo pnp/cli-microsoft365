@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, CommandInfo, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil, spo } from '../../../../utils';
 import commands from '../../commands';
@@ -13,8 +13,6 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   let log: any[];
   let logger: Logger;
   let commandInfo: CommandInfo;
-  const expectedId = 147;
-  let actualId = 0;
   const postFakes = (opts: any) => {
     if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
 
@@ -53,8 +51,6 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
 
       }
       if (opts.data.indexOf('Name="UndeclareItemAsRecord') > -1) {
-
-        actualId = expectedId;
         return Promise.resolve();
       }
     }
@@ -120,11 +116,10 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails to get _ObjecttIdentity_ when an error is returned by the _ObjectIdentity_ CSOM request', (done) => {
+  it('fails to get _ObjecttIdentity_ when an error is returned by the _ObjectIdentity_ CSOM request', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    actualId = 0;
     const options: any = {
       debug: false,
       listTitle: 'Demo List',
@@ -132,18 +127,10 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
       webUrl: 'https://returnerror.com/sites/project-y'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        done();
-      }
-      catch (e) {
-        assert(actualId !== expectedId);
-        done(e);
-      }
-    });
-
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('ClientSvc unknown error'));
   });
-  it('correctly undeclares list item as a record when listTitle is passes', (done) => {
+
+  it('correctly undeclares list item as a record when listTitle is passes', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -155,17 +142,10 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
       id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x'
     };
-    command.action(logger, { options: options } as any, () => {
-      try {
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    await command.action(logger, { options: options } as any);
   });
-  it('correctly undeclares list item as a record when listId is passed', (done) => {
+
+  it('correctly undeclares list item as a record when listId is passed', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -177,19 +157,10 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
       id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x'
     };
-    command.action(logger, { options: options } as any, () => {
-      try {
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    await command.action(logger, { options: options } as any);
   });
-  it('fails to undeclare a list item as a record when \'reject me\' values are used', (done) => {
-    actualId = 0;
 
+  it('fails to undeclare a list item as a record when \'reject me\' values are used', async () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -200,16 +171,9 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
       webUrl: 'https://rejectme.com/sites/project-y'
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    await assert.rejects(command.action(logger, { options: options } as any), new CommandError('Failed request'));
   });
+
   it('supports debug mode', () => {
     const options = command.options;
     let containsDebugOption = false;

@@ -48,9 +48,13 @@ class AppOpenCommand extends AppCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this.logOrOpenUrl(args, logger)
-      .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      await this.logOrOpenUrl(args, logger);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private logOrOpenUrl(args: CommandArgs, logger: Logger): Promise<void> {

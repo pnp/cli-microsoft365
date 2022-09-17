@@ -55,7 +55,7 @@ class SpoPageGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving information about the page...`);
     }
@@ -65,61 +65,56 @@ class SpoPageGetCommand extends SpoCommand {
       pageName += '.aspx';
     }
 
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
-      headers: {
-        'content-type': 'application/json;charset=utf-8',
-        accept: 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
+    try {
+      let requestOptions: any = {
+        url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${urlUtil.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
+        headers: {
+          'content-type': 'application/json;charset=utf-8',
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-    let pageItemData: any = {};
+      const page = await request.get<any>(requestOptions);
 
-    request
-      .get(requestOptions)
-      .then((res: any): Promise<{ CanvasContent1: string } | void> => {
-        if (res.ListItemAllFields.ClientSideApplicationId !== 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec') {
-          return Promise.reject(`Page ${args.options.name} is not a modern page.`);
-        }
+      if (page.ListItemAllFields.ClientSideApplicationId !== 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec') {
+        throw `Page ${args.options.name} is not a modern page.`;
+      }
 
-        pageItemData = Object.assign({}, res);
-        pageItemData.commentsDisabled = res.ListItemAllFields.CommentsDisabled;
-        pageItemData.title = res.ListItemAllFields.Title;
+      let pageItemData: any = {};
+      pageItemData = Object.assign({}, page);
+      pageItemData.commentsDisabled = page.ListItemAllFields.CommentsDisabled;
+      pageItemData.title = page.ListItemAllFields.Title;
 
-        if (res.ListItemAllFields.PageLayoutType) {
-          pageItemData.layoutType = res.ListItemAllFields.PageLayoutType;
-        }
+      if (page.ListItemAllFields.PageLayoutType) {
+        pageItemData.layoutType = page.ListItemAllFields.PageLayoutType;
+      }
 
-        if (args.options.metadataOnly) {
-          return Promise.resolve();
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/SitePages/Pages(${res.ListItemAllFields.Id})`,
+      if (!args.options.metadataOnly) {
+        requestOptions = {
+          url: `${args.options.webUrl}/_api/SitePages/Pages(${page.ListItemAllFields.Id})`,
           headers: {
             'content-type': 'application/json;charset=utf-8',
             accept: 'application/json;odata=nometadata'
           },
           responseType: 'json'
         };
-
-        return request.get<{ CanvasContent1: string }>(requestOptions);
-      })
-      .then((res: { CanvasContent1: string } | void) => {
-        if (res && res.CanvasContent1) {
-          const canvasData: any[] = JSON.parse(res.CanvasContent1);
-          pageItemData.canvasContentJson = res.CanvasContent1;
-          if (canvasData && canvasData.length > 0) {
-            pageItemData.numControls = canvasData.length;
-            const sections = [...new Set(canvasData.filter(c => c.position).map(c => c.position.zoneIndex))];
-            pageItemData.numSections = sections.length;
-          }
+  
+        const res = await request.get<{ CanvasContent1: string }>(requestOptions);
+        const canvasData: any[] = JSON.parse(res.CanvasContent1);
+        pageItemData.canvasContentJson = res.CanvasContent1;
+        if (canvasData && canvasData.length > 0) {
+          pageItemData.numControls = canvasData.length;
+          const sections = [...new Set(canvasData.filter(c => c.position).map(c => c.position.zoneIndex))];
+          pageItemData.numSections = sections.length;
         }
+      }
 
-        logger.log(pageItemData);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(pageItemData);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

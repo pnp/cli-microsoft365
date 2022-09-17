@@ -37,9 +37,9 @@ describe(commands.RUN_RESUBMIT, () => {
       }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     promptOptions = undefined;
   });
@@ -90,58 +90,45 @@ describe(commands.RUN_RESUBMIT, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before resubmitting the specified Microsoft Flow when confirm option not passed', (done) => {
-    command.action(logger, {
+  it('prompts before resubmitting the specified Microsoft Flow when confirm option not passed', async () => {
+    await command.action(logger, {
       options: {
         debug: false,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
-  it('aborts resubmitting the specified Microsoft Flow when confirm option not passed and prompt not confirmed', (done) => {
+  it('aborts resubmitting the specified Microsoft Flow when confirm option not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
     const getSpy = sinon.spy(request, 'get');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, {
       options: {
         debug: false,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
       }
-    }, () => {
-      try {
-        assert(postSpy.notCalled);
-        assert(getSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(postSpy.notCalled);
+    assert(getSpy.notCalled);
   });
 
-  it('correctly handles no environment found when prompt confirmed', (done) => {
+  it('correctly handles no environment found when prompt confirmed', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -152,11 +139,11 @@ describe(commands.RUN_RESUBMIT, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options:
       {
         debug: false,
@@ -164,18 +151,10 @@ describe(commands.RUN_RESUBMIT, () => {
         flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762687CU161'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`You are not permitted to make flows in this 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'. Please switch to the default environment, or to one of your own environment(s), where you have maker permissions.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError(`You are not permitted to make flows in this 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'. Please switch to the default environment, or to one of your own environment(s), where you have maker permissions.`));
   });
 
-  it('correctly handles specified Microsoft Flow not found when prompt confirmed', (done) => {
+  it('correctly handles specified Microsoft Flow not found when prompt confirmed', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -186,11 +165,11 @@ describe(commands.RUN_RESUBMIT, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options:
       {
         debug: false,
@@ -198,18 +177,10 @@ describe(commands.RUN_RESUBMIT, () => {
         flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
         name: '08585981115186985105550762687CU161'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88' under Api 'shared_logicflows'.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError(`The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88' under Api 'shared_logicflows'.`));
   });
 
-  it('correctly handles specified Microsoft Flow run not found when prompt confirmed', (done) => {
+  it('correctly handles specified Microsoft Flow run not found when prompt confirmed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72/triggers?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
@@ -245,11 +216,11 @@ describe(commands.RUN_RESUBMIT, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options:
       {
         debug: false,
@@ -257,18 +228,10 @@ describe(commands.RUN_RESUBMIT, () => {
         flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         name: '08585981115186985105550762688CP233'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError(`Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`));
   });
 
-  it('correctly getting triggername for the specified Microsoft Flow when prompt confirmed (debug)', (done) => {
+  it('correctly getting triggername for the specified Microsoft Flow when prompt confirmed (debug)', async () => {
     const getStub = sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
@@ -302,11 +265,11 @@ describe(commands.RUN_RESUBMIT, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         debug: true,
@@ -314,20 +277,13 @@ describe(commands.RUN_RESUBMIT, () => {
         flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
         name: '08585981115186985105550762687CU161'
       }
-    }, () => {
-      try {
-        assert.notStrictEqual(loggerLogToStderrSpy.getCall(1).args[0].indexOf('Retrieved trigger: manual'), -1);
-        assert(getStub.called);
-        assert(postStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.notStrictEqual(loggerLogToStderrSpy.getCall(1).args[0].indexOf('Retrieved trigger: manual'), -1);
+    assert(getStub.called);
+    assert(postStub.called);
   });
 
-  it('resubmits the specified Microsoft Flow run when confirm specified (debug)', (done) => {
+  it('resubmits the specified Microsoft Flow run when confirm specified (debug)', async () => {
     const getStub = sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
@@ -360,7 +316,7 @@ describe(commands.RUN_RESUBMIT, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         debug: true,
@@ -369,16 +325,9 @@ describe(commands.RUN_RESUBMIT, () => {
         name: '08585981115186985105550762687CU161',
         confirm: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(getStub.lastCall.args[0].url, 'https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers?api-version=2016-11-01');
-        assert.strictEqual(postStub.lastCall.args[0].url, 'https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers/manual/histories/08585981115186985105550762687CU161/resubmit?api-version=2016-11-01');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(getStub.lastCall.args[0].url, 'https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers?api-version=2016-11-01');
+    assert.strictEqual(postStub.lastCall.args[0].url, 'https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c6/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88/triggers/manual/histories/08585981115186985105550762687CU161/resubmit?api-version=2016-11-01');
   });
 
   it('supports debug mode', () => {

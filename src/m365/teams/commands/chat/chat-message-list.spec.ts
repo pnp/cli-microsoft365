@@ -121,7 +121,7 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('lists chat messages (debug)', (done) => {
+  it('lists chat messages (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages`) {
         return Promise.resolve({
@@ -132,129 +132,121 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         chatId: "19:2da4c29f6d7041eca70b638b43d45437@thread.v2"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "1616964509832",
-            "replyToId": null,
-            "etag": "1616964509832",
-            "messageType": "message",
-            "createdDateTime": "2021-03-28T20:48:29.832Z",
-            "lastModifiedDateTime": "2021-03-28T20:48:29.832Z",
-            "lastEditedDateTime": null,
-            "deletedDateTime": null,
-            "subject": null,
-            "summary": null,
-            "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
-            "importance": "normal",
-            "locale": "en-us",
-            "webUrl": null,
-            "channelIdentity": null,
-            "policyViolation": null,
-            "eventDetail": null,
-            "from": {
-              "application": null,
-              "device": null,
-              "user": {
-                "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2",
-                "displayName": "Robin Kline",
-                "userIdentityType": "aadUser"
-              }
-            },
-            "body": "Hello world",
-            "attachments": [],
-            "mentions": [],
-            "reactions": [],
-            "shortBody": "Hello world"
-          },
-          {
-            "id": "1615971548136",
-            "replyToId": null,
-            "etag": "1615971548136",
-            "messageType": "message",
-            "createdDateTime": "2021-03-17T08:59:08.136Z",
-            "lastModifiedDateTime": "2021-03-17T08:59:08.136Z",
-            "lastEditedDateTime": null,
-            "deletedDateTime": null,
-            "subject": null,
-            "summary": null,
-            "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
-            "importance": "normal",
-            "locale": "en-us",
-            "webUrl": null,
-            "channelIdentity": null,
-            "policyViolation": null,
-            "eventDetail": null,
-            "from": {
-              "application": null,
-              "device": null,
-              "user": {
-                "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2",
-                "displayName": "Robin Kline",
-                "userIdentityType": "aadUser"
-              }
-            },
-            "body": "<div><div><div><span><img height=\"63\" src=\"https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages/1615971548136/hostedContents/aWQ9eF8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNix0eXBlPTEsdXJsPWh0dHBzOi8vdXMtYXBpLmFzbS5za3lwZS5jb20vdjEvb2JqZWN0cy8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNi92aWV3cy9pbWdv/$value\" width=\"67\" style=\"vertical-align:bottom; width:67px; height:63px\"></span></div></div></div>",
-            "attachments": [],
-            "mentions": [],
-            "reactions": [],
-            "shortBody": "<div><div><div><span><img height=\"63\" src=\"https:/..."
-          },
-          {
-            "id": "1615943825123",
-            "replyToId": null,
-            "etag": "1615943825123",
-            "messageType": "unknownFutureValue",
-            "createdDateTime": "2021-03-1706:47:05.123Z",
-            "lastModifiedDateTime": "2021-03-1706:47:05.123Z",
-            "lastEditedDateTime": null,
-            "deletedDateTime": null,
-            "subject": null,
-            "summary": null,
-            "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
-            "importance": "normal",
-            "locale": "en-us",
-            "webUrl": null,
-            "channelIdentity": null,
-            "policyViolation": null,
-            "from": null,
-            "body": "<systemEventMessage/>",
-            "attachments": [],
-            "mentions": [],
-            "reactions": [],
-            "eventDetail": {
-              "@odata.type": "#microsoft.graph.chatRenamedEventMessageDetail",
-              "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
-              "chatDisplayName": "Graph Members",
-              "initiator": {
-                "application": null,
-                "device": null,
-                "user": {
-                  "id": "1fb8890f-423e-4154-8fbf-db6809bc8756",
-                  "displayName": null,
-                  "userIdentityType": "aadUser"
-                }
-              }
-            },
-            "shortBody": "<systemEventMessage/>"
-          }
-        ]));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "1616964509832",
+        "replyToId": null,
+        "etag": "1616964509832",
+        "messageType": "message",
+        "createdDateTime": "2021-03-28T20:48:29.832Z",
+        "lastModifiedDateTime": "2021-03-28T20:48:29.832Z",
+        "lastEditedDateTime": null,
+        "deletedDateTime": null,
+        "subject": null,
+        "summary": null,
+        "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
+        "importance": "normal",
+        "locale": "en-us",
+        "webUrl": null,
+        "channelIdentity": null,
+        "policyViolation": null,
+        "eventDetail": null,
+        "from": {
+          "application": null,
+          "device": null,
+          "user": {
+            "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2",
+            "displayName": "Robin Kline",
+            "userIdentityType": "aadUser"
+          }
+        },
+        "body": "Hello world",
+        "attachments": [],
+        "mentions": [],
+        "reactions": [],
+        "shortBody": "Hello world"
+      },
+      {
+        "id": "1615971548136",
+        "replyToId": null,
+        "etag": "1615971548136",
+        "messageType": "message",
+        "createdDateTime": "2021-03-17T08:59:08.136Z",
+        "lastModifiedDateTime": "2021-03-17T08:59:08.136Z",
+        "lastEditedDateTime": null,
+        "deletedDateTime": null,
+        "subject": null,
+        "summary": null,
+        "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
+        "importance": "normal",
+        "locale": "en-us",
+        "webUrl": null,
+        "channelIdentity": null,
+        "policyViolation": null,
+        "eventDetail": null,
+        "from": {
+          "application": null,
+          "device": null,
+          "user": {
+            "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2",
+            "displayName": "Robin Kline",
+            "userIdentityType": "aadUser"
+          }
+        },
+        "body": "<div><div><div><span><img height=\"63\" src=\"https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages/1615971548136/hostedContents/aWQ9eF8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNix0eXBlPTEsdXJsPWh0dHBzOi8vdXMtYXBpLmFzbS5za3lwZS5jb20vdjEvb2JqZWN0cy8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNi92aWV3cy9pbWdv/$value\" width=\"67\" style=\"vertical-align:bottom; width:67px; height:63px\"></span></div></div></div>",
+        "attachments": [],
+        "mentions": [],
+        "reactions": [],
+        "shortBody": "<div><div><div><span><img height=\"63\" src=\"https:/..."
+      },
+      {
+        "id": "1615943825123",
+        "replyToId": null,
+        "etag": "1615943825123",
+        "messageType": "unknownFutureValue",
+        "createdDateTime": "2021-03-1706:47:05.123Z",
+        "lastModifiedDateTime": "2021-03-1706:47:05.123Z",
+        "lastEditedDateTime": null,
+        "deletedDateTime": null,
+        "subject": null,
+        "summary": null,
+        "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
+        "importance": "normal",
+        "locale": "en-us",
+        "webUrl": null,
+        "channelIdentity": null,
+        "policyViolation": null,
+        "from": null,
+        "body": "<systemEventMessage/>",
+        "attachments": [],
+        "mentions": [],
+        "reactions": [],
+        "eventDetail": {
+          "@odata.type": "#microsoft.graph.chatRenamedEventMessageDetail",
+          "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
+          "chatDisplayName": "Graph Members",
+          "initiator": {
+            "application": null,
+            "device": null,
+            "user": {
+              "id": "1fb8890f-423e-4154-8fbf-db6809bc8756",
+              "displayName": null,
+              "userIdentityType": "aadUser"
+            }
+          }
+        },
+        "shortBody": "<systemEventMessage/>"
+      }
+    ]));
   });
 
-  it('lists chat messages', (done) => {
+  it('lists chat messages', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages`) {
         return Promise.resolve({
@@ -265,130 +257,122 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         chatId: "19:2da4c29f6d7041eca70b638b43d45437@thread.v2"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "1616964509832",
-            "replyToId": null,
-            "etag": "1616964509832",
-            "messageType": "message",
-            "createdDateTime": "2021-03-28T20:48:29.832Z",
-            "lastModifiedDateTime": "2021-03-28T20:48:29.832Z",
-            "lastEditedDateTime": null,
-            "deletedDateTime": null,
-            "subject": null,
-            "summary": null,
-            "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
-            "importance": "normal",
-            "locale": "en-us",
-            "webUrl": null,
-            "channelIdentity": null,
-            "policyViolation": null,
-            "eventDetail": null,
-            "from": {
-              "application": null,
-              "device": null,
-              "user": {
-                "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2",
-                "displayName": "Robin Kline",
-                "userIdentityType": "aadUser"
-              }
-            },
-            "body": "Hello world",
-            "attachments": [],
-            "mentions": [],
-            "reactions": [],
-            "shortBody": "Hello world"
-          },
-          {
-            "id": "1615971548136",
-            "replyToId": null,
-            "etag": "1615971548136",
-            "messageType": "message",
-            "createdDateTime": "2021-03-17T08:59:08.136Z",
-            "lastModifiedDateTime": "2021-03-17T08:59:08.136Z",
-            "lastEditedDateTime": null,
-            "deletedDateTime": null,
-            "subject": null,
-            "summary": null,
-            "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
-            "importance": "normal",
-            "locale": "en-us",
-            "webUrl": null,
-            "channelIdentity": null,
-            "policyViolation": null,
-            "eventDetail": null,
-            "from": {
-              "application": null,
-              "device": null,
-              "user": {
-                "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2",
-                "displayName": "Robin Kline",
-                "userIdentityType": "aadUser"
-              }
-            },
-            "body": "<div><div><div><span><img height=\"63\" src=\"https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages/1615971548136/hostedContents/aWQ9eF8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNix0eXBlPTEsdXJsPWh0dHBzOi8vdXMtYXBpLmFzbS5za3lwZS5jb20vdjEvb2JqZWN0cy8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNi92aWV3cy9pbWdv/$value\" width=\"67\" style=\"vertical-align:bottom; width:67px; height:63px\"></span></div></div></div>",
-            "attachments": [],
-            "mentions": [],
-            "reactions": [],
-            "shortBody": "<div><div><div><span><img height=\"63\" src=\"https:/..."
-          },
-          {
-            "id": "1615943825123",
-            "replyToId": null,
-            "etag": "1615943825123",
-            "messageType": "unknownFutureValue",
-            "createdDateTime": "2021-03-1706:47:05.123Z",
-            "lastModifiedDateTime": "2021-03-1706:47:05.123Z",
-            "lastEditedDateTime": null,
-            "deletedDateTime": null,
-            "subject": null,
-            "summary": null,
-            "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
-            "importance": "normal",
-            "locale": "en-us",
-            "webUrl": null,
-            "channelIdentity": null,
-            "policyViolation": null,
-            "from": null,
-            "body": "<systemEventMessage/>",
-            "attachments": [],
-            "mentions": [],
-            "reactions": [],
-            "eventDetail": {
-              "@odata.type": "#microsoft.graph.chatRenamedEventMessageDetail",
-              "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
-              "chatDisplayName": "Graph Members",
-              "initiator": {
-                "application": null,
-                "device": null,
-                "user": {
-                  "id": "1fb8890f-423e-4154-8fbf-db6809bc8756",
-                  "displayName": null,
-                  "userIdentityType": "aadUser"
-                }
-              }
-            },
-            "shortBody": "<systemEventMessage/>"
-          }
-        ]));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "1616964509832",
+        "replyToId": null,
+        "etag": "1616964509832",
+        "messageType": "message",
+        "createdDateTime": "2021-03-28T20:48:29.832Z",
+        "lastModifiedDateTime": "2021-03-28T20:48:29.832Z",
+        "lastEditedDateTime": null,
+        "deletedDateTime": null,
+        "subject": null,
+        "summary": null,
+        "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
+        "importance": "normal",
+        "locale": "en-us",
+        "webUrl": null,
+        "channelIdentity": null,
+        "policyViolation": null,
+        "eventDetail": null,
+        "from": {
+          "application": null,
+          "device": null,
+          "user": {
+            "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2",
+            "displayName": "Robin Kline",
+            "userIdentityType": "aadUser"
+          }
+        },
+        "body": "Hello world",
+        "attachments": [],
+        "mentions": [],
+        "reactions": [],
+        "shortBody": "Hello world"
+      },
+      {
+        "id": "1615971548136",
+        "replyToId": null,
+        "etag": "1615971548136",
+        "messageType": "message",
+        "createdDateTime": "2021-03-17T08:59:08.136Z",
+        "lastModifiedDateTime": "2021-03-17T08:59:08.136Z",
+        "lastEditedDateTime": null,
+        "deletedDateTime": null,
+        "subject": null,
+        "summary": null,
+        "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
+        "importance": "normal",
+        "locale": "en-us",
+        "webUrl": null,
+        "channelIdentity": null,
+        "policyViolation": null,
+        "eventDetail": null,
+        "from": {
+          "application": null,
+          "device": null,
+          "user": {
+            "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2",
+            "displayName": "Robin Kline",
+            "userIdentityType": "aadUser"
+          }
+        },
+        "body": "<div><div><div><span><img height=\"63\" src=\"https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages/1615971548136/hostedContents/aWQ9eF8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNix0eXBlPTEsdXJsPWh0dHBzOi8vdXMtYXBpLmFzbS5za3lwZS5jb20vdjEvb2JqZWN0cy8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNi92aWV3cy9pbWdv/$value\" width=\"67\" style=\"vertical-align:bottom; width:67px; height:63px\"></span></div></div></div>",
+        "attachments": [],
+        "mentions": [],
+        "reactions": [],
+        "shortBody": "<div><div><div><span><img height=\"63\" src=\"https:/..."
+      },
+      {
+        "id": "1615943825123",
+        "replyToId": null,
+        "etag": "1615943825123",
+        "messageType": "unknownFutureValue",
+        "createdDateTime": "2021-03-1706:47:05.123Z",
+        "lastModifiedDateTime": "2021-03-1706:47:05.123Z",
+        "lastEditedDateTime": null,
+        "deletedDateTime": null,
+        "subject": null,
+        "summary": null,
+        "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
+        "importance": "normal",
+        "locale": "en-us",
+        "webUrl": null,
+        "channelIdentity": null,
+        "policyViolation": null,
+        "from": null,
+        "body": "<systemEventMessage/>",
+        "attachments": [],
+        "mentions": [],
+        "reactions": [],
+        "eventDetail": {
+          "@odata.type": "#microsoft.graph.chatRenamedEventMessageDetail",
+          "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
+          "chatDisplayName": "Graph Members",
+          "initiator": {
+            "application": null,
+            "device": null,
+            "user": {
+              "id": "1fb8890f-423e-4154-8fbf-db6809bc8756",
+              "displayName": null,
+              "userIdentityType": "aadUser"
+            }
+          }
+        },
+        "shortBody": "<systemEventMessage/>"
+      }
+    ]));
   });
 
 
-  it('lists chat messages, with truncated shortbody property in text mode', (done) => {
+  it('lists chat messages, with truncated shortbody property in text mode', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages`) {
         return Promise.resolve({
@@ -399,131 +383,123 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         output: "text",
         chatId: "19:2da4c29f6d7041eca70b638b43d45437@thread.v2"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "1616964509832",
-            "replyToId": null,
-            "etag": "1616964509832",
-            "messageType": "message",
-            "createdDateTime": "2021-03-28T20:48:29.832Z",
-            "lastModifiedDateTime": "2021-03-28T20:48:29.832Z",
-            "lastEditedDateTime": null,
-            "deletedDateTime": null,
-            "subject": null,
-            "summary": null,
-            "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
-            "importance": "normal",
-            "locale": "en-us",
-            "webUrl": null,
-            "channelIdentity": null,
-            "policyViolation": null,
-            "eventDetail": null,
-            "from": {
-              "application": null,
-              "device": null,
-              "user": {
-                "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2",
-                "displayName": "Robin Kline",
-                "userIdentityType": "aadUser"
-              }
-            },
-            "body": "Hello world",
-            "shortBody": "Hello world",
-            "attachments": [],
-            "mentions": [],
-            "reactions": []
-          },
-          {
-            "id": "1615971548136",
-            "replyToId": null,
-            "etag": "1615971548136",
-            "messageType": "message",
-            "createdDateTime": "2021-03-17T08:59:08.136Z",
-            "lastModifiedDateTime": "2021-03-17T08:59:08.136Z",
-            "lastEditedDateTime": null,
-            "deletedDateTime": null,
-            "subject": null,
-            "summary": null,
-            "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
-            "importance": "normal",
-            "locale": "en-us",
-            "webUrl": null,
-            "channelIdentity": null,
-            "policyViolation": null,
-            "eventDetail": null,
-            "from": {
-              "application": null,
-              "device": null,
-              "user": {
-                "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2",
-                "displayName": "Robin Kline",
-                "userIdentityType": "aadUser"
-              }
-            },
-            "body": "<div><div><div><span><img height=\"63\" src=\"https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages/1615971548136/hostedContents/aWQ9eF8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNix0eXBlPTEsdXJsPWh0dHBzOi8vdXMtYXBpLmFzbS5za3lwZS5jb20vdjEvb2JqZWN0cy8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNi92aWV3cy9pbWdv/$value\" width=\"67\" style=\"vertical-align:bottom; width:67px; height:63px\"></span></div></div></div>",
-            "shortBody": "<div><div><div><span><img height=\"63\" src=\"https:/...",
-            "attachments": [],
-            "mentions": [],
-            "reactions": []
-          },
-          {
-            "id": "1615943825123",
-            "replyToId": null,
-            "etag": "1615943825123",
-            "messageType": "unknownFutureValue",
-            "createdDateTime": "2021-03-1706:47:05.123Z",
-            "lastModifiedDateTime": "2021-03-1706:47:05.123Z",
-            "lastEditedDateTime": null,
-            "deletedDateTime": null,
-            "subject": null,
-            "summary": null,
-            "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
-            "importance": "normal",
-            "locale": "en-us",
-            "webUrl": null,
-            "channelIdentity": null,
-            "policyViolation": null,
-            "from": null,
-            "body": "<systemEventMessage/>",
-            "shortBody": "<systemEventMessage/>",
-            "attachments": [],
-            "mentions": [],
-            "reactions": [],
-            "eventDetail": {
-              "@odata.type": "#microsoft.graph.chatRenamedEventMessageDetail",
-              "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
-              "chatDisplayName": "Graph Members",
-              "initiator": {
-                "application": null,
-                "device": null,
-                "user": {
-                  "id": "1fb8890f-423e-4154-8fbf-db6809bc8756",
-                  "displayName": null,
-                  "userIdentityType": "aadUser"
-                }
-              }
+    });
+    assert(loggerLogSpy.calledWith([
+      {
+        "id": "1616964509832",
+        "replyToId": null,
+        "etag": "1616964509832",
+        "messageType": "message",
+        "createdDateTime": "2021-03-28T20:48:29.832Z",
+        "lastModifiedDateTime": "2021-03-28T20:48:29.832Z",
+        "lastEditedDateTime": null,
+        "deletedDateTime": null,
+        "subject": null,
+        "summary": null,
+        "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
+        "importance": "normal",
+        "locale": "en-us",
+        "webUrl": null,
+        "channelIdentity": null,
+        "policyViolation": null,
+        "eventDetail": null,
+        "from": {
+          "application": null,
+          "device": null,
+          "user": {
+            "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2",
+            "displayName": "Robin Kline",
+            "userIdentityType": "aadUser"
+          }
+        },
+        "body": "Hello world",
+        "shortBody": "Hello world",
+        "attachments": [],
+        "mentions": [],
+        "reactions": []
+      },
+      {
+        "id": "1615971548136",
+        "replyToId": null,
+        "etag": "1615971548136",
+        "messageType": "message",
+        "createdDateTime": "2021-03-17T08:59:08.136Z",
+        "lastModifiedDateTime": "2021-03-17T08:59:08.136Z",
+        "lastEditedDateTime": null,
+        "deletedDateTime": null,
+        "subject": null,
+        "summary": null,
+        "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
+        "importance": "normal",
+        "locale": "en-us",
+        "webUrl": null,
+        "channelIdentity": null,
+        "policyViolation": null,
+        "eventDetail": null,
+        "from": {
+          "application": null,
+          "device": null,
+          "user": {
+            "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2",
+            "displayName": "Robin Kline",
+            "userIdentityType": "aadUser"
+          }
+        },
+        "body": "<div><div><div><span><img height=\"63\" src=\"https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages/1615971548136/hostedContents/aWQ9eF8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNix0eXBlPTEsdXJsPWh0dHBzOi8vdXMtYXBpLmFzbS5za3lwZS5jb20vdjEvb2JqZWN0cy8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNi92aWV3cy9pbWdv/$value\" width=\"67\" style=\"vertical-align:bottom; width:67px; height:63px\"></span></div></div></div>",
+        "shortBody": "<div><div><div><span><img height=\"63\" src=\"https:/...",
+        "attachments": [],
+        "mentions": [],
+        "reactions": []
+      },
+      {
+        "id": "1615943825123",
+        "replyToId": null,
+        "etag": "1615943825123",
+        "messageType": "unknownFutureValue",
+        "createdDateTime": "2021-03-1706:47:05.123Z",
+        "lastModifiedDateTime": "2021-03-1706:47:05.123Z",
+        "lastEditedDateTime": null,
+        "deletedDateTime": null,
+        "subject": null,
+        "summary": null,
+        "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
+        "importance": "normal",
+        "locale": "en-us",
+        "webUrl": null,
+        "channelIdentity": null,
+        "policyViolation": null,
+        "from": null,
+        "body": "<systemEventMessage/>",
+        "shortBody": "<systemEventMessage/>",
+        "attachments": [],
+        "mentions": [],
+        "reactions": [],
+        "eventDetail": {
+          "@odata.type": "#microsoft.graph.chatRenamedEventMessageDetail",
+          "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2",
+          "chatDisplayName": "Graph Members",
+          "initiator": {
+            "application": null,
+            "device": null,
+            "user": {
+              "id": "1fb8890f-423e-4154-8fbf-db6809bc8756",
+              "displayName": null,
+              "userIdentityType": "aadUser"
             }
           }
-        ]));
-
-        done();
+        }
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ]));
   });
 
 
-  it('outputs all data in json output mode', (done) => {
+  it('outputs all data in json output mode', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages`) {
         return Promise.resolve({
@@ -534,42 +510,23 @@ describe(commands.CHAT_MESSAGE_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         output: 'json',
         chatId: "19:2da4c29f6d7041eca70b638b43d45437@thread.v2"
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([{ "id": "1616964509832", "replyToId": null, "etag": "1616964509832", "messageType": "message", "createdDateTime": "2021-03-28T20:48:29.832Z", "lastModifiedDateTime": "2021-03-28T20:48:29.832Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "eventDetail": null, "from": { "application": null, "device": null, "user": { "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2", "displayName": "Robin Kline", "userIdentityType": "aadUser" } }, "body": { "contentType": "text", "content": "Hello world" }, "attachments": [], "mentions": [], "reactions": [] }, { "id": "1615971548136", "replyToId": null, "etag": "1615971548136", "messageType": "message", "createdDateTime": "2021-03-17T08:59:08.136Z", "lastModifiedDateTime": "2021-03-17T08:59:08.136Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "eventDetail": null, "from": { "application": null, "device": null, "user": { "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2", "displayName": "Robin Kline", "userIdentityType": "aadUser" } }, "body": { "contentType": "html", "content": "<div><div><div><span><img height=\"63\" src=\"https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages/1615971548136/hostedContents/aWQ9eF8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNix0eXBlPTEsdXJsPWh0dHBzOi8vdXMtYXBpLmFzbS5za3lwZS5jb20vdjEvb2JqZWN0cy8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNi92aWV3cy9pbWdv/$value\" width=\"67\" style=\"vertical-align:bottom; width:67px; height:63px\"></span></div></div></div>" }, "attachments": [], "mentions": [], "reactions": [] }, { "id": "1615943825123", "replyToId": null, "etag": "1615943825123", "messageType": "unknownFutureValue", "createdDateTime": "2021-03-1706:47:05.123Z", "lastModifiedDateTime": "2021-03-1706:47:05.123Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "from": null, "body": { "contentType": "html", "content": "<systemEventMessage/>" }, "attachments": [], "mentions": [], "reactions": [], "eventDetail": { "@odata.type": "#microsoft.graph.chatRenamedEventMessageDetail", "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "chatDisplayName": "Graph Members", "initiator": { "application": null, "device": null, "user": { "id": "1fb8890f-423e-4154-8fbf-db6809bc8756", "displayName": null, "userIdentityType": "aadUser" } } } }]));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([{ "id": "1616964509832", "replyToId": null, "etag": "1616964509832", "messageType": "message", "createdDateTime": "2021-03-28T20:48:29.832Z", "lastModifiedDateTime": "2021-03-28T20:48:29.832Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "eventDetail": null, "from": { "application": null, "device": null, "user": { "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2", "displayName": "Robin Kline", "userIdentityType": "aadUser" } }, "body": { "contentType": "text", "content": "Hello world" }, "attachments": [], "mentions": [], "reactions": [] }, { "id": "1615971548136", "replyToId": null, "etag": "1615971548136", "messageType": "message", "createdDateTime": "2021-03-17T08:59:08.136Z", "lastModifiedDateTime": "2021-03-17T08:59:08.136Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "eventDetail": null, "from": { "application": null, "device": null, "user": { "id": "8ea0e38b-efb3-4757-924a-5f94061cf8c2", "displayName": "Robin Kline", "userIdentityType": "aadUser" } }, "body": { "contentType": "html", "content": "<div><div><div><span><img height=\"63\" src=\"https://graph.microsoft.com/v1.0/chats/19:2da4c29f6d7041eca70b638b43d45437@thread.v2/messages/1615971548136/hostedContents/aWQ9eF8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNix0eXBlPTEsdXJsPWh0dHBzOi8vdXMtYXBpLmFzbS5za3lwZS5jb20vdjEvb2JqZWN0cy8wLXd1cy1kOS1lNTRmNjM1NWYxYmJkNGQ3ZTNmNGJhZmU4NTI5MTBmNi92aWV3cy9pbWdv/$value\" width=\"67\" style=\"vertical-align:bottom; width:67px; height:63px\"></span></div></div></div>" }, "attachments": [], "mentions": [], "reactions": [] }, { "id": "1615943825123", "replyToId": null, "etag": "1615943825123", "messageType": "unknownFutureValue", "createdDateTime": "2021-03-1706:47:05.123Z", "lastModifiedDateTime": "2021-03-1706:47:05.123Z", "lastEditedDateTime": null, "deletedDateTime": null, "subject": null, "summary": null, "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "importance": "normal", "locale": "en-us", "webUrl": null, "channelIdentity": null, "policyViolation": null, "from": null, "body": { "contentType": "html", "content": "<systemEventMessage/>" }, "attachments": [], "mentions": [], "reactions": [], "eventDetail": { "@odata.type": "#microsoft.graph.chatRenamedEventMessageDetail", "chatId": "19:2da4c29f6d7041eca70b638b43d45437@thread.v2", "chatDisplayName": "Graph Members", "initiator": { "application": null, "device": null, "user": { "id": "1fb8890f-423e-4154-8fbf-db6809bc8756", "displayName": null, "userIdentityType": "aadUser" } } } }]));
   });
 
-  it('correctly handles error when listing messages', (done) => {
+  it('correctly handles error when listing messages', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        chatId: "19:2da4c29f6d7041eca70b638b43d45437@thread.v2"
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      chatId: "19:2da4c29f6d7041eca70b638b43d45437@thread.v2" } } as any), new CommandError('An error has occurred'));
   });
 });

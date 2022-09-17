@@ -17,7 +17,7 @@ class PlannerTenantSettingsListCommand extends PlannerCommand {
     return ['isPlannerAllowed', 'allowCalendarSharing', 'allowTenantMoveWithDataLoss', 'allowTenantMoveWithDataMigration', 'allowRosterCreation', 'allowPlannerMobilePushNotifications'];
   }
 
-  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger): Promise<void> {
     const requestOptions: AxiosRequestConfig = {
       url: `${this.resource}/taskAPI/tenantAdminSettings/Settings`,
       headers: {
@@ -26,12 +26,13 @@ class PlannerTenantSettingsListCommand extends PlannerCommand {
       responseType: 'json'
     };
 
-    request
-      .get(requestOptions)
-      .then((result): void => {
-        logger.log(result);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const result = await request.get(requestOptions);
+      logger.log(result);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

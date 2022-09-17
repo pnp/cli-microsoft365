@@ -13,7 +13,6 @@ const command: Command = require('./team-clone');
 describe(commands.TEAM_CLONE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let commandInfo: CommandInfo;
 
@@ -37,7 +36,6 @@ describe(commands.TEAM_CLONE, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
@@ -187,7 +185,7 @@ describe(commands.TEAM_CLONE, () => {
     assert.deepStrictEqual(optionSets, [['id', 'teamId'], ['name', 'displayName']]);
   });
 
-  it('logs deprecation warning when option teamId is specified', (done) => {
+  it('logs deprecation warning when option teamId is specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone`) {
         return Promise.resolve({
@@ -198,25 +196,18 @@ describe(commands.TEAM_CLONE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         name: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
-    } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'teamId' is deprecated. Please use 'id' instead.`)));
   });
 
-  it('logs deprecation warning when option displayName is specified', (done) => {
+  it('logs deprecation warning when option displayName is specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone`) {
         return Promise.resolve({
@@ -227,25 +218,18 @@ describe(commands.TEAM_CLONE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
-    } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'displayName' is deprecated. Please use 'name' instead.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Option 'displayName' is deprecated. Please use 'name' instead.`)));
   });
 
-  it('creates a clone of a Microsoft Teams team with mandatory parameters', (done) => {
+  it('creates a clone of a Microsoft Teams team with mandatory parameters', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone`) {
         return Promise.resolve({
@@ -256,25 +240,17 @@ describe(commands.TEAM_CLONE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         name: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
   });
 
-  it('creates a clone of a Microsoft Teams team with optional parameters (debug)', (done) => {
+  it('creates a clone of a Microsoft Teams team with optional parameters (debug)', async () => {
     const sinonStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone`) {
         return Promise.resolve({
@@ -285,7 +261,7 @@ describe(commands.TEAM_CLONE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
@@ -295,45 +271,27 @@ describe(commands.TEAM_CLONE, () => {
         visibility: 'public',
         classification: 'label'
       }
-    } as any, () => {
-      try {
-        assert.strictEqual(sinonStub.lastCall.args[0].url, 'https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone');
-        assert.strictEqual(sinonStub.lastCall.args[0].data.displayName, 'Library Assist');
-        assert.strictEqual(sinonStub.lastCall.args[0].data.partsToClone, 'apps,tabs,settings,channels,members');
-        assert.strictEqual(sinonStub.lastCall.args[0].data.description, 'abc');
-        assert.strictEqual(sinonStub.lastCall.args[0].data.visibility, 'public');
-        assert.strictEqual(sinonStub.lastCall.args[0].data.classification, 'label');
-        assert.notStrictEqual(sinonStub.lastCall.args[0].data.mailNickname.length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert.strictEqual(sinonStub.lastCall.args[0].url, 'https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone');
+    assert.strictEqual(sinonStub.lastCall.args[0].data.displayName, 'Library Assist');
+    assert.strictEqual(sinonStub.lastCall.args[0].data.partsToClone, 'apps,tabs,settings,channels,members');
+    assert.strictEqual(sinonStub.lastCall.args[0].data.description, 'abc');
+    assert.strictEqual(sinonStub.lastCall.args[0].data.visibility, 'public');
+    assert.strictEqual(sinonStub.lastCall.args[0].data.classification, 'label');
+    assert.notStrictEqual(sinonStub.lastCall.args[0].data.mailNickname.length, 0);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        name: 'Library Assist',
-        partsToClone: 'apps,tabs,settings,channels,members',
-        description: 'abc',
-        visibility: 'public',
-        classification: 'label'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      id: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
+      name: 'Library Assist',
+      partsToClone: 'apps,tabs,settings,channels,members',
+      description: 'abc',
+      visibility: 'public',
+      classification: 'label' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

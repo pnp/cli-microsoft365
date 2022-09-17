@@ -60,7 +60,7 @@ describe(commands.HOMESITE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('gets information about the Home Site', (done) => {
+  it('gets information about the Home Site', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/_api/SP.SPHSite/Details') {
         return Promise.resolve({
@@ -75,26 +75,19 @@ describe(commands.HOMESITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: {} } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          "SiteId": "53ad95dc-5d2c-42a3-a63c-716f7b8014f5",
-          "WebId": "288ce497-483c-4cd5-b8a2-27b726d002e2",
-          "LogoUrl": "https://contoso.sharepoint.com/sites/Work/siteassets/work.png",
-          "Title": "Work @ Contoso",
-          "Url": "https://contoso.sharepoint.com/sites/Work"
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} } as any);
+    assert(loggerLogSpy.calledWith({
+      "SiteId": "53ad95dc-5d2c-42a3-a63c-716f7b8014f5",
+      "WebId": "288ce497-483c-4cd5-b8a2-27b726d002e2",
+      "LogoUrl": "https://contoso.sharepoint.com/sites/Work/siteassets/work.png",
+      "Title": "Work @ Contoso",
+      "Url": "https://contoso.sharepoint.com/sites/Work"
+    }));
   });
 
-  it(`doesn't output anything when information about the Home Site is not available`, (done) => {
+  it(`doesn't output anything when information about the Home Site is not available`, async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SP.SPHSite/Details') {
+      if (opts.url === 'https://contoso.sharepoint.com/_api/SP.SPHSite/Details') {
         return Promise.resolve({
           "odata.null": true
         });
@@ -103,29 +96,15 @@ describe(commands.HOMESITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: {} } as any, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} } as any);
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {} } as any),
+      new CommandError(`An error has occurred`));
   });
 
   it('supports debug mode', () => {

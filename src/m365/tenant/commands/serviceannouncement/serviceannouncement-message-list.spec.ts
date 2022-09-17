@@ -222,7 +222,7 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title']);
   });
 
-  it('handles promise error while getting service update messages available in Microsoft 365', (done) => {
+  it('handles promise error while getting service update messages available in Microsoft 365', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/admin/serviceAnnouncement/messages') > -1) {
         return Promise.reject('An error has occurred');
@@ -230,18 +230,10 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
-  it('gets the service update messages available in Microsoft 365', (done) => {
+  it('gets the service update messages available in Microsoft 365', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/admin/serviceAnnouncement/messages') > -1) {
         return Promise.resolve(jsonOutput);
@@ -249,22 +241,15 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(jsonOutput.value));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(jsonOutput.value));
   });
 
-  it('gets the service update messages available in Microsoft 365 (debug)', (done) => {
+  it('gets the service update messages available in Microsoft 365 (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/admin/serviceAnnouncement/messages') > -1) {
         return Promise.resolve(jsonOutput);
@@ -272,22 +257,15 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(jsonOutput.value));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(jsonOutput.value));
   });
 
-  it('gets the service update messages for a particular service available in Microsoft 365', (done) => {
+  it('gets the service update messages for a particular service available in Microsoft 365', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/admin/serviceAnnouncement/messages') > -1) {
         return Promise.resolve(jsonOutputMicrosoftTeams);
@@ -295,23 +273,16 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         service: 'Microsoft Teams',
         debug: false
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(jsonOutputMicrosoftTeams.value));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(loggerLogSpy.calledWith(jsonOutputMicrosoftTeams.value));
   });
 
-  it('gets the service update messages for a particular service available in Microsoft 365 as text', (done) => {
+  it('gets the service update messages for a particular service available in Microsoft 365 as text', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/admin/serviceAnnouncement/messages') > -1) {
         return Promise.resolve(jsonOutputMicrosoftTeams);
@@ -319,21 +290,14 @@ describe(commands.SERVICEANNOUNCEMENT_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         service: 'Microsoft Teams',
         output: 'text',
         debug: false
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(jsonOutputMicrosoftTeams.value));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(jsonOutputMicrosoftTeams.value));
   });
 
   it('supports debug mode', () => {

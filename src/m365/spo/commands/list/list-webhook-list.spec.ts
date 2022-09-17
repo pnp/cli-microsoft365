@@ -66,7 +66,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'clientState', 'expirationDateTime', 'resource']);
   });
 
-  it('retrieves all webhooks of the specific list if title option is passed (debug)', (done) => {
+  it('retrieves all webhooks of the specific list if title option is passed (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
         if (opts.headers &&
@@ -97,40 +97,33 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         title: 'Documents',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "clientState": "pnp-js-core-subscription",
-            "expirationDateTime": "2018-12-09T18:01:55.097Z",
-            "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
-            "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }, {
-            "clientState": '',
-            "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-            "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-            "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "clientState": "pnp-js-core-subscription",
+        "expirationDateTime": "2018-12-09T18:01:55.097Z",
+        "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
+        "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }, {
+        "clientState": '',
+        "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
+        "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
+        "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }
+    ]));
   });
 
-  it('retrieves all webhooks of the specific list if listTitle option is passed (debug)', (done) => {
+  it('retrieves all webhooks of the specific list if listTitle option is passed (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
         if (opts.headers &&
@@ -161,40 +154,33 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         listTitle: 'Documents',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "clientState": "pnp-js-core-subscription",
-            "expirationDateTime": "2018-12-09T18:01:55.097Z",
-            "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
-            "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }, {
-            "clientState": '',
-            "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-            "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-            "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "clientState": "pnp-js-core-subscription",
+        "expirationDateTime": "2018-12-09T18:01:55.097Z",
+        "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
+        "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }, {
+        "clientState": '',
+        "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
+        "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
+        "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }
+    ]));
   });
 
-  it('retrieves all webhooks of the specific list if title option is passed', (done) => {
+  it('retrieves all webhooks of the specific list if title option is passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
         if (opts.headers &&
@@ -225,40 +211,33 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         title: 'Documents',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "clientState": "pnp-js-core-subscription",
-            "expirationDateTime": "2018-12-09T18:01:55.097Z",
-            "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
-            "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }, {
-            "clientState": '',
-            "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-            "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-            "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "clientState": "pnp-js-core-subscription",
+        "expirationDateTime": "2018-12-09T18:01:55.097Z",
+        "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
+        "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }, {
+        "clientState": '',
+        "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
+        "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
+        "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }
+    ]));
   });
 
-  it('retrieves all webhooks of the specific list if listTitle option is passed', (done) => {
+  it('retrieves all webhooks of the specific list if listTitle option is passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
         if (opts.headers &&
@@ -289,40 +268,33 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         listTitle: 'Documents',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "clientState": "pnp-js-core-subscription",
-            "expirationDateTime": "2018-12-09T18:01:55.097Z",
-            "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
-            "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }, {
-            "clientState": '',
-            "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-            "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-            "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "clientState": "pnp-js-core-subscription",
+        "expirationDateTime": "2018-12-09T18:01:55.097Z",
+        "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
+        "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }, {
+        "clientState": '',
+        "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
+        "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
+        "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }
+    ]));
   });
 
-  it('retrieves all webhooks of the specific list if id option is passed (debug)', (done) => {
+  it('retrieves all webhooks of the specific list if id option is passed (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
         if (opts.headers &&
@@ -353,40 +325,33 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         id: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "clientState": "pnp-js-core-subscription",
-            "expirationDateTime": "2018-12-09T18:01:55.097Z",
-            "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
-            "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }, {
-            "clientState": '',
-            "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-            "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-            "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "clientState": "pnp-js-core-subscription",
+        "expirationDateTime": "2018-12-09T18:01:55.097Z",
+        "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
+        "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }, {
+        "clientState": '',
+        "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
+        "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
+        "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }
+    ]));
   });
 
-  it('retrieves all webhooks of the specific list if listId option is passed (debug)', (done) => {
+  it('retrieves all webhooks of the specific list if listId option is passed (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
         if (opts.headers &&
@@ -417,40 +382,33 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "clientState": "pnp-js-core-subscription",
-            "expirationDateTime": "2018-12-09T18:01:55.097Z",
-            "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
-            "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }, {
-            "clientState": '',
-            "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-            "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-            "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "clientState": "pnp-js-core-subscription",
+        "expirationDateTime": "2018-12-09T18:01:55.097Z",
+        "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
+        "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }, {
+        "clientState": '',
+        "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
+        "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
+        "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }
+    ]));
   });
 
-  it('retrieves all webhooks of the specific list if id option is passed', (done) => {
+  it('retrieves all webhooks of the specific list if id option is passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
         if (opts.headers &&
@@ -481,40 +439,33 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "clientState": "pnp-js-core-subscription",
-            "expirationDateTime": "2018-12-09T18:01:55.097Z",
-            "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
-            "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }, {
-            "clientState": '',
-            "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-            "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-            "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "clientState": "pnp-js-core-subscription",
+        "expirationDateTime": "2018-12-09T18:01:55.097Z",
+        "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
+        "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }, {
+        "clientState": '',
+        "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
+        "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
+        "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }
+    ]));
   });
 
-  it('retrieves all webhooks of the specific list if listId option is passed', (done) => {
+  it('retrieves all webhooks of the specific list if listId option is passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
         if (opts.headers &&
@@ -545,40 +496,33 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "clientState": "pnp-js-core-subscription",
-            "expirationDateTime": "2018-12-09T18:01:55.097Z",
-            "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
-            "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }, {
-            "clientState": '',
-            "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-            "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-            "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "clientState": "pnp-js-core-subscription",
+        "expirationDateTime": "2018-12-09T18:01:55.097Z",
+        "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
+        "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }, {
+        "clientState": '',
+        "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
+        "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
+        "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }
+    ]));
   });
 
-  it('renders empty string for clientState, if no value for clientState was specified in the webhook', (done) => {
+  it('renders empty string for clientState, if no value for clientState was specified in the webhook', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
         if (opts.headers &&
@@ -609,40 +553,33 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "clientState": '',
-            "expirationDateTime": "2018-12-09T18:01:55.097Z",
-            "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
-            "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }, {
-            "clientState": '',
-            "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-            "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-            "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-            "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-            "resourceData": null
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith([
+      {
+        "clientState": '',
+        "expirationDateTime": "2018-12-09T18:01:55.097Z",
+        "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
+        "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }, {
+        "clientState": '',
+        "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
+        "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
+        "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
+        "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+        "resourceData": null
+      }
+    ]));
   });
 
-  it('outputs user-friendly message when no webhooks found in verbose mode', (done) => {
+  it('outputs user-friendly message when no webhooks found in verbose mode', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
         if (opts.headers &&
@@ -657,24 +594,17 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         id: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith('No webhooks found'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogToStderrSpy.calledWith('No webhooks found'));
   });
 
-  it('outputs all properties when output is JSON', (done) => {
+  it('outputs all properties when output is JSON', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/Subscriptions`) > -1) {
         if (opts.headers &&
@@ -705,43 +635,36 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         output: 'json'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [
-            {
-              "clientState": "pnp-js-core-subscription",
-              "expirationDateTime": "2018-12-09T18:01:55.097Z",
-              "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
-              "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
-              "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-              "resourceData": null
-            }, {
-              "clientState": '',
-              "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
-              "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
-              "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
-              "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
-              "resourceData": null
-            }
-          ]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [
+        {
+          "clientState": "pnp-js-core-subscription",
+          "expirationDateTime": "2018-12-09T18:01:55.097Z",
+          "id": "cfda40f2-6ca2-4424-9be0-33e9785b0e67",
+          "notificationUrl": "https://deletemetestfunction.azurewebsites.net/api/FakeWebhookEndpoint?code=QlM2zaeJRti4WFGQUEqSo1ZmKMtRdB2JQ3mc2kzPj2aX6pNBAWVU4w==",
+          "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+          "resourceData": null
+        }, {
+          "clientState": '',
+          "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
+          "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
+          "notificationUrl": "https://mlk-document-publishing-fa-dev-we.azurewebsites.net/api/HandleWebHookNotification?code=jZyDfmBffPn7x0xYCQtZuxfqapu7cJzJo6puvruJiMUOxUl6XkxXAA==",
+          "resource": "dfddade1-4729-428d-881e-7fedf3cae50d",
+          "resourceData": null
+        }
+      ]
+    ));
   });
 
-  it('command correctly handles list get reject request', (done) => {
+  it('command correctly handles list get reject request', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
         return Promise.resolve({
@@ -763,24 +686,16 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
     const actionTitle: string = 'Documents';
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         title: actionTitle,
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
-  it('uses correct API url when id option is passed', (done) => {
+  it('uses correct API url when id option is passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
         return Promise.resolve('Correct Url');
@@ -791,19 +706,11 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: actionId,
         webUrl: 'https://contoso.sharepoint.com'
-      }
-    }, () => {
-      try {
-        assert(1 === 1);
-        done();
-      }
-      catch (e) {
-        done(e);
       }
     });
   });

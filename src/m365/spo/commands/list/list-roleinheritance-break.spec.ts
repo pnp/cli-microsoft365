@@ -105,7 +105,7 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('break role inheritance on list by title', (done) => {
+  it('break role inheritance on list by title', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/breakroleinheritance(true)') > -1) {
         return Promise.resolve();
@@ -114,24 +114,16 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test'
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('break role inheritance on list by title and clear all permissions', (done) => {
+  it('break role inheritance on list by title and clear all permissions', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/breakroleinheritance(false)') > -1) {
         return Promise.resolve();
@@ -140,25 +132,17 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test',
         clearExistingPermissions: true
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('break role inheritance on list by id', (done) => {
+  it('break role inheritance on list by id', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid\'202b8199-b9de-43fd-9737-7f213f51c991\')/breakroleinheritance(true)') > -1) {
         return Promise.resolve();
@@ -167,24 +151,16 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '202b8199-b9de-43fd-9737-7f213f51c991'
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('break role inheritance on list by id and clear all permissions', (done) => {
+  it('break role inheritance on list by id and clear all permissions', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid\'202b8199-b9de-43fd-9737-7f213f51c991\')/breakroleinheritance(false)') > -1) {
         return Promise.resolve();
@@ -193,25 +169,17 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listId: '202b8199-b9de-43fd-9737-7f213f51c991',
         clearExistingPermissions: true
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('list role inheritance break command handles reject request correctly', (done) => {
+  it('list role inheritance break command handles reject request correctly', async () => {
     const err = 'request rejected';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/getbytitle(\'test\')/breakroleinheritance(true)') > -1) {
@@ -221,20 +189,12 @@ describe(commands.LIST_ROLEINHERITANCE_BREAK, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'test'
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 });

@@ -70,7 +70,7 @@ describe(commands.MESSAGE_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('calls the messaging endpoint with the right parameters and confirmation', (done) => {
+  it('calls the messaging endpoint with the right parameters and confirmation', async () => {
     const requestDeleteStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123123.json') {
         return Promise.resolve();
@@ -78,40 +78,26 @@ describe(commands.MESSAGE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: 10123190123123, confirm: true } }, () => {
-      try {
-        assert.strictEqual(requestDeleteStub.lastCall.args[0].url, 'https://www.yammer.com/api/v1/messages/10123190123123.json');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: 10123190123123, confirm: true } });
+    assert.strictEqual(requestDeleteStub.lastCall.args[0].url, 'https://www.yammer.com/api/v1/messages/10123190123123.json');
   });
 
-  it('calls the messaging endpoint with the right parameters without confirmation', (done) => {
+  it('calls the messaging endpoint with the right parameters without confirmation', async () => {
     const requestDeleteStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123123.json') {
         return Promise.resolve();
       }
       return Promise.reject('Invalid request');
     });
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, { options: { debug: true, id: 10123190123123, confirm: false } }, () => {
-      try {
-        assert.strictEqual(requestDeleteStub.lastCall.args[0].url, 'https://www.yammer.com/api/v1/messages/10123190123123.json');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: 10123190123123, confirm: false } });
+    assert.strictEqual(requestDeleteStub.lastCall.args[0].url, 'https://www.yammer.com/api/v1/messages/10123190123123.json');
   });
 
-  it('does not call the messaging endpoint without confirmation', (done) => {
+  it('does not call the messaging endpoint without confirmation', async () => {
     const requestDeleteStub = sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/messages/10123190123123.json') {
         return Promise.resolve();
@@ -119,22 +105,15 @@ describe(commands.MESSAGE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
 
-    command.action(logger, { options: { debug: true, id: 10123190123123, confirm: false } }, () => {
-      try {
-        assert(requestDeleteStub.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, id: 10123190123123, confirm: false } });
+    assert(requestDeleteStub.notCalled);
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -143,15 +122,7 @@ describe(commands.MESSAGE_REMOVE, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, id: 10123190123123, confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 10123190123123, confirm: true  } } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation with parameters', async () => {

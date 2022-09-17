@@ -68,7 +68,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds a new library as org assets library (debug)', (done) => {
+  it('adds a new library as org assets library (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="AddToOrgAssetsLibAndCdnWithType" Id="11" ObjectPathId="8"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="String">https://contoso.sharepoint.com/siteassets</Parameter><Parameter Type="Null" /><Parameter Type="Enum">1</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
         return Promise.resolve(JSON.stringify(
@@ -81,19 +81,10 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets' } }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    await command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets' } });
   });
 
-  it('adds a new library as org assets library with CDN Type (debug)', (done) => {
+  it('adds a new library as org assets library with CDN Type (debug)', async () => {
     let orgAssetLibAddCallIssued = false;
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -110,19 +101,11 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public' } }, () => {
-      try {
-        assert(orgAssetLibAddCallIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    await command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public' } });
+    assert(orgAssetLibAddCallIssued);
   });
 
-  it('adds a new library as org assets library with CDN Type and thumbnailUrl (debug)', (done) => {
+  it('adds a new library as org assets library with CDN Type and thumbnailUrl (debug)', async () => {
     let orgAssetLibAddCallIssued = false;
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -139,19 +122,11 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png' } }, () => {
-      try {
-        assert(orgAssetLibAddCallIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    await command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png' } });
+    assert(orgAssetLibAddCallIssued);
   });
 
-  it('handles error if is already present', (done) => {
+  it('handles error if is already present', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="AddToOrgAssetsLibAndCdnWithType" Id="11" ObjectPathId="8"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="String">https://contoso.sharepoint.com/siteassets</Parameter><Parameter Type="String">https://contoso.sharepoint.com/siteassets/logo.png</Parameter><Parameter Type="Enum">1</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
         return Promise.resolve(JSON.stringify(
@@ -168,20 +143,11 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`This library is already an organization assets library.`)));
-
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-
+    await assert.rejects(command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png' } } as any),
+      new CommandError(`This library is already an organization assets library.`));
   });
 
-  it('handles error getting request', (done) => {
+  it('handles error getting request', async () => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([
@@ -196,34 +162,18 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert(svcListRequest.called);
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
+    assert(svcListRequest.called);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {} } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if the libraryUrl is not valid', async () => {

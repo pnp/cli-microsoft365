@@ -43,9 +43,9 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
       }
     };
     promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
   });
 
@@ -74,7 +74,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('completes a remove request - confirm parameter', (done) => {
+  it('completes a remove request - confirm parameter', async () => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -86,25 +86,18 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         verbose: true,
         confirm: true,
         url: "http://contoso.sharepoint.com/sites/site1"
       }
-    } as any, () => {
-      try {
-        assert(svcListRequest.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(svcListRequest.called);
   });
 
-  it('completes a remove request - prompt confirmed', (done) => {
+  it('completes a remove request - prompt confirmed', async () => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -117,28 +110,21 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
       options: {
         debug: false,
         verbose: true,
         confirm: false,
         url: "http://contoso.sharepoint.com/sites/site1"
       }
-    } as any, () => {
-      try {
-        assert(svcListRequest.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(svcListRequest.called);
   });
 
-  it('handles error during remove request', (done) => {
+  it('handles error during remove request', async () => {
     const svcListRequest = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.headers &&
@@ -156,72 +142,43 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         confirm: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert(svcListRequest.called);
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
+    assert(svcListRequest.called);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', confirm: true } } as any),
+      new CommandError('An error has occurred'));
   });
 
-  it('prompts before removing', (done) => {
-    command.action(logger, { options: { debug: true, verbose: true, confirm: false, url: 'https://contoso.sharepoint.com/sites/test1' } }, () => {
-      let promptIssued = false;
+  it('prompts before removing', async () => {
+    await command.action(logger, { options: { debug: true, verbose: true, confirm: false, url: 'https://contoso.sharepoint.com/sites/test1' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('aborts when declined confirmation', (done) => {
+  it('aborts when declined confirmation', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('Invalid request');
     });
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { debug: true, verbose: true, confirm: false, url: 'https://contoso.sharepoint.com/sites/test1' } }, () => {
-      try {
-        assert(postStub.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: { debug: true, verbose: true, confirm: false, url: 'https://contoso.sharepoint.com/sites/test1' } });
+    assert(postStub.notCalled);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {

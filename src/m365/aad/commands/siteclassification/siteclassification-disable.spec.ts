@@ -33,9 +33,9 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     promptOptions = undefined;
   });
@@ -76,25 +76,18 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     assert(containsOption);
   });
 
-  it('prompts before disabling siteclassification when confirm option not passed', (done) => {
-    command.action(logger, { options: { debug: false } }, () => {
-      let promptIssued = false;
+  it('prompts before disabling siteclassification when confirm option not passed', async () => {
+    await command.action(logger, { options: { debug: false } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('handles Microsoft 365 Tenant siteclassification is not enabled', (done) => {
+  it('handles Microsoft 365 Tenant siteclassification is not enabled', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
@@ -106,19 +99,11 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: true, confirm: true } } as any, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Site classification is not enabled.')));
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } } as any), 
+      new CommandError('Site classification is not enabled.'));
   });
 
-  it('handles Microsoft 365 Tenant siteclassification missing DirectorySettingTemplate', (done) => {
+  it('handles Microsoft 365 Tenant siteclassification missing DirectorySettingTemplate', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
@@ -189,19 +174,11 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: true, confirm: true } } as any, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\"")));
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } } as any),
+      new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\""));
   });
 
-  it('handles Microsoft 365 Tenant siteclassification missing UnifiedGroupSetting ID', (done) => {
+  it('handles Microsoft 365 Tenant siteclassification missing UnifiedGroupSetting ID', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
@@ -272,19 +249,11 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: true, confirm: true } } as any, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Missing UnifiedGroupSettting id")));
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } } as any),
+      new CommandError("Missing UnifiedGroupSettting id"));
   });
 
-  it('handles Microsoft 365 Tenant siteclassification empty UnifiedGroupSetting ID', (done) => {
+  it('handles Microsoft 365 Tenant siteclassification empty UnifiedGroupSetting ID', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
@@ -355,19 +324,11 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: true, confirm: true } } as any, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Missing UnifiedGroupSettting id")));
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } } as any),
+      new CommandError("Missing UnifiedGroupSettting id"));
   });
 
-  it('handles disabling site classification without prompting', (done) => {
+  it('handles disabling site classification without prompting', async () => {
     let deleteRequestIssued = false;
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
@@ -453,19 +414,11 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { confirm: true } } as any, () => {
-      try {
-        assert(deleteRequestIssued);
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { confirm: true } } as any);
+    assert(deleteRequestIssued);
   });
 
-  it('handles disabling site classification without prompting (debug)', (done) => {
+  it('handles disabling site classification without prompting (debug)', async () => {
     let deleteRequestIssued = false;
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
@@ -550,36 +503,21 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: true, confirm: true } } as any, () => {
-      try {
-        assert(deleteRequestIssued);
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, confirm: true } } as any);
+    assert(deleteRequestIssued);
   });
 
-  it('aborts removing the group when prompt not confirmed', (done) => {
+  it('aborts removing the group when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: { debug: false } });
+    assert(postSpy.notCalled);
   });
 
-  it('handles disabling site classification when prompt confirmed', (done) => {
+  it('handles disabling site classification when prompt confirmed', async () => {
     let deleteRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -666,17 +604,10 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(deleteRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false } });
+    assert(deleteRequestIssued);
   });
 });

@@ -75,7 +75,7 @@ describe(commands.APP_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('creates AAD app reg with just the name', (done) => {
+  it('creates AAD app reg with just the name', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -152,28 +152,20 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-          objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      tenantId: ''
+    }));
   });
 
-  it('creates multitenant AAD app reg', (done) => {
+  it('creates multitenant AAD app reg', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -250,29 +242,21 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         multitenant: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: '62f0f128-987f-47f2-827a-be50d0d894c7',
-          objectId: '9b1e2c08-6e35-4134-a0ac-16ab154cd05a',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: '62f0f128-987f-47f2-827a-be50d0d894c7',
+      objectId: '9b1e2c08-6e35-4134-a0ac-16ab154cd05a',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg for a web app with the specified redirect URIs', (done) => {
+  it('creates AAD app reg for a web app with the specified redirect URIs', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -358,30 +342,22 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         redirectUris: 'https://myapp.azurewebsites.net,http://localhost:4000',
         platform: 'web'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: 'd2941a3b-aad4-49e0-8a1d-b82de0b46067',
-          objectId: 'ff520671-4810-4d25-a10f-e565fc62a5ec',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: 'd2941a3b-aad4-49e0-8a1d-b82de0b46067',
+      objectId: 'ff520671-4810-4d25-a10f-e565fc62a5ec',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg for a desktop app with the specified redirect URI', (done) => {
+  it('creates AAD app reg for a desktop app with the specified redirect URI', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -465,30 +441,22 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         redirectUris: 'https://login.microsoftonline.com/common/oauth2/nativeclient',
         platform: 'publicClient'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: '1ce0287c-9ccc-457e-a0cf-3ec5b734c092',
-          objectId: 'f1bb2138-bff1-491e-b082-9f447f3742b8',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: '1ce0287c-9ccc-457e-a0cf-3ec5b734c092',
+      objectId: 'f1bb2138-bff1-491e-b082-9f447f3742b8',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg with a secret', (done) => {
+  it('creates AAD app reg with a secret', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -578,30 +546,22 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         withSecret: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: '3c5bd51d-f1ac-4344-bd16-43396cadff14',
-          objectId: '4d24b0c6-ad07-47c6-9bd8-9c167f9f758e',
-          secret: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: '3c5bd51d-f1ac-4344-bd16-43396cadff14',
+      objectId: '4d24b0c6-ad07-47c6-9bd8-9c167f9f758e',
+      secret: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg with a secret (debug)', (done) => {
+  it('creates AAD app reg with a secret (debug)', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -691,30 +651,22 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         name: 'My AAD app',
         withSecret: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: '3c5bd51d-f1ac-4344-bd16-43396cadff14',
-          objectId: '4d24b0c6-ad07-47c6-9bd8-9c167f9f758e',
-          secret: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: '3c5bd51d-f1ac-4344-bd16-43396cadff14',
+      objectId: '4d24b0c6-ad07-47c6-9bd8-9c167f9f758e',
+      secret: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg for a deamon app with specified Microsoft Graph application permissions', (done) => {
+  it('creates AAD app reg for a deamon app with specified Microsoft Graph application permissions', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -850,31 +802,23 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         withSecret: true,
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
-          objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
-          secret: 'vP2K-_K-N6EI-E5z0yOTsz443grfM_pyvv',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
+      objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
+      secret: 'vP2K-_K-N6EI-E5z0yOTsz443grfM_pyvv',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg for a deamon app with specified Microsoft Graph application and delegated permissions', (done) => {
+  it('creates AAD app reg for a deamon app with specified Microsoft Graph application and delegated permissions', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -1018,7 +962,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
@@ -1026,24 +970,16 @@ describe(commands.APP_ADD, () => {
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All',
         apisDelegated: 'https://graph.microsoft.com/Directory.Read.All'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', `Error: ${JSON.stringify(err, null, 2)}`);
-        assert(loggerLogSpy.calledWith({
-          appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
-          objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
-          secret: 'vP2K-_K-N6EI-E5z0yOTsz443grfM_pyvv',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
+      objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
+      secret: 'vP2K-_K-N6EI-E5z0yOTsz443grfM_pyvv',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg for a single-page app with specified Microsoft Graph delegated permissions', (done) => {
+  it('creates AAD app reg for a single-page app with specified Microsoft Graph delegated permissions', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -1181,7 +1117,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
@@ -1190,23 +1126,15 @@ describe(commands.APP_ADD, () => {
         apisDelegated: 'https://graph.microsoft.com/Calendars.Read,https://graph.microsoft.com/Directory.Read.All',
         implicitFlow: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: 'c505d465-9e4e-4bb4-b653-7b36d77cc94a',
-          objectId: 'f51ff52f-8f04-4924-91d0-636349eed65c',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: 'c505d465-9e4e-4bb4-b653-7b36d77cc94a',
+      objectId: 'f51ff52f-8f04-4924-91d0-636349eed65c',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg for a single-page app with specified Microsoft Graph delegated permissions (debug)', (done) => {
+  it('creates AAD app reg for a single-page app with specified Microsoft Graph delegated permissions (debug)', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -1344,7 +1272,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         name: 'My AAD app',
@@ -1353,23 +1281,15 @@ describe(commands.APP_ADD, () => {
         apisDelegated: 'https://graph.microsoft.com/Calendars.Read,https://graph.microsoft.com/Directory.Read.All',
         implicitFlow: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: 'c505d465-9e4e-4bb4-b653-7b36d77cc94a',
-          objectId: 'f51ff52f-8f04-4924-91d0-636349eed65c',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: 'c505d465-9e4e-4bb4-b653-7b36d77cc94a',
+      objectId: 'f51ff52f-8f04-4924-91d0-636349eed65c',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg with Application ID URI set to a fixed value', (done) => {
+  it('creates AAD app reg with Application ID URI set to a fixed value', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/c0e63919-057c-4e6b-be6c-8662e7aec4eb' &&
@@ -1457,29 +1377,21 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         uri: 'https://contoso.onmicrosoft.com/myapp'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: 'b08d9318-5612-4f87-9f94-7414ef6f0c8a',
-          objectId: 'c0e63919-057c-4e6b-be6c-8662e7aec4eb',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: 'b08d9318-5612-4f87-9f94-7414ef6f0c8a',
+      objectId: 'c0e63919-057c-4e6b-be6c-8662e7aec4eb',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg with Application ID URI set to a fixed value (debug)', (done) => {
+  it('creates AAD app reg with Application ID URI set to a fixed value (debug)', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/c0e63919-057c-4e6b-be6c-8662e7aec4eb' &&
@@ -1567,29 +1479,21 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         name: 'My AAD app',
         uri: 'https://contoso.onmicrosoft.com/myapp'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: 'b08d9318-5612-4f87-9f94-7414ef6f0c8a',
-          objectId: 'c0e63919-057c-4e6b-be6c-8662e7aec4eb',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: 'b08d9318-5612-4f87-9f94-7414ef6f0c8a',
+      objectId: 'c0e63919-057c-4e6b-be6c-8662e7aec4eb',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg with Application ID URI set to a value with the appId token and a custom scope that can be consented by admins', (done) => {
+  it('creates AAD app reg with Application ID URI set to a value with the appId token and a custom scope that can be consented by admins', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/fe45ba27-a692-4b11-adf8-f4ec184ea3a5') {
@@ -1691,7 +1595,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
@@ -1701,23 +1605,15 @@ describe(commands.APP_ADD, () => {
         scopeAdminConsentDisplayName: 'Access as a user',
         scopeConsentBy: 'admins'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', `Error: ${JSON.stringify(err)}`);
-        assert(loggerLogSpy.calledWith({
-          appId: '13e11551-2967-4985-8c55-cd2aaa6b80ad',
-          objectId: 'fe45ba27-a692-4b11-adf8-f4ec184ea3a5',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: '13e11551-2967-4985-8c55-cd2aaa6b80ad',
+      objectId: 'fe45ba27-a692-4b11-adf8-f4ec184ea3a5',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg with Application ID URI set to a value with the appId token and a custom scope that can be consented by admins and users', (done) => {
+  it('creates AAD app reg with Application ID URI set to a value with the appId token and a custom scope that can be consented by admins and users', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
     sinon.stub(request, 'patch').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications/fe45ba27-a692-4b11-adf8-f4ec184ea3a5') {
@@ -1819,7 +1715,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
@@ -1829,23 +1725,15 @@ describe(commands.APP_ADD, () => {
         scopeAdminConsentDisplayName: 'Access as a user',
         scopeConsentBy: 'adminsAndUsers'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', `Error: ${JSON.stringify(err)}`);
-        assert(loggerLogSpy.calledWith({
-          appId: '13e11551-2967-4985-8c55-cd2aaa6b80ad',
-          objectId: 'fe45ba27-a692-4b11-adf8-f4ec184ea3a5',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: '13e11551-2967-4985-8c55-cd2aaa6b80ad',
+      objectId: 'fe45ba27-a692-4b11-adf8-f4ec184ea3a5',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg with a certificate using certificate file', (done) => {
+  it('creates AAD app reg with a certificate using certificate file', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -1930,30 +1818,22 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => "somecertificatebase64string");
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         certificateDisplayName: 'some certificate',
         certificateFile: 'C:\\temp\\some-certificate.cer'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-          objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg with a certificate using base64 string', (done) => {
+  it('creates AAD app reg with a certificate using base64 string', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -2036,30 +1916,22 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         certificateDisplayName: 'some certificate',
         certificateBase64Encoded: 'somecertificatebase64string'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-          objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+      objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg for a deamon app with specified Microsoft Graph permissions, including admin consent', (done) => {
+  it('creates AAD app reg for a deamon app with specified Microsoft Graph permissions, including admin consent', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -2205,30 +2077,22 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         name: 'My AAD app',
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All',
         grantAdminConsent: true,
         debug: true
       }
-    }, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', `Error: ${JSON.stringify(err)}`);
-        assert(loggerLogSpy.calledWith({
-          appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
-          objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
+      objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
+      tenantId: ''
+    }));
   });
 
-  it('returns error when retrieving information about service principals failed', (done) => {
+  it('returns error when retrieving information about service principals failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject({
       error: {
         message: `An error has occurred`
@@ -2237,25 +2101,14 @@ describe(commands.APP_ADD, () => {
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(_ => Promise.reject('Issued POST request'));
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        name: 'My AAD app',
-        withSecret: true,
-        apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      name: 'My AAD app',
+      withSecret: true,
+      apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('returns error when non-existent service principal specified in the APIs', (done) => {
+  it('returns error when non-existent service principal specified in the APIs', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -2393,26 +2246,15 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        name: 'My AAD app',
-        platform: 'spa',
-        apisDelegated: 'https://myapi.onmicrosoft.com/access_as_user',
-        implicitFlow: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Service principal https://myapi.onmicrosoft.com not found')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      name: 'My AAD app',
+      platform: 'spa',
+      apisDelegated: 'https://myapi.onmicrosoft.com/access_as_user',
+      implicitFlow: true } } as any), new CommandError('Service principal https://myapi.onmicrosoft.com not found'));
   });
 
-  it('returns error when non-existent permission scope specified in the APIs', (done) => {
+  it('returns error when non-existent permission scope specified in the APIs', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -2550,26 +2392,15 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        name: 'My AAD app',
-        platform: 'spa',
-        apisDelegated: 'https://graph.microsoft.com/Read.Everything',
-        implicitFlow: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Permission Read.Everything for service principal https://graph.microsoft.com not found')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      name: 'My AAD app',
+      platform: 'spa',
+      apisDelegated: 'https://graph.microsoft.com/Read.Everything',
+      implicitFlow: true } } as any), new CommandError('Permission Read.Everything for service principal https://graph.microsoft.com not found'));
   });
 
-  it('returns error when configuring secret failed', (done) => {
+  it('returns error when configuring secret failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -2654,24 +2485,13 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        name: 'My AAD app',
-        withSecret: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      name: 'My AAD app',
+      withSecret: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it('returns error when creating the AAD app reg failed', (done) => {
+  it('returns error when creating the AAD app reg failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(_ => Promise.reject({
@@ -2680,23 +2500,12 @@ describe(commands.APP_ADD, () => {
       }
     }));
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        name: 'My AAD app'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      name: 'My AAD app' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('returns error when setting Application ID URI failed', (done) => {
+  it('returns error when setting Application ID URI failed', async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issued GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject({
       error: {
@@ -2777,46 +2586,24 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        name: 'My AAD app',
-        uri: 'https://contoso.onmicrosoft.com/myapp'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      name: 'My AAD app',
+      uri: 'https://contoso.onmicrosoft.com/myapp' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('returns error when certificate file cannot be read', (done) => {
+  it('returns error when certificate file cannot be read', async () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error("An error has occurred"); });
 
-    command.action(logger, {
-      options: {
-        debug: true,
-        name: 'My AAD app',
-        certificateDisplayName: 'some certificate',
-        certificateFile: 'C:\\temp\\some-certificate.cer'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, `Error reading certificate file: Error: An error has occurred. Please add the certificate using base64 option '--certificateBase64Encoded'.`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: true,
+      name: 'My AAD app',
+      certificateDisplayName: 'some certificate',
+      certificateFile: 'C:\\temp\\some-certificate.cer' } } as any), new CommandError(`Error reading certificate file: Error: An error has occurred. Please add the certificate using base64 option '--certificateBase64Encoded'.`));
   });
 
-  it('creates AAD app reg for a web app with service principal name with trailing slash', (done) => {
+  it('creates AAD app reg for a web app with service principal name with trailing slash', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -2939,7 +2726,7 @@ describe(commands.APP_ADD, () => {
       return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
@@ -2947,23 +2734,15 @@ describe(commands.APP_ADD, () => {
         redirectUris: 'https://global.consent.azure-apim.net/redirect',
         apisDelegated: 'https://admin.services.crm.dynamics.com/user_impersonation'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: '702e65ba-cacb-4a2f-aa5c-e6460967bc20',
-          objectId: '1cd23c5f-2cb4-4bd0-a582-d5b00f578dcd',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: '702e65ba-cacb-4a2f-aa5c-e6460967bc20',
+      objectId: '1cd23c5f-2cb4-4bd0-a582-d5b00f578dcd',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg for a web app from a manifest', (done) => {
+  it('creates AAD app reg for a web app from a manifest', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -3198,28 +2977,20 @@ describe(commands.APP_ADD, () => {
     };
 
     (command as any).manifest = manifest;
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest)
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: '689d2d97-7b80-4283-9185-ee24b5648607',
-          objectId: '3a0388de-2988-4a97-a068-ff4e2b218752',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: '689d2d97-7b80-4283-9185-ee24b5648607',
+      objectId: '3a0388de-2988-4a97-a068-ff4e2b218752',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg for a web app from a manifest without info URLs', (done) => {
+  it('creates AAD app reg for a web app from a manifest without info URLs', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -3441,28 +3212,20 @@ describe(commands.APP_ADD, () => {
     };
 
     (command as any).manifest = manifest;
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest)
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: '689d2d97-7b80-4283-9185-ee24b5648607',
-          objectId: '3a0388de-2988-4a97-a068-ff4e2b218752',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: '689d2d97-7b80-4283-9185-ee24b5648607',
+      objectId: '3a0388de-2988-4a97-a068-ff4e2b218752',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg for a web app from a manifest with pre-authorized apps', (done) => {
+  it('creates AAD app reg for a web app from a manifest with pre-authorized apps', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -3770,28 +3533,20 @@ describe(commands.APP_ADD, () => {
     };
 
     (command as any).manifest = manifest;
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest)
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg for a web app from a manifest with public client flows enabled', (done) => {
+  it('creates AAD app reg for a web app from a manifest with public client flows enabled', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -4099,28 +3854,20 @@ describe(commands.APP_ADD, () => {
     };
 
     (command as any).manifest = manifest;
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest)
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg for a web app from a manifest with public client flows disabled', (done) => {
+  it('creates AAD app reg for a web app from a manifest with public client flows disabled', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -4428,28 +4175,20 @@ describe(commands.APP_ADD, () => {
     };
 
     (command as any).manifest = manifest;
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest)
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg for a web app from a manifest with secrets', (done) => {
+  it('creates AAD app reg for a web app from a manifest with secrets', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -4746,32 +4485,24 @@ describe(commands.APP_ADD, () => {
     };
 
     (command as any).manifest = manifest;
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest)
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
-          tenantId: '',
-          secrets: [{
-            "displayName": "mysecret",
-            "value": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5"
-          }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+      tenantId: '',
+      secrets: [{
+        "displayName": "mysecret",
+        "value": "VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5"
+      }]
+    }));
   });
 
-  it('creates AAD app reg for a web app from a manifest with app roles', (done) => {
+  it('creates AAD app reg for a web app from a manifest with app roles', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -5104,28 +4835,20 @@ describe(commands.APP_ADD, () => {
     };
 
     (command as any).manifest = manifest;
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest)
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+      tenantId: ''
+    }));
   });
 
-  it('creates AAD app reg for a web app from a manifest with app roles and specified Microsoft Graph application permissions', (done) => {
+  it('creates AAD app reg for a web app from a manifest with app roles and specified Microsoft Graph application permissions', async () => {
     sinon.stub(request, 'get').callsFake(opts => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=appId,appRoles,id,oauth2PermissionScopes,servicePrincipalNames') {
         return Promise.resolve({
@@ -5500,29 +5223,21 @@ describe(commands.APP_ADD, () => {
     };
 
     (command as any).manifest = manifest;
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         manifest: JSON.stringify(manifest),
         apisApplication: 'https://graph.microsoft.com/Group.ReadWrite.All,https://graph.microsoft.com/Directory.Read.All'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(loggerLogSpy.calledWith({
-          appId: '19180b97-8f30-43ac-8a22-19565de0b064',
-          objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
-          tenantId: ''
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      appId: '19180b97-8f30-43ac-8a22-19565de0b064',
+      objectId: 'bcac8603-cf65-479b-a4e5-8d45d3d05379',
+      tenantId: ''
+    }));
   });
 
-  it(`creates AAD app reg with just the name. Doesn't save the app info if not requested`, (done) => {
+  it(`creates AAD app reg with just the name. Doesn't save the app info if not requested`, async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -5600,24 +5315,16 @@ describe(commands.APP_ADD, () => {
     });
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(fsWriteFileSyncSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(fsWriteFileSyncSpy.notCalled);
   });
 
-  it(`saves app info in the .m365rc.json file in the current folder when requested. Creates the file it doesn't exist`, (done) => {
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Creates the file it doesn't exist`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
@@ -5701,31 +5408,23 @@ describe(commands.APP_ADD, () => {
       fileContents = contents as string;
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         save: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert.strictEqual(filePath, '.m365rc.json');
-        assert.strictEqual(fileContents, JSON.stringify({
-          apps: [{
-            appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-            name: 'My AAD app'
-          }]
-        }, null, 2));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(filePath, '.m365rc.json');
+    assert.strictEqual(fileContents, JSON.stringify({
+      apps: [{
+        appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+        name: 'My AAD app'
+      }]
+    }, null, 2));
   });
 
-  it(`saves app info in the .m365rc.json file in the current folder when requested. Writes to the existing empty file`, (done) => {
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Writes to the existing empty file`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
@@ -5810,31 +5509,23 @@ describe(commands.APP_ADD, () => {
       fileContents = contents as string;
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         save: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert.strictEqual(filePath, '.m365rc.json');
-        assert.strictEqual(fileContents, JSON.stringify({
-          apps: [{
-            appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-            name: 'My AAD app'
-          }]
-        }, null, 2));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(filePath, '.m365rc.json');
+    assert.strictEqual(fileContents, JSON.stringify({
+      apps: [{
+        appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+        name: 'My AAD app'
+      }]
+    }, null, 2));
   });
 
-  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents`, (done) => {
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
@@ -5926,36 +5617,28 @@ describe(commands.APP_ADD, () => {
       fileContents = contents as string;
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         save: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert.strictEqual(filePath, '.m365rc.json');
-        assert.strictEqual(fileContents, JSON.stringify({
-          apps: [
-            {
-              "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
-              "name": "M365 app"
-            },
-            {
-              appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-              name: 'My AAD app'
-            }]
-        }, null, 2));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(filePath, '.m365rc.json');
+    assert.strictEqual(fileContents, JSON.stringify({
+      apps: [
+        {
+          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+          "name": "M365 app"
+        },
+        {
+          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+          name: 'My AAD app'
+        }]
+    }, null, 2));
   });
 
-  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents (debug)`, (done) => {
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents (debug)`, async () => {
     let fileContents: string | undefined;
     let filePath: string | undefined;
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
@@ -6047,36 +5730,28 @@ describe(commands.APP_ADD, () => {
       fileContents = contents as string;
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         name: 'My AAD app',
         save: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert.strictEqual(filePath, '.m365rc.json');
-        assert.strictEqual(fileContents, JSON.stringify({
-          apps: [
-            {
-              "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
-              "name": "M365 app"
-            },
-            {
-              appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
-              name: 'My AAD app'
-            }]
-        }, null, 2));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(filePath, '.m365rc.json');
+    assert.strictEqual(fileContents, JSON.stringify({
+      apps: [
+        {
+          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+          "name": "M365 app"
+        },
+        {
+          appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+          name: 'My AAD app'
+        }]
+    }, null, 2));
   });
 
-  it(`doesn't save app info in the .m365rc.json file when there was error reading file contents`, (done) => {
+  it(`doesn't save app info in the .m365rc.json file when there was error reading file contents`, async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -6156,25 +5831,17 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         save: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(fsWriteFileSyncSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(fsWriteFileSyncSpy.notCalled);
   });
 
-  it(`doesn't save app info in the .m365rc.json file when file has invalid JSON`, (done) => {
+  it(`doesn't save app info in the .m365rc.json file when file has invalid JSON`, async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -6254,25 +5921,17 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'readFileSync').callsFake(_ => '{');
     const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         save: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        assert(fsWriteFileSyncSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(fsWriteFileSyncSpy.notCalled);
   });
 
-  it(`doesn't fail execution when error occurred while saving app info`, (done) => {
+  it(`doesn't fail execution when error occurred while saving app info`, async () => {
     sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
     sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
     sinon.stub(request, 'post').callsFake(opts => {
@@ -6351,19 +6010,11 @@ describe(commands.APP_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => false);
     sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('Error occurred while saving app info'); });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         name: 'My AAD app',
         save: true
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
       }
     });
   });

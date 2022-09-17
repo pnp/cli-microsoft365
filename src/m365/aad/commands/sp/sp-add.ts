@@ -115,28 +115,29 @@ class AadSpAddCommand extends GraphCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getAppId(args)
-      .then((appId: string): Promise<void> => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/servicePrincipals`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json;odata=nometadata'
-          },
-          data: {
-            appId: appId
-          },
-          responseType: 'json'
-        };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const appId = await this.getAppId(args);
 
-        return request.post(requestOptions);
-      })
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/servicePrincipals`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          'content-type': 'application/json;odata=nometadata'
+        },
+        data: {
+          appId: appId
+        },
+        responseType: 'json'
+      };
+
+      const res = await request.post(requestOptions);
+
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

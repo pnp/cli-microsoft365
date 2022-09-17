@@ -185,7 +185,7 @@ class PlannerTaskAddCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.planName) {
       args.options.planTitle = args.options.planName;
 
@@ -193,51 +193,45 @@ class PlannerTaskAddCommand extends GraphCommand {
     }
 
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.', logger, cb);
+      this.handleError('This command does not support application permissions.');
       return;
     }
 
-    this
-      .getPlanId(args)
-      .then(planId => {
-        this.planId = planId;
-        return this.getBucketId(args, planId);
-      })
-      .then(bucketId => {
-        this.bucketId = bucketId;
-        return this.generateUserAssignments(args);
-      })
-      .then(assignments => {
-        const appliedCategories = this.generateAppliedCategories(args.options);
+    try {
+      this.planId = await this.getPlanId(args);
+      this.bucketId = await this.getBucketId(args, this.planId);
+      const assignments = await this.generateUserAssignments(args);
 
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/tasks`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json',
-          data: {
-            planId: this.planId,
-            bucketId: this.bucketId,
-            title: args.options.title,
-            startDateTime: args.options.startDateTime,
-            dueDateTime: args.options.dueDateTime,
-            percentComplete: args.options.percentComplete,
-            assignments: assignments,
-            orderHint: args.options.orderHint,
-            assigneePriority: args.options.assigneePriority,
-            appliedCategories: appliedCategories,
-            priority: taskPriority.getPriorityValue(args.options.priority)
-          }
-        };
+      const appliedCategories = this.generateAppliedCategories(args.options);
 
-        return request.post<PlannerTask>(requestOptions);
-      })
-      .then(newTask => this.updateTaskDetails(args.options, newTask))
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/planner/tasks`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json',
+        data: {
+          planId: this.planId,
+          bucketId: this.bucketId,
+          title: args.options.title,
+          startDateTime: args.options.startDateTime,
+          dueDateTime: args.options.dueDateTime,
+          percentComplete: args.options.percentComplete,
+          assignments: assignments,
+          orderHint: args.options.orderHint,
+          assigneePriority: args.options.assigneePriority,
+          appliedCategories: appliedCategories,
+          priority: taskPriority.getPriorityValue(args.options.priority)
+        }
+      };
+
+      const newTask = await request.post<PlannerTask>(requestOptions);
+      const result = await this.updateTaskDetails(args.options, newTask);
+      logger.log(result);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getTaskDetailsEtag(taskId: string): Promise<string> {

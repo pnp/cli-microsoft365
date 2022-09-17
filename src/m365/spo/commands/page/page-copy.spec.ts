@@ -69,7 +69,7 @@ describe(commands.PAGE_COPY, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Id', 'PageLayoutType', 'Title', 'Url']);
   });
 
-  it('create a page copy', (done) => {
+  it('create a page copy', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SP.MoveCopyUtil.CopyFileByPath()`) > -1) {
         return Promise.resolve();
@@ -86,18 +86,11 @@ describe(commands.PAGE_COPY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home.aspx", targetUrl: "home-copy.aspx" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(copyMock));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home.aspx", targetUrl: "home-copy.aspx" } });
+    assert(loggerLogSpy.calledWith(copyMock));
   });
 
-  it('create a page copy (DEBUG)', (done) => {
+  it('create a page copy (DEBUG)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SP.MoveCopyUtil.CopyFileByPath()`) > -1) {
         return Promise.resolve();
@@ -114,18 +107,11 @@ describe(commands.PAGE_COPY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home.aspx", targetUrl: "home-copy.aspx" } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home.aspx", targetUrl: "home-copy.aspx" } });
+    assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
   });
 
-  it('create a page copy and automatically append the aspx extension', (done) => {
+  it('create a page copy and automatically append the aspx extension', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SP.MoveCopyUtil.CopyFileByPath()`) > -1) {
         return Promise.resolve();
@@ -142,18 +128,11 @@ describe(commands.PAGE_COPY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home", targetUrl: "home-copy" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(copyMock));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home", targetUrl: "home-copy" } });
+    assert(loggerLogSpy.calledWith(copyMock));
   });
 
-  it('create a page copy and check if the webUrl is automatically added', (done) => {
+  it('create a page copy and check if the webUrl is automatically added', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SP.MoveCopyUtil.CopyFileByPath()`) > -1) {
         return Promise.resolve();
@@ -170,18 +149,11 @@ describe(commands.PAGE_COPY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home", targetUrl: "home-copy" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(copyMock));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home", targetUrl: "home-copy" } });
+    assert(loggerLogSpy.calledWith(copyMock));
   });
 
-  it('create a page copy with leading slash in the targetUrl', (done) => {
+  it('create a page copy with leading slash in the targetUrl', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SP.MoveCopyUtil.CopyFileByPath()`) > -1) {
         return Promise.resolve();
@@ -198,18 +170,11 @@ describe(commands.PAGE_COPY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home", targetUrl: "/home-copy" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(copyMock));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home", targetUrl: "/home-copy" } });
+    assert(loggerLogSpy.calledWith(copyMock));
   });
 
-  it('create a page copy and check if correct URL is used when sitepages is already added', (done) => {
+  it('create a page copy and check if correct URL is used when sitepages is already added', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SP.MoveCopyUtil.CopyFileByPath()`) > -1) {
         return Promise.resolve();
@@ -226,18 +191,11 @@ describe(commands.PAGE_COPY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home", targetUrl: "sitepages/home-copy" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(copyMock));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home", targetUrl: "sitepages/home-copy" } });
+    assert(loggerLogSpy.calledWith(copyMock));
   });
 
-  it('create a page copy and check if correct URL is used when sitepages (with leading slash) is already added', (done) => {
+  it('create a page copy and check if correct URL is used when sitepages (with leading slash) is already added', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SP.MoveCopyUtil.CopyFileByPath()`) > -1) {
         return Promise.resolve();
@@ -254,18 +212,11 @@ describe(commands.PAGE_COPY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home", targetUrl: "/sitepages/home-copy" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(copyMock));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home", targetUrl: "/sitepages/home-copy" } });
+    assert(loggerLogSpy.calledWith(copyMock));
   });
 
-  it('create a page copy to another site', (done) => {
+  it('create a page copy to another site', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SP.MoveCopyUtil.CopyFileByPath()`) > -1) {
         return Promise.resolve();
@@ -282,18 +233,11 @@ describe(commands.PAGE_COPY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home", targetUrl: "https://contoso.sharepoint.com/sites/team-b/sitepages/home-copy" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(copyMock));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home", targetUrl: "https://contoso.sharepoint.com/sites/team-b/sitepages/home-copy" } });
+    assert(loggerLogSpy.calledWith(copyMock));
   });
 
-  it('create a page copy and overwrite the file', (done) => {
+  it('create a page copy and overwrite the file', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SP.MoveCopyUtil.CopyFileByPath()`) > -1) {
         return Promise.resolve();
@@ -310,18 +254,11 @@ describe(commands.PAGE_COPY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home.aspx", targetUrl: "home-copy.aspx", overwrite: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home.aspx", targetUrl: "home-copy.aspx", overwrite: true } });
+    assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
   });
 
-  it('catch any other error in the copy command', (done) => {
+  it('catch any other error in the copy command', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SP.MoveCopyUtil.CopyFileByPath()`) > -1) {
         return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
@@ -330,15 +267,7 @@ describe(commands.PAGE_COPY, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home.aspx", targetUrl: "home-copy.aspx", overwrite: true } }, (err) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', sourceName: "home.aspx", targetUrl: "home-copy.aspx", overwrite: true } }), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

@@ -84,28 +84,29 @@ class TeamsAppUpdateCommand extends GraphCommand {
     this.optionSets.push(['id', 'name']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const { filePath } = args.options;
 
-    this
-      .getAppId(args)
-      .then((appId: string): Promise<void> => {
-        const fullPath: string = path.resolve(filePath);
-        if (this.verbose) {
-          logger.logToStderr(`Updating app with id '${appId}' and file '${fullPath}' in the app catalog...`);
-        }
+    try {
+      const appId: string = await this.getAppId(args);
+      const fullPath: string = path.resolve(filePath);
+      if (this.verbose) {
+        logger.logToStderr(`Updating app with id '${appId}' and file '${fullPath}' in the app catalog...`);
+      }
 
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/appCatalogs/teamsApps/${appId}`,
-          headers: {
-            "content-type": "application/zip"
-          },
-          data: fs.readFileSync(fullPath)
-        };
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/appCatalogs/teamsApps/${appId}`,
+        headers: {
+          "content-type": "application/zip"
+        },
+        data: fs.readFileSync(fullPath)
+      };
 
-        return request.put(requestOptions);
-      })
-      .then(_ => cb(), (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
+      await request.put(requestOptions);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getAppId(args: CommandArgs): Promise<string> {

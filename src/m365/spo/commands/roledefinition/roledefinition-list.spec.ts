@@ -85,7 +85,7 @@ describe(commands.ROLEDEFINITION_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('list role definitions handles reject request correctly', (done) => {
+  it('list role definitions handles reject request correctly', async () => {
     const err = 'request rejected';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/roledefinitions') > -1) {
@@ -95,23 +95,15 @@ describe(commands.ROLEDEFINITION_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
-  it('lists all role definitions from web', (done) => {
+  it('lists all role definitions from web', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/roledefinitions') > -1) {
         return Promise.resolve({
@@ -147,47 +139,40 @@ describe(commands.ROLEDEFINITION_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          [
-            {
-              "BasePermissions": {
-                "High": "2147483647",
-                "Low": "4294967295"
-              },
-              "Description": "Has full control.",
-              "Hidden": false,
-              "Id": 1073741829,
-              "Name": "Full Control",
-              "Order": 1,
-              "RoleTypeKind": 5
-            },
-            {
-              "BasePermissions": {
-                "High": "432",
-                "Low": "1012866047"
-              },
-              "Description": "Can view, add, update, delete, approve, and customize.",
-              "Hidden": false,
-              "Id": 1073741828,
-              "Name": "Design",
-              "Order": 32,
-              "RoleTypeKind": 4
-            }
-          ]
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      [
+        {
+          "BasePermissions": {
+            "High": "2147483647",
+            "Low": "4294967295"
+          },
+          "Description": "Has full control.",
+          "Hidden": false,
+          "Id": 1073741829,
+          "Name": "Full Control",
+          "Order": 1,
+          "RoleTypeKind": 5
+        },
+        {
+          "BasePermissions": {
+            "High": "432",
+            "Low": "1012866047"
+          },
+          "Description": "Can view, add, update, delete, approve, and customize.",
+          "Hidden": false,
+          "Id": 1073741828,
+          "Name": "Design",
+          "Order": 32,
+          "RoleTypeKind": 4
+        }
+      ]
+    ));
   });
 });

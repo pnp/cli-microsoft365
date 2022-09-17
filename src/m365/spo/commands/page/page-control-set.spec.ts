@@ -66,7 +66,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   // VALIDATE FUNCTIONALITY
 
-  it('correctly handles control not found', (done) => {
+  it('correctly handles control not found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
         return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
@@ -75,18 +75,10 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Control with ID 3ede60d3-dc2c-438b-b5bf-cc40bb2351e6 not found on page home.aspx")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }), new CommandError("Control with ID 3ede60d3-dc2c-438b-b5bf-cc40bb2351e6 not found on page home.aspx"));
   });
 
-  it('correctly handles control page with no Canvas Control content', (done) => {
+  it('correctly handles control page with no Canvas Control content', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
         return Promise.resolve({});
@@ -95,18 +87,10 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Page home.aspx doesn't contain canvas controls.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }), new CommandError("Page home.aspx doesn't contain canvas controls."));
   });
 
-  it('correctly handles control found and handles error on page checkout error', (done) => {
+  it('correctly handles control found and handles error on page checkout error', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
         return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
@@ -119,18 +103,10 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, (err) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }), new CommandError('An error has occurred'));
   });
 
-  it('correctly handles control found and handles page checkout correctly when no data is provided', (done) => {
+  it('correctly handles control found and handles page checkout correctly when no data is provided', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
         return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
@@ -149,18 +125,10 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, (err: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Page home.aspx information not retrieved with the checkout')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }), new CommandError('Page home.aspx information not retrieved with the checkout'));
   });
 
-  it('correctly handles control not found after the page has been checked out', (done) => {
+  it('correctly handles control not found after the page has been checked out', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
         return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
@@ -179,18 +147,10 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Control with ID ede2ee65-157d-4523-b4ed-87b9b64374a6 not found on page home.aspx')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }), new CommandError('Control with ID ede2ee65-157d-4523-b4ed-87b9b64374a6 not found on page home.aspx'));
   });
 
-  it('correctly handles control found and handles page checkout', (done) => {
+  it('correctly handles control found and handles page checkout', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
         return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
@@ -206,20 +166,17 @@ describe(commands.PAGE_CONTROL_SET, () => {
         return Promise.resolve(mockPageData);
       }
 
+      if (opts.url?.endsWith(`_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`)) {
+        return Promise.resolve();
+      }
+
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, () => {
-      try {
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } });
   });
 
-  it('correctly page save with webPartData', (done) => {
+  it('correctly page save with webPartData', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
         return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
@@ -240,20 +197,17 @@ describe(commands.PAGE_CONTROL_SET, () => {
         return Promise.resolve({});
       }
 
+      if (opts.url?.endsWith(`_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`)) {
+        return Promise.resolve();
+      }
+
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartData: '{}' } }, () => {
-      try {
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartData: '{}' } });
   });
 
-  it('correctly page save with webPartProperties', (done) => {
+  it('correctly page save with webPartProperties', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
         return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
@@ -274,20 +228,17 @@ describe(commands.PAGE_CONTROL_SET, () => {
         return Promise.resolve({});
       }
 
+      if (opts.url?.endsWith(`_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`)) {
+        return Promise.resolve();
+      }
+
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartProperties: '{}' } }, () => {
-      try {
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartProperties: '{}' } });
   });
 
-  it('correctly page save when page extension is not provided', (done) => {
+  it('correctly page save when page extension is not provided', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
         return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
@@ -308,33 +259,23 @@ describe(commands.PAGE_CONTROL_SET, () => {
         return Promise.resolve({});
       }
 
+      if (opts.url?.endsWith(`_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/SavePageAsDraft`)) {
+        return Promise.resolve();
+      }
+
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartProperties: '{}' } }, () => {
-      try {
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartProperties: '{}' } });
   });
 
-  it('correctly handles OData error when retrieving pages', (done) => {
+  it('correctly handles OData error when retrieving pages', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: true, id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webPartData: "{}", webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', webPartData: "{}", webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   // OPTIONS

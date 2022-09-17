@@ -61,7 +61,7 @@ describe(commands.LIST_LABEL_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('gets the label from the given list if title option is passed (debug)', (done) => {
+  it('gets the label from the given list if title option is passed (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_GetListComplianceTag`) > -1) {
         return Promise.resolve({
@@ -100,47 +100,40 @@ describe(commands.LIST_LABEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary'
       }
-    }, () => {
-      try {
-        const expected = {
-          "AcceptMessagesOnlyFromSendersOrMembers": false,
-          "AccessType": null,
-          "AllowAccessFromUnmanagedDevice": null,
-          "AutoDelete": false,
-          "BlockDelete": false,
-          "BlockEdit": false,
-          "ContainsSiteLabel": false,
-          "DisplayName": "",
-          "EncryptionRMSTemplateId": null,
-          "HasRetentionAction": false,
-          "IsEventTag": false,
-          "Notes": null,
-          "RequireSenderAuthenticationEnabled": false,
-          "ReviewerEmail": null,
-          "SharingCapabilities": null,
-          "SuperLock": false,
-          "TagDuration": 0,
-          "TagId": "4d535433-2a7b-40b0-9dad-8f0f8f3b3841",
-          "TagName": "Sensitive",
-          "TagRetentionBasedOn": null
-        };
-        const actual = log[log.length - 1];
-        assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const expected = {
+      "AcceptMessagesOnlyFromSendersOrMembers": false,
+      "AccessType": null,
+      "AllowAccessFromUnmanagedDevice": null,
+      "AutoDelete": false,
+      "BlockDelete": false,
+      "BlockEdit": false,
+      "ContainsSiteLabel": false,
+      "DisplayName": "",
+      "EncryptionRMSTemplateId": null,
+      "HasRetentionAction": false,
+      "IsEventTag": false,
+      "Notes": null,
+      "RequireSenderAuthenticationEnabled": false,
+      "ReviewerEmail": null,
+      "SharingCapabilities": null,
+      "SuperLock": false,
+      "TagDuration": 0,
+      "TagId": "4d535433-2a7b-40b0-9dad-8f0f8f3b3841",
+      "TagName": "Sensitive",
+      "TagRetentionBasedOn": null
+    };
+    const actual = log[log.length - 1];
+    assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
   });
 
-  it('gets the label from the given list if title option is passed', (done) => {
+  it('gets the label from the given list if title option is passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/`) > -1) {
         return Promise.resolve({
@@ -179,46 +172,39 @@ describe(commands.LIST_LABEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary'
       }
-    }, () => {
-      try {
-        const expected = {
-          "AcceptMessagesOnlyFromSendersOrMembers": false,
-          "AccessType": null,
-          "AllowAccessFromUnmanagedDevice": null,
-          "AutoDelete": false,
-          "BlockDelete": false,
-          "BlockEdit": false,
-          "ContainsSiteLabel": false,
-          "DisplayName": "",
-          "EncryptionRMSTemplateId": null,
-          "HasRetentionAction": false,
-          "IsEventTag": false,
-          "Notes": null,
-          "RequireSenderAuthenticationEnabled": false,
-          "ReviewerEmail": null,
-          "SharingCapabilities": null,
-          "SuperLock": false,
-          "TagDuration": 0,
-          "TagId": "4d535433-2a7b-40b0-9dad-8f0f8f3b3841",
-          "TagName": "Sensitive",
-          "TagRetentionBasedOn": null
-        };
-        const actual = log[log.length - 1];
-        assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const expected = {
+      "AcceptMessagesOnlyFromSendersOrMembers": false,
+      "AccessType": null,
+      "AllowAccessFromUnmanagedDevice": null,
+      "AutoDelete": false,
+      "BlockDelete": false,
+      "BlockEdit": false,
+      "ContainsSiteLabel": false,
+      "DisplayName": "",
+      "EncryptionRMSTemplateId": null,
+      "HasRetentionAction": false,
+      "IsEventTag": false,
+      "Notes": null,
+      "RequireSenderAuthenticationEnabled": false,
+      "ReviewerEmail": null,
+      "SharingCapabilities": null,
+      "SuperLock": false,
+      "TagDuration": 0,
+      "TagId": "4d535433-2a7b-40b0-9dad-8f0f8f3b3841",
+      "TagName": "Sensitive",
+      "TagRetentionBasedOn": null
+    };
+    const actual = log[log.length - 1];
+    assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
   });
 
-  it('gets the label from the given list if list id option is passed (debug)', (done) => {
+  it('gets the label from the given list if list id option is passed (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_GetListComplianceTag`) > -1) {
         return Promise.resolve({
@@ -257,48 +243,41 @@ describe(commands.LIST_LABEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'fb4b0cf8-c006-4802-a1ea-57e0e4852188'
       }
-    }, () => {
-      try {
-        const expected = {
-          "AcceptMessagesOnlyFromSendersOrMembers": false,
-          "AccessType": null,
-          "AllowAccessFromUnmanagedDevice": null,
-          "AutoDelete": false,
-          "BlockDelete": false,
-          "BlockEdit": false,
-          "ContainsSiteLabel": false,
-          "DisplayName": "",
-          "EncryptionRMSTemplateId": null,
-          "HasRetentionAction": false,
-          "IsEventTag": false,
-          "Notes": null,
-          "RequireSenderAuthenticationEnabled": false,
-          "ReviewerEmail": null,
-          "SharingCapabilities": null,
-          "SuperLock": false,
-          "TagDuration": 0,
-          "TagId": "4d535433-2a7b-40b0-9dad-8f0f8f3b3841",
-          "TagName": "Sensitive",
-          "TagRetentionBasedOn": null
-
-        };
-        const actual = log[log.length - 1];
-        assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const expected = {
+      "AcceptMessagesOnlyFromSendersOrMembers": false,
+      "AccessType": null,
+      "AllowAccessFromUnmanagedDevice": null,
+      "AutoDelete": false,
+      "BlockDelete": false,
+      "BlockEdit": false,
+      "ContainsSiteLabel": false,
+      "DisplayName": "",
+      "EncryptionRMSTemplateId": null,
+      "HasRetentionAction": false,
+      "IsEventTag": false,
+      "Notes": null,
+      "RequireSenderAuthenticationEnabled": false,
+      "ReviewerEmail": null,
+      "SharingCapabilities": null,
+      "SuperLock": false,
+      "TagDuration": 0,
+      "TagId": "4d535433-2a7b-40b0-9dad-8f0f8f3b3841",
+      "TagName": "Sensitive",
+      "TagRetentionBasedOn": null
+
+    };
+    const actual = log[log.length - 1];
+    assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
   });
 
-  it('gets the label from the given list if list id option is passed', (done) => {
+  it('gets the label from the given list if list id option is passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_GetListComplianceTag`) > -1) {
         return Promise.resolve({
@@ -337,46 +316,39 @@ describe(commands.LIST_LABEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'fb4b0cf8-c006-4802-a1ea-57e0e4852188'
       }
-    }, () => {
-      try {
-        const expected = {
-          "AcceptMessagesOnlyFromSendersOrMembers": false,
-          "AccessType": null,
-          "AllowAccessFromUnmanagedDevice": null,
-          "AutoDelete": false,
-          "BlockDelete": false,
-          "BlockEdit": false,
-          "ContainsSiteLabel": false,
-          "DisplayName": "",
-          "EncryptionRMSTemplateId": null,
-          "HasRetentionAction": false,
-          "IsEventTag": false,
-          "Notes": null,
-          "RequireSenderAuthenticationEnabled": false,
-          "ReviewerEmail": null,
-          "SharingCapabilities": null,
-          "SuperLock": false,
-          "TagDuration": 0,
-          "TagId": "4d535433-2a7b-40b0-9dad-8f0f8f3b3841",
-          "TagName": "Sensitive",
-          "TagRetentionBasedOn": null
-        };
-        const actual = log[log.length - 1];
-        assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const expected = {
+      "AcceptMessagesOnlyFromSendersOrMembers": false,
+      "AccessType": null,
+      "AllowAccessFromUnmanagedDevice": null,
+      "AutoDelete": false,
+      "BlockDelete": false,
+      "BlockEdit": false,
+      "ContainsSiteLabel": false,
+      "DisplayName": "",
+      "EncryptionRMSTemplateId": null,
+      "HasRetentionAction": false,
+      "IsEventTag": false,
+      "Notes": null,
+      "RequireSenderAuthenticationEnabled": false,
+      "ReviewerEmail": null,
+      "SharingCapabilities": null,
+      "SuperLock": false,
+      "TagDuration": 0,
+      "TagId": "4d535433-2a7b-40b0-9dad-8f0f8f3b3841",
+      "TagName": "Sensitive",
+      "TagRetentionBasedOn": null
+    };
+    const actual = log[log.length - 1];
+    assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
   });
 
-  it('correctly handles the case when no label has been set on the specified list', (done) => {
+  it('correctly handles the case when no label has been set on the specified list', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_GetListComplianceTag`) > -1) {
         return Promise.resolve({
@@ -396,23 +368,16 @@ describe(commands.LIST_LABEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'fb4b0cf8-c006-4802-a1ea-57e0e4852188'
       }
-    } as any, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles error when trying to get label for the list', (done) => {
+  it('correctly handles error when trying to get label for the list', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_GetListComplianceTag`) > -1) {
         return Promise.reject({
@@ -439,23 +404,15 @@ describe(commands.LIST_LABEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError("An error has occurred"));
   });
 
-  it('correctly handles error when trying to get label from a list that doesn\'t exist', (done) => {
+  it('correctly handles error when trying to get label from a list that doesn\'t exist', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_GetListComplianceTag`) > -1) {
         return Promise.resolve([]);
@@ -472,20 +429,12 @@ describe(commands.LIST_LABEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('404 - "404 FILE NOT FOUND"')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('404 - "404 FILE NOT FOUND"'));
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', async () => {

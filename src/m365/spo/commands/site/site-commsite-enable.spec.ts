@@ -68,7 +68,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('enables communication site features on the specified site', (done) => {
+  it('enables communication site features on the specified site', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><Method Name="EnableCommSite" Id="5" ObjectPathId="3"><Parameters><Parameter Type="String">https://contoso.sharepoint.com</Parameter><Parameter Type="Guid">{d604dac3-50d3-405e-9ab9-d4713cda74ef}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
@@ -81,18 +81,10 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com' } } as any);
   });
 
-  it('enables communication site features on the specified site (debug)', (done) => {
+  it('enables communication site features on the specified site (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><Method Name="EnableCommSite" Id="5" ObjectPathId="3"><Parameters><Parameter Type="String">https://contoso.sharepoint.com</Parameter><Parameter Type="Guid">{d604dac3-50d3-405e-9ab9-d4713cda74ef}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
@@ -105,18 +97,10 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any);
   });
 
-  it('escapes XML in user input', (done) => {
+  it('escapes XML in user input', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><Method Name="EnableCommSite" Id="5" ObjectPathId="3"><Parameters><Parameter Type="String">https://contoso.sharepoint.com&gt;</Parameter><Parameter Type="Guid">{d604dac3-50d3-405e-9ab9-d4713cda74ef}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
@@ -129,18 +113,10 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com>' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err, undefined);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com>' } } as any);
   });
 
-  it('correctly handles a generic error when setting tenant property', (done) => {
+  it('correctly handles a generic error when setting tenant property', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1 &&
         opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><Method Name="EnableCommSite" Id="5" ObjectPathId="3"><Parameters><Parameter Type="String">https://contoso.sharepoint.com</Parameter><Parameter Type="Guid">{d604dac3-50d3-405e-9ab9-d4713cda74ef}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
@@ -156,29 +132,13 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any), new CommandError('An error has occurred'));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

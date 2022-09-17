@@ -48,7 +48,7 @@ class TenantServiceAnnouncementMessageGetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving service update message ${args.options.id}`);
     }
@@ -61,12 +61,13 @@ class TenantServiceAnnouncementMessageGetCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    request
-      .get(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const res: any = await request.get(requestOptions);
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private isValidId(id: string): boolean {

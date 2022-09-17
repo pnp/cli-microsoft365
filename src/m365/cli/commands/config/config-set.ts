@@ -74,7 +74,7 @@ class CliConfigSetCommand extends AnonymousCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let value: any = undefined;
 
     switch (args.options.key) {
@@ -94,7 +94,6 @@ class CliConfigSetCommand extends AnonymousCommand {
     }
 
     Cli.getInstance().config.set(args.options.key, value);
-    cb();
   }
 }
 

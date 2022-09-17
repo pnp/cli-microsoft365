@@ -62,117 +62,75 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('appends completion scripts to profile when profile file already exists', (done) => {
+  it('appends completion scripts to profile when profile file already exists', async () => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
     sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
-    command.action(logger, { options: { debug: false, profile: profilePath } }, () => {
-      try {
-        assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, profile: profilePath } });
+    assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'));
   });
 
-  it('appends completion scripts to profile when profile file already exists (debug)', (done) => {
+  it('appends completion scripts to profile when profile file already exists (debug)', async () => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
     sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
-    command.action(logger, { options: { debug: true, profile: profilePath } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, profile: profilePath } });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('creates profile file when it does not exist and appends the completion script to it', (done) => {
+  it('creates profile file when it does not exist and appends the completion script to it', async () => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().indexOf('.ps1') < 0);
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
-    command.action(logger, { options: { debug: false, profile: profilePath } }, () => {
-      try {
-        assert(writeFileSyncStub.calledWithExactly(profilePath, '', 'utf8'), 'Profile file not created');
-        assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'), 'Completion script not appended');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, profile: profilePath } });
+    assert(writeFileSyncStub.calledWithExactly(profilePath, '', 'utf8'), 'Profile file not created');
+    assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'), 'Completion script not appended');
   });
 
-  it('creates profile file when it does not exist and appends the completion script to it (debug)', (done) => {
+  it('creates profile file when it does not exist and appends the completion script to it (debug)', async () => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().indexOf('.ps1') < 0);
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
-    command.action(logger, { options: { debug: true, profile: profilePath } }, () => {
-      try {
-        assert(writeFileSyncStub.calledWithExactly(profilePath, '', 'utf8'), 'Profile file not created');
-        assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'), 'Completion script not appended');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, profile: profilePath } });
+    assert(writeFileSyncStub.calledWithExactly(profilePath, '', 'utf8'), 'Profile file not created');
+    assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'), 'Completion script not appended');
   });
 
-  it('creates profile path when it does not exist and appends the completion script to it', (done) => {
+  it('creates profile path when it does not exist and appends the completion script to it', async () => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const mkdirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => '');
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
-    command.action(logger, { options: { debug: false, profile: profilePath } }, () => {
-      try {
-        assert(mkdirSyncStub.calledWith(path.dirname(profilePath), { recursive: true }), 'Profile path not created');
-        assert(writeFileSyncStub.calledWithExactly(profilePath, '', 'utf8'), 'Profile file not created');
-        assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'), 'Completion script not appended');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, profile: profilePath } });
+    assert(mkdirSyncStub.calledWith(path.dirname(profilePath), { recursive: true }), 'Profile path not created');
+    assert(writeFileSyncStub.calledWithExactly(profilePath, '', 'utf8'), 'Profile file not created');
+    assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'), 'Completion script not appended');
   });
 
-  it('creates profile path when it does not exist and appends the completion script to it (debug)', (done) => {
+  it('creates profile path when it does not exist and appends the completion script to it (debug)', async () => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const mkdirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => '');
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
-    command.action(logger, { options: { debug: true, profile: profilePath } }, () => {
-      try {
-        assert(mkdirSyncStub.calledWith(path.dirname(profilePath), { recursive: true }), 'Profile path not created');
-        assert(writeFileSyncStub.calledWithExactly(profilePath, '', 'utf8'), 'Profile file not created');
-        assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'), 'Completion script not appended');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, profile: profilePath } });
+    assert(mkdirSyncStub.calledWith(path.dirname(profilePath), { recursive: true }), 'Profile path not created');
+    assert(writeFileSyncStub.calledWithExactly(profilePath, '', 'utf8'), 'Profile file not created');
+    assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'), 'Completion script not appended');
   });
 
-  it('handles exception when creating profile path', (done) => {
+  it('handles exception when creating profile path', async () => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
     const error: string = 'Unexpected error';
     sinon.stub(fs, 'existsSync').callsFake(() => false);
@@ -180,57 +138,33 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
-    command.action(logger, { options: { debug: false, profile: profilePath } } as any, (err?: any) => {
-      try {
-        assert(mkdirSyncStub.calledWith(path.dirname(profilePath), { recursive: true }), 'Profile path not created');
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)), 'Invalid error returned');
-        assert(writeFileSyncStub.notCalled, 'Profile file created');
-        assert(appendFileSyncStub.notCalled, 'Completion script appended');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, profile: profilePath } } as any), new CommandError(error));
+    assert(mkdirSyncStub.calledWith(path.dirname(profilePath), { recursive: true }), 'Profile path not created');
+    assert(writeFileSyncStub.notCalled, 'Profile file created');
+    assert(appendFileSyncStub.notCalled, 'Completion script appended');
   });
 
-  it('handles exception when creating profile file', (done) => {
+  it('handles exception when creating profile file', async () => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
     const error: string = 'Unexpected error';
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().indexOf('.ps1') < 0);
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { throw error; });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
-    command.action(logger, { options: { debug: false, profile: profilePath } } as any, (err?: any) => {
-      try {
-        assert(writeFileSyncStub.calledWithExactly(profilePath, '', 'utf8'), 'Profile file not created');
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)), 'Invalid error returned');
-        assert(appendFileSyncStub.notCalled, 'Completion script appended');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, profile: profilePath } } as any), new CommandError(error));
+    assert(writeFileSyncStub.calledWithExactly(profilePath, '', 'utf8'), 'Profile file not created');
+    assert(appendFileSyncStub.notCalled, 'Completion script appended');
   });
 
-  it('handles exception when appending completion script to the profile file', (done) => {
+  it('handles exception when appending completion script to the profile file', async () => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
     const error: string = 'Unexpected error';
     sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { throw error; });
 
-    command.action(logger, { options: { debug: false, profile: profilePath } } as any, (err?: any) => {
-      try {
-        assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'), 'Completion script not appended');
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)), 'Invalid error returned');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, profile: profilePath } } as any), new CommandError(error));
+    assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'), 'Completion script not appended');
   });
 
   it('supports debug mode', () => {

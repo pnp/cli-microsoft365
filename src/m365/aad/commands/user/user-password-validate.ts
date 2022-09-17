@@ -35,24 +35,25 @@ class AadUserPasswordValidateCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const requestOptions: any = {
-      url: `${this.resource}/beta/users/validatePassword`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      data: {
-        password: args.options.password
-      },
-      responseType: 'json'
-    };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const requestOptions: any = {
+        url: `${this.resource}/beta/users/validatePassword`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        data: {
+          password: args.options.password
+        },
+        responseType: 'json'
+      };
 
-    request
-      .post(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res = await request.post(requestOptions);
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

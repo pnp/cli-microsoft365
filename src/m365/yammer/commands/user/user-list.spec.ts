@@ -65,7 +65,7 @@ describe(commands.USER_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'full_name', 'email']);
   });
 
-  it('returns all network users', function (done) {
+  it('returns all network users', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1') {
         return Promise.resolve(
@@ -76,18 +76,11 @@ describe(commands.USER_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: {} } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
-  it('returns all network users using json', function (done) {
+  it('returns all network users using json', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1') {
         return Promise.resolve(
@@ -99,18 +92,11 @@ describe(commands.USER_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { output: 'json' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { output: 'json' } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
-  it('sorts network users by messages', function (done) {
+  it('sorts network users by messages', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1&sort_by=messages') {
         return Promise.resolve([
@@ -120,18 +106,11 @@ describe(commands.USER_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { sortBy: "messages" } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { sortBy: "messages" } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
   });
 
-  it('fakes the return of more results', (done) => {
+  it('fakes the return of more results', async () => {
     let i: number = 0;
 
     sinon.stub(request, 'get').callsFake(() => {
@@ -152,18 +131,11 @@ describe(commands.USER_LIST, () => {
         });
       }
     });
-    command.action(logger, { options: { output: 'json' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 4);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { output: 'json' } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 4);
   });
 
-  it('fakes the return of more than 50 entries', (done) => {
+  it('fakes the return of more than 50 entries', async () => {
     let i: number = 0;
 
     sinon.stub(request, 'get').callsFake(() => {
@@ -228,18 +200,11 @@ describe(commands.USER_LIST, () => {
           { "type": "user", "id": 12310090123, "network_id": 801445, "state": "active", "full_name": "Carlo Lamber" }]);
       }
     });
-    command.action(logger, { options: { output: 'debug' } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 52);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { output: 'debug' } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 52);
   });
 
-  it('fakes the return of more results with exception', (done) => {
+  it('fakes the return of more results with exception', async () => {
     let i: number = 0;
 
     sinon.stub(request, 'get').callsFake(() => {
@@ -259,19 +224,10 @@ describe(commands.USER_LIST, () => {
         });
       }
     });
-
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
   });
 
-  it('sorts users in reverse order', function (done) {
+  it('sorts users in reverse order', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1&reverse=true') {
         return Promise.resolve(
@@ -283,18 +239,11 @@ describe(commands.USER_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { reverse: true } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { reverse: true } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
   });
 
-  it('sorts users in reverse order in a group and limits the user to 2', function (done) {
+  it('sorts users in reverse order in a group and limits the user to 2', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/in_group/5785177.json?page=1&reverse=true') {
         return Promise.resolve({
@@ -307,19 +256,12 @@ describe(commands.USER_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { groupId: 5785177, reverse: true, limit: 2 } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 2);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { groupId: 5785177, reverse: true, limit: 2 } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 2);
   });
 
-  it('returns users of a specific group', function (done) {
+  it('returns users of a specific group', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/in_group/5785177.json?page=1') {
         return Promise.resolve({
@@ -330,18 +272,11 @@ describe(commands.USER_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { groupId: 5785177 } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { groupId: 5785177 } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
-  it('returns users starting with the letter P', function (done) {
+  it('returns users starting with the letter P', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1&letter=P') {
         return Promise.resolve(
@@ -352,18 +287,11 @@ describe(commands.USER_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { letter: "P" } } as any, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { letter: "P" } } as any);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -372,15 +300,7 @@ describe(commands.USER_LIST, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred.'));
   });
 
   it('passes validation without parameters', async () => {

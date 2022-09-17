@@ -71,7 +71,7 @@ describe(commands.MAIL_SEND, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('sends email using the basic properties', (done) => {
+  it('sends email using the basic properties', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       message: {
@@ -93,18 +93,11 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sends email using the basic properties (debug)', (done) => {
+  it('sends email using the basic properties (debug)', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       message: {
@@ -126,18 +119,11 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sends email to multiple addresses', (done) => {
+  it('sends email to multiple addresses', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       message: {
@@ -162,18 +148,11 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bodyContents: 'Lorem ipsum' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bodyContents: 'Lorem ipsum' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('doesn\'t store email in sent items', (done) => {
+  it('doesn\'t store email in sent items', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       message: {
@@ -196,18 +175,11 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'false' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'false' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('correctly handles error', (done) => {
+  it('correctly handles error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -221,15 +193,8 @@ describe(commands.MAIL_SEND, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any),
+      new CommandError(`An error has occurred`));
   });
 
   it('fails validation if bodyContentType is invalid', async () => {
@@ -288,7 +253,7 @@ describe(commands.MAIL_SEND, () => {
     assert(containsOption);
   });
 
-  it('sends email using a specified group mailbox', (done) => {
+  it('sends email using a specified group mailbox', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       message: {
@@ -311,18 +276,11 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', mailbox: 'sales@domain.com', bodyContents: 'Lorem ipsum' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', mailbox: 'sales@domain.com', bodyContents: 'Lorem ipsum' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('sends email using a specified sender', (done) => {
+  it('sends email using a specified sender', async () => {
     let actual: string = '';
     const expected: string = JSON.stringify({
       message: {
@@ -344,29 +302,18 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', sender: 'some-user@domain.com', bodyContents: 'Lorem ipsum' } }, () => {
-      try {
-        assert.strictEqual(actual, expected);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', sender: 'some-user@domain.com', bodyContents: 'Lorem ipsum' } });
+    assert.strictEqual(actual, expected);
   });
 
-  it('throws an error when the sender is not defined when signed in using app only authentication', (done) => {
+  it('throws an error when the sender is not defined when signed in using app only authentication', async() => {
     sinonUtil.restore([ Auth.isAppOnlyAuth ]);
     sinon.stub(Auth, 'isAppOnlyAuth').callsFake(() => true);
-   
-    command.action(logger, { options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } } as any, (err?: any) => {
-      try {
-        assert.deepStrictEqual(err, new CommandError(`Specify a upn or user id in the 'sender' option when using app only authentication.`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await assert.rejects(command.action(logger, { options: {
+      debug: false, 
+      subject: 'Lorem ipsum', 
+      to: 'mail@domain.com', 
+      bodyContents: 'Lorem ipsum' } } as any), new CommandError(`Specify a upn or user id in the 'sender' option when using app only authentication.`));
   });
 });

@@ -56,27 +56,26 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    spo
-      .getSpoAdminUrl(logger, this.debug)
-      .then((adminUrl: string): Promise<any> => {
-        const requestOptions: any = {
-          url: `${adminUrl}/_api/SPOInternalUseOnly.Tenant/RestoreDeletedSite`,
-          headers: {
-            accept: 'application/json;odata=nometadata',
-            'content-type': 'application/json;charset=utf-8'
-          },
-          data: {
-            siteUrl: args.options.url
-          }
-        };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const adminUrl: string = await spo.getSpoAdminUrl(logger, this.debug);
+      const requestOptions: any = {
+        url: `${adminUrl}/_api/SPOInternalUseOnly.Tenant/RestoreDeletedSite`,
+        headers: {
+          accept: 'application/json;odata=nometadata',
+          'content-type': 'application/json;charset=utf-8'
+        },
+        data: {
+          siteUrl: args.options.url
+        }
+      };
 
-        return request.post(requestOptions);
-      })
-      .then(res => {
-        logger.log(JSON.parse(res));
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res: any = await request.post(requestOptions);
+      logger.log(JSON.parse(res));
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

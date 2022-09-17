@@ -83,124 +83,71 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('sets App Role assignments for service principal with specified displayName', (done) => {
+  it('sets App Role assignments for service principal with specified displayName', async () => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } }, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } });
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
   });
 
-  it('sets App Role assignments for service principal with specified objectId and multiple scopes', (done) => {
+  it('sets App Role assignments for service principal with specified objectId and multiple scopes', async () => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { objectId: '24448e9c-d0fa-43d1-a1dd-e279720969a0', resource: 'SharePoint', scope: 'Sites.Read.All,Sites.ReadWrite.All' } }, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][1].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][1].principalDisplayName, 'myapp');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][1].resourceDisplayName, 'Office 365 SharePoint Online');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { objectId: '24448e9c-d0fa-43d1-a1dd-e279720969a0', resource: 'SharePoint', scope: 'Sites.Read.All,Sites.ReadWrite.All' } });
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][1].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][1].principalDisplayName, 'myapp');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][1].resourceDisplayName, 'Office 365 SharePoint Online');
   });
 
-  it('sets App Role assignments for service principal with specified displayName and output json', (done) => {
+  it('sets App Role assignments for service principal with specified displayName and output json', async () => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All', output: 'json' } }, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalId, '24448e9c-d0fa-43d1-a1dd-e279720969a0');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalType, 'ServicePrincipal');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceId, 'df3d00f0-a24d-45a9-ba8b-3b0934ec3a6c');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All', output: 'json' } });
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalId, '24448e9c-d0fa-43d1-a1dd-e279720969a0');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalType, 'ServicePrincipal');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceId, 'df3d00f0-a24d-45a9-ba8b-3b0934ec3a6c');
   });
 
-  it('sets App Role assignments for service principal with specified appId (debug)', (done) => {
+  it('sets App Role assignments for service principal with specified appId (debug)', async () => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } });
   });
 
-  it('handles intune alias for the resource option value', (done) => {
+  it('handles intune alias for the resource option value', async () => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'intune', scope: 'Sites.Read.All' } }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'intune', scope: 'Sites.Read.All' } });
   });
 
-  it('handles exchange alias for the resource option value', (done) => {
+  it('handles exchange alias for the resource option value', async () => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'exchange', scope: 'Sites.Read.All' } }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'exchange', scope: 'Sites.Read.All' } });
   });
 
-  it('handles appId for the resource option value', (done) => {
+  it('handles appId for the resource option value', async () => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scope: 'Sites.Read.All' } }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scope: 'Sites.Read.All' } });
   });
 
-  it('rejects if app roles are not found for the specified resource option value', (done) => {
+  it('rejects if app roles are not found for the specified resource option value', async () => {
     postRequestStub();
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
@@ -214,18 +161,11 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The resource 'SharePoint' does not have any application permissions available.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } } as any),
+      new CommandError(`The resource 'SharePoint' does not have any application permissions available.`));
   });
 
-  it('rejects if app role scope not found for the specified resource option value', (done) => {
+  it('rejects if app role scope not found for the specified resource option value', async () => {
     postRequestStub();
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
@@ -239,18 +179,11 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The scope value 'Sites.Read.All' you have specified does not exist for SharePoint. ${os.EOL}Available scopes (application permissions) are: ${os.EOL}Scope1${os.EOL}Scope2`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } } as any),
+      new CommandError(`The scope value 'Sites.Read.All' you have specified does not exist for SharePoint. ${os.EOL}Available scopes (application permissions) are: ${os.EOL}Scope1${os.EOL}Scope2`));
   });
 
-  it('rejects if more than one service principal found', (done) => {
+  it('rejects if more than one service principal found', async () => {
     postRequestStub();
     sinon.stub(request, 'get').callsFake((opts: any): Promise<any> => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?`) > -1) {
@@ -264,18 +197,11 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("More than one service principal found. Please use the appId or objectId option to make sure the right service principal is specified.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } } as any),
+      new CommandError("More than one service principal found. Please use the appId or objectId option to make sure the right service principal is specified."));
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
@@ -289,15 +215,8 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, appId: '36e3a540-6f25-4483-9542-9f5fa00bb633' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, appId: '36e3a540-6f25-4483-9542-9f5fa00bb633' } } as any),
+      new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`));
   });
 
   it('fails validation if neither appId, objectId nor displayName are not specified', async () => {

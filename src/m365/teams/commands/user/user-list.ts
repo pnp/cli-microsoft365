@@ -71,34 +71,29 @@ class TeamsUserListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getOwners(logger, args.options.teamId)
-      .then((): Promise<User[]> => {
-        if (args.options.role === "Owner") {
-          return Promise.resolve([]);
-        }
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      await this.getOwners(logger, args.options.teamId);
+      const items = args.options.role === "Owner" ? [] : await this.getMembersAndGuests(logger, args.options.teamId);
+      this.items = this.items.concat(items);
 
-        return this.getMembersAndGuests(logger, args.options.teamId);
-      })
-      .then((items): void => {
-        this.items = this.items.concat(items);
+      // Filter out duplicate added values for owners (as they are returned as members as well)
+      // this aligns the output with what is displayed in the Teams UI
+      this.items = this.items.filter((groupUser, index, self) =>
+        index === self.findIndex((t) => (
+          t.id === groupUser.id && t.displayName === groupUser.displayName
+        ))
+      );
 
-        // Filter out duplicate added values for owners (as they are returned as members as well)
-        // this aligns the output with what is displayed in the Teams UI
-        this.items = this.items.filter((groupUser, index, self) =>
-          index === self.findIndex((t) => (
-            t.id === groupUser.id && t.displayName === groupUser.displayName
-          ))
-        );
+      if (args.options.role) {
+        this.items = this.items.filter(i => i.userType === args.options.role);
+      }
 
-        if (args.options.role) {
-          this.items = this.items.filter(i => i.userType === args.options.role);
-        }
-
-        logger.log(this.items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(this.items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getOwners(logger: Logger, groupId: string): Promise<void> {

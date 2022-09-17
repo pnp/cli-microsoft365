@@ -125,42 +125,41 @@ class PlannerTaskRemoveCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeTask: () => void = (): void => {
-      this
-        .getTask(args.options)
-        .then(task => {
-          const requestOptions: AxiosRequestConfig = {
-            url: `${this.resource}/v1.0/planner/tasks/${task.id}`,
-            headers: {
-              accept: 'application/json;odata.metadata=none',
-              'if-match': (task as any)['@odata.etag']
-            },
-            responseType: 'json'
-          };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeTask: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const task = await this.getTask(args.options);
 
-          return request.delete(requestOptions);
-        })
-        .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+        const requestOptions: AxiosRequestConfig = {
+          url: `${this.resource}/v1.0/planner/tasks/${task.id}`,
+          headers: {
+            accept: 'application/json;odata.metadata=none',
+            'if-match': (task as any)['@odata.etag']
+          },
+          responseType: 'json'
+        };
+
+        await request.delete(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeTask();
+      await removeTask();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the task ${args.options.id || args.options.title}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeTask();
-        }
       });
+
+      if (result.continue) {
+        await removeTask();
+      }
     }
   }
 

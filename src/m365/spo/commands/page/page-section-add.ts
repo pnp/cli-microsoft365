@@ -79,7 +79,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let pageFullName: string = args.options.name.toLowerCase();
     if (pageFullName.indexOf('.aspx') < 0) {
       pageFullName += '.aspx';
@@ -90,24 +90,20 @@ class SpoPageSectionAddCommand extends SpoCommand {
       logger.logToStderr(`Retrieving page information...`);
     }
 
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`,
-      headers: {
-        'accept': 'application/json;odata=nometadata'
-      },
-      responseType: 'json'
-    };
+    try {
+      let requestOptions: any = {
+        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-    request
-      .get<{ CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }>(requestOptions)
-      .then((res: { CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }): Promise<void> => {
-        canvasContent = JSON.parse(res.CanvasContent1 || "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]");
+      const res = await request.get<{ CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }>(requestOptions);
+      canvasContent = JSON.parse(res.CanvasContent1 || "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]");
 
-        if (res.IsPageCheckedOutToCurrentUser) {
-          return Promise.resolve();
-        }
-
-        const requestOptions: any = {
+      if (!res.IsPageCheckedOutToCurrentUser) {
+        requestOptions = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
           headers: {
             'accept': 'application/json;odata=nometadata'
@@ -116,48 +112,48 @@ class SpoPageSectionAddCommand extends SpoCommand {
         };
 
         return request.post(requestOptions);
-      })
-      .then((): Promise<void> => {
-        // get columns
-        const columns: Control[] = canvasContent
-          .filter(c => typeof c.controlType === 'undefined');
-        // get unique zoneIndex values given each section can have 1 or more
-        // columns each assigned to the zoneIndex of the corresponding section
-        const zoneIndices: number[] = columns
-          .map(c => c.position.zoneIndex)
-          .filter((value: number, index: number, array: number[]): boolean => {
-            return array.indexOf(value) === index;
-          })
-          .sort();
-        // zoneIndex for the new section to add
-        const zoneIndex: number = this.getSectionIndex(zoneIndices, args.options.order);
-        // get the list of columns to insert based on the selected template
-        const columnsToAdd: Control[] = this.getColumns(zoneIndex, args.options.sectionTemplate);
-        // insert the column in the right place in the array so that
-        // it stays sorted ascending by zoneIndex
-        let pos: number = canvasContent.findIndex(c => typeof c.controlType === 'undefined' && c.position.zoneIndex > zoneIndex);
-        if (pos === -1) {
-          pos = canvasContent.length - 1;
-        }
-        canvasContent.splice(pos, 0, ...columnsToAdd);
+      }
 
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/savepage`,
-          headers: {
-            'accept': 'application/json;odata=nometadata',
-            'content-type': 'application/json;odata=nometadata'
-          },
-          data: {
-            CanvasContent1: JSON.stringify(canvasContent)
-          },
-          responseType: 'json'
-        };
+      // get columns
+      const columns: Control[] = canvasContent
+        .filter(c => typeof c.controlType === 'undefined');
+      // get unique zoneIndex values given each section can have 1 or more
+      // columns each assigned to the zoneIndex of the corresponding section
+      const zoneIndices: number[] = columns
+        .map(c => c.position.zoneIndex)
+        .filter((value: number, index: number, array: number[]): boolean => {
+          return array.indexOf(value) === index;
+        })
+        .sort();
+      // zoneIndex for the new section to add
+      const zoneIndex: number = this.getSectionIndex(zoneIndices, args.options.order);
+      // get the list of columns to insert based on the selected template
+      const columnsToAdd: Control[] = this.getColumns(zoneIndex, args.options.sectionTemplate);
+      // insert the column in the right place in the array so that
+      // it stays sorted ascending by zoneIndex
+      let pos: number = canvasContent.findIndex(c => typeof c.controlType === 'undefined' && c.position.zoneIndex > zoneIndex);
+      if (pos === -1) {
+        pos = canvasContent.length - 1;
+      }
+      canvasContent.splice(pos, 0, ...columnsToAdd);
 
-        return request.post(requestOptions);
-      })
-      .then(_ => cb(), (err: any): void => {
-        this.handleRejectedODataJsonPromise(err, logger, cb);
-      });
+      requestOptions = {
+        url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/savepage`,
+        headers: {
+          'accept': 'application/json;odata=nometadata',
+          'content-type': 'application/json;odata=nometadata'
+        },
+        data: {
+          CanvasContent1: JSON.stringify(canvasContent)
+        },
+        responseType: 'json'
+      };
+
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getSectionIndex(zoneIndices: number[], order?: number): number {

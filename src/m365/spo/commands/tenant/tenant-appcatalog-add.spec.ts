@@ -62,7 +62,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('creates app catalog when app catalog and site with different URL already exist and force used', (done) => {
+  it('creates app catalog when app catalog and site with different URL already exist and force used', async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog' ||
@@ -100,18 +100,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any);
   });
 
-  it('creates app catalog when app catalog and site with different URL already exist and force used (debug)', (done) => {
+  it('creates app catalog when app catalog and site with different URL already exist and force used (debug)', async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog' ||
@@ -151,18 +143,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true } } as any);
   });
 
-  it('handles error when creating app catalog when app catalog and site with different URL already exist and force used failed', (done) => {
+  it('handles error when creating app catalog when app catalog and site with different URL already exist and force used failed', async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog' ||
@@ -200,18 +184,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it('handles error when app catalog and site with different URL already exist, force used and deleting the existing site failed', (done) => {
+  it('handles error when app catalog and site with different URL already exist, force used and deleting the existing site failed', async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
@@ -247,18 +223,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'Error deleting site new-app-catalog');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any), new CommandError('Error deleting site new-app-catalog'));
   });
 
-  it('creates app catalog when app catalog already exists, site with different URL does not exist and force used', (done) => {
+  it('creates app catalog when app catalog already exists, site with different URL does not exist and force used', async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
@@ -297,18 +265,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any);
   });
 
-  it('creates app catalog when app catalog already exists, site with different URL does not exist and force used (debug)', (done) => {
+  it('creates app catalog when app catalog already exists, site with different URL does not exist and force used (debug)', async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
@@ -347,18 +307,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true } } as any);
   });
 
-  it('handles error when creating app catalog when app catalog already exists, site with different URL does not exist and force used', (done) => {
+  it('handles error when creating app catalog when app catalog already exists, site with different URL does not exist and force used', async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
@@ -397,18 +349,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it('handles error when retrieving site with different URL failed and app catalog already exists, and force used', (done) => {
+  it('handles error when retrieving site with different URL failed and app catalog already exists, and force used', async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
@@ -439,18 +383,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it('handles error when deleting existing app catalog failed', (done) => {
+  it('handles error when deleting existing app catalog failed', async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
@@ -480,18 +416,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it('handles error app catalog exists and no force used', (done) => {
+  it('handles error app catalog exists and no force used', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
       if (command === spoTenantAppCatalogUrlGetCommand) {
         return Promise.resolve({
@@ -510,18 +438,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'Another site exists at https://contoso.sharepoint.com/sites/old-app-catalog');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any), new CommandError('Another site exists at https://contoso.sharepoint.com/sites/old-app-catalog'));
   });
 
-  it('creates app catalog when app catalog does not exist, site with different URL already exists and force used', (done) => {
+  it('creates app catalog when app catalog does not exist, site with different URL already exists and force used', async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
@@ -560,18 +480,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any);
   });
 
-  it('handles error when creating app catalog when app catalog does not exist, site with different URL already exists and force used', (done) => {
+  it('handles error when creating app catalog when app catalog does not exist, site with different URL already exists and force used', async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
@@ -610,18 +522,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it('handles error when deleting existing site, when app catalog does not exist, site with different URL already exists and force used', (done) => {
+  it('handles error when deleting existing site, when app catalog does not exist, site with different URL already exists and force used', async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
@@ -652,18 +556,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it('handles error when app catalog does not exist, site with different URL already exists and force not used', (done) => {
+  it('handles error when app catalog does not exist, site with different URL already exists and force not used', async () => {
     sinon.stub(Cli, 'executeCommand').callsFake(() => {
       return Promise.reject(new CommandError('Unknown case'));
     });
@@ -686,18 +582,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'Another site exists at https://contoso.sharepoint.com/sites/new-app-catalog');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any), new CommandError('Another site exists at https://contoso.sharepoint.com/sites/new-app-catalog'));
   });
 
-  it(`creates app catalog when app catalog and site with different URL don't exist`, (done) => {
+  it(`creates app catalog when app catalog and site with different URL don't exist`, async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
@@ -726,18 +614,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any);
   });
 
-  it(`handles error when creating app catalog fails, when app catalog when app catalog does and site with different URL don't exist`, (done) => {
+  it(`handles error when creating app catalog fails, when app catalog when app catalog does and site with different URL don't exist`, async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
@@ -766,18 +646,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any), new CommandError('An error has occurred'));
   });
 
-  it(`handles error when checking if the app catalog site exists`, (done) => {
+  it(`handles error when checking if the app catalog site exists`, async () => {
     sinon.stub(Cli, 'executeCommand').callsFake(() => {
       return Promise.reject(new CommandError('Unknown case'));
     });
@@ -799,18 +671,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any), new CommandError('An error has occurred'));
   });
 
-  it(`creates app catalog when app catalog not registered, site with different URL exists and force used`, (done) => {
+  it(`creates app catalog when app catalog not registered, site with different URL exists and force used`, async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
@@ -846,18 +710,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any);
   });
 
-  it(`creates app catalog when app catalog not registered, site with different URL exists and force used (debug)`, (done) => {
+  it(`creates app catalog when app catalog not registered, site with different URL exists and force used (debug)`, async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
@@ -893,18 +749,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true, debug: true } } as any);
   });
 
-  it(`handles error when creating app catalog when app catalog not registered, site with different URL exists and force used`, (done) => {
+  it(`handles error when creating app catalog when app catalog not registered, site with different URL exists and force used`, async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
@@ -940,18 +788,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it(`handles error when deleting existing site when app catalog not registered, site with different URL exists and force used`, (done) => {
+  it(`handles error when deleting existing site when app catalog not registered, site with different URL exists and force used`, async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteRemoveCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
@@ -979,18 +819,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog', force: true } } as any), new CommandError('An error has occurred'));
   });
 
-  it(`handles error when app catalog not registered, site with different URL exists and force not used`, (done) => {
+  it(`handles error when app catalog not registered, site with different URL exists and force not used`, async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
       if (command === spoTenantAppCatalogUrlGetCommand) {
         return Promise.resolve('');
@@ -1007,18 +839,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'Another site exists at https://contoso.sharepoint.com/sites/new-app-catalog');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any), new CommandError('Another site exists at https://contoso.sharepoint.com/sites/new-app-catalog'));
   });
 
-  it(`creates app catalog when app catalog not registered and site with different URL doesn't exist`, (done) => {
+  it(`creates app catalog when app catalog not registered and site with different URL doesn't exist`, async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
@@ -1046,18 +870,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any, (err: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any);
   });
 
-  it(`handles error when creating app catalog when app catalog not registered and site with different URL doesn't exist`, (done) => {
+  it(`handles error when creating app catalog when app catalog not registered and site with different URL doesn't exist`, async () => {
     sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
       if (command === spoSiteAddCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
@@ -1085,18 +901,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any), new CommandError('An error has occurred'));
   });
 
-  it(`handles error when app catalog not registered and checking if the site with different URL exists throws error`, (done) => {
+  it(`handles error when app catalog not registered and checking if the site with different URL exists throws error`, async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
       if (command === spoTenantAppCatalogUrlGetCommand) {
         return Promise.resolve('');
@@ -1113,18 +921,10 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any), new CommandError('An error has occurred'));
   });
 
-  it(`handles error when checking if app catalog registered throws error`, (done) => {
+  it(`handles error when checking if app catalog registered throws error`, async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === spoTenantAppCatalogUrlGetCommand) {
         return Promise.reject(new CommandError('An error has occurred'));
@@ -1133,15 +933,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any, (err: CommandError) => {
-      try {
-        assert.strictEqual(err.message, 'An error has occurred');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/new-app-catalog' } } as any), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

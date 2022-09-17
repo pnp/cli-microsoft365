@@ -76,109 +76,111 @@ class AadSiteClassificationSetCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groupSettings`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      let requestOptions: any = {
+        url: `${this.resource}/v1.0/groupSettings`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
 
-    request
-      .get<{ value: DirectorySetting[]; }>(requestOptions)
-      .then((res: { value: DirectorySetting[]; }): Promise<void> => {
-        const unifiedGroupSetting: DirectorySetting[] = res.value.filter((directorySetting: DirectorySetting): boolean => {
-          return directorySetting.displayName === 'Group.Unified';
-        });
+      const res = await request.get<{ value: DirectorySetting[]; }>(requestOptions);
 
-        if (!unifiedGroupSetting ||
-          unifiedGroupSetting.length === 0) {
-          return Promise.reject("There is no previous defined site classification which can updated.");
-        }
+      const unifiedGroupSetting: DirectorySetting[] = res.value.filter((directorySetting: DirectorySetting): boolean => {
+        return directorySetting.displayName === 'Group.Unified';
+      });
 
-        const updatedDirSettings: UpdateDirectorySetting = new UpdateDirectorySetting();
+      if (!unifiedGroupSetting ||
+        unifiedGroupSetting.length === 0) {
+        throw "There is no previous defined site classification which can updated.";
+      }
 
-        unifiedGroupSetting[0].values.forEach((directorySetting: DirectorySettingValue) => {
-          switch (directorySetting.name) {
-            case "ClassificationList":
-              if (args.options.classifications) {
-                updatedDirSettings.values.push({
-                  "name": directorySetting.name,
-                  "value": args.options.classifications as string
-                });
-              }
-              else {
-                updatedDirSettings.values.push({
-                  "name": directorySetting.name,
-                  "value": directorySetting.value as string
-                });
-              }
-              break;
-            case "DefaultClassification":
-              if (args.options.defaultClassification) {
-                updatedDirSettings.values.push({
-                  "name": directorySetting.name,
-                  "value": args.options.defaultClassification as string
-                });
-              }
-              else {
-                updatedDirSettings.values.push({
-                  "name": directorySetting.name,
-                  "value": directorySetting.value as string
-                });
-              }
-              break;
-            case "UsageGuidelinesUrl":
-              if (args.options.usageGuidelinesUrl) {
-                updatedDirSettings.values.push({
-                  "name": directorySetting.name,
-                  "value": args.options.usageGuidelinesUrl as string
-                });
-              }
-              else {
-                updatedDirSettings.values.push({
-                  "name": directorySetting.name,
-                  "value": directorySetting.value as string
-                });
-              }
-              break;
-            case "GuestUsageGuidelinesUrl":
-              if (args.options.guestUsageGuidelinesUrl) {
-                updatedDirSettings.values.push({
-                  "name": directorySetting.name,
-                  "value": args.options.guestUsageGuidelinesUrl as string
-                });
-              }
-              else {
-                updatedDirSettings.values.push({
-                  "name": directorySetting.name,
-                  "value": directorySetting.value as string
-                });
-              }
-              break;
-            default:
+      const updatedDirSettings: UpdateDirectorySetting = new UpdateDirectorySetting();
+
+      unifiedGroupSetting[0].values.forEach((directorySetting: DirectorySettingValue) => {
+        switch (directorySetting.name) {
+          case "ClassificationList":
+            if (args.options.classifications) {
+              updatedDirSettings.values.push({
+                "name": directorySetting.name,
+                "value": args.options.classifications as string
+              });
+            }
+            else {
               updatedDirSettings.values.push({
                 "name": directorySetting.name,
                 "value": directorySetting.value as string
               });
-              break;
-          }
-        });
+            }
+            break;
+          case "DefaultClassification":
+            if (args.options.defaultClassification) {
+              updatedDirSettings.values.push({
+                "name": directorySetting.name,
+                "value": args.options.defaultClassification as string
+              });
+            }
+            else {
+              updatedDirSettings.values.push({
+                "name": directorySetting.name,
+                "value": directorySetting.value as string
+              });
+            }
+            break;
+          case "UsageGuidelinesUrl":
+            if (args.options.usageGuidelinesUrl) {
+              updatedDirSettings.values.push({
+                "name": directorySetting.name,
+                "value": args.options.usageGuidelinesUrl as string
+              });
+            }
+            else {
+              updatedDirSettings.values.push({
+                "name": directorySetting.name,
+                "value": directorySetting.value as string
+              });
+            }
+            break;
+          case "GuestUsageGuidelinesUrl":
+            if (args.options.guestUsageGuidelinesUrl) {
+              updatedDirSettings.values.push({
+                "name": directorySetting.name,
+                "value": args.options.guestUsageGuidelinesUrl as string
+              });
+            }
+            else {
+              updatedDirSettings.values.push({
+                "name": directorySetting.name,
+                "value": directorySetting.value as string
+              });
+            }
+            break;
+          default:
+            updatedDirSettings.values.push({
+              "name": directorySetting.name,
+              "value": directorySetting.value as string
+            });
+            break;
+        }
+      });
 
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/groupSettings/${unifiedGroupSetting[0].id}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json'
-          },
-          responseType: 'json',
-          data: updatedDirSettings
-        };
+      requestOptions = {
+        url: `${this.resource}/v1.0/groupSettings/${unifiedGroupSetting[0].id}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          'content-type': 'application/json'
+        },
+        responseType: 'json',
+        data: updatedDirSettings
+      };
 
-        return request.patch(requestOptions);
-      })
-      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      await request.patch(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

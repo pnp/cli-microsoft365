@@ -91,7 +91,7 @@ describe(commands.ROLEDEFINITION_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('handles reject request correctly', (done) => {
+  it('handles reject request correctly', async () => {
     const err = 'request rejected';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/roledefinitions(1)') > -1) {
@@ -101,24 +101,16 @@ describe(commands.ROLEDEFINITION_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         id: 1
       }
-    }, (error?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(err));
   });
 
-  it('gets role definition from web by id', (done) => {
+  it('gets role definition from web by id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/roledefinitions(1)') > -1) {
         return Promise.resolve(
@@ -138,63 +130,56 @@ describe(commands.ROLEDEFINITION_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         output: 'json',
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         id: 1
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          {
-            "BasePermissions": {
-              "High": "432",
-              "Low": "1012866047"
-            },
-            "Description": "Can view, add, update, delete, approve, and customize.",
-            "Hidden": false,
-            "Id": 1073741828,
-            "Name": "Design",
-            "Order": 32,
-            "RoleTypeKind": 4,
-            "BasePermissionsValue": [
-              "ViewListItems",
-              "AddListItems",
-              "EditListItems",
-              "DeleteListItems",
-              "ApproveItems",
-              "OpenItems",
-              "ViewVersions",
-              "DeleteVersions",
-              "CancelCheckout",
-              "ManagePersonalViews",
-              "ManageLists",
-              "ViewFormPages",
-              "Open",
-              "ViewPages",
-              "AddAndCustomizePages",
-              "ApplyThemeAndBorder",
-              "ApplyStyleSheets",
-              "CreateSSCSite",
-              "BrowseDirectories",
-              "BrowseUserInfo",
-              "AddDelPrivateWebParts",
-              "UpdatePersonalWebParts",
-              "UseClientIntegration",
-              "UseRemoteAPIs",
-              "CreateAlerts",
-              "EditMyUserInfo"
-            ],
-            "RoleTypeKindValue": "WebDesigner"
-          }
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      {
+        "BasePermissions": {
+          "High": "432",
+          "Low": "1012866047"
+        },
+        "Description": "Can view, add, update, delete, approve, and customize.",
+        "Hidden": false,
+        "Id": 1073741828,
+        "Name": "Design",
+        "Order": 32,
+        "RoleTypeKind": 4,
+        "BasePermissionsValue": [
+          "ViewListItems",
+          "AddListItems",
+          "EditListItems",
+          "DeleteListItems",
+          "ApproveItems",
+          "OpenItems",
+          "ViewVersions",
+          "DeleteVersions",
+          "CancelCheckout",
+          "ManagePersonalViews",
+          "ManageLists",
+          "ViewFormPages",
+          "Open",
+          "ViewPages",
+          "AddAndCustomizePages",
+          "ApplyThemeAndBorder",
+          "ApplyStyleSheets",
+          "CreateSSCSite",
+          "BrowseDirectories",
+          "BrowseUserInfo",
+          "AddDelPrivateWebParts",
+          "UpdatePersonalWebParts",
+          "UseClientIntegration",
+          "UseRemoteAPIs",
+          "CreateAlerts",
+          "EditMyUserInfo"
+        ],
+        "RoleTypeKindValue": "WebDesigner"
+      }
+    ));
   });
 });

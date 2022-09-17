@@ -67,7 +67,7 @@ describe(commands.HUBSITE_CONNECT, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('connects site to the hub site', (done) => {
+  it('connects site to the hub site', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/site/JoinHubSite('255a50b2-527f-4413-8485-57f4c17a24d1')`) > -1) {
         return Promise.resolve({
@@ -78,18 +78,11 @@ describe(commands.HUBSITE_CONNECT, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles error when the specified id doesn\'t point to a valid hub site', (done) => {
+  it('correctly handles error when the specified id doesn\'t point to a valid hub site', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
@@ -104,15 +97,8 @@ describe(commands.HUBSITE_CONNECT, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Exception of type \'Microsoft.SharePoint.Client.ResourceNotFoundException\' was thrown.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', hubSiteId: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any),
+      new CommandError('Exception of type \'Microsoft.SharePoint.Client.ResourceNotFoundException\' was thrown.'));
   });
 
   it('supports debug mode', () => {

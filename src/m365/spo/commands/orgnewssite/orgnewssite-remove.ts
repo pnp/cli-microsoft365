@@ -1,11 +1,8 @@
 import { Cli, Logger } from '../../../../cli';
-import {
-  CommandError
-} from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, spo, validation } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, formatting, spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -60,58 +57,47 @@ class SpoOrgNewsSiteRemoveCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    const removeOrgNewsSite = (): void => {
-      let spoAdminUrl: string = '';
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeOrgNewsSite: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const spoAdminUrl = await spo.getSpoAdminUrl(logger, this.debug);
+        const reqDigest = await spo.getRequestDigest(spoAdminUrl);
 
-      spo
-        .getSpoAdminUrl(logger, this.debug)
-        .then((_spoAdminUrl: string): Promise<ContextInfo> => {
-          spoAdminUrl = _spoAdminUrl;
+        const requestOptions: any = {
+          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'X-RequestDigest': reqDigest.FormDigestValue
+          },
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="64" ObjectPathId="63" /><Method Name="RemoveOrgNewsSite" Id="65" ObjectPathId="63"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.url)}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="63" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+        };
 
-          return spo.getRequestDigest(spoAdminUrl);
-        })
-        .then((res: ContextInfo): Promise<string> => {
-          const requestOptions: any = {
-            url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-            headers: {
-              'X-RequestDigest': res.FormDigestValue
-            },
-            data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="64" ObjectPathId="63" /><Method Name="RemoveOrgNewsSite" Id="65" ObjectPathId="63"><Parameters><Parameter Type="String">${formatting.escapeXml(args.options.url)}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="63" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
-          };
+        const res = await request.post<string>(requestOptions);
 
-          return request.post(requestOptions);
-        })
-        .then((res: string): void => {
-          const json: ClientSvcResponse = JSON.parse(res);
-          const response: ClientSvcResponseContents = json[0];
-          if (response.ErrorInfo) {
-            cb(new CommandError(response.ErrorInfo.ErrorMessage));
-            return;
-          }
-          else {
-            cb();
-          }
-        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+        const json: ClientSvcResponse = JSON.parse(res);
+        const response: ClientSvcResponseContents = json[0];
+        if (response.ErrorInfo) {
+          throw response.ErrorInfo.ErrorMessage;
+        }
+      }
+      catch (err: any) {
+        this.handleRejectedPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeOrgNewsSite();
+      await removeOrgNewsSite();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove ${args.options.url} from the list of organizational news sites?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeOrgNewsSite();
-        }
       });
+
+      if (result.continue) {
+        await removeOrgNewsSite();
+      }
     }
   }
 }

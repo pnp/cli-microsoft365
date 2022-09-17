@@ -78,7 +78,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
     assert(containsDebugOption);
   });
 
-  it('handles client.svc promise error', (done) => {
+  it('handles client.svc promise error', async () => {
     // get tenant app catalog
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
@@ -87,22 +87,10 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
-  it('handles error while getting tenant appcatalog', (done) => {
+  it('handles error while getting tenant appcatalog', async () => {
     // get tenant app catalog
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
@@ -117,22 +105,10 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('An error has occurred'));
   });
 
-  it('lists the tenant settings (debug)', (done) => {
+  it('lists the tenant settings (debug)', async () => {
     // get tenant app catalog
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
@@ -155,39 +131,32 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].AllowDownloadingNonWebViewableFiles, true);
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].BccExternalSharingInvitationsList, null);
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].HideDefaultThemes, true);
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].UserVoiceForFeedbackEnabled, false);
-        assert.strictEqual(loggerLogSpy.lastCall.args[0]["_ObjectType_"], undefined);
-        assert.strictEqual(loggerLogSpy.lastCall.args[0]["_ObjectIdentity_"], undefined);
-
-        assert.strictEqual(loggerLogSpy.lastCall.args[0]["SharingCapability"], 'ExternalUserSharingOnly');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0]["SharingDomainRestrictionMode"], 'AllowList');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0]["ODBMembersCanShare"], 'Unspecified');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0]["ODBAccessRequests"], 'Unspecified');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0]["DefaultSharingLinkType"], 'Direct');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0]["FileAnonymousLinkType"], 'Edit');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0]["FolderAnonymousLinkType"], 'Edit');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0]["DefaultLinkPermission"], 'View');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0]["ConditionalAccessPolicy"], 'AllowFullAccess');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0]["SpecialCharactersStateInFileFolderNames"], 'Allowed');
-        assert.strictEqual(loggerLogSpy.lastCall.args[0]["LimitedAccessFileType"], 'WebPreviewableFiles');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].AllowDownloadingNonWebViewableFiles, true);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].BccExternalSharingInvitationsList, null);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].HideDefaultThemes, true);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0].UserVoiceForFeedbackEnabled, false);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0]["_ObjectType_"], undefined);
+    assert.strictEqual(loggerLogSpy.lastCall.args[0]["_ObjectIdentity_"], undefined);
+
+    assert.strictEqual(loggerLogSpy.lastCall.args[0]["SharingCapability"], 'ExternalUserSharingOnly');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0]["SharingDomainRestrictionMode"], 'AllowList');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0]["ODBMembersCanShare"], 'Unspecified');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0]["ODBAccessRequests"], 'Unspecified');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0]["DefaultSharingLinkType"], 'Direct');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0]["FileAnonymousLinkType"], 'Edit');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0]["FolderAnonymousLinkType"], 'Edit');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0]["DefaultLinkPermission"], 'View');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0]["ConditionalAccessPolicy"], 'AllowFullAccess');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0]["SpecialCharactersStateInFileFolderNames"], 'Allowed');
+    assert.strictEqual(loggerLogSpy.lastCall.args[0]["LimitedAccessFileType"], 'WebPreviewableFiles');
   });
 
-  it('handles tenant settings error', (done) => {
+  it('handles tenant settings error', async () => {
     // get tenant app catalog
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
@@ -204,18 +173,6 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Timed out')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false } } as any), new CommandError('Timed out'));
   });
 });

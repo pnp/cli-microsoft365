@@ -45,9 +45,9 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
   });
 
@@ -76,7 +76,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('revokes access to the specified site design from the specified principal without prompting for confirmation when confirm option specified', (done) => {
+  it('revokes access to the specified site design from the specified principal without prompting for confirmation when confirm option specified', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -91,18 +91,11 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('revokes access to the specified site design from the specified principals', (done) => {
+  it('revokes access to the specified site design from the specified principals', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -117,18 +110,11 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF,AdeleV' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF,AdeleV' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('revokes access to the specified site design from the principals specified via email', (done) => {
+  it('revokes access to the specified site design from the principals specified via email', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -143,18 +129,11 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com,AdeleV@contoso.com' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com,AdeleV@contoso.com' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('revokes access to the specified site design from the specified principals separated with an extra space', (done) => {
+  it('revokes access to the specified site design from the specified principals separated with an extra space', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -169,79 +148,44 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com, AdeleV@contoso.com' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com, AdeleV@contoso.com' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('prompts before revoking access to the specified site design when confirm option not passed', (done) => {
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } }, () => {
-      let promptIssued = false;
+  it('prompts before revoking access to the specified site design when confirm option not passed', async () => {
+    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('aborts revoking access to the site design when prompt not confirmed', (done) => {
+  it('aborts revoking access to the site design when prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
+    assert(postSpy.notCalled);
   });
 
-  it('revokes site design access when prompt confirmed', (done) => {
+  it('revokes site design access when prompt confirmed', async () => {
     const postStub = sinon.stub(request, 'post').callsFake(() => Promise.resolve());
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } }, () => {
-      try {
-        assert(postStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+
+    await command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', principals: 'PattiF' } });
+    assert(postStub.called);
   });
 
-  it('correctly handles error when site script not found', (done) => {
+  it('correctly handles error when site script not found', async () => {
     sinon.stub(request, 'post').callsFake(() => {
-      return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
+      return Promise.reject('File Not Found.' );
     });
 
-    command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } } as any), new CommandError('File Not Found.'));
   });
 
   it('supports debug mode', () => {

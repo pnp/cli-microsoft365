@@ -80,107 +80,71 @@ describe(commands.FOLDER_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Name', 'ServerRelativeUrl']);
   });
 
-  it('should correctly handle folder get reject request', (done) => {
+  it('should correctly handle folder get reject request', async () => {
     stubGetResponses(new Promise((res, rej)=>rej('error1')));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         parentFolderUrl: '/Shared Documents'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error1')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('error1'));
   });
 
-  it('should correctly handle folder get success request', (done) => {
+  it('should correctly handle folder get success request', async () => {
     stubGetResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         parentFolderUrl: '/Shared Documents'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.lastCall.calledWith([{"Exists":true,"IsWOPIEnabled":false,"ItemCount":2,"Name":"Test","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/Test","TimeCreated":"2018-04-23T21:29:40Z","TimeLastModified":"2018-04-23T21:32:13Z","UniqueId":"3e735407-9c9f-418b-8378-450a9888d815","WelcomePage":""},{"Exists":true,"IsWOPIEnabled":false,"ItemCount":0,"Name":"velin12","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/velin12","TimeCreated":"2018-05-02T22:28:50Z","TimeLastModified":"2018-05-02T22:36:14Z","UniqueId":"edeb37c6-8502-4a35-9fa2-6934bfc30214","WelcomePage":""},{"Exists":true,"IsWOPIEnabled":false,"ItemCount":0,"Name":"test111","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/test111","TimeCreated":"2018-05-02T23:21:45Z","TimeLastModified":"2018-05-02T23:21:45Z","UniqueId":"0ac3da45-cacf-4c31-9b38-9ef3697d5a66","WelcomePage":""},{"Exists":true,"IsWOPIEnabled":false,"ItemCount":0,"Name":"Forms","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/Forms","TimeCreated":"2018-02-15T13:57:52Z","TimeLastModified":"2018-02-15T13:57:52Z","UniqueId":"cbb96da6-c2d8-4af0-9451-d534d5949371","WelcomePage":""}]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.lastCall.calledWith([{"Exists":true,"IsWOPIEnabled":false,"ItemCount":2,"Name":"Test","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/Test","TimeCreated":"2018-04-23T21:29:40Z","TimeLastModified":"2018-04-23T21:32:13Z","UniqueId":"3e735407-9c9f-418b-8378-450a9888d815","WelcomePage":""},{"Exists":true,"IsWOPIEnabled":false,"ItemCount":0,"Name":"velin12","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/velin12","TimeCreated":"2018-05-02T22:28:50Z","TimeLastModified":"2018-05-02T22:36:14Z","UniqueId":"edeb37c6-8502-4a35-9fa2-6934bfc30214","WelcomePage":""},{"Exists":true,"IsWOPIEnabled":false,"ItemCount":0,"Name":"test111","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/test111","TimeCreated":"2018-05-02T23:21:45Z","TimeLastModified":"2018-05-02T23:21:45Z","UniqueId":"0ac3da45-cacf-4c31-9b38-9ef3697d5a66","WelcomePage":""},{"Exists":true,"IsWOPIEnabled":false,"ItemCount":0,"Name":"Forms","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/Forms","TimeCreated":"2018-02-15T13:57:52Z","TimeLastModified":"2018-02-15T13:57:52Z","UniqueId":"cbb96da6-c2d8-4af0-9451-d534d5949371","WelcomePage":""}]));
   });
 
-  it('returns all information for output type json', (done) => {
+  it('returns all information for output type json', async () => {
     stubGetResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         parentFolderUrl: '/Shared Documents',
         output: 'json'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.lastCall.calledWith([{"Exists":true,"IsWOPIEnabled":false,"ItemCount":2,"Name":"Test","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/Test","TimeCreated":"2018-04-23T21:29:40Z","TimeLastModified":"2018-04-23T21:32:13Z","UniqueId":"3e735407-9c9f-418b-8378-450a9888d815","WelcomePage":""},{"Exists":true,"IsWOPIEnabled":false,"ItemCount":0,"Name":"velin12","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/velin12","TimeCreated":"2018-05-02T22:28:50Z","TimeLastModified":"2018-05-02T22:36:14Z","UniqueId":"edeb37c6-8502-4a35-9fa2-6934bfc30214","WelcomePage":""},{"Exists":true,"IsWOPIEnabled":false,"ItemCount":0,"Name":"test111","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/test111","TimeCreated":"2018-05-02T23:21:45Z","TimeLastModified":"2018-05-02T23:21:45Z","UniqueId":"0ac3da45-cacf-4c31-9b38-9ef3697d5a66","WelcomePage":""},{"Exists":true,"IsWOPIEnabled":false,"ItemCount":0,"Name":"Forms","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/Forms","TimeCreated":"2018-02-15T13:57:52Z","TimeLastModified":"2018-02-15T13:57:52Z","UniqueId":"cbb96da6-c2d8-4af0-9451-d534d5949371","WelcomePage":""}]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.lastCall.calledWith([{"Exists":true,"IsWOPIEnabled":false,"ItemCount":2,"Name":"Test","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/Test","TimeCreated":"2018-04-23T21:29:40Z","TimeLastModified":"2018-04-23T21:32:13Z","UniqueId":"3e735407-9c9f-418b-8378-450a9888d815","WelcomePage":""},{"Exists":true,"IsWOPIEnabled":false,"ItemCount":0,"Name":"velin12","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/velin12","TimeCreated":"2018-05-02T22:28:50Z","TimeLastModified":"2018-05-02T22:36:14Z","UniqueId":"edeb37c6-8502-4a35-9fa2-6934bfc30214","WelcomePage":""},{"Exists":true,"IsWOPIEnabled":false,"ItemCount":0,"Name":"test111","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/test111","TimeCreated":"2018-05-02T23:21:45Z","TimeLastModified":"2018-05-02T23:21:45Z","UniqueId":"0ac3da45-cacf-4c31-9b38-9ef3697d5a66","WelcomePage":""},{"Exists":true,"IsWOPIEnabled":false,"ItemCount":0,"Name":"Forms","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/Forms","TimeCreated":"2018-02-15T13:57:52Z","TimeLastModified":"2018-02-15T13:57:52Z","UniqueId":"cbb96da6-c2d8-4af0-9451-d534d5949371","WelcomePage":""}]));
   });
 
-  it('should send correct request params when /', (done) => {
+  it('should send correct request params when /', async () => {
     const request: sinon.SinonStub = stubGetResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         webUrl: 'https://contoso.sharepoint.com',
         parentFolderUrl: '/Shared Documents'
       }
-    }, () => {
-      try {
-        const lastCall: any = request.lastCall.args[0];
-        assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents\')/folders');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const lastCall: any = request.lastCall.args[0];
+    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativeUrl(\'%2FShared%20Documents\')/folders');
   });
 
-  it('should send correct request params when /sites/abc', (done) => {
+  it('should send correct request params when /sites/abc', async () => {
     const request: sinon.SinonStub = stubGetResponses();
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/sites/abc',
         parentFolderUrl: '/Shared Documents'
       }
-    }, () => {
-      try {
-        const lastCall: any = request.lastCall.args[0];
-        assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/sites/abc/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2Fabc%2FShared%20Documents\')/folders');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    const lastCall: any = request.lastCall.args[0];
+    assert.strictEqual(lastCall.url, 'https://contoso.sharepoint.com/sites/abc/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2Fabc%2FShared%20Documents\')/folders');
   });
 
   it('supports debug mode', () => {

@@ -43,184 +43,121 @@ describe(commands.CONFIG_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it(`sets ${settingsNames.showHelpOnFailure} property`, (done) => {
+  it(`sets ${settingsNames.showHelpOnFailure} property`, async () => {
     const config = Cli.getInstance().config;
-    let actualKey: string, actualValue: any;
+    let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
     }) as any);
-    command.action(logger, { options: { key: settingsNames.showHelpOnFailure, value: false } }, () => {
-      try {
-        assert.strictEqual(actualKey, settingsNames.showHelpOnFailure, 'Invalid key');
-        assert.strictEqual(actualValue, false, 'Invalid value');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { key: settingsNames.showHelpOnFailure, value: false } });
+    assert.strictEqual(actualKey, settingsNames.showHelpOnFailure, 'Invalid key');
+    assert.strictEqual(actualValue, false, 'Invalid value');
   });
 
-  it(`sets ${settingsNames.autoOpenBrowserOnLogin} property`, (done) => {
+  it(`sets ${settingsNames.autoOpenBrowserOnLogin} property`, async () => {
     const config = Cli.getInstance().config;
-    let actualKey: string, actualValue: any;
+    let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
     }) as any);
-    command.action(logger, { options: { key: settingsNames.autoOpenBrowserOnLogin, value: false } }, () => {
-      try {
-        assert.strictEqual(actualKey, settingsNames.autoOpenBrowserOnLogin, 'Invalid key');
-        assert.strictEqual(actualValue, false, 'Invalid value');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { key: settingsNames.autoOpenBrowserOnLogin, value: false } });
+    assert.strictEqual(actualKey, settingsNames.autoOpenBrowserOnLogin, 'Invalid key');
+    assert.strictEqual(actualValue, false, 'Invalid value');
   });
 
-  it(`sets ${settingsNames.autoOpenLinksInBrowser} property`, (done) => {
+  it(`sets ${settingsNames.autoOpenLinksInBrowser} property`, async () => {
     const config = Cli.getInstance().config;
-    let actualKey: string, actualValue: any;
+    let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
     }) as any);
-    command.action(logger, { options: { key: settingsNames.autoOpenLinksInBrowser, value: false } }, () => {
-      try {
-        assert.strictEqual(actualKey, settingsNames.autoOpenLinksInBrowser, 'Invalid key');
-        assert.strictEqual(actualValue, false, 'Invalid value');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { key: settingsNames.autoOpenLinksInBrowser, value: false } });
+    assert.strictEqual(actualKey, settingsNames.autoOpenLinksInBrowser, 'Invalid key');
+    assert.strictEqual(actualValue, false, 'Invalid value');
   });
 
-  it(`sets ${settingsNames.output} property to 'text'`, (done) => {
+  it(`sets ${settingsNames.output} property to 'text'`, async () => {
     const output = "text";
     const config = Cli.getInstance().config;
-    let actualKey: string, actualValue: any;
+    let actualKey: string = '', actualValue: any;
     sinon.restore();
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
     }) as any);
 
-    command.action(logger, { options: { key: settingsNames.output, value: output } }, () => {
-      try {
-        assert.strictEqual(actualKey, settingsNames.output, 'Invalid key');
-        assert.strictEqual(actualValue, output, 'Invalid value');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { key: settingsNames.output, value: output } });
+    assert.strictEqual(actualKey, settingsNames.output, 'Invalid key');
+    assert.strictEqual(actualValue, output, 'Invalid value');
   });
 
-  it(`sets ${settingsNames.output} property to 'json'`, (done) => {
+  it(`sets ${settingsNames.output} property to 'json'`, async () => {
     const output = "json";
     const config = Cli.getInstance().config;
-    let actualKey: string, actualValue: any;
+    let actualKey: string = '', actualValue: any;
     sinon.restore();
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
     }) as any);
 
-    command.action(logger, { options: { key: settingsNames.output, value: output } }, () => {
-      try {
-        assert.strictEqual(actualKey, settingsNames.output, 'Invalid key');
-        assert.strictEqual(actualValue, output, 'Invalid value');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { key: settingsNames.output, value: output } });
+    assert.strictEqual(actualKey, settingsNames.output, 'Invalid key');
+    assert.strictEqual(actualValue, output, 'Invalid value');
   });
 
-  it(`sets ${settingsNames.output} property to 'csv'`, (done) => {
+  it(`sets ${settingsNames.output} property to 'csv'`, async () => {
     const output = "csv";
     const config = Cli.getInstance().config;
-    let actualKey: string, actualValue: any;
+    let actualKey: string = '', actualValue: any;
     sinon.restore();
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
     }) as any);
 
-    command.action(logger, { options: { key: settingsNames.output, value: output } }, () => {
-      try {
-        assert.strictEqual(actualKey, settingsNames.output, 'Invalid key');
-        assert.strictEqual(actualValue, output, 'Invalid value');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { key: settingsNames.output, value: output } });
+    assert.strictEqual(actualKey, settingsNames.output, 'Invalid key');
+    assert.strictEqual(actualValue, output, 'Invalid value');
   });
 
-  it(`sets ${settingsNames.csvHeader} property`, (done) => {
+  it(`sets ${settingsNames.csvHeader} property`, async () => {
     const config = Cli.getInstance().config;
-    let actualKey: string, actualValue: any;
+    let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
     }) as any);
-    command.action(logger, { options: { key: settingsNames.csvHeader, value: false } }, () => {
-      try {
-        assert.strictEqual(actualKey, settingsNames.csvHeader, 'Invalid key');
-        assert.strictEqual(actualValue, false, 'Invalid value');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { key: settingsNames.csvHeader, value: false } });
+    assert.strictEqual(actualKey, settingsNames.csvHeader, 'Invalid key');
+    assert.strictEqual(actualValue, false, 'Invalid value');
   });
 
-  it(`sets ${settingsNames.csvQuoted} property`, (done) => {
+  it(`sets ${settingsNames.csvQuoted} property`, async () => {
     const config = Cli.getInstance().config;
-    let actualKey: string, actualValue: any;
+    let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
     }) as any);
-    command.action(logger, { options: { key: settingsNames.csvQuoted, value: false } }, () => {
-      try {
-        assert.strictEqual(actualKey, settingsNames.csvQuoted, 'Invalid key');
-        assert.strictEqual(actualValue, false, 'Invalid value');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { key: settingsNames.csvQuoted, value: false } });
+    assert.strictEqual(actualKey, settingsNames.csvQuoted, 'Invalid key');
+    assert.strictEqual(actualValue, false, 'Invalid value');
   });
 
-  it(`sets ${settingsNames.csvQuotedEmpty} property`, (done) => {
+  it(`sets ${settingsNames.csvQuotedEmpty} property`, async () => {
     const config = Cli.getInstance().config;
-    let actualKey: string, actualValue: any;
+    let actualKey: string = '', actualValue: any;
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
     }) as any);
-    command.action(logger, { options: { key: settingsNames.csvQuotedEmpty, value: false } }, () => {
-      try {
-        assert.strictEqual(actualKey, settingsNames.csvQuotedEmpty, 'Invalid key');
-        assert.strictEqual(actualValue, false, 'Invalid value');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { key: settingsNames.csvQuotedEmpty, value: false } });
+    assert.strictEqual(actualKey, settingsNames.csvQuotedEmpty, 'Invalid key');
+    assert.strictEqual(actualValue, false, 'Invalid value');
   });
 
 

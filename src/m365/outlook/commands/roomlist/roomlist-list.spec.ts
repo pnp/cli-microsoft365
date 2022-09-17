@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -96,7 +96,7 @@ describe(commands.ROOMLIST_LIST, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'phone', 'emailAddress']);
   });
 
-  it('lists all available roomlist in the tenant (verbose)', (done) => {
+  it('lists all available roomlist in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/places/microsoft.graph.roomlist`) {
         return Promise.resolve(
@@ -106,17 +106,17 @@ describe(commands.ROOMLIST_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { verbose: true } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          jsonOutput.value
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { verbose: true } });
+    assert(loggerLogSpy.calledWith(
+      jsonOutput.value
+    ));
+  });
+
+  it('handles random API error', async () => {
+    const errorMessage = 'Something went wrong';
+    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
+
+    await assert.rejects(command.action(logger, { options: { confirm: true } }), new CommandError(errorMessage));
   });
 
   it('supports debug mode', () => {

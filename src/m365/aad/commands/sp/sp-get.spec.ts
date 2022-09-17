@@ -76,7 +76,7 @@ describe(commands.SP_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves information about the specified service principal using its display name', (done) => {
+  it('retrieves information about the specified service principal using its display name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
         return Promise.resolve(spAppInfo);
@@ -89,18 +89,11 @@ describe(commands.SP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, displayName: 'foo' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(spAppInfo));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, displayName: 'foo' } });
+    assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
-  it('retrieves information about the specified service principal using its appId', (done) => {
+  it('retrieves information about the specified service principal using its appId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=appId eq `) > -1) {
         return Promise.resolve(spAppInfo);
@@ -113,18 +106,11 @@ describe(commands.SP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, appId: '65415bb1-9267-4313-bbf5-ae259732ee12' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(spAppInfo));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, appId: '65415bb1-9267-4313-bbf5-ae259732ee12' } });
+    assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
-  it('retrieves information about the specified service principal using its objectId', (done) => {
+  it('retrieves information about the specified service principal using its objectId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=objectId eq `) > -1) {
         return Promise.resolve(spAppInfo);
@@ -137,42 +123,11 @@ describe(commands.SP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, objectId: '59e617e5-e447-4adc-8b88-00af644d7c92' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(spAppInfo));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, objectId: '59e617e5-e447-4adc-8b88-00af644d7c92' } });
+    assert(loggerLogSpy.calledWith(spAppInfo));
   });
 
-  it('correctly handles no service principal found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/myorganization/servicePrincipals?api-version=1.6&$filter=displayName eq 'Foo'`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          (opts.headers.accept as string).indexOf('application/json') === 0) {
-          return Promise.resolve({ value: [] });
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: false, displayName: 'Foo' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
@@ -186,19 +141,12 @@ describe(commands.SP_GET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   
-  it('fails when Azure AD app with same name exists', (done) => {
+  it('fails when Azure AD app with same name exists', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
         return Promise.resolve({
@@ -233,23 +181,15 @@ describe(commands.SP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         displayName: 'foo'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple Azure AD apps with name foo found: be559819-b036-470f-858b-281c4e808403,93d75ef9-ba9b-4361-9a47-1f6f7478f05f`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`Multiple Azure AD apps with name foo found: be559819-b036-470f-858b-281c4e808403,93d75ef9-ba9b-4361-9a47-1f6f7478f05f`));
   });
 
-  it('fails when the specified Azure AD app does not exist', (done) => {
+  it('fails when the specified Azure AD app does not exist', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
         return Promise.resolve({
@@ -261,20 +201,12 @@ describe(commands.SP_GET, () => {
       return Promise.reject(`Invalid request`);
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         displayName: 'Test App'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified Azure AD app does not exist`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError(`The specified Azure AD app does not exist`));
   });
 
   it('fails validation if neither the appId nor the displayName option specified', async () => {

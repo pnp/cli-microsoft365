@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import { sinonUtil } from '../../../../utils';
 import commands from '../../commands';
@@ -35,9 +35,9 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     promptOptions = undefined;
   });
@@ -67,8 +67,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('clears the recycle bin items without prompting for confirmation when --confirm option specified', (done) => {
-
+  it('clears the recycle bin items without prompting for confirmation when --confirm option specified', async () => {
     const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
     // Stub representing the get deleted items operation
@@ -132,19 +131,11 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, confirm: true } }, () => {
-      try {
-        assert(deleteStub.calledTwice);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, confirm: true } });
+    assert(deleteStub.calledTwice);
   });
 
-  it('clears the recycle bin items when deleted items data is served in pages and --confirm option specified', (done) => {
-
+  it('clears the recycle bin items when deleted items data is served in pages and --confirm option specified', async () => {
     const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
     // Stub representing the get deleted items operation
@@ -242,18 +233,11 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, confirm: true } }, () => {
-      try {
-        assert(deleteStub.calledThrice);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, confirm: true } });
+    assert(deleteStub.calledThrice);
   });
 
-  it('does not call delete when there are no items in the O365 group recycle bin', (done) => {
+  it('does not call delete when there are no items in the O365 group recycle bin', async () => {
 
     const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
@@ -267,71 +251,42 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, confirm: true } }, () => {
-      try {
-        assert(deleteStub.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, confirm: true } });
+    assert(deleteStub.notCalled);
   });
 
-  it('prompts before clearing the O365 Group recycle bin items when --confirm option is not passed', (done) => {
-    command.action(logger, { options: { debug: false } }, () => {
-      let promptIssued = false;
+  it('prompts before clearing the O365 Group recycle bin items when --confirm option is not passed', async () => {
+    await command.action(logger, { options: { debug: false } });
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('aborts clearing the O365 Group recyclebin items when prompt not confirmed', (done) => {
+  it('aborts clearing the O365 Group recyclebin items when prompt not confirmed', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(deleteSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: { debug: false } });
+    assert(deleteSpy.notCalled);
   });
 
-  it('aborts clearing the recycle bin items when prompt not confirmed (debug)', (done) => {
+  it('aborts clearing the recycle bin items when prompt not confirmed (debug)', async () => {
     const deleteSpy = sinon.spy(request, 'delete');
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(deleteSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
+    await command.action(logger, { options: { debug: true } });
+    assert(deleteSpy.notCalled);
   });
 
-  it('clears the O365 Group recycle bin items when prompt is confirmed', (done) => {
-
+  it('clears the O365 Group recycle bin items when prompt is confirmed', async () => {
     const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
     // Stub representing the get deleted items operation
@@ -396,23 +351,15 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(deleteStub.calledTwice);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: false } });
+    assert(deleteStub.calledTwice);
   });
 
 
-  it('clears the O365 Group recycle bin items when prompt is confirmed (debug)', (done) => {
-
+  it('clears the O365 Group recycle bin items when prompt is confirmed (debug)', async () => {
     const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
 
     // Stub representing the get deleted items operation
@@ -502,20 +449,19 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(deleteStub.calledThrice);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { debug: true } });
+    assert(deleteStub.calledThrice);
   });
 
+  it('handles random API error', async () => {
+    const errorMessage = 'Something went wrong';
+    sinon.stub(request, 'get').callsFake(async () => { throw errorMessage; });
+
+    await assert.rejects(command.action(logger, { options: { confirm: true } }), new CommandError(errorMessage));
+  });
 
   it('supports debug mode', () => {
     const options = command.options;

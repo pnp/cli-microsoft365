@@ -79,8 +79,8 @@ class SpoAppUninstallCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const uninstallApp: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const uninstallApp: () => Promise<void> = async (): Promise<void> => {
       const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
 
       if (this.verbose) {
@@ -94,28 +94,28 @@ class SpoAppUninstallCommand extends SpoCommand {
         }
       };
 
-      request
-        .post(requestOptions)
-        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
+      try {
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      uninstallApp();
+      await uninstallApp();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to uninstall the app ${args.options.id} from site ${args.options.siteUrl}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          uninstallApp();
-        }
       });
+
+      if (result.continue) {
+        await uninstallApp();
+      }
     }
   }
 }

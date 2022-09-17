@@ -48,7 +48,7 @@ class SpoWebListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving all webs in site at ${args.options.webUrl}...`);
     }
@@ -67,12 +67,13 @@ class SpoWebListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<WebPropertiesCollection>(requestOptions)
-      .then((webProperties: WebPropertiesCollection): void => {
-        logger.log(webProperties.value);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const webProperties: WebPropertiesCollection = await request.get<WebPropertiesCollection>(requestOptions);
+      logger.log(webProperties.value);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

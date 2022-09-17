@@ -134,7 +134,7 @@ describe(commands.GROUP_SET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('successfully updates group settings by id', (done) => {
+  it('successfully updates group settings by id', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `${validWebUrl}/_api/web/sitegroups/GetById(${validId})`) {
         return Promise.resolve();
@@ -143,24 +143,16 @@ describe(commands.GROUP_SET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: validWebUrl,
         id: validId,
         allowRequestToJoinLeave: 'true'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('successfully updates group settings by name', (done) => {
+  it('successfully updates group settings by name', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `${validWebUrl}/_api/web/sitegroups/GetByName('${validName}')`) {
         return Promise.resolve();
@@ -169,24 +161,16 @@ describe(commands.GROUP_SET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: validWebUrl,
         name: validName,
         allowRequestToJoinLeave: 'true'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('successfully updates group owner by ownerEmail', (done) => {
+  it('successfully updates group owner by ownerEmail', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify(userInfoResponse),
       stderr: ''
@@ -210,24 +194,16 @@ describe(commands.GROUP_SET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: validWebUrl,
         id: validId,
         ownerEmail: validOwnerEmail
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('successfully updates group owner by ownerEmail', (done) => {
+  it('successfully updates group owner by ownerEmail', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake(() => Promise.resolve({
       stdout: JSON.stringify(userInfoResponse),
       stderr: ''
@@ -251,24 +227,16 @@ describe(commands.GROUP_SET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: validWebUrl,
         name: validName,
         ownerUserName: validOwnerUserName
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(typeof err, 'undefined', err?.message);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `${validWebUrl}/_api/web/sitegroups/GetByName('${validName}')`) {
         return Promise.reject('An error has occurred');
@@ -277,21 +245,13 @@ describe(commands.GROUP_SET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         webUrl: validWebUrl,
         name: validName,
         autoAcceptRequestToJoinLeave: 'true'
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

@@ -72,7 +72,7 @@ describe(commands.APP_UNINSTALL, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('uninstalls an app from a Microsoft Teams team with confirmation', (done) => {
+  it('uninstalls an app from a Microsoft Teams team with confirmation', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/c527a470-a882-481c-981c-ee6efaba85c7/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) {
         return Promise.resolve();
@@ -81,24 +81,17 @@ describe(commands.APP_UNINSTALL, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
         confirm: true
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('uninstalls an app from a Microsoft Teams team without confirmation', (done) => {
+  it('uninstalls an app from a Microsoft Teams team without confirmation', async () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/c527a470-a882-481c-981c-ee6efaba85c7/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) {
         return Promise.resolve();
@@ -107,65 +100,40 @@ describe(commands.APP_UNINSTALL, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
+      options: {
+        teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+        appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='
+      }
     });
+    assert(loggerLogSpy.notCalled);
+  });
+
+  it('aborts uninstalling an app from a Microsoft Teams team when prompt not confirmed', async () => {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
     command.action(logger, {
       options: {
         teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('aborts uninstalling an app from a Microsoft Teams team when prompt not confirmed', (done) => {
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
-    command.action(logger, {
-      options: {
-        teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='
-      }
-    }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('correctly handles error when uninstalling an app', (done) => {
+  it('correctly handles error when uninstalling an app', async () => {
     sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
-      options: {
-        teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
-        confirm: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { 
+      teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
+      appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
+      confirm: true } } as any), new CommandError('An error has occurred'));
   });
 
   it('validates for a correct input.', async () => {

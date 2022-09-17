@@ -128,7 +128,7 @@ class TeamsTeamCloneCommand extends GraphCommand {
   	);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.teamId) {
       args.options.id = args.options.teamId;
 
@@ -169,9 +169,12 @@ class TeamsTeamCloneCommand extends GraphCommand {
       data: data
     };
 
-    request
-      .post(requestOptions)
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      await request.post(requestOptions);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   /**

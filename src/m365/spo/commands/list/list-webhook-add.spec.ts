@@ -60,7 +60,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('uses correct API url when list id option is passed', (done) => {
+  it('uses correct API url when list id option is passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
         return Promise.resolve('Correct Url');
@@ -69,7 +69,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
@@ -77,19 +77,10 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         listId: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
-    }, () => {
-
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('uses correct API url when list title option is passed', (done) => {
+  it('uses correct API url when list title option is passed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
         return Promise.resolve('Correct Url');
@@ -98,7 +89,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
@@ -106,19 +97,10 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
-    }, () => {
-
-      try {
-        assert(true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
   });
 
-  it('adds a webhook by passing list title (debug)', (done) => {
+  it('adds a webhook by passing list title (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
         return Promise.resolve({
@@ -133,7 +115,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         debug: true,
@@ -141,25 +123,18 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          'clientState': 'null',
-          'expirationDateTime': '2019-05-29T23:00:00.000Z',
-          'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
-          'notificationUrl': 'https://contoso-funcions.azurewebsites.net/webhook',
-          'resource': '0987cfd9-f02c-479b-9fb4-3f0550462848',
-          'resourceData': 'null'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      'clientState': 'null',
+      'expirationDateTime': '2019-05-29T23:00:00.000Z',
+      'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
+      'notificationUrl': 'https://contoso-funcions.azurewebsites.net/webhook',
+      'resource': '0987cfd9-f02c-479b-9fb4-3f0550462848',
+      'resourceData': 'null'
+    }));
   });
 
-  it('adds a webhook by passing list id (verbose)', (done) => {
+  it('adds a webhook by passing list id (verbose)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'0987cfd9-f02c-479b-9fb4-3f0550462848')/Subscriptions`) > -1) {
         return Promise.resolve({
@@ -174,7 +149,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         verbose: true,
@@ -182,25 +157,18 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         listId: '0987cfd9-f02c-479b-9fb4-3f0550462848',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          'clientState': 'null',
-          'expirationDateTime': '2019-05-29T23:00:00.000Z',
-          'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
-          'notificationUrl': 'https://contoso-funcions.azurewebsites.net/webhook',
-          'resource': '0987cfd9-f02c-479b-9fb4-3f0550462848',
-          'resourceData': 'null'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      'clientState': 'null',
+      'expirationDateTime': '2019-05-29T23:00:00.000Z',
+      'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
+      'notificationUrl': 'https://contoso-funcions.azurewebsites.net/webhook',
+      'resource': '0987cfd9-f02c-479b-9fb4-3f0550462848',
+      'resourceData': 'null'
+    }));
   });
 
-  it('adds a webhook by passing list title', (done) => {
+  it('adds a webhook by passing list title', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
         return Promise.resolve({
@@ -215,7 +183,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         debug: false,
@@ -223,25 +191,18 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         listTitle: 'Documents',
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          'clientState': 'null',
-          'expirationDateTime': '2019-05-29T23:00:00.000Z',
-          'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
-          'notificationUrl': 'https://contoso-funcions.azurewebsites.net/webhook',
-          'resource': '0987cfd9-f02c-479b-9fb4-3f0550462848',
-          'resourceData': 'null'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      'clientState': 'null',
+      'expirationDateTime': '2019-05-29T23:00:00.000Z',
+      'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
+      'notificationUrl': 'https://contoso-funcions.azurewebsites.net/webhook',
+      'resource': '0987cfd9-f02c-479b-9fb4-3f0550462848',
+      'resourceData': 'null'
+    }));
   });
 
-  it('adds a webhook by passing list title including a client state', (done) => {
+  it('adds a webhook by passing list title including a client state', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
         return Promise.resolve({
@@ -256,7 +217,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         debug: false,
@@ -265,25 +226,18 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         clientState: 'awesome state'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          'clientState': 'awesome state',
-          'expirationDateTime': '2019-05-29T23:00:00.000Z',
-          'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
-          'notificationUrl': 'https://contoso-funcions.azurewebsites.net/webhook',
-          'resource': '0987cfd9-f02c-479b-9fb4-3f0550462848',
-          'resourceData': 'null'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      'clientState': 'awesome state',
+      'expirationDateTime': '2019-05-29T23:00:00.000Z',
+      'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
+      'notificationUrl': 'https://contoso-funcions.azurewebsites.net/webhook',
+      'resource': '0987cfd9-f02c-479b-9fb4-3f0550462848',
+      'resourceData': 'null'
+    }));
   });
 
-  it('adds a webhook by passing list title including a expiration date', (done) => {
+  it('adds a webhook by passing list title including a expiration date', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions`) > -1) {
         return Promise.resolve({
@@ -298,7 +252,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options:
       {
         debug: false,
@@ -307,30 +261,23 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2019-01-09'
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          'clientState': 'null',
-          'expirationDateTime': '2019-01-09T23:00:00.000Z',
-          'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
-          'notificationUrl': 'https://contoso-funcions.azurewebsites.net/webhook',
-          'resource': '0987cfd9-f02c-479b-9fb4-3f0550462848',
-          'resourceData': 'null'
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith({
+      'clientState': 'null',
+      'expirationDateTime': '2019-01-09T23:00:00.000Z',
+      'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
+      'notificationUrl': 'https://contoso-funcions.azurewebsites.net/webhook',
+      'resource': '0987cfd9-f02c-479b-9fb4-3f0550462848',
+      'resourceData': 'null'
+    }));
   });
 
-  it('correctly handles a random API error', (done) => {
+  it('correctly handles a random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options:
       {
         debug: false,
@@ -339,15 +286,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2019-01-09'
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
   });
 
   it('fails validation if both list id and title options are not passed', async () => {

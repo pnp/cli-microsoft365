@@ -12,9 +12,8 @@ class VersionCommand extends AnonymousCommand {
     return 'Shows CLI for Microsoft 365 version';
   }
 
-  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger): Promise<void> {
     logger.log(`v${packageJSON.version}`);
-    cb();
   }
 }
 

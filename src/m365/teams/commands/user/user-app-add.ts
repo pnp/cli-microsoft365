@@ -57,7 +57,7 @@ class TeamsUserAppAddCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const endpoint: string = `${this.resource}/v1.0`;
 
     const requestOptions: any = {
@@ -72,9 +72,12 @@ class TeamsUserAppAddCommand extends GraphCommand {
       }
     };
 
-    request
-      .post(requestOptions)
-      .then(_ => cb(), (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
+    try {
+      await request.post(requestOptions);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

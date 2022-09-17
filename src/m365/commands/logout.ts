@@ -12,38 +12,36 @@ class LogoutCommand extends Command {
     return 'Log out from Microsoft 365';
   }
 
-  public commandAction(logger: Logger, args: any, cb: () => void): void {
+  public async commandAction(logger: Logger): Promise<void> {
     if (this.verbose) {
       logger.logToStderr('Logging out from Microsoft 365...');
     }
 
-    const logout: () => void = (): void => {
-      auth.service.logout();
-      cb();
-    };
+    const logout: () => void = (): void => auth.service.logout();
 
-    auth
-      .clearConnectionInfo()
-      .then((): void => {
-        logout();
-      }, (error: any): void => {
-        if (this.debug) {
-          logger.logToStderr(new CommandError(error));
-        }
-
-        logout();
-      });
+    try {
+      await auth.clearConnectionInfo();
+    }
+    catch (error: any) {
+      if (this.debug) {
+        logger.logToStderr(new CommandError(error));
+      }
+    }
+    finally {
+      logout();
+    }
   }
 
-  public action(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    auth
-      .restoreAuth()
-      .then((): void => {
-        this.initAction(args, logger);
-        this.commandAction(logger, args, cb);
-      }, (error: any): void => {
-        cb(new CommandError(error));
-      });
+  public async action(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      await auth.restoreAuth();
+    }
+    catch (error: any) {
+      throw new CommandError(error);
+    }
+
+    this.initAction(args, logger);
+    this.commandAction(logger);
   }
 }
 

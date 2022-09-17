@@ -155,7 +155,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('correctly retrieves user and add member to specified Microsoft 365 group', (done) => {
+  it('correctly retrieves user and add member to specified Microsoft 365 group', async () => {
     let addMemberRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -177,19 +177,11 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.resolve();
     });
 
-    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
-      try {
-        assert(addMemberRequestIssued);
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
+    assert(addMemberRequestIssued);
   });
 
-  it('correctly retrieves user and add member to specified Microsoft 365 group (debug)', (done) => {
+  it('correctly retrieves user and add member to specified Microsoft 365 group (debug)', async () => {
     let addMemberRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -211,19 +203,11 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.resolve();
     });
 
-    command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
-      try {
-        assert(addMemberRequestIssued);
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } });
+    assert(addMemberRequestIssued);
   });
 
-  it('correctly retrieves user and add owner to specified Microsoft 365 group', (done) => {
+  it('correctly retrieves user and add owner to specified Microsoft 365 group', async () => {
     let addMemberRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -245,19 +229,11 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.resolve();
     });
 
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", role: "Owner" } }, () => {
-      try {
-        assert(addMemberRequestIssued);
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", role: "Owner" } });
+    assert(addMemberRequestIssued);
   });
 
-  it('correctly retrieves user and add owner to specified Microsoft Teams team (debug)', (done) => {
+  it('correctly retrieves user and add owner to specified Microsoft Teams team (debug)', async () => {
     let addMemberRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -279,52 +255,23 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.resolve();
     });
 
-    command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", role: "Owner" } }, () => {
-      try {
-        assert(addMemberRequestIssued);
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", role: "Owner" } });
+    assert(addMemberRequestIssued);
   });
 
-  it('correctly skips adding member or owner when user is not found', (done) => {
-    let addMemberRequestIssued = false;
-
+  it('correctly skips adding member or owner when user is not found', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews.not.found%40contoso.onmicrosoft.com/id`) {
-        return Promise.reject({
-          "message": "Resource 'anne.matthews.not.found%40contoso.onmicrosoft.com' does not exist or one of its queried reference-property objects are not present."
-        });
+        return Promise.reject("Resource 'anne.matthews.not.found%40contoso.onmicrosoft.com' does not exist or one of its queried reference-property objects are not present.");
       }
 
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members/$ref`) {
-        addMemberRequestIssued = true;
-      }
-
-      return Promise.resolve();
-    });
-
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews.not.found@contoso.onmicrosoft.com" } }, () => {
-      try {
-        assert(addMemberRequestIssued === false);
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews.not.found@contoso.onmicrosoft.com" } } as any), new CommandError("Resource 'anne.matthews.not.found%40contoso.onmicrosoft.com' does not exist or one of its queried reference-property objects are not present."));
   });
 
-  it('correctly handles error when user cannot be retrieved', (done) => {
+  it('correctly handles error when user cannot be retrieved', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/doesnotexist.matthews%40contoso.onmicrosoft.com/id`) {
         return Promise.reject({ error: { 'odata.error': { message: { value: 'Resource \'doesnotexist.matthews@contoso.onmicrosoft.com\' does not exist or one of its queried reference-property objects are not present.' } } } });
@@ -333,19 +280,11 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "doesnotexist.matthews@contoso.onmicrosoft.com" } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Resource \'doesnotexist.matthews@contoso.onmicrosoft.com\' does not exist or one of its queried reference-property objects are not present.')));
-        done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "doesnotexist.matthews@contoso.onmicrosoft.com" } } as any),
+      new CommandError('Resource \'doesnotexist.matthews@contoso.onmicrosoft.com\' does not exist or one of its queried reference-property objects are not present.'));
   });
 
-  it('correctly retrieves user and handle error adding member to specified Microsoft 365 group', (done) => {
+  it('correctly retrieves user and handle error adding member to specified Microsoft 365 group', async () => {
 
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
@@ -365,15 +304,8 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Invalid object identifier'))); done();
-      }
-      catch (e) {
-
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any),
+      new CommandError('Invalid object identifier'));
   });
 
   it('supports debug mode', () => {

@@ -82,22 +82,23 @@ class TeamsMessageListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const deltaExtension: string = args.options.since !== undefined ? `/delta?$filter=lastModifiedDateTime gt ${args.options.since}` : '';
     const endpoint: string = `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${args.options.channelId}/messages${deltaExtension}`;
 
-    odata
-      .getAllItems<Message>(endpoint)
-      .then((items): void => {
-        if (args.options.output !== 'json') {
-          items.forEach(i => {
-            i.body = i.body.content as any;
-          });
-        }
+    try {
+      const items = await odata.getAllItems<Message>(endpoint);
+      if (args.options.output !== 'json') {
+        items.forEach(i => {
+          i.body = i.body.content as any;
+        });
+      }
 
-        logger.log(items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

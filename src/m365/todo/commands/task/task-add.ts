@@ -58,30 +58,30 @@ class TodoTaskAddCommand extends GraphCommand {
     this.optionSets.push(['listId', 'listName']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const endpoint: string = `${this.resource}/v1.0`;
 
-    this
-      .getTodoListId(args)
-      .then((listId: string): Promise<any> => {
-        const requestOptions: any = {
-          url: `${endpoint}/me/todo/lists/${listId}/tasks`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'Content-Type': 'application/json'
-          },
-          data: {
-            title: args.options.title
-          },
-          responseType: 'json'
-        };
+    try {
+      const listId: string = await this.getTodoListId(args);
 
-        return request.post(requestOptions);
-      })
-      .then((res): void => {
-        logger.log(res);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const requestOptions: any = {
+        url: `${endpoint}/me/todo/lists/${listId}/tasks`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          'Content-Type': 'application/json'
+        },
+        data: {
+          title: args.options.title
+        },
+        responseType: 'json'
+      };
+
+      const res: any = await request.post(requestOptions);
+      logger.log(res);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getTodoListId(args: CommandArgs): Promise<string> {

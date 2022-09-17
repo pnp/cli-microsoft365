@@ -102,21 +102,20 @@ class TeamsChannelListCommand extends GraphCommand {
       });
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getTeamId(args)
-      .then((teamId: string): Promise<Channel[]> => {
-        let endpoint: string = `${this.resource}/v1.0/teams/${teamId}/channels`;
-        if (args.options.type) {
-          endpoint += `?$filter=membershipType eq '${args.options.type}'`;
-        }
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const teamId: string = await this.getTeamId(args);
+      let endpoint: string = `${this.resource}/v1.0/teams/${teamId}/channels`;
+      if (args.options.type) {
+        endpoint += `?$filter=membershipType eq '${args.options.type}'`;
+      }
 
-        return odata.getAllItems<Channel>(endpoint);
-      })
-      .then((items): void => {
-        logger.log(items);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const items = await odata.getAllItems<Channel>(endpoint);
+      logger.log(items);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

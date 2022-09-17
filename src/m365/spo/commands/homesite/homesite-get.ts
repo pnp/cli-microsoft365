@@ -1,13 +1,8 @@
 import { Logger } from '../../../../cli';
-import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { spo } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-
-interface CommandArgs {
-  options: GlobalOptions;
-}
 
 class SpoHomeSiteGetCommand extends SpoCommand {
   public get name(): string {
@@ -18,27 +13,25 @@ class SpoHomeSiteGetCommand extends SpoCommand {
     return 'Gets information about the Home Site';
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((spoUrl: string): Promise<{ "odata.null"?: boolean }> => {
-        const requestOptions: any = {
-          url: `${spoUrl}/_api/SP.SPHSite/Details`,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
+  public async commandAction(logger: Logger): Promise<void> {
+    try {
+      const spoUrl = await spo.getSpoUrl(logger, this.debug);
+      const requestOptions: any = {
+        url: `${spoUrl}/_api/SP.SPHSite/Details`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-        return request.get(requestOptions);
-      })
-      .then((res: { "odata.null"?: boolean }): void => {
-        if (!res["odata.null"]) {
-          logger.log(res);
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      const res = await request.get<{ "odata.null"?: boolean }>(requestOptions);
+      if (!res["odata.null"]) {
+        logger.log(res);
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

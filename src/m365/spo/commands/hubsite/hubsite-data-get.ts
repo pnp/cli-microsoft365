@@ -56,7 +56,7 @@ class SpoHubSiteDataGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr('Retrieving hub site data...');
     }
@@ -71,20 +71,20 @@ class SpoHubSiteDataGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get(requestOptions)
-      .then((res: any): void => {
-        if (res['odata.null'] !== true) {
-          logger.log(JSON.parse(res.value));
+    try {
+      const res = await request.get<any>(requestOptions);
+      if (res['odata.null'] !== true) {
+        logger.log(JSON.parse(res.value));
+      }
+      else {
+        if (this.verbose) {
+          logger.logToStderr(`${args.options.webUrl} is not connected to a hub site and is not a hub site itself`);
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr(`${args.options.webUrl} is not connected to a hub site and is not a hub site itself`);
-          }
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

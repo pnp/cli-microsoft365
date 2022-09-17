@@ -71,49 +71,48 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Resubmitting run ${args.options.name} of Microsoft Flow ${args.options.flow}...`);
     }
 
-    const resubmitFlow: () => void = (): void => {
-      this
-        .getTriggerName(args.options.environment, args.options.flow)
-        .then((triggerName: string): Promise<void> => {
-          if (this.debug) {
-            logger.logToStderr(chalk.yellow(`Retrieved trigger: ${triggerName}`));
-          }
+    const resubmitFlow: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const triggerName = await this.getTriggerName(args.options.environment, args.options.flow);
 
-          const requestOptions: any = {
-            url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/triggers/${encodeURIComponent(triggerName)}/histories/${encodeURIComponent(args.options.name)}/resubmit?api-version=2016-11-01`,
-            headers: {
-              accept: 'application/json'
-            },
-            responseType: 'json'
-          };
+        if (this.debug) {
+          logger.logToStderr(chalk.yellow(`Retrieved trigger: ${triggerName}`));
+        }
 
-          return request.post(requestOptions);
-        })
-        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        const requestOptions: any = {
+          url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/triggers/${encodeURIComponent(triggerName)}/histories/${encodeURIComponent(args.options.name)}/resubmit?api-version=2016-11-01`,
+          headers: {
+            accept: 'application/json'
+          },
+          responseType: 'json'
+        };
+
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      resubmitFlow();
+      await resubmitFlow();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to resubmit the flow with run ${args.options.name}?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          resubmitFlow();
-        }
       });
+
+      if (result.continue) {
+        await resubmitFlow();
+      }
     }
   }
 

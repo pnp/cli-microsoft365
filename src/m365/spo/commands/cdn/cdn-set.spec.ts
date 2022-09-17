@@ -80,490 +80,329 @@ describe(commands.CDN_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('enables public CDN when Public type specified and enabled set to true', (done) => {
-    command.action(logger, { options: { debug: false, enabled: 'true', type: 'Public' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="21" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('enables public CDN when Public type specified and enabled set to true', async () => {
+    await command.action(logger, { options: { debug: false, enabled: 'true', type: 'Public' } });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="21" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('enables public CDN when Public type specified and enabled set to true (debug)', (done) => {
-    command.action(logger, { options: { debug: true, enabled: 'true', type: 'Public' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="21" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('enables public CDN when Public type specified and enabled set to true (debug)', async () => {
+    await command.action(logger, { options: { debug: true, enabled: 'true', type: 'Public' } });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="21" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('enables public CDN when Public type specified and enabled set to true without default origins (debug)', (done) => {
-    command.action(logger, { options: { debug: true, enabled: 'true', type: 'Public', noDefaultOrigins: true } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('enables public CDN when Public type specified and enabled set to true without default origins (debug)', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'true', type: 'Public', noDefaultOrigins: true } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('enables public CDN when no type specified and enabled set to true', (done) => {
-    command.action(logger, { options: { debug: false, enabled: true } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('enables public CDN when no type specified and enabled set to true', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: false, enabled: true } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('enables private CDN when Private type specified and enabled set to true (debug)', (done) => {
-    command.action(logger, { options: { debug: true, enabled: 'true', type: 'Private' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="21" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('enables private CDN when Private type specified and enabled set to true (debug)', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'true', type: 'Private' } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="21" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('enables private CDN when Private type specified and enabled set to true without default origins (debug)', (done) => {
-    command.action(logger, { options: { debug: true, enabled: 'true', type: 'Private', noDefaultOrigins: true } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('enables private CDN when Private type specified and enabled set to true without default origins (debug)', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'true', type: 'Private', noDefaultOrigins: true } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('enables both CDN\'s when Both type specified and enabled set to true (debug)', (done) => {
-    command.action(logger, { options: { debug: true, enabled: 'true', type: 'Both' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="96" ObjectPathId="95" /><Method Name="SetTenantCdnEnabled" Id="97" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="98" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="99" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="100" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="95" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('enables both CDN\'s when Both type specified and enabled set to true (debug)', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'true', type: 'Both' } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="96" ObjectPathId="95" /><Method Name="SetTenantCdnEnabled" Id="97" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="98" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="99" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="100" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="95" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('enables both CDN\'s when Both type specified and enabled set to true, with default origins', (done) => {
-    command.action(logger, { options: { enabled: 'true', type: 'Both', noDefaultOrigins: false } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="96" ObjectPathId="95" /><Method Name="SetTenantCdnEnabled" Id="97" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="98" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="99" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="100" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="95" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('enables both CDN\'s when Both type specified and enabled set to true, with default origins', async () => {
+    await assert.rejects(command.action(logger, { options: { enabled: 'true', type: 'Both', noDefaultOrigins: false } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="96" ObjectPathId="95" /><Method Name="SetTenantCdnEnabled" Id="97" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="98" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="99" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="100" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="95" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('enables both CDN\'s when Both type specified and enabled set to true, with origins (debug)', (done) => {
-    command.action(logger, { options: { debug: true, enabled: 'true', type: 'Both', noDefaultOrigins: false } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="96" ObjectPathId="95" /><Method Name="SetTenantCdnEnabled" Id="97" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="98" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="99" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="100" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="95" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('enables both CDN\'s when Both type specified and enabled set to true, with origins (debug)', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'true', type: 'Both', noDefaultOrigins: false } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="96" ObjectPathId="95" /><Method Name="SetTenantCdnEnabled" Id="97" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="98" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="99" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter></Parameters></Method><Method Name="CreateTenantCdnDefaultOrigins" Id="100" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="95" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('enables both CDN\'s when Both type specified and enabled set to true, without Default Origins', (done) => {
-    command.action(logger, { options: { enabled: 'true', type: 'Both', noDefaultOrigins: true } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><Method Name="SetTenantCdnEnabled" Id="13" ObjectPathId="11"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="14" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('enables both CDN\'s when Both type specified and enabled set to true, without Default Origins', async () => {
+    await assert.rejects(command.action(logger, { options: { enabled: 'true', type: 'Both', noDefaultOrigins: true } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><Method Name="SetTenantCdnEnabled" Id="13" ObjectPathId="11"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="14" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('enables both CDN\'s when Both type specified and enabled set to true, without default origins (debug)', (done) => {
-    command.action(logger, { options: { debug: true, enabled: 'true', type: 'Both', noDefaultOrigins: true } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><Method Name="SetTenantCdnEnabled" Id="13" ObjectPathId="11"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="14" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('enables both CDN\'s when Both type specified and enabled set to true, without default origins (debug)', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'true', type: 'Both', noDefaultOrigins: true } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><Method Name="SetTenantCdnEnabled" Id="13" ObjectPathId="11"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="14" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">true</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('disable both CDN\'s when Both type specified and enabled set to false, with default (debug)', (done) => {
-    command.action(logger, { options: { debug: true, enabled: 'false', type: 'Both', noDefaultOrigins: false } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="96" ObjectPathId="95" /><Method Name="SetTenantCdnEnabled" Id="97" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="98" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="95" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('disable both CDN\'s when Both type specified and enabled set to false, with default (debug)', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'false', type: 'Both', noDefaultOrigins: false } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="96" ObjectPathId="95" /><Method Name="SetTenantCdnEnabled" Id="97" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="98" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="95" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('disable both CDN\'s when Both type specified and enabled set to false, without default origins (debug)', (done) => {
-    command.action(logger, { options: { debug: true, enabled: 'false', type: 'Both', noDefaultOrigins: true } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><Method Name="SetTenantCdnEnabled" Id="13" ObjectPathId="11"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="14" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('disable both CDN\'s when Both type specified and enabled set to false, without default origins (debug)', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'false', type: 'Both', noDefaultOrigins: true } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><Method Name="SetTenantCdnEnabled" Id="13" ObjectPathId="11"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="14" ObjectPathId="11"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('disables both CDN\'s when Both type specified and enabled set to false', (done) => {
-    command.action(logger, { options: { debug: false, enabled: 'false', type: 'Both' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="96" ObjectPathId="95" /><Method Name="SetTenantCdnEnabled" Id="97" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="98" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="95" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('disables both CDN\'s when Both type specified and enabled set to false', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: false, enabled: 'false', type: 'Both' } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="96" ObjectPathId="95" /><Method Name="SetTenantCdnEnabled" Id="97" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="98" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="95" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('disables both CDN\'s when Both type specified and enabled set to false (debug)', (done) => {
-    command.action(logger, { options: { debug: true, enabled: 'false', type: 'Both' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="96" ObjectPathId="95" /><Method Name="SetTenantCdnEnabled" Id="97" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="98" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="95" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('disables both CDN\'s when Both type specified and enabled set to false (debug)', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'false', type: 'Both' } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="96" ObjectPathId="95" /><Method Name="SetTenantCdnEnabled" Id="97" ObjectPathId="95"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Name="SetTenantCdnEnabled" Id="98" ObjectPathId="95"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="95" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('disables public CDN when Public type specified and enabled set to false (debug)', (done) => {
-    command.action(logger, { options: { debug: true, enabled: 'false', type: 'Public' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('disables public CDN when Public type specified and enabled set to false (debug)', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'false', type: 'Public' } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('disables public CDN when Public type specified and enabled set to false and noDefaultOrigins is passed (debug)', (done) => {
-    command.action(logger, { options: { debug: true, enabled: 'false', type: 'Public', noDefaultOrigins: true } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('disables public CDN when Public type specified and enabled set to false and noDefaultOrigins is passed (debug)', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'false', type: 'Public', noDefaultOrigins: true } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('disables public CDN when Public type specified and enabled set to false and noDefaultOrigins is passed', (done) => {
-    command.action(logger, { options: { debug: false, enabled: 'false', type: 'Public', noDefaultOrigins: true } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('disables public CDN when Public type specified and enabled set to false and noDefaultOrigins is passed', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: false, enabled: 'false', type: 'Public', noDefaultOrigins: true } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('disables public CDN when Public type specified and enabled set to false', (done) => {
-    command.action(logger, { options: { debug: false, enabled: 'false', type: 'Public' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('disables public CDN when Public type specified and enabled set to false', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: false, enabled: 'false', type: 'Public' } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('disables Private CDN when Private type specified and enabled set to false (debug)', (done) => {
-    command.action(logger, { options: { debug: true, enabled: 'false', type: 'Private' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('disables Private CDN when Private type specified and enabled set to false (debug)', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'false', type: 'Private' } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('disables Private CDN when Private type specified and enabled set to false and noDefaultOrigins is passed (debug)', (done) => {
-    command.action(logger, { options: { debug: true, enabled: 'false', type: 'Private', noDefaultOrigins: true } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('disables Private CDN when Private type specified and enabled set to false and noDefaultOrigins is passed (debug)', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: true, enabled: 'false', type: 'Private', noDefaultOrigins: true } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('disables Private CDN when Private type specified and enabled set to false and noDefaultOrigins is passed', (done) => {
-    command.action(logger, { options: { debug: false, enabled: 'false', type: 'Private', noDefaultOrigins: true } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('disables Private CDN when Private type specified and enabled set to false and noDefaultOrigins is passed', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: false, enabled: 'false', type: 'Private', noDefaultOrigins: true } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('disables Private CDN when Private type specified and enabled set to false', (done) => {
-    command.action(logger, { options: { debug: false, enabled: 'false', type: 'Private' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('disables Private CDN when Private type specified and enabled set to false', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: false, enabled: 'false', type: 'Private' } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="19" ObjectPathId="18" /><Method Name="SetTenantCdnEnabled" Id="20" ObjectPathId="18"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="18" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('correctly handles an error when setting tenant CDN settings', (done) => {
+  it('correctly handles an error when setting tenant CDN settings', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
@@ -593,18 +432,8 @@ describe(commands.CDN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, enabled: 'true' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, enabled: 'true' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

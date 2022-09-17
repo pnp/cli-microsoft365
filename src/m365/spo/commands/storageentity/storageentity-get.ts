@@ -37,36 +37,35 @@ class SpoStorageEntityGetCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    spo
-      .getSpoUrl(logger, this.debug)
-      .then((spoUrl: string): Promise<TenantProperty> => {
-        const requestOptions: any = {
-          url: `${spoUrl}/_api/web/GetStorageEntity('${encodeURIComponent(args.options.key)}')`,
-          headers: {
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const spoUrl: string = await spo.getSpoUrl(logger, this.debug);
+      const requestOptions: any = {
+        url: `${spoUrl}/_api/web/GetStorageEntity('${encodeURIComponent(args.options.key)}')`,
+        headers: {
+          accept: 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
 
-        return request.get(requestOptions);
-      })
-      .then((property: TenantProperty): void => {
-        if (property["odata.null"] === true) {
-          if (this.verbose) {
-            logger.logToStderr(`Property with key ${args.options.key} not found`);
-          }
+      const property: TenantProperty = await request.get(requestOptions);
+      if (property["odata.null"] === true) {
+        if (this.verbose) {
+          logger.logToStderr(`Property with key ${args.options.key} not found`);
         }
-        else {
-          logger.log({
-            Key: args.options.key,
-            Value: property.Value,
-            Description: property.Description,
-            Comment: property.Comment
-          });
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      }
+      else {
+        logger.log({
+          Key: args.options.key,
+          Value: property.Value,
+          Description: property.Description,
+          Comment: property.Comment
+        });
+      }
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

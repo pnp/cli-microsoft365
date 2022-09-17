@@ -82,91 +82,62 @@ describe(commands.CDN_POLICY_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('sets IncludeFileExtensions CDN policy on the public CDN when Public type specified', (done) => {
-    command.action(logger, { options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF', type: 'Public' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetTenantCdnPolicy" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Enum">0</Parameter><Parameter Type="String">WOFF</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="abc" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('sets IncludeFileExtensions CDN policy on the public CDN when Public type specified', async () => {
+    await command.action(logger, { options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF', type: 'Public' } });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetTenantCdnPolicy" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Enum">0</Parameter><Parameter Type="String">WOFF</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="abc" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+    assert(setRequestIssued);
   });
 
-  it('sets IncludeFileExtensions CDN policy on the private CDN when Private type specified', (done) => {
-    command.action(logger, { options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF', type: 'Private' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetTenantCdnPolicy" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Enum">0</Parameter><Parameter Type="String">WOFF</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="abc" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('sets IncludeFileExtensions CDN policy on the private CDN when Private type specified', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF', type: 'Private' } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetTenantCdnPolicy" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="Enum">0</Parameter><Parameter Type="String">WOFF</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="abc" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('sets IncludeFileExtensions CDN policy on the public CDN when no type specified', (done) => {
-    command.action(logger, { options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetTenantCdnPolicy" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Enum">0</Parameter><Parameter Type="String">WOFF</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="abc" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('sets IncludeFileExtensions CDN policy on the public CDN when no type specified', async () => {
+    await command.action(logger, { options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF' } });
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetTenantCdnPolicy" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Enum">0</Parameter><Parameter Type="String">WOFF</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="abc" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('sets ExcludeRestrictedSiteClassifications CDN policy on the public CDN when no type specified', (done) => {
-    command.action(logger, { options: { debug: false, policy: 'ExcludeRestrictedSiteClassifications', value: 'foo' } }, () => {
-      let setRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
-          r.headers['X-RequestDigest'] &&
-          r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetTenantCdnPolicy" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Enum">1</Parameter><Parameter Type="String">foo</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="abc" /></ObjectPaths></Request>`) {
-          setRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(setRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+  it('sets ExcludeRestrictedSiteClassifications CDN policy on the public CDN when no type specified', async () => {
+    await assert.rejects(command.action(logger, { options: { debug: false, policy: 'ExcludeRestrictedSiteClassifications', value: 'foo' } }));
+    let setRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
+        r.headers['X-RequestDigest'] &&
+        r.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetTenantCdnPolicy" Id="12" ObjectPathId="8"><Parameters><Parameter Type="Enum">0</Parameter><Parameter Type="Enum">1</Parameter><Parameter Type="String">foo</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="8" Name="abc" /></ObjectPaths></Request>`) {
+        setRequestIssued = true;
       }
     });
+
+    assert(setRequestIssued);
   });
 
-  it('escapes XML in user input', (done) => {
+  it('escapes XML in user input', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
@@ -192,18 +163,11 @@ describe(commands.CDN_POLICY_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, policy: 'IncludeFileExtensions', value: '<WOFF' } }, () => {
-      try {
-        assert.strictEqual(log.length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, policy: 'IncludeFileExtensions', value: '<WOFF' } });
+    assert.strictEqual(log.length, 0);
   });
 
-  it('correctly handles an error when setting tenant CDN policy value', (done) => {
+  it('correctly handles an error when setting tenant CDN policy value', async () => {
     sinonUtil.restore(request.post);
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/contextinfo') > -1) {
@@ -233,18 +197,8 @@ describe(commands.CDN_POLICY_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, policy: 'IncludeFileExtensions', value: '<WOFF' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        sinonUtil.restore(request.post);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, policy: 'IncludeFileExtensions', value: '<WOFF' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

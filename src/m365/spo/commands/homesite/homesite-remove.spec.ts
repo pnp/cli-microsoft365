@@ -41,9 +41,9 @@ describe(commands.HOMESITE_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     promptOptions = undefined;
   });
@@ -74,45 +74,30 @@ describe(commands.HOMESITE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing the Home Site when confirm option is not passed', (done) => {
-    command.action(logger, { options: { debug: true } } as any, () => {
+  it('prompts before removing the Home Site when confirm option is not passed', async () => {
+    await command.action(logger, { options: { debug: true } } as any);
+    let promptIssued = false;
 
-      try {
-        let promptIssued = false;
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-        if (promptOptions && promptOptions.type === 'confirm') {
-          promptIssued = true;
-        }
-
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
-  it('aborts removing Home Site when confirm option is not passed and prompt not confirmed', (done) => {
+  it('aborts removing Home Site when confirm option is not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
 
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} });
+    assert(postSpy.notCalled);
   });
 
-  it('removes the Home Site when prompt confirmed', (done) => {
+  it('removes the Home Site when prompt confirmed', async () => {
     let homeSiteRemoveCallIssued = false;
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -135,21 +120,40 @@ describe(commands.HOMESITE_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(homeSiteRemoveCallIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: {} });
+    assert(homeSiteRemoveCallIssued);
   });
 
-  it('correctly handles error when removing the Home Site (debug)', (done) => {
+  it('removes the Home Site whithout confirm prompt', async () => {
+    let homeSiteRemoveCallIssued = false;
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="28" ObjectPathId="27" /><Method Name="RemoveSPHSite" Id="29" ObjectPathId="27" /></Actions><ObjectPaths><Constructor Id="27" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+
+        homeSiteRemoveCallIssued = true;
+
+        return Promise.resolve(JSON.stringify(
+          [
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8929.1227", "ErrorInfo": null, "TraceCorrelationId": "e4f2e59e-c0a9-0000-3dd0-1d8ef12cc742"
+            }, 57, {
+              "IsNull": false
+            }, 58, "The Home site has been removed."
+          ]
+        ));
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    
+    await command.action(logger, { options: { confirm: true } });
+    assert(homeSiteRemoveCallIssued);
+  });
+
+  it('correctly handles error when removing the Home Site (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="28" ObjectPathId="27" /><Method Name="RemoveSPHSite" Id="29" ObjectPathId="27" /></Actions><ObjectPaths><Constructor Id="27" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
         return Promise.resolve(JSON.stringify(
@@ -166,33 +170,18 @@ describe(commands.HOMESITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The requested operation is part of an experimental feature that is not supported in the current environment.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, confirm: true } } as any),
+      new CommandError(`The requested operation is part of an experimental feature that is not supported in the current environment.`));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         confirm: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError(`An error has occurred`));
   });
 
   it('supports debug mode', () => {

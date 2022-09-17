@@ -2,7 +2,6 @@ import * as chalk from 'chalk';
 import * as child_process from 'child_process';
 import { satisfies } from 'semver';
 import { Logger } from '../../../cli';
-import { CommandError } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import AnonymousCommand from '../../base/AnonymousCommand';
 import commands from '../commands';
@@ -499,7 +498,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
     this.types.string.push('e', 'env');
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (!args.options.output) {
       args.options.output = 'text';
     }
@@ -512,55 +511,49 @@ class SpfxDoctorCommand extends AnonymousCommand {
     let spfxVersion: string = '';
     let prerequisites: SpfxVersionPrerequisites;
     const fixes: string[] = [];
+    
+    try {
+      spfxVersion = await this.getSharePointFrameworkVersion(logger);
 
-    this
-      .getSharePointFrameworkVersion(logger)
-      .then((_spfxVersion: string): Promise<void> => {
-        if (!_spfxVersion) {
-          logger.log(this.getStatus(CheckStatus.Failure, `SharePoint Framework`));
-          return Promise.reject(`SharePoint Framework not found`);
-        }
+      if (!spfxVersion) {
+        logger.log(this.getStatus(CheckStatus.Failure, `SharePoint Framework`));
+        throw `SharePoint Framework not found`;
+      }
 
-        spfxVersion = _spfxVersion;
+      prerequisites = this.versions[spfxVersion];
+      if (!prerequisites) {
+        logger.log(this.getStatus(CheckStatus.Failure, `SharePoint Framework v${spfxVersion}`));
+        throw `spfx doctor doesn't support SPFx v${spfxVersion} at this moment`;
+      }
 
-        prerequisites = this.versions[spfxVersion];
-        if (!prerequisites) {
-          logger.log(this.getStatus(CheckStatus.Failure, `SharePoint Framework v${spfxVersion}`));
-          return Promise.reject(`spfx doctor doesn't support SPFx v${spfxVersion} at this moment`);
-        }
+      logger.log(this.getStatus(CheckStatus.Success, `SharePoint Framework v${spfxVersion}`));
 
-        logger.log(this.getStatus(CheckStatus.Success, `SharePoint Framework v${spfxVersion}`));
-        return Promise.resolve();
-      })
-      .then(_ => this.checkSharePointCompatibility(spfxVersion, prerequisites, args, fixes, logger))
-      .then(_ => this.checkNodeVersion(prerequisites, fixes, logger))
-      .then(_ => this.checkYo(prerequisites, fixes, logger))
-      .then(_ => this.checkGulp(fixes, logger))
-      .then(_ => this.checkGulpCli(prerequisites, fixes, logger))
-      .then(_ => this.checkTypeScript(fixes, logger))
-      .then(_ => {
-        if (fixes.length > 0) {
-          logger.log(' ');
-          logger.log('Recommended fixes:');
-          logger.log(' ');
-          fixes.forEach(f => logger.log(`- ${f}`));
-          logger.log(' ');
-        }
+      await this.checkSharePointCompatibility(spfxVersion, prerequisites, args, fixes, logger);
+      await this.checkNodeVersion(prerequisites, fixes, logger);
+      await this.checkYo(prerequisites, fixes, logger);
+      await this.checkGulp(fixes, logger);
+      await this.checkGulpCli(prerequisites, fixes, logger);
+      await this.checkTypeScript(fixes, logger);
 
-        cb();
-      })
-      .catch((error: string): void => {
+      if (fixes.length > 0) {
         logger.log(' ');
+        logger.log('Recommended fixes:');
+        logger.log(' ');
+        fixes.forEach(f => logger.log(`- ${f}`));
+        logger.log(' ');
+      }
+    } 
+    catch (err: any) {
+      logger.log(' ');
 
-        if (fixes.length > 0) {
-          logger.log('Recommended fixes:');
-          logger.log(' ');
-          fixes.forEach(f => logger.log(`- ${f}`));
-          logger.log(' ');
-        }
-
-        cb(new CommandError(error));
-      });
+      if (fixes.length > 0) {
+        logger.log('Recommended fixes:');
+        logger.log(' ');
+        fixes.forEach(f => logger.log(`- ${f}`));
+        logger.log(' ');
+      }
+      this.handleRejectedPromise(err);
+    }
   }
 
   private checkSharePointCompatibility(spfxVersion: string, prerequisites: SpfxVersionPrerequisites, args: CommandArgs, fixes: string[], logger: Logger): Promise<void> {

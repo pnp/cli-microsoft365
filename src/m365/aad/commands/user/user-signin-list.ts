@@ -89,27 +89,29 @@ class AadUserSigninListCommand extends GraphCommand {
     return ['id', 'userPrincipalName', 'appId', 'appDisplayName', 'createdDateTime'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let endpoint: string = `${this.resource}/v1.0/auditLogs/signIns`;
-    let filter: string = "";
-    if (args.options.userName || args.options.userId) {
-      filter = args.options.userId ?
-        `?$filter=userId eq '${encodeURIComponent(args.options.userId as string)}'` :
-        `?$filter=userPrincipalName eq '${encodeURIComponent(args.options.userName as string)}'`;
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      let endpoint: string = `${this.resource}/v1.0/auditLogs/signIns`;
+      let filter: string = "";
+      if (args.options.userName || args.options.userId) {
+        filter = args.options.userId ?
+          `?$filter=userId eq '${encodeURIComponent(args.options.userId as string)}'` :
+          `?$filter=userPrincipalName eq '${encodeURIComponent(args.options.userName as string)}'`;
+      }
+      if (args.options.appId || args.options.appDisplayName) {
+        filter += filter ? " and " : "?$filter=";
+        filter += args.options.appId ?
+          `appId eq '${encodeURIComponent(args.options.appId)}'` :
+          `appDisplayName eq '${encodeURIComponent(args.options.appDisplayName as string)}'`;
+      }
+      endpoint += filter;
+      
+      const signins = await odata.getAllItems<SignIn>(endpoint);
+      logger.log(signins);
     }
-    if (args.options.appId || args.options.appDisplayName) {
-      filter += filter ? " and " : "?$filter=";
-      filter += args.options.appId ?
-        `appId eq '${encodeURIComponent(args.options.appId)}'` :
-        `appDisplayName eq '${encodeURIComponent(args.options.appDisplayName as string)}'`;
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
-    endpoint += filter;
-    odata
-      .getAllItems<SignIn>(endpoint)
-      .then((signins): void => {
-        logger.log(signins);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 }
 

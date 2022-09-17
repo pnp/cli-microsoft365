@@ -2,7 +2,7 @@ import { Cli, Logger } from '../../../../cli';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, formatting, IdentityResponse, spo, validation } from '../../../../utils';
+import { ClientSvcResponse, ClientSvcResponseContents, formatting, IdentityResponse, spo, validation } from '../../../../utils';
 import commands from '../../commands';
 import { SpoPropertyBagBaseCommand } from './propertybag-base';
 
@@ -66,46 +66,40 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const removeProperty = (): void => {
-      spo
-        .getRequestDigest(args.options.webUrl)
-        .then((contextResponse: ContextInfo): Promise<IdentityResponse> => {
-          this.formDigestValue = contextResponse.FormDigestValue;
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const removeProperty: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const contextResponse = await spo.getRequestDigest(args.options.webUrl);
+        this.formDigestValue = contextResponse.FormDigestValue;
 
-          return spo.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
-        })
-        .then((identityResp: IdentityResponse): Promise<IdentityResponse> => {
-          const opts: Options = args.options;
-          if (opts.folder) {
-            // get the folder guid instead of the web guid
-            return spo.getFolderIdentity(identityResp.objectIdentity, opts.webUrl, opts.folder, this.formDigestValue);
-          }
-          return new Promise<IdentityResponse>(resolve => { return resolve(identityResp); });
-        })
-        .then((identityResp: IdentityResponse): Promise<any> => {
-          return this.removeProperty(identityResp, args.options);
-        })
-        .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
+        let identityResp = await spo.getCurrentWebIdentity(args.options.webUrl, this.formDigestValue);
+        const opts: Options = args.options;
+        if (opts.folder) {
+          // get the folder guid instead of the web guid
+          identityResp = await spo.getFolderIdentity(identityResp.objectIdentity, opts.webUrl, opts.folder, this.formDigestValue);
+        }
+
+        await this.removeProperty(identityResp, args.options);
+      }
+      catch (err: any) {
+        this.handleRejectedPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      removeProperty();
+      await removeProperty();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to remove the ${args.options.key} property?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          removeProperty();
-        }
       });
+
+      if (result.continue) {
+        await removeProperty();
+      }
     }
   }
 

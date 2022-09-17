@@ -94,7 +94,7 @@ class YammerMessageAddCommand extends YammerCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const requestOptions: any = {
       url: `${this.resource}/v1/messages.json`,
       headers: {
@@ -111,17 +111,18 @@ class YammerMessageAddCommand extends YammerCommand {
       }
     };
 
-    request
-      .post(requestOptions)
-      .then((res: any): void => {
-        let result = null;
-        if (res.messages && res.messages.length === 1) {
-          result = res.messages[0];
-        }
+    try {
+      const res: any = await request.post(requestOptions);
+      let result = null;
+      if (res.messages && res.messages.length === 1) {
+        result = res.messages[0];
+      }
 
-        logger.log(result);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(result);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

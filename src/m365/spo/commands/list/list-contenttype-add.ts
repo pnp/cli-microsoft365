@@ -88,7 +88,7 @@ class SpoListContentTypeAddCommand extends SpoCommand {
     this.optionSets.push(['listId', 'listTitle']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       const list: string = (args.options.listId ? args.options.listId : args.options.listTitle) as string;
       logger.logToStderr(`Adding content type ${args.options.contentTypeId} to list ${list} in site at ${args.options.webUrl}...`);
@@ -114,13 +114,13 @@ class SpoListContentTypeAddCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .post(requestOptions)
-      .then((res: any): void => {
-        logger.log(res);
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const res = await request.post<any>(requestOptions);
+      logger.log(res);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private mapRequestBody(options: Options): any {

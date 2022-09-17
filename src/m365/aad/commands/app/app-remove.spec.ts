@@ -37,9 +37,9 @@ describe(commands.APP_REMOVE, () => {
       }
     };
 
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
 
     promptOptions = undefined;
@@ -147,123 +147,82 @@ describe(commands.APP_REMOVE, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('prompts before removing the app when confirm option not passed', (done) => {
-    command.action(logger, {
+  it('prompts before removing the app when confirm option not passed', async () => {
+    await command.action(logger, {
       options: {
         appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8'
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
-  it('aborts removing the app when prompt not confirmed', (done) => {
+  it('aborts removing the app when prompt not confirmed', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8'
       }
-    }, () => {
-      try {
-        assert(deleteRequestStub.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(deleteRequestStub.notCalled);
   });
 
-  it('deletes app when prompt confirmed (debug)', (done) => {
+  it('deletes app when prompt confirmed (debug)', async () => {
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8'
       }
-    }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(deleteRequestStub.called);
   });
 
-  it('deletes app with specified app (client) ID', (done) => {
-    command.action(logger, {
+  it('deletes app with specified app (client) ID', async () => {
+    await command.action(logger, {
       options: {
         appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8',
         confirm: true
       }
-    }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(deleteRequestStub.called);
   });
 
-  it('deletes app with specified object ID', (done) => {
-    command.action(logger, {
+  it('deletes app with specified object ID', async () => {
+    await command.action(logger, {
       options: {
         objectId: 'd75be2e1-0204-4f95-857d-51a37cf40be8',
         confirm: true
       }
-    }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(deleteRequestStub.called);
   });
 
-  it('deletes app with specified name', (done) => {
-    command.action(logger, {
+  it('deletes app with specified name', async () => {
+    await command.action(logger, {
       options: {
         name: 'myapp',
         confirm: true
       }
-    }, () => {
-      try {
-        assert(deleteRequestStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(deleteRequestStub.called);
   });
 
-  it('fails to get app by id when app does not exists', (done) => {
+  it('fails to get app by id when app does not exists', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/myorganization/applications?$filter=`) > -1) {
@@ -272,18 +231,10 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject("No Azure AD application registration with ID myapp found");
     });
 
-    command.action(logger, { options: { debug: true, appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8', confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("No Azure AD application registration with ID d75be2e1-0204-4f95-857d-51a37cf40be8 found")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, appId: 'd75be2e1-0204-4f95-857d-51a37cf40be8', confirm: true } } as any), new CommandError("No Azure AD application registration with ID d75be2e1-0204-4f95-857d-51a37cf40be8 found"));
   });
 
-  it('fails to get app by name when app does not exists', (done) => {
+  it('fails to get app by name when app does not exists', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/myorganization/applications?$filter=`) > -1) {
@@ -292,18 +243,10 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject("No Azure AD application registration with name myapp found");
     });
 
-    command.action(logger, { options: { debug: true, name: 'myapp', confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("No Azure AD application registration with name myapp found")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, name: 'myapp', confirm: true } } as any), new CommandError("No Azure AD application registration with name myapp found"));
   });
 
-  it('fails when multiple apps with same name exists', (done) => {
+  it('fails when multiple apps with same name exists', async () => {
     sinonUtil.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/v1.0/myorganization/applications?$filter=`) > -1) {
@@ -323,21 +266,13 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject("Multiple Azure AD application registration with name myapp found. Please choose one of the object IDs: d75be2e1-0204-4f95-857d-51a37cf40be8, 340a4aa3-1af6-43ac-87d8-189819003952");
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: true,
         name: 'myapp',
         confirm: true
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Multiple Azure AD application registration with name myapp found. Please choose one of the object IDs: d75be2e1-0204-4f95-857d-51a37cf40be8, 340a4aa3-1af6-43ac-87d8-189819003952")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError("Multiple Azure AD application registration with name myapp found. Please choose one of the object IDs: d75be2e1-0204-4f95-857d-51a37cf40be8, 340a4aa3-1af6-43ac-87d8-189819003952"));
   });
 
   it('supports debug mode', () => {

@@ -70,7 +70,7 @@ class SpoNavigationNodeListCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving navigation nodes...`);
     }
@@ -83,19 +83,19 @@ class SpoNavigationNodeListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<{ value: NavigationNode[] }>(requestOptions)
-      .then((res: { value: NavigationNode[] }): void => {
-        logger.log(res.value.map(n => {
-          return {
-            Id: n.Id,
-            Title: n.Title,
-            Url: n.Url
-          };
-        }));
-
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+    try {
+      const res = await request.get<{ value: NavigationNode[] }>(requestOptions);
+      logger.log(res.value.map(n => {
+        return {
+          Id: n.Id,
+          Title: n.Title,
+          Url: n.Url
+        };
+      }));
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

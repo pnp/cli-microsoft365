@@ -70,27 +70,28 @@ class PaAppListCommand extends PowerAppsCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     const url = `${this.resource}/providers/Microsoft.PowerApps${args.options.asAdmin ? '/scopes/admin' : ''}${args.options.environment ? '/environments/' + encodeURIComponent(args.options.environment) : ''}/apps?api-version=2017-08-01`;
 
-    odata
-      .getAllItems<{ name: string; displayName: string; properties: { displayName: string } }>(url)
-      .then((apps: { name: string; displayName: string; properties: { displayName: string } }[]): void => {
-        if (apps.length > 0) {
-          apps.forEach(a => {
-            a.displayName = a.properties.displayName;
-          });
+    try {
+      const apps = await odata.getAllItems<{ name: string; displayName: string; properties: { displayName: string } }>(url);
 
-          logger.log(apps);
-        }
-        else {
-          if (this.verbose) {
-            logger.logToStderr('No apps found');
-          }
-        }
+      if (apps.length > 0) {
+        apps.forEach(a => {
+          a.displayName = a.properties.displayName;
+        });
 
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        logger.log(apps);
+      }
+      else {
+        if (this.verbose) {
+          logger.logToStderr('No apps found');
+        }
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

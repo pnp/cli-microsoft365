@@ -38,9 +38,9 @@ describe(commands.USER_REMOVE, () => {
     };
     requests = [];
     promptOptions = undefined;
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
   });
 
@@ -109,55 +109,41 @@ describe(commands.USER_REMOVE, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('should prompt before removing user using id from web when confirmation argument not passed ', (done) => {
-    command.action(logger, {
+  it('should prompt before removing user using id from web when confirmation argument not passed ', async () => {
+    await command.action(logger, {
       options:
       {
         webUrl: 'https://contoso.sharepoint.com/subsite',
         id: 10
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+
+    assert(promptIssued);
   });
 
-  it('should prompt before removing user using login name from web when confirmation argument not passed ', (done) => {
-    command.action(logger, {
+  it('should prompt before removing user using login name from web when confirmation argument not passed ', async () => {
+    await command.action(logger, {
       options:
       {
         webUrl: 'https://contoso.sharepoint.com/subsite',
         loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
       }
-    }, () => {
-      let promptIssued = false;
-
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
-
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    let promptIssued = false;
+
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    
+    assert(promptIssued);
   });
 
-  it('removes user by id successfully without prompting with confirmation argument', (done) => {
+  it('removes user by id successfully without prompting with confirmation argument', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
@@ -166,64 +152,50 @@ describe(commands.USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         id: 10,
         confirm: true
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
-          r.headers['accept'] === 'application/json;odata=nometadata') {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
+        r.headers['accept'] === 'application/json;odata=nometadata') {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes user by login name successfully without prompting with confirmation argument', (done) => {
+  it('removes user by login name successfully without prompting with confirmation argument', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
-      if ((opts.url as string).indexOf(`_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cjohn.doe%40mytenant.onmicrosoft.com')`) > -1) {
+      if (opts.url === "https://contoso.sharepoint.com/subsite/_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cparker%40tenant.onmicrosoft.com')") {
         return Promise.resolve(true);
       }
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         loginName: "i:0#.f|membership|parker@tenant.onmicrosoft.com",
         confirm: true
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cparker%40tenant.onmicrosoft.com')`) > -1 && 
-          r.headers['accept'] === 'application/json;odata=nometadata') {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`_api/web/siteusers/removeByLoginName('i%3A0%23.f%7Cmembership%7Cparker%40tenant.onmicrosoft.com')`) > -1 && 
+        r.headers['accept'] === 'application/json;odata=nometadata') {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes user by id successfully from web when prompt confirmed', (done) => {
+  it('removes user by id successfully from web when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
@@ -233,33 +205,26 @@ describe(commands.USER_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         id: 10
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
-          r.headers['accept'] === 'application/json;odata=nometadata') {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
+        r.headers['accept'] === 'application/json;odata=nometadata') {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes user by login name successfully from web when prompt confirmed', (done) => {
+  it('removes user by login name successfully from web when prompt confirmed', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`_api/web/siteusers/removeByLoginName`) > -1) {
@@ -269,33 +234,26 @@ describe(commands.USER_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`_api/web/siteusers/removeByLoginName`) > -1 &&
-          r.headers['accept'] === 'application/json;odata=nometadata') {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`_api/web/siteusers/removeByLoginName`) > -1 &&
+        r.headers['accept'] === 'application/json;odata=nometadata') {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes user from web successfully without prompting with confirmation argument (verbose)', (done) => {
+  it('removes user from web successfully without prompting with confirmation argument (verbose)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
@@ -304,32 +262,25 @@ describe(commands.USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         webUrl: "https://contoso.sharepoint.com/subsite",
         id: 10,
         confirm: true
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
-          r.headers['accept'] === 'application/json;odata=nometadata') {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
+        r.headers['accept'] === 'application/json;odata=nometadata') {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('removes user from web successfully without prompting with confirmation argument (debug)', (done) => {
+  it('removes user from web successfully without prompting with confirmation argument (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
@@ -338,32 +289,25 @@ describe(commands.USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/subsite",
         id: 10,
         confirm: true
       }
-    }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
-          r.headers['accept'] === 'application/json;odata=nometadata') {
-          correctRequestIssued = true;
-        }
-      });
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`_api/web/siteusers/removebyid(10)`) > -1 &&
+        r.headers['accept'] === 'application/json;odata=nometadata') {
+        correctRequestIssued = true;
       }
     });
+    assert(correctRequestIssued);
   });
 
-  it('handles error when removing using from web', (done) => {
+  it('handles error when removing using from web', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('_api/web/siteusers/removebyid(10)') > -1) {
@@ -372,20 +316,9 @@ describe(commands.USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        webUrl: "https://contoso.sharepoint.com/subsite",
-        id: 10,
-        confirm: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      webUrl: "https://contoso.sharepoint.com/subsite",
+      id: 10,
+      confirm: true } } as any), new CommandError('An error has occurred'));
   });
 });

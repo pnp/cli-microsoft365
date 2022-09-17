@@ -60,7 +60,7 @@ describe(commands.MAIL_SEND, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('Send an email to one recipient (debug)', (done) => {
+  it('Send an email to one recipient (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
@@ -70,26 +70,19 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.data) {
-          correctRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+        r.data) {
+        correctRequestIssued = true;
       }
     });
+
+    assert(correctRequestIssued);
   });
 
-  it('Send an email to one recipient', (done) => {
+  it('Send an email to one recipient', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
@@ -99,26 +92,19 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.data) {
-          correctRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email' } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+        r.data) {
+        correctRequestIssued = true;
       }
     });
+
+    assert(correctRequestIssued);
   });
 
-  it('Send an email to one recipient and from someone (debug)', (done) => {
+  it('Send an email to one recipient and from someone (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
@@ -128,26 +114,19 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'someone@contoso.com', verbose: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.data) {
-          correctRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'someone@contoso.com', verbose: true } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+        r.data) {
+        correctRequestIssued = true;
       }
     });
+
+    assert(correctRequestIssued);
   });
 
-  it('Send an email to one recipient and from someone', (done) => {
+  it('Send an email to one recipient and from someone', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
@@ -157,26 +136,19 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'someone@contoso.com' } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.data) {
-          correctRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'someone@contoso.com' } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+        r.data) {
+        correctRequestIssued = true;
       }
     });
+
+    assert(correctRequestIssued);
   });
 
-  it('Send an email to one recipient and from some peoples (debug)', (done) => {
+  it('Send an email to one recipient and from some peoples (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
@@ -186,26 +158,19 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'user@contoso.com,someone@consotos.com', verbose: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.data) {
-          correctRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'user@contoso.com,someone@consotos.com', verbose: true } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+        r.data) {
+        correctRequestIssued = true;
       }
     });
+
+    assert(correctRequestIssued);
   });
 
-  it('Send an email to one recipient and from some peoples', (done) => {
+  it('Send an email to one recipient and from some peoples', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
@@ -215,26 +180,19 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'user@contoso.com,someone@consotos.com' } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.data) {
-          correctRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', from: 'user@contoso.com,someone@consotos.com' } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+        r.data) {
+        correctRequestIssued = true;
       }
     });
+
+    assert(correctRequestIssued);
   });
 
-  it('Send an email to one recipient and CC someone (debug)', (done) => {
+  it('Send an email to one recipient and CC someone (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
@@ -244,26 +202,19 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', cc: 'someone@contoso.com', verbose: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.data) {
-          correctRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', cc: 'someone@contoso.com', verbose: true } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+        r.data) {
+        correctRequestIssued = true;
       }
     });
+
+    assert(correctRequestIssued);
   });
 
-  it('Send an email to one recipient and CC someone', (done) => {
+  it('Send an email to one recipient and CC someone', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
@@ -273,26 +224,19 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', cc: 'someone@contoso.com' } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.data) {
-          correctRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', cc: 'someone@contoso.com' } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+        r.data) {
+        correctRequestIssued = true;
       }
     });
+
+    assert(correctRequestIssued);
   });
 
-  it('Send an email to one recipient and BCC someone (debug)', (done) => {
+  it('Send an email to one recipient and BCC someone (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
@@ -302,26 +246,19 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', bcc: 'someone@contoso.com', verbose: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.data) {
-          correctRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', bcc: 'someone@contoso.com', verbose: true } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+        r.data) {
+        correctRequestIssued = true;
       }
     });
+
+    assert(correctRequestIssued);
   });
 
-  it('Send an email to one recipient and BCC someone', (done) => {
+  it('Send an email to one recipient and BCC someone', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
@@ -331,26 +268,19 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', bcc: 'someone@contoso.com' } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.data) {
-          correctRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', bcc: 'someone@contoso.com' } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+        r.data) {
+        correctRequestIssued = true;
       }
     });
+
+    assert(correctRequestIssued);
   });
 
-  it('Send an email to one recipient with additional header (debug)', (done) => {
+  it('Send an email to one recipient with additional header (debug)', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
@@ -360,26 +290,19 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', additionalHeaders: '{"X-Custom": "My Custom Header Value"}', verbose: true } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.data) {
-          correctRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: true, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', additionalHeaders: '{"X-Custom": "My Custom Header Value"}', verbose: true } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+        r.data) {
+        correctRequestIssued = true;
       }
     });
+
+    assert(correctRequestIssued);
   });
 
-  it('Send an email to one recipient with additional header', (done) => {
+  it('Send an email to one recipient with additional header', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1) {
@@ -389,39 +312,25 @@ describe(commands.MAIL_SEND, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', additionalHeaders: '{"X-Custom": "My Custom Header Value"}' } }, () => {
-      let correctRequestIssued = false;
-      requests.forEach(r => {
-        if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.data) {
-          correctRequestIssued = true;
-        }
-      });
-
-      try {
-        assert(correctRequestIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', additionalHeaders: '{"X-Custom": "My Custom Header Value"}' } });
+    let correctRequestIssued = false;
+    requests.forEach(r => {
+      if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
+        r.data) {
+        correctRequestIssued = true;
       }
     });
+
+    assert(correctRequestIssued);
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', additionalHeaders: '{"X-Custom": "My Custom Header Value"}' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: "https://contoso.sharepoint.com", to: 'user@contoso.com', subject: 'Subject of the email', body: 'Content of the email', additionalHeaders: '{"X-Custom": "My Custom Header Value"}' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

@@ -122,7 +122,7 @@ describe(commands.PAGE_SECTION_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('lists sections on the modern page', (done) => {
+  it('lists sections on the modern page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
@@ -131,28 +131,21 @@ describe(commands.PAGE_SECTION_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
-          columns: [{
-            "order": 1,
-            "factor": 6
-          },
-          {
-            "order": 2,
-            "factor": 6
-          }],
-          order: 1
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } });
+    assert(loggerLogSpy.calledWith({
+      columns: [{
+        "order": 1,
+        "factor": 6
+      },
+      {
+        "order": 2,
+        "factor": 6
+      }],
+      order: 1
+    }));
   });
 
-  it('lists sections on the modern page - no sections available', (done) => {
+  it('lists sections on the modern page - no sections available', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
@@ -219,18 +212,11 @@ describe(commands.PAGE_SECTION_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('lists sections on the modern page (debug)', (done) => {
+  it('lists sections on the modern page (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
@@ -239,30 +225,23 @@ describe(commands.PAGE_SECTION_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } });
+    assert(loggerLogSpy.calledWith({
+      "order": 1,
+      "columns": [
+        {
           "order": 1,
-          "columns": [
-            {
-              "order": 1,
-              "factor": 6
-            },
-            {
-              "order": 2,
-              "factor": 6
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+          "factor": 6
+        },
+        {
+          "order": 2,
+          "factor": 6
+        }
+      ]
+    }));
   });
 
-  it('lists sections on the modern page when the specified page name doesn\'t contain extension', (done) => {
+  it('lists sections on the modern page when the specified page name doesn\'t contain extension', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
@@ -271,30 +250,23 @@ describe(commands.PAGE_SECTION_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', section: 1 } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', section: 1 } });
+    assert(loggerLogSpy.calledWith({
+      "order": 1,
+      "columns": [
+        {
           "order": 1,
-          "columns": [
-            {
-              "order": 1,
-              "factor": 6
-            },
-            {
-              "order": 2,
-              "factor": 6
-            }
-          ]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+          "factor": 6
+        },
+        {
+          "order": 2,
+          "factor": 6
+        }
+      ]
+    }));
   });
 
-  it('lists all information about sections on the modern page in json output mode', (done) => {
+  it('lists all information about sections on the modern page in json output mode', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve(apiResponse);
@@ -303,32 +275,25 @@ describe(commands.PAGE_SECTION_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json', section: 1 } }, () => {
-      try {
-        assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
-          "order": 1,
-          "columns": [{
-            "factor": 6,
-            "order": 1,
-            "dataVersion": "1.0",
-            "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;"
-          },
-          {
-            "factor": 6,
-            "order": 2,
-            "dataVersion": "1.0",
-            "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1&#125;&#125;"
-          }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json', section: 1 } });
+    assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
+      "order": 1,
+      "columns": [{
+        "factor": 6,
+        "order": 1,
+        "dataVersion": "1.0",
+        "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1&#125;&#125;"
+      },
+      {
+        "factor": 6,
+        "order": 2,
+        "dataVersion": "1.0",
+        "jsonData": "&#123;&quot;displayMode&quot;&#58;2,&quot;position&quot;&#58;&#123;&quot;sectionFactor&quot;&#58;6,&quot;sectionIndex&quot;&#58;2,&quot;zoneIndex&quot;&#58;1&#125;&#125;"
+      }]
+    }));
   });
 
-  it('shows error when the specified page is a classic page', (done) => {
+  it('shows error when the specified page is a classic page', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
         return Promise.resolve({
@@ -391,18 +356,11 @@ describe(commands.PAGE_SECTION_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', sectipn: 1 } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Page home.aspx is not a modern page.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', sectipn: 1 } } as any),
+      new CommandError('Page home.aspx is not a modern page.'));
   });
 
-  it('correctly handles page not found', (done) => {
+  it('correctly handles page not found', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
@@ -417,31 +375,17 @@ describe(commands.PAGE_SECTION_GET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } } as any),
+      new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.'));
   });
 
-  it('correctly handles OData error when retrieving pages', (done) => {
+  it('correctly handles OData error when retrieving pages', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1 } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

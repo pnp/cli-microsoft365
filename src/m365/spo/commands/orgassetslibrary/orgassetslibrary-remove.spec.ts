@@ -41,9 +41,9 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
         log.push(msg);
       }
     };
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options: any) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
     promptOptions = undefined;
   });
@@ -73,45 +73,30 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('prompts before removing the Org Assets Library when confirm option is not passed', (done) => {
-    command.action(logger, { options: { debug: true } } as any, () => {
+  it('prompts before removing the Org Assets Library when confirm option is not passed', async () => {
+    await command.action(logger, { options: { debug: true } } as any);
+    
+    let promptIssued = false;
 
-      try {
-        let promptIssued = false;
-
-        if (promptOptions && promptOptions.type === 'confirm') {
-          promptIssued = true;
-        }
-
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
+    assert(promptIssued);
   });
 
-  it('aborts removing the Org Assets Library when confirm option is not passed and prompt not confirmed', (done) => {
+  it('aborts removing the Org Assets Library when confirm option is not passed and prompt not confirmed', async () => {
     const postSpy = sinon.spy(request, 'post');
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: false }
+    ));
 
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(postSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: {} });
+    assert(postSpy.notCalled);
   });
 
-  it('removes the Org Assets Library when prompt confirmed', (done) => {
+  it('removes the Org Assets Library when prompt confirmed', async () => {
     let orgAssetLibRemoveCallIssued = false;
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -134,21 +119,40 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { libraryUrl: '/sites/branding/assets' } }, () => {
-      try {
-        assert(orgAssetLibRemoveCallIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { libraryUrl: '/sites/branding/assets' } });
+    assert(orgAssetLibRemoveCallIssued);
   });
 
-  it('removes the Org Assets Library when prompt confirmed and output set to JSON', (done) => {
+  it('removes the Org Assets Library without confirm prompt', async () => {
+    let orgAssetLibRemoveCallIssued = false;
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><Method Name="RemoveFromOrgAssets" Id="10" ObjectPathId="8"><Parameters><Parameter Type="String">/sites/branding/assets</Parameter><Parameter Type="Guid">{00000000-0000-0000-0000-000000000000}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
+
+        orgAssetLibRemoveCallIssued = true;
+
+        return Promise.resolve(JSON.stringify(
+          [
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.19520.12061", "ErrorInfo": null, "TraceCorrelationId": "f4e1279f-100c-9000-7ea4-40fa74757476"
+            }, 9, {
+              "IsNull": false
+            }
+          ]
+        ));
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    await command.action(logger, { options: { libraryUrl: '/sites/branding/assets', confirm: true } });
+    assert(orgAssetLibRemoveCallIssued);
+  });
+
+  it('removes the Org Assets Library when prompt confirmed and output set to JSON', async () => {
     let orgAssetLibRemoveCallIssued = false;
 
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -171,21 +175,14 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { libraryUrl: '/sites/branding/assets', output: 'json' } }, () => {
-      try {
-        assert(orgAssetLibRemoveCallIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    sinon.stub(Cli, 'prompt').callsFake(async () => (
+      { continue: true }
+    ));
+    await command.action(logger, { options: { libraryUrl: '/sites/branding/assets', output: 'json' } });
+    assert(orgAssetLibRemoveCallIssued);
   });
 
-  it('correctly handles error when removing a non-existing Org Asset Library', (done) => {
+  it('correctly handles error when removing a non-existing Org Asset Library', async () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><Method Name="RemoveFromOrgAssets" Id="10" ObjectPathId="8"><Parameters><Parameter Type="String">/sites/branding/assets</Parameter><Parameter Type="Guid">{00000000-0000-0000-0000-000000000000}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
 
@@ -203,33 +200,18 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { libraryUrl: '/sites/branding/assets', debug: true, confirm: true } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Run Add-SPOOrgAssetsLibrary first to set up the organization assets library feature for your organization.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { libraryUrl: '/sites/branding/assets', debug: true, confirm: true } } as any), 
+      new CommandError(`Run Add-SPOOrgAssetsLibrary first to set up the organization assets library feature for your organization.`));
   });
 
-  it('correctly handles random API error', (done) => {
+  it('correctly handles random API error', async () => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         confirm: true
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError(`An error has occurred`));
   });
 
   it('supports debug mode', () => {

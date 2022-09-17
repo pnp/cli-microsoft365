@@ -1,5 +1,5 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
-import Command, { CommandError, CommandErrorWithOutput } from '../../../../Command';
+import Command, { CommandErrorWithOutput } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import { validation } from '../../../../utils';
@@ -98,47 +98,41 @@ class SpoGroupUserAddCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    let groupId: number = 0;
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      const groupId = await this.getGroupId(args);
+      const resolvedUsernameList = await this.getValidUsers(args, logger);
 
-    this
-      .getGroupId(args)
-      .then((_groupId: number): Promise<string[]> => {
-        groupId = _groupId;
-        return this.getValidUsers(args, logger);
-      })
-      .then((resolvedUsernameList: string[]): Promise<SharingResult> => {
-        if (this.verbose) {
-          logger.logToStderr(`Start adding Active user/s to SharePoint Group ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
-        }
+      if (this.verbose) {
+        logger.logToStderr(`Start adding Active user/s to SharePoint Group ${args.options.groupId ? args.options.groupId : args.options.groupName}`);
+      }
 
-        const data: any = {
-          url: args.options.webUrl,
-          peoplePickerInput: this.getFormattedUserList(resolvedUsernameList),
-          roleValue: `group:${groupId}`
-        };
+      const data: any = {
+        url: args.options.webUrl,
+        peoplePickerInput: this.getFormattedUserList(resolvedUsernameList),
+        roleValue: `group:${groupId}`
+      };
 
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/SP.Web.ShareObject`,
-          headers: {
-            'Accept': 'application/json;odata=nometadata',
-            'Content-type': 'application/json;odata=verbose'
-          },
-          data: data,
-          responseType: 'json'
-        };
+      const requestOptions: any = {
+        url: `${args.options.webUrl}/_api/SP.Web.ShareObject`,
+        headers: {
+          'Accept': 'application/json;odata=nometadata',
+          'Content-type': 'application/json;odata=verbose'
+        },
+        data: data,
+        responseType: 'json'
+      };
 
-        return request.post<SharingResult>(requestOptions);
-      })
-      .then((sharingResult: SharingResult): void => {
-        if (sharingResult.ErrorMessage !== null) {
-          return cb(new CommandError(sharingResult.ErrorMessage));
-        }
+      const sharingResult = await request.post<SharingResult>(requestOptions);
+      if (sharingResult.ErrorMessage !== null) {
+        throw sharingResult.ErrorMessage;
+      }
 
-        logger.log(sharingResult.UsersAddedToGroup);
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      logger.log(sharingResult.UsersAddedToGroup);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getGroupId(args: CommandArgs): Promise<number> {

@@ -74,56 +74,54 @@ class PaAppGetCommand extends PowerAppsCommand {
     this.optionSets.push(['name', 'displayName']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (args.options.name) {
-      const requestOptions: any = {
-        url: `${this.resource}/providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
-        headers: {
-          accept: 'application/json'
-        },
-        responseType: 'json'
-      };
-
-      if (this.verbose) {
-        logger.logToStderr(`Retrieving information about Microsoft Power App with name '${args.options.name}'...`);
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    try {
+      if (args.options.name) {
+        const requestOptions: any = {
+          url: `${this.resource}/providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+          headers: {
+            accept: 'application/json'
+          },
+          responseType: 'json'
+        };
+  
+        if (this.verbose) {
+          logger.logToStderr(`Retrieving information about Microsoft Power App with name '${args.options.name}'...`);
+        }
+  
+        const res = await request.get<any>(requestOptions);
+        logger.log(this.setProperties(res));
       }
+      else {
+        if (this.verbose) {
+          logger.logToStderr(`Retrieving information about Microsoft Power App with displayName '${args.options.displayName}'...`);
+        }
+  
+        const getAppsOutput = await this.getApps(args, logger);
 
-      request
-        .get(requestOptions)
-        .then((res: any): void => {
-          logger.log(this.setProperties(res));
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-    }
-    else {
-      if (this.verbose) {
-        logger.logToStderr(`Retrieving information about Microsoft Power App with displayName '${args.options.displayName}'...`);
-      }
-
-      this
-        .getApps(args, logger)
-        .then((getAppsOutput: CommandOutput): void => {
-          const allApps: any = JSON.parse(getAppsOutput.stdout);
-          if (allApps.length > 0) {
-            const app = allApps.find((a: any) => {
-              return a.properties.displayName.toLowerCase() === `${args.options.displayName}`.toLowerCase();
-            });
-            if (!!app) {
-              logger.log(this.setProperties(app));
-            }
-            else {
-              if (this.verbose) {
-                logger.logToStderr(`No app found with displayName '${args.options.displayName}'`);
-              }
-            }
+        const allApps: any = JSON.parse(getAppsOutput.stdout);
+        if (allApps.length > 0) {
+          const app = allApps.find((a: any) => {
+            return a.properties.displayName.toLowerCase() === `${args.options.displayName}`.toLowerCase();
+          });
+          if (!!app) {
+            logger.log(this.setProperties(app));
           }
           else {
             if (this.verbose) {
-              logger.logToStderr('No apps found');
+              logger.logToStderr(`No app found with displayName '${args.options.displayName}'`);
             }
           }
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        }
+        else {
+          if (this.verbose) {
+            logger.logToStderr('No apps found');
+          }
+        }
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
     }
   }
 

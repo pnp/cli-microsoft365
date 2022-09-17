@@ -70,8 +70,8 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const executeRemoveAction: () => void = (): void => {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const executeRemoveAction: () => Promise<void> = async (): Promise<void> => {
       const endpoint = `${this.resource}/v1/group_memberships.json`;
 
       const requestOptions: any = {
@@ -87,14 +87,16 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
         }
       };
 
-      request
-        .delete(requestOptions)
-        .then((): void => cb(),
-          (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      try {
+        await request.delete(requestOptions);
+      } 
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      executeRemoveAction();
+      await executeRemoveAction();
     }
     else {
       let messagePrompt: string = `Are you sure you want to leave group ${args.options.id}?`;
@@ -102,19 +104,16 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
         messagePrompt = `Are you sure you want to remove the user ${args.options.userId} from the group ${args.options.id}?`;
       }
 
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: messagePrompt
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          executeRemoveAction();
-        }
       });
+
+      if (result.continue) {
+        await executeRemoveAction();
+      }
     }
   }
 }

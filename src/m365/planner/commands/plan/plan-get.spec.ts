@@ -230,7 +230,7 @@ describe(commands.PLAN_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('correctly get planner plan with given id', (done) => {
+  it('correctly get planner plan with given id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}`) {
         return Promise.resolve(planResponse);
@@ -243,23 +243,17 @@ describe(commands.PLAN_GET, () => {
       return Promise.reject(`Invalid request ${opts.url}`);
     });
 
-    const options: any = {
-      debug: false,
-      id: validId
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(outputResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, { 
+      options: {
+        debug: false,
+        id: validId
       }
     });
+
+    assert(loggerLogSpy.calledWith(outputResponse));
   });
 
-  it('correctly get planner plan with deprecated planId', (done) => {
+  it('correctly get planner plan with deprecated planId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/${validId}`) {
         return Promise.resolve(planResponse);
@@ -272,23 +266,16 @@ describe(commands.PLAN_GET, () => {
       return Promise.reject(`Invalid request ${opts.url}`);
     });
 
-    const options: any = {
-      debug: false,
-      planId: validId
-    };
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(outputResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
+    await command.action(logger, {
+      options: {
+        debug: false,
+        planId: validId
       }
     });
+    assert(loggerLogSpy.calledWith(outputResponse));
   });
 
-  it('correctly get planner plan with given title and ownerGroupId', (done) => {
+  it('correctly get planner plan with given title and ownerGroupId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return Promise.resolve({
@@ -311,18 +298,11 @@ describe(commands.PLAN_GET, () => {
       ownerGroupId: validOwnerGroupId
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(outputResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options });
+    assert(loggerLogSpy.calledWith(outputResponse));
   });
 
-  it('correctly get planner plan with given ownerGroupId and deprecated planTitle', (done) => {
+  it('correctly get planner plan with given ownerGroupId and deprecated planTitle', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return Promise.resolve({
@@ -345,37 +325,22 @@ describe(commands.PLAN_GET, () => {
       ownerGroupId: validOwnerGroupId
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(outputResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options });
+    assert(loggerLogSpy.calledWith(outputResponse));
   });
 
-  it('fails validation when using app only access token', (done) => {
+  it('fails validation when using app only access token', async () => {
     sinonUtil.restore(accessToken.isAppOnlyAccessToken);
     sinon.stub(accessToken, 'isAppOnlyAccessToken').returns(true);
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         id: validId
       }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This command does not support application permissions.')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    }), new CommandError('This command does not support application permissions.'));
   });
 
-  it('correctly get planner plan with given title and ownerGroupName', (done) => {
+  it('correctly get planner plan with given title and ownerGroupName', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
         return Promise.resolve(singleGroupResponse);
@@ -402,18 +367,11 @@ describe(commands.PLAN_GET, () => {
       ownerGroupName: validOwnerGroupName
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(outputResponse));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: options } as any);
+    assert(loggerLogSpy.calledWith(outputResponse));
   });
 
-  it('correctly handles no plan found with given ownerGroupId', (done) => {
+  it('correctly handles no plan found with given ownerGroupId', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/${validOwnerGroupId}/planner/plans`) {
         return Promise.resolve({ "value": [] });
@@ -428,31 +386,17 @@ describe(commands.PLAN_GET, () => {
       ownerGroupId: validOwnerGroupId
     };
 
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: options } as any));
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
-      return Promise.reject("An error has occurred.");
+      return Promise.reject('An error has occurred.');
     });
 
-    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+
+    await assert.rejects(command.action(logger, { options: { debug: false } }), new CommandError('An error has occurred.'));
   });
 
   it('supports debug mode', () => {

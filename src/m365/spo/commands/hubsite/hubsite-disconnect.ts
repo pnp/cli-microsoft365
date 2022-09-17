@@ -1,7 +1,7 @@
 import { Cli, Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { ContextInfo, spo, validation } from '../../../../utils';
+import { spo, validation } from '../../../../utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -56,46 +56,45 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const disconnectHubSite: () => void = (): void => {
-      spo
-        .getRequestDigest(args.options.url)
-        .then((res: ContextInfo): Promise<void> => {
-          if (this.verbose) {
-            logger.logToStderr(`Disconnecting site collection ${args.options.url} from its hubsite...`);
-          }
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
+    const disconnectHubSite: () => Promise<void> = async (): Promise<void> => {
+      try {
+        const res = await spo.getRequestDigest(args.options.url);
 
-          const requestOptions: any = {
-            url: `${args.options.url}/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`,
-            headers: {
-              'X-RequestDigest': res.FormDigestValue,
-              accept: 'application/json;odata=nometadata'
-            },
-            responseType: 'json'
-          };
+        if (this.verbose) {
+          logger.logToStderr(`Disconnecting site collection ${args.options.url} from its hubsite...`);
+        }
 
-          return request.post(requestOptions);
-        })
-        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        const requestOptions: any = {
+          url: `${args.options.url}/_api/site/JoinHubSite('00000000-0000-0000-0000-000000000000')`,
+          headers: {
+            'X-RequestDigest': res.FormDigestValue,
+            accept: 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+
+        await request.post(requestOptions);
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err);
+      }
     };
 
     if (args.options.confirm) {
-      disconnectHubSite();
+      await disconnectHubSite();
     }
     else {
-      Cli.prompt({
+      const result = await Cli.prompt<{ continue: boolean }>({
         type: 'confirm',
         name: 'continue',
         default: false,
         message: `Are you sure you want to disconnect the site collection ${args.options.url} from its hub site?`
-      }, (result: { continue: boolean }): void => {
-        if (!result.continue) {
-          cb();
-        }
-        else {
-          disconnectHubSite();
-        }
       });
+
+      if (result.continue) {
+        await disconnectHubSite();
+      }
     }
   }
 }

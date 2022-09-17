@@ -68,26 +68,23 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
     });
   }
   
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (args.options.output !== 'json' || this.verbose) {
       logger.logToStderr(`This command is currently in preview. Feedback welcome at https://github.com/pnp/cli-microsoft365/issues${os.EOL}`);
     }
 
     this.projectRootPath = this.getProjectRoot(process.cwd());
     if (this.projectRootPath === null) {
-      cb(new CommandError(`Couldn't find project root folder`, SpfxProjectExternalizeCommand.ERROR_NO_PROJECT_ROOT_FOLDER));
-      return;
+      throw new CommandError(`Couldn't find project root folder`, SpfxProjectExternalizeCommand.ERROR_NO_PROJECT_ROOT_FOLDER);
     }
 
     this.projectVersion = this.getProjectVersion();
     if (!this.projectVersion) {
-      cb(new CommandError(`Unable to determine the version of the current SharePoint Framework project`, SpfxProjectExternalizeCommand.ERROR_NO_VERSION));
-      return;
+      throw new CommandError(`Unable to determine the version of the current SharePoint Framework project`, SpfxProjectExternalizeCommand.ERROR_NO_VERSION);
     }
 
     if (this.projectVersion && this.supportedVersions.indexOf(this.projectVersion) < 0) {
-      cb(new CommandError(`CLI for Microsoft 365 doesn't support externalizing dependencies of SharePoint Framework projects of version ${this.projectVersion}. Supported versions are ${this.supportedVersions.join(', ')}`, SpfxProjectExternalizeCommand.ERROR_UNSUPPORTED_VERSION));
-      return;
+      throw new CommandError(`CLI for Microsoft 365 doesn't support externalizing dependencies of SharePoint Framework projects of version ${this.projectVersion}. Supported versions are ${this.supportedVersions.join(', ')}`, SpfxProjectExternalizeCommand.ERROR_UNSUPPORTED_VERSION);
     }
 
     if (this.verbose) {
@@ -101,18 +98,17 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
     }
 
     const asyncRulesResults = (rules as BasicDependencyRule[]).map(r => r.visit(project));
-    Promise
-      .all(asyncRulesResults)
-      .then((rulesResults) => {
-        this.allFindings.push(...rulesResults.map(x => x.entries).reduce((x, y) => [...x, ...y]));
-        this.allEditSuggestions.push(...rulesResults.map(x => x.suggestions).reduce((x, y) => [...x, ...y]));
-        //removing duplicates
-        this.allFindings = this.allFindings.filter((x, i) => this.allFindings.findIndex(y => y.key === x.key) === i);
-        this.writeReport(this.allFindings, this.allEditSuggestions, logger, args.options);
-        cb();
-      }).catch((err) => {
-        cb(new CommandError(err));
-      });
+    try {
+      const rulesResults = await Promise.all(asyncRulesResults);
+      this.allFindings.push(...rulesResults.map(x => x.entries).reduce((x, y) => [...x, ...y]));
+      this.allEditSuggestions.push(...rulesResults.map(x => x.suggestions).reduce((x, y) => [...x, ...y]));
+      //removing duplicates
+      this.allFindings = this.allFindings.filter((x, i) => this.allFindings.findIndex(y => y.key === x.key) === i);
+      this.writeReport(this.allFindings, this.allEditSuggestions, logger, args.options);
+    }
+    catch (err: any) {
+      throw new CommandError(err);
+    }
   }
 
   private writeReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[], logger: Logger, options: GlobalOptions): void {

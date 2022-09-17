@@ -134,7 +134,7 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('Retrieve posts for the specified conversation threadId of o365 group groupId in the tenant (verbose)', (done) => {
+  it('Retrieve posts for the specified conversation threadId of o365 group groupId in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/threads/AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E=/posts`) {
         return Promise.resolve(
@@ -144,25 +144,18 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         groupId: "00000000-0000-0000-0000-000000000000",
         threadId: "AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E="
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          jsonOutput.value
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      jsonOutput.value
+    ));
   });
-  it('Retrieve posts for the specified conversation threadId of o365 group groupDisplayName in the tenant (verbose)', (done) => {
+  it('Retrieve posts for the specified conversation threadId of o365 group groupDisplayName in the tenant (verbose)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
         return Promise.resolve({
@@ -182,45 +175,30 @@ describe(commands.O365GROUP_CONVERSATION_POST_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         verbose: true,
         groupDisplayName: "MyGroup",
         threadId: "AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E="
       }
-    }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          jsonOutput.value
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert(loggerLogSpy.calledWith(
+      jsonOutput.value
+    ));
   });
 
-  it('correctly handles error when listing posts', (done) => {
+  it('correctly handles error when listing posts', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, {
+    await assert.rejects(command.action(logger, {
       options: {
         debug: false,
         groupId: "00000000-0000-0000-0000-000000000000",
         threadId: "AAQkADkwN2Q2NDg1LWQ3ZGYtNDViZi1iNGRiLTVhYjJmN2Q5NDkxZQAQAOnRAfDf71lIvrdK85FAn5E="
       }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any), new CommandError('An error has occurred'));
   });
   it('supports debug mode', () => {
     const options = command.options;

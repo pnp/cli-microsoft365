@@ -53,28 +53,29 @@ class AadOAuth2GrantListCommand extends GraphCommand {
     );
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Retrieving list of OAuth grants for the service principal...`);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/oauth2PermissionGrants?$filter=clientId eq '${encodeURIComponent(args.options.spObjectId)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
+    try {
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/oauth2PermissionGrants?$filter=clientId eq '${encodeURIComponent(args.options.spObjectId)}'`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
 
-    request
-      .get<{ value: any[] }>(requestOptions)
-      .then((res: { value: any[] }): void => {
-        if (res.value && res.value.length > 0) {
-          logger.log(res.value);
-        }
+      const res = await request.get<{ value: any[] }>(requestOptions);
 
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      if (res.value && res.value.length > 0) {
+        logger.log(res.value);
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

@@ -94,7 +94,7 @@ describe(commands.APP_GET, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('retrieves information about the specified app using name (debug)', (done) => {
+  it('retrieves information about the specified app using name (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
@@ -107,18 +107,11 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, name: '5369f386-e380-46cb-82a4-4e18f9e4f3a7' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({ "name": "5369f386-e380-46cb-82a4-4e18f9e4f3a7", "id": "/providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7", "type": "Microsoft.PowerApps/apps", "tags": { "primaryDeviceWidth": "640", "primaryDeviceHeight": "1136", "sienaVersion": "20210118T125447Z-3.20123.24.0", "deviceCapabilities": "", "supportsPortrait": "true", "supportsLandscape": "false", "primaryFormFactor": "Phone", "publisherVersion": "3.20123.24", "minimumRequiredApiVersion": "2.2.0", "hasComponent": "false", "hasUnlockedComponent": "false", "isUnifiedRootApp": "false" }, "properties": { "appVersion": "2021-01-18T12:54:47Z", "createdByClientVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "minClientVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "owner": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "createdBy": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "lastModifiedBy": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "backgroundColor": "rgba(0, 176, 240, 1)", "backgroundImageUri": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/logoSmallFile?sv=2018-03-28&sr=c&sig=Y5OvBpqU9EXwpXthPre62%2B24zwCNS9ihPfCNmBmuXro%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "teamsColorIconUrl": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z7f1ae936e0c84483a435f047250f9a90/teamsColorIcon.png?sv=2018-03-28&sr=c&sig=ECrnlPPWWirepGA0BwPAfi3RDcNxugeuBajcE9DvJcI%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "teamsOutlineIconUrl": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z7f1ae936e0c84483a435f047250f9a90/teamsOutlineIcon.png?sv=2018-03-28&sr=c&sig=ECrnlPPWWirepGA0BwPAfi3RDcNxugeuBajcE9DvJcI%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "displayName": "App", "description": "test", "appUris": { "documentUri": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/document.msapp?sv=2018-03-28&sr=c&sig=bx4dLMgjOurFPWW%2FuanqlJlb1clSqH05cZDPgbEkEno%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/document.msapp?sv=2018-03-28&sr=c&sig=bx4dLMgjOurFPWW%2FuanqlJlb1clSqH05cZDPgbEkEno%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "imageUris": [] }, "createdTime": "2021-01-18T12:54:47.9591484Z", "lastModifiedTime": "2021-01-18T12:54:48.0998249Z", "sharedGroupsCount": 0, "sharedUsersCount": 0, "appOpenProtocolUri": "ms-apps:///providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7", "appOpenUri": "https://apps.powerapps.com/play/5369f386-e380-46cb-82a4-4e18f9e4f3a7?tenantId=2ca3eaa5-140f-4175-9563-1172edf9f339&hint=c67d9086-a429-45b8-8b19-91fab5174177", "connectionReferences": { "c189738b-6a2d-4713-939d-e2ed35101124": { "id": "/providers/microsoft.powerapps/apis/shared_sharepointonline", "displayName": "SharePoint", "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1431/1.0.1431.2301/sharepointonline/icon.png", "dataSources": ["ICT Aanvragen"], "dependencies": [], "dependents": [], "parameterHints": {}, "isOnPremiseConnection": false, "bypassConsent": false, "apiTier": "Standard", "isCustomApiConnection": false } }, "userAppMetadata": { "favorite": "NotSpecified", "includeInAppsList": true }, "isFeaturedApp": false, "bypassConsent": false, "isHeroApp": false, "environment": { "id": "/providers/Microsoft.PowerApps/environments/Default-2ca3eaa5-140f-4175-9563-1172edf9f339", "name": "Default-2ca3eaa5-140f-4175-9563-1172edf9f339" }, "appPackageDetails": { "playerPackage": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/player.msappk?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/player.msappk?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "webPackage": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/web/index.web.html?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/web/index.web.html?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "unauthenticatedWebPackage": { "value": "https://pafeblobprodam.blob.core.windows.net/alt20210118t000000z84a0aa047e784c87b15a6529a8f7ab50/20210118T125458Z/index.web.html" }, "documentServerVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "appPackageResourcesKind": "Split", "packagePropertiesJson": "{\"cdnUrl\":\"https://content.powerapps.com/resource/app\",\"preLoadIdx\":\"https://content.powerapps.com/resource/app/a5ccjkurht6g5/preloadindex.web.html\",\"id\":\"637465712959244709\",\"v\":2.1}" }, "almMode": "Environment", "performanceOptimizationEnabled": true, "unauthenticatedWebPackageHint": "c67d9086-a429-45b8-8b19-91fab5174177", "canConsumeAppPass": true, "executionRestrictions": { "isTeamsOnly": false, "dataLossPreventionEvaluationResult": { "status": "Compliant", "lastEvaluationDate": "2021-01-18T12:54:58.0824718Z", "violationDetails": [] } }, "appPlanClassification": "Standard", "usesPremiumApi": false, "usesOnlyGrandfatheredPremiumApis": true, "usesCustomApi": false, "usesOnPremiseGateway": false, "isCustomizable": true }, "isAppComponentLibrary": false, "appType": "ClassicCanvasApp", displayName: 'App', description: 'test', appVersion: '2021-01-18T12:54:47Z', owner: 'admin@contoso.com' }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, name: '5369f386-e380-46cb-82a4-4e18f9e4f3a7' } });
+    assert(loggerLogSpy.calledWith({ "name": "5369f386-e380-46cb-82a4-4e18f9e4f3a7", "id": "/providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7", "type": "Microsoft.PowerApps/apps", "tags": { "primaryDeviceWidth": "640", "primaryDeviceHeight": "1136", "sienaVersion": "20210118T125447Z-3.20123.24.0", "deviceCapabilities": "", "supportsPortrait": "true", "supportsLandscape": "false", "primaryFormFactor": "Phone", "publisherVersion": "3.20123.24", "minimumRequiredApiVersion": "2.2.0", "hasComponent": "false", "hasUnlockedComponent": "false", "isUnifiedRootApp": "false" }, "properties": { "appVersion": "2021-01-18T12:54:47Z", "createdByClientVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "minClientVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "owner": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "createdBy": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "lastModifiedBy": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "backgroundColor": "rgba(0, 176, 240, 1)", "backgroundImageUri": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/logoSmallFile?sv=2018-03-28&sr=c&sig=Y5OvBpqU9EXwpXthPre62%2B24zwCNS9ihPfCNmBmuXro%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "teamsColorIconUrl": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z7f1ae936e0c84483a435f047250f9a90/teamsColorIcon.png?sv=2018-03-28&sr=c&sig=ECrnlPPWWirepGA0BwPAfi3RDcNxugeuBajcE9DvJcI%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "teamsOutlineIconUrl": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z7f1ae936e0c84483a435f047250f9a90/teamsOutlineIcon.png?sv=2018-03-28&sr=c&sig=ECrnlPPWWirepGA0BwPAfi3RDcNxugeuBajcE9DvJcI%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "displayName": "App", "description": "test", "appUris": { "documentUri": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/document.msapp?sv=2018-03-28&sr=c&sig=bx4dLMgjOurFPWW%2FuanqlJlb1clSqH05cZDPgbEkEno%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/document.msapp?sv=2018-03-28&sr=c&sig=bx4dLMgjOurFPWW%2FuanqlJlb1clSqH05cZDPgbEkEno%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "imageUris": [] }, "createdTime": "2021-01-18T12:54:47.9591484Z", "lastModifiedTime": "2021-01-18T12:54:48.0998249Z", "sharedGroupsCount": 0, "sharedUsersCount": 0, "appOpenProtocolUri": "ms-apps:///providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7", "appOpenUri": "https://apps.powerapps.com/play/5369f386-e380-46cb-82a4-4e18f9e4f3a7?tenantId=2ca3eaa5-140f-4175-9563-1172edf9f339&hint=c67d9086-a429-45b8-8b19-91fab5174177", "connectionReferences": { "c189738b-6a2d-4713-939d-e2ed35101124": { "id": "/providers/microsoft.powerapps/apis/shared_sharepointonline", "displayName": "SharePoint", "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1431/1.0.1431.2301/sharepointonline/icon.png", "dataSources": ["ICT Aanvragen"], "dependencies": [], "dependents": [], "parameterHints": {}, "isOnPremiseConnection": false, "bypassConsent": false, "apiTier": "Standard", "isCustomApiConnection": false } }, "userAppMetadata": { "favorite": "NotSpecified", "includeInAppsList": true }, "isFeaturedApp": false, "bypassConsent": false, "isHeroApp": false, "environment": { "id": "/providers/Microsoft.PowerApps/environments/Default-2ca3eaa5-140f-4175-9563-1172edf9f339", "name": "Default-2ca3eaa5-140f-4175-9563-1172edf9f339" }, "appPackageDetails": { "playerPackage": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/player.msappk?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/player.msappk?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "webPackage": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/web/index.web.html?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/web/index.web.html?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "unauthenticatedWebPackage": { "value": "https://pafeblobprodam.blob.core.windows.net/alt20210118t000000z84a0aa047e784c87b15a6529a8f7ab50/20210118T125458Z/index.web.html" }, "documentServerVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "appPackageResourcesKind": "Split", "packagePropertiesJson": "{\"cdnUrl\":\"https://content.powerapps.com/resource/app\",\"preLoadIdx\":\"https://content.powerapps.com/resource/app/a5ccjkurht6g5/preloadindex.web.html\",\"id\":\"637465712959244709\",\"v\":2.1}" }, "almMode": "Environment", "performanceOptimizationEnabled": true, "unauthenticatedWebPackageHint": "c67d9086-a429-45b8-8b19-91fab5174177", "canConsumeAppPass": true, "executionRestrictions": { "isTeamsOnly": false, "dataLossPreventionEvaluationResult": { "status": "Compliant", "lastEvaluationDate": "2021-01-18T12:54:58.0824718Z", "violationDetails": [] } }, "appPlanClassification": "Standard", "usesPremiumApi": false, "usesOnlyGrandfatheredPremiumApis": true, "usesCustomApi": false, "usesOnPremiseGateway": false, "isCustomizable": true }, "isAppComponentLibrary": false, "appType": "ClassicCanvasApp", displayName: 'App', description: 'test', appVersion: '2021-01-18T12:54:47Z', owner: 'admin@contoso.com' }));
   });
 
-  it('retrieves information about the specified app using name', (done) => {
+  it('retrieves information about the specified app using name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
@@ -131,18 +124,11 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: '5369f386-e380-46cb-82a4-4e18f9e4f3a7' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({ "name": "5369f386-e380-46cb-82a4-4e18f9e4f3a7", "id": "/providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7", "type": "Microsoft.PowerApps/apps", "tags": { "primaryDeviceWidth": "640", "primaryDeviceHeight": "1136", "sienaVersion": "20210118T125447Z-3.20123.24.0", "deviceCapabilities": "", "supportsPortrait": "true", "supportsLandscape": "false", "primaryFormFactor": "Phone", "publisherVersion": "3.20123.24", "minimumRequiredApiVersion": "2.2.0", "hasComponent": "false", "hasUnlockedComponent": "false", "isUnifiedRootApp": "false" }, "properties": { "appVersion": "2021-01-18T12:54:47Z", "createdByClientVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "minClientVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "owner": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "createdBy": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "lastModifiedBy": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "backgroundColor": "rgba(0, 176, 240, 1)", "backgroundImageUri": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/logoSmallFile?sv=2018-03-28&sr=c&sig=Y5OvBpqU9EXwpXthPre62%2B24zwCNS9ihPfCNmBmuXro%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "teamsColorIconUrl": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z7f1ae936e0c84483a435f047250f9a90/teamsColorIcon.png?sv=2018-03-28&sr=c&sig=ECrnlPPWWirepGA0BwPAfi3RDcNxugeuBajcE9DvJcI%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "teamsOutlineIconUrl": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z7f1ae936e0c84483a435f047250f9a90/teamsOutlineIcon.png?sv=2018-03-28&sr=c&sig=ECrnlPPWWirepGA0BwPAfi3RDcNxugeuBajcE9DvJcI%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "displayName": "App", "description": "", "appUris": { "documentUri": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/document.msapp?sv=2018-03-28&sr=c&sig=bx4dLMgjOurFPWW%2FuanqlJlb1clSqH05cZDPgbEkEno%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/document.msapp?sv=2018-03-28&sr=c&sig=bx4dLMgjOurFPWW%2FuanqlJlb1clSqH05cZDPgbEkEno%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "imageUris": [] }, "createdTime": "2021-01-18T12:54:47.9591484Z", "lastModifiedTime": "2021-01-18T12:54:48.0998249Z", "sharedGroupsCount": 0, "sharedUsersCount": 0, "appOpenProtocolUri": "ms-apps:///providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7", "appOpenUri": "https://apps.powerapps.com/play/5369f386-e380-46cb-82a4-4e18f9e4f3a7?tenantId=2ca3eaa5-140f-4175-9563-1172edf9f339&hint=c67d9086-a429-45b8-8b19-91fab5174177", "connectionReferences": { "c189738b-6a2d-4713-939d-e2ed35101124": { "id": "/providers/microsoft.powerapps/apis/shared_sharepointonline", "displayName": "SharePoint", "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1431/1.0.1431.2301/sharepointonline/icon.png", "dataSources": ["ICT Aanvragen"], "dependencies": [], "dependents": [], "parameterHints": {}, "isOnPremiseConnection": false, "bypassConsent": false, "apiTier": "Standard", "isCustomApiConnection": false } }, "userAppMetadata": { "favorite": "NotSpecified", "includeInAppsList": true }, "isFeaturedApp": false, "bypassConsent": false, "isHeroApp": false, "environment": { "id": "/providers/Microsoft.PowerApps/environments/Default-2ca3eaa5-140f-4175-9563-1172edf9f339", "name": "Default-2ca3eaa5-140f-4175-9563-1172edf9f339" }, "appPackageDetails": { "playerPackage": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/player.msappk?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/player.msappk?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "webPackage": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/web/index.web.html?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/web/index.web.html?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "unauthenticatedWebPackage": { "value": "https://pafeblobprodam.blob.core.windows.net/alt20210118t000000z84a0aa047e784c87b15a6529a8f7ab50/20210118T125458Z/index.web.html" }, "documentServerVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "appPackageResourcesKind": "Split", "packagePropertiesJson": "{\"cdnUrl\":\"https://content.powerapps.com/resource/app\",\"preLoadIdx\":\"https://content.powerapps.com/resource/app/a5ccjkurht6g5/preloadindex.web.html\",\"id\":\"637465712959244709\",\"v\":2.1}" }, "almMode": "Environment", "performanceOptimizationEnabled": true, "unauthenticatedWebPackageHint": "c67d9086-a429-45b8-8b19-91fab5174177", "canConsumeAppPass": true, "executionRestrictions": { "isTeamsOnly": false, "dataLossPreventionEvaluationResult": { "status": "Compliant", "lastEvaluationDate": "2021-01-18T12:54:58.0824718Z", "violationDetails": [] } }, "appPlanClassification": "Standard", "usesPremiumApi": false, "usesOnlyGrandfatheredPremiumApis": true, "usesCustomApi": false, "usesOnPremiseGateway": false, "isCustomizable": true }, "isAppComponentLibrary": false, "appType": "ClassicCanvasApp", displayName: 'App', description: '', appVersion: '2021-01-18T12:54:47Z', owner: 'admin@contoso.com' }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, name: '5369f386-e380-46cb-82a4-4e18f9e4f3a7' } });
+    assert(loggerLogSpy.calledWith({ "name": "5369f386-e380-46cb-82a4-4e18f9e4f3a7", "id": "/providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7", "type": "Microsoft.PowerApps/apps", "tags": { "primaryDeviceWidth": "640", "primaryDeviceHeight": "1136", "sienaVersion": "20210118T125447Z-3.20123.24.0", "deviceCapabilities": "", "supportsPortrait": "true", "supportsLandscape": "false", "primaryFormFactor": "Phone", "publisherVersion": "3.20123.24", "minimumRequiredApiVersion": "2.2.0", "hasComponent": "false", "hasUnlockedComponent": "false", "isUnifiedRootApp": "false" }, "properties": { "appVersion": "2021-01-18T12:54:47Z", "createdByClientVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "minClientVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "owner": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "createdBy": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "lastModifiedBy": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "backgroundColor": "rgba(0, 176, 240, 1)", "backgroundImageUri": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/logoSmallFile?sv=2018-03-28&sr=c&sig=Y5OvBpqU9EXwpXthPre62%2B24zwCNS9ihPfCNmBmuXro%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "teamsColorIconUrl": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z7f1ae936e0c84483a435f047250f9a90/teamsColorIcon.png?sv=2018-03-28&sr=c&sig=ECrnlPPWWirepGA0BwPAfi3RDcNxugeuBajcE9DvJcI%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "teamsOutlineIconUrl": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z7f1ae936e0c84483a435f047250f9a90/teamsOutlineIcon.png?sv=2018-03-28&sr=c&sig=ECrnlPPWWirepGA0BwPAfi3RDcNxugeuBajcE9DvJcI%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "displayName": "App", "description": "", "appUris": { "documentUri": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/document.msapp?sv=2018-03-28&sr=c&sig=bx4dLMgjOurFPWW%2FuanqlJlb1clSqH05cZDPgbEkEno%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/document.msapp?sv=2018-03-28&sr=c&sig=bx4dLMgjOurFPWW%2FuanqlJlb1clSqH05cZDPgbEkEno%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "imageUris": [] }, "createdTime": "2021-01-18T12:54:47.9591484Z", "lastModifiedTime": "2021-01-18T12:54:48.0998249Z", "sharedGroupsCount": 0, "sharedUsersCount": 0, "appOpenProtocolUri": "ms-apps:///providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7", "appOpenUri": "https://apps.powerapps.com/play/5369f386-e380-46cb-82a4-4e18f9e4f3a7?tenantId=2ca3eaa5-140f-4175-9563-1172edf9f339&hint=c67d9086-a429-45b8-8b19-91fab5174177", "connectionReferences": { "c189738b-6a2d-4713-939d-e2ed35101124": { "id": "/providers/microsoft.powerapps/apis/shared_sharepointonline", "displayName": "SharePoint", "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1431/1.0.1431.2301/sharepointonline/icon.png", "dataSources": ["ICT Aanvragen"], "dependencies": [], "dependents": [], "parameterHints": {}, "isOnPremiseConnection": false, "bypassConsent": false, "apiTier": "Standard", "isCustomApiConnection": false } }, "userAppMetadata": { "favorite": "NotSpecified", "includeInAppsList": true }, "isFeaturedApp": false, "bypassConsent": false, "isHeroApp": false, "environment": { "id": "/providers/Microsoft.PowerApps/environments/Default-2ca3eaa5-140f-4175-9563-1172edf9f339", "name": "Default-2ca3eaa5-140f-4175-9563-1172edf9f339" }, "appPackageDetails": { "playerPackage": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/player.msappk?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/player.msappk?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "webPackage": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/web/index.web.html?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/web/index.web.html?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "unauthenticatedWebPackage": { "value": "https://pafeblobprodam.blob.core.windows.net/alt20210118t000000z84a0aa047e784c87b15a6529a8f7ab50/20210118T125458Z/index.web.html" }, "documentServerVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "appPackageResourcesKind": "Split", "packagePropertiesJson": "{\"cdnUrl\":\"https://content.powerapps.com/resource/app\",\"preLoadIdx\":\"https://content.powerapps.com/resource/app/a5ccjkurht6g5/preloadindex.web.html\",\"id\":\"637465712959244709\",\"v\":2.1}" }, "almMode": "Environment", "performanceOptimizationEnabled": true, "unauthenticatedWebPackageHint": "c67d9086-a429-45b8-8b19-91fab5174177", "canConsumeAppPass": true, "executionRestrictions": { "isTeamsOnly": false, "dataLossPreventionEvaluationResult": { "status": "Compliant", "lastEvaluationDate": "2021-01-18T12:54:58.0824718Z", "violationDetails": [] } }, "appPlanClassification": "Standard", "usesPremiumApi": false, "usesOnlyGrandfatheredPremiumApis": true, "usesCustomApi": false, "usesOnPremiseGateway": false, "isCustomizable": true }, "isAppComponentLibrary": false, "appType": "ClassicCanvasApp", displayName: 'App', description: '', appVersion: '2021-01-18T12:54:47Z', owner: 'admin@contoso.com' }));
   });
 
-  it(`retrieves information about the specified app using displayName`, (done) => {
+  it(`retrieves information about the specified app using displayName`, async () => {
     const apps = [
       {
         "name": "4d4bb961-eef9-4258-8516-aa8d64e6b477",
@@ -618,181 +604,174 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, displayName: 'Playwright' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          {
-            "name": "f581c872-9852-4100-8e25-3d6891595204",
-            "id": "/providers/Microsoft.PowerApps/apps/f581c872-9852-4100-8e25-3d6891595204",
-            "type": "Microsoft.PowerApps/apps",
-            "tags": {
-              "primaryDeviceWidth": "640",
-              "primaryDeviceHeight": "1136",
-              "sienaVersion": "20200812T204016Z-3.20074.20.0",
-              "deviceCapabilities": "",
-              "supportsPortrait": "true",
-              "supportsLandscape": "false",
-              "primaryFormFactor": "Phone",
-              "publisherVersion": "3.20074.20",
-              "minimumRequiredApiVersion": "2.2.0",
-              "hasComponent": "false",
-              "hasUnlockedComponent": "false",
-              "isUnifiedRootApp": "false"
+    await command.action(logger, { options: { debug: false, displayName: 'Playwright' } });
+    assert(loggerLogSpy.calledWith(
+      {
+        "name": "f581c872-9852-4100-8e25-3d6891595204",
+        "id": "/providers/Microsoft.PowerApps/apps/f581c872-9852-4100-8e25-3d6891595204",
+        "type": "Microsoft.PowerApps/apps",
+        "tags": {
+          "primaryDeviceWidth": "640",
+          "primaryDeviceHeight": "1136",
+          "sienaVersion": "20200812T204016Z-3.20074.20.0",
+          "deviceCapabilities": "",
+          "supportsPortrait": "true",
+          "supportsLandscape": "false",
+          "primaryFormFactor": "Phone",
+          "publisherVersion": "3.20074.20",
+          "minimumRequiredApiVersion": "2.2.0",
+          "hasComponent": "false",
+          "hasUnlockedComponent": "false",
+          "isUnifiedRootApp": "false"
+        },
+        "properties": {
+          "appVersion": "2020-08-12T20:40:16Z",
+          "lastDraftVersion": "2020-08-12T20:40:16Z",
+          "lifeCycleId": "Published",
+          "status": "Ready",
+          "createdByClientVersion": {
+            "major": 3,
+            "minor": 20074,
+            "build": 20,
+            "revision": 0,
+            "majorRevision": 0,
+            "minorRevision": 0
+          },
+          "minClientVersion": {
+            "major": 3,
+            "minor": 20074,
+            "build": 20,
+            "revision": 0,
+            "majorRevision": 0,
+            "minorRevision": 0
+          },
+          "owner": {
+            "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
+            "displayName": "Garry Trinder",
+            "email": "garry@trinder365dev.onmicrosoft.com",
+            "type": "User",
+            "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
+            "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
+          },
+          "createdBy": {
+            "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
+            "displayName": "Garry Trinder",
+            "email": "garry@trinder365dev.onmicrosoft.com",
+            "type": "User",
+            "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
+            "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
+          },
+          "lastModifiedBy": {
+            "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
+            "displayName": "Garry Trinder",
+            "email": "garry@trinder365dev.onmicrosoft.com",
+            "type": "User",
+            "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
+            "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
+          },
+          "lastPublishedBy": {
+            "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
+            "displayName": "Garry Trinder",
+            "email": "garry@trinder365dev.onmicrosoft.com",
+            "type": "User",
+            "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
+            "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
+          },
+          "backgroundColor": "rgba(0, 176, 240, 1)",
+          "backgroundImageUri": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z1766ec3fd78941bea695c957e898a62a/logoSmallFile?sv=2018-03-28&sr=c&sig=sqK6%2FXY4cHidwE%2Brb3JoBV3bNToOaA6EM3%2FczbWMQDc%3D&se=2020-10-05T18%3A56%3A46Z&sp=rl",
+          "teamsColorIconUrl": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/teamsColorIcon.png?sv=2018-03-28&sr=c&sig=UYs6LV%2BGqPjfNczXP80lm%2BmG1ebFNcLCF0D8MIJ6Lt8%3D&se=2020-10-05T18%3A56%3A46Z&sp=rl",
+          "teamsOutlineIconUrl": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/teamsOutlineIcon.png?sv=2018-03-28&sr=c&sig=UYs6LV%2BGqPjfNczXP80lm%2BmG1ebFNcLCF0D8MIJ6Lt8%3D&se=2020-10-05T18%3A56%3A46Z&sp=rl",
+          "displayName": "Playwright",
+          "description": "",
+          "commitMessage": "",
+          "appUris": {
+            "documentUri": {
+              "value": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z1766ec3fd78941bea695c957e898a62a/document.msapp?sv=2018-03-28&sr=c&sig=aToV3yl8gK0eiAPsh3DIxo3VC77OyLrZgYo2G%2BYXDgI%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
+              "readonlyValue": "https://pafeblobprodln-secondary.blob.core.windows.net/20200812t000000z1766ec3fd78941bea695c957e898a62a/document.msapp?sv=2018-03-28&sr=c&sig=aToV3yl8gK0eiAPsh3DIxo3VC77OyLrZgYo2G%2BYXDgI%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl"
             },
-            "properties": {
-              "appVersion": "2020-08-12T20:40:16Z",
-              "lastDraftVersion": "2020-08-12T20:40:16Z",
-              "lifeCycleId": "Published",
-              "status": "Ready",
-              "createdByClientVersion": {
-                "major": 3,
-                "minor": 20074,
-                "build": 20,
-                "revision": 0,
-                "majorRevision": 0,
-                "minorRevision": 0
-              },
-              "minClientVersion": {
-                "major": 3,
-                "minor": 20074,
-                "build": 20,
-                "revision": 0,
-                "majorRevision": 0,
-                "minorRevision": 0
-              },
-              "owner": {
-                "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
-                "displayName": "Garry Trinder",
-                "email": "garry@trinder365dev.onmicrosoft.com",
-                "type": "User",
-                "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
-                "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
-              },
-              "createdBy": {
-                "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
-                "displayName": "Garry Trinder",
-                "email": "garry@trinder365dev.onmicrosoft.com",
-                "type": "User",
-                "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
-                "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
-              },
-              "lastModifiedBy": {
-                "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
-                "displayName": "Garry Trinder",
-                "email": "garry@trinder365dev.onmicrosoft.com",
-                "type": "User",
-                "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
-                "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
-              },
-              "lastPublishedBy": {
-                "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
-                "displayName": "Garry Trinder",
-                "email": "garry@trinder365dev.onmicrosoft.com",
-                "type": "User",
-                "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
-                "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
-              },
-              "backgroundColor": "rgba(0, 176, 240, 1)",
-              "backgroundImageUri": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z1766ec3fd78941bea695c957e898a62a/logoSmallFile?sv=2018-03-28&sr=c&sig=sqK6%2FXY4cHidwE%2Brb3JoBV3bNToOaA6EM3%2FczbWMQDc%3D&se=2020-10-05T18%3A56%3A46Z&sp=rl",
-              "teamsColorIconUrl": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/teamsColorIcon.png?sv=2018-03-28&sr=c&sig=UYs6LV%2BGqPjfNczXP80lm%2BmG1ebFNcLCF0D8MIJ6Lt8%3D&se=2020-10-05T18%3A56%3A46Z&sp=rl",
-              "teamsOutlineIconUrl": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/teamsOutlineIcon.png?sv=2018-03-28&sr=c&sig=UYs6LV%2BGqPjfNczXP80lm%2BmG1ebFNcLCF0D8MIJ6Lt8%3D&se=2020-10-05T18%3A56%3A46Z&sp=rl",
-              "displayName": "Playwright",
-              "description": "",
-              "commitMessage": "",
-              "appUris": {
-                "documentUri": {
-                  "value": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z1766ec3fd78941bea695c957e898a62a/document.msapp?sv=2018-03-28&sr=c&sig=aToV3yl8gK0eiAPsh3DIxo3VC77OyLrZgYo2G%2BYXDgI%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
-                  "readonlyValue": "https://pafeblobprodln-secondary.blob.core.windows.net/20200812t000000z1766ec3fd78941bea695c957e898a62a/document.msapp?sv=2018-03-28&sr=c&sig=aToV3yl8gK0eiAPsh3DIxo3VC77OyLrZgYo2G%2BYXDgI%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl"
-                },
-                "imageUris": []
-              },
-              "createdTime": "2020-08-10T23:28:41.8191546Z",
-              "lastModifiedTime": "2020-08-12T20:40:20.3706202Z",
-              "lastPublishTime": "2020-08-12T20:40:20.3706202Z",
-              "sharedGroupsCount": 0,
-              "sharedUsersCount": 0,
-              "appOpenProtocolUri": "ms-apps:///providers/Microsoft.PowerApps/apps/f581c872-9852-4100-8e25-3d6891595204",
-              "appOpenUri": "https://apps.powerapps.com/play/f581c872-9852-4100-8e25-3d6891595204?tenantId=e8954f17-a373-4b61-b54d-45c038fe3188",
-              "connectionReferences": {
-                "dd1ebcc1-9930-4e87-a680-45fb1eaf94e6": {
-                  "id": "/providers/microsoft.powerapps/apis/shared_office365users",
-                  "displayName": "Office 365 Users",
-                  "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1381/1.0.1381.2096/office365users/icon.png",
-                  "dataSources": [
-                    "Office365Users"
-                  ],
-                  "dependencies": [],
-                  "dependents": [],
-                  "isOnPremiseConnection": false,
-                  "bypassConsent": false,
-                  "dataSets": {},
-                  "apiTier": "Standard",
-                  "isCustomApiConnection": false
-                }
-              },
-              "userAppMetadata": {
-                "favorite": "NotSpecified",
-                "lastOpenedTime": "2020-08-13T23:26:44.2982102Z",
-                "includeInAppsList": true
-              },
-              "isFeaturedApp": false,
+            "imageUris": []
+          },
+          "createdTime": "2020-08-10T23:28:41.8191546Z",
+          "lastModifiedTime": "2020-08-12T20:40:20.3706202Z",
+          "lastPublishTime": "2020-08-12T20:40:20.3706202Z",
+          "sharedGroupsCount": 0,
+          "sharedUsersCount": 0,
+          "appOpenProtocolUri": "ms-apps:///providers/Microsoft.PowerApps/apps/f581c872-9852-4100-8e25-3d6891595204",
+          "appOpenUri": "https://apps.powerapps.com/play/f581c872-9852-4100-8e25-3d6891595204?tenantId=e8954f17-a373-4b61-b54d-45c038fe3188",
+          "connectionReferences": {
+            "dd1ebcc1-9930-4e87-a680-45fb1eaf94e6": {
+              "id": "/providers/microsoft.powerapps/apis/shared_office365users",
+              "displayName": "Office 365 Users",
+              "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1381/1.0.1381.2096/office365users/icon.png",
+              "dataSources": [
+                "Office365Users"
+              ],
+              "dependencies": [],
+              "dependents": [],
+              "isOnPremiseConnection": false,
               "bypassConsent": false,
-              "isHeroApp": false,
-              "environment": {
-                "id": "/providers/Microsoft.PowerApps/environments/Default-e8954f17-a373-4b61-b54d-45c038fe3188",
-                "name": "Default-e8954f17-a373-4b61-b54d-45c038fe3188"
-              },
-              "appPackageDetails": {
-                "playerPackage": {
-                  "value": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/player.msappk?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
-                  "readonlyValue": "https://pafeblobprodln-secondary.blob.core.windows.net/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/player.msappk?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
-                  "sizeInBytes": 0
-                },
-                "webPackage": {
-                  "value": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/web/index.web.html?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
-                  "readonlyValue": "https://pafeblobprodln-secondary.blob.core.windows.net/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/web/index.web.html?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl"
-                },
-                "unauthenticatedWebPackage": {
-                  "value": "https://pafeblobprodln.blob.core.windows.net/alt20200810t000000zc57cd52652b24a1eb573f7b2a36a10a9/20200812T204028Z/index.web.html"
-                },
-                "documentServerVersion": {
-                  "major": 3,
-                  "minor": 20074,
-                  "build": 20,
-                  "revision": 0,
-                  "majorRevision": 0,
-                  "minorRevision": 0
-                },
-                "appPackageResourcesKind": "Split",
-                "packagePropertiesJson": "{\"cdnUrl\":\"https://content.powerapps.com/resource/app\",\"preLoadIdx\":\"https://content.powerapps.com/resource/app/4g3nunecadgk9/preloadindex.web.html\",\"id\":\"637328616254057865\",\"v\":2.1}"
-              },
-              "almMode": "Environment",
-              "performanceOptimizationEnabled": true,
-              "unauthenticatedWebPackageHint": "1eef5df9-6032-459c-9194-77d926b11f37",
-              "canConsumeAppPass": true,
-              "appPlanClassification": "Standard",
-              "usesPremiumApi": false,
-              "usesOnlyGrandfatheredPremiumApis": true,
-              "usesCustomApi": false,
-              "usesOnPremiseGateway": false
+              "dataSets": {},
+              "apiTier": "Standard",
+              "isCustomApiConnection": false
+            }
+          },
+          "userAppMetadata": {
+            "favorite": "NotSpecified",
+            "lastOpenedTime": "2020-08-13T23:26:44.2982102Z",
+            "includeInAppsList": true
+          },
+          "isFeaturedApp": false,
+          "bypassConsent": false,
+          "isHeroApp": false,
+          "environment": {
+            "id": "/providers/Microsoft.PowerApps/environments/Default-e8954f17-a373-4b61-b54d-45c038fe3188",
+            "name": "Default-e8954f17-a373-4b61-b54d-45c038fe3188"
+          },
+          "appPackageDetails": {
+            "playerPackage": {
+              "value": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/player.msappk?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
+              "readonlyValue": "https://pafeblobprodln-secondary.blob.core.windows.net/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/player.msappk?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
+              "sizeInBytes": 0
             },
-            "isAppComponentLibrary": false,
-            "appType": "ClassicCanvasApp",
-            "displayName": "Playwright",
-            "description": "",
-            "appVersion": "2020-08-12T20:40:16Z",
-            "owner": "garry@trinder365dev.onmicrosoft.com"
-          }
-        ));
-        done();
+            "webPackage": {
+              "value": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/web/index.web.html?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
+              "readonlyValue": "https://pafeblobprodln-secondary.blob.core.windows.net/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/web/index.web.html?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl"
+            },
+            "unauthenticatedWebPackage": {
+              "value": "https://pafeblobprodln.blob.core.windows.net/alt20200810t000000zc57cd52652b24a1eb573f7b2a36a10a9/20200812T204028Z/index.web.html"
+            },
+            "documentServerVersion": {
+              "major": 3,
+              "minor": 20074,
+              "build": 20,
+              "revision": 0,
+              "majorRevision": 0,
+              "minorRevision": 0
+            },
+            "appPackageResourcesKind": "Split",
+            "packagePropertiesJson": "{\"cdnUrl\":\"https://content.powerapps.com/resource/app\",\"preLoadIdx\":\"https://content.powerapps.com/resource/app/4g3nunecadgk9/preloadindex.web.html\",\"id\":\"637328616254057865\",\"v\":2.1}"
+          },
+          "almMode": "Environment",
+          "performanceOptimizationEnabled": true,
+          "unauthenticatedWebPackageHint": "1eef5df9-6032-459c-9194-77d926b11f37",
+          "canConsumeAppPass": true,
+          "appPlanClassification": "Standard",
+          "usesPremiumApi": false,
+          "usesOnlyGrandfatheredPremiumApis": true,
+          "usesCustomApi": false,
+          "usesOnPremiseGateway": false
+        },
+        "isAppComponentLibrary": false,
+        "appType": "ClassicCanvasApp",
+        "displayName": "Playwright",
+        "description": "",
+        "appVersion": "2020-08-12T20:40:16Z",
+        "owner": "garry@trinder365dev.onmicrosoft.com"
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ));
   });
 
-  it('renders empty string for missing properties using name', (done) => {
+  it('renders empty string for missing properties using name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
@@ -805,18 +784,11 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, name: '5369f386-e380-46cb-82a4-4e18f9e4f3a7' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith({ "name": "5369f386-e380-46cb-82a4-4e18f9e4f3a7", "id": "/providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7", "type": "Microsoft.PowerApps/apps", "tags": { "primaryDeviceWidth": "640", "primaryDeviceHeight": "1136", "sienaVersion": "20210118T125447Z-3.20123.24.0", "deviceCapabilities": "", "supportsPortrait": "true", "supportsLandscape": "false", "primaryFormFactor": "Phone", "publisherVersion": "3.20123.24", "minimumRequiredApiVersion": "2.2.0", "hasComponent": "false", "hasUnlockedComponent": "false", "isUnifiedRootApp": "false" }, "properties": { "appVersion": "2021-01-18T12:54:47Z", "createdByClientVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "minClientVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "owner": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "createdBy": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "lastModifiedBy": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "backgroundColor": "rgba(0, 176, 240, 1)", "backgroundImageUri": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/logoSmallFile?sv=2018-03-28&sr=c&sig=Y5OvBpqU9EXwpXthPre62%2B24zwCNS9ihPfCNmBmuXro%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "teamsColorIconUrl": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z7f1ae936e0c84483a435f047250f9a90/teamsColorIcon.png?sv=2018-03-28&sr=c&sig=ECrnlPPWWirepGA0BwPAfi3RDcNxugeuBajcE9DvJcI%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "teamsOutlineIconUrl": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z7f1ae936e0c84483a435f047250f9a90/teamsOutlineIcon.png?sv=2018-03-28&sr=c&sig=ECrnlPPWWirepGA0BwPAfi3RDcNxugeuBajcE9DvJcI%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "displayName": "App", "description": "", "appUris": { "documentUri": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/document.msapp?sv=2018-03-28&sr=c&sig=bx4dLMgjOurFPWW%2FuanqlJlb1clSqH05cZDPgbEkEno%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/document.msapp?sv=2018-03-28&sr=c&sig=bx4dLMgjOurFPWW%2FuanqlJlb1clSqH05cZDPgbEkEno%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "imageUris": [] }, "createdTime": "2021-01-18T12:54:47.9591484Z", "lastModifiedTime": "2021-01-18T12:54:48.0998249Z", "sharedGroupsCount": 0, "sharedUsersCount": 0, "appOpenProtocolUri": "ms-apps:///providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7", "appOpenUri": "https://apps.powerapps.com/play/5369f386-e380-46cb-82a4-4e18f9e4f3a7?tenantId=2ca3eaa5-140f-4175-9563-1172edf9f339&hint=c67d9086-a429-45b8-8b19-91fab5174177", "connectionReferences": { "c189738b-6a2d-4713-939d-e2ed35101124": { "id": "/providers/microsoft.powerapps/apis/shared_sharepointonline", "displayName": "SharePoint", "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1431/1.0.1431.2301/sharepointonline/icon.png", "dataSources": ["ICT Aanvragen"], "dependencies": [], "dependents": [], "parameterHints": {}, "isOnPremiseConnection": false, "bypassConsent": false, "apiTier": "Standard", "isCustomApiConnection": false } }, "userAppMetadata": { "favorite": "NotSpecified", "includeInAppsList": true }, "isFeaturedApp": false, "bypassConsent": false, "isHeroApp": false, "environment": { "id": "/providers/Microsoft.PowerApps/environments/Default-2ca3eaa5-140f-4175-9563-1172edf9f339", "name": "Default-2ca3eaa5-140f-4175-9563-1172edf9f339" }, "appPackageDetails": { "playerPackage": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/player.msappk?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/player.msappk?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "webPackage": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/web/index.web.html?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/web/index.web.html?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "unauthenticatedWebPackage": { "value": "https://pafeblobprodam.blob.core.windows.net/alt20210118t000000z84a0aa047e784c87b15a6529a8f7ab50/20210118T125458Z/index.web.html" }, "documentServerVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "appPackageResourcesKind": "Split", "packagePropertiesJson": "{\"cdnUrl\":\"https://content.powerapps.com/resource/app\",\"preLoadIdx\":\"https://content.powerapps.com/resource/app/a5ccjkurht6g5/preloadindex.web.html\",\"id\":\"637465712959244709\",\"v\":2.1}" }, "almMode": "Environment", "performanceOptimizationEnabled": true, "unauthenticatedWebPackageHint": "c67d9086-a429-45b8-8b19-91fab5174177", "canConsumeAppPass": true, "executionRestrictions": { "isTeamsOnly": false, "dataLossPreventionEvaluationResult": { "status": "Compliant", "lastEvaluationDate": "2021-01-18T12:54:58.0824718Z", "violationDetails": [] } }, "appPlanClassification": "Standard", "usesPremiumApi": false, "usesOnlyGrandfatheredPremiumApis": true, "usesCustomApi": false, "usesOnPremiseGateway": false, "isCustomizable": true }, "isAppComponentLibrary": false, "appType": "ClassicCanvasApp", displayName: 'App', description: '', appVersion: '2021-01-18T12:54:47Z', owner: '' }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, name: '5369f386-e380-46cb-82a4-4e18f9e4f3a7' } });
+    assert(loggerLogSpy.calledWith({ "name": "5369f386-e380-46cb-82a4-4e18f9e4f3a7", "id": "/providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7", "type": "Microsoft.PowerApps/apps", "tags": { "primaryDeviceWidth": "640", "primaryDeviceHeight": "1136", "sienaVersion": "20210118T125447Z-3.20123.24.0", "deviceCapabilities": "", "supportsPortrait": "true", "supportsLandscape": "false", "primaryFormFactor": "Phone", "publisherVersion": "3.20123.24", "minimumRequiredApiVersion": "2.2.0", "hasComponent": "false", "hasUnlockedComponent": "false", "isUnifiedRootApp": "false" }, "properties": { "appVersion": "2021-01-18T12:54:47Z", "createdByClientVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "minClientVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "owner": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "createdBy": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "lastModifiedBy": { "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e", "displayName": "Contoso Admin", "email": "admin@contoso.com", "type": "User", "tenantId": "2ca3eaa5-140f-4175-9563-1172edf9f339", "userPrincipalName": "admin@contoso.com" }, "backgroundColor": "rgba(0, 176, 240, 1)", "backgroundImageUri": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/logoSmallFile?sv=2018-03-28&sr=c&sig=Y5OvBpqU9EXwpXthPre62%2B24zwCNS9ihPfCNmBmuXro%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "teamsColorIconUrl": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z7f1ae936e0c84483a435f047250f9a90/teamsColorIcon.png?sv=2018-03-28&sr=c&sig=ECrnlPPWWirepGA0BwPAfi3RDcNxugeuBajcE9DvJcI%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "teamsOutlineIconUrl": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z7f1ae936e0c84483a435f047250f9a90/teamsOutlineIcon.png?sv=2018-03-28&sr=c&sig=ECrnlPPWWirepGA0BwPAfi3RDcNxugeuBajcE9DvJcI%3D&se=2021-04-03T02%3A12%3A49Z&sp=rl", "displayName": "App", "description": "", "appUris": { "documentUri": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/document.msapp?sv=2018-03-28&sr=c&sig=bx4dLMgjOurFPWW%2FuanqlJlb1clSqH05cZDPgbEkEno%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z6c2a80eb28694f6d8ded45d116516cfe/document.msapp?sv=2018-03-28&sr=c&sig=bx4dLMgjOurFPWW%2FuanqlJlb1clSqH05cZDPgbEkEno%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "imageUris": [] }, "createdTime": "2021-01-18T12:54:47.9591484Z", "lastModifiedTime": "2021-01-18T12:54:48.0998249Z", "sharedGroupsCount": 0, "sharedUsersCount": 0, "appOpenProtocolUri": "ms-apps:///providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7", "appOpenUri": "https://apps.powerapps.com/play/5369f386-e380-46cb-82a4-4e18f9e4f3a7?tenantId=2ca3eaa5-140f-4175-9563-1172edf9f339&hint=c67d9086-a429-45b8-8b19-91fab5174177", "connectionReferences": { "c189738b-6a2d-4713-939d-e2ed35101124": { "id": "/providers/microsoft.powerapps/apis/shared_sharepointonline", "displayName": "SharePoint", "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1431/1.0.1431.2301/sharepointonline/icon.png", "dataSources": ["ICT Aanvragen"], "dependencies": [], "dependents": [], "parameterHints": {}, "isOnPremiseConnection": false, "bypassConsent": false, "apiTier": "Standard", "isCustomApiConnection": false } }, "userAppMetadata": { "favorite": "NotSpecified", "includeInAppsList": true }, "isFeaturedApp": false, "bypassConsent": false, "isHeroApp": false, "environment": { "id": "/providers/Microsoft.PowerApps/environments/Default-2ca3eaa5-140f-4175-9563-1172edf9f339", "name": "Default-2ca3eaa5-140f-4175-9563-1172edf9f339" }, "appPackageDetails": { "playerPackage": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/player.msappk?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/player.msappk?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "webPackage": { "value": "https://pafeblobprodam.blob.core.windows.net:443/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/web/index.web.html?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl", "readonlyValue": "https://pafeblobprodam-secondary.blob.core.windows.net/20210118t000000z1e14514d87e148ef915413781752b174/bda64b54-eb93-4ca8-b1a7-d6f85536c985/web/index.web.html?sv=2018-03-28&sr=c&sig=TwHX9CQJk8KEC6sjIWvYkMJ60v7jY%2FH534DYfL7tyAw%3D&se=2021-02-17T00%3A00%3A00Z&sp=rl" }, "unauthenticatedWebPackage": { "value": "https://pafeblobprodam.blob.core.windows.net/alt20210118t000000z84a0aa047e784c87b15a6529a8f7ab50/20210118T125458Z/index.web.html" }, "documentServerVersion": { "major": 3, "minor": 20123, "build": 24, "revision": 0, "majorRevision": 0, "minorRevision": 0 }, "appPackageResourcesKind": "Split", "packagePropertiesJson": "{\"cdnUrl\":\"https://content.powerapps.com/resource/app\",\"preLoadIdx\":\"https://content.powerapps.com/resource/app/a5ccjkurht6g5/preloadindex.web.html\",\"id\":\"637465712959244709\",\"v\":2.1}" }, "almMode": "Environment", "performanceOptimizationEnabled": true, "unauthenticatedWebPackageHint": "c67d9086-a429-45b8-8b19-91fab5174177", "canConsumeAppPass": true, "executionRestrictions": { "isTeamsOnly": false, "dataLossPreventionEvaluationResult": { "status": "Compliant", "lastEvaluationDate": "2021-01-18T12:54:58.0824718Z", "violationDetails": [] } }, "appPlanClassification": "Standard", "usesPremiumApi": false, "usesOnlyGrandfatheredPremiumApis": true, "usesCustomApi": false, "usesOnPremiseGateway": false, "isCustomizable": true }, "isAppComponentLibrary": false, "appType": "ClassicCanvasApp", displayName: 'App', description: '', appVersion: '2021-01-18T12:54:47Z', owner: '' }));
   });
 
-  it('renders empty string for missing properties using displayName', (done) => {
+  it('renders empty string for missing properties using displayName', async () => {
     const apps = [
       {
         "name": "4d4bb961-eef9-4258-8516-aa8d64e6b477",
@@ -1292,181 +1264,174 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, displayName: 'Playwright' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(
-          {
-            "name": "f581c872-9852-4100-8e25-3d6891595204",
-            "id": "/providers/Microsoft.PowerApps/apps/f581c872-9852-4100-8e25-3d6891595204",
-            "type": "Microsoft.PowerApps/apps",
-            "tags": {
-              "primaryDeviceWidth": "640",
-              "primaryDeviceHeight": "1136",
-              "sienaVersion": "20200812T204016Z-3.20074.20.0",
-              "deviceCapabilities": "",
-              "supportsPortrait": "true",
-              "supportsLandscape": "false",
-              "primaryFormFactor": "Phone",
-              "publisherVersion": "3.20074.20",
-              "minimumRequiredApiVersion": "2.2.0",
-              "hasComponent": "false",
-              "hasUnlockedComponent": "false",
-              "isUnifiedRootApp": "false"
+    await command.action(logger, { options: { debug: false, displayName: 'Playwright' } });
+    assert(loggerLogSpy.calledWith(
+      {
+        "name": "f581c872-9852-4100-8e25-3d6891595204",
+        "id": "/providers/Microsoft.PowerApps/apps/f581c872-9852-4100-8e25-3d6891595204",
+        "type": "Microsoft.PowerApps/apps",
+        "tags": {
+          "primaryDeviceWidth": "640",
+          "primaryDeviceHeight": "1136",
+          "sienaVersion": "20200812T204016Z-3.20074.20.0",
+          "deviceCapabilities": "",
+          "supportsPortrait": "true",
+          "supportsLandscape": "false",
+          "primaryFormFactor": "Phone",
+          "publisherVersion": "3.20074.20",
+          "minimumRequiredApiVersion": "2.2.0",
+          "hasComponent": "false",
+          "hasUnlockedComponent": "false",
+          "isUnifiedRootApp": "false"
+        },
+        "properties": {
+          "appVersion": "2020-08-12T20:40:16Z",
+          "lastDraftVersion": "2020-08-12T20:40:16Z",
+          "lifeCycleId": "Published",
+          "status": "Ready",
+          "createdByClientVersion": {
+            "major": 3,
+            "minor": 20074,
+            "build": 20,
+            "revision": 0,
+            "majorRevision": 0,
+            "minorRevision": 0
+          },
+          "minClientVersion": {
+            "major": 3,
+            "minor": 20074,
+            "build": 20,
+            "revision": 0,
+            "majorRevision": 0,
+            "minorRevision": 0
+          },
+          "owner": {
+            "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
+            "displayName": "Garry Trinder",
+            "email": "",
+            "type": "User",
+            "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
+            "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
+          },
+          "createdBy": {
+            "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
+            "displayName": "Garry Trinder",
+            "email": "",
+            "type": "User",
+            "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
+            "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
+          },
+          "lastModifiedBy": {
+            "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
+            "displayName": "Garry Trinder",
+            "email": "",
+            "type": "User",
+            "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
+            "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
+          },
+          "lastPublishedBy": {
+            "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
+            "displayName": "Garry Trinder",
+            "email": "",
+            "type": "User",
+            "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
+            "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
+          },
+          "backgroundColor": "rgba(0, 176, 240, 1)",
+          "backgroundImageUri": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z1766ec3fd78941bea695c957e898a62a/logoSmallFile?sv=2018-03-28&sr=c&sig=sqK6%2FXY4cHidwE%2Brb3JoBV3bNToOaA6EM3%2FczbWMQDc%3D&se=2020-10-05T18%3A56%3A46Z&sp=rl",
+          "teamsColorIconUrl": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/teamsColorIcon.png?sv=2018-03-28&sr=c&sig=UYs6LV%2BGqPjfNczXP80lm%2BmG1ebFNcLCF0D8MIJ6Lt8%3D&se=2020-10-05T18%3A56%3A46Z&sp=rl",
+          "teamsOutlineIconUrl": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/teamsOutlineIcon.png?sv=2018-03-28&sr=c&sig=UYs6LV%2BGqPjfNczXP80lm%2BmG1ebFNcLCF0D8MIJ6Lt8%3D&se=2020-10-05T18%3A56%3A46Z&sp=rl",
+          "displayName": "Playwright",
+          "description": "",
+          "commitMessage": "",
+          "appUris": {
+            "documentUri": {
+              "value": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z1766ec3fd78941bea695c957e898a62a/document.msapp?sv=2018-03-28&sr=c&sig=aToV3yl8gK0eiAPsh3DIxo3VC77OyLrZgYo2G%2BYXDgI%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
+              "readonlyValue": "https://pafeblobprodln-secondary.blob.core.windows.net/20200812t000000z1766ec3fd78941bea695c957e898a62a/document.msapp?sv=2018-03-28&sr=c&sig=aToV3yl8gK0eiAPsh3DIxo3VC77OyLrZgYo2G%2BYXDgI%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl"
             },
-            "properties": {
-              "appVersion": "2020-08-12T20:40:16Z",
-              "lastDraftVersion": "2020-08-12T20:40:16Z",
-              "lifeCycleId": "Published",
-              "status": "Ready",
-              "createdByClientVersion": {
-                "major": 3,
-                "minor": 20074,
-                "build": 20,
-                "revision": 0,
-                "majorRevision": 0,
-                "minorRevision": 0
-              },
-              "minClientVersion": {
-                "major": 3,
-                "minor": 20074,
-                "build": 20,
-                "revision": 0,
-                "majorRevision": 0,
-                "minorRevision": 0
-              },
-              "owner": {
-                "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
-                "displayName": "Garry Trinder",
-                "email": "",
-                "type": "User",
-                "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
-                "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
-              },
-              "createdBy": {
-                "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
-                "displayName": "Garry Trinder",
-                "email": "",
-                "type": "User",
-                "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
-                "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
-              },
-              "lastModifiedBy": {
-                "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
-                "displayName": "Garry Trinder",
-                "email": "",
-                "type": "User",
-                "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
-                "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
-              },
-              "lastPublishedBy": {
-                "id": "a86f34fb-fc0b-476f-b2d3-84b2648cc87a",
-                "displayName": "Garry Trinder",
-                "email": "",
-                "type": "User",
-                "tenantId": "e8954f17-a373-4b61-b54d-45c038fe3188",
-                "userPrincipalName": "garry@trinder365dev.onmicrosoft.com"
-              },
-              "backgroundColor": "rgba(0, 176, 240, 1)",
-              "backgroundImageUri": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z1766ec3fd78941bea695c957e898a62a/logoSmallFile?sv=2018-03-28&sr=c&sig=sqK6%2FXY4cHidwE%2Brb3JoBV3bNToOaA6EM3%2FczbWMQDc%3D&se=2020-10-05T18%3A56%3A46Z&sp=rl",
-              "teamsColorIconUrl": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/teamsColorIcon.png?sv=2018-03-28&sr=c&sig=UYs6LV%2BGqPjfNczXP80lm%2BmG1ebFNcLCF0D8MIJ6Lt8%3D&se=2020-10-05T18%3A56%3A46Z&sp=rl",
-              "teamsOutlineIconUrl": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/teamsOutlineIcon.png?sv=2018-03-28&sr=c&sig=UYs6LV%2BGqPjfNczXP80lm%2BmG1ebFNcLCF0D8MIJ6Lt8%3D&se=2020-10-05T18%3A56%3A46Z&sp=rl",
-              "displayName": "Playwright",
-              "description": "",
-              "commitMessage": "",
-              "appUris": {
-                "documentUri": {
-                  "value": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z1766ec3fd78941bea695c957e898a62a/document.msapp?sv=2018-03-28&sr=c&sig=aToV3yl8gK0eiAPsh3DIxo3VC77OyLrZgYo2G%2BYXDgI%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
-                  "readonlyValue": "https://pafeblobprodln-secondary.blob.core.windows.net/20200812t000000z1766ec3fd78941bea695c957e898a62a/document.msapp?sv=2018-03-28&sr=c&sig=aToV3yl8gK0eiAPsh3DIxo3VC77OyLrZgYo2G%2BYXDgI%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl"
-                },
-                "imageUris": []
-              },
-              "createdTime": "2020-08-10T23:28:41.8191546Z",
-              "lastModifiedTime": "2020-08-12T20:40:20.3706202Z",
-              "lastPublishTime": "2020-08-12T20:40:20.3706202Z",
-              "sharedGroupsCount": 0,
-              "sharedUsersCount": 0,
-              "appOpenProtocolUri": "ms-apps:///providers/Microsoft.PowerApps/apps/f581c872-9852-4100-8e25-3d6891595204",
-              "appOpenUri": "https://apps.powerapps.com/play/f581c872-9852-4100-8e25-3d6891595204?tenantId=e8954f17-a373-4b61-b54d-45c038fe3188",
-              "connectionReferences": {
-                "dd1ebcc1-9930-4e87-a680-45fb1eaf94e6": {
-                  "id": "/providers/microsoft.powerapps/apis/shared_office365users",
-                  "displayName": "Office 365 Users",
-                  "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1381/1.0.1381.2096/office365users/icon.png",
-                  "dataSources": [
-                    "Office365Users"
-                  ],
-                  "dependencies": [],
-                  "dependents": [],
-                  "isOnPremiseConnection": false,
-                  "bypassConsent": false,
-                  "dataSets": {},
-                  "apiTier": "Standard",
-                  "isCustomApiConnection": false
-                }
-              },
-              "userAppMetadata": {
-                "favorite": "NotSpecified",
-                "lastOpenedTime": "2020-08-13T23:26:44.2982102Z",
-                "includeInAppsList": true
-              },
-              "isFeaturedApp": false,
+            "imageUris": []
+          },
+          "createdTime": "2020-08-10T23:28:41.8191546Z",
+          "lastModifiedTime": "2020-08-12T20:40:20.3706202Z",
+          "lastPublishTime": "2020-08-12T20:40:20.3706202Z",
+          "sharedGroupsCount": 0,
+          "sharedUsersCount": 0,
+          "appOpenProtocolUri": "ms-apps:///providers/Microsoft.PowerApps/apps/f581c872-9852-4100-8e25-3d6891595204",
+          "appOpenUri": "https://apps.powerapps.com/play/f581c872-9852-4100-8e25-3d6891595204?tenantId=e8954f17-a373-4b61-b54d-45c038fe3188",
+          "connectionReferences": {
+            "dd1ebcc1-9930-4e87-a680-45fb1eaf94e6": {
+              "id": "/providers/microsoft.powerapps/apis/shared_office365users",
+              "displayName": "Office 365 Users",
+              "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1381/1.0.1381.2096/office365users/icon.png",
+              "dataSources": [
+                "Office365Users"
+              ],
+              "dependencies": [],
+              "dependents": [],
+              "isOnPremiseConnection": false,
               "bypassConsent": false,
-              "isHeroApp": false,
-              "environment": {
-                "id": "/providers/Microsoft.PowerApps/environments/Default-e8954f17-a373-4b61-b54d-45c038fe3188",
-                "name": "Default-e8954f17-a373-4b61-b54d-45c038fe3188"
-              },
-              "appPackageDetails": {
-                "playerPackage": {
-                  "value": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/player.msappk?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
-                  "readonlyValue": "https://pafeblobprodln-secondary.blob.core.windows.net/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/player.msappk?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
-                  "sizeInBytes": 0
-                },
-                "webPackage": {
-                  "value": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/web/index.web.html?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
-                  "readonlyValue": "https://pafeblobprodln-secondary.blob.core.windows.net/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/web/index.web.html?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl"
-                },
-                "unauthenticatedWebPackage": {
-                  "value": "https://pafeblobprodln.blob.core.windows.net/alt20200810t000000zc57cd52652b24a1eb573f7b2a36a10a9/20200812T204028Z/index.web.html"
-                },
-                "documentServerVersion": {
-                  "major": 3,
-                  "minor": 20074,
-                  "build": 20,
-                  "revision": 0,
-                  "majorRevision": 0,
-                  "minorRevision": 0
-                },
-                "appPackageResourcesKind": "Split",
-                "packagePropertiesJson": "{\"cdnUrl\":\"https://content.powerapps.com/resource/app\",\"preLoadIdx\":\"https://content.powerapps.com/resource/app/4g3nunecadgk9/preloadindex.web.html\",\"id\":\"637328616254057865\",\"v\":2.1}"
-              },
-              "almMode": "Environment",
-              "performanceOptimizationEnabled": true,
-              "unauthenticatedWebPackageHint": "1eef5df9-6032-459c-9194-77d926b11f37",
-              "canConsumeAppPass": true,
-              "appPlanClassification": "Standard",
-              "usesPremiumApi": false,
-              "usesOnlyGrandfatheredPremiumApis": true,
-              "usesCustomApi": false,
-              "usesOnPremiseGateway": false
+              "dataSets": {},
+              "apiTier": "Standard",
+              "isCustomApiConnection": false
+            }
+          },
+          "userAppMetadata": {
+            "favorite": "NotSpecified",
+            "lastOpenedTime": "2020-08-13T23:26:44.2982102Z",
+            "includeInAppsList": true
+          },
+          "isFeaturedApp": false,
+          "bypassConsent": false,
+          "isHeroApp": false,
+          "environment": {
+            "id": "/providers/Microsoft.PowerApps/environments/Default-e8954f17-a373-4b61-b54d-45c038fe3188",
+            "name": "Default-e8954f17-a373-4b61-b54d-45c038fe3188"
+          },
+          "appPackageDetails": {
+            "playerPackage": {
+              "value": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/player.msappk?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
+              "readonlyValue": "https://pafeblobprodln-secondary.blob.core.windows.net/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/player.msappk?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
+              "sizeInBytes": 0
             },
-            "isAppComponentLibrary": false,
-            "appType": "ClassicCanvasApp",
-            "displayName": "Playwright",
-            "description": "",
-            "appVersion": "2020-08-12T20:40:16Z",
-            "owner": ""
-          }
-        ));
-        done();
+            "webPackage": {
+              "value": "https://pafeblobprodln.blob.core.windows.net:443/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/web/index.web.html?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl",
+              "readonlyValue": "https://pafeblobprodln-secondary.blob.core.windows.net/20200812t000000z4928635e44124aa5b50bfae36ed252b5/05358dc3-4770-4f73-a5ec-fe0a3e341454/web/index.web.html?sv=2018-03-28&sr=c&sig=UXTet030wmU8QR2TH8TWCrgm354F2LTjgIubPcfXGD4%3D&se=2020-08-28T08%3A00%3A00Z&sp=rl"
+            },
+            "unauthenticatedWebPackage": {
+              "value": "https://pafeblobprodln.blob.core.windows.net/alt20200810t000000zc57cd52652b24a1eb573f7b2a36a10a9/20200812T204028Z/index.web.html"
+            },
+            "documentServerVersion": {
+              "major": 3,
+              "minor": 20074,
+              "build": 20,
+              "revision": 0,
+              "majorRevision": 0,
+              "minorRevision": 0
+            },
+            "appPackageResourcesKind": "Split",
+            "packagePropertiesJson": "{\"cdnUrl\":\"https://content.powerapps.com/resource/app\",\"preLoadIdx\":\"https://content.powerapps.com/resource/app/4g3nunecadgk9/preloadindex.web.html\",\"id\":\"637328616254057865\",\"v\":2.1}"
+          },
+          "almMode": "Environment",
+          "performanceOptimizationEnabled": true,
+          "unauthenticatedWebPackageHint": "1eef5df9-6032-459c-9194-77d926b11f37",
+          "canConsumeAppPass": true,
+          "appPlanClassification": "Standard",
+          "usesPremiumApi": false,
+          "usesOnlyGrandfatheredPremiumApis": true,
+          "usesCustomApi": false,
+          "usesOnPremiseGateway": false
+        },
+        "isAppComponentLibrary": false,
+        "appType": "ClassicCanvasApp",
+        "displayName": "Playwright",
+        "description": "",
+        "appVersion": "2020-08-12T20:40:16Z",
+        "owner": ""
       }
-      catch (e) {
-        done(e);
-      }
-    });
+    ));
   });
 
-  it('correctly handles App not found using name', (done) => {
+  it('correctly handles App not found using name', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -1476,19 +1441,12 @@ describe(commands.APP_GET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, name: '1c6ee23a-a835-44bc-a4f5-462b658efc12' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Could not find App '1c6ee23a-a835-44bc-a4f5-462b658efc12'.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, name: '1c6ee23a-a835-44bc-a4f5-462b658efc12' } } as any),
+      new CommandError(`Could not find App '1c6ee23a-a835-44bc-a4f5-462b658efc12'.`));
   });
 
 
-  it('correctly handles App not found using displayName (debug)', (done) => {
+  it('correctly handles App not found using displayName (debug)', async () => {
     const apps = [
       {
         "name": "4d4bb961-eef9-4258-8516-aa8d64e6b477",
@@ -1964,18 +1922,11 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, displayName: 'NoAppFound' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(`No app found with displayName 'NoAppFound'`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, displayName: 'NoAppFound' } });
+    assert(loggerLogToStderrSpy.calledWith(`No app found with displayName 'NoAppFound'`));
   });
 
-  it('correctly handles no apps found using displayName (debug)', (done) => {
+  it('correctly handles no apps found using displayName (debug)', async () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === paAppListCommand) {
         return Promise.resolve({ "stdout": JSON.stringify([]) });
@@ -1983,18 +1934,11 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, displayName: 'Playwright' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(`No apps found`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, displayName: 'Playwright' } });
+    assert(loggerLogToStderrSpy.calledWith(`No apps found`));
   });
 
-  it('correctly handles API OData error', (done) => {
+  it('correctly handles API OData error', async () => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
@@ -2008,15 +1952,8 @@ describe(commands.APP_GET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d' } } as any),
+      new CommandError('An error has occurred'));
   });
 
   it('supports debug mode', () => {

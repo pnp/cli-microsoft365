@@ -19,9 +19,9 @@ describe(commands.TASK_REMOVE, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: true });
+      return { continue: true };
     });
     commandInfo = Cli.getCommandInfo(command);
   });
@@ -65,9 +65,9 @@ describe(commands.TASK_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('removes a To Do task by task id and task list name', (done) => {
+  it('removes a To Do task by task id and task list name', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/lists?$filter=displayName eq 'Tasks'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks'`) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('eded3a2a-8f01-40aa-998a-e4f02ec693ba')/todo/lists",
           "value": [
@@ -85,6 +85,7 @@ describe(commands.TASK_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
+
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/BBMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhBBB=/tasks/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=`) {
         return Promise.resolve();
@@ -93,24 +94,17 @@ describe(commands.TASK_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
         listName: "Tasks"
       }
-    }, () => {
-      try {
-        assert.strictEqual(log.length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(log.length, 0);
   });
 
-  it('removes a To Do task by task id and task list name when confirm option is passed', (done) => {
+  it('removes a To Do task by task id and task list name when confirm option is passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks'`) {
         return Promise.resolve({
@@ -138,25 +132,18 @@ describe(commands.TASK_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
         listName: "Tasks",
         confirm: true
       }
-    }, () => {
-      try {
-        assert.strictEqual(log.length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
+    assert.strictEqual(log.length, 0);
   });
 
-  it('removes a To Do task by task id and task list id', (done) => {
+  it('removes a To Do task by task id and task list id', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/BBMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhBBB=`) {
         return Promise.resolve({
@@ -180,24 +167,17 @@ describe(commands.TASK_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
         listId: "BBMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhBBB="
       }
-    } as any, () => {
-      try {
-        assert.strictEqual(log.length, 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    } as any);
+    assert.strictEqual(log.length, 0);
   });
 
-  it('handles error correctly', (done) => {
+  it('handles error correctly', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return Promise.resolve({
@@ -221,24 +201,14 @@ describe(commands.TASK_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, {
-      options: {
-        debug: false,
-        id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
-        listName: "FooList"
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The list FooList cannot be found')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: {
+      debug: false,
+      id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
+      listName: "FooList" } } as any), new CommandError('The list FooList cannot be found'));
+
   });
 
-  it('prompts before removing the To Do task when confirm option not passed', (done) => {
+  it('prompts before removing the To Do task when confirm option not passed', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks'`) {
         return Promise.resolve({
@@ -267,31 +237,24 @@ describe(commands.TASK_REMOVE, () => {
     });
 
     sinonUtil.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake(async (options) => {
       promptOptions = options;
-      cb({ continue: false });
+      return { continue: false };
     });
-    command.action(logger, {
+    await command.action(logger, {
       options: {
         debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=",
         listName: "Tasks"
       }
-    } as any, () => {
-      let promptIssued = false;
+    } as any);
+    let promptIssued = false;
 
-      if (promptOptions && promptOptions.type === 'confirm') {
-        promptIssued = true;
-      }
+    if (promptOptions && promptOptions.type === 'confirm') {
+      promptIssued = true;
+    }
 
-      try {
-        assert(promptIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    assert(promptIssued);
   });
 
   it('passes validation when all parameters are valid with listId', async () => {

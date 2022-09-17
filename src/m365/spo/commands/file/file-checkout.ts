@@ -79,7 +79,7 @@ class SpoFileCheckoutCommand extends SpoCommand {
     this.optionSets.push(['id', 'fileUrl']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     let requestUrl: string = '';
 
     if (args.options.id) {
@@ -98,9 +98,12 @@ class SpoFileCheckoutCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .post(requestOptions)
-      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      await request.post(requestOptions);
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 }
 

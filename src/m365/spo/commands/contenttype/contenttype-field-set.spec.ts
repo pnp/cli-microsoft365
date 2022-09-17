@@ -77,7 +77,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds a field reference to content type updating field schema', (done) => {
+  it('adds a field reference to content type updating field schema', async () => {
     let fieldLinksRequestNum: number = 0;
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
@@ -161,18 +161,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('adds a field reference to content type updating field schema (debug)', (done) => {
+  it('adds a field reference to content type updating field schema (debug)', async () => {
     let fieldLinksRequestNum: number = 0;
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
@@ -271,18 +264,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('adds a field reference to content type updating field schema from AllowDeletion=FALSE', (done) => {
+  it('adds a field reference to content type updating field schema from AllowDeletion=FALSE', async () => {
     let fieldLinksRequestNum: number = 0;
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
@@ -366,18 +352,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('adds a field reference to content type without updating field schema', (done) => {
+  it('adds a field reference to content type without updating field schema', async () => {
     let fieldLinksRequestNum: number = 0;
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
@@ -454,18 +433,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('adds a field reference to content type without updating field schema (debug)', (done) => {
+  it('adds a field reference to content type without updating field schema (debug)', async () => {
     let fieldLinksRequestNum: number = 0;
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
@@ -542,18 +514,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('handles error while updating field schema', (done) => {
+  it('handles error while updating field schema', async () => {
     let fieldLinksRequestNum: number = 0;
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
@@ -593,18 +558,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } } as any),
+      new CommandError('An error has occurred'));
   });
 
-  it('handles error while adding field reference', (done) => {
+  it('handles error while adding field reference', async () => {
     let fieldLinksRequestNum: number = 0;
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
@@ -668,18 +626,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } } as any),
+      new CommandError('An error has occurred'));
   });
 
-  it('updates existing field link', (done) => {
+  it('updates existing field link', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         return Promise.resolve({
@@ -722,18 +673,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('updates existing field link (debug)', (done) => {
+  it('updates existing field link (debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         return Promise.resolve({
@@ -776,18 +720,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('updates existing field link (hidden)', (done) => {
+  it('updates existing field link (hidden)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         return Promise.resolve({
@@ -830,18 +767,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'false', hidden: 'true' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'false', hidden: 'true' } }));
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('updates existing field link (required)', (done) => {
+  it('updates existing field link (required)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         return Promise.resolve({
@@ -884,18 +814,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'false' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'false' } }));
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('handles error while trying to retrieve field link', (done) => {
+  it('handles error while trying to retrieve field link', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         return Promise.resolve({
@@ -948,18 +871,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find field link for field 5ee2dd25-d941-455a-9bdb-7f2c54aed11b`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } } as any),
+      new CommandError(`Couldn't find field link for field 5ee2dd25-d941-455a-9bdb-7f2c54aed11b`));
   });
 
-  it('skips updating when existing field link is up-to-date (no values specified)', (done) => {
+  it('skips updating when existing field link is up-to-date (no values specified)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         return Promise.resolve({
@@ -974,18 +890,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' } }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' } });
+    assert(loggerLogSpy.notCalled);
   });
 
-  it('skips updating when existing field link is up-to-date (no values specified; debug)', (done) => {
+  it('skips updating when existing field link is up-to-date (no values specified; debug)', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         return Promise.resolve({
@@ -1000,18 +909,11 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' } });
+    assert(loggerLogToStderrSpy.called);
   });
 
-  it('handles error while updating the field link', (done) => {
+  it('handles error while updating the field link', async () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')/fieldlinks('5ee2dd25-d941-455a-9bdb-7f2c54aed11b')`) > -1) {
         return Promise.resolve({
@@ -1062,15 +964,8 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Unknown Error`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true' } } as any), 
+      new CommandError(`Unknown Error`));
   });
 
   it('supports debug mode', () => {
@@ -1141,7 +1036,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
     });
   });
 
-  it('handles error while retrieving request digest', (done) => {
+  it('handles error while retrieving request digest', async () => {
     sinonUtil.restore(spo.getRequestDigest);
     sinon.stub(spo, 'getRequestDigest').callsFake(() => Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } }));
     let fieldLinksRequestNum: number = 0;
@@ -1173,14 +1068,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+    await assert.rejects(command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } } as any), 
+      new CommandError('An error has occurred'));
   });
 });

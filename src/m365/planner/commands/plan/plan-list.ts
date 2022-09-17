@@ -74,21 +74,22 @@ class PlannerPlanListCommand extends GraphCommand {
     return ['id', 'title', 'createdDateTime', 'owner'];
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> {
     if (accessToken.isAppOnlyAccessToken(auth.service.accessTokens[this.resource].accessToken)) {
-      this.handleError('This command does not support application permissions.', logger, cb);
+      this.handleError('This command does not support application permissions.');
       return;
     }
 
-    this
-      .getGroupId(args)
-      .then((groupId: string) => planner.getPlansByGroupId(groupId))
-      .then((res): void => {
-        if (res && res.length > 0) {
-          logger.log(res);
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    try {
+      const groupId = await this.getGroupId(args);
+      const result = await planner.getPlansByGroupId(groupId);
+      if (result && result.length > 0) {
+        logger.log(result);
+      }
+    }
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getGroupId(args: CommandArgs): Promise<string> {

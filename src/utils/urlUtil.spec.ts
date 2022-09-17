@@ -471,4 +471,9 @@ describe('urlUtil/urlUtil', () => {
     const actual = urlUtil.getAbsoluteUrl('https://contoso.sharepoint.com/sites/team1/', '/sites/team1/Shared Documents/MyFolder');
     assert.strictEqual(actual, 'https://contoso.sharepoint.com/sites/team1/Shared Documents/MyFolder');
   });
+
+  it('combines URL successfully ending on a slash', () => {
+    const actual = urlUtil.urlCombine('https://contoso.sharepoint.com/sites/team1/', '/sites/team1/Shared Documents/MyFolder');
+    assert.strictEqual(actual, 'https://contoso.sharepoint.com/sites/team1/sites/team1/Shared Documents/MyFolder');
+  });
 });

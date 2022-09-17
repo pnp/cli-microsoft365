@@ -55,24 +55,23 @@ class BookingBusinessGetCommand extends GraphCommand {
   	this.optionSets.push(['id', 'name']);
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {    
-    this
-      .getBusinessId(args.options)
-      .then(businessId => {
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/solutions/bookingBusinesses/${encodeURIComponent(businessId)}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          responseType: 'json'
-        }; 
-    
-        return request.get<BookingBusiness>(requestOptions);
-      })
-      .then(business => {
-        logger.log(business);
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  public async commandAction(logger: Logger, args: CommandArgs): Promise<void> { 
+    try {
+      const businessId = await this.getBusinessId(args.options);
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/solutions/bookingBusinesses/${encodeURIComponent(businessId)}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      }; 
+  
+      const business = await request.get<BookingBusiness>(requestOptions);
+      logger.log(business);
+    } 
+    catch (err: any) {
+      this.handleRejectedODataJsonPromise(err);
+    }
   }
 
   private getBusinessId(options: Options): Promise<string> {
